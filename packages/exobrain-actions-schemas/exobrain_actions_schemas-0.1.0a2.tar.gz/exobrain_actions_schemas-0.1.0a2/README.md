@@ -1,0 +1,110 @@
+# exobrain-actions-schemas
+
+[![CI](https://github.com/laurent-laporte-pro/exobrain-actions-schemas/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/laurent-laporte-pro/exobrain-actions-schemas/actions/workflows/ci.yml)
+[![License: Private](https://img.shields.io/badge/license-private-red)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/release/python-3120/)
+
+Pydantic models for Exobrain Actions management.
+
+This package provides Pydantic models for managing Exobrain Actions schemas.
+It is designed to be used as a dependency in REST API clients, web services
+built with FastAPI or Flask, or any other Python application that requires
+strict data validation and serialization for Exobrain Actions management.
+
+Key features:
+
+- Typed data models for Exobrain Actions
+- Support for modern Pydantic (>=2.11.7, <3)
+- Can be integrated into server or client-side projects
+
+## Development workflow
+
+### Prerequisites
+
+Before starting development, make sure you have the following tools installed:
+
+- **[Hatch](https://hatch.pypa.io/)**: a modern Python project, environment, and packaging manager.
+
+- **[uv](https://github.com/astral-sh/uv)**: a fast Python package installer and resolver.
+
+### Project Structure
+
+- **Code:** Place your models in `exobrain/actions/schemas/`.
+- **Tests:** Add your tests in `tests/`.
+
+### Development Commands
+
+All tasks (testing, linting, type checking, packaging, etc.) are managed via **hatch** environments and scripts:
+
+#### 1. Installing Dependencies
+
+Install all dependencies (including development tools):
+
+```shell
+hatch env create
+```
+
+#### 2. Running Tests
+
+Launch all tests using `pytest`:
+
+```shell
+hatch test
+```
+
+#### 3. Linting and Formatting
+
+Format your code:
+
+```shell
+hatch fmt -f
+```
+
+Check code style:
+
+```shell
+hatch fmt
+```
+
+#### 4. Type Checking
+
+Run type checks with `mypy`:
+
+```shell
+hatch run types:check
+```
+
+#### 5. Coverage
+
+Check test coverage with:
+
+```shell
+hatch test --cover
+```
+
+#### 6. Building the Package
+
+Build the package for distribution:
+
+```shell
+hatch build
+```
+
+#### 7. Releasing
+
+The release process uses **uv** and Github Actions.
+
+- For pre-release on TestPyPI: push a tag with `rc` or `beta` in the version (`0.1rc1`, `0.2b1` etc.).
+- For release: push a tag type `v0.1` (main release) on `main` branch.
+- Configure secrets for PyPI tokens in repository settings (`PYPI_TOKEN`, `TEST_PYPI_TOKEN`).
+
+### Continuous Integration
+
+All pushes and pull requests on `main` or `development` branches trigger the Continuous Integration pipeline  
+(see `.github/workflows/` directory for details).
+
+---
+
+## License
+
+This project is private and confidential.
