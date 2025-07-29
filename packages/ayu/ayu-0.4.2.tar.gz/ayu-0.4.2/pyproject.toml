@@ -1,0 +1,70 @@
+[project]
+name = "ayu"
+version = "0.4.2"
+description = "An interactive TUI for pytest"
+readme = "README.md"
+authors = [
+    { name = "Zaloog", email = "gramslars@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "pytest>=8.3.5",
+    "textual[syntax]<=4.0.0",
+    "textual-slidecontainer>=0.2.5",
+    "websockets>=15.0.1",
+    "click>=8.1.8",
+    "textual-tags>=0.1.0",
+    "requests-cache>=1.2.1",
+    "watchfiles>=1.0.5",
+]
+
+keywords = ["python", "textual", "tui", "pytest"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+Repository = "https://github.com/Zaloog/ayu"
+Changelog = "https://github.com/Zaloog/ayu/blob/main/CHANGELOG.md"
+
+[project.entry-points.pytest11]
+ayu = "ayu.plugin"
+
+[project.scripts]
+ayu = "ayu.__main__:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+    "pytest-asyncio>=0.26.0",
+    "pytest-cov>=6.1.1",
+    "pytest-xdist>=3.6.1",
+    "textual-dev>=1.7.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = ["custom", "custom_two", "custom1"]
+asyncio_default_fixture_loop_scope = "function"
+addopts =[
+"--cov", "src/ayu",
+"--cov-report", "term-missing",
+# "--color=yes",
+"--ignore=tests/test_cases",
+"--verbose",
+"-n", "auto", "--dist=worksteal"
+]
+testpaths = ["tests"]
