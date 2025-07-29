@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>lmfit</class>
+ <widget class="QWidget" name="lmfit">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>656</width>
+    <height>180</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="layout">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>LM-Fit</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <property name="leftMargin">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
+      <item>
+       <layout class="QGridLayout" name="layout_2">
+        <item row="2" column="1">
+         <widget class="QComboBox" name="method_combobox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <item>
+           <property name="text">
+            <string>Levenberg-Marquardt (leastsq)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Matrix Inversion (matrix_inversion)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Least-Square (least_squares)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Differential Evolution (differential_evolution)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Brute Force (brute)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Basinhopping (basinhopping)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Adaptive Memory Programming for Global Optimization (ampgo)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Nelder-Method (nelder)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>L-BFGS-B (lbfgsb)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Powell (powell)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Conjugate-Gradient (cg)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Cobyla (cobyla)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>BFGS (bfgs)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Truncated Newton (tnc)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dual Annealing optimization (dual_annealing)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QComboBox" name="slice_combobox">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <item>
+             <property name="text">
+              <string>Only this Slice</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>All Slices Individually</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>All Slices Combined</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Some Slices</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="from_slice_spinbox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="frame">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="keyboardTracking">
+             <bool>false</bool>
+            </property>
+            <property name="prefix">
+             <string>From: </string>
+            </property>
+            <property name="maximum">
+             <number>1000000</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="to_slice_spinbox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="keyboardTracking">
+             <bool>false</bool>
+            </property>
+            <property name="prefix">
+             <string>To: </string>
+            </property>
+            <property name="maximum">
+             <number>10000000</number>
+            </property>
+            <property name="value">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="background_label">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Background Eq.:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="region_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Fit Region:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="fit_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Fit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="background_combobox">
+          <property name="maximumSize">
+           <size>
+            <width>450</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Enter an equation for a region-dependency you want to
+impose onto the background. Press return key to accept.
+
+The equation entered will be parsed with eval() and can
+contain any number of variables as well as all numpy,
+math or builtin methods. Prefix the first with 'np.' and
+the second with 'math.'.
+
+The variables will be added to be tree and can be subject
+to fitting like any other variable. You can use lower and
+upper case letters, underscores and numbers (can't start
+with numbers).
+
+Example: 2D Gaussian Curve centered at (x_m, y_m) and
+with a standard deviation of (std_x, std_y):
+
+a*np.exp(-((x+x_m)**2/(2*std_x**2)+(y-y_m)**2)/(2*std_y**2))+c
+ </string>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <property name="currentText">
+           <string>Enter background equation here...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="region_comboBox">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <item>
+           <property name="text">
+            <string>Entire kMap</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Only ROI</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Only Annulus</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Except ROI</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Except Annulus</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="method_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Method:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
