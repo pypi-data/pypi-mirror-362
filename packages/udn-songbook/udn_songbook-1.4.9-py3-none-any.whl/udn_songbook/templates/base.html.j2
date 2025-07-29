@@ -1,0 +1,38 @@
+{% block doctype %}
+{# vim: set ts=2 sts=2 sw=2 et ci ft=jinja: #}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% endblock %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  {% block head %}
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <!-- {{ songbook.stylesheet|default('none') }} -->
+  <link rel="stylesheet" type="text/css" href="{{ css_path | default('../css') }}/{{ book_css }}.css" />
+  <link rel="stylesheet" type="text/css" href="{{ css_path | default('../css') }}/{{ song.filename.with_suffix('.css').name }}"/>
+  {% block localstyles %}
+  <style type="text/css">
+  .chord { display:{%- if chords %} inline; {% else %} none; {% endif %}}
+  .capo { display:{%- if capo %} inline;{% else %} none;{% endif %}}
+  .notes { display:{% if notes %} inline;{% else %} none;{% endif %}}
+  .chords, .overflow { display:{% if diagrams %} flex;{% else %} none;{% endif %}}
+  .singer { display:{%if singer_notes%} inline;{% else %}none;{% endif %}}
+  {% if song.meta.font_size %}
+  .content { font-size: {{ song.meta.font_size }}; }
+  {% endif %}
+  </style>
+  {% endblock %}
+  {% block js %}{% endblock %}
+  <title>{% block title %}{{ songbook.title|default('Songbook') }}{% endblock %}</title>
+  {% endblock %}
+</head>
+  <div class="branding">{% block branding %}{% endblock %}</div>
+  <div class="header">{% block songheader %}{% endblock %}</div>
+  <div class="content">{% block content %}{% endblock %}</div>
+  {% if diagrams %}
+    {% if song.chords|length  > 10 %}
+  <div class="overflow">{% block overflow %}{% endblock %}</div>
+    {% endif %}
+  <div class="chords">{% block chords %}{% endblock %}</div>
+  {% endif %}
+  <div class="footer">{% block footer %}{% endblock %}</div>
+</html>
