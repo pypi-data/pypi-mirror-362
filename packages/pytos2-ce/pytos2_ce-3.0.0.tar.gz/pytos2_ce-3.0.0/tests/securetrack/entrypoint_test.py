@@ -1,0 +1,2 @@
+class TestEntrypoint:
+    pass

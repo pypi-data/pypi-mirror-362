@@ -1,0 +1,61 @@
+image: python:3.11
+
+stages:
+- linters
+- unittest
+- build
+- publish
+
+black:
+  stage: linters
+  before_script:
+  - pip install black
+  script:
+  - black --check .
+  except:
+  - tags
+
+ruff:
+  stage: linters
+  before_script:
+  - pip install ruff
+  script:
+  - ruff check .
+  except:
+  - tags
+
+unittest:
+  before_script:
+  - pip install tox 
+  stage: unittest
+  script: tox run-parallel
+  except:
+  - tags
+
+build:
+  stage: build
+  before_script:
+  - pip install build
+  script: 
+  - python3 -m build
+  artifacts: 
+    paths:
+    - dist/*.whl
+  only:
+  - tags
+  - master
+
+publish_to_lab:
+  before_script:
+  - pip install twine
+  stage: publish
+  script:
+  - twine upload dist/* --skip-existing
+  environment:
+    name: lab
+    url: $LAB_PYPI
+  dependencies:
+  - build
+  only:
+  - tags
+  - master

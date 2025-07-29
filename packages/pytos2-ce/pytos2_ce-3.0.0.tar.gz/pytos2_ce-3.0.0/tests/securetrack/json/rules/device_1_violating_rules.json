@@ -1,0 +1,1115 @@
+{
+  "security_policy_device_violations": {
+    "device_name": "RTR1",
+    "severity": "LOW",
+    "violating_rules_count": 4,
+    "violating_rules": {
+      "violating_rule": [
+        {
+          "rule": {
+            "@xsi.type": "securityRuleDTO",
+            "id": "787",
+            "cp_uid": "",
+            "uid": "{673c325d-594c-4d37-bc96-16d83b5ddc6a}",
+            "order": 14,
+            "binding": [
+              {
+                "acl": {
+                  "name": "outside",
+                  "global": false,
+                  "interfaces": [
+                    {
+                      "id": 77,
+                      "uid": "{59fb2024-ac02-4cab-bfda-8a03db075fa4}",
+                      "direction": "OUTSIDE",
+                      "device_id": 1,
+                      "acl_name": "outside",
+                      "global": false,
+                      "implicit": false,
+                      "interface_ips": {
+                        "interface_ip": [
+                          {
+                            "ip": "10.1.1.2",
+                            "netmask": "255.255.255.252"
+                          }
+                        ]
+                      },
+                      "name": "GigabitEthernet2"
+                    },
+                    {
+                      "id": 79,
+                      "uid": "{77d811fd-1ca7-4606-8cff-4b566afe5882}",
+                      "direction": "OUTSIDE",
+                      "device_id": 1,
+                      "acl_name": "outside",
+                      "global": false,
+                      "implicit": false,
+                      "interface_ips": {
+                        "interface_ip": [
+                          {
+                            "ip": "10.2.2.1",
+                            "netmask": "255.255.255.0"
+                          }
+                        ]
+                      },
+                      "name": "GigabitEthernet3"
+                    }
+                  ],
+                  "ipv6_only": false
+                },
+                "rule_count": 10,
+                "security_rule_count": 10,
+                "default": false,
+                "uid": "outside_@_1"
+              }
+            ],
+            "name": "",
+            "action": "Accept",
+            "implicit": false,
+            "disabled": false,
+            "external": false,
+            "global_location": "MIDDLE",
+            "acceleration_breaker": false,
+            "authentication_rule": false,
+            "rule_number": 30,
+            "track": {
+              "level": "LOG"
+            },
+            "option": [],
+            "src_networks_negated": false,
+            "dest_networks_negated": false,
+            "src_services_negated": false,
+            "dest_services_negated": false,
+            "src_network": [
+              {
+                "id": "10960",
+                "uid": "{a21134d5-2194-4da5-ba3b-61939a617843}",
+                "display_name": "NetworkGroup_4",
+                "name": "group_NetworkGroup_4"
+              }
+            ],
+            "dst_network": [
+              {
+                "id": "10946",
+                "uid": "{bbb9e48a-5ab6-43f1-981a-7728332279b0}",
+                "display_name": "172.16.90.6",
+                "name": "172.16.90.6-255.255.255.255"
+              }
+            ],
+            "src_service": [],
+            "dst_service": [
+              {
+                "id": "2935550",
+                "uid": "{a7fc42a7-574d-4c1e-8db9-99ae9ec9d21b}",
+                "display_name": "ServiceGroup_4",
+                "name": "group_ServiceGroup_4"
+              }
+            ],
+            "application": [],
+            "time": [],
+            "vpn": [],
+            "install": [],
+            "users": [],
+            "user_access": [],
+            "url_category": [],
+            "criteria": [],
+            "members": [],
+            "textual_rep": "ip access-list extended outside\n permit object-group ServiceGroup_4 object-group NetworkGroup_4 host 172.16.90.6 log",
+            "src_zone": [],
+            "dst_zone": [],
+            "is_sdwan": false,
+            "type": "rule",
+            "additional_parameter": []
+          },
+          "violations": {
+            "violation": [
+              {
+                "severity": "LOW",
+                "sources_in_zone": {
+                  "zone_name": "p_RnD",
+                  "networks": {
+                    "network": [
+                      {
+                        "path": [
+                          "192.168.1.252"
+                        ]
+                      },
+                      {
+                        "path": [
+                          "192.168.1.251"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "destinations_in_zone": {
+                  "zone_name": "Virtual_DC-02",
+                  "networks": {
+                    "network": [
+                      {
+                        "path": [
+                          "172.16.90.6"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "violating_services": {
+                  "negated": false,
+                  "violating_service": [
+                    {
+                      "path": [
+                        "902"
+                      ]
+                    }
+                  ]
+                },
+                "rule_properties_violations": {
+                  "rule_property_violation": [
+                    {
+                      "type": "HAS_COMMENT",
+                      "description": "No comment"
+                    }
+                  ]
+                },
+                "flow_source_violations": {
+                  "negated": false,
+                  "violating_object": []
+                },
+                "flow_destination_violations": {
+                  "negated": false,
+                  "violating_object": []
+                },
+                "security_requirement": {
+                  "type": "SECURITY_POLICY",
+                  "policy_control_name": "Corporate Matrix ",
+                  "access_type": "ALLOW_ONLY",
+                  "allowed_services": {
+                    "is_any": false,
+                    "exclude_any": false,
+                    "negate": false,
+                    "service_items": {
+                      "service_item": [
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "https"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "ssh"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 3306"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "udp 53"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 67-68"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 389"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 445"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "SMTPS"
+                        }
+                      ]
+                    }
+                  },
+                  "from_zone": "p_RnD",
+                  "to_zone": "Virtual_DC-02",
+                  "rule_properties": {
+                    "rule_property": [
+                      {
+                        "type": "IS_LOGGED",
+                        "description": "Rules must be logged"
+                      },
+                      {
+                        "type": "HAS_COMMENT",
+                        "description": "Rules must have comment"
+                      },
+                      {
+                        "type": "LAST_HIT_WITHIN",
+                        "payload": "30",
+                        "description": "Rules must have hit within last 30 days"
+                      },
+                      {
+                        "type": "SOURCE_MAX_IP",
+                        "payload": "3",
+                        "description": "Source must contain less than 3 IP addresses"
+                      },
+                      {
+                        "type": "DESTINATION_MAX_IP",
+                        "payload": "3",
+                        "description": "Destination must contain less than 3 IP addresses"
+                      },
+                      {
+                        "type": "SERVICE_MAX_SERVICES",
+                        "payload": "10",
+                        "description": "Service must contain less than 10 services"
+                      },
+                      {
+                        "type": "EXPLICIT_SOURCE",
+                        "description": "Rules must have explicit source (not ANY)"
+                      },
+                      {
+                        "type": "EXPLICIT_DESTINATION",
+                        "description": "Rules must have explicit destination (not ANY)"
+                      },
+                      {
+                        "type": "EXPLICIT_SERVICE",
+                        "description": "Rules must have explicit service (not ANY)"
+                      }
+                    ]
+                  },
+                  "flow": {
+                    "type": "HOST_TO_HOST",
+                    "description": "Rules must have only single hosts in both source and destination fields"
+                  }
+                },
+                "creation_date": "28/04/2021 08:13"
+              }
+            ]
+          }
+        },
+        {
+          "rule": {
+            "@xsi.type": "securityRuleDTO",
+            "id": "778",
+            "cp_uid": "",
+            "uid": "{2079f927-3135-432e-b502-74d894e560c7}",
+            "order": 4,
+            "binding": [
+              {
+                "acl": {
+                  "name": "inside",
+                  "global": false,
+                  "interfaces": [
+                    {
+                      "id": 78,
+                      "uid": "{77d811fd-1ca7-4606-8cff-4b566afe5882}",
+                      "direction": "INSIDE",
+                      "device_id": 1,
+                      "acl_name": "inside",
+                      "global": false,
+                      "implicit": false,
+                      "interface_ips": {
+                        "interface_ip": [
+                          {
+                            "ip": "10.2.2.1",
+                            "netmask": "255.255.255.0"
+                          }
+                        ]
+                      },
+                      "name": "GigabitEthernet3"
+                    },
+                    {
+                      "id": 76,
+                      "uid": "{59fb2024-ac02-4cab-bfda-8a03db075fa4}",
+                      "direction": "INSIDE",
+                      "device_id": 1,
+                      "acl_name": "inside",
+                      "global": false,
+                      "implicit": false,
+                      "interface_ips": {
+                        "interface_ip": [
+                          {
+                            "ip": "10.1.1.2",
+                            "netmask": "255.255.255.252"
+                          }
+                        ]
+                      },
+                      "name": "GigabitEthernet2"
+                    }
+                  ],
+                  "ipv6_only": false
+                },
+                "rule_count": 10,
+                "security_rule_count": 10,
+                "default": false,
+                "uid": "inside_@_1"
+              }
+            ],
+            "name": "",
+            "action": "Accept",
+            "implicit": false,
+            "disabled": false,
+            "external": false,
+            "global_location": "MIDDLE",
+            "acceleration_breaker": false,
+            "authentication_rule": false,
+            "rule_number": 40,
+            "track": {
+              "level": "LOG"
+            },
+            "option": [],
+            "src_networks_negated": false,
+            "dest_networks_negated": false,
+            "src_services_negated": false,
+            "dest_services_negated": false,
+            "src_network": [
+              {
+                "id": "10960",
+                "uid": "{a21134d5-2194-4da5-ba3b-61939a617843}",
+                "display_name": "NetworkGroup_4",
+                "name": "group_NetworkGroup_4"
+              }
+            ],
+            "dst_network": [
+              {
+                "id": "10945",
+                "uid": "{0f0cee7a-c7a8-40b9-811a-ee6b5d47c894}",
+                "display_name": "172.16.90.5",
+                "name": "172.16.90.5-255.255.255.255"
+              }
+            ],
+            "src_service": [],
+            "dst_service": [
+              {
+                "id": "2935553",
+                "uid": "{8acd676b-f2ff-41d2-9ae0-08080abb675a}",
+                "display_name": "ServiceGroup_2",
+                "name": "group_ServiceGroup_2"
+              }
+            ],
+            "application": [],
+            "time": [],
+            "vpn": [],
+            "install": [],
+            "users": [],
+            "user_access": [],
+            "url_category": [],
+            "criteria": [],
+            "members": [],
+            "textual_rep": "ip access-list extended inside\n permit object-group ServiceGroup_2 object-group NetworkGroup_4 host 172.16.90.5 log",
+            "src_zone": [],
+            "dst_zone": [],
+            "is_sdwan": false,
+            "type": "rule",
+            "additional_parameter": []
+          },
+          "violations": {
+            "violation": [
+              {
+                "severity": "LOW",
+                "sources_in_zone": {
+                  "zone_name": "p_RnD",
+                  "networks": {
+                    "network": [
+                      {
+                        "path": [
+                          "192.168.1.251"
+                        ]
+                      },
+                      {
+                        "path": [
+                          "192.168.1.252"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "destinations_in_zone": {
+                  "zone_name": "Virtual_DC-02",
+                  "networks": {
+                    "network": [
+                      {
+                        "path": [
+                          "172.16.90.5"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "violating_services": {
+                  "negated": false,
+                  "violating_service": [
+                    {
+                      "path": [
+                        "902"
+                      ]
+                    }
+                  ]
+                },
+                "rule_properties_violations": {
+                  "rule_property_violation": [
+                    {
+                      "type": "HAS_COMMENT",
+                      "description": "No comment"
+                    }
+                  ]
+                },
+                "flow_source_violations": {
+                  "negated": false,
+                  "violating_object": []
+                },
+                "flow_destination_violations": {
+                  "negated": false,
+                  "violating_object": []
+                },
+                "security_requirement": {
+                  "type": "SECURITY_POLICY",
+                  "policy_control_name": "Corporate Matrix ",
+                  "access_type": "ALLOW_ONLY",
+                  "allowed_services": {
+                    "is_any": false,
+                    "exclude_any": false,
+                    "negate": false,
+                    "service_items": {
+                      "service_item": [
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "https"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "ssh"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 3306"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "udp 53"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 67-68"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 389"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 445"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "SMTPS"
+                        }
+                      ]
+                    }
+                  },
+                  "from_zone": "p_RnD",
+                  "to_zone": "Virtual_DC-02",
+                  "rule_properties": {
+                    "rule_property": [
+                      {
+                        "type": "IS_LOGGED",
+                        "description": "Rules must be logged"
+                      },
+                      {
+                        "type": "HAS_COMMENT",
+                        "description": "Rules must have comment"
+                      },
+                      {
+                        "type": "LAST_HIT_WITHIN",
+                        "payload": "30",
+                        "description": "Rules must have hit within last 30 days"
+                      },
+                      {
+                        "type": "SOURCE_MAX_IP",
+                        "payload": "3",
+                        "description": "Source must contain less than 3 IP addresses"
+                      },
+                      {
+                        "type": "DESTINATION_MAX_IP",
+                        "payload": "3",
+                        "description": "Destination must contain less than 3 IP addresses"
+                      },
+                      {
+                        "type": "SERVICE_MAX_SERVICES",
+                        "payload": "10",
+                        "description": "Service must contain less than 10 services"
+                      },
+                      {
+                        "type": "EXPLICIT_SOURCE",
+                        "description": "Rules must have explicit source (not ANY)"
+                      },
+                      {
+                        "type": "EXPLICIT_DESTINATION",
+                        "description": "Rules must have explicit destination (not ANY)"
+                      },
+                      {
+                        "type": "EXPLICIT_SERVICE",
+                        "description": "Rules must have explicit service (not ANY)"
+                      }
+                    ]
+                  },
+                  "flow": {
+                    "type": "HOST_TO_HOST",
+                    "description": "Rules must have only single hosts in both source and destination fields"
+                  }
+                },
+                "creation_date": "28/04/2021 08:13"
+              }
+            ]
+          }
+        },
+        {
+          "rule": {
+            "@xsi.type": "securityRuleDTO",
+            "id": "788",
+            "cp_uid": "",
+            "uid": "{2d7052a0-cc2c-4c9b-a3ad-fdc8ff69155b}",
+            "order": 15,
+            "binding": [
+              {
+                "acl": {
+                  "name": "outside",
+                  "global": false,
+                  "interfaces": [
+                    {
+                      "id": 77,
+                      "uid": "{59fb2024-ac02-4cab-bfda-8a03db075fa4}",
+                      "direction": "OUTSIDE",
+                      "device_id": 1,
+                      "acl_name": "outside",
+                      "global": false,
+                      "implicit": false,
+                      "interface_ips": {
+                        "interface_ip": [
+                          {
+                            "ip": "10.1.1.2",
+                            "netmask": "255.255.255.252"
+                          }
+                        ]
+                      },
+                      "name": "GigabitEthernet2"
+                    },
+                    {
+                      "id": 79,
+                      "uid": "{77d811fd-1ca7-4606-8cff-4b566afe5882}",
+                      "direction": "OUTSIDE",
+                      "device_id": 1,
+                      "acl_name": "outside",
+                      "global": false,
+                      "implicit": false,
+                      "interface_ips": {
+                        "interface_ip": [
+                          {
+                            "ip": "10.2.2.1",
+                            "netmask": "255.255.255.0"
+                          }
+                        ]
+                      },
+                      "name": "GigabitEthernet3"
+                    }
+                  ],
+                  "ipv6_only": false
+                },
+                "rule_count": 10,
+                "security_rule_count": 10,
+                "default": false,
+                "uid": "outside_@_1"
+              }
+            ],
+            "name": "",
+            "action": "Accept",
+            "implicit": false,
+            "disabled": false,
+            "external": false,
+            "global_location": "MIDDLE",
+            "acceleration_breaker": false,
+            "authentication_rule": false,
+            "rule_number": 40,
+            "track": {
+              "level": "LOG"
+            },
+            "option": [],
+            "src_networks_negated": false,
+            "dest_networks_negated": false,
+            "src_services_negated": false,
+            "dest_services_negated": false,
+            "src_network": [
+              {
+                "id": "10959",
+                "uid": "{175166f2-3002-4254-81e3-ec3b8f57919c}",
+                "display_name": "NetworkGroup_3",
+                "name": "group_NetworkGroup_3"
+              }
+            ],
+            "dst_network": [
+              {
+                "id": "10945",
+                "uid": "{0f0cee7a-c7a8-40b9-811a-ee6b5d47c894}",
+                "display_name": "172.16.90.5",
+                "name": "172.16.90.5-255.255.255.255"
+              }
+            ],
+            "src_service": [],
+            "dst_service": [
+              {
+                "id": "2935559",
+                "uid": "{d199bdbd-2309-4f8e-9695-4cfc8aeec90c}",
+                "display_name": "ServiceGroup_1",
+                "name": "group_ServiceGroup_1"
+              }
+            ],
+            "application": [],
+            "time": [],
+            "vpn": [],
+            "install": [],
+            "users": [],
+            "user_access": [],
+            "url_category": [],
+            "criteria": [],
+            "members": [],
+            "textual_rep": "ip access-list extended outside\n permit object-group ServiceGroup_1 object-group NetworkGroup_3 host 172.16.90.5 log",
+            "src_zone": [],
+            "dst_zone": [],
+            "is_sdwan": false,
+            "type": "rule",
+            "additional_parameter": []
+          },
+          "violations": {
+            "violation": [
+              {
+                "severity": "LOW",
+                "sources_in_zone": {
+                  "zone_name": "p_RnD",
+                  "networks": {
+                    "network": [
+                      {
+                        "path": [
+                          "192.168.1.252"
+                        ]
+                      },
+                      {
+                        "path": [
+                          "192.168.1.251"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "destinations_in_zone": {
+                  "zone_name": "Virtual_DC-02",
+                  "networks": {
+                    "network": [
+                      {
+                        "path": [
+                          "172.16.90.5"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "violating_services": {
+                  "negated": false,
+                  "violating_service": [
+                    {
+                      "path": [
+                        "902"
+                      ]
+                    }
+                  ]
+                },
+                "rule_properties_violations": {
+                  "rule_property_violation": [
+                    {
+                      "type": "HAS_COMMENT",
+                      "description": "No comment"
+                    }
+                  ]
+                },
+                "flow_source_violations": {
+                  "negated": false,
+                  "violating_object": []
+                },
+                "flow_destination_violations": {
+                  "negated": false,
+                  "violating_object": []
+                },
+                "security_requirement": {
+                  "type": "SECURITY_POLICY",
+                  "policy_control_name": "Corporate Matrix ",
+                  "access_type": "ALLOW_ONLY",
+                  "allowed_services": {
+                    "is_any": false,
+                    "exclude_any": false,
+                    "negate": false,
+                    "service_items": {
+                      "service_item": [
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "https"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "ssh"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 3306"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "udp 53"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 67-68"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 389"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 445"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "SMTPS"
+                        }
+                      ]
+                    }
+                  },
+                  "from_zone": "p_RnD",
+                  "to_zone": "Virtual_DC-02",
+                  "rule_properties": {
+                    "rule_property": [
+                      {
+                        "type": "IS_LOGGED",
+                        "description": "Rules must be logged"
+                      },
+                      {
+                        "type": "HAS_COMMENT",
+                        "description": "Rules must have comment"
+                      },
+                      {
+                        "type": "LAST_HIT_WITHIN",
+                        "payload": "30",
+                        "description": "Rules must have hit within last 30 days"
+                      },
+                      {
+                        "type": "SOURCE_MAX_IP",
+                        "payload": "3",
+                        "description": "Source must contain less than 3 IP addresses"
+                      },
+                      {
+                        "type": "DESTINATION_MAX_IP",
+                        "payload": "3",
+                        "description": "Destination must contain less than 3 IP addresses"
+                      },
+                      {
+                        "type": "SERVICE_MAX_SERVICES",
+                        "payload": "10",
+                        "description": "Service must contain less than 10 services"
+                      },
+                      {
+                        "type": "EXPLICIT_SOURCE",
+                        "description": "Rules must have explicit source (not ANY)"
+                      },
+                      {
+                        "type": "EXPLICIT_DESTINATION",
+                        "description": "Rules must have explicit destination (not ANY)"
+                      },
+                      {
+                        "type": "EXPLICIT_SERVICE",
+                        "description": "Rules must have explicit service (not ANY)"
+                      }
+                    ]
+                  },
+                  "flow": {
+                    "type": "HOST_TO_HOST",
+                    "description": "Rules must have only single hosts in both source and destination fields"
+                  }
+                },
+                "creation_date": "28/04/2021 08:13"
+              }
+            ]
+          }
+        },
+        {
+          "rule": {
+            "@xsi.type": "securityRuleDTO",
+            "id": "777",
+            "cp_uid": "",
+            "uid": "{5f3f6b84-343f-48f9-89dc-10f744b06917}",
+            "order": 3,
+            "binding": [
+              {
+                "acl": {
+                  "name": "inside",
+                  "global": false,
+                  "interfaces": [
+                    {
+                      "id": 78,
+                      "uid": "{77d811fd-1ca7-4606-8cff-4b566afe5882}",
+                      "direction": "INSIDE",
+                      "device_id": 1,
+                      "acl_name": "inside",
+                      "global": false,
+                      "implicit": false,
+                      "interface_ips": {
+                        "interface_ip": [
+                          {
+                            "ip": "10.2.2.1",
+                            "netmask": "255.255.255.0"
+                          }
+                        ]
+                      },
+                      "name": "GigabitEthernet3"
+                    },
+                    {
+                      "id": 76,
+                      "uid": "{59fb2024-ac02-4cab-bfda-8a03db075fa4}",
+                      "direction": "INSIDE",
+                      "device_id": 1,
+                      "acl_name": "inside",
+                      "global": false,
+                      "implicit": false,
+                      "interface_ips": {
+                        "interface_ip": [
+                          {
+                            "ip": "10.1.1.2",
+                            "netmask": "255.255.255.252"
+                          }
+                        ]
+                      },
+                      "name": "GigabitEthernet2"
+                    }
+                  ],
+                  "ipv6_only": false
+                },
+                "rule_count": 10,
+                "security_rule_count": 10,
+                "default": false,
+                "uid": "inside_@_1"
+              }
+            ],
+            "name": "",
+            "action": "Accept",
+            "implicit": false,
+            "disabled": false,
+            "external": false,
+            "global_location": "MIDDLE",
+            "acceleration_breaker": false,
+            "authentication_rule": false,
+            "rule_number": 30,
+            "track": {
+              "level": "LOG"
+            },
+            "option": [],
+            "src_networks_negated": false,
+            "dest_networks_negated": false,
+            "src_services_negated": false,
+            "dest_services_negated": false,
+            "src_network": [
+              {
+                "id": "10960",
+                "uid": "{a21134d5-2194-4da5-ba3b-61939a617843}",
+                "display_name": "NetworkGroup_4",
+                "name": "group_NetworkGroup_4"
+              }
+            ],
+            "dst_network": [
+              {
+                "id": "10946",
+                "uid": "{bbb9e48a-5ab6-43f1-981a-7728332279b0}",
+                "display_name": "172.16.90.6",
+                "name": "172.16.90.6-255.255.255.255"
+              }
+            ],
+            "src_service": [],
+            "dst_service": [
+              {
+                "id": "2935550",
+                "uid": "{a7fc42a7-574d-4c1e-8db9-99ae9ec9d21b}",
+                "display_name": "ServiceGroup_4",
+                "name": "group_ServiceGroup_4"
+              }
+            ],
+            "application": [],
+            "time": [],
+            "vpn": [],
+            "install": [],
+            "users": [],
+            "user_access": [],
+            "url_category": [],
+            "criteria": [],
+            "members": [],
+            "textual_rep": "ip access-list extended inside\n permit object-group ServiceGroup_4 object-group NetworkGroup_4 host 172.16.90.6 log",
+            "src_zone": [],
+            "dst_zone": [],
+            "is_sdwan": false,
+            "type": "rule",
+            "additional_parameter": []
+          },
+          "violations": {
+            "violation": [
+              {
+                "severity": "LOW",
+                "sources_in_zone": {
+                  "zone_name": "p_RnD",
+                  "networks": {
+                    "network": [
+                      {
+                        "path": [
+                          "192.168.1.251"
+                        ]
+                      },
+                      {
+                        "path": [
+                          "192.168.1.252"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "destinations_in_zone": {
+                  "zone_name": "Virtual_DC-02",
+                  "networks": {
+                    "network": [
+                      {
+                        "path": [
+                          "172.16.90.6"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "violating_services": {
+                  "negated": false,
+                  "violating_service": [
+                    {
+                      "path": [
+                        "902"
+                      ]
+                    }
+                  ]
+                },
+                "rule_properties_violations": {
+                  "rule_property_violation": [
+                    {
+                      "type": "HAS_COMMENT",
+                      "description": "No comment"
+                    }
+                  ]
+                },
+                "flow_source_violations": {
+                  "negated": false,
+                  "violating_object": []
+                },
+                "flow_destination_violations": {
+                  "negated": false,
+                  "violating_object": []
+                },
+                "security_requirement": {
+                  "type": "SECURITY_POLICY",
+                  "policy_control_name": "Corporate Matrix ",
+                  "access_type": "ALLOW_ONLY",
+                  "allowed_services": {
+                    "is_any": false,
+                    "exclude_any": false,
+                    "negate": false,
+                    "service_items": {
+                      "service_item": [
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "https"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "ssh"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 3306"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "udp 53"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 67-68"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 389"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "tcp 445"
+                        },
+                        {
+                          "@xsi.type": "predefined",
+                          "predefined_service_name": "SMTPS"
+                        }
+                      ]
+                    }
+                  },
+                  "from_zone": "p_RnD",
+                  "to_zone": "Virtual_DC-02",
+                  "rule_properties": {
+                    "rule_property": [
+                      {
+                        "type": "IS_LOGGED",
+                        "description": "Rules must be logged"
+                      },
+                      {
+                        "type": "HAS_COMMENT",
+                        "description": "Rules must have comment"
+                      },
+                      {
+                        "type": "LAST_HIT_WITHIN",
+                        "payload": "30",
+                        "description": "Rules must have hit within last 30 days"
+                      },
+                      {
+                        "type": "SOURCE_MAX_IP",
+                        "payload": "3",
+                        "description": "Source must contain less than 3 IP addresses"
+                      },
+                      {
+                        "type": "DESTINATION_MAX_IP",
+                        "payload": "3",
+                        "description": "Destination must contain less than 3 IP addresses"
+                      },
+                      {
+                        "type": "SERVICE_MAX_SERVICES",
+                        "payload": "10",
+                        "description": "Service must contain less than 10 services"
+                      },
+                      {
+                        "type": "EXPLICIT_SOURCE",
+                        "description": "Rules must have explicit source (not ANY)"
+                      },
+                      {
+                        "type": "EXPLICIT_DESTINATION",
+                        "description": "Rules must have explicit destination (not ANY)"
+                      },
+                      {
+                        "type": "EXPLICIT_SERVICE",
+                        "description": "Rules must have explicit service (not ANY)"
+                      }
+                    ]
+                  },
+                  "flow": {
+                    "type": "HOST_TO_HOST",
+                    "description": "Rules must have only single hosts in both source and destination fields"
+                  }
+                },
+                "creation_date": "28/04/2021 08:13"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

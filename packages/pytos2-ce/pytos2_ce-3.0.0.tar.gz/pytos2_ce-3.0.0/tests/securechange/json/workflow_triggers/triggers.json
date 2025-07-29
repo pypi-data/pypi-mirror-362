@@ -1,0 +1,50 @@
+{
+    "workflow_triggers": {
+        "workflow_trigger": [
+            {
+                "id": 4,
+                "name": "Test Integration",
+                "executer": {
+                    "@xsi.type": "ScriptDTO",
+                    "path": "",
+                    "arguments": "/opt/tufin/securitysuite/ps/bin/attach_test_report_to_ticket.py"
+                },
+                "triggers": [
+                    {
+                        "name": "New trigger group",
+                        "workflow": {
+                            "parent_workflow_id": 426,
+                            "name": "AR_MG",
+                            "deleted": true
+                        },
+                        "events": [
+                            "CREATE",
+                            "ADVANCE"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 14,
+                "name": "Test One",
+                "executer": {
+                    "@xsi.type": "ScriptDTO",
+                    "path": "test-one-solutions/populate-access-request",
+                    "arguments": ""
+                },
+                "triggers": [
+                    {
+                        "name": "Test One",
+                        "workflow": {
+                            "parent_workflow_id": 595,
+                            "name": "Test One"
+                        },
+                        "events": [
+                            "REOPEN"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

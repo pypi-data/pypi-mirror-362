@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytos2-ce"
+description="Pytos2 for tos1 tos2 and beyond"
+requires-python = ">=3.10"
+readme = "README.md"
+
+dependencies = [
+  "requests<3",
+  "traversify",
+  "attrs>=24,<25",
+  "python-json-logger>=3,<4",
+  "netaddr>=1.0.0,<2",
+  "typing_extensions",
+  "python-dateutil>=2.8,<3",
+  "requests-oauthlib",
+  "xmltodict",
+]
+
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "pytest-logger",
+  "responses",
+  "black",
+  "tox",
+  "ruff",
+]
+
+dev-jupyter = [
+  "black[jupyter]",
+  "pre-commit",
+  "nb-clean",
+]
+
+[tool.setuptools.packages.find]
+include = ["pytos2"]
+
+[tool.setuptools_scm]
+
+[tool.pyright]
+
+ignore = ["tests/**/*.py"]
+
+reportAny = false
+reportUnusedCallResult = false
+reportUnknownMemberType = false
+reportUnusedImport = false
+reportUnknownVaribaleType = false
+

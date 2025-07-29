@@ -1,0 +1,613 @@
+{
+   "access_request_workflow" : {
+      "allow_requester_confirmation" : false,
+      "calendar" : {
+         "name" : "None"
+      },
+      "close_implemented" : false,
+      "description" : "Fully automated change request",
+      "designer_verifier_advanced_option" : "NONE",
+      "disable_rule_suggestion" : false,
+      "global_fields" : {
+         "global_field" : {
+            "field_value" : {
+               "@xsi.type" : "multi_access_request",
+               "access_request" : {
+                  "action" : "Accept",
+                  "destinations" : {
+                     "destination" : [
+                        {
+                           "@type" : "ANY",
+                           "id" : 57942
+                        }
+                     ]
+                  },
+                  "id" : 57940,
+                  "labels" : "",
+                  "order" : "AR1",
+                  "services" : {
+                     "service" : [
+                        {
+                           "@type" : "ANY",
+                           "id" : 57944
+                        }
+                     ]
+                  },
+                  "sources" : {
+                     "source" : [
+                        {
+                           "@type" : "ANY",
+                           "id" : 57946
+                        }
+                     ]
+                  },
+                  "targets" : {
+                     "target" : {
+                        "@type" : "ANY",
+                        "id" : 57948
+                     }
+                  },
+                  "use_topology" : true,
+                  "users" : {
+                     "user" : [
+                        "Any"
+                     ]
+                  }
+               },
+               "designer_verifier_advanced_option" : "NONE",
+               "id" : 57939,
+               "name" : "Required Access"
+            },
+            "id" : 57939,
+            "mandatory" : false,
+            "multiple" : true,
+            "name" : "Required Access",
+            "tooltip" : "Enter requested access.",
+            "type" : "access_request"
+         }
+      },
+      "id" : 586,
+      "is_active" : true,
+      "is_valid" : true,
+      "name" : "Fully automated Firewall change request",
+      "reference_ticket_enabled" : false,
+      "reopen_step_name" : "Suggest Target",
+      "risk_analysis" : {
+         "external_risk_analysis" : {
+            "custom_title" : {
+               "status" : "DISABLED"
+            },
+            "status" : "DISABLED"
+         },
+         "unified_security_policy" : {
+            "status" : "ENABLED"
+         }
+      },
+      "steps" : {
+         "step" : [
+            {
+               "assignment" : {
+                  "@xsi.type" : "self_assign"
+               },
+               "default_task" : {
+                  "is_default" : true,
+                  "name" : "Default",
+                  "participants" : "",
+                  "uid" : "5c7f96e6-4620-448a-b556-05541993b9db"
+               },
+               "description" : "Submit a new access request",
+               "fields" : {
+                  "field" : {
+                     "configuration" : {
+                        "@xsi.type" : "access_request_configuration",
+                        "allow_access_request_import" : true,
+                        "allow_objects" : true,
+                        "designer" : {
+                           "designer_commit" : false,
+                           "designer_design" : false,
+                           "designer_implement" : false
+                        },
+                        "notify_risk_disregard" : false,
+                        "read_only" : false,
+                        "risk_analysis" : false,
+                        "security_zones" : false,
+                        "show_users_palo_alto" : false,
+                        "source_destination_and_service_values" : "ANY_ALLOWED",
+                        "type" : "access_request",
+                        "view_targets" : false
+                     },
+                     "id" : 57939,
+                     "mandatory" : false,
+                     "multiple" : true,
+                     "name" : "Required Access",
+                     "tooltip" : "Enter requested access.",
+                     "type" : "access_request"
+                  }
+               },
+               "is_active" : true,
+               "is_auto" : false,
+               "is_dynamic" : false,
+               "is_request_attachment_enabled" : false,
+               "is_request_group_notification_enabled" : false,
+               "is_request_priority_enabled" : false,
+               "is_skip" : false,
+               "is_step_by_script" : false,
+               "name" : "Submit Access Request",
+               "order" : 0,
+               "uid" : "55ec4374-57ba-43ea-9bdd-8db6e23f31b8"
+            },
+            {
+               "assignment" : {
+                  "@xsi.type" : "dynamic_assignment",
+                  "tasks" : {
+                     "task" : [
+                        {
+                           "assignment" : {
+                              "@xsi.type" : "self_assign"
+                           },
+                           "condition_connector" : "and",
+                           "conditions" : {
+                              "condition" : [
+                                 {
+                                    "@xsi.type" : "workflowTaskApplicationConditionDTO",
+                                    "operator" : "CONTAINS",
+                                    "type" : "application_name",
+                                    "value" : "mobile"
+                                 },
+                                 {
+                                    "@xsi.type" : "workflowTaskApplicationConditionDTO",
+                                    "operator" : "CONTAINS",
+                                    "type" : "application_name",
+                                    "value" : "fraud"
+                                 }
+                              ]
+                           },
+                           "is_default" : false,
+                           "name" : 1,
+                           "participants" : "",
+                           "uid" : "d0a0da3b-93b4-4734-b38c-f8f8397a54fb"
+                        },
+                        {
+                           "assignment" : {
+                              "@xsi.type" : "self_assign"
+                           },
+                           "condition_connector" : "and",
+                           "conditions" : {
+                              "condition" : [
+                                 {
+                                    "@xsi.type" : "workflowTaskApplicationConditionDTO",
+                                    "operator" : "CONTAINS",
+                                    "type" : "application_name",
+                                    "value" : "tos"
+                                 },
+                                 {
+                                    "@xsi.type" : "workflowTaskApplicationConditionDTO",
+                                    "operator" : "CONTAINS",
+                                    "type" : "application_name",
+                                    "value" : "mail"
+                                 }
+                              ]
+                           },
+                           "is_default" : false,
+                           "name" : 2,
+                           "participants" : "",
+                           "uid" : "54d014ee-04c6-4b38-834a-16cbcf05fb0a"
+                        },
+                        {
+                           "assignment" : {
+                              "@xsi.type" : "self_assign"
+                           },
+                           "is_default" : true,
+                           "name" : "Default",
+                           "participants" : "",
+                           "uid" : "82c7fb8f-ef19-4b3b-be0d-d5ffe55a7b94"
+                        }
+                     ]
+                  }
+               },
+               "configurations" : {
+                  "configuration" : {
+                     "@xsi.type" : "workflowSkipStepConfigurationDTO",
+                     "condition_connector" : "and",
+                     "conditions" : {
+                        "condition" : {
+                           "@xsi.type" : "workflowTaskApplicationConditionDTO",
+                           "operator" : "IS",
+                           "type" : "application_name",
+                           "value" : "DNS server"
+                        }
+                     }
+                  }
+               },
+               "description" : "Approve business requirement",
+               "fields" : {
+                  "field" : [
+                     {
+                        "configuration" : {
+                           "@xsi.type" : "access_request_configuration",
+                           "allow_access_request_import" : true,
+                           "allow_objects" : true,
+                           "designer" : {
+                              "designer_commit" : false,
+                              "designer_design" : false,
+                              "designer_implement" : false
+                           },
+                           "notify_risk_disregard" : false,
+                           "read_only" : false,
+                           "risk_analysis" : true,
+                           "security_zones" : false,
+                           "show_users_palo_alto" : false,
+                           "source_destination_and_service_values" : "ANY_ALLOWED",
+                           "type" : "access_request",
+                           "view_targets" : false
+                        },
+                        "id" : 57939,
+                        "mandatory" : false,
+                        "multiple" : true,
+                        "name" : "Required Access",
+                        "tooltip" : "Enter requested access.",
+                        "type" : "access_request"
+                     },
+                     {
+                        "field_value" : {
+                           "@xsi.type" : "approve_reject",
+                           "approved" : true,
+                           "id" : 57949,
+                           "name" : "Approve Access Request",
+                           "reason" : "Approved"
+                        },
+                        "id" : 57949,
+                        "mandatory" : true,
+                        "multiple" : false,
+                        "name" : "Approve Access Request",
+                        "tooltip" : "",
+                        "type" : "approve_reject"
+                     }
+                  ]
+               },
+               "is_active" : true,
+               "is_auto" : false,
+               "is_dynamic" : true,
+               "is_skip" : true,
+               "is_step_by_script" : false,
+               "name" : "Business Approval",
+               "order" : 1,
+               "uid" : "cf0d1464-0887-48b8-a8e8-a71f37322e89"
+            },
+            {
+               "assignment" : {
+                  "@xsi.type" : "auto_assignment",
+                  "prefer_previous_handler" : false
+               },
+               "configurations" : {
+                  "configuration" : {
+                     "@xsi.type" : "auto_step",
+                     "assign_handler" : false,
+                     "commit_policy_changes" : false,
+                     "field_type" : "access_request",
+                     "run_designer" : false,
+                     "run_risk_analysis" : false,
+                     "run_suggest_target" : true,
+                     "run_verifier" : false,
+                     "update_policy" : false
+                  }
+               },
+               "default_task" : {
+                  "is_default" : true,
+                  "name" : "Default",
+                  "participants" : "",
+                  "uid" : "20aebfaf-5d25-46c8-9735-376b0f6b34ed"
+               },
+               "description" : "Suggest Target",
+               "fields" : {
+                  "field" : {
+                     "configuration" : {
+                        "@xsi.type" : "access_request_configuration",
+                        "allow_access_request_import" : true,
+                        "allow_objects" : true,
+                        "designer" : {
+                           "designer_commit" : false,
+                           "designer_design" : false,
+                           "designer_implement" : false
+                        },
+                        "notify_risk_disregard" : false,
+                        "read_only" : false,
+                        "risk_analysis" : false,
+                        "security_zones" : false,
+                        "show_users_palo_alto" : false,
+                        "source_destination_and_service_values" : "ANY_ALLOWED",
+                        "type" : "access_request",
+                        "view_targets" : true
+                     },
+                     "id" : 57939,
+                     "mandatory" : false,
+                     "multiple" : true,
+                     "name" : "Required Access",
+                     "tooltip" : "Enter requested access.",
+                     "type" : "access_request"
+                  }
+               },
+               "is_active" : true,
+               "is_auto" : true,
+               "is_dynamic" : false,
+               "is_skip" : false,
+               "is_step_by_script" : false,
+               "name" : "Suggest Target",
+               "order" : 2,
+               "uid" : "ca7ea5da-c34e-4bd4-b13b-4f0ed3909984"
+            },
+            {
+               "assignment" : {
+                  "@xsi.type" : "auto_assignment",
+                  "prefer_previous_handler" : false
+               },
+               "configurations" : {
+                  "configuration" : {
+                     "@xsi.type" : "auto_step",
+                     "assign_handler" : false,
+                     "commit_policy_changes" : false,
+                     "field_type" : "access_request",
+                     "run_designer" : false,
+                     "run_risk_analysis" : true,
+                     "run_suggest_target" : false,
+                     "run_verifier" : false,
+                     "update_policy" : false
+                  }
+               },
+               "default_task" : {
+                  "is_default" : true,
+                  "name" : "Default",
+                  "participants" : "",
+                  "uid" : "02f17e7d-7e04-4a4a-82f1-bfe6fbc8c49b"
+               },
+               "description" : "Run Risk Analysis",
+               "fields" : {
+                  "field" : {
+                     "configuration" : {
+                        "@xsi.type" : "access_request_configuration",
+                        "allow_access_request_import" : true,
+                        "allow_objects" : true,
+                        "designer" : {
+                           "designer_commit" : false,
+                           "designer_design" : false,
+                           "designer_implement" : false
+                        },
+                        "notify_risk_disregard" : false,
+                        "read_only" : false,
+                        "risk_analysis" : true,
+                        "security_zones" : false,
+                        "show_users_palo_alto" : false,
+                        "source_destination_and_service_values" : "ANY_ALLOWED",
+                        "type" : "access_request",
+                        "view_targets" : true
+                     },
+                     "id" : 57939,
+                     "mandatory" : false,
+                     "multiple" : true,
+                     "name" : "Required Access",
+                     "tooltip" : "Enter requested access.",
+                     "type" : "access_request"
+                  }
+               },
+               "is_active" : true,
+               "is_auto" : true,
+               "is_dynamic" : false,
+               "is_skip" : false,
+               "is_step_by_script" : false,
+               "name" : "Run Risk Analysis",
+               "order" : 3,
+               "uid" : "2a4ce9f3-f8a1-4d1a-9fae-9aa5a51fdea7"
+            },
+            {
+               "assignment" : {
+                  "@xsi.type" : "self_assign"
+               },
+               "configurations" : {
+                  "configuration" : {
+                     "@xsi.type" : "workflowSkipStepConfigurationDTO",
+                     "condition_connector" : "and",
+                     "conditions" : {
+                        "condition" : {
+                           "@xsi.type" : "workflowTaskRiskConditionDTO",
+                           "operator" : "IS_ALL",
+                           "risk_status" : "NO_RISK",
+                           "type" : "risk_status"
+                        }
+                     }
+                  }
+               },
+               "default_task" : {
+                  "is_default" : true,
+                  "name" : "Default",
+                  "participants" : "",
+                  "uid" : "dd9f865c-59b2-48d8-88fa-01c41e215abd"
+               },
+               "description" : "Approval is required when there's a risk",
+               "fields" : {
+                  "field" : [
+                     {
+                        "configuration" : {
+                           "@xsi.type" : "access_request_configuration",
+                           "allow_access_request_import" : true,
+                           "allow_objects" : true,
+                           "designer" : {
+                              "designer_commit" : false,
+                              "designer_design" : false,
+                              "designer_implement" : false
+                           },
+                           "notify_risk_disregard" : false,
+                           "read_only" : true,
+                           "risk_analysis" : true,
+                           "security_zones" : false,
+                           "show_users_palo_alto" : false,
+                           "source_destination_and_service_values" : "ANY_ALLOWED",
+                           "type" : "access_request",
+                           "view_targets" : true
+                        },
+                        "id" : 57939,
+                        "mandatory" : false,
+                        "multiple" : true,
+                        "name" : "Required Access",
+                        "tooltip" : "Enter requested access.",
+                        "type" : "access_request"
+                     },
+                     {
+                        "field_value" : {
+                           "@xsi.type" : "approve_reject",
+                           "approved" : true,
+                           "id" : 57952,
+                           "name" : "Risk Approval",
+                           "reason" : "Only requests with no risks will be approved"
+                        },
+                        "id" : 57952,
+                        "mandatory" : true,
+                        "multiple" : false,
+                        "name" : "Risk Approval",
+                        "tooltip" : "Based on the Risk Analysis Results",
+                        "type" : "approve_reject"
+                     }
+                  ]
+               },
+               "is_active" : true,
+               "is_auto" : false,
+               "is_dynamic" : false,
+               "is_skip" : true,
+               "is_step_by_script" : false,
+               "name" : "Security Review and approval (escalation)",
+               "order" : 4,
+               "uid" : "4dc5c9f7-3767-4293-9a1f-1aca2975beb1"
+            },
+            {
+               "assignment" : {
+                  "@xsi.type" : "auto_assignment",
+                  "prefer_previous_handler" : false
+               },
+               "configurations" : {
+                  "configuration" : {
+                     "@xsi.type" : "auto_step",
+                     "assign_handler" : false,
+                     "commit_policy_changes" : false,
+                     "field_type" : "access_request",
+                     "run_designer" : true,
+                     "run_risk_analysis" : false,
+                     "run_suggest_target" : false,
+                     "run_verifier" : false,
+                     "update_policy" : true
+                  }
+               },
+               "default_task" : {
+                  "is_default" : true,
+                  "name" : "Default",
+                  "participants" : "",
+                  "uid" : "535f04e5-ef55-4c99-b75f-1f43c63fe0d4"
+               },
+               "description" : "Technical Design & Implementation",
+               "fields" : {
+                  "field" : {
+                     "configuration" : {
+                        "@xsi.type" : "access_request_configuration",
+                        "allow_access_request_import" : true,
+                        "allow_objects" : true,
+                        "designer" : {
+                           "designer_commit" : false,
+                           "designer_design" : true,
+                           "designer_implement" : true
+                        },
+                        "notify_risk_disregard" : false,
+                        "read_only" : false,
+                        "risk_analysis" : false,
+                        "security_zones" : false,
+                        "show_users_palo_alto" : false,
+                        "source_destination_and_service_values" : "ANY_ALLOWED",
+                        "type" : "access_request",
+                        "view_targets" : true
+                     },
+                     "id" : 57939,
+                     "mandatory" : false,
+                     "multiple" : true,
+                     "name" : "Required Access",
+                     "tooltip" : "Enter requested access.",
+                     "type" : "access_request"
+                  }
+               },
+               "is_active" : true,
+               "is_auto" : true,
+               "is_dynamic" : false,
+               "is_skip" : false,
+               "is_step_by_script" : false,
+               "name" : "Technical Design & Implementation",
+               "order" : 5,
+               "uid" : "b0be0d23-2ad1-4ef3-a9d2-426977cc1ecc"
+            },
+            {
+               "assignment" : {
+                  "@xsi.type" : "self_assign"
+               },
+               "configurations" : {
+                  "configuration" : {
+                     "@xsi.type" : "auto_step",
+                     "assign_handler" : false,
+                     "commit_policy_changes" : false,
+                     "field_type" : "access_request",
+                     "run_designer" : false,
+                     "run_risk_analysis" : false,
+                     "run_suggest_target" : false,
+                     "run_verifier" : true,
+                     "update_policy" : false
+                  }
+               },
+               "default_task" : {
+                  "is_default" : true,
+                  "name" : "Default",
+                  "participants" : "",
+                  "uid" : "d6a10dfe-cafd-4130-b5b5-500b3489201f"
+               },
+               "description" : "New step description",
+               "fields" : {
+                  "field" : {
+                     "configuration" : {
+                        "@xsi.type" : "access_request_configuration",
+                        "allow_access_request_import" : true,
+                        "allow_objects" : true,
+                        "auto_verifier" : false,
+                        "block_if_not_verified" : false,
+                        "designer" : {
+                           "designer_commit" : false,
+                           "designer_design" : false,
+                           "designer_implement" : false
+                        },
+                        "notify_risk_disregard" : false,
+                        "read_only" : false,
+                        "risk_analysis" : false,
+                        "security_zones" : false,
+                        "show_users_palo_alto" : false,
+                        "source_destination_and_service_values" : "ANY_ALLOWED",
+                        "tools_threshold" : 100,
+                        "type" : "access_request",
+                        "verifier" : true,
+                        "verify_against" : "SAVED",
+                        "view_targets" : true
+                     },
+                     "id" : 57939,
+                     "mandatory" : false,
+                     "multiple" : true,
+                     "name" : "Required Access",
+                     "tooltip" : "Enter requested access.",
+                     "type" : "access_request"
+                  }
+               },
+               "is_active" : true,
+               "is_auto" : true,
+               "is_dynamic" : false,
+               "is_skip" : false,
+               "is_step_by_script" : false,
+               "name" : "Auto Verification",
+               "order" : 6,
+               "uid" : "30b53ef3-cacb-495f-9ac7-512f62570fe0"
+            }
+         ]
+      },
+      "type" : "ACCESS_REQUEST",
+      "use_topology" : true
+   }
+}
