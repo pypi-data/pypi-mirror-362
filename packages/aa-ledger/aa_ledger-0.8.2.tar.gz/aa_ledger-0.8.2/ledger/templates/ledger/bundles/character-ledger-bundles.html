@@ -1,0 +1,27 @@
+{% load sri %}
+{% load i18n %}
+
+<script type="application/javascript">
+    // Extract the 'main' parameter from the current URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const mainParam = urlParams.get('single');
+
+    let singleViewParam = false;
+    if (mainParam) {
+        singleViewParam = true;
+    }
+
+    let ledgersettings = {
+		csrfToken: '{% csrf_token %}',
+        entity_pk: {{ entity_pk }},
+        entity_type: "{{ entity_type }}",
+        altShow: singleViewParam,
+        overviewText: '{% translate "Overview" %}',
+        planetaryText: '{% translate "Show Planetary Interaction" %}',
+        planetaryUrl: "{% url 'ledger:planetary_ledger' character_id=1337 %}",
+        characterUrl: "{% url 'ledger:character_ledger' character_id=1337 %}",
+    };
+</script>
+
+<!-- Ledger Resources -->
+{% sri_static 'ledger/js/character.js' %}
