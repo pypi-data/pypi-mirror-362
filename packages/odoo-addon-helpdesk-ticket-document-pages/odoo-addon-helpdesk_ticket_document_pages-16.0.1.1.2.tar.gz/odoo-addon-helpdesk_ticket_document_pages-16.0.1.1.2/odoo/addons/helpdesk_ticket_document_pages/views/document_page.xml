@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="document_page_ticket_tag_form_view" model="ir.ui.view">
+      <field name="name">Document page with ticket tag form view</field>
+      <field name="model">document.page</field>
+      <field name="inherit_id" ref="document_page.view_wiki_form"/>
+      <field name="arch" type="xml">
+        <field name="tag_ids" position="after">
+          <field name="ticket_tag_ids" widget="many2many_tags"
+                options="{'color_field': 'color'}"/>
+        </field>
+      </field>
+  </record>
+  <record id="document_page_tree_new_target" model="ir.ui.view">
+      <field name="name">Document page tree view new target</field>
+      <field name="model">document.page</field>
+      <field name="arch" type="xml">
+        <tree string="Categories" create="0">
+          <button name="look_up_view" string="Open" type="object" icon="fa-search"
+                  context="{'document_page_ids': context.get('document_page_ids')}"/>
+          <field name="name"/>
+          <field name="parent_id"/>
+          <field name="write_uid"/>
+          <field name="write_date"/>
+        </tree>
+      </field>
+  </record>
+  <record id="document_page_look_up_form_view" model="ir.ui.view">
+      <field name="name">Document page look up form view</field>
+      <field name="model">document.page</field>
+      <field name="arch" type="xml">
+        <form string="Document Page" create="false">
+            <h3>
+              <field name="name"/>
+            </h3>
+            <field name="content" widget="html"/>
+            <footer>
+              <button name="open_tree_view_target_new" string="Back" type="object" class="btn-default"
+                      context="{'document_page_ids': context.get('document_page_ids')}"/>
+              <button string="Close" type="object" class="btn-default" special="cancel"/>
+            </footer>
+        </form>
+      </field>
+  </record>
+</odoo>
