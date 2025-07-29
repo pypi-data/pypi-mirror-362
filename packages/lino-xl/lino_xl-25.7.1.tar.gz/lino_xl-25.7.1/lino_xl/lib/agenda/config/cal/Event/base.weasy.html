@@ -1,0 +1,78 @@
+{# copied from storage/DeliveryNote/ #}
+{% set show_site_op_in_footer = False %}
+{% set show_printed_time = False %}
+{%- block bottomleft %}{%- endblock %}
+{%- block bottomright %}{%- endblock %}
+
+{%- extends "weasyprint/base.weasy.html" -%}
+{%- block pagesize %}portrait{%- endblock %}
+
+{%- block footer %}
+{% set site_op = settings.SITE.site_config.site_company %}
+{% if site_op  %}
+<div class="footer_div">
+<table class="footer">
+<tr>
+<td>
+{{site_op.get_address(", ")}}
+{#{site_op.get_address_html(sep=', ')}#}
+{{tostring(site_op.contact_details)}}
+</td><td style="text-align:right">
+{{obj}}
+<br/>
+<span class="page_num_of"></span>
+{%- if show_printed_time -%}
+<br/>
+<span class="printed_time"></span>
+{%- endif %}
+</td></tr></table>
+</div>
+{%- endif %}
+{%- endblock footer %}
+
+{%- block main %}
+
+<h1>{{obj}}</h1>
+
+<table class="preamble">
+<tr>
+<td>
+  {{obj.user}}
+</td>
+<td>
+{{_("Date")}}: {{fdl(obj.start_date)}}
+</td></tr></table>
+
+{% if obj.intro %}
+<div style="height:2mm;"></div>
+{% if obj.description.startswith("<") %}
+{{obj.description}}
+{% else %}
+{{restify(obj.description)}}
+{% endif %}
+<div style="height:2mm;"></div>
+{% else %}
+<div style="height:10mm;"></div>
+{% endif %}
+
+
+<div>
+{% block body %}
+{%- for item in obj.items_by_meeting.order_by('seqno') -%}
+  <p>
+  {%- if item.description -%}
+    <b>{{item.title}}</b></p><p>
+    {% if item.description.startswith("<") %}
+      {{item.description}}
+    {% else %}
+      {{restify(item.description)}}
+    {% endif %}
+  {% else %}
+    {{item.title}}
+  {% endif %}
+  </p>
+{%- endfor -%}
+</table>
+
+{%- endblock body %}
+{%- endblock main %}
