@@ -1,0 +1,172 @@
+# WESkit Client
+
+The WESkit client is a command-line tool for interacting with a WESkit instance.
+It provides a simple interface for managing workflows, executing runs, and monitoring their status.
+
+## Installation
+
+* WESkit client can be installed via pip:
+
+* Verify installation:
+
+```bash
+weskit-client --help
+```
+
+* The client requires setting the environment variable **WESKIT_API_URL**, the base URL of the WESkit instance (e.g. `https://localhost`):
+
+```bash
+export WESKIT_API_URL=URLTOWESKITINSTANCE
+```
+
+## Commands Reference
+
+### service-info
+
+Display information about the WESkit service.
+
+```bash
+weskit-client service-info
+```
+
+**Purpose**: Check service availability and get basic service information.
+
+### workflows
+
+List all available workflows on the WESkit instance.
+
+```bash
+weskit-client workflows
+```
+
+**Output**: Table showing workflow names, types, versions, and other metadata.
+
+### init
+
+Initialize a workflow for execution by creating necessary local files.
+
+```bash
+weskit-client init --name <workflow-name>
+```
+
+**Parameters**:
+
+* `--name`: Name of the workflow to initialize (required)
+
+**Purpose**: Prepares a workflow for execution and creates default configuration files.
+
+### exec
+
+Execute a workflow with specified configuration.
+
+```bash
+weskit-client exec --name <workflow-name> --config <config-file>
+```
+
+**Parameters**:
+
+* `--name`: Name of the workflow to execute (required)
+* `--config`: Path to YAML configuration file (required)
+
+**Output**: Execution confirmation with run ID.
+
+### runs
+
+List and manage workflow runs.
+
+```bash
+# List runs for current working directory
+weskit-client runs
+
+# List all runs
+weskit-client runs --all
+
+# Get details for specific run
+weskit-client runs --rid <run-id>
+```
+
+**Parameters**:
+
+* `--all`: Show all runs (not just current directory runs)
+* `--rid <run-id>`: Show details for specific run ID
+
+## OIDC support
+
+WESkit can use OIDC (OpenID Connect) for authentication. If your instance is configured with OIDC, you must authenticate before using most commands
+
+* **WESKIT_OIDC_CLIENT_ID**: Your OIDC client identifier
+* **WESKIT_OIDC_CLIENT_SECRET**: Your OIDC client secret
+* **WESKIT_OIDC_REDIRECT_PORT**: Local port for OIDC redirect (default: 8000)
+* **WESKIT_OIDC_CONFIG**: OIDC discovery endpoint URL
+
+```bash
+export WESKIT_OIDC_CLIENT_ID=CLIENTID
+export WESKIT_OIDC_CLIENT_SECRET=CLIENTSECRET
+export WESKIT_OIDC_REDIRECT_PORT=REDIRECTPORT
+export WESKIT_OIDC_CONFIG=OIDC_CONFIG
+
+weskit-client login
+```
+
+This command will:
+
+1. Open your default web browser
+2. Redirect you to the OIDC provider login page
+3. After successful authentication, redirect back to save your access token locally
+
+Logout removes the stored access token from your local system:
+
+```bash
+weskit-client logout
+```
+
+## Quick Start Workflow
+
+* Connect to WESkit: Here we suppose that a local WESkit instance is running on the same host and is available at localhost.
+
+```bash
+export WESKIT_API_URL="https://localhost/"
+```
+
+* To check the connection to the WESkit instance, request the service info page via:
+
+```bash
+weskit-client service-info
+```
+
+* List all available workflows on the WESkit instance. The basic installation of WESkit contains two demo workflows (`wf1` and `wf2`):
+
+```bash
+weskit-client workflows
++--------+--------+-----------+--------------------+---------------------------------------------------+
+| Name   | Type   | Version   | URI                | Description                                       |
++========+========+===========+====================+===================================================+
+| wf1    | SMK    | 7.32.3    | file:wf1/Snakefile | This document describes the configuration for WF1 |
++--------+--------+-----------+--------------------+---------------------------------------------------+
+| wf2    | SMK    | 7.32.3    | file:wf2/Snakefile | This document describes the configuration for WF2 |
++--------+--------+-----------+--------------------+---------------------------------------------------+
+```
+
+* Initialization of `wf1` will create an empty configuration file in the current working directory.
+
+```bash
+weskit-client init --name wf1
+Workflow 'wf1' initialized and '20250630_config_wf1.yaml' created.
+```
+
+* After finalizing the configuration by extending the config.yaml, execution of `wf1` can be triggered.
+
+```bash
+weskit-client exec --name wf1 --config 20250630_config_wf1.yaml
+Executed workflow 'wf1' with config '20250630_config_wf1.yaml'. Run-id: f3c43665-7d1d-412d-8a59-99fc9e35bd67
+```
+
+* Status of all current runs can be checked by:
+
+```bash
+weskit-client runs
++--------------------------------------+---------+--------------------+--------------+
+| ID                                   | State   | workflow           | start_time   |
++======================================+=========+====================+==============+
+| f3c43665-7d1d-412d-8a59-99fc9e35bd67 | RUNNING | file:wf1/Snakefile |              |
++--------------------------------------+---------+--------------------+--------------+
