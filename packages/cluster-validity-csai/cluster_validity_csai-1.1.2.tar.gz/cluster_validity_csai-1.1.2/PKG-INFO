@@ -1,0 +1,121 @@
+Metadata-Version: 2.4
+Name: cluster-validity-csai
+Version: 1.1.2
+Summary: CSAIEvaluator: A Cluster Stability Assesment Index for clustering validation
+Home-page: https://github.com/adaneNT/cluster-validity-csai
+Author: Adane Nega Tarekegn
+Author-email: nega2002@email.com
+License: Custom (Academic, Non-Commercial). See LICENSE file.
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: matplotlib
+Requires-Dist: umap-learn
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# CSAIEvaluator: Clustering Stability Assessment Index (CSAI)
+
+CSAIEvaluator is a Python library for evaluating the stability and validity of clustering algorithms across multiple data splits.
+It uses a newly proposed Clustering Stability Assessment Index (CSAI) that compares the feature structure of clusters over different partitions.
+
+## Installation
+
+```bash
+pip install cluster-validity-csai
+
+```
+## Or the development version from GitHub:
+```bash
+pip install git+https://github.com/AdaneNT/cluster-validity-csai.git
+```
+
+## Example Usage
+
+### Dataset
+ Let's use the **20 Newsgroups (20NG)** dataset — a collection of approximately 20,000 newsgroup posts organized into various categories. It is widely used for benchmarking text clustering and classification algorithms. To apply CSAIEvaluator, we first transform the raw text documents into embeddings using encoders like BERT or SentenceTransformers.
+
+
+```python
+import torch
+from sentence_transformers import SentenceTransformer
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+import pandas as pd
+import numpy as np
+import re
+import umap
+import warnings
+
+from csai import CSAIEvaluator
+
+# Step 1: Text embedding (e.g.SentenceTransformer )
+def get_sbert_embeddings(texts):
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+    return model.encode(texts, convert_to_tensor=False)
+
+# Step 2: Dimensionality reduction (e.g. UMAP)
+def reduce_with_umap(df, emb_col="Embedding", output_col="key_umap", n_components=10):
+    reducer = umap.UMAP(n_components=n_components, random_state=42)
+    emb_array = np.array(df[emb_col].tolist())
+    reduced = reducer.fit_transform(emb_array)
+    df[output_col] = reduced.tolist()
+    return df
+
+# Step 3: Load and preprocess data (e.g 20news group dataset)
+def run_pipeline():
+    newsgroups = fetch_20newsgroups(subset='all')
+    data = newsgroups.data
+    df = pd.DataFrame(data, columns=["text"])
+    df = df.sample(n=5000, random_state=42).reset_index(drop=True)
+
+    texts = df["text"].fillna("").apply(lambda x: re.sub(r"\d+|[^\w\s]|\s+@", " ", x.lower()).strip()).tolist()
+    embeddings = get_sbert_embeddings(texts)
+    df["SBERT_Embedding"] = embeddings.tolist()
+
+    df = reduce_with_umap(df, emb_col="SBERT_Embedding", output_col="key_umap", n_components=10)
+    return df
+
+df_result = run_pipeline()
+
+# Step 4: Train/test split
+X_train, X_test = train_test_split(df_result, test_size=0.30, random_state=42)
+
+# Step 5: Define clustering function (e.g. K-means)
+def kmeans_label_func(embeddings, n_clusters=7):
+    model = KMeans(n_clusters=n_clusters, random_state=42)
+    labels = model.fit_predict(embeddings)
+    return labels, model
+
+# Step 6: Apply CSAI Evaluation
+csai = CSAIEvaluator()
+score = csai.run_csai_evaluation(X_train, X_test, key_col="key_umap", label_func=kmeans_label_func, n_splits=5)
+
+print("CSAIEvaluator Score:", score)
+```
+## 📄 Citation
+If you use this package in your work, please cite:
+
+Tarekegn, A. N., Tessem, B., & Rabbi, F. (2025).  
+*A New Cluster Validation Index Based on Stability Analysis*.  
+In Proceedings of the 14th International Conference on Pattern Recognition Applications and Methods (ICPRAM),  
+SciTePress, pp. 377–384.  
+DOI: [10.5220/0013309100003905](https://doi.org/10.5220/0013309100003905)
+
+## License
+
+This software is provided under a custom academic, non-commercial license.  
+See [LICENSE.txt](https://github.com/AdaneNT/cluster-validity-csai/blob/main/LICENSE) for full terms.
