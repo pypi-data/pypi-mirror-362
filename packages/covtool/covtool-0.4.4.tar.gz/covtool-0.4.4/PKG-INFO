@@ -1,0 +1,61 @@
+Metadata-Version: 2.3
+Name: covtool
+Version: 0.4.4
+Summary: a multitool for manipulating coverage traces for dynamic analysis
+Author: redthing1
+Author-email: redthing1@alt.icu
+Requires-Python: >=3.10,<4.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: minlog (>=0.6.0,<0.7.0)
+Requires-Dist: rich (>=13.0.0,<14.0.0)
+Requires-Dist: typer (>=0.15.4,<0.16.0)
+Requires-Dist: urwid (>=2.6.0,<3.0.0)
+Description-Content-Type: text/markdown
+
+
+# covtool
+
+a multitool for manipulating coverage traces for dynamic analysis
+
+primarily built around the standard-ish [DrCov](https://www.ayrx.me/drcov-file-format/) coverage trace format; but supports converting other, simpler trace formats.
+also supports a [custom backwards-compatible extension](./doc/drcov_spec_hits_v2.md) to the DrCov format to track block hitcounts.
+
+## features
+
++ a flagship tui for inspecting traces
++ view stats about coverage traces
++ perform queries (intersection, difference, etc.) on multiple traces
++ edit traces (rebase modules, adjust offsets)
++ lift simple formats to drcov (write your own coverage tools)
+
+## install
+
+```sh
+uv tool install covtool
+```
+
+## coverage formats
+
+### flagship: drcov (+hits)
+
+this is either the standard DrCov format (any version), or the custom extension to support hitcounts.
+
+### simple formats (lifted to drcov)
+
+you can make a file that just outputs block traces in very simple formats (one entry per line).
+these get auto-detected and can be converted to drcov using the `lift` tool:
+
++ **module+offset**: `boombox+3a06`  
++ **address**: `14000419c` or `0x14000419c`  
++ **address+hits**: `14000419c 24`
+
+you can lift to the standard format by specifying module names and optionally base addresses:
+
+```sh
+covtool lift input.txt -o output.drcov -M module@base_addr
+```
+
