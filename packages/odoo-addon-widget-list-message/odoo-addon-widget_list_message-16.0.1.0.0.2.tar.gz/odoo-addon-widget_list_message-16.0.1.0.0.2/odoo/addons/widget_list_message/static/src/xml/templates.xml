@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- List Message Grouped Fields Template -->
+    <t t-name="widget_list_message.ListMessageGroupField" owl="1">
+        <div class="o_message_content_wrapper">
+            <t t-foreach="Object.entries(groupedData)" t-as="groupField" t-key="groupField[0]">
+                <t t-set="groupFieldName" t-value="groupField[0]"/>
+                <t t-set="fields" t-value="groupField[1]"/>
+                <div class="o_message_group">
+                    <t t-foreach="fields" t-as="field" t-key="field[0]">
+                        <span class="o_message_group_field">
+                            <t t-out="field" type="html"/>
+                        </span>
+                    </t>
+                </div>
+            </t>
+        </div>
+    </t>
+    <!-- List Message Tooltip Template -->
+    <t t-name="widget_list_message.ListMessageTooltip" owl="1">
+        <div class="o_custom_tooltip">
+            <p t-if="message.email_from">
+                <strong>Email From: </strong>
+                <span t-esc="message.email_from"/>
+            </p>
+            <p t-if="message.email_to">
+                <strong>Email To: </strong>
+                <span t-esc="message.email_to"/>
+            </p>
+            <p t-if="message.email_cc">
+                <strong>Email CC: </strong>
+                <span t-esc="message.email_cc"/>
+            </p>
+        </div>
+    </t>
+    <!-- List View Relative Dates -->
+    <t t-name="widget_list_message.RelativeDateField" owl="1">
+        <span t-esc="formattedDate"/>
+    </t>
+</templates>
