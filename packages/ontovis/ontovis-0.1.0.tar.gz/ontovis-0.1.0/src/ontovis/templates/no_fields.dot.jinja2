@@ -1,0 +1,32 @@
+{% macro subgraph_cluster(name, group, color="lightgrey") %}
+subgraph cluster_{{ name }} {
+    style=filled;
+    color={{ color }};
+    node [style=filled,color=pink];
+    label="{{ name }}";
+    fontsize=20;
+
+    {{ group.path|join(' -> ') }};
+
+    {% for field in group.fields %}
+    {{ field.path|join(' -> ') }};
+    {% endfor %}
+
+    {% for sg in group.subgroups %}
+    {{ subgraph_cluster(sg.name, sg, "yellow")|indent }}
+    {% endfor %}
+}
+{% endmacro %}
+
+digraph G {
+    concentrate=true;
+    graph [fontname = "Courier"];
+    node [fontname = "Courier"];
+    edge [fontname = "Courier"];
+
+    bgcolor=transparent;
+
+    {% for name, group in groups|items %}
+    {{ subgraph_cluster(name, group)|indent }}
+    {% endfor %}
+}
