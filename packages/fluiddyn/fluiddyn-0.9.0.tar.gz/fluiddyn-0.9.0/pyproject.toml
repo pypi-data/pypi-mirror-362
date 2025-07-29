@@ -1,0 +1,200 @@
+[build-system]
+requires = [
+    "pdm-backend",
+]
+build-backend = "pdm.backend"
+
+[project]
+name = "fluiddyn"
+version = "0.9.0"
+description = "Framework for studying fluid dynamics."
+keywords = [
+    "Fluid dynamics",
+    "research",
+]
+authors = [
+    { name = "Pierre Augier", email = "pierre.augier@legi.cnrs.fr" },
+]
+requires-python = ">= 3.10"
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "h5py",
+    "h5netcdf",
+    "psutil >= 5.2.1",
+    "distro",
+    "simpleeval>=0.9.13",
+]
+readme = "README.rst"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Scientific/Engineering",
+]
+
+[project.license]
+text = "CeCILL-B License"
+
+[project.urls]
+homepage = "https://foss.heptapod.net/fluiddyn/fluiddyn"
+documentation = "https://fluiddyn.readthedocs.io"
+twitter = "https://twitter.com/pyfluiddyn"
+conda-forge = "https://github.com/conda-forge/fluiddyn-feedstock"
+
+[project.optional-dependencies]
+fft = [
+    "pyfftw >= 0.15",
+    "pulp",
+]
+mpi = [
+    "mpi4py",
+]
+sht = [
+    "shtns",
+]
+full = [
+    "fluiddyn[mpi, sht]",
+    "scikit-image",
+    "opencv-python",
+]
+
+[project.scripts]
+fluidcluster-help = "fluiddyn.clusters:print_help_scheduler"
+fluiddocset = "fluiddoc.fluiddocset:main"
+fluiddump = "fluiddyn.io.dump:main"
+fluidinfo = "fluiddyn.util.info:main"
+fluidmat2py = "fluiddyn.util.matlab2py:main"
+fluidnbstripout = "fluiddoc.fluidnbstripout:main"
+fluidconvertim7 = "fluiddyn.io.davis:main"
+
+[tool.pdm]
+distribution = true
+ignore_package_warnings = [
+    "ipython",
+]
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pip",
+    "black",
+    "pylint",
+    "vermin",
+    "isort",
+]
+test = [
+    "coverage[toml]",
+    "pytest",
+    "pytest-cov",
+    "ipython",
+    "ipdb",
+    "scipy",
+    "pillow",
+    "imageio",
+    "fluiddyn[fft]",
+]
+doc = [
+    "jupyter",
+    "sphinx",
+    "sphinx_rtd_theme",
+    "numpydoc",
+    "sphinxemoji",
+    "myst-nb",
+    "myst-nb-json",
+    "sphinx-copybutton",
+    "pyqt5",
+    "pyqt5-qt5==5.15.2",
+    "towncrier",
+    "scipy",
+    "scikit-image",
+    "nbstripout",
+    "sphinxcontrib-mermaid",
+]
+dev-doc = [
+    "jupyterlab",
+    "jupyterlab-myst",
+    "jupytext",
+    "mdformat-myst",
+]
+
+[tool.pdm.scripts]
+black = "black fluiddyn fluiddoc doc"
+isort = "isort --atomic --tc fluiddyn fluiddoc doc/examples"
+black_check = "black --check fluiddyn fluiddoc doc"
+
+[tool.pdm.options]
+lock = [
+    "-G",
+    ":all",
+]
+
+[tool.coverage.run]
+source = [
+    "./fluiddyn",
+]
+data_file = ".coverage/coverage"
+omit = [
+    "*/test*.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "raise ValueError",
+    "raise RuntimeError",
+    "if __name__ == '__main__':",
+]
+
+[tool.coverage.html]
+directory = ".coverage"
+
+[tool.coverage.xml]
+output = ".coverage/coverage.xml"
+
+[tool.towncrier]
+package = "fluiddyn"
+single_file = true
+filename = "CHANGES.rst"
+directory = "doc/newsfragments"
+template = "doc/newsfragments/template.rst.j2"
+title_format = false
+issue_format = "`!{issue} <https://foss.heptapod.net/fluiddyn/fluiddyn/-/merge_requests/{issue}>`__"
+underline = "-~"
+all_bullets = true
+type = [
+    { directory = "added", name = "Added", showcontent = true },
+    { directory = "changed", name = "Changed", showcontent = true },
+    { directory = "deprecated", name = "Deprecated", showcontent = true },
+    { directory = "removed", name = "Removed", showcontent = true },
+    { directory = "fixed", name = "Fixed", showcontent = true },
+    { directory = "security", name = "Security", showcontent = true },
+]
+
+[tool.black]
+line-length = 82
+
+[tool.isort]
+profile = "black"
+line_length = 82
+include_trailing_comma = true
+atomic = true
+known_first_party = [
+    "fluiddyn",
+    "fluiddoc",
+]
+multi_line_output = 3
+skip_glob = [
+    ".pixi/*",
+]
+
+[tool.pytest.ini_options]
+addopts = "--pdbcls=IPython.terminal.debugger:TerminalPdb"
