@@ -1,0 +1,70 @@
+Metadata-Version: 2.4
+Name: django_rds_iam_auth
+Version: 0.0.86rc0
+Summary: Django database backends to use AWS Database IAM Authentication
+Home-page: https://github.com/LabD/django-iam-dbauth
+Author: Lab Digital
+Author-email: admin@ibrag.me
+License: MIT
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 1.11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: Django>=1.11
+Requires-Dist: boto3
+Requires-Dist: dnspython
+Requires-Dist: requests
+Requires-Dist: djangorestframework
+Requires-Dist: PyJWT
+Requires-Dist: cryptography
+Provides-Extra: docs
+Provides-Extra: test
+Requires-Dist: coverage; extra == "test"
+Requires-Dist: pretend; extra == "test"
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: pytest-cov; extra == "test"
+Requires-Dist: pytest-mock; extra == "test"
+Requires-Dist: pytest-django; extra == "test"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: summary
+
+# Django IAM database backends
+
+
+## Usage
+
+```shell
+pip install django-rds-iam-auth
+```
+
+In your settings use the following
+
+```python
+DATABASES = {
+    "default": {
+        "HOST": "<hostname>",
+        "USER": "<user>",
+        "ENGINE": 'django_rds_iam_auth.aws.postgresql'
+        "OPTIONS": {
+            "use_iam_auth": True
+        }
+    }
+}
+```
