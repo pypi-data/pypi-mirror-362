@@ -1,0 +1,127 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="collective.exportimport"
+      metal:use-macro="context/main_template/macros/master">
+
+<div metal:fill-slot="main">
+    <tal:main-macro metal:define-macro="main">
+
+      <h1 class="documentFirstHeading" i18n:translate="">Import Members, Groups and their Roles</h1>
+
+      <p class="documentDescription" i18n:translate="">Here you can upload a json-file.</p>
+
+        <form action="@@import_members" tal:attributes="action request/URL" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="jsonfile"/><br/>
+            </div>
+            <div class="formControls" class="form-group">
+                <button class="btn btn-primary submit-widget button-field context"
+                        type="submit" name="form.submitted" value="Import" i18n:attributes="value" i18n:translate="">Import
+                </button>
+            </div>
+        </form>
+
+        <div metal:use-macro="context/@@exportimport_links/links">
+          Links to all exports and imports
+        </div>
+
+        <div>
+          <h3 i18n:translate="">Help</h3>
+          <p i18n:translate="">Here is a example for the expected format. This is the format created by collective.exportimport when used for export.</p>
+          <pre>
+{
+    "groups": [
+        {
+            "description": "",
+            "email": "",
+            "groupid": "Reviewers",
+            "groups": [],
+            "roles": [
+                "Reviewer"
+            ],
+            "title": "Reviewers"
+        },
+        {
+            "description": "",
+            "email": "",
+            "groupid": "Site Administrators",
+            "groups": [],
+            "roles": [
+                "Site Administrator"
+            ],
+            "title": "Site Administrators"
+        },
+        {
+            "description": "Extranet Editors",
+            "email": "",
+            "groupid": "extranet",
+            "groups": [],
+            "roles": [
+                "Reader"
+            ],
+            "title": "Extranet Editors"
+        },
+    ],
+    "members": [
+        {
+            "description": "",
+            "email": "example@gmail.com",
+            "fullname": "Example Example",
+            "groups": [],
+            "home_page": "",
+            "last_login_time": "2016-06-25T00:03:04+00:00",
+            "listed": true,
+            "location": "",
+            "login_time": "2016-06-25T19:45:04+00:00",
+            "password": "{SSHA}W1YSVUajeCSgTYN1B1JxFzNZUa9n/rV+Ddvc",
+            "roles": [
+                "Reader"
+            ],
+            "username": "example1"
+        },
+        {
+            "description": "",
+            "email": "example2@example.com",
+            "fullname": "Example Example (Foo)",
+            "groups": [],
+            "home_page": "",
+            "last_login_time": "2016-04-19T08:56:06+00:00",
+            "listed": true,
+            "location": "",
+            "login_time": "2016-04-19T09:36:51+00:00",
+            "password": "{SSHA}q/ZTEW9yQJT7XxIbwASAv5dqctel/tlgQaKi",
+            "roles": [
+                "Member",
+                "Reader"
+            ],
+            "username": "example2"
+        },
+        {
+            "description": "",
+            "email": "example3@example.com",
+            "fullname": "Rest Test",
+            "groups": [],
+            "home_page": "",
+            "last_login_time": "2017-09-27T09:51:30+00:00",
+            "listed": true,
+            "location": "",
+            "login_time": "2017-09-27T09:51:30+00:00",
+            "password": "{SSHA}yU1PnlcM6NPd7054yPYgwnIWU4Z/f8WzHq8t",
+            "roles": [
+                "Member",
+                "Reader",
+                "Manager"
+            ],
+            "username": "example3"
+        }
+    ]
+}
+          </pre>
+        </div>
+
+    </tal:main-macro>
+</div>
+
+</html>
