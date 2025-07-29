@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="approval_approval_view_tree" model="ir.ui.view">
+    <field name="name">approval.approval - tree</field>
+    <field name="model">approval.approval</field>
+    <field name="arch" type="xml">
+        <tree
+                string="Multiple Approval"
+                decoration-danger="status=='rejected'"
+                decoration-success="status=='approved'"
+                create="false"
+                edit="false"
+                delete="false"
+            >
+            <field name="sequence" />
+            <field name="approver_selection_method" invisible="1" />
+            <field name="approver_user_ids" widget="many2many_tags_avatar" />
+            <field name="user_id" widget="many2one_avatar_user" />
+            <field name="date" />
+            <field name="status" />
+        </tree>
+    </field>
+</record>
+
+<record id="approval_approval_view_form" model="ir.ui.view">
+    <field name="name">approval.approval - form</field>
+    <field name="model">approval.approval</field>
+    <field name="arch" type="xml">
+        <form>
+            <header>
+                <field name="status" widget="statusbar" />
+            </header>
+            <sheet>
+                <group name="form_1" colspan="4" col="2">
+                    <group name="form_1_1" colspan="1" col="2">
+                        <field name="sequence" />
+                        <field name="approver_selection_method" invisible="1" />
+                        <field
+                                name="approver_user_ids"
+                                widget="many2many_tags_avatar"
+                            />
+                    </group>
+                    <group name="form_1_1" colspan="1" col="2">
+                        <field name="user_id" widget="many2one_avatar_user" />
+                        <field name="date" />
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+</odoo>

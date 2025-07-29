@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="approval_template_detail_view_tree" model="ir.ui.view">
+        <field name="name">approval.template.detail.tree</field>
+        <field name="model">approval.template_detail</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="approver_selection_method" />
+                <field name="approver_user_ids" widget="many2many_tags_avatar" />
+                <field name="approver_group_ids" widget="many2many_tags" />
+                <field name="python_code" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="approval_template_detail_view_form" model="ir.ui.view">
+        <field name="name">approval.template.detail.form</field>
+        <field name="model">approval.template_detail</field>
+        <field name="arch" type="xml">
+            <form>
+                <header />
+                <sheet>
+                    <group name="group_1" colspan="4" col="2">
+                        <group name="group_1_1" colspan="1" col="2">
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                            <field name="sequence" />
+                        </group>
+                        <group name="group_1_2">
+                            <field name="active" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="page_approver" string="Approver">
+                            <group name="group_approver_1" colspan="4" col="2">
+                                <field name="approver_selection_method" colspan="4" />
+                                <field
+                                    name="approver_user_ids"
+                                    colspan="4"
+                                    attrs="{
+                                         'invisible': [('approver_selection_method', '!=', 'use_user'), ('approver_selection_method', '!=', 'use_both')],
+                                         'required': ['|', ('approver_selection_method', '=', 'use_user'), ('approver_selection_method', '=', 'use_both')]}"
+                                    widget="many2many_tags_avatar"
+                                />
+                                <field
+                                    name="approver_group_ids"
+                                    colspan="4"
+                                    attrs="{
+                                         'invisible': [('approver_selection_method', '!=', 'use_group'), ('approver_selection_method', '!=', 'use_both')],
+                                         'required': ['|', ('approver_selection_method', '=', 'use_group'), ('approver_selection_method', '=', 'use_both')]}"
+                                    widget="many2many_tags"
+                                />
+                                <field
+                                    name="python_code"
+                                    colspan="4"
+                                    widget="ace"
+                                    attrs="{'invisible': [('approver_selection_method', '&lt;&gt;', 'use_python')]}"
+                                />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
