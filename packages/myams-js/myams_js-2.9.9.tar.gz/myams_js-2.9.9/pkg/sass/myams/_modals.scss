@@ -1,0 +1,87 @@
+
+@import "variables";
+
+
+/**
+ * Overlapped modals styles
+ */
+
+@each $color, $value in $theme-colors {
+  @include bg-variant(".modal .bg-#{$color}-modal", $value, true);
+}
+
+.modal {
+  z-index: 10000;
+
+  .hidden-modal {
+    display: none !important;
+  }
+  .py-1-modal,
+  .pt-1-modal {
+    padding-top: 0.25rem !important;
+  }
+  .py-1-modal,
+  .pb-1-modal {
+    padding-bottom: 0.25rem !important;
+  }
+  .py-2-modal,
+  .pt-2-modal {
+    padding-top: 0.5rem !important;
+  }
+  .py-2-modal,
+  .pb-2-modal {
+    padding-bottom: 0.5rem !important;
+  }
+  .py-3-modal,
+  .pt-3-modal {
+    padding-top: 1rem !important;
+  }
+  .py-3-modal,
+  .pb-3-modal {
+    padding-bottom: 1rem !important;
+  }
+}
+
+/**
+ * Size of a modal which is resized in javascript based on contained image
+ *
+ * See MyAMS.modal.fitWidthToImage
+ */
+.modal-auto {
+  max-width: 20em;
+  transition: max-width linear 0.5s, transform ease-out 0.3s !important;
+}
+
+.modal-max {
+  max-width: calc(100vw - 5em) !important;
+
+  @media (max-width: $sm-width) {
+    max-width: calc(100vw - 1em) !important;
+  }
+}
+
+.modal-header {
+  .close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+  }
+}
+.modal-body {
+  overflow-y: auto;
+  max-height: calc(100vh - 210px);
+
+  > section {
+    > h2 {
+      font-size: 1.4rem;
+    }
+  }
+
+  @media (max-width: $md-width) {
+    padding: 0.1rem!important;
+  }
+}
+
+.modal-backdrop.show {
+  opacity: 0.75;
+}

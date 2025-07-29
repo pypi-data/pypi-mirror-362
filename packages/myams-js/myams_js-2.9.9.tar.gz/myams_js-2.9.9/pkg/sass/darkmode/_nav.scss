@@ -1,0 +1,113 @@
+@import "variables";
+@import "../myams/nav";
+
+
+#left-panel {
+  nav {
+    ul {
+      li {
+        &.header {
+          padding: 8px 10px 8px 15px;
+          border-top: 2px solid #bbb;
+
+          &:empty {
+            border-top: 0;
+            background-color: $gray-200;
+          }
+        }
+        &.active {
+          > a {
+            &:before {
+              line-height: 1.25rem;
+            }
+          }
+        }
+        a {
+          padding: 12px 10px 12px 12px;
+        }
+      }
+
+      ul {
+        li {
+          > a.active {
+            margin-top: 2px;
+            margin-bottom: 2px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            border-radius: 6px 0 0 6px;
+          }
+        }
+      }
+    }
+
+    > ul {
+      > li {
+        > ul::before {
+          bottom: 1rem;
+        }
+
+        > ul > li > a,
+        > ul > li > ul > li > a {
+          padding-top: 6px;
+          padding-bottom: 6px;
+        }
+      }
+      ul {
+        li {
+          &::before {
+            top: 1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+.minified {
+  #left-panel {
+    nav {
+      ul {
+        li {
+          > a.active {
+            margin: 0;
+            padding: 12px 11px 10px;
+          }
+        }
+
+        &.active {
+          > li {
+            > a.open.active {
+              background-color: $nav-sub-menu-active-bg;
+            }
+          }
+        }
+      }
+
+      > ul {
+        > li {
+          > a {
+            > .menu-item-parent {
+              top: 0;
+            }
+          }
+
+          &.active {
+            > a.open {
+              border-top-left-radius: 0;
+              border-bottom-left-radius: 0;
+              background-color: $nav-sub-menu-active-bg;
+
+              > .menu-item-parent {
+                left: 40px;
+              }
+            }
+          }
+
+          > ul {
+            top: 36px;
+          }
+        }
+      }
+    }
+  }
+}

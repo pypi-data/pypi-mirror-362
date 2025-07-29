@@ -1,0 +1,129 @@
+
+@import "variables";
+
+
+.select2-container--bootstrap4 {
+    .select2-selection--multiple {
+
+        // height of input box
+        min-height: $input-height !important;
+        display: flex;
+
+        // input box
+        .select2-selection__rendered {
+            box-sizing: border-box;
+            list-style: none;
+            margin: 0;
+            padding: 1px 0.25em;
+            width: 100%;
+
+            &.ui-sortable {
+                padding-right: 1.5em;
+
+                &::after {
+                    content: '';
+                    display: block;
+                    position: absolute;
+                    top: 1em;
+                    right: 0.5em;
+                    width: 0;
+                    height: 0;
+                    margin-left: -4px;
+                    margin-top: -2px;
+                    border-color: $gray-800 transparent transparent transparent;
+                    border-style: solid;
+                    border-width: 5px 4px 0 4px;
+                }
+            }
+        }
+
+        .select2-selection__clear {
+            right: 1.35em;
+            margin: 0.2em;
+        }
+
+        // each selected item in input box
+        .select2-selection__choice {
+            font-family: $font-family-sans-serif;
+            color: $light;
+            background-color: $primary;
+            border: 1px solid $primary;
+            border-radius: $btn-border-radius-sm;
+            padding: 0;
+            padding-left: 5px;
+            cursor: pointer;
+            float: left;
+            margin-top: 0.35em;
+            margin-right: 5px;
+            margin-bottom: 0.35em;
+            line-height: 1.5;
+
+            .select2.sortable + & {
+                margin-top: 0.15em;
+                margin-bottom: 0.1em;
+                cursor: move;
+                width: 100%;
+                &:first-child {
+                    margin-top: 0.2em;
+                }
+                &::before {
+                    display: inline-block;
+                    content: "\f338";
+                    font-family: "Font Awesome 6 Free";
+                    font-weight: 900;
+                    padding-right: 0.25em;
+                    line-height: 1.25;
+                    opacity: 0.5;
+                }
+            }
+            .select2.sortable[data-allow-clear="true"] + & {
+                width: $select2-multiple-sortable-width;
+            }
+        }
+
+        .select2-search--inline {
+            .select2.sortable[data-allow-clear="true"] + & {
+                clear: both;
+            }
+        }
+
+        // x button of each selected item in input box
+        .select2-selection__choice__remove {
+            position: relative;
+            color: transparent;
+            font-weight: bold;
+            margin-left: 0.5em;
+            margin-right: 0;
+            width: 1.5em;
+            max-height: 1.5em;
+            float: right;
+            cursor: pointer;
+
+            &::before {
+                display: inline-flex;
+                content: "x";
+                width: 100%;
+                height: 100%;
+                justify-content: center;
+                align-items: baseline;
+                color: $light;
+                background-color: darken($primary, 10%);
+            }
+            &:hover::before {
+                background-color: lighten($primary, 20%);
+            }
+
+            .select2[readonly] + & {
+                width: 0;
+
+                &::before {
+                    content: "";
+                }
+            }
+        }
+    }
+}
+
+select.select2[readonly] + .select2 input {
+    background-color: transparent;
+}
