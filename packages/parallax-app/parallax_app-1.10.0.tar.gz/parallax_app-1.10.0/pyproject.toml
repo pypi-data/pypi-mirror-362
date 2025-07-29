@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+ 
+[project]
+name = "parallax-app"
+authors = [
+  { name="Hanna Lee", email="hanna.lee@alleninstitute.org" },
+]
+description = "GUI software for photogrammetry-assisted probe targeting in electrophysiology"
+license =  {text = "MIT"}
+readme = "README.md"
+keywords = ["parallax"]
+dynamic = ["version"]
+requires-python = "~=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3"
+]
+
+dependencies = [
+    "pip",
+    "PyQt5>=5.15",
+    "pyqtgraph",
+    "opencv-python",
+    "scipy",
+    "pandas",
+    "scikit-image",
+    "requests",
+    "scikit-learn",
+    "plotly",
+    "PyQtWebEngine",
+    "aiohttp"
+   ]
+ 
+[tool.setuptools.packages.find]
+include = ["parallax", "ui", "img"]
+exclude = ["tests", "tests.*"]
+
+[tool.setuptools.package-data]
+exclude = ["tests", "tests/*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "parallax.__version__"}
+readme = {file = "README.md"}
+ 
+[project.optional-dependencies]
+dev = ['parallax-app[linters]']
+camera = ["spinnaker-python"]
+
+linters = [
+    'codespell',
+    'coverage',
+    'flake8',
+    'interrogate',
+    'isort',
+    'pytest-mock'
+]
+
+docs = [
+    'Sphinx',
+    'sphinxcontrib-video',
+    'sphinx-jinja',
+    'furo',
+    'docutils'
+]
+
+[tool.coverage.run]
+omit = [
+    "*__init__*"
+]
+source = ["parallax", "tests"]
+
+[tool.coverage.report]
+exclude_lines = ["if __name__ == .__main__.:", "pragma: no cover"]
+fail_under = 100
+
+[tool.isort]
+line_length = 120
+profile = "black"
+
+[tool.interrogate]
+exclude = ["setup.py", "docs", "build"]
+fail-under = 100
+ 
+[tool.codespell]
+skip = ".git,*.json,*.log"
+ 
+[tool]
+homepage = "https://github.com/AllenNeuralDynamics/parallax"
+repository = "https://github.com/AllenNeuralDynamics/parallax"
+documentation = "https://github.com/AllenNeuralDynamics/parallax/wiki"
