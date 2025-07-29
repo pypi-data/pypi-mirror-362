@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=70", "wheel", "setuptools_scm[toml]>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ts_features_sculptor"
+description = "Package for transforming time series features"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Nikolskii D.N.", email = "nikolskydn@mail.ru"}]
+urls = {Homepage = "https://github.com/nikolskydn/ts_features_sculptor"}
+
+dependencies = [
+  "pandas>=2.2.3",
+  "scikit-learn>=1.5.1",
+  "holidays>=0.31",
+  "numpy>=1.24.0"
+]
+
+optional-dependencies.dev = [
+  "pytest>=7.4.0",
+  "pytest-cov>=4.1.0",
+  "build>=1.0.3",
+  "twine>=4.0.2",
+  "black>=23.12.0",
+  "isort>=5.13.2",
+  "flake8>=6.1.0"
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+version_scheme   = "post-release"
+local_scheme     = "node-and-date"
+write_to         = "src/ts_features_sculptor/_version.py"
+fallback_version = "1.0.0"
+tag_regex        = "^v(\\d+\\.\\d+\\.\\d+[^+]*)$"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools]
+include-package-data = true
+zip-safe             = false
+license-files        = ["LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths       = ["tests"]
+python_files    = "test_*"
+python_functions = "test_*"
+python_classes  = "Test*"
+addopts         = "--doctest-modules --cov=src"
+
+[tool.coverage.run]
+source = ["src"]
+omit   = ["src/ts_features_sculptor/_version.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "pass",
+  "raise ImportError"
+]
