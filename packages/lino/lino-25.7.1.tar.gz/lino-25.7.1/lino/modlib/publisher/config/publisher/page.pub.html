@@ -1,0 +1,71 @@
+{% extends "bootstrap3/base.html" %}
+
+{% block header %}
+<div class="container-fluid lino-bs-header">
+  {% if ar -%}
+    {% if isinstance(obj, rt.models.publisher.Page) -%}
+    {{obj.get_prev_link(ar)}} | {{obj.get_next_link(ar)}} |
+    {% endif -%}
+    {% if dd.is_installed('react') %}
+        {% set ar_react = obj.get_default_table().request(parent=ar, permalink_uris=True, renderer=dd.plugins.react.renderer) %}
+        {% if ar_react.obj2url(obj) %}
+        {{ tostring(ar_react.obj2html(obj, text='Edit')) }} |
+        {% endif %}
+    {% endif %}
+    {% if ar.request and ar.request.path != '/' -%}
+        <a href="{{ar.get_home_url()}}">{{_("Home")}}</a>
+    {% else -%}
+        {{_("Home")}}
+    {% endif -%}
+    {% if site.kernel.editing_front_end.url_prefix -%}
+        <a href="/{{site.kernel.editing_front_end.url_prefix}}/">{{_("Admin")}}</a>
+    {% endif -%}
+    {% if len(site.languages) > 1 -%}
+      {% for lang in site.languages -%}
+        {% if lang.django_code == requested_language -%}
+            {{lang.django_code}}
+        {% else -%} {# URL_PARAM_USER_LANGUAGE #}
+            <a href="{{ar.get_request_url(ul=lang.django_code)}}">{{lang.django_code}}</a>
+        {% endif -%}
+      {% endfor -%}
+    {% endif -%}
+    {%- if site.kernel.admin_ui -%}
+        &mdash;
+        <a href="{{site.kernel.admin_ui.build_plain_url()}}/">{{site.kernel.admin_ui.ui_label}}</a>
+    {%- endif -%}
+{% endif -%}
+
+</div>
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+      {% set index_node, home_children = obj.home_and_children(ar) %}
+      <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar-collapsible-content" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ar.get_home_url()}}">{{ index_node.title }}</a>
+      </div>
+      <div class="collapse navbar-collapse" id="bs-navbar-collapsible-content">
+          <ul class="nav navbar-nav">
+              {% for child in home_children %}
+              <li>{{tostring(ar.obj2html(child))}}</li>
+              {% endfor %}
+          </ul>
+      </div>
+   </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+  {% for chunk in obj.as_page(ar) %}
+    {{ chunk }}
+  {% endfor %}
+</div>
+{% endblock %}
