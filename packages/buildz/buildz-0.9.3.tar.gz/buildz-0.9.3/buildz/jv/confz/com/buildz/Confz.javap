@@ -1,0 +1,144 @@
+package com.buildz;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import com.buildz.xf.Loader;
+import java.util.regex.Pattern;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.lang.reflect.Method;
+public class Confz{
+    public static Loader jni = new Loader();
+    <<default("utf-8")||loadf>>
+    public static Object loadf(String filepath, String encoding){
+        return loadf(Paths.get(filepath), encoding);
+    }
+    public static Object loadf(Path filepath, String encoding) {
+        try{
+            String content = new String(Files.readAllBytes(filepath), encoding);
+            return jni.loads(content);
+        } catch (Exception exp) {
+            throw new RuntimeException("loadf exp");
+        }
+    }
+    <<default(null,"dp", "src.conf")||loadConf>>
+    public static Conf loadConf(Map conf, String dp, String dpKey, String srcKey) {
+        Conf obj = new Conf();
+        obj.update(conf);
+        return loadConf(obj, dp, dpKey, srcKey);
+    }
+    public static Conf loadConf(Conf conf, String dp, String dpKey, String srcKey) {
+        class Param{
+            public String[] fps;
+            @Key("conf")
+            public Map base;
+            public boolean conf_first=true,replace=true,flush=true;
+            public String spt=".",spts=",";
+            public String dp;
+        }
+        Param p = conf.getObj(Param.class);
+        p.dp = conf.wget(dpKey, dp);
+        Conf rst = new Conf(p.spt, p.spts);
+        if (srcKey!=null) {
+            rst.set(srcKey, conf);
+        }
+        if (p.conf_first) {
+            rst.update(p.base, p.flush, p.replace);
+        }
+        for(String fp:p.fps) {
+            Map tmp = (Map)loadf(Paths.get(dp, fp));
+            rst.update(tmp, p.flush, p.replace);
+        }
+        if (!p.conf_first) {
+            rst.update(p.base, p.flush, p.replace);
+        }
+        return rst;
+    }
+    public static Object calls(Conf conf){
+        Object calls = conf.get("calls", new ArrayList());
+        Conf root = conf.top();
+        Conf sub = conf;
+        if (calls instanceof Map) {
+            sub = sub.sub("calls");
+            String target = sub.wget("target", "run");
+            calls = sub.get(target, new ArrayList());
+            sub = sub.sub(target);
+        }
+        if (calls instanceof Map) {
+            String dm = (String)sub.get("domain");
+            Map init = (Map)sub.get("init");
+            if (init!=null) {
+                Conf init_conf = conf.top("confz.init");
+                if (dm!=null){
+                    init_conf = init_conf.sub(dm);
+                }
+                init_conf.update(init, true, false);
+                root.update(init_conf.val());
+            }
+        }
+        if (calls instanceof String) {
+            List tmp = new ArrayList(1);
+            tmp.add(calls);
+            calls = tmp;
+        }
+        for(String key:(List<String>)calls) {
+            if (!conf.has(key))throw new RuntimeException("not key:"+key);
+            simple(conf.sub(key));
+        }
+        return conf;
+    }
+    public static Object simple(String fp) {
+        Map map = (Map)loadf(fp);
+        return simple(map);
+    }
+    public static Object simple(Map map) {
+        return simple(new Conf().update(map));
+    }
+    public static Object simple(Conf conf) {
+        String fc = (String)conf.get("fc");
+        String up = (String) conf.get("up", null, 0);
+        if (up!=null) {
+            conf.top().link(conf.domain, up);
+        }
+        if (fc==null){
+            return calls(conf);
+        }
+        try{
+            String[] arr = fc.split(Pattern.quote("."));
+            String methodName = arr[arr.length-1];
+            arr = Arrays.copyOfRange(arr, 0, arr.length-1);
+            String className = String.join(".", arr);
+            Class<?> clazz = Class.forName(className);
+            Method method = clazz.getMethod(methodName, Conf.class);
+            return method.invoke(null, conf);
+        }catch (Exception exp) {
+            throw new RuntimeException("simple call "+fc+" exp:"+exp);
+        }
+    }
+    <<default(".", new HashMap())||
+    public static Object run(String fp, String dp, Map init_conf) {
+        if (dp==null) {
+            dp = ".";
+        }
+        Map conf = new HashMap();
+        if (fp!=null) {
+            conf = (Map)loadf(Paths.get(dp, fp));
+        }
+        Conf confObj = new Conf().update(conf);
+        if (init_conf!=null){
+            confObj.update(init_conf);
+        }
+        Map init = confObj.wget(confObj.wget("key.init", "init"), new HashMap());
+        confObj = loadConf(confObj, dp);
+        confObj.update(init);
+        return simple(confObj);
+    }>>
+    <<default(".", null)||
+    public static Object run(Map init_conf, String dp, String fp){
+        return run(fp, dp, init_conf);
+    }>>
+}

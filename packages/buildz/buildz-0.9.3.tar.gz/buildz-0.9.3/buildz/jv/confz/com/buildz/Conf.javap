@@ -1,0 +1,266 @@
+package com.buildz;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+class Link{
+    public Map<String, Link> maps=new HashMap<>();
+    public String val=null;
+    public Link(){}
+}
+class LinkMatch{
+    public String val;
+    public int deep;
+    public LinkMatch(String val, int deep){
+        this.val = val;
+        this.deep=deep;
+    }
+}
+public class Conf{
+    public static Object[] args(Object... vars){
+        return vars;
+    }
+    public String toString(){
+        return val().toString();
+    }
+    public <T> T getObj(Class<T> targetClass) {
+        try{
+            return ConfUtil.fill(this, targetClass);
+        }catch (Exception exp){
+            throw new RuntimeException(""+exp);
+        }
+    }
+    public Map<String, Object> conf=null;
+    Conf root=null;
+    Map<String, List> stacks=null;
+    Link _links=null;
+    public String spt;
+    public String spts;
+    public String domain;
+    <<default(".", ",", null, null)||Conf>>
+    public Conf(String spt, String spts, String domain, Conf root) {
+        this.spt = spt;
+        this.spts = spts;
+        this.domain = domain;
+        this.root = root;
+        if (root==null) {
+            conf = new HashMap<>();
+            stacks = new HashMap<>();
+            _links = new Link();
+        }
+    }
+    <<default(null)||top>>
+    public Conf top(String domain){
+        Conf obj = this;
+        if (root!=null)obj =root;
+        if (domain!=null) {
+            obj = obj.sub(domain);
+        }
+        return obj;
+    }
+    <<rename(val)||getConf>>
+    public Map getConf(){
+        Conf obj = top();
+        if (domain!=null) {
+            return (Map)obj._get(domain);
+        }
+        return obj.conf;
+    }
+    public Conf sub(String domain) {
+        domain = dmKey(domain);
+        root = top();
+        return new Conf(spt, spts, domain, root);
+    }
+    public Conf clean(){
+        if (root!=null) {
+            root.clean();
+            return this;
+        }
+        conf = new HashMap<>();
+        stacks = new HashMap<>();
+        _links = new Link();
+        return this;
+    }
+    public String dmKey(String key){
+        if (domain !=null) {
+            key = domain+spt+key;
+        }
+        return key;
+    }
+    <<default(true,true)||
+    public Conf update(Map<String, Object> conf, boolean flush, boolean replace) {
+        if (conf==null)return this;
+        if (domain!=null) {
+            String[] ks = Utils.keys(domain, spt);
+            Map tmp = new HashMap();
+            Utils.dset(tmp, ks, conf);
+            conf = tmp;
+        }
+        if (root!=null) {
+            root.update(conf, flush, replace);
+            return this;
+        }
+        if (flush) {
+            conf = Utils.flushMaps(conf, spt);
+        }
+        Utils.fill(conf, this.conf, replace);
+        return this;
+    }>>
+    <<methods(stackSets,true)||domain(stackSet)||
+    public void _stackSet(String key, Object value) {
+        List list = new ArrayList();
+        list.add(value);
+        stacks.put(key, list);
+    }>>
+    <<methods(stackUnsets,ret=0)||domain(stackUnset)||
+    public boolean _stackUnset(String key) {
+        if (!stacks.containsKey(key)) {
+            return false;
+        }
+        stacks.remove(key);
+        return true;
+    }>>
+    <<rename(tmpSet)||stackSet>>
+    <<rename(tmpUnset)||stackUnset>>
+    <<rename(tmpSets)||stackSets>>
+    <<rename(tmpUnsets)||stackUnsets>>
+    <<methods(pushs,val=true)||domain(push)||
+    public void _push(String key, Object value) {
+        if (!stacks.containsKey(key)) {
+            stacks.put(key, new ArrayList());
+        }
+        List list = (List)stacks.get(key);
+        list.add(value);
+    }>>
+    <<methods(pops,ret=1)||domain(pop)||
+    public boolean _pop(String key) {
+        if (!stacks.containsKey(key)) {
+            return false;
+        }
+        List list = stacks.get(key);
+        if (list.size()==0)return false;
+        list.remove(list.size()-1);
+        return true;
+    }>>
+    <<domain(link)||_link>>
+    <<methods(links,val=true,ret=false,align=true)||link>>
+    public void _link(String src, String target) {
+        String[] keys = Utils.keys(src, spt);
+        Link links = this._links;
+        for (String key:keys) {
+            if (!links.maps.containsKey(key)) {
+                links.maps.put(key, new Link());
+            }
+            links = links.maps.get(key);
+        }
+        links.val = target;
+    }
+    <<methods(unlinks)||domain(unlink)||_unlink>>
+    public boolean _unlink(String key) {
+        String[] keys = sptKeys(key);
+        Link links = this._links;
+        for (String _key:keys) {
+            if (!links.maps.containsKey(_key)) {
+                return false;
+            }
+            links = links.maps.get(_key);
+        }
+        links.val = null;
+        return true;
+    }
+    private LinkMatch linkMatch(String[] keys) {
+        Conf obj = top();
+        Link links = obj._links;
+        int deep=0;
+        for(String key:keys){
+            if (!links.maps.containsKey(key)){
+                break;
+            }
+            deep+=1;
+            links = links.maps.get(key);
+        }
+        return new LinkMatch(links.val,deep);
+    }
+    <<methods(sets,val=true,ret=false,align=true)||domain(set)||
+    public void _set(String key, Object value) {
+        String[] keys = sptKeys(key);
+        // System.out.println("[XXX] set.key:"+key);
+        // System.out.println("[XXX] set.keys:"+keys.length);
+        Utils.dset(this.conf, keys, value);
+    }>>
+    <<||->||domain(hget)->default(null,-1,-1)->
+    public Result _hget(String key, Object def, int loop, int stack){
+        Result rst = new Result();
+        if (stack!=0&&stacks.containsKey(key)){
+            List list = stacks.get(key);
+            if (list.size()>0){
+                rst.val = list.get(list.size()-1);
+                rst.find=true;
+                return rst;
+            }
+        }
+        String[] keys = sptKeys(key);
+        Utils.dget(conf, keys, def, rst);
+        if (rst.find || loop==0){
+            return rst;
+        }
+        LinkMatch match = linkMatch(keys);
+        if (match.val ==null) {
+            return rst;
+        }
+        keys = Arrays.copyOfRange(keys, match.deep, keys.length);
+        key = String.join(spt, keys);
+        if (loop>0)loop-=1;
+        if (stack>0)stack-=1;
+        return _hget(key, def, loop, stack);
+    }>>
+    <<methods(gets, Object, true, false,'null')||domain(get)||default(null,-1,-1)||
+    public Object _get(String key, Object def, int loop, int stack) {
+        return _hget(key, def, loop, stack).val;
+    }>>
+    <<default(-1,-1)||
+    public <T> T wget(String key, T def, int loop, int stack) {
+        Object val = get(key, def, loop, stack);
+        return (T) val;
+    }>>
+    <<default(null, -1,-1)||
+    public <T> T tget(String key, Class<T> type, T def, int loop, int stack) {
+        Object val = get(key, def, loop, stack);
+        return (T) val;
+    }>>
+    <<methods(removes)||domain(remove)||
+    public boolean _remove(String key) {
+        String[] keys = sptKeys(key);
+        return Utils.dremove(conf, keys);
+    }>>
+    <<domain(has)||default(0,0)||
+    public boolean _has(String key, int loop, int stack){
+        return _hget(key, null, loop, stack).find;
+    }>>
+    public String[] sptKeys(String key){
+        return Utils.keys(key, spt);
+    }
+    public String[] sptsKeys(String keys) {
+        String[] ks = Utils.keys(keys, spts);
+        for(int i=0;i<ks.length;i++){
+            ks[i] = ks[i].trim();
+        }
+        return ks;
+    }
+    public boolean hasAll(String keys, int loop, int stack) {
+        String[] ks = sptsKeys(keys);
+        for(String key:ks) {
+            if (!has(key,loop,stack))return false;
+        }
+        return true;
+    }
+    public boolean hasAny(String keys, int loop, int stack) {
+        String[] ks = sptsKeys(keys);
+        for(String key:ks) {
+            if (has(key,loop,stack))return true;
+        }
+        return false;
+    }
+}
