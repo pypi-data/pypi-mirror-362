@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="tnc_page">
+        <page name="tnc" string="Terms &amp; Conditions">
+            <group name="tnc_1" colspan="4" col="2">
+                <field
+                    name="allowed_tnc_template_ids"
+                    widget="many2many_tags"
+                    invisible="1"
+                />
+                <field
+                    name="tnc_template_id"
+                    domain="[('id','in',allowed_tnc_template_ids)]"
+                />
+            </group>
+            <button
+                name="action_generate_tnc"
+                type="object"
+                string="Generate T&amp;C"
+                class="oe_highlight"
+                icon="fa-gear"
+            />
+            <separator name="section" string="Sections" />
+            <field
+                name="tnc_section_ids"
+                nolabel="1"
+                context="{'tnc_model': active_model}"
+            />
+            <separator name="clause" string="Clauses" />
+            <field
+                name="tnc_clause_ids"
+                nolabel="1"
+                context="{'tree_view_ref': 'ssi_term_condition.tnc_clause_view_tree2','form_view_ref': 'ssi_term_condition.tnc_clause_view_form2'}"
+            />
+        </page>
+    </template>
+</odoo>
