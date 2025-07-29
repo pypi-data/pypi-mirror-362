@@ -1,0 +1,1 @@
+# sdelete/__init__.py
