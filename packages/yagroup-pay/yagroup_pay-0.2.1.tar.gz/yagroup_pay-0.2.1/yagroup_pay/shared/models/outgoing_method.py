@@ -1,0 +1,42 @@
+#
+# (c) 2025, Yegor Yakubovich, yegoryakubovich.com, personal@yegoryakybovich.com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+from typing import Optional
+
+from sqlmodel import Field, Relationship
+
+from .base import BaseDbModel
+from .method import Method
+from .order import Order
+from .tg_message import TGMessage
+from ..enums.outgoing_method_state import OutgoingMethodState
+
+
+class OutgoingMethod(BaseDbModel, table=True):
+    __tablename__ = 'outgoing_methods'
+
+    state: OutgoingMethodState
+
+    order_id: Optional[int] = Field(foreign_key='orders.id')
+    order: Optional[Order] = Relationship(sa_relationship_kwargs={'lazy': 'joined'})
+
+    method_id: int = Field(foreign_key='methods.id', nullable=True, default=None)
+    method: Method = Relationship(sa_relationship_kwargs={'lazy': 'joined'})
+
+    amount: float
+    amount_paid: float
+    amount_confirmed: float
