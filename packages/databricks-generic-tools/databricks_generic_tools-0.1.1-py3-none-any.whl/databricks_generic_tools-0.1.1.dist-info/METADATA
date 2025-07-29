@@ -1,0 +1,56 @@
+Metadata-Version: 2.4
+Name: databricks_generic_tools
+Version: 0.1.1
+Summary: Contains generic tools for Databricks, such as connectors and debug printers.
+Author-email: Alpina Group NL - Data Team <data@alpinagroup.com>
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: pyodbc
+Requires-Dist: pyarrow
+Requires-Dist: pyspark
+Requires-Dist: pyspark.sql
+Requires-Dist: mypy
+Requires-Dist: databricks-connect
+
+# README
+
+## Using this project
+
+You can use this project from within any py file running on a databricks cluster.
+
+Example: 
+``` 
+from databricks_python_generics import DebugPrinter, DebugLevel
+Debugprinter.msg('this is a test message', DebugLevel.Informational)
+```
+
+## Requirements
+Note that the compute cluster using this library will demand Python >=3.12. The `Databricks Runtime 16.4 LTS` or newer are good.
+
+## Developing on this project
+
+It is recommended to build, publish and test from within the databricks environment. 
+
+The project root contains several `_Databricks_[action]` notebooks that will do just that. 
+
+For developing it is also recommended to check the files locally with an advanced intellisense tool like PyLance. 
+
+### First time installation instructions for Windows
+
+Make sure you have installed python 3.12.X and that the `python` variable is available in `PATH`.
+
+Also you need to have the `databricks-cli` installed.
+
+Login to the databricks portal and go to `Settings -> User Settings -> Developer -> Access Tokens` and create an access token, temporarily store the value.
+
+Run `databricks configure` and enter the host name when prompted like `https://adb-3658969401163793.13.azuredatabricks.net`. Provide the previously generated token when asked.
+
+Run the `first_install.bat` file.py
+
+#### Developing on Windows
+
+Run `venvs\dev\Scripts\activate`
+
+If you changed the required packages in the pyproject.toml then you can run the `rebuild_dev` script to make sure your venv matches those requirements.
+
+
