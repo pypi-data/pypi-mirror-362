@@ -1,0 +1,58 @@
+[project]
+name = "arc-advisor"
+version = "0.1.0"
+description = "The learning co-pilot for AI agents. Implements the Executor-Advisor pattern for building self-improving agentic systems."
+authors = [{ name = "The Arc AI Team", email = "team@arc.computer" }]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = ["ai", "agents", "machine-learning", "reinforcement-learning", "llm", "advisor", "executor"]
+
+dependencies = [
+    "requests>=2.28.0",
+    "huggingface_hub>=0.20.0",
+    "torch>=2.0.0",
+    "transformers>=4.38.0",
+    "pydantic>=2.0",
+    "chromadb>=0.4.0",
+    "sentence-transformers>=2.2.0"
+]
+
+[project.optional-dependencies]
+examples = [
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0"
+]
+
+[project.urls]
+Homepage = "https://arc.computer"
+Documentation = "https://docs.arc.computer"
+Repository = "https://github.com/arc-ai/arc-advisor"
+Issues = "https://github.com/arc-ai/arc-advisor/issues"
+
+[project.scripts]
+"arc-advisor" = "arc_advisor.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+packages = ["arc_advisor"]
+
+[tool.setuptools.package-data]
+arc_advisor = ["py.typed"]
