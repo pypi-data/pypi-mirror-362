@@ -1,0 +1,11 @@
+- after creating transcript by caption extraction or transciption, I want to  add a chat section below the transcript using the Streamlit native chat components. Use context7 MCP server to get the latest streamlit component documentation
+
+- use `st.testing.v1.AppTest.from_file` to write end to end test
+- when api key is empty, assert both model selection and url text input are disabled
+- use the api key in `.env` for api key input, assert both model selecton and url input are enabled after inputting the api key
+- use this url https://youtube.com/shorts/NbY29sW7gbU?si=SCdby8-yHiG-UUGB and assert transciption ui is triggered, wait for the AI to generate the transcript, then assert the transcript text area is not empty
+- use this url https://www.youtube.com/watch?v=uYZ4J7ctpio and assert the caption extraction ui is triggered, in the caption ui, assert:
+    - when the language is not selected, caption format selection is disabled
+    - after lauguage is selected, caption format selection is enabled
+    - select `txt` for caption format, assert the caption text_area is not empty
+    - select `ai formatted`, wait for the text to generate by AI in the caption text area, assert its not empty
