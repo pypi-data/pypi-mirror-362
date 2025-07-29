@@ -1,0 +1,153 @@
+{{ if .Values.test_ce.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wms.fullname" . }}-dirac-ce
+  labels:
+    {{- include "wms.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "wms.name" . }}-dirac-ce
+spec:
+  selector:
+    matchLabels:
+      {{- include "wms.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: {{ include "wms.name" . }}-dirac-ce
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "wms.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        app.kubernetes.io/name: {{ include "wms.name" . }}-dirac-ce
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            privileged: true
+            capabilities:
+               drop:
+               - ALL
+            allowPrivilegeEscalation: true
+          image: "{{ .Values.image.repository_prefix }}-ce:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - name: ssh
+              containerPort: 22
+              protocol: TCP
+
+          livenessProbe:
+            exec:
+              command:
+              - "true"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          readinessProbe:
+            exec:
+              command:
+              - "true"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          resources:
+            {{- toYaml .Values.test_ce.resources | nindent 12 }}
+          volumeMounts:
+          - name: diracuser-sshkey
+            mountPath: /home/dirac/.ssh/authorized_keys
+            subPath: ssh-diracuser_sshkey.pub
+          - name: cafile
+            subPath: ca.pem
+            mountPath: /etc/grid-security/certificates/dpps_test_ca.pem
+          - name: cafile
+            subPath: ca.pem
+            mountPath: /etc/grid-security/certificates/74df993b.0
+          - name: cafile
+            subPath: dpps_test_ca.crl.r0
+            mountPath: /etc/grid-security/certificates/74df993b.r0
+          - name: cafile
+            subPath: dpps_test_ca.crl.r0
+            mountPath: /etc/grid-security/certificates/dpps_test_ca.crl.r0
+          - name: dpps-certkey-600
+            subPath: hostcert.pem
+            mountPath: /opt/dirac/etc/grid-security/hostcert.pem
+          - name: dpps-certkey-400
+            subPath: hostkey.pem
+            mountPath: /opt/dirac/etc/grid-security/hostkey.pem
+          {{ if .Values.rucio.enabled }}
+          - name: rucio-config
+            mountPath: /opt/rucio/etc
+          {{ end }}
+
+      volumes:
+      - name: diracuser-sshkey
+        secret:
+          secretName: {{ .Release.Name }}-diracuser-sshkey
+      - name: cafile
+        secret:
+          defaultMode: 420
+          secretName: {{ template "certprefix" . }}-server-cafile
+      - name: dpps-certkey-600
+        secret:
+          defaultMode: 0600
+          secretName: {{ template "certprefix" . }}-dirac-server-hostkey
+      - name: dpps-certkey-400
+        secret:
+          defaultMode: 0400
+          secretName: {{ template "certprefix" . }}-dirac-server-hostkey
+      - name: diracuser-sshkey-600
+        secret:
+          defaultMode: 0600
+          secretName: {{ .Release.Name }}-diracuser-sshkey
+      - name: diracuser-sshkey-644
+        secret:
+          defaultMode: 0644
+          secretName: {{ .Release.Name }}-diracuser-sshkey
+
+      {{ if .Values.rucio.enabled }}
+      - name: rucio-config
+        configMap:
+          name: {{ .Values.rucio.rucioConfig }}
+      {{ end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dirac-ce
+  labels:
+    {{- include "wms.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "wms.name" . }}-dirac-ce
+spec:
+  type: ClusterIP
+  ports:
+    - name: ssh
+      port: 22
+      targetPort: 22
+      protocol: TCP
+  selector:
+    {{- include "wms.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "wms.name" . }}-dirac-ce
+{{ end }}

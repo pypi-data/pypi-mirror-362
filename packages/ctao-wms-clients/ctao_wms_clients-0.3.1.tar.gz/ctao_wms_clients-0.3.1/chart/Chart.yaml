@@ -1,0 +1,29 @@
+apiVersion: v2
+name: wms
+description: A Helm chart to deploy the Workload Management System of CTAO
+
+type: application
+
+# this is a place-holder for the chart version for local development
+# the version for release artifacts is taken from the git tag information
+version: 0.0.0-dev
+
+# this is a place-holder for the app version
+# the version for release artifacts is taken from the git tag information
+appVersion: dev
+
+dependencies:
+- name: cert-generator-grid
+  version: v2.1.0
+  repository: oci://harbor.cta-observatory.org/dpps
+  condition: cert-generator-grid.enabled
+
+- name: cvmfs
+  version: v0.5.0
+  repository: oci://harbor.cta-observatory.org/dpps
+  condition: cvmfs.enabled
+
+- name: mariadb
+  condition: mariadb.enabled
+  version: 20.5.5
+  repository: oci://registry-1.docker.io/bitnamicharts

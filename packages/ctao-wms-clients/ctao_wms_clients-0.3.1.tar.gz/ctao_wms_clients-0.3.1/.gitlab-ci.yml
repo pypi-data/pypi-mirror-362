@@ -1,0 +1,57 @@
+include:
+  - project: 'cta-computing/dpps/aiv/dpps-aiv-toolkit'
+    ref: 1e9b640800ac73c215ce59df01330085d05b335e
+    file: "ci-functions.yml"
+  - "aiv-config.yml"
+
+variables:
+  # make sure we use the images that were just build and pushed
+  CHART_EXTRA_VALUES: "--set image.tag=${DOCKER_TAG}"
+  # used by jobs in test report
+  DPPS_AIV_TOOLKIT_DIR: ./dpps-aiv-toolkit/
+  CONDA_IMAGE: "quay.io/condaforge/miniforge3:24.11.3-0"
+
+
+stages:
+  - prepare
+  - lint
+  - build
+  - sign
+  - tests
+  - sonarqube
+  - publish
+  - report
+  - changelog
+
+build-docs:
+  image: "${CONDA_IMAGE}"
+
+  before_script:
+    - source /opt/conda/etc/profile.d/conda.sh
+    - mamba create -y -n ci python=3.12 gfal2 m2crypto dirac-grid make
+    - conda activate ci
+    - python --version
+    - pip install .[doc]
+
+
+pylint:
+  image: "${CONDA_IMAGE}"
+
+  before_script:
+    - apt update && apt install -y --no-install-recommends git
+    - source /opt/conda/etc/profile.d/conda.sh
+    - mamba create -y -n ci python=3.12 gfal2 m2crypto dirac-grid pylint
+    - conda activate ci
+    - python --version
+    - pip install .[all]
+
+
+build:
+  retry: 2
+  parallel:
+    matrix:
+      - IMAGE: ["server", "client", "ce"]
+  variables:
+    CI_HARBOR_REGISTRY_IMAGE: harbor.cta-observatory.org/dpps/${CI_PROJECT_NAME}-${IMAGE}:${DOCKER_TAG}
+    DOCKER_IMAGE_CONTEXT: docker/${IMAGE}
+    DOCKER_CONFIG: /kaniko/.docker

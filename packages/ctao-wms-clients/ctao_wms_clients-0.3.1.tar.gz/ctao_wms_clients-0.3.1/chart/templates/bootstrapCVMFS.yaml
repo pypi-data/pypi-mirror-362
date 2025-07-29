@@ -1,0 +1,46 @@
+{{- if .Values.cvmfs.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "wms.fullname" . }}-ce-cvmfs-bootstrap
+  labels:
+    app: {{ include "wms.fullname" . }}-ce-cvmfs-bootstrap
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    # this weight must be higher than the weight of the cvmfs-mkfs job
+    # defined in the cvmfs chart, otherwise this job will be stuck in waiting
+    # for the cvmfs to come online, which will never happen
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ include "wms.fullname" . }}-ce-cvmfs-bootstrap
+    spec:
+      serviceAccountName: exec-pods
+      containers:
+      - name: {{ include "wms.fullname" . }}-ce-cvmfs-bootstrap
+        image: bitnami/kubectl:1.31.1
+        command:
+        - bash
+        - -c
+        - |
+          set -ex
+          kubectl get pods
+          kubectl get deployments
+          kubectl wait deployment/{{ include "wms.fullname" . }}-dirac-ce --for=condition=Available=True --timeout=600s || (echo "failed to wait for ce deployment";  exit 1)
+          kubectl wait deployment/{{ include "cvmfs.fullname" .Subcharts.cvmfs }}-stratum0 --for=condition=Available=True --timeout=600s || (echo "failed to wait for cvmfs deployment"; exit 1)
+
+          kubectl exec deployment/{{ include "wms.fullname" . }}-dirac-ce -- bash -c '
+            for i in $(seq 1 60); do
+              curl -sf -o /etc/cvmfs/keys/ctao.dpps.test.pub http://cvmfs-stratum0/ctao.dpps.test.pub && break
+              sleep 10
+            done
+            ls /etc/cvmfs/keys/ctao.dpps.test.pub
+            cvmfs_config chksetup
+            cvmfs_config setup
+            ls /cvmfs/ctao.dpps.test
+          '
+      restartPolicy: Never
+{{- end }}

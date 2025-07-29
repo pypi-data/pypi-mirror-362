@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "wms.fullname" . }}-pytest"
+  labels:
+    {{- include "wms.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+
+  containers:
+  - name: test
+    image: "{{ .Values.image.repository_prefix }}-client:{{ .Values.image.tag | default .Chart.AppVersion }}"
+    workingDir: /home/dirac/wms/
+
+    command:
+    - bash
+    - -c
+    - |
+      set -xe
+
+      source ${DIRAC_DIR}/diracos/diracosrc
+
+      mkdir -pv /home/dirac/diracos/etc/grid-security/certificates/
+      cp -fv /etc/grid-security/certificates/* /home/dirac/diracos/etc/grid-security/certificates/
+
+      dirac-proxy-init -g dpps_group --nocs
+      dirac-configure -C dips://dirac-server:9135/Configuration/Server -S DPPS-Tests
+
+      {{ if .Values.dev.mount_repo }}
+      pip install .[test]
+
+      {{ if .Values.dev.run_tests }}
+      python3 -m pytest \
+        -svv \
+        -o cache_dir=$PWD/.pytest-cache \
+        --cov \
+        --cov-report=xml:/tmp/coverage.xml \
+        --junitxml=/tmp/report.xml \
+        --color=yes \
+        --log-cli-level=DEBUG
+
+      curl -T /tmp/coverage.xml http://testkit:8000/coverage.xml
+      curl -T /tmp/report.xml http://testkit:8000/report.xml
+      {{ end }}
+      {{ end }}
+
+      {{ if .Values.dev.sleep }}
+      sleep infinity
+      {{ end }}
+
+
+    volumeMounts:
+    {{ if .Values.dev.mount_repo }}
+    - name: repo
+      mountPath: /home/dirac/wms/
+    {{ end }}
+    - name: cafile
+      subPath: ca.pem
+      mountPath: /etc/grid-security/certificates/dpps_test_ca.pem
+    - name: cafile
+      subPath: ca.pem
+      mountPath: /etc/grid-security/certificates/74df993b.0
+    - name: cafile
+      subPath: dpps_test_ca.crl.r0
+      mountPath: /etc/grid-security/certificates/74df993b.r0
+    - name: cafile
+      subPath: dpps_test_ca.crl.r0
+      mountPath: /etc/grid-security/certificates/dpps_test_ca.crl.r0
+    - name: cafile
+      subPath: ca.pem
+      mountPath: /etc/grid-security/ca.pem
+    - name: dppsuser-certkey-400
+      mountPath: /home/dirac/.globus/userkey.pem
+      subPath: dppsuser.key.pem
+    - name: dppsuser-certkey-600
+      mountPath: /home/dirac/.globus/usercert.pem
+      subPath: dppsuser.pem
+    - name: diracuser-sshkey
+      mountPath: /home/dirac/.ssh/diracuser_sshkey
+      subPath: ssh-diracuser_sshkey
+
+  volumes:
+  {{ if .Values.dev.mount_repo }}
+  - name: repo
+    hostPath:
+      path: /repo
+      type: Directory
+  {{ end }}
+  - name: cafile
+    secret:
+      defaultMode: 420
+      secretName: {{ template "certprefix" . }}-server-cafile
+  - name: dppsuser-certkey-600
+    secret:
+      defaultMode: 0600
+      secretName: {{ template "certprefix" . }}-dppsuser-certkey
+  - name: dppsuser-certkey-400
+    secret:
+      defaultMode: 0400
+      secretName: {{ template "certprefix" . }}-dppsuser-certkey
+  - name: test-results
+    persistentVolumeClaim:
+      claimName: test-results
+      # ./certs/ssh/diracuser_sshkey:/home/dirac/.ssh/diracuser_sshkey
+  - name: diracuser-sshkey
+    secret:
+      secretName: {{ .Release.Name }}-diracuser-sshkey
+      defaultMode: 420
+
+  restartPolicy: Never

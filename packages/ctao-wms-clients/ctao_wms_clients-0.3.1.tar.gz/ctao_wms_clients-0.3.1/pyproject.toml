@@ -1,0 +1,196 @@
+[build-system]
+requires = ["setuptools>=65", "setuptools_scm[toml]>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ctao-wms-clients"
+description = "Client package for the Workload Management System of CTAO DPPS"
+readme = "README.md"
+license = {text = "BSD-3-Clause"}
+authors = [
+  { name = "Volodymyr Savchenko", email = "volodymyr.savchenko@cta-consortium.org"},
+  { name = "Natthan Pigoux", email = "natthan.pigoux@lupm.in2p3.fr"},
+  { name = "Maximilian Linhoff", email = "maximilian.linhoff@cta-observatory.org"},
+  { name = "Volodymyr.Savchenko", email = "volodymyr.savchenko@cta-consortium.org"},
+  { name = "Luisa Arrabito", email = "arrabito@in2p3.fr"},
+]
+
+requires-python = ">=3.9"
+dependencies = [
+    "CTADIRAC~=2.2.81",
+]
+
+# needed for setuptools_scm, we don"t define a static version
+dynamic = ["version"]
+
+[project.urls]
+repository = "https://gitlab.cta-observatory.org/cta-computing/dpps/workload/wms"
+documentation = "http://cta-computing.gitlab-pages.cta-observatory.org/dpps/workload/wms"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["wms._dev_version"]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-cov",
+  "pytest-requirements"
+]
+doc = [
+  "sphinx",
+  "numpydoc",
+  "ctao-sphinx-theme",
+  "myst-parser",
+  "sphinx_changelog",
+]
+dev = [
+  "setuptools_scm",
+  "sphinx-autobuild",
+]
+
+# we can use self-references to simplify all
+all = [
+  "ctao-wms-clients[test,doc,dev]",
+]
+
+[tool.setuptools_scm]
+write_to = "src/wms/_version.py"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+
+[tool.ruff.lint]
+extend-select = [
+    "I", # isort
+    "N", # pep8 naming
+    "D", # pydocstyle
+    "NPY", # numpy
+    "PT", # pytest
+    "UP", # pyupgrade
+    "COM", # flake8-commas
+    "ISC", # implicit string concat rules
+    "ICN", # import name conventions
+    "G", # logging
+]
+ignore = [
+    "COM812", # incompatible with ruff format
+    "ISC001", # incompatible with ruff format
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+# no documentation linting for test files
+"**/tests/**" = ["D"]
+"**/tests_*.py" = ["D"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["wms"]
+
+[tool.coverage.run]
+relative_files = true
+source = ["src"]
+omit = [
+    "src/wms/_version.py",
+    "src/wms/_dev_version/*"
+]
+
+[tool.pytest.ini_options]
+minversion = "7"
+testpaths = ["src"]
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s %(levelname)s %(name)s %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S.%f"
+xfail_strict = true
+# print summary of failed tests, force errors if settings are misspelled
+addopts = ["-ra", "--strict-config", "--strict-markers", "-p", "pytest_requirements"]
+filterwarnings = [
+    "error",
+    # this warning comes from pytest itself and was triggered by a resource
+    # leak in rucio in a subthread. Keep it as a warning. Issue is opened.
+    # https://github.com/rucio/rucio/issues/6787
+    "default::pytest.PytestUnraisableExceptionWarning",
+    "error",
+    # this warning should not be turned into an error, will happen e.g. when
+    # using wheels compiled against an older version of numpy then is used at runtime
+    # left as warning as the other direction (compiled vs. newer, using older numpy) is
+    # problematic
+    "default:numpy.ndarray size changed:RuntimeWarning",
+    # resource warning due to unclosed resources in rucio turned into error
+    "default::pytest.PytestUnraisableExceptionWarning",
+    # warnings from DIRAC we cannot do anything about
+    "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
+    "ignore:Deprecated call to `pkg_resources:DeprecationWarning",
+    "ignore:distutils Version classes:DeprecationWarning",
+    "ignore:_SixMetaPathImporter:ImportWarning",
+    "ignore:The asyncore module:DeprecationWarning",
+    "ignore:datetime.datetime.utcnow\\(\\) is deprecated:DeprecationWarning:DIRAC",
+]
+
+markers = [
+  "wms: tests for the WMS",
+  "dirac_client: tests to be executed in the dirac-client container",
+]
+
+
+
+[tool.repo-review]
+select = ["PY", "PP", "PC"]
+ignore = [
+    "PY007", # we do not use tox for now
+    "PC140", # mypy is not used
+    "PC170", # pygrep is not used
+    "PC180", # prettier is not used
+    "PC111", # blacken-docs is not used
+    "PC901", # no CI setup currently for updating pre-commit hooks
+]
+
+[tool.codespell]
+skip = "*.fits,*.fits.gz,*.fits.fz"
+ignore-words = ".codespell-ignores"
+
+[tool.pylint]
+ignore = [
+  "_version.py",
+]
+
+[tool.towncrier]
+package = "wms"
+directory = "docs/changes"
+filename = "CHANGES.rst"
+template = "docs/changes/template.rst"
+underlines = ["-", "~", "^"]
+# template to turn the number to a link, we link to merge requests
+issue_format = "`!{issue} <https://gitlab.cta-observatory.org/cta-computing/dpps/workload/wms/-/merge_requests/{issue}>`__"
+
+[tool.towncrier.fragment.feature]
+    name = "New Features"
+    showcontent = true
+
+[tool.towncrier.fragment.bugfix]
+    name = "Bug Fixes"
+    showcontent = true
+
+[tool.towncrier.fragment.api]
+    name = "API Changes"
+    showcontent = true
+
+[tool.towncrier.fragment.optimization]
+    name = "Refactoring and Optimization"
+    showcontent = true
+
+[tool.towncrier.fragment.maintenance]
+    name = "Maintenance"
+    showcontent = true
