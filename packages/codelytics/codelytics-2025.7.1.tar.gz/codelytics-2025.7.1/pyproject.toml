@@ -1,0 +1,105 @@
+[project]
+name = "codelytics"
+version = "2025.07.1"
+description = "A Python package for extracting code and text metrics in Python projects."
+readme = "README.md"
+authors = [{ name = "marijanbeg", email = "m.beg@imperial.ac.uk" }]
+requires-python = ">=3.13"
+dependencies = [
+    "complexipy>=3.0.0",
+    "nbformat>=5.10.4",
+    "pandas>=2.3.0",
+    "pymupdf>=1.26.1",
+    "pyspellchecker>=0.8.3",
+    "radon>=6.0.1",
+]
+license = "MIT"
+keywords = [
+    "github",
+    "repositories",
+    "automation",
+    "higher education",
+    "code quality",
+    "linting",
+    "code analysis",
+    "code metrics",
+    "Jupyter",
+    "Python",
+    "Python package",
+    "assessment",
+    "coursework",
+    "generative AI",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Education",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "pre-commit>=4.2.0",
+    "pytest>=8.4.0",
+    "pytest-cov>=6.1.1",
+    "pytest-sugar>=1.0.0",
+    "pytest-xdist>=3.7.0",
+]
+
+[project.urls]
+Repository = "https://github.com/teachnology/codelytics"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+exclude = ["tests/data/project01/dir01/invalid-syntax/"]
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = [
+    "F",    # flake8
+    "E",    # pycodestyle
+    "W",    # pycodestyle (warnings)
+    "N",    # pep8-naming
+    "E501", # line too long - not enabled by default
+    "UP",   # pyupgrade
+    "I",    # isort
+    "D",    # pydocstyle
+    "PD",   # pandas-vet
+    "PL",   # pylint
+    "NPY",  # numpy
+    "RUF",  # ruff
+]
+ignore = [
+    "D100",    # Missing docstring in public module
+    "PLR2004", # Magic value used in comparison
+    "PLR0911", # Too many return statements
+    "PLR0912", # Too many branches
+    "PLR0915", # Too many statements
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["D"]
+"tests/*" = ["D"]
+
+[tool.coverage.run]
+omit = ["tests/*.py"]
+
+[tool.pytest.ini_options]
+addopts = [
+    "-v",
+    "--numprocesses=auto",
+    "--doctest-modules",
+    "--cov=codelytics",
+    "--cov-report=html",
+    "--cov-report=term",
+    "--ignore=tests/data/project01/dir01/invalid-syntax.py",
+    "--ignore=tests/data/project01/invalid-syntax/",
+]
