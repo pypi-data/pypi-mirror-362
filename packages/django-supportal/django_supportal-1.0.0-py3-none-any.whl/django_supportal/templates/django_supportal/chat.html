@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - {{ business.name }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'django_supportal/css/chat.css' %}">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>{{ business.name }}</h2>
+            <span class="status" id="connection-status">connecting...</span>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <!-- messages will be added here -->
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="type your message..." autocomplete="off">
+            <button id="send-button">send</button>
+        </div>
+    </div>
+
+    <script>
+        const businessId = {{ business.id }};
+        const sessionId = "{{ session.session_id }}";
+        const websocketUrl = "ws://{{ request.get_host }}/ws/chat/" + businessId + "/" + sessionId + "/";
+    </script>
+    <script src="{% static 'django_supportal/js/chat.js' %}"></script>
+</body>
+</html>

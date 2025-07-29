@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>supportal admin dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'django_supportal/css/chat.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>supportal admin dashboard</h1>
+        
+        <div class="businesses-section">
+            <h2>your businesses</h2>
+            
+            {% for business in businesses %}
+                <div class="business-card">
+                    <h3>{{ business.name }}</h3>
+                    <p>{{ business.description }}</p>
+                    <div class="business-stats">
+                        <span>documents: {{ business.documents.count }}</span>
+                        <span>active sessions: {{ business.chat_sessions.filter.is_active=True.count }}</span>
+                    </div>
+                    <div class="business-actions">
+                        <a href="{% url 'admin:django_supportal_business_change' business.id %}">edit</a>
+                        <a href="{% url 'django_supportal:chat-interface' business.id 'demo' %}">test chat</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p>no businesses found. create one to get started.</p>
+            {% endfor %}
+        </div>
+        
+        <div class="actions">
+            <a href="{% url 'admin:django_supportal_business_add' %}" class="btn">add business</a>
+            <a href="{% url 'admin:django_supportal_document_add' %}" class="btn">upload document</a>
+        </div>
+    </div>
+</body>
+</html>
