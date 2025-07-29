@@ -1,0 +1,130 @@
+[build-system]
+requires = ["uv_build>=0.7.20,<0.8.0"]
+build-backend = "uv_build"
+
+[project]
+name = "namedtuple_table"
+version = "0.1.0"
+authors = [
+    {name = "Adam Jackson", email = "adam.jackson@stfc.ac.uk"},
+]
+maintainers = [
+    {name = "Adam Jackson", email = "adam.jackson@stfc.ac.uk"},
+]
+description = "Simple indexable tables using NamedTuple"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+keywords = [
+    "Python",
+    "table",
+    "index",
+    "simple",
+    "lightweight",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+lint = [
+     "mypy",
+     "ruff",
+]
+
+[project.urls]
+Repository = "https://github.com/ajjackson/namedtuple-table"
+
+
+[tool.mypy]
+python_version = "3.12"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+testpaths = [
+    "test/test*.py",
+]
+
+[tool.ruff]
+target-version = "py312"
+namespace-packages = ["test"]
+
+[tool.ruff.lint]
+preview = true
+explicit-preview-rules = true
+select = [
+       "ERA001",  # Eradicate commented-out code
+       "YTT",     # Flake8-2020
+       "ANN",     # Annotations
+       "S",       # Security (flake8-bandit)
+       "BLE",     # flake8-blind-except
+       "FBT",     # flake8-boolean-trap
+       "B",       # flake8-bugbear
+       "A",       # flake8-builtins
+       "COM",     # flake8-commas
+       "C4",      # flake8-comprehensions
+       "T10",     # flake8-debugger
+       "EM",      # flake8-errmsg
+       "EXE",     # flake8-executable
+       "FIX",     # flake8-fixme (leftover FIXME, TODO etc.)
+       "FA",      # flake8-future-annotations
+       "INT",     # flake8-gettext
+       "ISC",     # flake8-implicit-str-concat
+       "ICN",     # flake8-import-conventions
+       "LOG",     # flake8-logging
+       "G",       # flake8-logging-format
+       "INP",     # flake8-no-pep420
+       "PIE",     # flake8-pie
+       "PYI",     # flake8-pyi
+       "PT",      # flake8-pytest-style
+       "Q",       # flake8-quotes
+       "RSE",     # flake8-raise
+       "RET",     # flake8-return
+       "SLF",     # flake8-self
+       "SIM",   # flake8-simplify : good stuff, worth its own PR
+       "SLOT",    # flake8-slots
+       "TID",     # flake8-tidy-imports
+       "TD",      # flake8-todos
+       "TC",      # flake8-type-checking
+       "ARG",     # flake8-unused-arguments
+       "PTH",     # flake8-use-pathlib : would love to but maybe easier with API breaks
+       "FLY",     # flynt
+       "I",       # isort
+       "C90",     # mccabe : code complexity check. Worth a look but non-trivial
+       "N",       # pep8-naming
+       "PERF",    # Perflint
+       "F401",    # unused-import
+       "E",       # pycodestyle error
+       "W",       # pycodestyle warning
+       "DOC",     # pydoclint
+       "D",       # pydocstyle
+       "F",       # pyflakes
+       "PL",      # pylint
+       "UP",      # pyupgrade
+       "FURB",    # refurb
+       "RUF",     # ruff
+       "TRY",     # tryceratops
+]
+
+ignore = [
+       "COM812",
+       "D400",  # I don't like punctuation at the end of short fragments
+       "D107",  # Don't need docstring in class _and_ init, prefer class
+       "D203",  # Line before class docstring (inconsistent with D211)
+       "D213",  # D212 and D213 are incompatible
+       "D415",  # ""
+       "UP047", # Generic function annotation. Don't understand how to make it work with mypy
+]
+
+[tool.ruff.lint.per-file-ignores]
+"test/*" = [
+         "S101",    # pytest expects "assert" to be used
+         "ANN",     # life to short to annotate pytests
+         "PLR2004", # magic values ok in unit tests
+]
