@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling >= 1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "plnq-gvsu"
+version = "2.0.3"
+authors = [
+  { name="Zachary Kurmas", email="kurmasz@gvsu.edu" },
+]
+description = "Builds PrairieLearn questions containing auto-graded Jupyter notebooks"
+dependencies = [
+    "nbformat >= 5.10.4"
+]
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Education"
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICEN[CS]E*"]
+
+[tool.hatch.build.targets.sdist]
+include = ["plnq/**", "plnq_mock/**"]
+
+[tool.hatch.build.targets.wheel]
+include = ["plnq/**", "plnq_mock/**"]
+
+
+[project.urls]
+Homepage = "https://github.com/kurmasz/plnq"
+Issues = "https://github.com/kurmasz/plnq/issues"
+
+[project.scripts]
+plnq = "plnq.plnq:main"
+
+
+# Instructions for updating PyPI:
+# 1. Update version in plnq.py
+# 2. Update the .plnq files in expected_output
+# 3. Update the version in this file.
+# 4. Run  
