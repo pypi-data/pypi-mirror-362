@@ -1,0 +1,35 @@
+[project]
+name = "qlauncher"
+version = "2.0.4"
+description = "Quantum Launcher is modular tool, for solving many problems on many algorithms using many quantum computing backends"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "networkx",
+    "notebook",
+    "numpy<=1.26.4",
+    "overrides",
+    "pandas",
+    "pathos>=0.3.3",
+    "matplotlib",
+    "pyqubo",
+    "scipy",
+    "qiskit < 2.0",
+    "qiskit_algorithms",
+    "qiskit_aqt_provider",
+    "qiskit_ibm_runtime",
+    "qiskit_optimization",
+    "qiskit_aer",
+    "qcg-pilotjob",
+    "dill"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["qlauncher*"]
+
+[project.optional-dependencies]
+orca = ["numba==0.60.0", "torch"]
+dwave = ["dwave-ocean-sdk", "dwave-tabu>=0.5.0"]
+cirq = ["cirq>=1.4.1", "ply"]
+dev = ["pytest", "pytest-httpx>=0.35.0"]
