@@ -1,0 +1,23 @@
+version: 3
+
+dotenv: [.env]
+
+vars:
+  PACKAGE: notebookutils
+
+tasks:
+  default:
+    silent: true
+    cmd: task -a
+
+  build:
+    cmds:
+      - rm -rf ./dist
+      - uv build
+
+  publish:
+    cmd: uv publish --token $PYPI_TOKEN
+
+  verify_installation:
+    cmd: >
+      uv run --with dummy-notebookutils-reborn --no-project -- python -c "import {{.PACKAGE}}"
