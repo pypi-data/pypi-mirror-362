@@ -1,0 +1,35 @@
+[project]
+name = "umnet-db"
+version = "0.4.4"
+description = "Custom database for storing network data"
+authors = [
+    {name = "Amy Liebowitz",email = "amylieb@umich.edu"}
+]
+license="MIT"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "sqlalchemy (>=2.0.24)",
+    "python-decouple (>=3.8)",
+    "texttable (>=1.7.0)",
+    "netaddr (>=1.3.0)",
+    "postgresql-audit (>=0.17.1)",
+    "psycopg-binary (>=3.2.6)",
+    "psycopg (>=3.2.6)",
+]
+
+[project.scripts]
+umnetdb-lookup='umnet_db.cli.table_query:main'
+umnetdb-diff='umnet_db.cli.activity_query:main'
+umnetdb-delete='umnet_db.cli.db_delete:main'
+umnetdb-init='umnet_db.cli.db_init:main'
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+
