@@ -1,0 +1,89 @@
+Metadata-Version: 2.4
+Name: pydal-psycopg3
+Version: 0.1.1
+Summary: Experimental psycopg3 driver for pydal
+Author-email: Robin van der Noord <robinvandernoord@gmail.com>
+Requires-Python: >=3.10
+Requires-Dist: psycopg<4,>3
+Requires-Dist: pydal>=20250629.2
+Provides-Extra: dev
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: testcontainers; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# pydal-psycopg3
+
+`pydal-psycopg3` is a proof-of-concept driver for [pyDAL](https://github.com/web2py/pydal), demonstrating integration
+with [psycopg3](https://www.psycopg.org/psycopg3/) as a drop-in replacement for the psycopg2 driver. The goal is to
+ensure databases relying on `psycopg2` functionality can seamlessly transition to `psycopg3` while preserving the same
+driver schemes.
+
+## Key Features
+
+- **Drop-In Replacement**: The module is designed to work with existing `psycopg2` configurations.
+- **Custom Scheme Support**: Supports both the original "postgres" scheme and a custom "postgres:psycopg3" scheme for
+  explicit usage.
+- **Compatibility with pyDAL**: Built as a registerable driver, compatible with the DAL object.
+
+## Installation
+
+To use this driver, install the package and its dependencies:
+
+```bash
+(uv) pip install pydal-psycopg3
+# or to include the prebuilt driver:
+(uv) pip install pydal-psycopg3 psycopg-binary
+```
+
+## Getting Started
+
+To integrate `pydal-psycopg3`, use the following setup:
+
+```python
+from pydal import DAL
+
+# Required to register the driver
+import pydal_psycopg3
+
+# Using the original scheme
+db = DAL("postgres://someuser:somepass@localhost:5432/postgres")
+
+# Or using the explicit psycopg3 scheme
+db = DAL("postgres:psycopg3://someuser:somepass@localhost:5432/postgres")
+```
+
+Both approaches ensure the driver works transparently.
+
+### Example Usage
+
+- Define tables and perform queries just like with `psycopg2`. Here's a minimal example to get started:
+
+```python
+# Defining a table
+db.define_table("example_table", db.Field("example_field"))
+
+# Inserting data
+db.example_table.insert(example_field="test data")
+db.commit()
+
+# Querying the table
+rows = db(db.example_table).select()
+print(rows)
+```
+
+### Driver Registration
+
+The driver registers itself automatically when `imported` and works with either of the following schemes:
+
+1. `postgres://` – The default scheme connects using `psycopg3` as the driver.
+2. `postgres:psycopg3://` – An explicitly declared scheme to use `psycopg3`.
+
+## Limitations
+
+This module is in its **proof-of-concept** phase and should be used with caution in production environments.
+While most functionalities are expected to work as intended, thorough testing is recommended.
+
+## License
+
+This project is licensed under the MIT License.
