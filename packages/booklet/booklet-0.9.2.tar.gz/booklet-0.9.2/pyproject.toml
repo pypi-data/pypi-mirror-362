@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling>=1.26.1"]
+build-backend = "hatchling.build"
+
+[project]
+name = "booklet"
+dynamic = ["version"]
+description = "A python key-value file database"
+readme = "README.rst"
+license = "Apache-2.0"
+authors = [
+    { name = "Mike Kittridge", email = "mullenkamp1@gmail.com" },
+]
+keywords = [
+    "dbm",
+    "shelve",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+]
+
+requires-python = ">=3.10"
+dependencies = ['portalocker', 'orjson', 'uuid6>=2024.07.10']
+
+[dependency-groups]
+dev = [
+  "spyder-kernels==2.5",
+  "black",
+  "mypy",
+  "ruff",
+  "pytest",
+  "pytest-cov",
+]
+
+[tool.hatch.envs.default]
+# type = "container"
+# image = 'python:3.9-slim-bullseye'
+python = "3.10"
+dependencies = [
+  "spyder-kernels==2.4",
+  "matplotlib",
+  "coverage[toml]>=6.5",
+  "pytest",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.9", "3.10", "3.11"]
+
+[project.urls]
+Homepage = "https://github.com/mullenkamp/booklet"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/booklet",
+]
+exclude = [
+  "/booklet/tests/*",
+]
+
+[tool.hatch.version]
+path = "booklet/__init__.py"
+
