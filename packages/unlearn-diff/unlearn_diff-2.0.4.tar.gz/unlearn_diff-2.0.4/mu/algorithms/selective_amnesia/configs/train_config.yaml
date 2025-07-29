@@ -1,0 +1,82 @@
+# Training parameters
+seed : 23 
+scale_lr : True 
+
+# Model configuration
+model_config_path: "mu/algorithms/selective_amnesia/configs/model_configg.yaml"
+ckpt_path: "/home/ubuntu/Projects/UnlearnCanvas/UnlearnCanvas/machine_unlearning/models/compvis/style50/compvis.ckpt"  # Checkpoint path for Stable Diffusion
+full_fisher_dict_pkl_path : "mu/algorithms/selective_amnesia/data/full_fisher_dict.pkl"
+
+# Dataset directories
+raw_dataset_dir: "data/quick-canvas-dataset/sample"
+processed_dataset_dir: "mu/algorithms/selective_amnesia/data"
+dataset_type : "unlearncanvas"
+template : "style"
+template_name : "Abstractionism"
+replay_prompt_path: "mu/algorithms/selective_amnesia/data/fim_prompts_sample.txt"
+
+
+# Output configurations
+output_dir: "outputs/selective_amnesia/finetuned_models"  # Output directory to save results
+
+# Sampling and image configurations
+
+# Device configuration
+devices: "0,"  # CUDA devices to train on (comma-separated)
+
+# Additional flags
+use_sample: True  # Use the sample dataset for training
+
+data:
+  target: mu.algorithms.selective_amnesia.data_handler.SelectiveAmnesiaDataHandler
+  params:
+    train_batch_size: 4
+    val_batch_size: 6
+    num_workers: 4
+    num_val_workers: 0 # Avoid a weird val dataloader issue (keep unchanged)
+    train:
+      target: stable_diffusion.ldm.data.ForgettingDataset
+      params:
+        forget_prompt: An image in Artist_Sketch style
+        forget_dataset_path: ./q_dist/photo_style
+    validation:
+      target: stable_diffusion.ldm.data.VisualizationDataset
+      params:
+        output_size: 512
+        n_gpus: 1 # CHANGE THIS TO NUMBER OF GPUS! small hack to sure we see all our logging samples
+
+lightning:
+  find_unused_parameters: False
+
+  modelcheckpoint:
+    params:
+      every_n_epochs: 0
+      save_top_k: 0
+      monitor: null
+
+  callbacks:
+    image_logger:
+      target: mu.algorithms.selective_amnesia.callbacks.ImageLogger
+      params:
+        batch_frequency: 1
+        max_images: 999
+        increase_log_steps: False
+        log_first_step: False
+        log_all_val: True
+        clamp: True
+        log_images_kwargs:
+          ddim_eta: 0
+          ddim_steps: 50
+          use_ema_scope: True
+          inpaint: False
+          plot_progressive_rows: False
+          plot_diffusion_rows: False
+          N: 6 # keep this the same as number of validation prompts!
+          unconditional_guidance_scale: 7.5
+          unconditional_guidance_label: [""]
+
+  trainer:
+    benchmark: True
+    num_sanity_val_steps: 0
+    max_epochs: 50 # modify epochs here!
+    check_val_every_n_epoch: 10
