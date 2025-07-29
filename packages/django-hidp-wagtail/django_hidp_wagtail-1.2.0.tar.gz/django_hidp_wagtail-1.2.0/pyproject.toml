@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=42", "wheel", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-hidp-wagtail"
+requires-python = ">=3.11"
+dynamic = ["version"]
+description = "A Wagtail-themed template pack for HIdP"
+authors = [
+    { name = "Ramon de Jezus", email = "rdejezus@leukeleu.nl" },
+    { name = "Wouter de Vries", email = "wdevries@leukeleu.nl" },
+]
+dependencies = [
+    "django-hidp>=1.5.0,<2",
+]
+readme = "README.md"
+license = "BSD-3-Clause"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Django",
+    "Framework :: Wagtail",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Repository = "https://github.com/leukeleu/django-hidp-wagtail/"
+Issues = "https://github.com/leukeleu/django-hidp-wagtail/issues"
+Releasenotes = "https://github.com/leukeleu/django-hidp-wagtail/releases"
+
+[tool.setuptools_scm]
+root = "../.."
+
+[tool.setuptools]
+packages = ["hidp_wagtail"]
+
+[tool.setuptools.package-data]
+hidp_wagtail = ["templates/hidp/*.html", "static/css/*.css"]
+
+[tool.ruff]
+unsafe-fixes = false
+line-length = 88
+
+[tool.ruff.lint.isort.sections]
+django = [
+  "django",
+]
