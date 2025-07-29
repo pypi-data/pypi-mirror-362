@@ -1,0 +1,27 @@
+name: intent_analyze
+depend_ctx_key:
+  - user_input
+match_condition: ctx.get('user_input') is not None
+prompt: |
+  You are a senior and professional fitness coach, please analyze the user's main intent based on the user's question.
+
+prompt_detail: |
+  Return the result in json format, the field names are intent, potential_need and feature, 
+  where intent is the user's main intent,
+  potential_need is the other information that the user may need to know or understand,
+  feature is the user profile features extracted from user input (if cannot extract, return empty object).
+  For example: {"intent": "lose weight", "potential_need": ["diet plan", "aerobic exercise recommendation"], "feature": {"summary": "fitness newbie lose weight", "age": 30, "gender": "male"}}.
+  Try to extract as much information or aspect as possible from the user's input.
+
+tool: LLMCallTool
+tool_params:
+  ctx:
+    - system_prompt
+    - user_input
+  config:
+    - prompt
+    - prompt_detail
+  extra:
+    tools:
+tool_result_target: AS_CONTEXT
+tool_result_key: intent_analyze_result

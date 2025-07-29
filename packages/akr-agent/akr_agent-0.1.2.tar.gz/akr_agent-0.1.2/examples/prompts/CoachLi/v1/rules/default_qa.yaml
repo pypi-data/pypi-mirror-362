@@ -1,0 +1,25 @@
+name: DefaultQA
+depend_ctx_key:
+  - intent_analyze_result
+match_condition: "ctx.get('intent_analyze_result') is not None"
+prompt: |
+  After analysis, the user's main intent is: {{ intent_analyze_result.intent }}，user's potential need is: {{ intent_analyze_result.potential_need }}，user's profile features are: {{ intent_analyze_result.feature }}
+
+prompt_detail:
+
+tool: LLMCallTool
+tool_params:
+  ctx:
+    - user_input
+    - image_url
+    - image_url_detail
+    - system_prompt
+    - intent_analyze_result.intent
+    - intent_analyze_result.potential_need
+    - intent_analyze_result.feature
+  config:
+    - prompt
+    - prompt_detail
+  extra: {}
+tool_result_target: DIRECT_RETURN
+tool_result_key:
