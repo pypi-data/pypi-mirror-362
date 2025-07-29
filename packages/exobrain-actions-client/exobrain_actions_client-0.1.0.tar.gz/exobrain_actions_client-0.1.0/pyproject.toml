@@ -1,0 +1,102 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "exobrain-actions-client"
+dynamic = ["version"]
+description = "REST API client for interacting with Exobrain Actions services, providing access to action management endpoints."
+authors = [
+    { name = "Laurent LAPORTE", email = "laurent.laporte.pro@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE.md" }
+keywords = []
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.12",
+    "License :: Other/Proprietary License",
+]
+packages = [
+    { include = "exobrain.actions.client" }
+]
+dependencies = [
+    "exobrain-actions-schemas>=0.1.0.post1",
+]
+
+[project.urls]
+Documentation = "https://github.com/laurent-laporte-pro/exobrain-actions-client#readme"
+Issues = "https://github.com/laurent-laporte-pro/exobrain-actions-client/issues"
+Source = "https://github.com/laurent-laporte-pro/exobrain-actions-client"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.9.2",
+    "mypy>=1.16.1",
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "ruff>=0.12.3",
+    "twine>=6.1.0",
+]
+
+# -----------------------------------------------------------------------------
+# Hatch configuration
+# -----------------------------------------------------------------------------
+
+[tool.hatch.version]
+path = "src/exobrain/actions/client/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/exobrain"]
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+    "mypy>=1.16.1",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --namespace-packages --install-types --non-interactive  --package exobrain.actions.client  --package tests"
+
+# -----------------------------------------------------------------------------
+# Coverage configuration
+# -----------------------------------------------------------------------------
+
+[tool.coverage.run]
+source_pkgs = ["exobrain.actions.client", "tests"]
+branch = true
+parallel = true
+omit = [
+    "src/exobrain/actions/client/__about__.py",
+]
+
+[tool.coverage.paths]
+exobrain_actions_client = ["src/exobrain/actions/client", "*/exobrain-actions-client/src/exobrain/actions/client"]
+tests = ["tests", "*/exobrain-actions-client/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "no cov",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+# -----------------------------------------------------------------------------
+# Mypy configuration
+# -----------------------------------------------------------------------------
+
+[tool.mypy]
+python_version = "3.12"
+namespace_packages = true
+ignore_missing_imports = true
+strict = true
+exclude = '^src/exobrain/actions/client/http_client/__init__\.py$'
+
+# -----------------------------------------------------------------------------
+# Ruff configuration
+# -----------------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py312"
