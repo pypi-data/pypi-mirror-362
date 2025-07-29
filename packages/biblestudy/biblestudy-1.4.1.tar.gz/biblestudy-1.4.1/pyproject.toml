@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biblestudy"
+version = "1.4.1"
+description = "A text-based Bible study companion for your terminal"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "labrack", email = "labrack@users.noreply.github.com"}
+]
+keywords = ["bible", "study", "cli", "terminal", "scripture", "devotional"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Religion", 
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Religion",
+    "Topic :: Utilities"
+]
+requires-python = ">=3.9"
+dependencies = [
+    "openai>=1.0.0",
+    "requests>=2.31.0",
+    "urllib3<2",
+    "rich>=13.7.0",
+    "beautifulsoup4>=4.12.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "black",
+    "flake8"
+]
+
+[project.urls]
+Homepage = "https://github.com/labrack/biblestudy-cli"
+Repository = "https://github.com/labrack/biblestudy-cli"
+Issues = "https://github.com/labrack/biblestudy-cli/issues"
+
+[project.scripts]
+biblestudy = "biblestudy.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+biblestudy = ["*.json"]
