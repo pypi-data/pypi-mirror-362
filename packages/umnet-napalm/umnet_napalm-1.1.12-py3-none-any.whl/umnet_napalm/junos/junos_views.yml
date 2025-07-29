@@ -1,0 +1,228 @@
+### ip interfaces ###
+junos_ip_interfaces:
+  rpc: get-interface-information
+  item: physical-interface/logical-interface/address-family/interface-address
+  key: ifa-local
+  view: junos_ip_interfaces_view
+
+junos_ip_interfaces_view:
+  fields:
+    ip: ifa-local
+    subnet: ifa-destination
+    family: ../address-family-name
+    interface: ../../name
+    mtu: ../mtu
+    description: ../../description
+    primary: ifa-flags/ifaf-current-primary
+    preferred: ifa-flags/ifaf-current-preferred
+    admin_up: ../../if-config-flags/iff-up
+    device_down: ../../if-config-flags/iff-device-down
+    hardware_down: ../../if-config-flags/iff-hardware-down
+
+
+junos_vrf_interfaces:
+  rpc: get-instance-information
+  args:
+    detail: True
+  item: instance-core/instance-interface
+  key: interface-name
+  view: junos_vrf_interfaces_view
+
+junos_vrf_interfaces_view:
+  fields:
+    vrf: ../instance-name
+
+## show route active-path ####
+junos_route_table:
+  rpc: get-route-information
+  item: route-table/rt
+  args:
+    active-path: True
+  key: 
+    - rt-destination
+    - ../table-name
+  view: junos_route_table_view
+
+junos_route_table_view:
+  fields:
+    vrf: ../table-name
+    prefix: rt-destination
+    rt_entry: _entry_table
+
+_entry_table:
+  item: rt-entry
+  key:
+   - protocol-name
+   - learned-from
+  view: _entry_view
+
+_entry_view:
+  fields:
+    age: age
+    protocol: protocol-name
+    learned_from: gateway
+    next_hop: _nh_table
+    
+_nh_table:
+  item: nh
+  key:
+    - to
+    - via
+  view: _nh_view
+
+_nh_view:
+  fields:
+    nh_ip: to
+    nh_interface: via
+    mpls_label: mpls-label
+    selected_next_hop: selected-next-hop
+#    nh_table_receive: nh-table-receive
+#    nh_table: nh-table
+
+### show route table mpls ###
+junos_mpls_table:
+  rpc: get-route-information
+  item: route-table/rt
+  args:
+    table: mpls.0
+    active-path: True
+  key: 
+    - rt-destination
+  view: junos_mpls_table_view
+
+junos_mpls_table_view:
+  fields:
+    prefix: rt-destination
+    rt_entry: _mpls_entry_table
+
+_mpls_entry_table:
+  item: rt-entry
+  key:
+   - protocol-name
+   - learned-from
+  view: _mpls_entry_view
+
+_mpls_entry_view:
+  fields:
+    next_hop: _mpls_nh_table
+    
+_mpls_nh_table:
+  item: nh
+  key:
+    - to
+    - via
+  view: _mpls_nh_view
+
+_mpls_nh_view:
+  fields:
+    nh_ip: to
+    nh_interface: via
+    mpls_label: mpls-label
+#    selected_next_hop: selected-next-hop
+    nh_table_receive: nh-table-receive
+    nh_table: nh-table
+
+
+### show chassis inventory ###
+junos_inventory:
+  rpc: get-chassis-inventory
+  item: chassis
+  view: junos_inventory_view
+
+junos_inventory_view:
+  fields:
+    system_serial: serial-number
+    system_description: description
+    modules: _module_table
+
+_module_table:
+  item: chassis-module
+  key: name
+  view: _module_view
+
+_module_view:
+  fields:
+    name: name
+    part_number: part-number
+    serial_number: serial-number
+    description: description
+    model_number: model-number
+    sub_modules: _sub_module_table
+
+_sub_module_table:
+  item: chassis-sub-module
+  key: name
+  view: _sub_module_view
+
+_sub_module_view:
+  fields:
+    name: name
+    part_number: part-number
+    serial_number: serial-number
+    description: description
+    model_number: model-number
+    sub_sub_modules: _sub_sub_module_table
+
+_sub_sub_module_table:
+  item: chassis-sub-sub-module
+  key: name
+  view: _sub_sub_module_view
+
+_sub_sub_module_view:
+  fields:
+    name: name
+    part_number: part-number
+    serial_number: serial-number
+    description: description
+    model_number: model-number
+
+
+### show route summary (for determining VPNs for ARP table) ###
+junos_route_summary:
+  rpc: get-route-summary-information
+  item: route-table
+  key: table-name
+  view: junos_route_summary_view
+
+junos_route_summary_view:
+  fields:
+    table: table-name
+
+
+junos_show_int_lag:
+  rpc: get-interface-information
+  args:
+    terse: True
+  item: physical-interface/logical-interface
+  key: name
+  view: junos_show_int_lag_view
+
+junos_show_int_lag_view:
+  fields:
+    phy_admin_status: ../admin-status
+    admin_status: admin-status
+    oper_status: oper-status
+    lag_name: address-family/ae-bundle-name
+
+
+junos_show_lacp:
+  rpc: get-lacp-interface-information
+  item: lacp-interface-information
+  key: lag-lacp-header/aggregate-name
+  view: show_lacp_view
+
+show_lacp_view:
+  fields:
+    name: lag-lacp-header/aggregate-name
+    members: _lacp_member_table
+
+_lacp_member_table:
+  item: lag-lacp-state
+  key: name
+  view: _show_lacp_member_view
+
+_show_lacp_member_view:
+  fields:
+    lacp_timeout: lacp-timeout
+    lacp_activity: lacp-activity
+
