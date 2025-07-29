@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dash-kline-charts"
+version = "0.1.2"
+description = "A Dash component for displaying financial charts using KLineChart"
+readme = "README.md"
+requires-python = ">=3.7"
+license = "Apache-2.0"
+authors = [
+    {name = "Yefei Fan", email = "fyfcnc@gmail.com"},
+]
+keywords = ["dash", "plotly", "react", "kline", "chart", "financial", "candlestick"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Dash",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = [
+    "dash>=2.0.0",
+    "plotly>=5.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0.0",
+    "pytest-cov>=2.0.0",
+    "black>=21.0.0",
+    "flake8>=3.8.0",
+    "mypy>=0.910",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/dash-kline-charts"
+Repository = "https://github.com/your-username/dash-kline-charts"
+Documentation = "https://github.com/your-username/dash-kline-charts/blob/main/docs/API.md"
+"Bug Tracker" = "https://github.com/your-username/dash-kline-charts/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dash_kline_charts*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"dash_kline_charts" = ["*.json", "*.js", "*.css", "*.map"]
+
+[tool.black]
+line-length = 88
+target-version = ['py37']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | node_modules
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--disable-warnings",
+    "--tb=short",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
