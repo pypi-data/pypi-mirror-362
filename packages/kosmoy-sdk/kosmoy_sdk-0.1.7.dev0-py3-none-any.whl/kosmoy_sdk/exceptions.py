@@ -1,0 +1,3 @@
+
+class FunctionalityNotImplemented(Exception):
+    pass
