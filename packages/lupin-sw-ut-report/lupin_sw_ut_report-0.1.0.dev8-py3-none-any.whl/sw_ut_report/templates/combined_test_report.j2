@@ -1,0 +1,55 @@
+# Combined test report
+
+{% for report in reports %}
+**Test file :**  
+`{{ report.filename }}`
+
+{% if report.type == "txt" %}
+    {% for scenario in report.content %}
+        {% if scenario.raw_lines %}
+            {% for line in scenario.raw_lines %}
+{{ line }}
+            {% endfor %}
+        {% else %}
+## {{ scenario.test_case }}
+
+{% if scenario.covers %}
+- **Covers:** {{ scenario.covers }}
+{% endif %}
+
+{% if scenario.steps %}
+### Steps
+
+{% for step in scenario.steps %}
+**Given** {{ step['given'] | default('') }}  
+**When** {{ step['when'] | default('') }}  
+**Then** {{ step['then'] | default('') }}  
+
+{% endfor %}
+{% endif %}
+        {% endif %}
+    {% endfor %}
+
+{% elif report.type == "xml" %}
+# {{ report.content.name }}
+
+**Date**: {{ report.content.timestamp }}  
+**Number of tests**: {{ report.content.tests }}  
+**Errors**: {{ report.content.errors }}  
+**Failures**: {{ report.content.failures }} {{ report.content.status }}
+
+---
+
+{% for testsuite in report.content.suites %}
+## {{ testsuite.name }}
+
+**Number of tests**: {{ testsuite.tests }}  
+**Failures**: {{ testsuite.failures }} {{ testsuite.status }}
+{% for testcase in testsuite.testcases %}
+- {{ testcase.name }} {{ testcase.status }}
+  - **Number of tests**: {{ testcase.tests }}
+  - **Failures**: {{ testcase.failures }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% endfor %}
