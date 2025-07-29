@@ -1,0 +1,26 @@
+{% load i18n %}
+{% load juntagrico.config %}
+<div class="row mt-3">
+    <div class="col-md-2">
+        {% trans "Inhalt" %}
+    </div>
+    <div class="col-md-4">
+        {% trans "Deine Bedürfnisse haben sich geändert und du möchtest die Zusammenstellung deines Abos ändern?" %} {% trans "Du kannst diese jederzeit ändern - die Änderung werden drei mal jahrlich jeweils Anfang Jahr, ende April und mitte August aktiv." %}
+    </div>
+    <div class="col-md-4">
+        {% trans "Aktuell" %}: <br/>
+        {% for content in subscription.custom.display_content %}
+            {{ content }}<br/>
+        {% endfor %}
+        <br/>
+        {% trans "Zukünftig" %}: <br/>
+        {% for content in subscription.custom.display_future_content %}
+            {{ content }}<br/>
+        {% endfor %}
+    </div>
+    <div class="col-md-2">
+        <a href="{% url 'content_edit' subscription.id %}" class="btn btn-success">
+            {% blocktrans %}Inhalt ändern{% endblocktrans %}
+        </a>
+    </div>
+</div>
