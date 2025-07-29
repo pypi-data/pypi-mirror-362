@@ -1,0 +1,107 @@
+[build-system] # Require setuptool version due to https://github.com/pypa/setuptools/issues/2938
+requires = ["setuptools>=61.0.0", "wheel"]
+
+[project]
+name = "fenics-smart"
+version = "2.3.0.beta.1"
+description = "Spatial Modeling Algorithms for Reactions and Transport (SMART) is a high-performance finite-element-based simulation package for model specification and numerical simulation of spatially-varying reaction-transport processes in biological cells."
+authors = [{ name = "Justin Laughlin", email = "justinglaughlin@gmail.com" }]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.16.0, <2.0",
+    "pandas",
+    "Pint",
+    "scipy>=1.1.0",
+    "sympy",
+    "cached-property",
+    "tabulate",
+    "termcolor",
+]
+
+
+[project.urls]
+homepage = "https://rangamanilabucsd.github.io/smart"
+repository = "https://github.com/RangamaniLabUCSD/smart"
+
+[tool.setuptools]
+packages = ["smart"]
+
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov"]
+# Astroid is pinned due to: https://github.com/readthedocs/sphinx-autoapi/issues/407
+# which causes https://github.com/executablebooks/jupyter-book/issues/2063
+docs = ["jupyter-book==0.15.1", "sphinx-autoapi==2.0.1", "astroid<3"]
+examples = ["meshio", "gmsh", "matplotlib", "jupyter", "jupyterlab"]
+pyvista = ["pyvista[all]>=0.43.0", "trame-vuetify", "ipywidgets",]
+
+all = [
+    "fenics-smart[examples]",
+    "fenics-smart[test]",
+    "fenics-smart[docs]",
+    "fenics-smart[pyvista]",
+]
+
+
+[tool.pytest.ini_options]
+addopts = [
+    "--cov=smart",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "-v",
+]
+
+testpaths = ["tests"]
+
+
+[tool.black]
+#line-length = 79
+
+
+[tool.ruff]
+# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
+select = ["E", "F"]
+ignore = []
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["A", "B", "C", "D", "E", "F"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Same as Black.
+line-length = 100
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.10.
+target-version = "py310"
+
+[tool.ruff.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 10
