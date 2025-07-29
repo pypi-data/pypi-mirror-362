@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reticulum Network Status</title>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="browsing-topics=()">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{{ meta_description|e }}">
+    <meta name="keywords" content="reticulum, network, status, monitoring">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Reticulum Network Status">
+    <meta property="og:description" content="{{ meta_description|e }}">
+    <meta property="og:image" content="{{ url_for('static', filename='og.png', _external=True) }}">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Reticulum Network Status">
+    <meta name="twitter:description" content="{{ meta_description|e }}">
+    <meta name="twitter:image" content="{{ url_for('static', filename='og.png', _external=True) }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.png') }}">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" integrity="sha384-{{ htmx_integrity }}" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Reticulum Network Status</h1>
+            <div class="search-container">
+                <input type="search" 
+                       id="search-box" 
+                       placeholder="Search interfaces (e.g., TCP, RNS Testnet)..."
+                       hx-get="/api/search"
+                       hx-trigger="input changed delay:500ms, search"
+                       hx-target="#status-grid"
+                       hx-indicator=".htmx-indicator"
+                       name="q"
+                       pattern="[a-zA-Z0-9\s\-_]+"
+                       title="Only alphanumeric characters, spaces, hyphens and underscores are allowed">
+                <a href="/api/export-all"
+                   id="export-all"
+                   class="export-button"
+                   title="Export all interfaces"
+                   download="all_interfaces.txt">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="interface-counts">
+                <span class="clickable" onclick="filterStatus('up')">Up: {{ up_count|e }}</span>
+                <span class="count-separator">|</span>
+                <span class="clickable down" onclick="filterStatus('down')">Down: {{ down_count|e }}</span>
+                <span class="count-separator">|</span>
+                <span>Total: {{ total_count|e }}</span>
+            </div>
+        </div>
+        <div id="status-grid" 
+             class="status-grid"
+             hx-get="/api/status"
+             hx-trigger="load, every 5s"
+             hx-swap="innerHTML">
+            <div class="status-card loading-card">
+                <div class="loading-message">
+                    <div class="spinner"></div>
+                    <p>Initializing connection to Reticulum network...</p>
+                    <p class="loading-subtext">This may take a few moments while the network connection is established.</p>
+                </div>
+            </div>
+        </div>
+        <div id="last-updated" class="last-updated">
+            <span id="update-time">Loading status...</span>
+            <span class="footer-separator">|</span>
+            <a href="https://github.com/Sudo-Ivan/rns-status-page" class="version" target="_blank">v1.4.0</a>
+            <span class="footer-separator">|</span>
+            <span class="footer-separator">|</span>
+            <span class="created-by">Created by Ivan</span>
+        </div>
+        <div class="htmx-indicator">
+            <div class="spinner"></div>
+        </div>
+    </div>
+    <script>
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            if (evt.detail.target.id === 'status-grid') {
+                const now = new Date();
+                document.getElementById('update-time').textContent = `Last updated: ${now.toLocaleTimeString()}`;
+            }
+        });
+
+        function filterStatus(status) {
+            const cards = document.querySelectorAll('.status-card');
+            cards.forEach(card => {
+                const statusIndicator = card.querySelector('.status-indicator');
+                if (statusIndicator) {
+                    if (status === 'up' && statusIndicator.classList.contains('status-up')) {
+                        card.style.display = 'block';
+                    } else if (status === 'down' && statusIndicator.classList.contains('status-down')) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
