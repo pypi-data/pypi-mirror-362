@@ -1,0 +1,112 @@
+Metadata-Version: 2.3
+Name: django_supportal
+Version: 1.0.0
+Summary: AI-Powered business support chat system for django
+License: MIT
+Keywords: django,ai,chat,support,openai,rag
+Author: Amin Dehghan Dehnavi
+Author-email: amin.dehghandehnavi@gmail.com
+Requires-Python: >=3.10,<4.0
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 4.2
+Classifier: Framework :: Django :: 5.0
+Classifier: Framework :: Django :: 5.1
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Communications :: Chat
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Requires-Dist: PyPDF2 (>=3.0.1,<4.0.0)
+Requires-Dist: celery (>=5.3.0,<6.0.0)
+Requires-Dist: channels (>=4.0.0,<5.0.0)
+Requires-Dist: channels-redis (>=4.2.0,<5.0.0)
+Requires-Dist: django (>=4.2,<5.0)
+Requires-Dist: djangorestframework (>=3.14.0,<4.0.0)
+Requires-Dist: faiss-cpu (>=1.7.4,<2.0.0)
+Requires-Dist: mysqlclient (>=2.2.0,<3.0.0)
+Requires-Dist: numpy (>=1.24.0,<2.0.0)
+Requires-Dist: openai (>=1.0.0,<2.0.0)
+Requires-Dist: python-decouple (>=3.8,<4.0)
+Requires-Dist: python-docx (>=1.1.0,<2.0.0)
+Requires-Dist: redis (>=5.0.0,<6.0.0)
+Requires-Dist: tiktoken (>=0.5.0,<0.6.0)
+Project-URL: Homepage, https://github.com/mrsins02/django_supportal
+Project-URL: Repository, https://github.com/mrsins02/django_supportal
+Description-Content-Type: text/markdown
+
+# 🧠 Django Supportal – AI-Powered Business Support Chat APIs for django projects
+
+**Django Supportal** is an intelligent, AI-powered customer support system built with **Django**, **Django Channels**, and **OpenAI API**.  
+It provides APIs for businesses to upload their internal documents, and a smart assistant will handle customer inquiries via live chat – powered by a Retrieval-Augmented Generation (RAG) system.
+
+---
+
+## 🚀 Features
+
+- ✅ Real-time chat via **Django Channels (WebSockets)**
+- 📎 Businesses can upload **PDF, DOCX, or TXT documents**
+- 🤖 Uses **OpenAI GPT models** to provide intelligent responses
+- 📚 Implements **RAG (Retrieval-Augmented Generation)** to process custom business knowledge
+- 🔒 Secured communication and Redis-based event layer
+
+---
+
+## 🧠 How it Works (RAG Architecture)
+
+Supportal uses a **Retrieval-Augmented Generation (RAG)** approach to enable AI to answer business-specific questions:
+
+1. **Document Upload:**  
+   Businesses upload documents such as FAQs, product guides, manuals, or policies.
+
+2. **Chunking & Embedding:**  
+   Uploaded documents are:
+   - Split into smaller text chunks
+   - Converted into **vector embeddings** using OpenAI's `text-embedding` models
+
+3. **Vector Storage:**  
+   Embeddings are stored in a **vector database** (like FAISS) for fast similarity search.
+
+4. **Chat Inference:**
+   - When a customer sends a message, it's embedded and compared against stored chunks.
+   - The most relevant chunks are selected as **context**.
+   - The context is fed into OpenAI's **chat completion API** along with the user's question.
+   - A tailored, relevant answer is generated based on actual business documents.
+
+> This allows Supportal to **answer domain-specific questions accurately**, beyond what a generic AI model can do.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend:** Django + Django Channels
+- **Realtime Layer:** Redis (via `channels_redis`)
+- **AI Engine:** OpenAI API (GPT + Embeddings)
+- **Vector DB:** FAISS (in-memory vector search)
+
+---
+
+## 📦 Getting Started
+
+### 🔧 Prerequisites
+
+- Django 4.2.2
+- Channels
+- Celery
+- Redis
+- OpenAI API key
+
+### 🧪 Installation
+
+```bash
+Installation guide will be added after publish to pypi
+```
+
+## 📄 License
+This project is licensed under the **MIT License** – see the [LICENSE](./LICENSE) file for details.
