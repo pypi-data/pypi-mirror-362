@@ -1,0 +1,106 @@
+[tool.poetry]
+name = "muffin-grpc"
+version = "0.9.1"
+description = "GRPC support for Muffin framework."
+readme = "README.rst"
+homepage = "https://github.com/klen/muffin-grpc"
+repository = "https://github.com/klen/muffin-grpc"
+authors = ["Kirill Klenov <horneds@gmail.com>"]
+license = "MIT"
+keywords = ["grpc", "muffin", "asyncio", "asgi", "web"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Framework :: AsyncIO",
+]
+packages = [{ include = "muffin_grpc" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+muffin = "*"
+grpcio = "^1"
+grpcio-tools = "^1"
+attrs = "*"
+proto-schema-parser = "*"
+
+[tool.poetry.group.tests.dependencies]
+pytest = "*"
+pytest-aio = "*"
+pytest-mypy = "*"
+ruff = "*"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "*"
+black = "*"
+
+[tool.poetry.group.example.dependencies]
+uvicorn = "*"
+muffin-jinja2 = "*"
+
+[tool.pytest.ini_options]
+addopts = "-xsv tests"
+log_cli = true
+
+[tool.mypy]
+packages = ["muffin_grpc"]
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310,py311,py312,py313,pypy310
+
+[testenv]
+deps = -e .[tests]
+commands =
+	pytest --mypy tests
+
+[testenv:pypy310]
+deps = -e .[tests]
+commands =
+	pytest tests
+"""
+
+[tool.ruff]
+fix = true
+line-length = 100
+target-version = "py310"
+exclude = [".venv", "docs", "examples"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ANN",
+  "COM",
+  "D",
+  "DJ",
+  "EM",
+  "UP",
+  "RSE",
+  "SLF",
+  "RET",
+  "S101",
+  "PLR2004",
+  "PLR0912",
+  "N804",
+  "A003",
+  "TRY003",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312", "py313"]
+preview = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
