@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pepe-cli"
+dynamic = ["version"]
+authors = [
+    {name = "Jahn Zhong", email = "jahn.zhong@medisin.uio.no"},
+]
+description = "Pipeline for Easy Protein Embedding - Extract embeddings and attention matrices from protein sequences"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = ["protein", "embeddings", "bioinformatics", "machine-learning", "nlp", "transformers"]
+dependencies = [
+    "torch>=1.9.0",
+    "transformers>=4.20.0",
+    "fair-esm",
+    "sentencepiece",
+    "numpy",
+    "protobuf",
+    "rjieba",
+    "alive_progress",
+]
+
+[project.urls]
+Homepage = "https://github.com/csi-greifflab/pepe-cli"
+"Bug Reports" = "https://github.com/csi-greifflab/pepe-cli/issues"
+"Source" = "https://github.com/csi-greifflab/pepe-cli"
+"Documentation" = "https://github.com/csi-greifflab/pepe-cli#readme"
+
+[project.scripts]
+pepe = "pepe.__main__:main"
+pepe-cli = "pepe.__main__:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "pepe.__version__"}
