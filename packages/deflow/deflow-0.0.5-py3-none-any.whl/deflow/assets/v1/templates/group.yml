@@ -1,0 +1,46 @@
+group-workflow:
+  type: Workflow
+
+  desc: |
+    Group workflow for run all process workflow that was config in this group.
+
+  params:
+    name:
+      desc: "A group name for passing to run this group workflow."
+      type: str
+    stream:
+      desc: "A stream name for passing to run this group workflow."
+      type: str
+    audit-date:
+      type: datetime
+
+  jobs:
+    start-group:
+      desc: "A start group job for get a group information"
+      stages:
+        - name: "Get Process from Group"
+          id: get-processes
+          uses: tasks/get-processes-from-group@v1
+          with:
+            group: ${{ params.name }}
+            stream: ${{ params.stream }}
+
+        - name: "For-each process"
+          id: processes
+          foreach: ${{ stages.get-processes.outputs.processes }}
+          concurrency: 1
+          stages:
+            - name: Run Process
+              id: trigger-process-workflow
+              trigger: process-workflow
+              params:
+                name: ${{ item }}
+                stream: ${{ params.stream }}
+                audit-date: ${{ params.audit-date }}
+
+            - name: End trigger Process
+              id: end-trigger-process
+              echo: "End trigger Process: ${{ item }}"
+
+        - name: "Clear log"
+          echo: Clear logging and close stream

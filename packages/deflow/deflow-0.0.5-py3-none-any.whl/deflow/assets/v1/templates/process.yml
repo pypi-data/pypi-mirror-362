@@ -1,0 +1,41 @@
+process-workflow:
+  type: Workflow
+  desc: |
+    Process workflow for run the minimum data process like ETL/ELT/EL action.
+
+  params:
+    name:
+      desc: "A process name."
+      type: str
+    audit-date:
+      type: datetime
+  jobs:
+    start-process:
+      stages:
+        - name: "Start Run Process"
+          id: start-process
+          uses: tasks/start-process@v1
+          with:
+            name: ${{ params.name }}
+
+#        - name: "Call Process Routing"
+#          uses: tasks/routing-${{ stages.start-process.outputs.routing }}@v1
+#          with:
+#            process: ${{ stages.start-process.outputs.process }}
+#            audit_date: ${{ params.audit-date }}
+
+        - name: Switch routing
+          trigger: routing-${{ stages.start-process.outputs.routing }}-workflow
+          params:
+            name: ${{ params.name }}
+            audit-date: ${{ params.audit-date }}
+
+        - name: "Making Data Quality"
+          echo: Start run data quality
+
+        - name: "Clear Log"
+          echo: Clear logging and close process
+
+        - name: "End Process"
+          echo: |
+            End run process: ${{ params.name }}

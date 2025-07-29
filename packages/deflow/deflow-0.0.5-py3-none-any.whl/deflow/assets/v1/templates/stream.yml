@@ -1,0 +1,75 @@
+# A Stream workflow template that passing 2 parameters:
+#   - name: (str) A stream name that must exist on the config path.
+#   - run-mode: (choice) A running mode that want to execution with the audit
+#     tracking log.
+#
+stream-workflow:
+  type: Workflow
+
+  desc: |
+    Stream workflow for run all group and process workflow that was config in
+    this stream name.
+
+  params:
+    name:
+      desc: "A stream name for passing to run this stream workflow."
+      type: str
+    run-mode:
+      desc: |
+        Running mode of this workflow. This workflow allow mode to run be:
+          - N (Normal): Run with normal mode.
+          - R (Rerun): Run with rerun mode, that get only failed process to run.
+          - F (Force): Run with force mode, that run all processes from the begin.
+          - T (Test): Run with test mode.
+      type: choice
+      options: ["N", "R", "F", "T"]
+
+  jobs:
+    start-steam:
+      desc: "A start stream job for get a stream information."
+      stages:
+
+        - name: "Get and Start Stream Information"
+          id: get-start-stream
+          uses: tasks/get-start-stream-info@v1
+          with:
+            name: ${{ params.name }}
+
+        - name: "For-each Priorities"
+          id: group-priorities
+          foreach: ${{ stages.get-start-stream.outputs.priority-groups }}
+          stages:
+
+            - name: "Get Group from Priorities"
+              id: get-groups
+              uses: tasks/get-groups-from-priority@v1
+              with:
+                priority: ${{ item }}
+                stream: ${{ stages.get-start-stream.outputs.stream }}
+
+            - name: "For-each Priority Group"
+              id: groups
+              foreach: ${{ stages.get-groups.outputs.groups }}
+              stages:
+
+                - name: "Trigger Group"
+                  id: trigger-group-workflow
+                  trigger: group-workflow
+                  params:
+                    name: ${{ item }}
+                    stream: ${{ stages.get-start-stream.outputs.name }}
+                    audit-date: ${{ stages.get-start-stream.outputs.audit-date }}
+
+                - name: "End trigger Group"
+                  id: end-trigger-group
+                  echo: "End trigger Group: ${{ item }}"
+
+            - name: "End Trigger Priority Group"
+              id: end-trigger-priority-group
+              echo: "End trigger Priority Group: ${{ item }}"
+
+        - name: "Clear Log"
+          echo: Clear logging and close stream
+
+        - name: "Notification"
+          echo: Notify with mail or notify-services
