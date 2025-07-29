@@ -1,0 +1,165 @@
+# Reference:
+#   - https://github.com/actions/cache
+#   - https://github.com/actions/checkout
+#   - https://github.com/actions/download-artifact
+#   - https://github.com/actions/setup-python
+#   - https://github.com/actions/upload-artifact
+#   - https://github.com/prefix-dev/setup-pixi
+#   - https://github.com/pypa/build
+#   - https://github.com/pypa/gh-action-pypi-publish
+#   - https://test.pypi.org/help/#apitoken
+
+name: ci-wheels
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - "main"
+      - "v*x"
+      - "!pixi-auto-update"
+      - "!pre-commit-ci-update-config"
+      - "!dependabot/*"
+    tags:
+      - "v*"
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: none
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  build-artifacts:
+    name: "build pypi artifacts"
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+
+    - name: "build sdist and wheel"
+      run: |
+        # slam is a pure python package, so simply use pypa/build
+        pipx run build
+
+    - name: "show sdist and wheel"
+      run: |
+        ls -l ${{ github.workspace }}/dist
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: pypi-artifacts-${{ github.job }}-${{ strategy.job-index }}
+        path: ${{ github.workspace }}/dist
+
+
+  test-artifacts:
+    needs: [build-artifacts]
+    name: "test wheel (${{ matrix.python-version }})"
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+
+    - name: "configure environment"
+      run: |
+        echo "NAME=py$(echo ${{ matrix.python-version }} | tr -d '.')" >> ${GITHUB_ENV}
+
+    - name: "setup pixi"
+      uses: prefix-dev/setup-pixi@273e4808c831936a3ce1a3080c829d9e153143d3
+      with:
+        environments: ${{ env.NAME }}
+        frozen: true
+        activate-environment: true
+
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: pypi-artifacts-*
+        path: ${{ github.workspace }}/dist
+        merge-multiple: true
+
+    - name: "test wheel (${{ matrix.python-version }})"
+      run: |
+        WHEEL=$(ls -1 dist/*.whl)
+        python -m pip install --no-deps ${WHEEL}
+        python -c "import slam; print(f'slam version = {slam.__version__}')"
+
+
+  show-artifacts:
+    needs: [build-artifacts]
+    name: "show artifacts"
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: pypi-artifacts-*
+        path: ${{ github.workspace }}/dist
+        merge-multiple: true
+
+    - run: |
+        ls -l ${{ github.workspace }}/dist
+
+
+  publish-artifacts-test-pypi:
+    needs: [test-artifacts]
+    name: "Publish to Test PyPI"
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Mandatory for PyPI Trusted Publishing OpenID Connect (OIDC)
+    environment: test-pypi
+
+    # upload to Test PyPI for every commit on main branch
+    if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: pypi-artifacts-*
+        path: ${{ github.workspace }}/dist
+        merge-multiple: true
+
+    - uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        skip-existing: true
+        print-hash: true
+
+
+  publish-artifacts-pypi:
+    needs: [test-artifacts]
+    name: "Publish to PyPI"
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Mandatory for PyPI Trusted Publishing OpenID Connect (OIDC)
+    environment: pypi
+
+    # upload to PyPI for every tag starting with 'v'
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: pypi-artifacts-*
+        path: ${{ github.workspace }}/dist
+        merge-multiple: true
+
+    - uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
+      with:
+        print-hash: true

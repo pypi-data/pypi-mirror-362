@@ -1,0 +1,95 @@
+# Reference:
+#   - https://github.com/actions/checkout
+#   - https://github.com/prefix-dev/setup-pixi
+#   - https://github.com/pavelzw/pixi-diff-to-markdown
+#   - https://github.com/peter-evans/create-pull-request
+
+name: ci-locks
+
+on:
+  schedule:
+    - cron: "3 0 * * 1"
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SHELLOPTS: "errexit:pipefail"
+  NAME: "slam-py312"
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  locks-update:
+    name: "update lockfiles"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: "setup pixi"
+        uses: prefix-dev/setup-pixi@273e4808c831936a3ce1a3080c829d9e153143d3
+        with:
+          run-install: false
+
+      - name: "refresh pixi"
+        run: |
+          pixi update --json | pixi exec pixi-diff-to-markdown > diff.md
+          if [ $(wc -c < diff.md) -lt 10 ]; then
+              rm -f diff.md
+          fi
+
+      - name: "refresh locks"
+        if: ${{ hashFiles('diff.md') }}
+        run: |
+          pixi workspace export conda-explicit-spec --environment ${{ env.NAME }} --frozen --ignore-pypi-errors requirements
+          pixi workspace export conda-environment --environment ${{ env.NAME }} requirements/slam.yml
+
+      - name: "create pull-request"
+        id: cpr
+        if: ${{ hashFiles('diff.md') }}
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          add-paths: |
+            ${{ github.workspace }}/pixi.lock
+            ${{ github.workspace }}/requirements/slam*.txt
+            ${{ github.workspace }}/requirements/slam*.yml
+          commit-message: "updated lockfiles"
+          branch: pixi-auto-update
+          base: main
+          delete-branch: true
+          title: "chore: pixi update lockfiles"
+          body-path: ${{ github.workspace }}/diff.md
+          labels: |
+            bot
+            new: pull request
+            pixi
+
+      - name: "show pull-request"
+        if: ${{ hashFiles('diff.md') }}
+        env:
+          STEPS_CPR_OUTPUTS_PULL_REQUEST_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+          STEPS_CPR_OUTPUTS_PULL_REQUEST_URL: ${{ steps.cpr.outputs.pull-request-url }}
+          STEPS_CPR_OUTPUTS_PULL_REQUEST_OPERATION: ${{ steps.cpr.outputs.pull-request-operation }}
+          STEPS_CPR_OUTPUTS_PULL_REQUEST_HEAD_SHA: ${{ steps.cpr.outputs.pull-request-head-sha }}
+        run: |
+          echo "### :rocket: Pull-Request Summary" >> ${GITHUB_STEP_SUMMARY}
+          echo "" >> ${GITHUB_STEP_SUMMARY}
+          echo "The following locks pull-request has been auto-generated:"
+          echo "- **PR** #${STEPS_CPR_OUTPUTS_PULL_REQUEST_NUMBER}" >> ${GITHUB_STEP_SUMMARY}
+          echo "- **URL** ${STEPS_CPR_OUTPUTS_PULL_REQUEST_URL}" >> ${GITHUB_STEP_SUMMARY}
+          echo "- **Operation** [${STEPS_CPR_OUTPUTS_PULL_REQUEST_OPERATION}]" >> ${GITHUB_STEP_SUMMARY}
+          echo "- **SHA** ${STEPS_CPR_OUTPUTS_PULL_REQUEST_HEAD_SHA}" >> ${GITHUB_STEP_SUMMARY}
