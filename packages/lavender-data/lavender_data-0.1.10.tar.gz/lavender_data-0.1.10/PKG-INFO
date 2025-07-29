@@ -1,0 +1,136 @@
+Metadata-Version: 2.1
+Name: lavender-data
+Version: 0.1.10
+Summary: Load & evolve datasets efficiently
+Home-page: https://github.com/fal-ai/lavender-data
+License: Apache-2.0
+Author: Hanch Han
+Author-email: cndghks15@gmail.com
+Requires-Python: >=3.10,<3.14
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Provides-Extra: hf
+Provides-Extra: pgsql
+Provides-Extra: redis
+Provides-Extra: s3
+Provides-Extra: wds
+Requires-Dist: alembic (>=1.15.2,<2.0.0)
+Requires-Dist: attrs (>=22.2.0)
+Requires-Dist: boto3 (>=1.38.13,<2.0.0) ; extra == "s3"
+Requires-Dist: fastapi[standard] (==0.115.6)
+Requires-Dist: filetype (>=1.2.0,<2.0.0)
+Requires-Dist: httpx (>=0.20.0,<0.29.0)
+Requires-Dist: huggingface-hub (>=0.31.1,<0.32.0) ; extra == "hf"
+Requires-Dist: numpy (==2.1.2)
+Requires-Dist: psycopg2-binary (>=2.9.10,<3.0.0) ; extra == "pgsql"
+Requires-Dist: pyarrow (==19.0.1)
+Requires-Dist: pydantic-settings (>=2.8.1,<3.0.0)
+Requires-Dist: python-daemon (>=3.1.2,<4.0.0)
+Requires-Dist: python-dateutil (>=2.8.0,<3.0.0)
+Requires-Dist: redis[hiredis] (>=5.2.1,<6.0.0) ; extra == "redis"
+Requires-Dist: sqlmodel (>=0.0.23,<0.0.24)
+Requires-Dist: ujson (>=5.10.0,<6.0.0)
+Requires-Dist: webdataset (>=0.2.111,<0.3.0) ; extra == "wds"
+Project-URL: Changelog, https://docs.lavenderdata.com/release-notes
+Project-URL: Documentation, https://docs.lavenderdata.com
+Project-URL: Repository, https://github.com/fal-ai/lavender-data
+Description-Content-Type: text/markdown
+
+<p align="center">
+    <img src="https://github.com/fal-ai/lavender-data/raw/main/assets/logo.webp" alt="Lavender Data Logo" width="50%" />
+</p>
+
+<h2>
+    <p align="center">
+        Load & evolve datasets efficiently
+    </p>
+</h2>
+
+<p align="center">
+    <a href="https://pypi.org/project/lavender-data/">
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/lavender-data.svg">
+    </a>
+    <a href="https://discord.gg/fal-ai">
+        <img alt="Discord" src="https://img.shields.io/badge/Discord-chat-2eb67d.svg?logo=discord">
+    </a>
+    <a href="https://github.com/fal-ai/lavender-data/blob/main/LICENSE">
+        <img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-green.svg">
+    </a>
+</p>
+
+<br />
+
+<p align="center">
+    Please visit our docs for more information.
+    <br />
+    <a href="https://docs.lavenderdata.com/">
+        docs.lavenderdata.com
+    </a>
+</p>
+
+## Quick Start
+
+### Installation
+
+```bash
+pip install lavender-data
+```
+
+#### Start the server
+
+```bash
+lavender-data server start --init
+```
+
+```
+lavender-data is running on 0.0.0.0:8000
+UI is running on http://localhost:3000
+API key created: la-...
+```
+
+Save the API key to use it in the next steps.
+
+```bash
+export LAVENDER_API_URL=http://0.0.0.0:8000
+export LAVENDER_API_KEY=la-...
+```
+
+### Create an example dataset
+
+```bash
+lavender-data client \
+  datasets create \
+  --name my_dataset \
+  --uid-column-name id \
+  --shardset-location https://docs.lavenderdata.com/example-dataset/images/
+```
+
+### Iterate over the dataset
+
+```python
+import lavender_data.client as lavender
+
+lavender.init()
+
+iteration = lavender.LavenderDataLoader(
+    dataset_name="my_dataset",
+    shuffle=True,
+    shuffle_block_size=10,
+)
+
+for i in iteration:
+    print(i["id"])
+```
+
+<p align="center">
+    Please visit our docs for more information.
+    <br />
+    <a href="https://docs.lavenderdata.com/">
+        docs.lavenderdata.com
+    </a>
+</p>
+
