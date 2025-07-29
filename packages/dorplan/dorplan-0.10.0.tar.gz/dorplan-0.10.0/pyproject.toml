@@ -1,0 +1,55 @@
+[project]
+name = "dorplan"
+version = "0.10.0"
+description = "Desktop OR planner"
+requires-python = ">=3.10"
+dependencies = [
+    "cornflow-client-pchtsp", "PySide6", "click"
+]
+authors= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
+maintainers= [{name= "Franco Peschiera", email= "pchtsp@gmail.com"}]
+readme='README.md'
+keywords= ["Mathematical", "Optimization", "solver", "GUI", "desktop", "cross-platform"]
+classifiers= [
+    "Programming Language :: Python",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+reports = [
+    "quarto",
+    "quarto-cli; sys_platform == 'linux'",
+    "papermill",
+    "matplotlib"
+]
+example = ["orloge", "pulp", "highspy", "ortools", "networkx", "timefold", "pydantic"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+    "dorplan",
+    "dorplan.example",
+    "dorplan.ui",
+    "dorplan.workers",
+    "dorplan.tests",
+    "dorplan.tests.data.graph_coloring",
+    "dorplan.tests.data.graph_coloring.core",
+    "dorplan.tests.data.graph_coloring.data",
+    "dorplan.tests.data.graph_coloring.schemas",
+    "dorplan.tests.data.graph_coloring.report",
+    "dorplan.tests.data.graph_coloring.solvers"
+]
+
+[tool.setuptools.package-data]
+"dorplan.tests.data.graph_coloring.data"= ["*"]
+"dorplan.tests.data.graph_coloring.report"= ["*.qmd"]
+"dorplan.tests.data.graph_coloring.schemas"= ["*.json"]
+"dorplan" = ["py.typed"]
+
+[dependency-groups]
+dev = ["black", "mypy", "types-networkx"]
