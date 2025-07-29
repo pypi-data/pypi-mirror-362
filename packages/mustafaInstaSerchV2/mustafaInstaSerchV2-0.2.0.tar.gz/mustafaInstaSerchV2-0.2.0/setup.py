@@ -1,0 +1,25 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="mustafaInstaSerchV2",
+    version="0.2.0",
+    packages=find_packages(),
+    install_requires=[
+        "requests",
+        "user-agent",
+    ],
+    author="Your Name",
+    author_email="your.email@example.com",
+    description="A Python library for Instagram username search.",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/yourusername/mustafaInstaSerchV2",
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires=">=3.6",
+)
+
+
