@@ -1,0 +1,105 @@
+Metadata-Version: 2.4
+Name: nautex
+Version: 0.1.9
+Summary: Nautex AI MCP server that works as Product and Project manager for coding agents
+Author-email: Ivan Makarov <ivan@nautex.ai>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/hmldns/nautex
+Project-URL: Repository, https://github.com/hmldns/nautex
+Project-URL: Documentation, https://github.com/hmldns/nautex#readme
+Project-URL: Bug Reports, https://github.com/hmldns/nautex/issues
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Environment :: Console
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Utilities
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pydantic<3.0.0,>=2.0.0
+Requires-Dist: pydantic-settings<3.0.0,>=2.0.0
+Requires-Dist: aiohttp<4.0.0,>=3.9.0
+Requires-Dist: textual<5.0.0,>=3.0.0
+Requires-Dist: fastmcp>=2.8.1
+Requires-Dist: python-dotenv<2.0.0,>=1.0.0
+Requires-Dist: aiofiles>=20.0.0
+Provides-Extra: dev
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.5.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: isort>=5.12.0; extra == "dev"
+Requires-Dist: build>=0.10.0; extra == "dev"
+Requires-Dist: twine>=4.0.0; extra == "dev"
+Dynamic: license-file
+
+# Nautex
+
+Nautex is a command-line tool and MCP (Multi-Agent Collaboration Protocol) server that integrates the Nautex AI platform with development environments. It acts as a Product and Project manager for coding agents, facilitating AI-assisted software development.
+
+## Installation
+
+```bash
+uvx nautex setup
+```
+
+## Requirements
+
+- Python 3.10 or higher
+- Dependencies: pydantic, aiohttp, textual, fastmcp, python-dotenv, aiofiles
+
+## Features
+
+- **Interactive Setup**: Configure your Nautex integration with a text-based user interface
+- **Integration Status**: View the status of your Nautex integration
+- **MCP Server**: Run an MCP server for IDE integration, enabling AI agents to:
+  - Get project and plan information
+  - Retrieve the next development scope
+  - Update task statuses and add notes
+  - Access project documents and dependencies
+
+## Usage
+
+### Initial Setup
+
+```bash
+nautex setup
+```
+
+This launches an interactive TUI to configure your Nautex integration.
+
+### Check Status
+
+```bash
+nautex status
+```
+
+View the current integration status with a TUI, or use `--noui` flag for console output:
+
+```bash
+nautex status --noui
+```
+
+### Start MCP Server
+
+```bash
+nautex mcp
+```
+
+Starts the MCP server for IDE integration, allowing AI agents to interact with the Nautex platform.
+
+### Testing MCP Functionality
+
+```bash
+nautex mcp test next_scope
+```
+
+Tests the next_scope functionality of the MCP server.
+
+## License
+
+MIT
