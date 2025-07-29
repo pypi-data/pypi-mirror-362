@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "mipdb"
+version = "3.0.6"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python            = "~3.10"          # μένει ως έχει
+SQLAlchemy        = "*"
+sqlalchemy_monetdb = "*"
+pymonetdb         = "*"
+pandas            = "*"              # 3.0+ είναι ΟΚ με 3.10 :contentReference[oaicite:0]{index=0}
+pandera           = "*"
+click             = "*"              # 8.2+ απαιτεί ≥3.10, άρα συμβατό :contentReference[oaicite:1]{index=1}
+toml              = "*"
+numpy             = "*"              # 2.x στηρίζει 3.10–3.13 :contentReference[oaicite:2]{index=2}
+setuptools        = "*"
+
+[tool.poetry.dev-dependencies]
+pytest            = "*"
+pytest-xdist      = "*"
+ipython           = "*"
+pdbpp             = "*"
+black             = "*"
+pre-commit        = "*"
+coverage          = {extras = ["toml"], version = "*"}
+pytest-cov        = "*"
+pylint            = "*"
+rope              = "*"
+docker            = "*"
+
+[tool.poetry.scripts]
+mipdb = "mipdb.commands:entry"
+
+[tool.pytest.ini_options]
+markers = [
+    "database: these tests depend on an external dockerized MonetDB service running (deselect with '-m \"not database\"')",
+]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ['mipdb']
+dynamic_context = 'test_function'
+
+[tool.coverage.report]
+exclude_lines = ['def __repr__', 'raise NotImplementedError', 'pragma: no cover', 'pass']
+show_missing = true
+
+[tool.coverage.html]
+show_contexts = true
+
+[build-system]
+requires = ["poetry-core>=1.4.0"]
+build-backend = "poetry.core.masonry.api"
