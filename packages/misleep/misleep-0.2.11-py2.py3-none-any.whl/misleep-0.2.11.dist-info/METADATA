@@ -1,0 +1,95 @@
+Metadata-Version: 2.1
+Name: misleep
+Version: 0.2.11
+Summary: MiSleep: Mice Sleep EEG/EMG visualization, scoring and analysis.
+Home-page: https://github.com/BryanWang0702/MiSleep/
+Download-URL: https://github.com/BryanWang0702/MiSleep/
+Author: Xueqiang Wang
+Author-email: swang@gmail.com
+Maintainer: Xueqiang Wang
+Maintainer-email: swang@gmail.com
+License: BSD (3-clause)
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.18.1
+Requires-Dist: matplotlib
+Requires-Dist: scipy
+Requires-Dist: pyedflib
+Requires-Dist: hdf5storage
+Requires-Dist: pyqt5
+Requires-Dist: mat73
+Requires-Dist: pandas
+Requires-Dist: openpyxl
+Requires-Dist: antropy
+Requires-Dist: lightgbm
+
+# MiSleep
+MiSleep is for EEG/EMG signal processing and visualization
+
+![logo](resources/entire_logo.png)
+
+The name 'MiSleep' is from '**Mi**ce **Sleep**' and sounds like '**my sleep**'.
+
+---
+
+## Get start
+```shell
+pip install misleep
+```
+
+Find the directory where you installed misleep, run
+```shell
+python -m misleep
+```
+If you use the miniconda or anaconda, the path will be like `D:/miniconda3/envs/misleep/Lib/site-packages`.
+
+See [https://bryanwang.cn/MiSleep/](https://bryanwang.cn/MiSleep/) for a simple documentation.
+
+---
+
+## Some features
+1. Free self-define data structure
+
+You can organize your data with matlab structure like this:
+```matlab
+data.EEG = AN_ARRAY_OF_EEG_DATA;
+data.EMG_DIFF = AN_ARRAY_OF_EMG_DIFFERENTIAL_DATA;
+% Channel name must be the same with you defined above
+data.channels = {'EEG' 'EMG_DIFF'};
+% Sampling frequency for each channel of data
+data.sf = {256 256};
+% Acquisition time of your data
+data.time = {'20240409-18:00:00'}; 
+```
+Or if your data format is `.edf`, misleep will also support well.
+
+2. Event Detection
+
+For sleep spindle and sleep slow-wave activities detection, you can check the tools menu for event detection. The auto stage will coming soon.
+
+3. Self-define `config.ini`
+
+There is a config.ini in the root directory of MiSleep source package, multiple parameters can be self define there, check [config.ini](https://bryanwang.cn/MiSleep/#config-file) for detail.
+
+4. Auto stage
+
+Finally, now we have the auto stage function! Check it in the tool. The overall test accuracy of NREM and Wake is higher than 90%, and for REM, the accuracy is higher than 80%. Currently the model's result is rather fragmented in the state transition segments, we will add some constraints to fix this.
+
+**Future**: Open for suggestions :).
+
+---
+
+## Cite this work
+
+If you use this software, please cite it as below.
+Xueqiang Wang. (2024). BryanWang0702/MiSleep. Zenodo. https://doi.org/10.5281/zenodo.14511905
+
