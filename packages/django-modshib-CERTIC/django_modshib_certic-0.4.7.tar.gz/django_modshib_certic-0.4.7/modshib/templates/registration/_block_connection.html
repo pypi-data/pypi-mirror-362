@@ -1,0 +1,63 @@
+{% load i18n %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{% translate MODSHIB_FORMS_TITLE %}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{% translate "Connexion" %}</h6>
+        {% if MODSHIB_SHOW_SSO_LOGIN %}
+            <div class="card-text d-grid gap-2">
+                <a href="{% url "modshib_sso" %}{% if 'next' in request.GET %}?next={{ request.GET.next }}{% endif %}"
+                   class="btn btn-primary">{% translate MODSHIB_SSO_SUBMIT_LABEL %}</a>
+            </div>
+            {% if MODSHIB_SHOW_LOCAL_LOGIN %}
+                <div class="card-text" style="margin-top: 1em;margin-bottom: 1em;">
+                    ou:
+                </div>
+            {% endif %}
+        {% endif %}
+        {% if MODSHIB_SHOW_LOCAL_LOGIN %}
+            <script>
+            function _strip_credentials(){
+                document.getElementById("id_username").value = document.getElementById("id_username").value.trim();
+                document.getElementById("id_password").value = document.getElementById("id_password").value.trim();
+                return true;
+            }
+            </script>
+            <div class="card-text" id="localForm">
+                <form method="post" class="d-grid gap-2" onsubmit="_strip_credentials()">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% translate "Échec de la connexion" %}
+                        </div>
+                    {% endif %}
+                    <table class="table table-borderless align-middle">
+                        <tr>
+                            <th><label for="id_username">{% translate "Utilisateur" %}</label></th>
+                            <td><input type="text"
+                                       class="form-control"
+                                       name="username"
+                                       autofocus=""
+                                       autocapitalize="none"
+                                       autocomplete="username"
+                                       maxlength="150"
+                                       required=""
+                                       id="id_username"
+                                       value="{% if form.username.value %}{{ form.username.value }}{% endif %}"></td>
+                        </tr>
+                        <tr>
+                            <th><label for="id_password">{% translate "Mot de passe" %}</label></th>
+                            <td><input type="password"
+                                       class="form-control"
+                                       name="password"
+                                       autocomplete="current-password"
+                                       required=""
+                                       id="id_password"
+                                       value="{% if form.password.value %}{{ form.password.value }}{% endif %}"></td>
+                        </tr>
+                    </table>
+                    <button class="btn btn-secondary" type="submit">{% translate MODSHIB_LOCAL_SUBMIT_LABEL %}</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</div>

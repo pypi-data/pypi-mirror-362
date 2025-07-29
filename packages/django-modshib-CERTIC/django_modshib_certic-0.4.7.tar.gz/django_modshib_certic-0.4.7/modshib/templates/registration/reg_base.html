@@ -1,0 +1,21 @@
+{% load i18n %}
+{% load static %}
+<!doctype html>
+<html lang="{% get_current_language as LANGUAGE_CODE %}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block head_title %}Titre{% endblock head_title %} - {% translate MODSHIB_FORMS_TITLE %}</title>
+    <link href="{% static "modshib/bootstrap.min.css" %}" rel="stylesheet">
+    <link  rel="icon" href="{% static "favicon.ico" %}" type="image/ico" />
+    <link  rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico" />
+    {% if MODSHIB_STYLESHEET_URL is not null %}
+        <link href="{{ MODSHIB_STYLESHEET_URL }}" rel="stylesheet" crossorigin="anonymous">
+    {% endif %}
+</head>
+<body id="modshib-auth">
+{% block content %}
+    Contenu ici
+{% endblock content %}
+</body>
+</html>
