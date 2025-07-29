@@ -1,0 +1,224 @@
+Metadata-Version: 2.1
+Name: craftxpy
+Version: 0.1.0
+Summary: Python-native intelligence, modular by design
+Home-page: https://github.com/davidanderson01/craftxpy
+Author: DavidAnderson01
+Author-email: questions@craftx.py
+License: UNKNOWN
+Project-URL: Documentation, https://docs.craftx.py
+Project-URL: Source, https://github.com/davidanderson01/craftxpy
+Project-URL: Website, https://craftx.py
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Provides-Extra: docs
+License-File: LICENSE
+
+# CraftX.py
+
+**Python-native intelligence, modular by design.**
+
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/davidanderson01/CraftX.py)
+
+CraftX.py is a modular AI scripting framework designed specifically for Python developers. It provides seamless integration with multiple AI models, secure automation tools, and an extensible plugin architecture.
+
+## 🚀 Features
+
+- **🤖 Multi-Model Support**: Integrate WizardCoder, CommandR7B, CodeGeeX4, and Qwen2.5-Coder
+- **🔧 Modular Tools**: Extensible plugin system with built-in utilities
+- **🛡️ Secure Execution**: Safe shell commands with whitelist protection
+- **💾 Memory System**: Persistent conversation history and session management
+- **🎨 Beautiful UI**: Modern Streamlit-based interface
+- **🐍 Python-Native**: Clean APIs with type hints and pythonic design
+
+## 📦 Installation
+
+### Quick Start
+
+```bash
+git clone https://github.com/davidanderson01/CraftX.py.git
+cd CraftX.py
+pip install -r requirements.txt
+```
+
+### Development Installation
+
+```bash
+pip install -e .[dev]
+```
+
+## 🎯 Quick Start
+
+### 1. Basic Usage
+
+```python
+from craftxpy.agents.router import AgentRouter
+from craftxpy.plugins.wizardcoder import WizardCoder
+
+# Initialize AI model router
+router = AgentRouter({"codegen": WizardCoder()})
+
+# Generate code
+response = router.route("codegen", "Create a FastAPI endpoint for user auth")
+print(response)
+```
+
+### 2. Web Interface
+
+```bash
+streamlit run assistant_ui/app.py
+```
+
+### 3. Run Demo
+
+```bash
+python examples/demo.py
+```
+
+## 🏗️ Architecture
+
+```text
+craftxpy/
+├── agents/          # AI model routing and management
+├── plugins/         # Model integrations and tools
+│   ├── wizardcoder.py
+│   ├── commandr7b.py
+│   ├── codegeex4.py
+│   ├── qwen25coder.py
+│   └── tools/       # Extensible tool plugins
+├── memory/          # Conversation logging and history
+├── utils/           # Utilities (shell, page builder)
+└── assistant_ui/    # Streamlit web interface
+```
+
+## 🔧 Built-in Tools
+
+- **🌐 DNS Validator**: Validate domain resolution
+- **🔒 SSL Checker**: Check certificate status and expiration
+- **📁 File Monitor**: Monitor OneDrive file hydration (Windows)
+- **🛠️ Custom Tools**: Easy plugin creation system
+
+## 💡 Creating Custom Tools
+
+```bash
+python scripts/new_tool.py "My Custom Tool"
+```
+
+Or programmatically:
+
+```python
+from craftxpy.plugins.tools.base_tool import BaseTool
+
+class MyTool(BaseTool):
+    def run(self, **kwargs) -> str:
+        return "✅ Tool executed successfully!"
+```
+
+## 🎨 Web Interface
+
+The Streamlit-based interface provides:
+
+- **Real-time Chat**: Interactive AI conversations
+- **Model Switching**: Choose between different AI models
+- **Tool Integration**: Access all tools through the UI
+- **Session Management**: Persistent conversation history
+- **Developer Mode**: Safe shell execution and debugging
+
+## 🛡️ Security Features
+
+- **Command Whitelisting**: Only approved shell commands can execute
+- **Input Validation**: All inputs are validated and sanitized
+- **Error Handling**: Comprehensive error handling and logging
+- **Session Isolation**: Each session is isolated and secure
+
+## 📚 Documentation
+
+- **Website**: [https://craftx.py](https://craftx.py)
+- **Documentation**: [https://docs.craftx.py](https://docs.craftx.py)
+
+## 🧪 Testing
+
+```bash
+# Run all tests with beautiful output
+python run_tests.py
+
+# Run with pytest
+python -m pytest tests/ -v
+
+# Run specific test
+python -m pytest tests/test_ui.py::test_logo_files -v
+```
+
+## 🌐 Static Website
+
+CraftX.py includes a complete static website with:
+
+- **Landing Page** (`index.html`) - Professional project showcase
+- **Documentation** (`docs.html`) - Complete API and usage docs  
+- **Examples** (`examples.html`) - Code samples and tutorials
+- **About Page** (`about.html`) - Project information and stats
+
+To view locally:
+
+```bash
+# Simple HTTP server
+python -m http.server 8000
+# Then visit: http://localhost:8000
+```
+
+The website is also GitHub Pages ready with automatic deployment.
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+```bash
+git clone https://github.com/davidanderson01/CraftX.py.git
+cd CraftX.py
+pip install -e .[dev]
+pre-commit install
+```
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **AI Models**: Thanks to the teams behind WizardCoder, CommandR7B, CodeGeeX4, and Qwen2.5-Coder
+- **Framework**: Built with Streamlit, Python, and modern web technologies
+- **Community**: Special thanks to all contributors and early adopters
+
+## 🔗 Links
+
+- **GitHub**: [github.com/davidanderson01/CraftX.py](https://github.com/davidanderson01/CraftX.py.git)
+- **PyPI**: [pypi.org/project/craftxpy](https://pypi.org/project/craftxpy)
+- **Docker**: [hub.docker.com/r/craftx/craftxpy](https://hub.docker.com/r/craftx/craftxpy)
+
+---
+
+![CraftX.py Logo](assets/img/craftx-logo.png)
+
+**CraftX.py** - *Python-native intelligence, modular by design.*
+
+[Get Started](https://docs.craftx.py) • [Documentation](https://docs.craftx.py/docs) • [Examples](examples/) • [Community](https://github.com/davidanderson01/CraftX.py/discussions)
+
+
