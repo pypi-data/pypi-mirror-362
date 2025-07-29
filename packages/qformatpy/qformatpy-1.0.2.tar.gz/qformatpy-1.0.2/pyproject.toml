@@ -1,0 +1,148 @@
+[project]
+name = "qformatpy"
+dynamic = []
+description = "Simple to use fixed-point library."
+readme = "README.md"
+authors = [
+    { name = "Eric Macedo", email = "ericsmacedo@gmail.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10.0,<4.0"
+dependencies = [
+    "numba>=0.61.2",
+    "numpy",
+]
+keywords = [
+    "DSP",
+    "Fixed-point",
+    "Signal-Processing",
+    "Qformat",
+]
+version = "1.0.2"
+
+[project.urls]
+Documentation = "https://qformatpy.readthedocs.io/en/latest/"
+"Source Code" = "https://github.com/ericsmacedo/qformatpy"
+
+[dependency-groups]
+dev = [
+    "contextlib-chdir>=1.0.2",
+    "coveralls>=3.3.1",
+    "jupyterlab>=4.4.4",
+    "matplotlib>=3.10.3",
+    "mkdocs-click>=0.8.1",
+    "mkdocs-include-markdown-plugin>=6.0.5",
+    "mkdocs-literate-nav>=0.6.1",
+    "mkdocs-material>=9.5.18",
+    "mkdocstrings-python>=1.9.2",
+    "mypy>=1.9.0",
+    "pre-commit>=4.1.0",
+    "pyqt6>=6.9.1",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.11.2",
+    "test2ref>=0.4.2",
+    "tqdm>=4.67.1",
+]
+
+[build-system]
+requires = [
+    "pdm-backend",
+]
+build-backend = "pdm.backend"
+
+[tool.pdm.build]
+includes = [
+    "src/qformatpy",
+]
+
+[tool.pdm.version]
+source = "scm"
+fallback_version = "0.0.0"
+
+[tool.ruff]
+line-length = 120
+fix = true
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "I",
+    "F",
+    "E",
+    "W",
+    "D",
+    "N",
+    "YTT",
+    "B",
+    "Q",
+    "T10",
+    "INT",
+    "PL",
+    "PIE",
+    "PYI",
+    "TID",
+    "ISC",
+    "TC",
+    "C",
+    "C4",
+    "PGH",
+    "RUF",
+    "S102",
+    "NPY002",
+    "PERF",
+    "FLY",
+    "G",
+    "UP",
+    "ARG",
+    "PTH",
+    "RET",
+    "RSE",
+]
+ignore = [
+    "RUF012",
+    "G004",
+    "D107",
+    "D105",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "PLR2004",
+    "ARG001",
+    "S101",
+    "PTH123",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+addopts = "    --cov src/qformatpy\n    --cov-report term\n    --cov-report html\n    --doctest-glob=docs/*\n    --doctest-modules\n    --ignore-glob=tests/testdata/*\n    --log-level=INFO\n    --junitxml=report.xml\n"
+filterwarnings = [
+    "error",
+]
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "return NotImplemented",
+    "raise NotImplementedError()",
+    "pragma: no cover",
+    "assert False",
+]
+
+[tool.mypy]
+disable_error_code = "misc"
+ignore_missing_imports = true
+overrides = [
+    { module = "tests.*", allow_untyped_defs = true },
+]
