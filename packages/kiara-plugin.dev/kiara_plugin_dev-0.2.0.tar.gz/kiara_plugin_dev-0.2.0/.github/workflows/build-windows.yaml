@@ -1,0 +1,28 @@
+name: "windows tests for 'kiara_plugin.dev'"
+# This workflow is triggered on pushes to the repository.
+on: [push]
+
+jobs:
+  test-windows:
+    name: pytest on windows
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: install Python
+        run: uv python install ${{ matrix.python_version }}
+      - name: create lockfile
+        if: hashFiles('uv.lock') == ''
+        run: uv lock --python ${{ matrix.python_version }}
+      - name: install the project
+        run: uv sync --locked --dev --python ${{ matrix.python_version }}
+      - name: Test with pytest
+        run: make test
