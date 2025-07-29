@@ -1,0 +1,73 @@
+[project]
+name = "sdmxabs"
+version = "0.1.8"
+description = "Download data from the Australian Bureau of Statistics (ABS) using its SDMX API"
+readme = "README.md"
+license = { text = "LICENSE" }   # MIT License
+requires-python = ">=3.13"
+
+dependencies = [
+    # - system
+    "typing",
+    "pathlib",
+    "importlib",
+
+    # - internet
+    "requests",
+    "defusedxml",
+
+    # - data science
+    "pandas",
+    "numpy",
+]
+
+[dependency-groups]
+dev = [
+    # - tools
+    "black",
+    "mypy",
+    "pdoc",
+    "pylint",
+    "ruff",
+    "nbqa",
+    
+    # - typing
+    "pandas-stubs",
+    "types-requests",
+    "types-defusedxml",
+
+    # --- testing
+    "ipython",
+    "ipykernel",
+    "watermark",
+    "mgplot",
+]
+
+[project.urls]
+Repository = "https://github.com/bpalmer4/sdmxabs"
+Homepage = "https://github.com/bpalmer4/sdmxabs"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length=110
+lint.select = [ "ALL" ]  # Aggresively select all rules
+lint.ignore = [
+    # --- specific rules to ignore
+    "COM812",  # missing or trailing comma - recommended by ruff format
+    "D203",    # Incorrect blank line before class - recommended by ruff check
+    "D213",    # Multi-line docstring summary should start at the first line - recommended by ruff
+    "EM101",   # Exception must not use a string literal
+    "EM102",   # Exception must not use an f-string literal
+    "T201",    # Remove `print` --> But I use print to alert the user
+    "TRY003",  # Long exception messages.
+]
+[tool.ruff.lint.per-file-ignores]
+"test/*" = [
+    "INP001",  # implicit-namespace-package - not relevant for Jupyter notebooks
+    "BLE001",  # catch-all exceptions - not useful in Jupyter notebooks
+    "E402",    # Module level import not at top of file - doesn't work with Notebooks
+    "PLR0913", # Too many arguments - not relevant for Jupyter notebooks
+]
