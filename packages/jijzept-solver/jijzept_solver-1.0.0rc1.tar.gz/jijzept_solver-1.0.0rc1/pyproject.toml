@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools >= 64", "setuptools_scm >= 8", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jijzept_solver"
+authors = [
+    {name = "Jij Inc.", email = "info@j-ij.com"},
+]
+description = "A client for JijZept Solver API."
+dynamic = ["version"]
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+requires-python = ">= 3.9"
+dependencies = [
+    "ommx >= 1.8.0, < 2.0.0",
+    "grpcio >= 1.69.0, < 2.0.0",
+    "certifi >= 2025.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "requests"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = [
+    "jijzept_solver",
+    "jijzept_solver_proto",
+]
+
+[tool.ruff]
+target-version="py311"
+line-length = 88
+indent-width = 4
+fix = true
+exclude = [
+    "*_pb2.py",
+    "*_pb2_grpc.py", 
+    "*_pb2.pyi"
+]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "W",
+    "I",
+    "Q",
+    "PERF",
+    "RUF"
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "double"
+
+[tool.setuptools_scm]
+root = ".."
+tag_regex = "^client-(?P<version>[vV]?\\d+(?:\\.\\d+){0,2}[^\\+]*)(?:\\+.*)?$"
