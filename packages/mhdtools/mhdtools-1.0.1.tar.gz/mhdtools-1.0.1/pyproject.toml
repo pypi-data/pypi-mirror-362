@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = { file = "mhdtools/.pkginfo/version" }
+readme = { file = "README.md", content-type = "text/markdown" }
+
+[project]
+name = "mhdtools"
+authors = [{ name = "Alexis Pereda" }]
+dynamic = ["version", "readme", "dependencies"]
+description = "Tools to manipulate MHD/RAW files" 
+license = "MIT"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+
+[project.scripts]
+mhdview = "mhdtools.mhdview:main"
+
+[project.urls]
+Homepage = "https://github.com/alexis-pereda/mhdtools"
+Issues = "https://github.com/alexis-pereda/mhdtools/issues"
