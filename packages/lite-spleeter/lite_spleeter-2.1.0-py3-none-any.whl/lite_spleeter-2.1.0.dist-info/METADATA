@@ -1,0 +1,98 @@
+Metadata-Version: 2.3
+Name: lite-spleeter
+Version: 2.1.0
+Summary: A very lite version of The Deezer source separation library with very low RAM usage.
+License: MIT
+Author: Mohammad Mansour
+Author-email: mohammadamansour03@gmail.com
+Requires-Python: >=3.9,<3.13
+Classifier: Environment :: Console
+Classifier: Environment :: MacOS X
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Artistic Software
+Classifier: Topic :: Multimedia
+Classifier: Topic :: Multimedia :: Sound/Audio
+Classifier: Topic :: Multimedia :: Sound/Audio :: Analysis
+Classifier: Topic :: Multimedia :: Sound/Audio :: Conversion
+Classifier: Topic :: Multimedia :: Sound/Audio :: Sound Synthesis
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Utilities
+Requires-Dist: ffmpeg-python (>=0.2.0,<0.3.0)
+Requires-Dist: norbert (>=0.2.1,<0.3.0)
+Requires-Dist: numpy (<2.0.0)
+Requires-Dist: tensorflow (==2.12.1)
+Requires-Dist: typer (>=0.3.2,<0.4.0)
+Requires-Dist: validators (==0.35.0)
+Requires-Dist: yt-dlp[default] (>=2025.6.30,<2026.0.0)
+Project-URL: Homepage, https://baseet.netlify.app/ai
+Project-URL: Repository, https://github.com/mohammadmansour200/lite-spleeter
+Description-Content-Type: text/markdown
+
+`lite-spleeter`: Lightweight musical instruments removing library
+
+## About
+This is a lightweight [Spleeter](https://github.com/deezer/spleeter) (a library that uses AI/ML to extract vocals from audio files) version that works with media files of any length, with very low and fixed RAM usage (around 1.5 GB RAM usage on my computer).
+
+## Features
+• Progress indicator
+
+• Very lightweight on low-end Computers
+
+• Smaller package and simpler
+
+• No numpy errors
+
+## How does it work?
+It processes 30-second segments sequentially. After processing all segments, it concatenates them. This approach of processing chunks instead of the whole audio file helps keep memory usage low.
+
+## Get started
+*Make sure you have [ffmpeg](https://www.ffmpeg.org/download.html) installed.*
+
+Download package:
+```bash
+pip install lite-spleeter
+```
+
+
+
+## Usage
+```bash
+lite-spleeter separate audio_example.mp3  -o audio_output_path
+```
+
+You can provide either a single or a list of files for batch processing
+
+##### Batch processing
+`separate` command builds the model each time it is called, this process may be long, in this case If you have several files to separate, it is then recommended to perform all separation with a single call to separate:
+```bash
+lite-spleeter separate <path/to/audio1.mp3> <path/to/audio2.wav> <path/to/audio3.ogg> -o audio_output_path
+```
+
+
+To get help on the different options available with the separate command, type:
+```bash
+lite-spleeter separate --help
+```
+
+Read the original [Spleeter repo](https://github.com/deezer/spleeter) for more info.
