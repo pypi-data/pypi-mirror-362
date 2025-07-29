@@ -1,0 +1,145 @@
+Metadata-Version: 2.3
+Name: pyspfileuploader
+Version: 1.0.0
+Summary: A versatile Python package for uploading files to multiple storage backends including local, S3, Azure ADLS, and Blob storage. Supports ZIP file extraction and multiple file uploads.
+License: MIT
+Author: Deepak Gadge
+Author-email: dip.gadge2008@hotmail.com
+Requires-Python: >=3.9,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: azure-storage-blob (>=12.17.0,<13.0.0)
+Requires-Dist: azure-storage-file-datalake (>=12.11.0,<13.0.0)
+Requires-Dist: boto3 (>=1.28.1,<2.0.0)
+Requires-Dist: databricks-sdk (>=0.1.0,<0.2.0)
+Requires-Dist: google-cloud-storage (>=2.10.0,<3.0.0)
+Requires-Dist: pandas (>=2.0.3,<3.0.0)
+Requires-Dist: python-dotenv (>=1.0.0,<2.0.0)
+Description-Content-Type: text/markdown
+
+# File Uploader
+
+A Python package for seamlessly uploading files to various storage backends (Local, S3, Azure Blob, ADLS) with job tracking, error logging, and comprehensive file management capabilities.
+
+## Features
+
+- Multiple storage backend support:
+  - Local filesystem
+  - AWS S3
+  - Azure Blob Storage
+  - Azure Data Lake Storage (ADLS)
+- Robust job tracking with SQLite database
+- Detailed error logging and exception handling
+- Intelligent folder structure with date-based organization
+- Advanced ZIP file support with safety checks:
+  - File size validation (100MB per file limit)
+  - Total uncompressed size limit (200MB)
+  - Zip file integrity verification
+- Custom date handling for file organization
+- Comprehensive error handling and custom exceptions
+- Support for file metadata tracking
+
+## Installation
+
+```bash
+pip install file-uploader
+```
+
+## Configuration
+
+The package uses environment variables for configuration. Create a `.env` file with the required variables based on your chosen storage type:
+
+### Local Storage
+```env
+STORAGE_TYPE=local
+BASE_PATH=/path/to/storage
+```
+
+### AWS S3
+```env
+STORAGE_TYPE=s3
+AWS_BUCKET_NAME=your-bucket
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+REGION_NAME=us-east-1  # optional
+```
+
+### Azure Blob Storage
+```env
+STORAGE_TYPE=blob
+BLOB_CONNECTION_STRING=your-connection-string
+BLOB_CONTAINER_NAME=your-container
+```
+
+### Azure Data Lake Storage
+```env
+STORAGE_TYPE=adls
+ADLS_ACCOUNT_NAME=your-account
+ADLS_FILE_SYSTEM_NAME=your-filesystem
+ADLS_CREDENTIAL=your-credential
+```
+
+## Usage
+
+### Command Line
+```bash
+file-uploader /path/to/file [job_id] [storage_type] [created_date]
+```
+
+### Python API
+```python
+from file_uploader import upload_file
+
+# Simple upload with automatic job ID generation
+job_id = upload_file("/path/to/file")
+
+# Upload with custom job ID and storage type
+job_id = upload_file("/path/to/file", job_id="custom-job", storage_type="s3")
+
+# Upload with specific created date
+job_id = upload_file("/path/to/file", created_date="14-07-2025")
+
+# Upload ZIP file (will be automatically extracted and validated)
+job_id = upload_file("/path/to/archive.zip")
+```
+
+### Storage Backend Selection
+
+The storage backend is determined by the `STORAGE_TYPE` environment variable. If not specified, it defaults to "local" storage. You can also override the storage type per upload using the `storage_type` parameter.
+
+### File Size Limits
+
+- Individual file size limit: 100MB
+- Total uncompressed size limit for ZIP files: 200MB
+
+### Job Tracking
+
+Each upload operation is assigned a unique job ID, which can be used to:
+- Track the upload status
+- Retrieve file metadata
+- Access uploaded file locations
+
+## Development
+
+1. Clone the repository
+2. Install poetry: `pip install poetry`
+3. Install dependencies: `poetry install`
+4. Run tests: `poetry run pytest`
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
+
+## License
+
+MIT License
+
