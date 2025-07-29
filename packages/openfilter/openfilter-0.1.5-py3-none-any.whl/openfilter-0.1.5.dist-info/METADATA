@@ -1,0 +1,188 @@
+Metadata-Version: 2.4
+Name: openfilter
+Version: 0.1.5
+License-Expression: Apache-2.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: <3.13,>=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy==1.26.4
+Requires-Dist: opencv-python-headless==4.10.0.84
+Requires-Dist: psutil==5.9.8
+Requires-Dist: pyzmq==26.2.0
+Requires-Dist: openlineage-python==1.33.0
+Requires-Dist: requests==2.32.4
+Provides-Extra: dev
+Requires-Dist: build==1.2.1; extra == "dev"
+Requires-Dist: docker==7.1.0; extra == "dev"
+Requires-Dist: setuptools==72.2.0; extra == "dev"
+Requires-Dist: twine<7,>=6.1.0; extra == "dev"
+Requires-Dist: wheel==0.44.0; extra == "dev"
+Requires-Dist: pytest==8.3.4; extra == "dev"
+Requires-Dist: jq==1.8.0; extra == "dev"
+Requires-Dist: pytest-cov==6.0.0; extra == "dev"
+Provides-Extra: mqtt-out
+Requires-Dist: paho-mqtt==1.6.1; extra == "mqtt-out"
+Requires-Dist: setuptools==72.2.0; extra == "mqtt-out"
+Provides-Extra: recorder
+Provides-Extra: rest
+Requires-Dist: fastapi==0.89.0; extra == "rest"
+Requires-Dist: uvicorn==0.20.0; extra == "rest"
+Requires-Dist: python-multipart==0.0.9; extra == "rest"
+Provides-Extra: util
+Provides-Extra: video
+Provides-Extra: video-in
+Requires-Dist: setuptools==72.2.0; extra == "video-in"
+Requires-Dist: vidgear[core]==0.3.3; extra == "video-in"
+Requires-Dist: boto3>=1.26.0; extra == "video-in"
+Provides-Extra: video-out
+Requires-Dist: setuptools==72.2.0; extra == "video-out"
+Requires-Dist: vidgear[core]==0.3.3; extra == "video-out"
+Provides-Extra: webvis
+Requires-Dist: fastapi==0.89.0; extra == "webvis"
+Requires-Dist: uvicorn==0.20.0; extra == "webvis"
+Provides-Extra: all
+Requires-Dist: setuptools==72.2.0; extra == "all"
+Requires-Dist: paho-mqtt==1.6.1; extra == "all"
+Requires-Dist: fastapi==0.89.0; extra == "all"
+Requires-Dist: uvicorn==0.20.0; extra == "all"
+Requires-Dist: python-multipart==0.0.9; extra == "all"
+Requires-Dist: google-cloud-monitoring==2.22.2; extra == "all"
+Requires-Dist: google-cloud-storage==2.17.0; extra == "all"
+Requires-Dist: vidgear[core]==0.3.3; extra == "all"
+Requires-Dist: boto3>=1.26.0; extra == "all"
+Dynamic: license-file
+
+# OpenFilter
+
+[![PyPI version](https://img.shields.io/pypi/v/openfilter.svg?style=flat-square)](https://pypi.org/project/openfilter/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/PlainsightAI/openfilter/blob/main/LICENSE)
+![Build Status](https://github.com/PlainsightAI/openfilter/actions/workflows/ci.yaml/badge.svg)
+
+
+**OpenFilter** is an universal abstraction for building and running vision workloads in modular image/video processing pipelines. It simplifies communication between components (called filters) and supports synchronization, side-channel paths, metrics, and load balancing — all in pure Python.
+
+Jump to:
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Examples](#examples)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Features
+
+- 🔁 Easily pluggable filter components
+- 🧪 Develop and test filters locally with Python
+- ⚡ High-throughput synchronized pipelines
+- 📡 MQTT/REST visualization and data publishing
+- 🧵 Parallel processing via load-balanced filter branches
+- 📊 Built-in telemetry and metrics streaming (coming soon)
+
+---
+
+## Installation
+
+Install OpenFilter with all utility filter dependencies:
+
+```bash
+pip install openfilter[all]
+````
+
+Install directly from GitHub:
+
+```bash
+pip install git+ssh://git@github.com/PlainsightAI/openfilter.git@main#egg=openfilter[all]
+```
+
+To install a specific version:
+
+```bash
+pip install git+ssh://git@github.com/PlainsightAI/openfilter.git@v1.3.17#egg=openfilter[all]
+```
+
+Editable install for development:
+
+```bash
+git clone git@github.com:PlainsightAI/openfilter.git
+cd openfilter
+make install
+```
+
+---
+
+## Quick Start
+
+Here’s a minimal example that plays a video and visualizes it in the browser:
+
+```python
+from openfilter.filter_runtime.filter import Filter
+from openfilter.filter_runtime.filters.video_in import VideoIn
+from openfilter.filter_runtime.filters.webvis import Webvis
+
+if __name__ == '__main__':
+    Filter.run_multi([
+        (VideoIn, dict(sources='file://video.mp4', outputs='tcp://*')),
+        (Webvis,  dict(sources='tcp://localhost')),
+    ])
+```
+
+Run it with:
+
+```bash
+python script.py
+```
+
+Then open [http://localhost:8000](http://localhost:8000) to see your video stream.
+
+---
+
+Alternatively, simply use the CLI:
+
+```
+openfilter run - VideoIn --sources 'file://video.mp4!loop' - Webvis
+```
+
+Note: Ensure that a `video.mp4` file exists. A simple example is available at `examples/hello-world/video.mp4`.
+
+## Examples
+
+Explore real-world examples covering:
+
+* Frame-by-frame video processing
+* Writing frames to JPEG or output video
+* Dual-video pipelines with multiple topics
+* Load balancing using multiple filter processes
+* Sending metrics to MQTT
+* Ephemeral side-channel processing
+* S3 integration for cloud video processing
+* Fully declarative + class-based configuration
+
+➡️ See [`docs/overview.md`](https://github.com/PlainsightAI/openfilter/blob/main/docs/overview.md) for all examples.
+
+---
+
+## Documentation
+
+* 📘 [Overview](https://github.com/PlainsightAI/openfilter/blob/main/docs/overview.md)
+
+---
+
+## Contributing
+
+We welcome contributions of all kinds — new filters, bugfixes, or documentation improvements!
+
+Please see the [contributing guide](https://github.com/PlainsightAI/openfilter/blob/main/CONTRIBUTING.md) for details on how to get started.
+
+If you encounter issues, [open an issue](https://github.com/PlainsightAI/openfilter/issues/new/choose).
+
+---
+
+## License
+
+Apache License 2.0. See [LICENSE](https://github.com/PlainsightAI/openfilter/blob/main/LICENSE) for full text.
