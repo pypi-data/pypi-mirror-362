@@ -1,0 +1,132 @@
+Metadata-Version: 2.4
+Name: jbussdieker-service
+Version: 0.5.1
+Summary: A modern Python development toolkit.
+Author-email: "Joshua B. Bussdieker" <jbussdieker@gmail.com>
+Maintainer-email: "Joshua B. Bussdieker" <jbussdieker@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/jbussdieker/jbussdieker-service
+Project-URL: Documentation, https://github.com/jbussdieker/jbussdieker-service/blob/main/README.md
+Project-URL: Repository, https://github.com/jbussdieker/jbussdieker-service
+Project-URL: Issues, https://github.com/jbussdieker/jbussdieker-service/issues
+Project-URL: Changelog, https://github.com/jbussdieker/jbussdieker-service/blob/main/CHANGELOG.md
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Operating System :: OS Independent
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Typing :: Typed
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# jbussdieker-service
+
+A modern Python development toolkit plugin for managing systemd services. This plugin integrates with the jbussdieker CLI framework to provide easy systemd service installation and management capabilities.
+
+## 🚀 Features
+
+- **Systemd Service Installation**: Automatically creates and configures systemd service files
+- **Service Management**: Provides commands to install and manage jbussdieker services
+- **CLI Integration**: Seamlessly integrates with the jbussdieker CLI framework
+- **Automatic Restart**: Configures automatic restart on failure with configurable intervals
+- **Logging Integration**: Proper logging configuration with journald integration
+- **User Management**: Configures proper user and group permissions
+
+## 📦 Installation
+
+```bash
+pip install jbussdieker-service --upgrade
+```
+
+## 🔧 Prerequisites
+
+- Python 3.9 or higher
+- Linux system with systemd
+- jbussdieker CLI framework installed
+- Appropriate user permissions for systemd service management
+
+## 🎯 Usage
+
+### Install Systemd Service
+
+Install the jbussdieker service as a systemd service:
+
+```bash
+jbussdieker service install
+```
+
+This command will:
+- Create a systemd service file at `/etc/systemd/system/jbussdieker.service`
+- Configure the service with proper restart policies
+- Set up logging to journald
+- Configure user and group permissions
+
+### Start the Service
+
+After installation, you can manage the service using standard systemd commands:
+
+```bash
+# Start the service
+sudo systemctl start jbussdieker
+
+# Enable the service to start on boot
+sudo systemctl enable jbussdieker
+
+# Check service status
+sudo systemctl status jbussdieker
+
+# View service logs
+sudo journalctl -u jbussdieker -f
+```
+
+## 🔍 How It Works
+
+1. **Service Installation**: Creates a systemd service file with proper configuration
+2. **Service Configuration**: Sets up restart policies, logging, and user permissions
+3. **Integration**: Integrates with the jbussdieker CLI framework for seamless operation
+4. **Monitoring**: Provides continuous service operation with proper logging
+
+## 🛠️ Development
+
+This plugin is part of the jbussdieker ecosystem. It integrates seamlessly with the jbussdieker CLI framework.
+
+### Project Structure
+
+```
+src/jbussdieker/service/
+├── __init__.py
+└── cli.py          # CLI interface and service management
+```
+
+### Service Configuration
+
+The plugin creates a systemd service with the following configuration:
+
+- **Type**: Simple service
+- **Restart Policy**: Restart on failure with 5-second intervals
+- **User**: jbussdieker
+- **Group**: jbussdieker
+- **Working Directory**: /tmp
+- **Logging**: Integrated with systemd journal
+
+## 📝 License
+
+This project is licensed under **MIT**.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📚 Related
+
+- [jbussdieker](https://pypi.org/project/jbussdieker/) - The main CLI framework
+- [systemd](https://systemd.io/) - System and service manager
