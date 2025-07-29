@@ -1,0 +1,25 @@
+{% extends 'allianceauth/base-bs5.html' %}
+
+{% load i18n %}
+{% load evelinks %}
+
+{% block page_title %}{% translate "Corporation Member Data" %}{% endblock %}
+
+{% block header_nav_collapse_left %}
+    {% include "corpstat/navigation.html" %}
+{% endblock %}
+
+{% block header_nav_collapse_right %}
+    <li role="presentation" class="nav-item">
+        {% include "corpstat/menu-search-corporation.html" with suffix="menu" %}
+    </li>
+{% endblock %}
+
+{% block content %}
+    <div class="aa-corpstats">
+        {% translate "Corporation Member Data" as site_title %}
+        {% include "framework/header/page-header.html" with title=site_title %}
+
+        {% block member_data %}{% endblock %}
+    </div>
+{% endblock %}
