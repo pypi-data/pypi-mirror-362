@@ -1,0 +1,106 @@
+Metadata-Version: 2.4
+Name: orange_newton
+Version: 0.0.14
+Summary: A Simple Orange Newton Project
+Author-email: Hiroshi Fujiwara <hiroshi.829f@gmail.com>
+License: MIT License
+        
+        Copyright (c) 2020 Hiroshi Fujiwara
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+
+# Welcome to Hoge13
+
+A Simple Orange Newton Project
+
+## 開発用セットアップ
+プロジェクト構築後に、以下の手順で実行環境を構築します
+
+```bash
+cd <your-project-name>
+
+# Install dependencies
+uv sync
+
+# Install pre-commit hooks
+uv run pre-commit install
+
+# Run tests
+uv run pytest
+
+# Run formatting and linting (automatically runs on commit)
+uv run ruff format .
+uv run ruff check .
+# Auto Fix
+uv run ruff check . --fix
+
+```
+
+## ビルドとリリース
+ビルドして、リリースします
+
+```bash
+# Git tag
+git tag vX.X.X
+
+# Build
+uv build
+
+# Publish testpypi
+uv publish --publish-url https://test.pypi.org/legacy/ --token <TOKEN>
+OR
+uv publish --index testpypi --token <TOKEN>
+
+# To install testpypi
+pip install -i https://test.pypi.org/simple/ <PACKAGE_NAME>
+
+# Publish pypi
+uv publish --token <TOKEN>
+
+# To install pypi
+pip install <PACKAGE_NAME>
+OR
+uv add <PACKAGE_NAME>
+
+```
+
+## Github actionでのリリース
+Githubアクションを経由してリリースします
+
+```
+# Test-Pypiへのリリース
+git tag release-test/vX.X.X
+git push origin release-test/vX.X.X
+
+# Pypiへのリリース
+git tag release/vX.X.X
+git push origin release/vX.X.X
+
+```
+
+## VSCodeでのDevcontainerを利用した開発用セットアップ
+VSCodeの場合、Devcontainerを開きます
+
