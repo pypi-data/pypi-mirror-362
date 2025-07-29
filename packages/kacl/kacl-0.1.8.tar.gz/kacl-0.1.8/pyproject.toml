@@ -1,0 +1,45 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "kacl"
+authors = [{name = "Daniel Rocha", email = "daniel@rocha.io"}]
+dynamic = ["version", "description"]
+requires-python = ">=3.13"
+dependencies = [
+    "typer>=0.13.0",
+]
+
+[project.scripts]
+kacl = "kacl:app"
+
+[tool.ruff]
+preview = true
+line-length = 79
+
+[tool.ruff.lint]
+extend-select = [
+  # "D",   # pydocstyle
+  "I",   # isort
+  "UP",  # pyupgrade
+  "S",   # flake8-bandit
+  "B",   # flake8-bugbear
+  # "COM", # flake8-commas
+  "C4",  # flake8-comprehensions
+  "ISC", # flake8-implicit-str-concat
+  "FIX", # flake8-fixme
+  "FA",  # flake8-future-annotations
+  "SIM", # flake8-simplify
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "D100", "D103", "D104"]
+
+[dependency-groups]
+dev = [
+    "flit>=3.10.1",
+]
