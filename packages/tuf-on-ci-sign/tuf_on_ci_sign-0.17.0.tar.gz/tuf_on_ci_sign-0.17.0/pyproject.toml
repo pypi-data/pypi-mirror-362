@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tuf-on-ci-sign"
+description = "Signing tools for TUF-on-CI"
+license = "MIT"
+license-files = [ "LICENSE" ]
+readme = "README.md"
+dependencies = [
+  "packaging >= 24,< 26",
+  "platformdirs ~= 4.2",
+  "securesystemslib[awskms,azurekms,gcpkms,hsm,sigstore] ~= 1.2",
+  "tuf >= 5.1,< 7.0",
+  "click ~= 8.1",
+]
+requires-python = ">=3.9"
+dynamic = ["version"]
+
+[project.urls]
+issues = "https://github.com/theupdateframework/tuf-on-ci/issues"
+source = "https://github.com/theupdateframework/tuf-on-ci/"
+
+[project.scripts]
+tuf-on-ci-delegate = "tuf_on_ci_sign:delegate"
+tuf-on-ci-import-repo = "tuf_on_ci_sign:import_repo"
+tuf-on-ci-sign = "tuf_on_ci_sign:sign"
+
+[project.optional-dependencies]
+lint = [
+  "mypy == 1.16.1",
+  "ruff == 0.12.0",
+]
+
+[tool.hatch.version]
+path = "tuf_on_ci_sign/__init__.py"
+
+[tool.mypy]
+python_version = "3.9"
+
+[[tool.mypy.overrides]]
+module = [
+  "securesystemslib.*",
+  "PyKCS11.*",
+]
+ignore_missing_imports = "True"
+
+[tool.ruff.lint]
+select = [
+  "ARG", # flake8-unused-arguments
+  "B",   # flake8-bugbear
+  "BLE", # flake8-blind-except
+  "C4",  # flake8-comprehensions
+  "E",   # pycodestyle errors
+  "F",   # pyflakes
+  "I",   # isort
+  "LOG", # flake8-logging
+  "N",   # pep8-naming
+  "RET", # flake8-return
+  "RUF", # ruff-specific rules
+  "S",   # flake8-bandit
+  "SIM", # flake8-simplify
+  "UP",  # pyupgrade
+  "W",   # pycodestyle warnings
+]
+ignore = [
+  "S101", # Use of `assert` detected
+  "S603", # `subprocess` call: check for execution of untrusted input
+]
