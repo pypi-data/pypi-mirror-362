@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Save trace setting
+XTRACE=$(set +o | grep xtrace)
+set +o xtrace
+
+function octavia_create_network_interface_device {
+    INTERFACE=$1
+    MGMT_PORT_ID=$2
+    MGMT_PORT_MAC=$3
+
+    if [[ $NEUTRON_AGENT == "openvswitch" || $Q_AGENT == "openvswitch" || $NEUTRON_AGENT == "ovn" || $Q_AGENT == "ovn" ]]; then
+        if [[ $NEUTRON_AGENT == "ovn" || $Q_AGENT == "ovn" ]]; then
+            openstack subnet set --gateway none lb-mgmt-subnet
+        fi
+        sudo ovs-vsctl -- --may-exist add-port ${OVS_BRIDGE:-br-int} $INTERFACE -- set Interface $INTERFACE type=internal -- set Interface $INTERFACE external-ids:iface-status=active -- set Interface $INTERFACE external-ids:attached-mac=$MGMT_PORT_MAC -- set Interface $INTERFACE external-ids:iface-id=$MGMT_PORT_ID -- set Interface $INTERFACE external-ids:skip_cleanup=true
+    else
+        die "Unknown network controller - $NEUTRON_AGENT/$Q_AGENT"
+    fi
+}
+
+function octavia_delete_network_interface_device {
+
+    if [[ $NEUTRON_AGENT == "openvswitch" || $Q_AGENT == "openvswitch" || $NEUTRON_AGENT == "ovn" || $Q_AGENT == "ovn" ]]; then
+        :  # Do nothing
+    else
+        die "Unknown network controller - $NEUTRON_AGENT/$Q_AGENT"
+    fi
+}
+
+# Restore xtrace
+$XTRACE
