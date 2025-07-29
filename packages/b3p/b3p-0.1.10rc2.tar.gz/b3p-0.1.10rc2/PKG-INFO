@@ -1,0 +1,89 @@
+Metadata-Version: 2.4
+Name: b3p
+Version: 0.1.10rc2
+Summary: Command line tools for preprocessing of wind turbine blade models
+Author-email: wr1 <8971152+wr1@users.noreply.github.com>
+License: MIT
+License-File: LICENSE.md
+Requires-Python: <4.0.0,>=3.11
+Requires-Dist: frd2vtu>=0.1.6
+Requires-Dist: h5py<4.0.0,>=3.11.0
+Requires-Dist: jinja2<4.0.0,>=3.1.4
+Requires-Dist: meshio<6.0.0,>=5.3.5
+Requires-Dist: mkdocs-material<10.0.0,>=9.6.1
+Requires-Dist: numpy>=2.3.1
+Requires-Dist: pandas<3.0.0,>=2.2.3
+Requires-Dist: pyarrow>18
+Requires-Dist: pydantic>=2.11.7
+Requires-Dist: pytest<9.0.0,>=8.3.3
+Requires-Dist: pyvista>=0.44.2
+Requires-Dist: ruamel-yaml==0.18.11
+Requires-Dist: scipy<2.0.0,>=1.13.0
+Requires-Dist: sympy<2.0.0,>=1.13.3
+Requires-Dist: tqdm<5.0.0,>=4.66.5
+Requires-Dist: vtk==9.3.1
+Description-Content-Type: text/markdown
+
+[![Deploy](https://github.com/wr1/b3p/actions/workflows/publish.yml/badge.svg)](https://github.com/wr1/b3p/actions/workflows/publish.yml)[![Test](https://github.com/wr1/b3p/actions/workflows/test.yml/badge.svg)](https://github.com/wr1/b3p/actions/workflows/test.yml)![PyPI](https://img.shields.io/pypi/v/b3p)
+
+# b3p 
+Command line tools to create models for composite (wind turbine) blades. 
+
+## Functionality
+- Building 3D models of wind turbine blades
+- Creating a quad mesh for the blade
+- Assigning scalable *slab based* laminate plans to the structure
+- Assembling a shell mesh with laminate properties
+- Writing mesh information to VTK files
+
+## Install
+From pypi
+```sh
+pip install b3p
+``` 
+From source
+```sh
+git clone https://github.com/wr1/b3p.git
+cd b3p 
+pip install -e .
+``` 
+## How to run
+```sh 
+usage: b3p [-h] {build,ccx,2d,ccblade,clean} ...
+
+Blade Design CLI
+
+positional arguments:
+  {build,ccx,2d,ccblade,clean}
+    build               Build the full blade model
+    ccx                 Run Calculix operations
+    2d                  2D mesh and ANBA4 operations
+    ccblade             Run CCBlade analysis
+    clean               Clean working directory
+
+options:
+  -h, --help            show this help message and exit
+```
+In a cloned repository:
+```sh
+cd examples
+# build the blade model, geometry, mesh, drape
+b3p build blade_test.yml
+# run the ccx fea analysis
+b3p ccx blade_test.yml  
+```
+
+## Output
+Plot of geometric input parameters for the example blade
+![test_blade](https://user-images.githubusercontent.com/8971152/148471383-7f652a84-447a-4db0-81e2-2e27b1785745.png)
+
+Visualisation of the number of plies on the mesh using [Paraview](https://paraview.org)
+![3dblade_nplies](https://user-images.githubusercontent.com/8971152/148471469-61fb3efb-1789-4667-97b4-11b9e36d2e73.png)
+
+Visualisation of a 2d cross section mesh 
+![mesh2d](https://user-images.githubusercontent.com/8971152/148645980-51c36e1a-89e1-469d-aeea-49bf5adf4070.png)
+
+[CalculiX](http://www.dhondt.de/) results (very coarse mesh)
+![zstrain](https://user-images.githubusercontent.com/8971152/151350188-0a6f31bf-5f0e-457b-b6cb-438bb10b4c91.png)
+
+
