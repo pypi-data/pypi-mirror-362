@@ -1,0 +1,93 @@
+# ⏰ timelycli
+
+**timelycli** is a simple and cross-platform Python CLI tool to display the current date and time.
+It supports multiple options including UTC output, local timezone name, and selective display of date or time.
+
+---
+
+## 📦 Installation
+
+### ✅ Install from PyPI
+
+Once published to PyPI:
+
+```bash
+pip install timelycli
+````
+
+### 🔬 Install from TestPyPI (for testing)
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ timelycli
+```
+
+---
+
+## 🚀 Usage
+
+Run the CLI tool with:
+
+```bash
+timely [OPTIONS]
+```
+
+### 🔧 Options
+
+| Option       | Description            |
+| ------------ | ---------------------- |
+| `--utc`      | Show time in UTC       |
+| `--timezone` | Show the timezone name |
+| `--date`     | Show only the date     |
+| `--time`     | Show only the time     |
+
+---
+
+## 🧪 Examples
+
+```bash
+timely
+# 2025-07-14 12:30:45
+
+timely --date
+# 2025-07-14
+
+timely --time
+# 12:30:45
+
+timely --timezone
+# 2025-07-14 12:30:45 (IST)
+
+timely --utc --timezone
+# 2025-07-14 07:00:45 (UTC)
+```
+
+---
+
+## 🧱 Project Structure
+
+```
+timelycli/
+├── timelycli/
+│   └── __main__.py
+├── pyproject.toml
+└── README.md
+```
+
+---
+
+## 🛠 Development Setup
+
+To install and run locally (without publishing):
+
+```bash
+git clone https://github.com/yourusername/timelycli.git
+cd timelycli
+pip install .
+timely
+```
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License.
