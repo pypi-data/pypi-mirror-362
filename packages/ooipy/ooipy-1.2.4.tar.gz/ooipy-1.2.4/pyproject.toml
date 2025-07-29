@@ -1,0 +1,113 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ooipy"
+dynamic = ["version"]
+description = 'toolbox for downloading and analyzing OOI hydrophone data'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+maintainers = [
+  { name = "John Ragland", email = "jhrag@uw.edu" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "fsspec",
+    "xarray",
+    "obspy",
+    "pandas",
+    "numpy",
+    "tqdm",
+    "aiohttp",
+    "netcdf4"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest >= 6.0",
+]
+dev = [
+    "pre-commit",
+    "black",
+]
+docs = [
+  "furo",
+  "myst_parser >=0.13",
+  "sphinx >=4.0",
+  "sphinx-copybutton",
+  "sphinx-autodoc-typehints",
+  "sphinxcontrib-bibtex"
+]
+
+[project.urls]
+Documentation = "https://ooipy.readthedocs.io"
+Issues = "https://github.com/Ocean-Data-Lab/ooipy/issues"
+Source = "https://github.com/Ocean-Data-Lab/ooipy"
+
+[project.scripts]
+download_hydrophone_data = "ooipy.scripts.download_hydrophone_data:main"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/ooipy/version.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/ooipy tests}"
+
+[tool.coverage.run]
+source_pkgs = ["ooipy", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/ooipy/__about__.py",
+]
+
+[tool.coverage.paths]
+ooipy = ["src/ooipy", "*/ooipy/src/ooipy"]
+tests = ["tests", "*/ooipy/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning", # temporarily adding for python 3.13 support
+]
+# adding catch for pkg_resources API deprecation warning until obspy updates
+minversion = "6.0"
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+log_cli_level = "info"
+testpaths = [
+  "tests",
+]
+
+[tool.black]
+line-length = 100
