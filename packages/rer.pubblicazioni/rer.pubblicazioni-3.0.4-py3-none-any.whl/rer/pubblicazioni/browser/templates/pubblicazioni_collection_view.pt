@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+  lang="en"
+  metal:use-macro="context/main_template/macros/master"
+  i18n:domain="plone">
+  <body>
+
+    <metal:content-core fill-slot="content-core">
+      <metal:block define-macro="content-core">
+
+        <div metal:define-macro="text-field-view"
+             id="parent-fieldname-text" class="stx"
+             tal:define="text view/text"
+             tal:condition="text"
+             tal:attributes="class view/text_class">
+          <div metal:define-slot="inside" tal:replace="structure text">The body</div>
+        </div>
+
+        <metal:listingmacro define-macro="listing">
+          <tal:results define="batch view/batch;
+                               thumb_scale_list view/get_thumb_scale_list;
+                               thumb_scale_table view/get_thumb_scale_table;
+                               thumb_scale_summary view/get_thumb_scale_summary;
+                               img_class python:'thumb-%s pull-left' % thumb_scale_list;
+                               showicons view/show_icons">
+            <tal:listing condition="batch">
+              <div class="entries" metal:define-slot="entries"
+                   tal:define="portal context/@@plone_portal_state/portal;
+                               image_scale portal/@@image_scale">
+                <tal:repeat repeat="item batch" metal:define-macro="entries">
+                  <tal:block tal:define="obj item/getObject;
+                                         item_url item/getURL;
+                                         item_id item/getId;
+                                         item_title item/Title;
+                                         item_description item/Description;
+                                         item_type item/PortalType;
+                                         item_modified item/ModificationDate;
+                                         item_created item/CreationDate;
+                                         item_wf_state item/review_state;
+                                         item_wf_state_class python:'state-' + view.normalizeString(item_wf_state);
+                                         item_creator item/Creator;
+                                         item_link python:item_type in view.use_view_action and item_url+'/view' or item_url;
+                                         item_is_event python:view.is_event(obj);
+                                         item_has_image python:item.getIcon;
+                                         item_type_class python:('contenttype-' + view.normalizeString(item_type)) if showicons else '' ;
+                                         publication_author obj/publicationAuthor|nothing;
+                                         publication_date obj/publicationDate|nothing;
+                                         publication_type obj/publicationType|nothing;">
+                    <metal:block define-slot="entry">
+                      <div class="entry" metal:define-macro="listitem">
+                        <div class="item-image"
+                             tal:condition="python: item_has_image and thumb_scale_list">
+                          <a tal:attributes="href item_link; title item_type">
+                            <img tal:replace="structure python:image_scale.tag(item, 'image', scale='newshome', css_class=img_class)" />
+                          </a>
+                        </div>
+                        <div class="publicationDetails">
+                          <div tal:attributes="class string:$item_type_class $item_wf_state_class item-title">
+                            <a tal:attributes="href item_link; title item_type">
+                              <h2><span tal:content="item_title">Item Title</span></h2>
+                            </a>
+                          </div>
+                          <div class="publicationDateAuthor" tal:condition="python:publication_author or publication_date or publication_type">
+                            <div class="publicationAuthor" tal:condition="publication_author">
+                              <span class="publication-label">Autore:</span>
+                              <div class="publication-content">
+                                <tal:authors repeat="author publication_author">
+                                  <a href="${context/portal_url}/@@search?authors=${author}"><span tal:content="author">Author</span></a>
+                                  <tal:comma tal:condition="not:repeat/author/end">, </tal:comma>
+                                </tal:authors>
+                              </div>
+                            </div>
+                            <div class="publicationDate" tal:condition="publication_date">
+                              <span class="publication-label">Data:</span>
+                              <span class="publication-content" tal:content="python:view.toLocalizedTime(publication_date)" />
+                            </div>
+                            <div class="publicationTypes" tal:condition="publication_type">
+                              <span class="publication-label">Tipo:</span>
+                              <span class="publication-content" tal:content="python:', '.join(publication_type)" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </metal:block>
+                  </tal:block>
+                </tal:repeat>
+              </div>
+
+              <div metal:use-macro="context/batch_macros/macros/navigation" />
+
+            </tal:listing>
+
+            <metal:empty metal:define-slot="no_items_in_listing">
+              <p class="discreet"
+                tal:condition="not: view/batch"
+                tal:content="view/no_items_message">
+                There are currently no items in this folder.
+              </p>
+            </metal:empty>
+
+          </tal:results>
+        </metal:listingmacro>
+
+      </metal:block>
+    </metal:content-core>
+
+  </body>
+</html>
