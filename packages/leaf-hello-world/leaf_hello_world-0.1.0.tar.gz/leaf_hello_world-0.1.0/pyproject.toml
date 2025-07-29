@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "leaf-hello-world"
+version = "0.1.0"
+description = "Leaf Adapter with a basic Hello World function. Creating a hello world message every x interval."
+authors = ["Jasper Koehorst <jasper.koehorst@wur.nl>"]
+readme = "README.md"
+packages = [
+    { include = "leaf_hello_world" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+leaf-framework = "*"
+
+[tool.poetry.group.test.dependencies]
+pytest-xdist = "^3.6.1"
+pytest = "^8.3.4"
+coverage = "^7.6.8"
+
+[tool.poetry.plugins."leaf.adapters"]
+leaf_hello_world = "leaf_hello_world.adapter:HelloWorldAdapter"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
