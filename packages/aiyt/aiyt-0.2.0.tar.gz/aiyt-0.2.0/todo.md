@@ -1,0 +1,2 @@
+- add tests
+- ctrl-c exit should return 0
