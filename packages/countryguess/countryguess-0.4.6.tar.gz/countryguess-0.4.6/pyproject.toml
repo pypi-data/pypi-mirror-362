@@ -1,0 +1,58 @@
+[project]
+name = "countryguess"
+description = "Fuzzy lookup of country information"
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+authors = [
+  { name="plotski", email="plotski@example.org" },
+]
+dynamic = ["version"]  # Get version from PROJECT/__version__
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+requires-python = ">=3.8"
+dependencies = [
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+
+    "tox",
+
+    "coverage",
+    "pytest-cov",
+    "pytest-mock",
+
+    "ruff",
+    "flake8",
+    "isort",
+]
+
+[project.scripts]
+countryguess = "countryguess._cli:run"
+
+[project.urls]
+Repository = "https://codeberg.org/plotski/countryguess"
+"Bug Tracker" = "https://codeberg.org/plotski/countryguess/issues"
+Changelog = "https://codeberg.org/plotski/countryguess/raw/branch/master/NEWS"
+
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["countryguess*"]
+
+[tool.setuptools.package-data]
+"*" = ["_countrydata.json"]
+
+[tool.setuptools.dynamic]
+version = {attr = "countryguess.__version__"}
