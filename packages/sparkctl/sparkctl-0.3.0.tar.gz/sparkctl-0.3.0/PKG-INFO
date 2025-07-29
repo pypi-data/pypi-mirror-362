@@ -1,0 +1,103 @@
+Metadata-Version: 2.4
+Name: sparkctl
+Version: 0.3.0
+Summary: Orchestrates Spark standalone clusters on HPCs.
+Author-email: Daniel Thom <daniel.thom@nrel.gov>
+License-Expression: BSD-3-Clause
+Project-URL: Documentation, https://github.com/NREL/sparkctl#readme
+Project-URL: Issues, https://github.com/NREL/sparkctl/issues
+Project-URL: Source, https://github.com/NREL/sparkctl
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: <3.14,>=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: click<9,>=8.2
+Requires-Dist: dynaconf
+Requires-Dist: loguru>=0.7.2
+Requires-Dist: psutil
+Requires-Dist: pydantic<3,>=2.7
+Requires-Dist: pyspark-client==4.0.0
+Requires-Dist: rich_click
+Requires-Dist: rmon>=0.4.0
+Requires-Dist: toml
+Requires-Dist: types-psutil
+Provides-Extra: pyspark
+Requires-Dist: pyspark==4.0.0; extra == "pyspark"
+Provides-Extra: dev
+Requires-Dist: furo; extra == "dev"
+Requires-Dist: mypy<2,>=1.13; extra == "dev"
+Requires-Dist: myst_parser; extra == "dev"
+Requires-Dist: pre-commit; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: requests; extra == "dev"
+Requires-Dist: sphinx; extra == "dev"
+Requires-Dist: sphinx-click; extra == "dev"
+Requires-Dist: sphinx-copybutton; extra == "dev"
+Requires-Dist: autodoc_pydantic~=2.0; extra == "dev"
+Requires-Dist: sphinx-tabs~=3.4; extra == "dev"
+Requires-Dist: types-requests; extra == "dev"
+Requires-Dist: types-toml; extra == "dev"
+Dynamic: license-file
+
+# sparkctl
+This package implements configuration and orchestration of Spark clusters with standalone cluster
+managers. This is useful in environments like HPCs where the infrastructure implemented by cloud
+providers, such as AWS, is not available. It is particularly helpful when users want to deploy Spark
+but do not have administrative control of the servers.
+
+## Example usage
+There are two main ways to use this package:
+
+First, allocate compute nodes. For example, with Slurm (1 compute node for the Spark master and
+4 compute nodes for Spark workers):
+   
+```console
+$ salloc -t 01:00:00 -n4 --partition=shared --mem=30G : -N4 --account=<your-account> --mem=240G
+```
+  
+1. Configure a Spark cluster and run Spark jobs with `spark-submit` or `pyspark`.
+```console
+$ sparkctl configure
+$ sparkctl start
+$ spark-submit --master spark://$(hostname):7077 my-job.py
+$ sparkctl stop
+```
+
+2. Run Spark jobs in a Python script using the `sparkctl` library to manage the cluster.
+```python
+from sparkctl import ClusterManager, make_default_spark_config
+
+config = make_default_spark_config()
+mgr = ClusterManager(config)
+with mgr.managed_cluster() as spark:
+    df = spark.createDataFrame([(x, x + 1) for x in range(1000)], ["a", "b"])
+    df.show()
+```
+
+Refer to the [user documentation](https://nrel.github.io/sparkctl/) for a description of features
+and detailed usage instructions.
+
+## Project Status
+The package is actively maintained and used at the National Renewable Energy Laboratory (NREL).
+The software is primarily geared toward HPCs that use Slurm. It also supports a generic list of
+servers as long as the servers have access to a shared filesystem and are accessible via SSH without
+password login.
+
+It would be straightforward to extend the functionality to support other HPC resource managers.
+Please submit an issue or idea or discussion if you have interest in this package but need that
+support.
+
+Contributions are welcome.
+
+## License
+sparkctl is released under a BSD 3-Clause [license](https://github.com.NREL/sparkctl/LICENSE).
+
+## Software Record
+This package is developed under NREL Software Record SWR-25-109.

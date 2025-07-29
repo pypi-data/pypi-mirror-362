@@ -1,0 +1,135 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sparkctl"
+version = "0.3.0"
+description = "Orchestrates Spark standalone clusters on HPCs."
+readme = "README.md"
+requires-python = ">=3.11, <3.14"
+license = "BSD-3-Clause"
+keywords = []
+authors = [
+    { name = "Daniel Thom", email = "daniel.thom@nrel.gov" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "click >= 8.2, < 9",
+    "dynaconf",
+    "loguru >= 0.7.2",
+    "psutil",
+    "pydantic >= 2.7, < 3",
+    "pyspark-client == 4.0.0",
+    "rich_click",
+    "rmon >= 0.4.0",
+    "toml",
+    "types-psutil",
+]
+
+[project.optional-dependencies]
+pyspark = [
+    "pyspark == 4.0.0",
+]
+dev = [
+    "furo",
+    "mypy >=1.13, < 2",
+    "myst_parser",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "requests",
+    "sphinx",
+    "sphinx-click",
+    "sphinx-copybutton",
+    "autodoc_pydantic~=2.0",
+    "sphinx-tabs~=3.4",
+    "types-requests",
+    "types-toml",
+]
+
+[project.urls]
+Documentation = "https://github.com/NREL/sparkctl#readme"
+Issues = "https://github.com/NREL/sparkctl/issues"
+Source = "https://github.com/NREL/sparkctl"
+
+[project.scripts]
+sparkctl = "sparkctl.cli.sparkctl:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.sh", "*.conf", "*.properties", "*.template"]
+
+[tool.mypy]
+check_untyped_defs = true
+exclude = [
+    "tests/data",
+]
+files = [
+  "src",
+  "tests",
+]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+minversion = "6.0"
+addopts = "-ra"
+testpaths = ["tests"]
+norecursedirs = ["tests/data"]
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".venv",
+    "_build",
+    "build",
+    "dist",
+    "env",
+    "venv",
+]
+
+line-length = 99
+indent-width = 4
+
+target-version = "py312"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+select = [
+    "C901",   # McCabe complexity
+    "E4",     # Subset of pycodestyle (E)
+    "E7",
+    "E9",
+    "EM",     # string formatting in an exception message
+    "F",      # Pyflakes
+    "W",      # pycodestyle warnings
+]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
