@@ -1,0 +1,59 @@
+{% from '_clipboard_input.html' import clipboard_input %}
+{% set host = vc_room.data.host %}
+{% set alt_hosts = vc_room.data.alternative_hosts %}
+{% set phone_link = settings.get('phone_link') %}
+{% set passcode_visible = (
+    event_vc_room.data.password_visibility == 'everyone' or
+    event_vc_room.event.can_manage(session.user) or
+    (session.user and event_vc_room.data.password_visibility == 'logged_in') or
+    (session.user and event_vc_room.data.password_visibility == 'registered' and event_vc_room.event.is_user_registered(session.user))
+) %}
+<div class="ui list">
+    <div class="item">
+        <div class="header">{% trans %}Zoom Meeting ID{% endtrans %}</div>
+        {{ vc_room.data.zoom_id }}
+    </div>
+    {% if vc_room.data.description %}
+        <div class="item">
+            <div class="header">{% trans %}Description{% endtrans %}</div>
+            {{ vc_room.data.description }}
+        </div>
+    {% endif %}
+    {% if host %}
+        <div class="item">
+            <div class="header">{% trans %}Host{% endtrans %}</div>
+            {{ (host|decodeprincipal).full_name }}
+        </div>
+    {% endif %}
+    {% if alt_hosts %}
+        <div class="item">
+            <div class="header">
+                {% trans count=alt_hosts|length -%}
+                    Alternative host
+                {%- pluralize -%}
+                    Alternative hosts
+                {%- endtrans %}
+            </div>
+            {{ alt_hosts | map('decodeprincipal') | map(attribute='full_name') | join(', ') }}
+        </div>
+    {% endif %}
+    {% if passcode_visible %}
+        <div class="item">
+            <div class="header">{% trans %}Passcode{% endtrans %}</div>
+            {{ vc_room.data.password }}
+        </div>
+    {% endif %}
+    {% if phone_link %}
+        <div class="item">
+            <div class="header">{% trans %}Useful links{% endtrans %}</div>
+            <a href="{{ phone_link }}" target="_blank">
+                {% trans %}Join via phone{% endtrans %}
+            </a>
+        </div>
+    {% endif %}
+    <div class="item">
+        <div class="header">{% trans %}Zoom URL{% endtrans %}</div>
+        {{ clipboard_input(vc_room.data.url if passcode_visible else vc_room.data.public_url,
+                        name="vc-room-url-%s"|format(event_vc_room.id)) }}
+    </div>
+</div>
