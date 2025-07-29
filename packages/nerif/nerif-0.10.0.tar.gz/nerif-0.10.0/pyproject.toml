@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nerif"
+version = "0.10.0"
+
+description = "LLM powered Python"
+readme = "README.md"
+authors = [{ name = "Chivier Humber" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["feed", "reader", "tutorial"]
+dependencies = [
+    "requests",
+    "numpy",
+    "httpx",
+    "openai",
+    "python-dotenv",
+    "litellm",
+    "prettytable",
+    "Pillow>=9.0.0",
+]
+requires-python = ">=3.8"
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+
+[project.optional-dependencies]
+dev = ["bumpver", "ruff", "pip-tools", "pytest", "ipython", "isort"]
+image = ["Pillow>=9.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/Nerif-AI/nerif"
+
+[tool.bumpver]
+current_version = "0.10.0"
+
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "Bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+push = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = ['current_version = "{version}"', 'version = "{version}"']
+
+[tool.ruff]
+exclude = [
+    ".bzr", ".direnv", ".eggs", ".git", ".git-rewrite", ".hg", ".ipynb_checkpoints",
+    ".mypy_cache", ".nox", ".pants.d", ".pyenv", ".pytest_cache", ".pytype",
+    ".ruff_cache", ".svn", ".tox", ".venv", ".vscode", "__pypackages__",
+    "_build", "buck-out", "build", "dist", "node_modules", "site-packages", "venv",
+]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+ignore = []
+fixable = ["ALL"]
+unfixable = []
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = false
+docstring-code-line-length = "dynamic"
