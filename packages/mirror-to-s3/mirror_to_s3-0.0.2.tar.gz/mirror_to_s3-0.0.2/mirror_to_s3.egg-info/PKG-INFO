@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: mirror_to_s3
+Version: 0.0.2
+Summary: mirror-to-S3 - mirror an index page into an S3 bucket
+Author-email: Dale Magee <mirror2s3@antisol.org>
+License-Expression: BSD-3-Clause
+Project-URL: Homepage, https://gitlab.com/AntiSol/mirror_to_s3
+Project-URL: Bug Tracker, https://gitlab.com/AntiSol/mirror_to_s3/-/issues
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.11
+Description-Content-Type: text/plain
+License-File: LICENSE
+Requires-Dist: httpx
+Requires-Dist: httpx-retries
+Requires-Dist: aiofiles
+Requires-Dist: aioboto3
+Requires-Dist: pyyaml
+Requires-Dist: python-dotenv
+Requires-Dist: lxml
+Dynamic: license-file
+
+mirror_to_s3
+
+A Python tool to mirror a HTTP directory listing into an S3 bucket.
+
+By Dale Magee
+
+Developed for Saber Astronautics (https://saberastro.com)
+ and released as FOSS with their blessing - thanks!
+
+This tool allows you to archive a number of sources into an S3 bucket, checking whether each
+ file exists in the destination bucket and only retrieving files which are missing 
+ (or marked to be refreshed each run).
+
+Note that this tool does not (presently) check file sizes or dates, only whether a file with 
+ the same name exists at the destination.
+
+mirror_to_s3 is intended to be fast and robust, and is designed to be able to mirror large 
+ data sets. It features concurrent downloads and has been tested with 
+
+
+CONFIGURATION
+
+Program Configuration is done via environment variables and/or .env file.
+
+The following env vars are required:
+	AWS_ACCESS_KEY_ID       string          AWS Access Key
+	AWS_SECRET_ACCESS_KEY   string          AWS Secret Key
+	S3_BUCKET               string          Name of S3 bucket to use. You'll need read/write access to this bucket.
+
+You must provide at least one of CONTACT_EMAIL or USER_AGENT:
+	USER_AGENT              string          User Agent to send when performing HTTP requests
+	CONTACT_EMAIL           email           Contact Email address to be used in user agent.
+
+The following settings are optional:
+	JSON_LOG                True/Yes/1      Use the optional (proprietary) jsonlog library. Default False
+	LOG_LEVEL               string          Logging Level. Default INFO. Valid options: VERBOSE/DEBUG/INFO/WARN
+	S3_ENDPOINT             url             Endpoint to use for S3-compatible server (minio, mega, etc)
+	SOURCES_FILE            path            Location of the sources.yaml file to use. If not provided the program
+	                                         will look for a file named sources.yaml in a) the current directory 
+	                                         b) the same directory as archiver.py c) the parent of that
+	MAX_DOWNLOADS           int             maximum number of concurrent downloads allowed
+	DRY_RUN                 bool            if True, nothing will be downloaded. Useful for testing/debugging
+
+See example.env for more info
+
+
+You'll also need a sources.yaml file specifying what sources you want to archive into your S3 bucket.
+
+This yaml file should contain a list of sources, each of which must have:
+	name                    string          A human-readable name for the source
+	
+The yaml file must provide one of:
+	index_url               url             The top-level url. Must be an "index of <path>" page. Must end with a slash.
+	file_url                url             The URL for a single file to be mirrored. The basename of this file will be used 
+	                                          when saving in the dest_dir
+The yaml file may also provide the following:
+	dest_dir                string          Name of "directory" to store files from this source in. If not provided, a 
+	                                         destination dir will be derived from the name. 
+	                                         You may include {DATE} in the dest_dir, this will be replaced the current date,
+	                                         formatted YYYY_MM_DD
+	include                 list            List of glob expressions indicating which files/directories to archive.
+	                                         if an include list is provided, only matching items will be archived.
+	exclude                 list            List of glob expressions indicating files/directories to exclude from archiving.
+	refresh                 list            List of glob expressions indicating files/directories to archive on every run,
+	                                         i.e items in this list will be archived regardless of whether they already exist
+	                                         in the destination bucket. Used for files which are updated regularly at the source.
+
+see sources.example.yaml for more info
+

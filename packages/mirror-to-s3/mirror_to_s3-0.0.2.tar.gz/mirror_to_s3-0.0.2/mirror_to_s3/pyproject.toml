@@ -1,0 +1,54 @@
+[project]
+name="mirror_to_s3"
+requires-python = ">=3.11"
+version="0.0.2"
+dependencies = [
+    "httpx",
+    "httpx-retries",
+    "aiofiles",
+    "aioboto3",
+    "pyyaml",
+    "python-dotenv",
+    "lxml",
+    # "ftputil",    # unused at present
+]
+authors = [ 
+  { name="Dale Magee", email="mirror2s3@antisol.org" },
+]
+description = "mirror-to-S3 - mirror an index page into an S3 bucket"
+#readme = "README"
+license = "BSD-3-Clause"
+classifiers = [ 
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3", 
+    "Operating System :: OS Independent",
+]
+
+[project.readme]
+file = "README"
+content-type = "text/plain"
+
+[project.urls]
+"Homepage" = "https://gitlab.com/AntiSol/mirror_to_s3"
+"Bug Tracker" = "https://gitlab.com/AntiSol/mirror_to_s3/-/issues"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools]
+packages = ["mirror_to_s3"]
+
+
+[tool.setuptools.package-data]
+mirror_to_s3 = ["pyproject.toml"]
+
+[project.scripts]
+mirror_to_s3 = "mirror_to_s3.archiver:run"
+
+# coming one day
+#[project.optional-dependencies]
+#dev = ["pytest", "pytest-cov"]
+
