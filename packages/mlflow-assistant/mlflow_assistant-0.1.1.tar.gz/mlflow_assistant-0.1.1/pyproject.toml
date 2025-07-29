@@ -1,0 +1,110 @@
+[project]
+name = "mlflow-assistant"
+version = "0.1.1"
+description = "An MLflow plugin that enables natural language conversations with your MLflow server using LLM providers like OpenAI and Ollama."
+authors = [
+    {name = "Hugo Carvalho",email = "hugodanielsilvacarvalho.hc@gmail.com"}
+]
+license = {text = "Apache License 2.0"}
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "mlflow>=2.21.0,<3.0.0"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.6"
+pytest = "^8.3.5"
+pytest-cov = "^6.1.1"
+
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.6.12"
+mkdocstrings = {extras = ["python"], version = "^0.29.1"}
+mkdocs-gen-files = "^0.5.0"
+mkdocs-literate-nav = "^0.6.2"
+mkdocs-section-index = "^0.3.10"
+
+[tool.ruff]
+preview = true
+line-length = 88
+target-version = "py311"
+fix = true  # Enable autofix mode when using `ruff check --fix`
+show-fixes = true # Show fixes that would be applied
+
+[tool.ruff.lint]
+ignore = [
+  "E501",  # Line too long (leave to Black)
+  "D203",  # Ignore incorrect-blank-line-before-class
+  "D213",  # Ignore multi-line-summary-second-line
+]
+select = [
+    "D",    # Pydocstyle
+    "E",    # Pycodestyle Errors
+    "F",    # PyFlakes
+    "W",    # Pycodestyle Warnings
+    "C90",  # McCabe
+    "U",    # Unused
+    "ASYNC",# flake8-async
+    "T20",  # flake8-print
+    "COM",  # flake8-commas
+    "EM",   # flake8-errmsg
+    "ISC",  # flake8-implicit-str-concat
+    "PIE",  # flake8-pie
+    "PT",   # flake8-pytest-style
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "ARG",  # flake8-unused-arguments
+    "BLE",  # flake8-blind-except
+    "B",    # flake8-bugbear
+    "S",    # flake8-bandit (enable specific S rules as needed)
+    "C",    # pylint (style checks)
+    "N",    # pep8-naming
+    "PGH",  # pep8-naming
+    "ERA",  # eradicate
+    "PD",   # pandas-vet (if applicable)
+    "RSE",  # flake8-raise
+    "RET",  # flake8-return
+    "RUF",  # Ruff-specific rules
+    "SLF",  # flake8-self
+    "FURB", # refurb
+]
+
+# Exclude some common directories
+exclude = [
+  ".venv",
+  "build",
+  "dist",
+  ".git",
+  "__pycache__",
+  "migrations",
+]
+
+# Optional: Per-file rule overrides (e.g., disable print checks in scripts)
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["T20"]
+"tests/*" = ["S101", "S108", "ARG001", "ARG002", "ARG005", "PT004"] # Ignore specific rules in tests
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
+minversion = "6.0"
+addopts = "-ra"
+testpaths = [
+    "tests/unit",
+    "tests/integration"
+]
+markers = [
+    "unit: mark test as a unit test",
+    "integration: mark test as an integration test"
+]
