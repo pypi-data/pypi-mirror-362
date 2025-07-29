@@ -1,0 +1,69 @@
+[build-system]
+requires = [
+  "hatchling",
+  "setuptools",
+  "setuptools_scm[toml]>=6.0",
+  "build",
+  "hatch-requirements-txt"
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "techlens-agent"
+authors = [
+  { name="Ben Perry", email="techlens@crosslaketech.com" },
+]
+description = "This tool safely and securely analyzes applications for benchmarking."
+readme = "README.md"
+requires-python = ">=3.9,<=3.14"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Free for non-commercial use",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies", "version"]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.1.1",
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    "coverage",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/corsis-tech/techlens-agent"
+"Bug Tracker" = "https://github.com/corsis-tech/techlens-agent/issues"
+"Source" = "https://github.com/corsis-tech/techlens-agent"
+
+[project.scripts]
+techlens-agent = "techlens_agent.agent:main"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.hatch.version]
+path = "VERSION.py"
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[tool.hatch.build]
+exclude = [
+  "src/techlens_agent/config.yaml",
+  "src/techlens_agent/reset.sh"
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+^/VERSION\.py$
+'''
