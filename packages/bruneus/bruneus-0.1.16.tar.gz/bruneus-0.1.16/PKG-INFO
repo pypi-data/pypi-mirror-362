@@ -1,0 +1,77 @@
+Metadata-Version: 2.4
+Name: bruneus
+Version: 0.1.16
+Summary: bruneus: BigQuery helper utils.
+Home-page: https://github.com/yokoe/bruneus
+Download-URL: https://github.com/yokoe/bruneus
+Author: yokoe
+Author-email: kreuz45@kreuz45.com
+Maintainer: yokoe
+Maintainer-email: kreuz45@kreuz45.com
+License: MIT
+Keywords: bigquery
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: google-cloud-bigquery>=3.4.0
+Requires-Dist: Jinja2>=3.0.0
+Requires-Dist: pandas>=1.4.0
+Requires-Dist: db-dtypes>=1.0.5
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: download-url
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: maintainer
+Dynamic: maintainer-email
+Dynamic: requires-dist
+Dynamic: summary
+
+# bruneus
+[![Maintainability](https://api.codeclimate.com/v1/badges/c9d020ea15b032c4cefb/maintainability)](https://codeclimate.com/github/yokoe/bruneus/maintainability)
+
+BigQuery helper library for Python
+
+## How to use
+### Select from table
+```
+import bruneus
+bruneus.select("SELECT * FROM `foo.bar.purchases` LIMIT 20").as_dicts()
+bruneus.select("SELECT * FROM `foo.bar.purchases` ORDER BY created_at LIMIT 1", client=bigquery.Client(project="foobar")).first_as_dict()
+bruneus.select("SELECT * FROM `foo.bar.purchases` LIMIT 20").to_dataframe()
+
+bruneus.select("SELECT word, word_count FROM `bigquery-public-data.samples.shakespeare` LIMIT 5").stringify(names={"word": "Word", "word_count": "Word count"})
+```
+
+### Create table from query
+```
+bruneus.select("SELECT * FROM `some.source.table`").to_table("foo.bar.new_table")
+```
+
+### Create temp table from query
+```
+bruneus.select("SELECT * FROM `some.source.table`").to_table("foo.bar.new_table").expires_in(days=7)
+```
+
+### Export table to GCS as csv
+```
+bruneus.export_table("foo.bar.sample").as_csv(gzip=True).to_gcs("my-bucket", "exported-table.csv.gz")
+```
+
+
+### Generate random table name
+```
+bruneus.random_table_name("prefix-here")
+```
+
+## Development
+### Run tests
+```
+docker compose run bruneus
+```
