@@ -1,0 +1,29 @@
+default_inputs:
+    bands_kpoints_distance: 0.025
+    clean_workdir: False
+    nbands_factor: 3.0
+    scf:
+        pw:
+            parameters:
+                CONTROL:
+                    calculation: scf
+    bands:
+        pw:
+            parameters:
+                CONTROL:
+                    calculation: bands
+                    restart_mode: from_scratch
+                ELECTRONS:
+                    diagonalization: paro
+                    diago_full_acc: True
+                    startingpot: file
+default_protocol: balanced
+protocols:
+    balanced:
+        description: 'Protocol to perform a band structure calculation at normal precision at moderate computational cost.'
+    stringent:
+        description: 'Protocol to perform a band structure calculation at high precision at higher computational cost.'
+        bands_kpoints_distance: 0.015
+    fast:
+        description: 'Protocol to perform a band structure calculation at low precision at minimal computational cost for testing purposes.'
+        bands_kpoints_distance: 0.1
