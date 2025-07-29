@@ -1,0 +1,39 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% for style in book.style -%}
+    <link rel="stylesheet" type="text/css" href="{{ (book.styles_dir / style).with_suffix('.css').name }}" />
+    {% endfor %}
+    <title>{{ book.title }}</title>
+    <!-- # also import javascript stuff here if needed -->
+</head>
+  {% if logo %}
+<div class="branding"><img src="images/karauke_logo.png" alt="Karauke Logo - you sing, we play ukulele" /></div>
+  {% endif %}
+  <div class="header" id="index_{{ index_id }}">
+    <h1>{{ book.title }}</h1>
+</div>
+<div class="index">
+    {% for title, song in entries %}
+    {% if outfmt == "html" %}
+    {% set target='songs/%s'| format(song.filename.with_suffix('.html').name) %}
+    {% else %}
+    {% set target='#title_%03d'| format(song.id) %}
+    {% endif %}
+    <a class="indexlink" id="song_{{ song.id }}" href="{{ target }}" alt="{{ song.title }} - {{ song.artist }}">
+        {{ song.title }} ({{ song.artist }})
+    </a>
+    <br />
+    {% endfor %}
+</div>
+<!-- outer div -->
+<div class="footer">
+    {% if page > 0 %}
+    <a class="middle" href="#index_00">Home</a>
+    {% endif %}
+</div>
+
+</html>
