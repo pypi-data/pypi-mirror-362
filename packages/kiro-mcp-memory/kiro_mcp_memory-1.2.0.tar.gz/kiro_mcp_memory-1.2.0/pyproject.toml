@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kiro-mcp-memory"
+version = "1.2.0"
+description = "Enhanced MCP server for Kiro memory and task management with AI-powered features"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "cbunting99", email = "cbunting99@users.noreply.github.com"}
+]
+maintainers = [
+    {name = "cbunting99", email = "cbunting99@users.noreply.github.com"}
+]
+keywords = ["mcp", "memory", "ai", "task-management", "knowledge-graph", "semantic-search"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "fastmcp>=2.10.5",
+    "python-dotenv>=1.0.0",
+    "sentence-transformers>=2.2.0",
+    "numpy>=1.21.0",
+    "scipy>=1.7.0",
+    "filelock>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=22.0.0",
+    "isort>=5.0.0",
+    "flake8>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/cbunting99/kiro-mcp-memory"
+Repository = "https://github.com/cbunting99/kiro-mcp-memory"
+Issues = "https://github.com/cbunting99/kiro-mcp-memory/issues"
+Documentation = "https://github.com/cbunting99/kiro-mcp-memory#readme"
+
+[project.scripts]
+kiro-mcp-memory = "mcp_server_enhanced:main"
+
+[tool.setuptools]
+py-modules = ["mcp_server_enhanced", "memory_manager", "database"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
