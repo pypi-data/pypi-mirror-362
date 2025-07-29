@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" i18n:domain="pyams_app_msc">
+<head>
+	<title i18n:translate="">
+		[<tal:var i18n:name="service_name" tal:content="settings.service_name">Service name</tal:var>]
+		Booking request notification
+	</title>
+	<meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8" />
+	<meta charset="utf-8" />
+	<style>
+		html,
+		body,
+		p,
+		pre {
+			font-family: Ubuntu, Verdana, Arial, Helvetica, sans-serif;
+			font-size: 13px;
+			color: #333;
+		}
+		pre {
+			border-left: 2px solid #346597;
+			padding-left: 10px;
+		}
+		pre.noborder {
+			border-left: none;
+			padding-left: 0;
+		}
+	</style>
+</head>
+<body>
+	<p i18n:translate="">Hello,</p>
+	<p i18n:translate="">
+		You received a new booking request from <span i18n:name="recipient" tal:content="sender.title">sender</span>
+		for <span i18n:name="session" tal:content="title">session</span>, with the following criteria:
+	</p>
+	<ul>
+		<li><span i18n:translate="">Nb participants:</span> ${booking.nb_participants}</li>
+		<li><span i18n:translate="">Participants age:</span> ${booking.participants_age}</li>
+		<li><span i18n:translate="">Nb accompanists:</span> ${booking.nb_accompanists}</li>
+		<li><span i18n:translate="">Nb groups:</span> ${booking.nb_groups}</li>
+		<li><span i18n:translate="">Cultural pass:</span> ${'oui' if booking.cultural_pass else 'non'}</li>
+	</ul>
+	<tal:if condition="booking.comments">
+		<p i18n:translate="">The following message was added to this request:</p>
+		<pre style="padding: 5px 20px;">${booking.comments}</pre>
+	</tal:if>
+	<p i18n:translate="">You can check this request from
+		<a href="${tales:absolute_url(theater)}/admin#booking-dashboard.html"
+		   i18n:name="link" i18n:translate="">your dashboard</a>.</p>
+	<br />
+	<pre class="noborder" tal:content="settings.signature">signature</pre>
+</body>
+</html>

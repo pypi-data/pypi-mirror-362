@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkpyams_app_msc=self.webpackChunkpyams_app_msc||[]).push([[697],{6697:(e,s,r)=>{r.r(s),r.d(s,{default:()=>p});const p={BTN_CLOSE:"Fermer",SUCCESS:"Opération effectuée",ERROR_OCCURRED:"Une erreur s'est produite !",ERRORS_OCCURRED:"Des erreurs se sont produites !"}}}]);
