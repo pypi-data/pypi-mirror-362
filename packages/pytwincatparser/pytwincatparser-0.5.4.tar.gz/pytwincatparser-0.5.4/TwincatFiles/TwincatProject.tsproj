@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.53" TcVersionFixed="true">
+	<Project ProjectGUID="{819343CB-F9B4-4FAF-9C6C-9BF9B5828672}" Target64Bit="true" ShowHideConfigurations="#x3c7">
+		<System>
+			<Settings RouterMemory="268435456">
+				<IoIdleTask Priority="8" CycleTime="100000"/>
+			</Settings>
+			<Licenses>
+				<Target BkhfOrder="123" CustomOrder="LCA">
+					<CustomComment><![CDATA[Test]]></CustomComment>
+					<ManualSelect>{2AFA4536-55C8-4554-BE9D-FAF0C7E2EFC3}</ManualSelect>
+				</Target>
+			</Licenses>
+			<Tasks>
+				<Task Id="3" Priority="4" CycleTime="50000" AmsPort="350" WatchdogStackCapacity="10" AdtTasks="true">
+					<Name>TestTask</Name>
+				</Task>
+				<Task Id="4" Priority="10" CycleTime="250000" AmsPort="351" WatchdogStackCapacity="10" AdtTasks="true">
+					<Name>Slow</Name>
+				</Task>
+				<Task Id="5" Priority="6" CycleTime="100000" AmsPort="352" WatchdogStackCapacity="10" AdtTasks="true">
+					<Name>Fast</Name>
+				</Task>
+				<Task Id="6" Priority="20" CycleTime="100000" AmsPort="353" AdtTasks="true">
+					<Name>PlcTask</Name>
+				</Task>
+				<Task Id="7" Priority="21" CycleTime="100000" AmsPort="354" AdtTasks="true">
+					<Name>PlcTask1</Name>
+				</Task>
+			</Tasks>
+		</System>
+		<Plc>
+			<Project File="LCA_NGP_Core.xti"/>
+			<Project GUID="{D867BE7E-A231-41A8-B687-010BAD544E79}" Name="Spielwiese" PrjFilePath="Spielwiese\Spielwiese.plcproj" TmcFilePath="Spielwiese\Spielwiese.tmc" ReloadTmc="true" AmsPort="852" FileArchiveSettings="#x000e" SymbolicMapping="true">
+				<Instance Id="#x08502040" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="Spielwiese\Spielwiese.tmc" TmcHash="{E632F061-D150-4506-EAEF-BEA1A4429028}">
+					<Name>Spielwiese Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<Contexts>
+						<Context>
+							<Id>0</Id>
+							<Name>PlcTask</Name>
+							<ManualConfig>
+								<OTCID>#x02010060</OTCID>
+							</ManualConfig>
+							<Priority>20</Priority>
+							<CycleTime>10000000</CycleTime>
+						</Context>
+					</Contexts>
+					<TaskPouOids>
+						<TaskPouOid Prio="20" OTCID="#x08502041"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
+			<Project GUID="{82F18BEE-B90F-45ED-AAB5-D1F159AAD207}" Name="LCA_NGP_Core_TEST" PrjFilePath="LCA_NGP_Core_TEST\LCA_NGP_Core_TEST.plcproj" TmcFilePath="LCA_NGP_Core_TEST\LCA_NGP_Core_TEST.tmc" ReloadTmc="true" AmsPort="853" FileArchiveSettings="#x000e" SymbolicMapping="true">
+				<Instance Id="#x08502080" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="LCA_NGP_Core_TEST\LCA_NGP_Core_TEST.tmc" TmcHash="{E923ED6F-1919-5B30-CAC3-44CC728E0067}">
+					<Name>LCA_NGP_Core_TEST Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<Contexts>
+						<Context>
+							<Id>0</Id>
+							<Name>PlcTask</Name>
+							<ManualConfig>
+								<OTCID>#x02010070</OTCID>
+							</ManualConfig>
+							<Priority>21</Priority>
+							<CycleTime>10000000</CycleTime>
+						</Context>
+					</Contexts>
+					<TaskPouOids>
+						<TaskPouOid Prio="21" OTCID="#x08502081"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
+		</Plc>
+	</Project>
+</TcSmProject>

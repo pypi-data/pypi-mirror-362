@@ -1,0 +1,567 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Base" Id="{ae258f57-8349-41d4-9dcd-5e11bbba79e4}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Base EXTENDS FB_BasePart IMPLEMENTS I_Elementinformation, I_TestInterface
+(*
+ @details
+ The FB_Base is the base function block of the.
+ @usage
+ The function block works like this or like that.
+ also there are multiline stuff possible
+*)
+VAR
+	//Elementinformation
+  _bCodeActive 						: BOOL; // this does that or those
+	_bEnableCode              			: BOOL;  (* other possible comment *)          
+
+	{attribute 'hide'}                							
+	_bUseParentEnableCode				: BOOL; (*** other possible comment *)
+	
+    _bEnableAlarm         				: BOOL := TRUE;
+    {attribute 'hide'}
+	_bUseParentEnableAlarm				: BOOL;   
+		
+    _eSimulation      					: E_SimulationMode := E_SimulationMode.simOff;
+    {attribute 'hide'}
+	_bUseParentSimulation				: BOOL;
+	
+	_bReset								: BOOL;
+    {attribute 'hide'}
+	_bUseParentReset					: BOOL;
+	
+	_nParentNumber						: INT;
+    {attribute 'hide'}
+	_bUseParentNumber					: BOOL;
+	
+	_sParentName						: STRING(Par_Core.C_nLengthOfParentName);
+    {attribute 'hide'}
+	_bUseParentName						: BOOL;	
+	
+    _sDesignationName     				: STRING(Par_Core.C_nLengthOfDesignationName);      
+	
+	_bError								: BOOL;
+	
+    {attribute 'hide'}
+    _iParentInformation 				: I_ElementInformation;												
+    {attribute 'hide'}
+    _eCodeExecution 					: E_CodeExecutionMode; 										
+	
+	// Logging
+	{attribute 'hide'}
+	_LogCollector						: FB_LogCollector;
+    {attribute 'hide'}	        		
+	_BaseLogger							: FB_Log := (logCollector := _LogCollector);
+END_VAR
+
+VAR_STAT
+	{attribute 'hide'}
+	_bLicenseOk 							: BOOL := TRUE; // static class variable, access to all fb
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="External" Id="{644b7fe0-1b81-4012-ae47-0a9d6a4ddaf0}">
+      <Folder Name="Cyclic" Id="{66851ef5-4a16-4212-bc1e-020ddbb0600e}" />
+      <Folder Name="ElementInformation" Id="{299da64f-9e3e-4f49-a9ed-4e21ddaacf78}" />
+    </Folder>
+    <Folder Name="Internal" Id="{0dfa9513-08d8-4087-9bfa-06d9c0f2a5de}">
+      <Folder Name="Alarm" Id="{72c74cb0-177c-4495-9f02-b2386fee407f}" />
+      <Folder Name="Error" Id="{e2fe0268-cb79-417f-9c08-d6d2f4b840f0}" />
+      <Folder Name="Hmi" Id="{a04651d6-80a6-4d9e-a265-747bcd93077b}" />
+      <Folder Name="Logging" Id="{292e455d-6e5a-4ade-9ed2-b549b8e0f798}" />
+    </Folder>
+    <Method Name="_ConfigureAlarm" Id="{45a3ec5b-7241-4a4c-967e-684dee223ad7}" FolderPath="Internal\Alarm\">
+      <Declaration><![CDATA[METHOD PROTECTED _ConfigureAlarm : BOOL;
+(***********************************************************************************
+* @brief Description : Gets called in enabling
+* @return None
+************************************************************************************)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Call update once to enable/disableAlarms
+_UpdateAlarm();
+_BaseLogger.Info(sMsg := 'Alarms configured').Send();
+_ConfigureAlarm := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_ConfigureHmi" Id="{bee58f22-9a7a-438a-9923-d7cc2a50e47d}" FolderPath="Internal\Hmi\">
+      <Declaration><![CDATA[METHOD PROTECTED _ConfigureHmi : BOOL;
+// gets called in enabling]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// do some elementmgr magic
+_BaseLogger.Debug(sMsg := 'HMI configured').Send();
+_ConfigureHmi := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_Disabling" Id="{ca184a1d-ad07-49e1-8807-681f6213d1e5}" FolderPath="Internal\">
+      <Declaration><![CDATA[METHOD PROTECTED _Disabling : BOOL;
+(***********************************************************************************
+* @brief Description : Logic which disables the function block
+* @return BOOL 1 = Disabling completed
+************************************************************************************)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_ResetError(); // call reset method
+_Disabling := _ConfigureAlarm() AND _ConfigureHmi();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_Enabling" Id="{1941c1a7-98e5-42d3-b1ff-31a93388b95a}" FolderPath="Internal\">
+      <Declaration><![CDATA[METHOD PROTECTED _Enabling : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_ResetError(); // call reset method
+_Enabling := _ConfigureAlarm() AND _ConfigureHmi();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_GetParentInformation" Id="{7e22c7e0-5e4f-4d4a-9c50-0abb2847914b}" FolderPath="Internal\">
+      <Declaration><![CDATA[METHOD PRIVATE _GetParentInformation
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _iParentInformation <> 0 THEN
+	IF _bUseParentEnableAlarm 	THEN _bEnableAlarm 		:= _iParentInformation.EnableAlarm; 	END_IF
+	IF _bUseParentEnableCode 	THEN _bEnableCode 		:= _iParentInformation.EnableCode; 		END_IF
+	IF _bUseParentReset 		THEN _bReset 			:= _iParentInformation.Reset; 			END_IF
+	IF _bUseParentSimulation 	THEN _eSimulation 		:= _iParentInformation.Simulation; 		END_IF
+	IF _bUseParentName 	THEN _sParentName 		:= _iParentInformation.ParentName; 		END_IF
+	IF _bUseParentNumber 	THEN _nParentNumber 	:= _iParentInformation.ParentNumber; 	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_MainGeneral" Id="{203b172e-859f-4316-af01-0872fbbb1c80}" FolderPath="Internal\">
+      <Declaration><![CDATA[METHOD PROTECTED _MainGeneral
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+
+
+
+
+_UpdateAlarm();
+_UpdateHmi();
+IF _bReset THEN
+	_ResetError();
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_ResetError" Id="{90906135-6609-43a9-b296-a6983ebe86e2}" FolderPath="Internal\Error\">
+      <Declaration><![CDATA[METHOD PROTECTED _ResetError
+(***********************************************************************************
+* @brief Description : Gets called if bReset is true, in enabling,disabling and maingeneral
+* @return None
+************************************************************************************)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// do some things
+
+
+
+
+
+
+
+
+_UpdateAlarm();
+_BaseLogger.Debug(sMsg := 'Reset triggered').Send();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_SetError" Id="{90272852-62aa-4bdd-b315-5ac2ae233479}" FolderPath="Internal\Error\">
+      <Declaration><![CDATA[METHOD PROTECTED _SetError
+(***********************************************************************************
+* @brief Description : gets called by update Alarm, used to set the error bit
+* @return None
+************************************************************************************)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// set the function block error bit
+_bError := FALSE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_UpdateAlarm" Id="{ed6b3f20-7366-4f42-ac50-4b23411a20cd}" FolderPath="Internal\Alarm\">
+      <Declaration><![CDATA[METHOD PROTECTED _UpdateAlarm
+(***********************************************************************************
+* @brief Description : Call of all alarm function blocks
+* @return None
+************************************************************************************)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//// Example
+
+
+
+
+
+
+
+// Call error collection method
+_SetError();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_UpdateHmi" Id="{9503ce37-dc79-4f37-aacc-ed2eafc83780}" FolderPath="Internal\Hmi\">
+      <Declaration><![CDATA[METHOD PROTECTED _UpdateHmi
+(***********************************************************************************
+* @brief Description : Method to update the HMI interface
+* @return None
+************************************************************************************)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// copy all internal parameters to the HMI interface
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicGeneral" Id="{3c5c321f-6670-46a8-bbc3-149ff338d692}" FolderPath="External\Cyclic\">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicGeneral
+
+VAR_INST
+	{attribute 'hide'}
+	_EnableCodeLogger 		: FB_LogVar := (LogCollector := LogCollector);
+	{attribute 'hide'}
+	_EnableAlarmLogger 		: FB_LogVar := (LogCollector := LogCollector);
+	{attribute 'hide'}
+	_CodeActiveLogger 		: FB_LogVar := (LogCollector := LogCollector);
+	{attribute 'hide'}
+	_DesignationNameLogger 	: FB_LogVar := (LogCollector := LogCollector);
+	{attribute 'hide'}
+	_SimulationLogger 		: FB_LogVar := (LogCollector := LogCollector);
+	{attribute 'hide'}
+	_ParentNameLogger 		: FB_LogVar := (LogCollector := LogCollector);
+	{attribute 'hide'}
+	_ParentNumberLogger 	: FB_LogVar := (LogCollector := LogCollector);
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_GetParentInformation();
+_EnableCodeLogger.OnChange(_bEnableCode);
+
+CASE _eCodeExecution OF
+    E_CodeExecutionMode.enable:
+        IF _Enabling() THEN
+            _eCodeExecution := E_CodeExecutionMode.cyclic;
+        END_IF
+
+    E_CodeExecutionMode.cyclic:
+        IF NOT _bEnableCode OR NOT _bLicenseOk THEN
+            _eCodeExecution := E_CodeExecutionMode.disable;
+        END_IF
+
+    E_CodeExecutionMode.disable:
+        IF _Disabling() THEN
+            _eCodeExecution := E_CodeExecutionMode.undefined;
+        END_IF
+
+    E_CodeExecutionMode.undefined:
+        IF _bEnableCode AND _bLicenseOk THEN		
+            _eCodeExecution := E_CodeExecutionMode.enable;
+        END_IF
+END_CASE
+
+_bCodeActive := _eCodeExecution = E_CodeExecutionMode.cyclic;
+_CodeActiveLogger.OnChange(_bCodeActive);
+
+IF _bCodeActive THEN
+	_DesignationNameLogger.OnChange(_sDesignationName);
+	_ParentNameLogger.OnChange(_sParentName);
+	_ParentNumberLogger.OnChange(_nParentNumber);
+	_EnableAlarmLogger.OnChange(_bEnableCode);
+	_SimulationLogger.OnChange(_eSimulation);
+    _MainGeneral();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="DesignationName" Id="{2b07be22-2703-43af-8b6b-38139b620086}" FolderPath="External\ElementInformation\">
+      <Declaration><![CDATA[PROPERTY DesignationName : String(Par_Core.C_nLengthOfDesignationName)]]></Declaration>
+      <Get Name="Get" Id="{52ec2361-f01a-4ef6-80d0-fbb75289521f}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DesignationName := THIS^._sDesignationName;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{d77c8f5d-0989-406f-aad7-00725eae2b55}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[THIS^._sDesignationName := DesignationName;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="EnableAlarm" Id="{83a03a7a-d617-45a2-867b-dbfbeb2771b0}" FolderPath="External\ElementInformation\">
+      <Declaration><![CDATA[PROPERTY EnableAlarm : BOOL]]></Declaration>
+      <Get Name="Get" Id="{194df314-021a-4578-963f-c5c1ecb85b34}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[EnableAlarm := THIS^._bEnableAlarm;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{7f1792ff-97a7-4839-a232-3000f19224b4}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_bUseParentEnableAlarm := FALSE;
+THIS^._bEnableAlarm := EnableAlarm;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="EnableCode" Id="{15f2624c-0669-4454-8048-44a82b4da53a}" FolderPath="External\ElementInformation\">
+      <Declaration><![CDATA[PROPERTY EnableCode : Bool]]></Declaration>
+      <Get Name="Get" Id="{c1e9d95f-75d8-416d-88ab-db03cc0a14cb}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[EnableCode := THIS^._bCodeActive;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{46202e93-ab20-459e-8ad6-3cf87a7696fa}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_bUseParentEnableCode := FALSE;
+THIS^._bEnableCode := EnableCode;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Error" Id="{70f833c0-c50e-441d-aa7c-9df706ffab5b}" FolderPath="External\ElementInformation\">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{8f2619b3-5004-4d16-99bb-0e18731ea4c9}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := THIS^._bError;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="LogCollector" Id="{adfe944a-f435-407a-8921-dc4caeb31b01}" FolderPath="Internal\Logging\">
+      <Declaration><![CDATA[PROPERTY LogCollector : REFERENCE TO FB_LogCollector]]></Declaration>
+      <Get Name="Get" Id="{c65275c8-c826-40ef-a5d0-9540de438477}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[LogCollector REF= _LogCollector;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Parent" Id="{2d0fedf9-593e-4499-968d-e6045e383501}" FolderPath="External\">
+      <Declaration><![CDATA[PROPERTY Parent : I_ElementInformation]]></Declaration>
+      <Set Name="Set" Id="{29ecbc33-84a1-4663-b64e-08a3d1480ed3}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_iParentInformation 			:= Parent;
+// Reset all information selectors
+_bUseParentReset 			:= TRUE;
+_bUseParentEnableCode 		:= TRUE;
+_bUseParentEnableAlarm 		:= TRUE;
+_bUseParentSimulation 		:= TRUE;
+_bUseParentNumber		:= TRUE;
+_bUseParentName		:= True;
+
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ParentName" Id="{56e98454-019c-4dc6-8bdf-2203b95184c7}" FolderPath="External\ElementInformation\">
+      <Declaration><![CDATA[PROPERTY ParentName : STRING(Par_Core.C_nLengthOfParentName)
+]]></Declaration>
+      <Get Name="Get" Id="{2cf50430-f590-47bd-960d-daabac11a2c5}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ParentName := THIS^._sParentName;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c815d856-2159-4a4b-9e86-da0d8ba172f7}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_bUseParentName := FALSE;
+THIS^._sParentName := ParentName;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ParentNumber" Id="{99503c9f-d3be-48e6-bcc4-464a22849af2}" FolderPath="External\ElementInformation\">
+      <Declaration><![CDATA[PROPERTY ParentNumber : INT
+]]></Declaration>
+      <Get Name="Get" Id="{77ae15b3-abb9-40a4-8fd8-045a7795910b}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ParentNumber := THIS^._nParentNumber;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c16baaac-626a-4708-9ab9-f32cc02c3217}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_bUseParentNumber := FALSE;
+THIS^._nParentNumber := ParentNumber;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Reset" Id="{18e3ae02-8020-43c1-8ac3-b42813f58858}" FolderPath="External\ElementInformation\">
+      <Declaration><![CDATA[PROPERTY Reset : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{650b18b0-3694-4de3-9ff2-daf2f64740cd}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Reset := THIS^._bReset;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{76ed96c1-77e6-4944-a950-8f352bcb0fe3}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_bUseParentReset := FALSE;
+THIS^._bReset := Reset;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Simulation" Id="{6a62df8c-b165-4c7f-9010-807c3f15f925}" FolderPath="External\ElementInformation\">
+      <Declaration><![CDATA[PROPERTY Simulation : E_SimulationMode]]></Declaration>
+      <Get Name="Get" Id="{52e0e525-56e4-44b6-a857-e6145ff02d01}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Simulation := THIS^._eSimulation;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a0098d24-7d7e-4fec-8f41-404a01da5430}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_bUseParentSimulation := FALSE;
+THIS^._eSimulation := Simulation;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_Base">
+      <LineId Id="98" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._ConfigureAlarm">
+      <LineId Id="373" Count="2" />
+      <LineId Id="310" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._ConfigureHmi">
+      <LineId Id="374" Count="1" />
+      <LineId Id="368" Count="0" />
+      <LineId Id="310" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._Disabling">
+      <LineId Id="129" Count="0" />
+      <LineId Id="66" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._Enabling">
+      <LineId Id="14" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._GetParentInformation">
+      <LineId Id="5" Count="1" />
+      <LineId Id="9" Count="4" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._MainGeneral">
+      <LineId Id="24" Count="5" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._ResetError">
+      <LineId Id="164" Count="0" />
+      <LineId Id="167" Count="7" />
+      <LineId Id="166" Count="0" />
+      <LineId Id="175" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._SetError">
+      <LineId Id="159" Count="0" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="161" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._UpdateAlarm">
+      <LineId Id="697" Count="0" />
+      <LineId Id="763" Count="0" />
+      <LineId Id="698" Count="0" />
+      <LineId Id="700" Count="1" />
+      <LineId Id="703" Count="1" />
+      <LineId Id="751" Count="0" />
+      <LineId Id="782" Count="0" />
+      <LineId Id="776" Count="0" />
+      <LineId Id="783" Count="0" />
+      <LineId Id="777" Count="0" />
+      <LineId Id="781" Count="0" />
+      <LineId Id="764" Count="0" />
+      <LineId Id="766" Count="4" />
+      <LineId Id="733" Count="0" />
+      <LineId Id="732" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base._UpdateHmi">
+      <LineId Id="102" Count="0" />
+      <LineId Id="107" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_Base.CyclicGeneral">
+      <LineId Id="75" Count="0" />
+      <LineId Id="89" Count="1" />
+      <LineId Id="46" Count="22" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="70" Count="1" />
+      <LineId Id="93" Count="2" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="72" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Base.DesignationName.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.DesignationName.Set">
+      <LineId Id="2" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Base.EnableAlarm.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.EnableAlarm.Set">
+      <LineId Id="4" Count="0" />
+      <LineId Id="2" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Base.EnableCode.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.EnableCode.Set">
+      <LineId Id="4" Count="0" />
+      <LineId Id="2" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Base.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.LogCollector.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.Parent.Set">
+      <LineId Id="2" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="4" Count="6" />
+      <LineId Id="3" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.ParentName.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.ParentName.Set">
+      <LineId Id="4" Count="0" />
+      <LineId Id="2" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Base.ParentNumber.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.ParentNumber.Set">
+      <LineId Id="4" Count="0" />
+      <LineId Id="2" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Base.Reset.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.Reset.Set">
+      <LineId Id="4" Count="0" />
+      <LineId Id="2" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Base.Simulation.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Base.Simulation.Set">
+      <LineId Id="4" Count="0" />
+      <LineId Id="2" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
