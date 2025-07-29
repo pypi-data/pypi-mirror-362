@@ -1,0 +1,56 @@
+---
+alwaysApply: true
+---
+## Purpose
+- `jbussdieker` generates modern Python projects with zero friction: from `git init` to PyPI.
+- Generated projects must work out-of-the-box, automate linting, testing, versioning, changelogs, and publishing.
+- Use release-please + Trusted Publishers only. No manual secrets.
+- Repo must be GitHub-native: squash merges, PR-driven, CI/CD-first.
+
+## Core Principles
+- Do not require API tokens or manual uploads. Use OIDC + Trusted Publisher only.
+- Store metadata in `pyproject.toml` only (PEP 621). No `setup.py` or `setup.cfg`.
+- Keep files/configs minimal and idiomatic. Makefile must stay simple.
+- Use release-please for versioning and changelogs. Version bumps come from PRs.
+- Enforce squash merges for linear history.
+- Support Python 3.9+ and update for new releases.
+
+## Entrypoint Best Practices
+- `__main__.py` must only import and call `main()` from `cli.py`. No other logic.
+- `cli.py` must define `main(argv=None)` to enable testing.
+- Declare `[project.scripts]` in `pyproject.toml` to wire console script to `cli:main`.
+- Unit test `cli:main()` directly with explicit `argv`.
+- Use `monkeypatch` for stdout/env mocks as needed.
+- Include subprocess tests for `python -m jbussdieker` to verify `__main__.py` runs correctly.
+- Mark `if __name__ == "__main__"` with `# pragma: no cover`. Subprocess test must verify runtime path.
+- Never embed logic in `__main__.py`.
+
+## Allowed Enhancements
+- Suggest improvements to GitHub Actions (caching, fail states).
+- Suggest simple Makefile tasks for local dev.
+- Improve README scaffolding for new users.
+- Suggest optional plug-ins gated behind flags (e.g., pytest only if unittest is disabled).
+- Default test framework is unittest.
+
+## Disallowed Changes
+- Never add API secrets, `.pypirc`, or legacy publish flows.
+- Never add `setup.py` or `setup.cfg`.
+- Do not add full frameworks like Flask/Django.
+- Do not tie to CD pipelines outside GitHub Actions.
+- Do not add other test frameworks unless explicitly optional.
+
+## Future-Proofing
+- Generated projects must be easy to edit (workflows, metadata, environments).
+- PyPI Trusted Publisher instructions must stay correct.
+- Breaking template changes require a major version bump.
+
+## Local Development
+- Make changes via small atomic PRs only.
+- Use semantic commits: `feat:`, `fix:`, `docs:`.
+- Maintain 100% test coverage, including entrypoints.
+- Keep `pyproject.toml`, Makefile, and CI minimal and idiomatic.
+
+## Final Rule
+- When in doubt, less is more.
+- Users must spend zero time debugging.
+- Only add features that keep the generator frictionless.
