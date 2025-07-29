@@ -1,0 +1,108 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2025 Latchfield Technologies http://latchfield.com
+[project]
+dynamic = ["version", "dependencies", "classifiers"]
+name = "vulcan-core"
+license="Apache-2.0"
+description = "AI-Hybrid Rules Engine for Logical Reasoning."
+readme = "README.md"
+authors = []
+keywords = ["rules", "logic", "reasoning", "ai", "artificial intelligence", "RAG", "LLM"]
+requires-python = ">=3.12,<4.0"
+dependencies = ["pyyaml (>=6.0.2,<7.0.0)", "pydantic (>=2.11.7,<3.0.0)"]
+
+[project.urls]
+homepage = "https://latchfield.com/vulcan"
+repository = "https://github.com/latchfield/vulcan-core"
+documentation = "https://latchfield.com/vulcan/docs"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+version = "1.2.0" # Update manually, or use plugin
+packages = [{ include = "vulcan_core", from="src" }]
+requires-poetry = "~2.1.1"
+classifiers = [
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Operating System :: OS Independent"
+]
+# These are needed until dependabot issue is resolved: https://github.com/dependabot/dependabot-core/issues/11237
+name = "vulcan-core"
+description = ""
+authors = []
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B", "Q", "N", "UP",
+          "SIM", "YTT", "ASYNC", "S", "A", "COM", "FBT",
+          "C4", "DTZ", "T10", "EM", "DJ", "EXE", "ISC",
+          "ICN", "LOG", "G", "INP", "PIE", "PT", "RSE",
+          "SLF", "TCH", "INT", "PD", "TRY", "PERF1", "PERF4",
+          "FURB", "RUF"]
+
+# Recommended ignore list: https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+ignore = ["E111", "E114", "E117", "D206", "D300", "Q000",
+          "Q001", "Q002", "Q003", "COM812", "COM819",
+          "ISC001", "ISC002", "S311"]
+
+# Ignore some rules for tests
+# https://github.com/astral-sh/ruff/issues/4368#issue-1705468153
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "ARG", "FBT"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.pyright]
+typeCheckingMode = "basic"
+reportUndefinedVariable = false
+
+[tool.pytest.ini_options]
+minversion = "8.3"
+required_plugins = ["pytest-cov"]
+pythonpath = ["src"]
+addopts = "-rA --showlocals --color=yes --tb=short -q --cov-report=html --cov=src"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+source = ["src"]
+branch = true # Could be an issue if true for native decoration: https://github.com/microsoft/vscode-python/issues/24156
+
+[tool.poetry.requires-plugins]
+# Not working unless installed via pipx
+#poetry-plugin-up = "0.9.0"
+
+[tool.poetry.dependencies]
+langchain = { version = "~0.3.25", optional = true } 
+langchain-openai = { version = "~0.3.18", optional = true }
+
+[tool.poetry.extras]
+openai = ["langchain", "langchain-openai"]
+
+[project.optional-dependencies]
+openai = ["langchain", "langchain-openai"]
+
+[tool.poetry.group.test.dependencies]
+pytest = "~8.4.1"
+pytest-asyncio = "~1.0.0"
+pytest-timeout = "~2.4.0"
+pytest-cov = "~6.2.1"
+pytest-xdist = "~3.7.0"
+doppler-env = "~0.3.1"
+
+[tool.poetry.group.dev.dependencies]
+bandit = "~1.8.5"
+deptry = "~0.23.0"
+langchain-chroma = "~0.2.4" # On py3.13 needs a compiler installed until transitive dependency numpy 1.26.4 has a whl
+ipykernel = "~6.29.5"
+ruff = "~0.12.0"
+pyright = {extras = ["nodejs"], version = "1.1.402"}
+twine = "~6.1.0"
