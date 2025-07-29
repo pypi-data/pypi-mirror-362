@@ -1,0 +1,152 @@
+Metadata-Version: 2.3
+Name: ai-fuzzy-rec
+Version: 0.1.0
+Summary: An AI-enhanced fuzzy logic-based item recommendation system for SQLite databases.
+License: MIT
+Keywords: fuzzy logic,recommender system,ai,sqlite,recommendations
+Author: fadedreams7
+Author-email: fadedreams7@gmail.com
+Requires-Python: >=3.6
+Classifier: Environment :: Console
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: numpy (>=1.25.0)
+Requires-Dist: packaging (>=21.3)
+Requires-Dist: pandas (>=2.0.0)
+Requires-Dist: scikit-fuzzy (>=0.4.2)
+Requires-Dist: scipy (>=1.10.0)
+Project-URL: Homepage, https://github.com/fadedreams/ai-fuzzy-rec
+Project-URL: Repository, https://github.com/fadedreams/ai-fuzzy-rec
+Description-Content-Type: text/markdown
+
+# AIFuzzyRec
+
+A Python library for generating AI-powered item recommendations using fuzzy logic and SQLite databases. AIFuzzyRec leverages fuzzy set theory and artificial intelligence to compute item similarities based on user-item interactions, providing flexible and AI-enhanced recommendations for applications like e-commerce, content platforms, or personalized systems.
+
+## Features
+- Fuzzy Logic-Based Recommendations: Uses fuzzy membership functions to compute item similarities, allowing nuanced recommendation scores.
+
+- Flexible Database Schema: Supports any SQLite database with user-item interaction data, with customizable table and column names.
+
+- Context Manager Support: Ensures automatic cleanup of database connections using Python's with statement.
+
+- Configurable Fuzzy Weights: Adjust weights for low, medium, and high similarity to fine-tune recommendation behavior.
+
+- Error Handling: Robust handling of invalid user/item IDs and empty databases.
+
+- Logging: Optional logging of recommendations to a file for debugging and analysis.
+
+- Easy Integration: Lightweight and compatible with Python 3.6+.
+
+## Installation
+
+Install AIFuzzyRec using pip:
+```
+pip install ai-fuzzy-rec
+```
+Or, if using Poetry, add it to your project:
+```
+poetry add ai-fuzzy-rec
+```
+### Requirements
+Python >= 3.6
+pandas >= 2.0.0
+scikit-fuzzy >= 0.4.2
+numpy >= 1.25.0
+scipy >= 1.10.0
+packaging >= 21.3
+
+## Usage
+
+### Basic Example
+
+Generate recommendations using a SQLite database (purchases.db) containing user-item interactions:
+```
+from ai_fuzzy_rec import FuzzyRecommender
+
+# Initialize with default settings
+with FuzzyRecommender(db_path='purchases.db') as recommender:
+    # Recommend items similar to item ID 2
+    item_rec = recommender.recommend_items_for_item(2, top_n=3)
+    print(f"Items recommended for item 2: {[(item, round(score, 3)) for item, score in item_rec]}")
+
+    # Recommend items for user ID 1
+    user_rec = recommender.recommend_items_for_user(1, top_n=3)
+    print(f"Items recommended for user 1: {[(item, round(score, 3)) for item, score in user_rec]}")
+```
+Expected Output:
+```
+Items recommended for item 2: [(3, 0.5), (4, 0.5), (1, 0.5)]
+Items recommended for user 1: [(4, 1.0), (5, 0.5)]
+```
+### Custom Schema and Parameters
+
+Use a custom database schema and adjust fuzzy weights:
+```
+from ai_fuzzy_rec import FuzzyRecommender
+
+with FuzzyRecommender(
+    db_path='custom.db',
+    table_name='orders',
+    user_col='customer_id',
+    item_col='product_id',
+    fuzzy_weights=(0.1, 0.4, 0.5),  # Emphasize high similarity
+    log_file='custom_recommendations.log'
+) as recommender:
+    item_rec = recommender.recommend_items_for_item(2, top_n=2)
+    print(f"Top 2 items for item 2: {item_rec}")
+```
+### Database Setup
+
+Create a SQLite database with user-item interactions:
+```
+import sqlite3
+
+# Create a sample database
+conn = sqlite3.connect('purchases.db')
+cursor = conn.cursor()
+cursor.execute('''CREATE TABLE IF NOT EXISTS purchases
+                 (user_id INTEGER, item_id INTEGER)''')
+# Insert sample data
+data = [(1, 1), (1, 2), (1, 3), (2, 2), (2, 3), (2, 4),
+        (3, 3), (3, 4), (3, 5), (4, 1), (4, 4), (5, 1), (5, 2)]
+cursor.executemany('INSERT INTO purchases VALUES (?, ?)', data)
+conn.commit()
+conn.close()
+```
+### Testing
+
+Run tests to verify functionality:
+```
+poetry run pytest
+```
+This executes tests in tests/test_ai_fuzzy_rec.py, ensuring recommendations and error handling work as expected.
+
+### Project Structure
+```
+/home/m/pyprj/
+├── ai_fuzzy_rec/
+│   ├── __init__.py
+│   ├── ai_fuzzy_rec.py
+├── create_database.py
+├── purchases.db
+├── pyproject.toml
+├── README.md
+├── LICENSE
+├── test_recommender.py
+└── tests/
+    └── test_ai_fuzzy_rec.py
+
+```
+
