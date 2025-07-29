@@ -1,0 +1,71 @@
+[project]
+name = "timecopilot-timesfm"
+version = "0.1.0"
+description = "Open weights time-series foundation model from Google Research."
+requires-python = ">=3.10"
+readme = "README.md"
+keywords = [
+    "time series",
+    "timesfm",
+    "forecast",
+    "time series model",
+]
+classifiers = [
+    "Environment :: Console",
+    "Framework :: Flake8",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+    "einshape>=1.0.0",
+    "numpy>=1.26.4",
+    "pandas>=2.0.0",
+    "utilsforecast>=0.1.10",
+    "huggingface_hub[cli]>=0.23.0",
+    "scikit-learn>=1.2.2",
+    "typer>=0.12.3",
+    "wandb>=0.17.5",
+    "absl-py>=1.4.0",
+    "safetensors>=0.5.3,<0.6",
+    "torch>=2.0.0",
+]
+
+[project.optional-dependencies]
+pax = [
+    "paxml>=1.4.0 ; python_version >= '3.10' and python_version < '3.11'",
+    "lingvo>=0.12.7 ; python_version >= '3.10' and python_version < '3.11'",
+    "jax[cuda12]>=0.4.26 ; python_version >= '3.10' and python_version < '3.12'",
+    "jaxlib>=0.4.26 ; python_version >= '3.10' and python_version < '3.12'",
+]
+torch = []
+
+[project.urls]
+Homepage = "https://github.com/google-research/timesfm"
+Repository = "https://github.com/google-research/timesfm"
+
+[dependency-groups]
+dev = ["pytest>=8.3.2"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/timesfm",
+    "src/finetuning",
+    "LICENSE",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "src/timesfm",
+    "src/finetuning",
+    "LICENSE",
+]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/timesfm" = "timesfm"
+"src/finetuning" = "finetuning"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
