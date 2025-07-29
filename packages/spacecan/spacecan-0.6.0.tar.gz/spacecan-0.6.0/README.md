@@ -1,0 +1,47 @@
+# Python SpaceCAN, Version 0.6
+
+SpaceCAN is an onboard system communication bus that is highly reliable.
+
+Please refer to the official [SpaceCAN documentation](https://librecube.gitlab.io/standards/spacecan/).
+
+## Installation
+
+Install via pip:
+
+```
+pip install spacecan
+```
+
+## Examples
+
+See the [examples folder](examples/) on how to create and operate a SpaceCAN network.
+
+# Documentation
+
+See the [docs folder](docs/) to learn more about the Python SpaceCAN implementation.
+
+## Testing
+
+The tests use virtual CAN network and thus cannot be run automatically by the GitLab pipeline. You
+need to clone/download the repository and run the tests manually as such:
+
+```
+cd tests
+source vcan.sh
+pytest
+```
+
+## Contribute
+
+To learn more on how to successfully contribute please read the contributing
+information in the [LibreCube documentation](https://librecube.gitlab.io/).
+
+## Support
+
+If you are having issues, please let us know. Reach us at
+[Matrix](https://app.element.io/#/room/#librecube.org:matrix.org)
+or via [Email](mailto:info@librecube.org).
+
+## License
+
+The project is licensed under the MIT license. See the [LICENSE](./LICENSE.txt) file for details.
