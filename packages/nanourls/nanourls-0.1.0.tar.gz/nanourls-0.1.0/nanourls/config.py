@@ -1,0 +1,1 @@
+BASE_DOMAIN = "https://nano.ly/"
