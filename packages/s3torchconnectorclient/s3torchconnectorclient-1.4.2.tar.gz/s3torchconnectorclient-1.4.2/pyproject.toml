@@ -1,0 +1,123 @@
+[build-system]
+requires = ["setuptools", "setuptools-rust", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "s3torchconnectorclient"
+version = "1.4.2"
+description = "Internal S3 client implementation for s3torchconnector"
+requires-python = ">=3.8,<3.13"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Topic :: Utilities"
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+test = [
+    "boto3",
+    "pytest",
+    "pytest-timeout",
+    "hypothesis",
+    "flake8",
+    "black",
+    "mypy",
+    "Pillow<=11.2.1" # installation of the newer versions fails in manylinux2014 images
+]
+
+[tool.setuptools.packages]
+# Pure Python packages/modules
+find = { where = ["python/src"] }
+
+[[tool.setuptools-rust.ext-modules]]
+target = "s3torchconnectorclient._mountpoint_s3_client"
+
+[tool.setuptools]
+license-files = [ "LICENSE", "THIRD-PARTY-LICENSES", "NOTICE"]
+
+[tool.cibuildwheel]
+test-requires = ["./s3torchconnector[e2e]"]
+test-extras = "test"
+test-command = [
+    "pytest {package}/python/tst/unit",
+    "pytest {package}/../s3torchconnector/tst/unit --ignore {package}/../s3torchconnector/tst/unit/lightning --ignore {package}/../s3torchconnector/tst/unit/dcp",
+    "CI_STORAGE_CLASS='' CI_REGION=${S3_REGION} CI_BUCKET=${S3_BUCKET} CI_PREFIX=${S3_PREFIX} CI_CUSTOM_ENDPOINT_URL=${S3_CUSTOM_ENDPOINT_URL} CI_PROFILE_ROLE=${PROFILE_IAM_ROLE} CI_PROFILE_BUCKET=${S3_PROFILE_BUCKET} pytest {package}/python/tst/integration",
+    "CI_STORAGE_CLASS='' CI_REGION=${S3_REGION} CI_BUCKET=${S3_BUCKET} CI_PREFIX=${S3_PREFIX} CI_CUSTOM_ENDPOINT_URL=${S3_CUSTOM_ENDPOINT_URL} CI_PROFILE_ROLE=${PROFILE_IAM_ROLE} CI_PROFILE_BUCKET=${S3_PROFILE_BUCKET} pytest {package}/../s3torchconnector/tst/e2e --ignore {package}/../s3torchconnector/tst/e2e/test_e2e_s3_lightning_checkpoint.py --ignore {package}/../s3torchconnector/tst/e2e/dcp",
+    "CI_STORAGE_CLASS=EXPRESS_ONEZONE CI_REGION=${S3_EXPRESS_REGION} CI_BUCKET=${S3_EXPRESS_BUCKET} CI_PREFIX=${S3_PREFIX} CI_CUSTOM_ENDPOINT_URL='' CI_PROFILE_ROLE=${PROFILE_IAM_ROLE} CI_PROFILE_BUCKET=${S3_EXPRESS_PROFILE_BUCKET} pytest {package}/python/tst/integration",
+    "CI_STORAGE_CLASS=EXPRESS_ONEZONE CI_REGION=${S3_EXPRESS_REGION} CI_BUCKET=${S3_EXPRESS_BUCKET} CI_PREFIX=${S3_PREFIX} CI_CUSTOM_ENDPOINT_URL='' CI_PROFILE_ROLE=${PROFILE_IAM_ROLE} CI_PROFILE_BUCKET=${S3_EXPRESS_PROFILE_BUCKET} pytest {package}/../s3torchconnector/tst/e2e --ignore {package}/../s3torchconnector/tst/e2e/test_e2e_s3_lightning_checkpoint.py --ignore {package}/../s3torchconnector/tst/e2e/dcp",
+    "python -m pip install -e '{package}/../s3torchconnector[lightning-tests]'",
+    "pytest {package}/../s3torchconnector/tst/unit/lightning",
+    "CI_STORAGE_CLASS='' CI_REGION=${S3_REGION} CI_BUCKET=${S3_BUCKET} CI_PREFIX=${S3_PREFIX} CI_CUSTOM_ENDPOINT_URL=${S3_CUSTOM_ENDPOINT_URL} pytest {package}/../s3torchconnector/tst/e2e/test_e2e_s3_lightning_checkpoint.py",
+    "AWS_DEFAULT_REGION=${S3_EXPRESS_REGION} CI_STORAGE_CLASS=EXPRESS_ONEZONE CI_REGION=${S3_EXPRESS_REGION} CI_BUCKET=${S3_EXPRESS_BUCKET} CI_PREFIX=${S3_PREFIX} CI_CUSTOM_ENDPOINT_URL='' pytest {package}/../s3torchconnector/tst/e2e/test_e2e_s3_lightning_checkpoint.py",
+]
+environment-pass = [
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_SESSION_TOKEN",
+    "S3_REGION",
+    "S3_BUCKET",
+    "S3_PREFIX",
+    "S3_EXPRESS_BUCKET",
+    "S3_EXPRESS_REGION",
+    "S3_CUSTOM_ENDPOINT_URL",
+    "PROFILE_IAM_ROLE",
+    "S3_PROFILE_BUCKET",
+    "S3_EXPRESS_PROFILE_BUCKET"
+]
+before-build = "cp README.md s3torchconnectorclient; cp LICENSE s3torchconnectorclient/; cp THIRD-PARTY-LICENSES s3torchconnectorclient/; cp NOTICE s3torchconnectorclient/"
+build = ["cp38*", "cp39*", "cp310*", "cp311*", "cp312*"]
+skip = "*musllinux* *i686"
+
+[tool.cibuildwheel.linux]
+before-all = [
+  "curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y",
+  "bash -c 'platform=$(uname -p); if [ \"$platform\" == \"aarch64\" ]; then sed -i \"s|centos/7|altarch/7|g\" /etc/yum.repos.d/*.repo; fi'",
+  "yum install -y fuse",
+  "yum install -y fuse-devel",
+  "yum install -y make",
+  "yum install -y git",
+  "yum install -y pkgconfig",
+  "yum install -y tar",
+  "yum install -y wget",
+  "yum install -y devtoolset-10-gcc",
+  "yum install -y devtoolset-10-gcc-c++",
+  "yum install -y llvm-toolset-7.0-clang"
+]
+environment = { PATH="/opt/rh/llvm-toolset-7.0/root/usr/bin:/opt/rh/devtoolset-10/root/usr/bin:$HOME/.cargo/bin:$PATH", LD_LIBRARY_PATH="/opt/rh/llvm-toolset-7.0/root/usr/lib64:/opt/rh/devtoolset-10/root/usr/lib64:/opt/rh/devtoolset-10/root/usr/lib", CC="/opt/rh/devtoolset-10/root/usr/bin/gcc", CXX="/opt/rh/devtoolset-10/root/usr/bin/g++" }
+
+[tool.cibuildwheel.macos]
+environment = { MACOSX_DEPLOYMENT_TARGET = "10.12" }
+
+[[tool.cibuildwheel.overrides]]
+# We want to run DCP's tests only on Linux and macOS ARM64 platforms because
+# DCP requires PyTorch >= 2.3, and PyTorch has stopped supporting the Intel platform for macOS
+# since version 2.3. See https://dev-discuss.pytorch.org/t/pytorch-macos-x86-builds-deprecation-starting-january-2024/1690
+select = "{*linux*,*macosx_arm64}"
+inherit.test-command = "append"
+test-command = [
+    "python -m pip install -e '{package}/../s3torchconnector[dcp-test]'",
+    "pytest {package}/../s3torchconnector/tst/unit/dcp",
+    "CI_STORAGE_CLASS='' CI_REGION=${S3_REGION} CI_BUCKET=${S3_BUCKET} CI_PREFIX=${S3_PREFIX} CI_CUSTOM_ENDPOINT_URL=${S3_CUSTOM_ENDPOINT_URL} pytest -s {package}/../s3torchconnector/tst/e2e/dcp/test_e2e_s3_file_system.py",
+    "AWS_DEFAULT_REGION=${S3_EXPRESS_REGION} CI_STORAGE_CLASS=EXPRESS_ONEZONE CI_REGION=${S3_EXPRESS_REGION} CI_BUCKET=${S3_EXPRESS_BUCKET} CI_PREFIX=${S3_PREFIX} CI_CUSTOM_ENDPOINT_URL='' pytest -s {package}/../s3torchconnector/tst/e2e/dcp/test_e2e_s3_file_system.py",
+]
+
+[[tool.cibuildwheel.overrides]]
+# Using CPython 3.12.9 for MacOS to mitigate integration test hanging issue
+# Python is unable to cleanup hanging multiprocessing resource tracker processes in test_multiprocess_dataloading.py
+# See similar issue in: https://github.com/pytorch/pytorch/issues/153050
+select = "cp312-macosx*"
+before-all = [
+    "curl -o /tmp/Python3129.pkg https://www.python.org/ftp/python/3.12.9/python-3.12.9-macos11.pkg", 
+    "sudo installer -pkg /tmp/Python3129.pkg -target /",
+    "sh '/Applications/Python 3.12/Install Certificates.command'"
+]
