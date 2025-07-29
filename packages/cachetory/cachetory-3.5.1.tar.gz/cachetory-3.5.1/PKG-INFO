@@ -1,0 +1,70 @@
+Metadata-Version: 2.1
+Name: cachetory
+Version: 3.5.1
+Summary: Caching library with support for multiple cache backends
+Home-page: https://github.com/kpn/cachetory
+License: Apache-2.0
+Keywords: cache
+Author: Pavel Perestoronin
+Author-email: pavel.perestoronin@kpn.com
+Requires-Python: >=3.9.0,<4.0.0
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Typing :: Typed
+Provides-Extra: django
+Provides-Extra: ormsgpack
+Provides-Extra: redis
+Provides-Extra: zstd
+Requires-Dist: django (>=4.0.0,<6.0.0) ; extra == "django"
+Requires-Dist: ormsgpack (>=1.4.0,<2.0.0) ; (platform_python_implementation == "CPython") and (extra == "ormsgpack")
+Requires-Dist: pydantic (>=2.0.0,<3.0.0)
+Requires-Dist: redis (>=4.4.2,<7.0.0) ; extra == "redis"
+Requires-Dist: typing-extensions (>=4.4.0,<5.0.0)
+Requires-Dist: zstd (>=1.5.2.6,<2.0.0.0) ; extra == "zstd"
+Project-URL: Repository, https://github.com/kpn/cachetory
+Description-Content-Type: text/markdown
+
+# Cachetory
+
+[![PyPI](https://img.shields.io/pypi/v/cachetory?logo=python&logoColor=yellow)](https://pypi.org/project/cachetory/)
+[![Python versions](https://img.shields.io/pypi/pyversions/cachetory?logo=python&logoColor=yellow)](https://pypi.org/project/cachetory/)
+[![Checks](https://img.shields.io/github/actions/workflow/status/kpn/cachetory/check.yml?label=checks&logo=github)](https://github.com/kpn/cachetory/actions/workflows/check.yml)
+[![Coverage](https://codecov.io/gh/kpn/cachetory/branch/main/graph/badge.svg?token=UNYTTvxiWk)](https://codecov.io/gh/kpn/cachetory)
+![Code style](https://img.shields.io/badge/code%20style-ruff-000000.svg)
+
+## Documentation
+
+<a href="https://kpn.github.io/cachetory/">
+    <img alt="Documentation" height="30em" src="https://img.shields.io/github/actions/workflow/status/kpn/cachetory/docs.yml?label=documentation&logo=github">
+</a>
+
+## Sneak peak
+
+```python
+from cachetory import serializers
+from cachetory.backends import async_ as async_backends
+from cachetory.caches.async_ import Cache
+
+
+cache = Cache[int, bytes](
+    serializer=serializers.from_url("pickle://?pickle-protocol=4"),
+    backend=async_backends.from_url("redis://localhost:6379"),
+)
+
+async def main() -> None:
+    await cache.set("foo", 42)
+    assert await cache.get("foo") == 42
+```
+

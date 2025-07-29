@@ -1,0 +1,169 @@
+[project]
+requires-python = ">=3.9"
+
+[tool.poetry]
+authors = [
+    "Pavel Perestoronin <pavel.perestoronin@kpn.com>",
+]
+description = "Caching library with support for multiple cache backends"
+keywords = ["cache"]
+license = "Apache-2.0"
+name = "cachetory"
+readme = "README.md"
+repository = "https://github.com/kpn/cachetory"
+version = "3.5.1"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Typing :: Typed",
+]
+
+[build-system]
+requires = ["poetry-core", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry.dependencies]
+django = {version = "^4.0.0 || ^5.0.0", optional = true}
+ormsgpack = {version = "^1.4.0", optional = true, markers = "platform_python_implementation == 'CPython'"}
+pydantic = "^2.0.0"
+python = "^3.9.0"
+redis = {version = "^4.4.2 || ^5.0.0 || ^6.0.0", optional = true}
+typing-extensions = "^4.4.0"
+zstd = {version = "^1.5.2.6", optional = true}
+
+[tool.poetry.extras]
+django = ["django"]
+ormsgpack = ["ormsgpack"]
+redis = ["redis"]
+zstd = ["zstd"]
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+freezegun = "1.5.2"
+mypy = "1.16.1"
+pytest = "8.4.1"
+pytest-asyncio = "1.0.0"
+pytest-cov = "6.2.1"
+ruff = "0.12.1"
+types-redis = "^4.4.0.4"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+black = "25.1.0"
+cairosvg = "2.8.2"
+mkdocs-autorefs = "1.4.2"
+mkdocs-git-committers-plugin-2 = "2.5.0"
+mkdocs-git-revision-date-localized-plugin = "1.4.7"
+mkdocs-material = "9.6.15"
+mkdocstrings = { version = "0.29.1", extras = ["python"] }
+pillow = "11.3.0"
+
+[tool.black]
+line-length = 120
+target_version = ["py39", "py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    "A",
+    "ANN",
+    "B",
+    "C4",
+    "COM",
+    "D",
+    "E",
+    "F",
+    "I",
+    "N",
+    "PIE",
+    "PT",
+    "PTH",
+    "RET",
+    "SIM",
+    "T20",
+    "TRY",
+    "UP",
+    "W",
+    "YTT",
+]
+ignore = [
+    "A005",
+    "ANN001",  # TODO: fix and enable
+    "ANN401",
+    "D100",  # TODO: fix and enable
+    "D102",  # TODO: fix and enable
+    "D103",  # TODO: fix and enable
+    "D104",  # TODO: fix and enable
+    "D105",  # TODO: fix and enable
+    "D107",  # TODO: fix and enable
+    "D202",
+    "D203",  # alternative of D211
+    "D212",  # alternative of D213
+    "D406",
+    "D407",
+    "D413",
+    "D417",  # TODO: fix and enable
+    "PT001",
+    "PT011",
+    "PT013",
+    "RET505",
+    "TRY003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D101", "D102", "D106"]
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+
+[tool.mypy]
+disallow_untyped_calls = false
+no_implicit_optional = true
+no_implicit_reexport = false
+pretty = true
+strict = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=./ --cov-report=xml"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+source = ["cachetory"]
+branch = true
+omit = ["tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "except ImportError",
+    "if TYPE_CHECKING:",
+    "@overload",
+]
+
+[tool.poetry-dynamic-versioning]
+enable = false
+vcs = "git"
+pattern = "default-unprefixed"
+style = "pep440"
+strict = true
+latest-tag = true
