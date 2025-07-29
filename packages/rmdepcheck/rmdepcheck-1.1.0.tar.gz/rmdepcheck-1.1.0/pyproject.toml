@@ -1,0 +1,60 @@
+[project]
+name = "rmdepcheck"
+dynamic = ["dependencies"]
+version = "1.1.0"
+description = "RPM installability and repoclosure checks based on repomd.xml modification"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["COPYING"]
+requires-python = ">=3.9"
+authors = [
+    { name = "Adam Williamson", email = "awilliam@redhat.com" },
+]
+keywords = ["rpm", "dependency", "test", "check", "reverse"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: System :: Archiving :: Packaging",
+    "Topic :: Software Development :: Testing",
+]
+
+[project.urls]
+Homepage = "https://codeberg.org/AdamWill/rmdepcheck"
+Documentation = "https://codeberg.org/AdamWill/rmdepcheck/src/branch/main/README.md"
+Repository = "https://codeberg.org/AdamWill/rmdepcheck"
+Issues = "https://codeberg.org/AdamWill/rmdepcheck/issues"
+Changelog = "https://codeberg.org/AdamWill/rmdepcheck/src/branch/main/CHANGELOG.md"
+
+[project.scripts]
+rmdepcheck = "rmdepcheck:main"
+
+[build-system]
+requires = ["setuptools>=40.6.0", "setuptools-git", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.coverage.run]
+parallel = true
+branch = true
+source_pkgs = ["rmdepcheck"]
+
+[tool.coverage.paths]
+source = [".", ".tox/**/site-packages"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.black]
+# don't @ me, Hynek
+line-length = 100
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["install.requires"] }
