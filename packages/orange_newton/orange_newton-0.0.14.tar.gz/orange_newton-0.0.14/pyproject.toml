@@ -1,0 +1,94 @@
+[project]
+name = "orange_newton"
+description = "A Simple Orange Newton Project"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [{ name = "Hiroshi Fujiwara", email = "hiroshi.829f@gmail.com" }]
+requires-python = ">=3.13"
+classifiers = [
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.13',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+]
+dynamic = ["version"]
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+    "pytest>=8.4.1",
+    "ruff>=0.12.0",
+]
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/orange_newton"]
+
+[tool.hatch.version]
+source = "vcs"
+tag-pattern = "(release)?-?(test)?/?(?P<version>[vV]?\\d+(?:\\.\\d+){0,2}[^\\+]*)(?:\\+.*)?"
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+src = ["src"]
+exclude = [".git", ".ruff_cache", ".venv", ".vscode"]
+
+[tool.ruff.lint]
+select = [
+    "ANN", # Type Annotation
+    "B",   # flake8-bugbear
+    "C90", # flake8-bugbear
+    "D",   # pydocstyle
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "RUF", # ruff specific rules
+    "PL",  # pylint
+    "UP",  # pyupgrade
+    "W",   # pycodestyle warnings
+]
+
+ignore = [
+    "ANN201", # Missing return type undocumented public function
+    "ANN204", # Missing return type for special method
+    "D100",   # Missing docstring in public module
+    "D101",   # Missing docstring in public class
+    "D102",   # Missing docstring in public method
+    "D103",   # Missing docstring in public function
+    "D104",   # Missing docstring in public package
+    "D105",   # Missing docstring in magic method
+    "D107",   # Missing docstring in __init__
+]
+
+fixable = [
+    "ALL"     # fix all
+]
+
+unfixable = [] # ignore no
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+docstring-code-format = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.pylint]
+max-args = 5
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"] # ignore unused import

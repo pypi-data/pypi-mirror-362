@@ -1,0 +1,74 @@
+{
+  "name": "python-devcontainer",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "containerEnv": {
+    // allow X11 app
+    "DISPLAY": "${localEnv:DISPLAY}",
+    "UV_CACHE_DIR": "${containerWorkspaceFolder}/.cache/uv",
+    "UV_LINK_MODE": "copy",
+    "UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv",
+    "UV_COMPILE_BYTECODE": "1"
+  },
+  "features": {
+    // node
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "latest"
+    },
+    // python
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "latest"
+    },
+    // uv
+    "ghcr.io/va-h/devcontainers-features/uv:1": {
+      "shellAutocompletion": true
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      //"installZsh": false,
+      //"installOhMyZsh": false,
+      //"installOhMyZshConfig": false,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    },
+    "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+      "packages": "curl,wget,git,jq,ca-certificates,build-essential"
+    }
+  },
+  "containerUser": "vscode",
+  "remoteUser": "vscode",
+  "runArgs": ["--net=host", "--init", "--rm"],
+  // "hostRequirements": {
+  // 	"gpu": "optional"
+  // },
+  "postCreateCommand": "/bin/sh .devcontainer/postCreateCommand.sh",
+  "postStartCommand": "/bin/sh .devcontainer/postStartCommand.sh",
+  //"workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind,consistency=cached",
+  //"workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/workspace,type=bind",
+  //"workspaceFolder": "/home/vscode/workspace",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python"
+      },
+      "extensions": [
+        // MicrosoftのPython拡張機能 (必須)
+        "ms-python.python",
+        // Jupyter Notebookサポート (Jupyterを使う場合)
+        "ms-toolsai.jupyter",
+        // Pylance (Python拡張機能に含まれるが、明示的に)
+        "ms-python.vscode-pylance",
+        // Prettier (Python以外も含む汎用フォーマッター)
+        "esbenp.prettier-vscode",
+        // スペルチェッカー
+        "streetsidesoftware.code-spell-checker",
+        // インデントの可視化
+        "oderwat.indent-rainbow",
+        // Ruff  linter and formatter
+        "charliermarsh.ruff",
+        // Markdown editor
+        "yzhang.markdown-all-in-one"
+      ]
+    }
+  }
+}
