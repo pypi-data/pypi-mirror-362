@@ -1,0 +1,239 @@
+Metadata-Version: 2.4
+Name: jbussdieker
+Version: 0.20.0
+Summary: A modern Python development toolkit.
+Author-email: "Joshua B. Bussdieker" <jbussdieker@gmail.com>
+Maintainer-email: "Joshua B. Bussdieker" <jbussdieker@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/jbussdieker/jbussdieker
+Project-URL: Documentation, https://github.com/jbussdieker/jbussdieker/blob/main/README.md
+Project-URL: Repository, https://github.com/jbussdieker/jbussdieker
+Project-URL: Issues, https://github.com/jbussdieker/jbussdieker/issues
+Project-URL: Changelog, https://github.com/jbussdieker/jbussdieker/blob/main/CHANGELOG.md
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Operating System :: OS Independent
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Typing :: Typed
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: jbussdieker-config>=0.3
+Provides-Extra: app
+Requires-Dist: jbussdieker-app>=0.3; extra == "app"
+Provides-Extra: commit
+Requires-Dist: jbussdieker-commit>=0.3.1; extra == "commit"
+Provides-Extra: project
+Requires-Dist: jbussdieker-project>=0.3.1; extra == "project"
+Provides-Extra: service
+Requires-Dist: jbussdieker-service>=0.3; extra == "service"
+Provides-Extra: storage
+Requires-Dist: jbussdieker-storage>=0.1; extra == "storage"
+Dynamic: license-file
+
+# jbussdieker
+
+**A modern Python development toolkit — from project scaffolding to AI-powered commits with automated releases.**
+
+## 🚀 What it does
+
+**`jbussdieker`** is your complete Python development toolkit:
+
+**Project Scaffolding:**
+- ✅ `pyproject.toml` using **PEP 621**
+- ✅ GitHub Actions CI for linting, typing, tests, and publishing
+- ✅ `Makefile` with simple install, lint, test commands
+- ✅ `.gitignore` for Python best practices
+- ✅ **release-please** workflow for versioning and changelogs
+- ✅ Publish to **PyPI** using [Trusted Publishers](https://docs.pypi.org/trusted-publishers/)
+
+**AI-Powered Development:**
+- ✅ **AI-powered commit messages** with conventional commit format
+- ✅ Analyzes your changes and project context
+- ✅ Opens your editor for review and editing
+
+**No tokens. No manual uploads. Just push, merge, and release.**
+
+## 📦 Install
+
+```bash
+pip install jbussdieker --upgrade
+```
+
+## 🧑‍💻 Create a new project
+
+```bash
+jbussdieker create myproject
+cd myproject
+git init
+git commit --allow-empty -m "chore: init" # creates initial branch so you can push & configure settings
+gh repo create --source=. --private --push
+# ⏸️ IMPORTANT: Before pushing real code,
+# ensure GitHub Actions permissions are set as described below!
+git add .
+git commit -m "feat: initial commit"
+git push
+# Make sure to configure PyPI Trusted Publisher before merging the release PR
+```
+
+## 🤖 AI-Powered Commits
+
+**`jbussdieker`** can generate conventional commit messages using AI! Just stage your changes and let the AI craft the perfect commit message.
+
+### Install with AI support
+
+```bash
+pip install jbussdieker[ai]
+```
+
+### Generate commit messages
+
+```bash
+# Stage your changes
+git add .
+
+# Generate and edit a commit message
+jbussdieker commit
+
+# Or preview the message without committing
+jbussdieker commit --dry-run
+```
+
+The AI will:
+- 📝 Generate conventional commit messages (feat, fix, docs, etc.)
+- 🔍 Analyze your staged changes and project context
+- ✏️ Open your editor for final review and editing
+- 🚀 Create the commit with your approved message
+
+**Requirements:**
+- OpenAI API key in `OPENAI_API_KEY` environment variable
+- Staged changes in your git repository
+- Your preferred editor (defaults to `vim`)
+
+**Example workflow:**
+```bash
+# Make your changes
+echo "new feature" >> myfile.txt
+git add myfile.txt
+
+# Let AI generate the commit message
+jbussdieker commit
+# Opens editor with: "feat: add new feature to myfile.txt"
+# Edit if needed, save and close to commit
+```
+
+## ✅ Set up automated releases
+
+1️⃣ **Ensure GitHub Actions has required permissions**
+
+For `release-please` to work, your repository’s Actions must have write access and permission to create PRs.
+
+* **Allow workflows to write to your repo:**
+   - Go to your repo’s **Settings → Actions → General** ([GitHub Actions settings](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#configuring-the-default-github_token-permissions))
+   - Under **Workflow permissions**, select **Read and write permissions**
+
+* **Allow Actions to create PRs:**
+   - In the same [Actions settings](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests)
+   - Check **Allow GitHub Actions to create and approve pull requests**
+
+These are **required** so the workflows can open changelog PRs and publish your releases automatically.
+
+2️⃣ **Add a Trusted Publisher on PyPI**
+
+Configure PyPI to trust your GitHub repo for publishing
+
+* Visit [PyPI Publishing](https://pypi.org/manage/account/publishing/)
+* Scroll down to add a new pending publisher
+* Fill out:
+
+  * **GitHub Owner** → your username or org
+  * **Repository Name** → your repo name (`myproject`)
+  * **Workflow Name** →
+
+    ```plaintext
+    publish.yml
+    ```
+  * **Environment Name** →
+
+    ```plaintext
+    release
+    ```
+* Click **Add**.
+
+**Note:** The generated `publish.yml` uses an environment named `release` by default. You can edit or remove this later — just keep it in sync with your PyPI settings.
+
+3️⃣ **Push your first tag**
+
+Once `release-please` opens a version bump PR, merging it will automatically publish your package. No API keys needed — PyPI trusts your GitHub Action.
+
+Want to learn more? See the [release-please GitHub repo](https://github.com/googleapis/release-please).
+
+## 🧹 Local development
+
+Your project includes a simple `Makefile`:
+
+```bash
+make venv    # create .venv
+make install # pip install -e .
+make lint    # black + mypy
+make format  # run black
+make test    # run unittest
+make clean   # remove .venv
+```
+
+## 🔒 Recommended GitHub repo settings
+
+- ✅ **Use Squash merge only** — keeps your history tidy and is required for a linear commit history.
+  [See why release-please recommends this.](https://github.com/googleapis/release-please?tab=readme-ov-file#linear-git-commit-history-use-squash-merge)
+- ✅ Enable **Auto-delete branches after merge**
+
+## 📢 Example workflow
+
+```bash
+# 1️⃣ Scaffold the project locally
+jbussdieker create myproject
+cd myproject
+
+# 2️⃣ Init the repo with an empty commit to push just the structure
+git init
+git commit --allow-empty -m "chore: init"  # ensures a branch exists for first push
+gh repo create --source=. --public --push
+
+# ⏸️ This step ensures your repo exists on GitHub first,
+# so you can safely configure required Actions + PyPI before any workflows run!
+
+# 3️⃣ Now pause — go to GitHub and:
+#    ✅ Set Workflow permissions to Read & Write
+#    ✅ Allow Actions to create & approve PRs
+#    ✅ Add PyPI Trusted Publisher if you like
+
+# 4️⃣ Add the actual files
+git add .
+# Optionally use AI-powered commits:
+# jbussdieker commit
+# Or traditional commit:
+git commit -m "feat: initial code"
+git push
+
+# 5️⃣ Merge your first release-please PR 🚀
+```
+
+## 📝 License
+
+This project is licensed under **MIT**.
+
+## 🎉 Ship faster
+
+No config sprawl. No secrets rotation. Just `git push` and publish Python packages the *modern* way.
+
+---
+
+**Enjoy! 🚀**
