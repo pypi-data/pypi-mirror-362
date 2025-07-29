@@ -1,0 +1,35 @@
+language: python
+dist: xenial
+os: linux
+
+jobs:
+  fast_finish: true
+  include:
+  - python: 3.6
+    env: MATRIX=py36
+  - python: 3.7
+    dist: bionic
+    env: MATRIX=py37
+  - python: 3.11
+    env: MATRIX=py311
+  - python: pypy3
+    env: MATRIX=pypy3
+
+before_install:
+  - if [ $MATRIX != pypy3 ]; then pip install black; fi
+  - pip install coverage coveralls flake8 sphinx sphinx-argparse
+
+install:
+  - pip install .
+
+script:
+  - make flake
+  - coverage run setup.py test
+  - make -C docs doctest
+  - make -C docs html
+
+after_success:
+  - coveralls
+
+cache:
+  pip: true

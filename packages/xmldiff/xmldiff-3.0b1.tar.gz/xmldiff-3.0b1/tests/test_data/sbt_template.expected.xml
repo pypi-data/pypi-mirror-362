@@ -1,0 +1,20 @@
+<metal:block xmlns:app="http://namespaces.shoobx.com/application" xmlns:tal="http://xml.zope.org/namespaces/tal" xmlns:metal="http://xml.zope.org/namespaces/metal" xmlns:diff="http://namespaces.shoobx.com/diff" tal:define="         filename string:advisor-agreement.pdf;         title string:Advisor Agreement;">
+  <metal:block use-macro="macros/document">
+    <metal:block fill-slot="content">
+
+  <app:section name="payment" title="Payment" hidden="advisor.payment_type == 'none'" allowCustom="False" diff:update-attr="hidden:advisor.stock_award == 'exclude'"><tal:if condition="python: advisor.payment_type == 'stock_award'" diff:update-attr="condition:python: advisor.stock_award != 'exclude'">
+      <para diff:insert="">
+        A <i diff:insert="">whole</i><diff:insert>load of formatted text and</diff:insert><br diff:insert=""/><diff:insert>other stuff.</diff:insert></para><para diff:delete="">
+        We write <b diff:delete="">stuff here</b> that has nothing in common with the new text.
+      </para>
+    </tal:if><tal:if diff:insert="" condition="python: advisor.payment_type == 'cash'" diff:add-attr="condition">
+      <para diff:insert="">
+        More text for diffing purposes
+      </para></tal:if><tal:if diff:insert="" condition="python: advisor.payment_type == 'stock_award_and_cash'" diff:add-attr="condition">
+      <para diff:insert="">
+        Lorem hipster ipso facto
+      </para></tal:if></app:section>
+
+  </metal:block>
+  </metal:block>
+</metal:block>
