@@ -1,0 +1,67 @@
+Metadata-Version: 2.4
+Name: mcp-server-anki
+Version: 0.1.5
+Summary: MCP Server for Anki via AnkiConnect
+Project-URL: Homepage, https://github.com/cdpath/mcp-server-anki
+Project-URL: Repository, https://github.com/cdpath/mcp-server-anki.git
+Project-URL: Issues, https://github.com/cdpath/mcp-server-anki/issues
+Author-email: cdpath <cdpath@outlook.com>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: anki,ankiconnect,mcp
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Requires-Dist: aiohttp>=3.11.16
+Requires-Dist: mcp>=1.6.0
+Description-Content-Type: text/markdown
+
+# mcp-anki-server
+
+## prerequisite
+
+- [Anki Desktop](https://apps.ankiweb.net/)
+- [Anki Connect](https://ankiweb.net/shared/info/2055492159)
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+
+## usage
+
+
+### cursor
+
+update `.mcp.json` to add the following:
+
+```
+{
+    "mcpServers": {
+      "anki": {
+        "command": "uvx",
+        "args": ["mcp-server-anki"],
+        "env": {},
+        "disabled": false,
+        "autoApprove": []
+      }
+    }
+}
+```
+
+### chatwise
+
+Go to Settings -> Tools -> Add and use the following config:
+
+```
+Type: stdio
+ID: Anki
+Command: uvx mcp-server-anki
+```
+
+
+## local development
+
+```
+uv --directory $HOME/Developer/mcp-server-anki/src/mcp_server_anki run server.py
+```
