@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_form_activity_edit" model="ir.ui.view">
+            <field name="name">mail.activity.edit.form</field>
+            <field name="model">mail.activity</field>
+            <field name="inherit_id" ref="mail_activity_board.mail_activity_view_form_board"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="attributes">
+                    <attribute name="create">true</attribute>
+                    <attribute name="edit">true</attribute>
+                    <attribute name="delete">true</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Allow to view and edit res_model -->
+        <record id="mail_activity_type_view_form_res_model" model="ir.ui.view">
+            <field name="name">mail.activity.type.form.res.model.id</field>
+            <field name="model">mail.activity.type</field>
+            <field name="inherit_id" ref="mail.mail_activity_type_view_form"/>
+            <field name="arch" type="xml">
+                <field name='res_model' position="attributes">
+                    <attribute name="groups" delete="1"/>
+                </field>
+                <field name='mail_template_ids' position="attributes">
+                    <attribute name="domain">[('model_id.model', 'in', [res_model, 'mail.activity'])]</attribute>
+                </field>
+            </field>
+        </record>
+
+        <!-- Mail Activity Types action view -->
+        <record id="action_mail_activity_type" model="ir.actions.act_window">
+            <field name="name">Mail Activity Types</field>
+            <field name="res_model">mail.activity.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Mail Activty Type submenu -->
+        <menuitem
+            id="board_menu_configuration"
+            name="Configuration"
+            parent="base.menu_board_root"
+            sequence="100"/>
+        <menuitem
+            id="menu_mail_activity_type"
+            name="Mail Activity Types"
+            parent="mail_activity_mail_template.board_menu_configuration"
+            action="action_mail_activity_type"
+        />
+    </data>
+</odoo>
