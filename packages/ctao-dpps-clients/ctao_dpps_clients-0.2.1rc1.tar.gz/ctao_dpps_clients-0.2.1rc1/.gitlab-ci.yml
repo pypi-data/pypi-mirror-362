@@ -1,0 +1,79 @@
+#
+include:
+  - project: 'cta-computing/dpps/aiv/dpps-aiv-toolkit'
+    ref: 40bfaea75784493a2a19bc32f761f987dec08367
+    file: 'ci-functions.yml'
+  - "aiv-config.yml"
+
+
+variables:
+  CHART_LOCATION: chart
+  CHART_NAME: dpps
+  CHART_EXTRA_VALUES: "--set dev.client_image_tag=${DOCKER_TAG} --set dev.pipelines.calibpipe.version=${CALIBPIPE_VERSION} --set dev.pipelines.datapipe.version=${DATAPIPE_VERSION}"
+  DOCKER_IMAGE_CONTEXT: '${CI_PROJECT_DIR}'
+  CONDA_IMAGE: "quay.io/condaforge/miniforge3:24.11.3-0"
+
+stages:
+  - prepare
+  - lint
+  - build
+  - sign
+  - tests
+  - sonarqube
+  - publish
+  - report
+  - changelog
+
+
+build:
+  variables:
+    CI_HARBOR_REGISTRY_IMAGE: '${HARBOR_HOST}/dpps/dpps-clients:${DOCKER_TAG}'
+    KANIKO_EXTRA_ARGS: --build-arg DATAPIPE_VERSION=${DATAPIPE_VERSION} --build-arg CALIBPIPE_VERSION=${CALIBPIPE_VERSION}
+  rules:
+    - when: always
+
+
+# wms depends on gfal2 via dirac, which is sessentially impossible to install with pip
+build-docs:
+  image: "${CONDA_IMAGE}"
+
+  before_script:
+    - source /opt/conda/etc/profile.d/conda.sh
+    - mamba create -y -n ci python=3.12 gfal2 m2crypto dirac-grid make rucio-clients==35.4.1
+    - conda activate ci
+    - python --version
+    - pip install .[doc]
+
+
+pylint:
+  image: "${CONDA_IMAGE}"
+
+  before_script:
+    - apt update && apt install -y --no-install-recommends git
+    - source /opt/conda/etc/profile.d/conda.sh
+    - mamba create -y -n ci python=3.12 gfal2 m2crypto dirac-grid pylint rucio-clients==35.4.1
+    - conda activate ci
+    - python --version
+    - pip install .[all]
+
+kubeconform:
+  rules:
+    - when: never
+
+sign:
+  rules:
+    - when: never
+
+
+# TODO: remove before merge! needs update of wms
+kubeconform:
+  allow_failure: true
+
+k8s-integration-tests:
+  variables:
+    KUBERNETES_CPU_REQUEST: "4"
+    KUBERNETES_CPU_LIMIT: "10"
+    KUBERNETES_MEMORY_REQUEST: "16Gi"
+    KUBERNETES_MEMORY_LIMIT: "63Gi"
+    RUNNER_SCRIPT_TIMEOUT: "115m"
+  timeout: 2h

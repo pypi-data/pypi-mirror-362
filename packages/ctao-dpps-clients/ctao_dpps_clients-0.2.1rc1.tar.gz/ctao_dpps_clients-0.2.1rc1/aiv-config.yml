@@ -1,0 +1,31 @@
+# This is the configuration used both in CI and local Makefile
+
+variables:
+  # used to select requirements
+  DPPS_UC_GROUPS: ALL
+  DPPS_RELEASE: v0.2.0
+
+  CHART_LOCATION: chart
+  CHART_NAME: dpps
+
+  RELEASE_PLAN_FN: dpps-aiv-toolkit/dpps-release-plan/release_development_document/dpps-release-plan.tex
+  TRACEABILITY_CSV_FN: dpps-aiv-toolkit/requirements-traceability/DPPS_Requirements_Traceability_Matrix.csv
+
+  APPLICATION_NAME: DPPS
+  APPLICATION_AUTHOR: DPPS Team
+  APPLICATION_AUTHOR_ORGANIZATION: CTAO
+  APPLICATION_VERSION: 0.0.0a0
+
+  DEFAULT_HELM_TEST: name=dpps-pytest
+
+  EXTRA_CONFIG_FILES: aiv-config-dependencies.yml
+
+  # these UCs are executed during project deployment and hence verified by the very completion of the pipeline
+  # TODO: separate in bdms,wms
+  DEPLOYMENT_UCS: DPPS-UC-170-1.2.1,DPPS-UC-170-1.2.2,DPPS-UC-170-1.2.3,DPPS-UC-170-1.2.4,DPPS-UC-170-1.6
+
+
+  # used in clients container
+  # TODO: reduce number of repeated occurrences of these versions
+  DATAPIPE_VERSION: v0.2.1
+  CALIBPIPE_VERSION: v0.2.0
