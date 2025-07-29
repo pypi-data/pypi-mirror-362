@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl-3.0-standalone.html). -->
+<odoo>
+    <record id="state_change_constrain_template_view_search" model="ir.ui.view">
+        <field name="name">state.change.constrain.template.search</field>
+        <field name="model">state.change.constrain.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="model_id" />
+                <field name="status_check_template_id" />
+                <group name="group2">
+                    <filter
+                        name="grp_model"
+                        string="Model"
+                        context="{'group_by':'model_id'}"
+                    />
+                    <filter
+                        name="grp_status_check_template"
+                        string="Status Check Template"
+                        context="{'group_by':'status_check_template_id'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="state_change_constrain_template_view_tree" model="ir.ui.view">
+        <field name="name">state.change.constrain.template.tree</field>
+        <field name="model">state.change.constrain.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="model_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="state_change_constrain_template_view_form" model="ir.ui.view">
+        <field name="name">state.change.constrain.template.form</field>
+        <field name="model">state.change.constrain.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <header />
+                <sheet>
+                    <div class="oe_button_box" style="width: 300px;" name="buttons">
+                    </div>
+                    <group name="group_1" colspan="4" col="2">
+                        <group name="group_1_1" colspan="1" col="2">
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                            <field name="name" />
+                            <field name="model_id" />
+                            <field name="model" />
+                        </group>
+                        <group name="group_1_2">
+                            <field name="sequence" />
+                            <field name="state_field_id" />
+                            <field
+                                name="status_check_template_id"
+                                domain="[('model', '=', model)]"
+                            />
+                            <field name="active" widget="boolean_toggle" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="page_note" string="Note">
+                            <group name="group_note_1" colspan="4" col="2">
+                                <field name="note" colspan="4" nolabel="1" />
+                            </group>
+                        </page>
+                        <page name="page_detail" string="Details">
+                            <field name="allowed_check_item_ids" invisible="1" />
+                            <group name="group_detail_1" colspan="4" col="2">
+                                <field name="detail_ids" nolabel="1">
+                                    <tree name="Details">
+                                        <field name="sequence" widget="handle" />
+                                        <field name="state_id" />
+                                        <field
+                                            name="status_check_item_ids"
+                                            widget="many2many_tags"
+                                            width="0.5"
+                                            optional="show"
+                                        />
+                                    </tree>
+                                    <form name="Details">
+                                        <group name="group_1" colspan="4" col="2">
+                                            <field name="sequence" />
+                                            <field
+                                                name="allowed_state_ids"
+                                                invisible="1"
+                                            />
+                                            <field
+                                                name="state_id"
+                                                domain="[('id', 'in', allowed_state_ids)]"
+                                            />
+                                            <field
+                                                name="status_check_item_ids"
+                                                domain="[('id', 'in', parent.allowed_check_item_ids)]"
+                                            />
+                                        </group>
+                                    </form>
+                                </field>
+                            </group>
+                        </page>
+                        <page name="page_computation" string="Computation">
+                            <group name="group_computation_1" colspan="4" col="2">
+                                <field name="python_code" colspan="4" widget="ace" />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="state_change_constrain_template_action" model="ir.actions.act_window">
+        <field name="name">State Change Constrain Templates</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">state.change.constrain.template</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+        id="state_change_constrain_template_menu"
+        name="Templates"
+        parent="menu_state_change_constrain"
+        action="state_change_constrain_template_action"
+        sequence="10"
+    />
+
+</odoo>
