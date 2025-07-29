@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Optional commit message and branch name
+COMMIT_MSG=${1:-"initial commit"}
+BRANCH_NAME=${2:-"develop"}
+
+echo "🔄 Cleaning cache files..."
+
+# Remove __pycache__ directories, .DS_Store and .pyc files
+find . -type d -name '__pycache__' -exec rm -rf {} +
+find . -type f -name '*.pyc' -delete
+find . -name '.DS_Store' -delete
+
+echo "✅ Cleanup done."
+
+# Git operations
+echo "📦 Adding changes to Git..."
+git add .
+
+echo "📝 Committing with message: $COMMIT_MSG"
+git commit -m "$COMMIT_MSG"
+
+echo "🚀 Pushing to $BRANCH_NAME branch..."
+git push origin $BRANCH_NAME
+
+echo "✅ Done!"
