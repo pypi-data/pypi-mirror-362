@@ -1,0 +1,72 @@
+[project]
+name = "udn-songbook"
+# version = "1.4.4"
+dynamic = ["version"]
+description = "songbook and songsheet management for songsheets in ukedown format"
+authors = [{ name = "Stuart Sears", email = "stuart@sjsears.com" }]
+maintainers = [{ name = "Stuart Sears", email = "stuart@sjsears.com" }]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "beautifulsoup4>=4.13.3",
+  "dynaconf>=3.2.10",
+  "jinja2>=3.1.6",
+  "jmespath>=1.0.1",
+  "loguru>=0.7.3",
+  "lxml>=5.3.1",
+  "markdown>=3.7",
+  "more-itertools>=10.6.0",
+  "platformdirs>=4.3.6",
+  "pychord>=1.2.2",
+  "pyyaml>=6.0.2",
+  "requests>=2.32.4",
+  "tqdm>=4.67.1",
+  "ukedown>=2.2.2",
+  "weasyprint>=65.0",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+
+[project.scripts]
+udn_transpose = "udn_songbook.tools.transpose:main"
+udn_songsheet = "udn_songbook.tools.makesheet:main"
+udn_pdfbook = "udn_songbook.tools.pdfbook:main"
+udn_from_ug = "udn_songbook.tools.fromug:main"
+udn_parse_test = "udn_songbook.tools.parse_test:main"
+
+[project.urls]
+Repository = "https://github.com/lanky/udn-songbook"
+Issues = "https://github.com/lanky/udn-songbook/issues"
+
+[tool.uv]
+dev-dependencies = [
+  "ipython>=9.4.0",
+  "mypy>=1.15.0",
+  "pre-commit>=4.2.0",
+  "ruff>=0.11.2",
+  "types-beautifulsoup4>=4.12.0.20250204",
+  "types-jmespath>=1.0.2.20250711",
+  "types-markdown>=3.7.0.20250322",
+  "types-pyyaml>=6.0.12.20250326",
+  "types-requests>=2.32.0.20250306",
+]
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+style = "semver"
+# pattern-prefix = "v"
