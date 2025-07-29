@@ -1,0 +1,51 @@
+from __future__ import annotations
+
+import typing as t
+
+from aiogram import Bot, Dispatcher
+
+{% if use_db or use_redis or use_scheduler %}
+from .services.abstract import AbstractService
+
+{% endif %}
+
+class Context:
+{% if use_db or use_redis or use_scheduler %}
+    services: t.List[AbstractService]
+{% endif %}
+    dp: Dispatcher
+    bot: Bot
+{% if use_db or use_redis or use_scheduler %}
+
+    def __init__(self, *services: AbstractService) -> None:
+        self.services: list[AbstractService] = list(services)
+
+        for service in self.services:
+            for attr in getattr(service, "__slots__", []):
+                if hasattr(service, attr):
+                    value = getattr(service, attr)
+                    setattr(self, attr, value)
+{% endif %}
+
+    def __getattr__(self, item: str) -> t.Any:
+{% if use_db or use_redis or use_scheduler %}
+        for service in self.services:
+            if hasattr(service, item):
+                return getattr(service, item)
+{% else %}
+        if hasattr(self, item):
+            return getattr(self, item)
+{% endif %}
+        raise AttributeError(f"'Context' has no attribute '{item}'")
+
+    def __setattr__(self, key: str, value: t.Any) -> None:
+        super().__setattr__(key, value)
+
+{% if use_db or use_redis or use_scheduler %}
+    def __dir__(self) -> list[str]:
+        attrs = set(super().__dir__()) | set(vars(self).keys())
+        for service in self.services:
+            attrs.update(getattr(service, "__slots__", []))
+        return sorted(attrs)
+
+{% endif %}

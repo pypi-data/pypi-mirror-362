@@ -1,0 +1,27 @@
+from aiogram import Dispatcher, Bot
+from sulguk import AiogramSulgukMiddleware
+
+{% if use_db %}
+from .db import DbSessionMiddleware
+{% endif %}
+from .i18n import I18nJinjaMiddleware
+from .throttling import ThrottlingMiddleware
+
+
+def register(dp: Dispatcher, bot: Bot) -> None:
+    bot.session.middleware(AiogramSulgukMiddleware())
+
+    {% if use_db %}
+    dp.update.middleware(DbSessionMiddleware())
+    {% endif %}
+    dp.update.middleware(ThrottlingMiddleware())
+    dp.update.middleware(I18nJinjaMiddleware())
+
+    {% if use_db %}
+    dp.error.middleware(DbSessionMiddleware())
+    {% endif %}
+    dp.error.middleware(ThrottlingMiddleware())
+    dp.error.middleware(I18nJinjaMiddleware())
+
+
+__all__ = ["register"]
