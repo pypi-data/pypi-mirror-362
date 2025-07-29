@@ -1,0 +1,95 @@
+[build-system]
+requires = [
+    "pdm-backend",
+]
+build-backend = "pdm.backend"
+
+[project]
+name = "alyx-connector"
+authors = [
+    { name = "Timothé Jost-Mousseau", email = "timothe.jost-mousseau@pasteur.fr" },
+]
+maintainers = [
+    { name = "Timothé Jost-Mousseau", email = "timothe.jost-mousseau@pasteur.fr" },
+]
+description = "Alyx Connector, based on the Open Neurophysiology Environment"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dynamic = []
+dependencies = [
+    "iblutil>=1.7.0",
+    "natsort>=8.4.0",
+    "numpy>=1.25.2",
+    "packaging>=23.2",
+    "pandas>=2.1.4",
+    "PyYAML>=6.0.1",
+    "Requests>=2.31.0",
+    "pint",
+    "rich",
+    "openapi3-parser>=1.1.19",
+]
+version = "2.1.42"
+
+[project.license]
+text = "MIT"
+
+[project.urls]
+homepage = "https://gitlab.pasteur.fr/haisslab/data-management/ONE"
+repository = "https://gitlab.pasteur.fr/haisslab/data-management/ONE"
+documentation = "https://gitlab.pasteur.fr/haisslab/data-management/ONE"
+
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material>=9.6.12",
+]
+tests = [
+    "pytest-cov>=6.2.1",
+    "responses>=0.25.7",
+]
+
+[tool.pytest.ini_options]
+addopts = "--pdbcls=IPython.terminal.debugger:TerminalPdb --cov-report xml --cov=alyx_connector --junitxml=pytest_results.xml --cov-config=pyproject.toml"
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+omit = [
+    ".venv/*",
+    ".vscode/*",
+    ".tests/*",
+]
+
+[tool.pdm.version]
+source = "file"
+path = "src/alyx_connector/__init__.py"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "-e file:///C:/Users/tjostmou/Documents/Python/__packages__/ONE-registrator#egg=alyx-registrator",
+]
+
+[tool.flake8]
+exclude = [
+    ".git",
+    "__pycache__",
+    "__init__.py",
+    "scratch_*.py",
+    "tutorial_script.py",
+    "venv",
+    "test_imports.py",
+    "build",
+    "dist",
+    "brainbox/examples/",
+]
+ignore = [
+    "W504",
+    "W503",
+    "E266",
+]
+max-line-length = 99
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]
