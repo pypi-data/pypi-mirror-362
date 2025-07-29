@@ -1,0 +1,6 @@
+- [x] Tests
+- [ ] Local logging config instead of global one
+- [ ] User-friendly
+    - [ ] Readme
+    - [ ] Docs
+- [ ] Publish
