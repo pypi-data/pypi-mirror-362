@@ -1,0 +1,84 @@
+[project]
+name = "ilc-models"
+version = "0.1.7"
+description = "Data models for the ILC project"
+readme = "README.md"
+authors = [
+    { name = "Neil Martin", email = "neil@fourtrees.tech" }
+]
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = [
+    "pydantic>=2.10.6",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Natural Language :: English",
+  "Topic :: Software Development :: Libraries",
+  "Typing :: Typed",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Repository = "https://github.com/fourtreestech/ilc-models"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.bumpver]
+current_version = "0.1.7"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "Bump version {old_version} -> {new_version}"
+tag_message = "{new_version}"
+tag_scope = "default"
+pre_commit_hook = ""
+post_commit_hook = ""
+commit = true
+tag = false
+push = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'version = "{version}"',
+]
+"README.md" = [
+    'version-{version}-blue',
+]
+"src/ilc_models/__init__.py" = [
+    '__version__ = "{version}"'
+]
+"docs/source/conf.py" = [
+    'release = "{version}"'
+]
+
+[tool.mypy]
+packages = ["ilc_models", "tests.conftest"]
+
+[tool.ruff.lint]
+select = ["F", "I"]
+
+[tool.tox]
+requires = ["tox>=4.25"]
+env_list = ["3.13", "3.12"]
+
+[tool.tox.env_run_base]
+description = "Run tests under {base_python}"
+deps = ["pytest>=8", "pytest-cov>=6", "pytest-randomly>=3", "ilc_provider>=0.1.1"]
+commands = [["pytest"]]
+
+[dependency-groups]
+dev = [
+    "faker>=37.0.0",
+    "ilc-provider>=0.1.1",
+    "mypy>=1.15.0",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.0.0",
+    "pytest-randomly>=3.16.0",
+    "rich>=13.9.4",
+    "sphinx>=8.2.3",
+    "sphinx-rtd-theme>=3.0.2",
+]
+
