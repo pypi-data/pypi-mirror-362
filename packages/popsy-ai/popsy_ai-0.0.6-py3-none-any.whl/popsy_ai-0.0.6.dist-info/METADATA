@@ -1,0 +1,382 @@
+Metadata-Version: 2.4
+Name: popsy-ai
+Version: 0.0.6
+Summary: Reddit DM automation CLI using Popsy AI for lead generation and outreach
+Project-URL: Homepage, https://popsy.ai
+Author-email: Popsy AI <support@popsy.ai>
+License: Copyright 2025 Popsy Labs, Inc.
+Keywords: ai,automation,dm,lead-generation,outreach,reddit
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Communications
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Office/Business
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.9
+Requires-Dist: browserforge>=1.2.3
+Requires-Dist: camoufox[geoip]>=0.4.11
+Requires-Dist: requests>=2.31.0
+Description-Content-Type: text/markdown
+
+# Reddit DM Automation - Unified API & Browser Integration
+
+## What You Need:
+- MacBook with macOS 10.15 or newer
+- Reddit account
+- Popsy API token
+- 30 minutes for setup
+
+---
+
+## Step 1: Install Python 3.11.9
+
+### Check if you have Python:
+```bash
+python3 --version
+```
+
+### If you don't have Python 3.11.9, install it:
+```bash
+# Install Homebrew first (copy and paste this whole line)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Python 3.11.9
+brew install python@3.11
+```
+
+---
+
+## Step 2: Install Required Software
+
+```bash
+# Install the required libraries
+pip3 install requests "camoufox[geoip]" browserforge
+
+# Download the special browser (this takes a few minutes)
+python3 -m camoufox fetch
+```
+
+---
+
+## Step 3: Unzip and go to the folder
+
+```bash
+# Go to the folder
+cd reddit-automation
+```
+
+---
+
+## Step 4: Get Your API Token
+
+1. **Login to Popsy Dashboard**
+2. **Get your API token** from settings
+3. **Set environment variable:**
+```bash
+export POPSY_API_TOKEN="your-token-here"
+```
+
+Or create a config file:
+```bash
+# Create config.json
+{
+  "token": "your-api-token-here",
+  "base_url": "https://app.popsy.ai",
+  "min_relevancy": 10,
+  "max_threads": 5,
+  "show_new": false,
+  "hide_already_dmed": true,
+  "sort_by": "by_relevancy"
+}
+```
+
+---
+
+## Step 5: Test the Connection (NEW Unified CLI)
+
+```bash
+# Test with simulation mode (no actual DMs sent)
+python3 main.py --dry-run --verbose --min-relevancy 80
+
+# Test with detailed debugging
+python3 main.py --debug --dry-run --show-new
+```
+
+---
+
+## Step 6: Choose Your Automation Mode
+
+### 🔹 **API Simulation Mode** (Default - Safe Testing)
+```bash
+# Basic simulation - see what would happen
+python3 main.py --dry-run --verbose
+
+# Live simulation with API tracking
+python3 main.py --min-relevancy 80 --max-threads 3
+```
+
+### 🔹 **Live Browser Automation** (Real DM Sending)
+```bash
+# Live browser automation with visible browser
+python3 main.py --browser --min-relevancy 80 --max-threads 3
+
+# Headless browser automation (background)
+python3 main.py --browser --headless --min-relevancy 9 --max-threads 2
+```
+
+---
+
+## 🆕 New Advanced Features:
+
+### **Smart Configuration Management**
+- **Precedence**: CLI arguments → config.json → defaults
+- **Verbose mode**: See exactly what configuration is being used
+- **Debug mode**: Full API request/response logging
+
+```bash
+# See all configuration details
+python3 main.py --verbose --dry-run
+
+# Debug API calls and responses
+python3 main.py --debug --dry-run
+```
+
+### **Flexible Thread Filtering**
+```bash
+# Include new threads (default: false)
+python3 main.py --show-new --verbose
+
+# Hide threads from already-DMed authors (default: true)
+python3 main.py --hide-already-dmed
+
+# Show threads from already-DMed authors
+python3 main.py --show-already-dmed
+
+# Sort by relevance or recency
+python3 main.py --sort-by by_relevancy
+python3 main.py --sort-by by_date
+```
+
+### **Multiple Processing Modes**
+```bash
+# DM mode (default)
+python3 main.py --mode dm --browser
+
+# Comment mode (simulation only)
+python3 main.py --mode comment --dry-run
+```
+
+---
+
+## Daily Use Examples:
+
+### **Conservative Automation** (Recommended)
+```bash
+# High-quality leads only, visible browser
+python3 main.py --browser --min-relevancy 90 --max-threads 3 --verbose
+```
+
+### **Testing New Filters**
+```bash
+# Test different relevancy thresholds
+python3 main.py --dry-run --min-relevancy 60 --show-new --verbose
+
+# Test specific subreddit
+python3 main.py --subreddit-id 123 --dry-run --debug
+```
+
+### **Bulk Processing** (Advanced Users)
+```bash
+# Background automation with higher volume
+python3 main.py --browser --headless --min-relevancy 80 --max-threads 10
+```
+
+---
+
+## 🚀 Complete Configuration Options:
+
+### **Core Settings:**
+- `--token`: Your Popsy API authentication token
+- `--base-url`: API base URL (default: https://app.popsy.ai)
+- `--config`: Configuration file path (default: config.json)
+
+### **Thread Filtering:**
+- `--min-relevancy`: Minimum relevancy score 1-10 (default: 7)
+- `--max-threads`: Maximum threads to process (default: 100)
+- `--subreddit-id`: Filter by specific subreddit ID
+- `--page-size`: Threads per API page (default: 50)
+- `--sort-by`: Sort by 'by_relevancy' or 'by_date' (default: by_date)
+
+### **Thread Type Filters:**
+- `--show-new`: Include new threads (default: false)
+- `--dm-sent`: Include threads with DMs sent (default: false)
+- `--comment-sent`: Include threads with comments sent (default: false)
+- `--show-deleted`: Include deleted threads (default: false)
+- `--hide-already-dmed`: Hide previously contacted authors (default: true)
+- `--show-already-dmed`: Override hide setting
+
+### **Processing Mode:**
+- `--mode`: Choose 'dm' or 'comment' processing (default: dm)
+- `--dry-run`: Test without sending actual DMs/comments
+
+### **Browser Automation:**
+- `--browser` / `--live`: Use live browser automation (requires camoufox)
+- `--headless`: Run browser in background mode
+- `--browser-delay`: Custom delay between actions (seconds)
+
+### **Debugging & Logging:**
+- `--verbose` / `-v`: Show detailed configuration and processing info
+- `--debug`: Enable full API request/response logging
+
+---
+
+## File Structure:
+
+```
+reddit-dm-tool/
+├── main.py                   # 🆕 Unified CLI interface
+├── api.py                    # Core API client library
+├── dm_automation.py          # Browser automation library
+├── config.json              # Your configuration
+├── logs/
+│   ├── api_client_YYYY-MM-DD.log
+│   ├── sent_messages_YYYY-MM-DD.csv
+│   └── sent_comments_YYYY-MM-DD.csv
+└── browser_data/            # Persistent browser session
+```
+
+---
+
+## 🆕 Enhanced Features:
+
+### **Smart Configuration Display**
+```bash
+python3 main.py --verbose --dry-run
+```
+Shows:
+- ✅ **Command line arguments** you used
+- ✅ **Configuration file values** loaded
+- ✅ **Environment variables** detected
+- ✅ **Effective values** after precedence resolution
+
+### **Robust Error Handling**
+- ✅ **API response validation** (handles different response formats)
+- ✅ **Browser dependency checking** (graceful fallback if camoufox not installed)
+- ✅ **Configuration validation** (ensures compatible settings)
+
+### **Flexible Automation**
+- ✅ **Simulation mode**: Test with API tracking but no actual sends
+- ✅ **Browser mode**: Live DM sending with real browser
+- ✅ **Headless mode**: Background automation for scheduled runs
+
+---
+
+## Configuration Examples:
+
+### **Conservative Setup** (config.json)
+```json
+{
+  "token": "your-token-here",
+  "base_url": "https://app.popsy.ai",
+  "min_relevancy": 90,
+  "max_threads": 3,
+  "show_new": false,
+  "hide_already_dmed": true,
+  "sort_by": "by_relevancy"
+}
+```
+
+### **Testing Setup** (config.json)
+```json
+{
+  "token": "your-token-here",
+  "min_relevancy": 60,
+  "max_threads": 10,
+  "show_new": true,
+  "hide_already_dmed": false,
+  "sort_by": "by_date"
+}
+```
+
+---
+
+## Troubleshooting:
+
+**🔧 Browser Issues:**
+```bash
+python3 -m camoufox remove
+python3 -m camoufox fetch
+```
+
+**🔧 Configuration Issues:**
+```bash
+# See what configuration is actually being used
+python3 main.py --verbose --dry-run
+
+# Debug API communication
+python3 main.py --debug --dry-run
+```
+
+**🔧 No threads found?**
+- Check your API token is valid: `--debug` shows request details
+- Lower the `--min-relevancy` score
+- Try `--show-new` to include new threads
+- Use `--show-already-dmed` to see previously contacted authors
+- Verify you have tracked subreddits in Popsy dashboard
+
+**🔧 API connection failed?**
+- Check internet connection
+- Verify `--base-url` is correct with `--verbose`
+- Ensure token hasn't expired with `--debug`
+
+---
+
+## Migration from Old Version:
+
+If you were using the old separate scripts:
+
+```bash
+# Old way:
+python3 api.py --token TOKEN --dry-run
+python3 dm_automation.py --token TOKEN
+
+# New unified way:
+python3 main.py --dry-run --verbose                    # Simulation
+python3 main.py --browser --verbose                    # Browser automation
+```
+
+---
+
+## ✅ What's New in This Version:
+
+- 🆕 **Unified CLI**: Single `main.py` for all automation modes
+- 🆕 **Smart Configuration**: CLI → config.json → defaults precedence
+- 🆕 **Verbose & Debug Modes**: See exactly what's happening
+- 🆕 **Browser Integration**: Seamless switch between simulation and live automation
+- 🆕 **Enhanced Filtering**: More control over thread selection
+- 🆕 **Better Error Handling**: Graceful failures and helpful error messages
+- 🆕 **Configuration Display**: See effective settings before running
+- 🆕 **API Compatibility**: Handles different API response formats
+
+The new system provides:
+- ✅ **Smart targeting** with AI relevancy scoring
+- ✅ **Flexible automation** modes (simulation vs live browser)
+- ✅ **Advanced configuration** management with precedence rules
+- ✅ **Comprehensive logging** and debugging capabilities
+- ✅ **Better user experience** with verbose feedback
+- ✅ **Robust error handling** and validation
+
+
+# How to build the package
+
+```bash
+uv build
+uv run twine upload dist/*
+```
