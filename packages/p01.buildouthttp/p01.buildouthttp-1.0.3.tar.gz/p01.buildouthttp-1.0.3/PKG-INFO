@@ -1,0 +1,219 @@
+Metadata-Version: 2.1
+Name: p01.buildouthttp
+Version: 1.0.3
+Summary: Buildout authentication extension
+Home-page: http://pypi.python.org/pypi/p01.buildouthttp
+Author: Roger Ineichen, Projekt01 GmbH
+Author-email: dev@projekt01.ch
+License: ZPL 2.1
+Description: =========================
+        HTTP plugins for buildout
+        =========================
+        
+        HTTP Basic-Authentication
+        -------------------------
+        
+        With this extension it is possible to define password protected
+        package directories without specifying the password and user in the
+        url.
+        
+        Let's take the example protected location, ``http://www.example.com/dist``
+        
+        First we would need to add the extension and the find link for our
+        protected location::
+        
+            [buildout]
+            find-links = http://www.example.com/dist
+            extensions = p01.buildouthttp
+        
+        Then create the ``.httpauth`` password file, this file contains all
+        authentication information. The ``.httpauth`` file can be placed in the root of
+        the current buildout or in the ``~/.buildout`` directory. Each row consists of
+        ``realm, uri, username, password``.
+        
+        Here is an example of the ``.httpauth`` file::
+        
+            Example com realm, http://www.example.com, username, secret
+        
+        It is also possible to leave the secret away. Then you will be prompted for the
+        secret whenever buildout is run::
+        
+            Example com realm, http://www.example.com, username
+        
+        Note that basic auth also works with any recipe using
+        zc.buildout.download (e.g. hexagonit.recipe.download) because this
+        extension also overwrites the url opener of zc.buildout.
+        
+        
+        Github Private Downloads
+        ------------------------
+        
+        Private downloads on http://github.com/ require authorization to download.
+        The previous token-based authentication system based on the v2 API (see
+        http://github.com/blog/170-token-authentication) is no longer supported by
+        GitHub as of June 1 2012; You must now request a v3 API token and use that
+        instead.
+        
+        Requesting a new API token can be done in one line using ``curl`` (please
+        substitute your own github username and password):
+        
+            curl -s -X POST -d '{"scopes": ["repo"], "note": "my API token"}' \
+                https://${user}:${pass}@api.github.com/authorizations | grep token
+        
+        Now set the value of github.token to the hash returned from the command above:
+        
+            git config --global github.accesstoken ${token}
+        
+        Note that the v3 API does not require your github username to work, and can
+        be removed from your configuration if you wish.
+        
+        For details on managing authorization GitHub's OAuth tokens, see the API
+        documentation: http://developer.github.com/v3/oauth/#oauth-authorizations-api
+        
+        URL to download a tag or branch::
+        
+            https://api.github.com/repos/<gituser>/<repos>/tarball/master
+        
+        URL to downlad a "download"::
+        
+            https://github.com/downloads/<gituser>/<repos>/<name>
+        
+        As some eggs on PyPi also use public Github download URLs you may want to
+        whitelist the repos that authentication is required for as Github will
+        return a 401 error code even for public repositories if the wrong auth
+        details are provided.
+        To do this just list each repo in the format `<gituser>/<repos>` one per
+        line in the buildout config `github-repos`::
+        
+            [buildout]
+            extensions = p01.buildouthttp
+            github-repos = p01/repos
+                           bitly/asyncmongo
+        
+        
+        Credits
+        -------
+        
+        Thanks to lovely systems for development and Tarek Ziade, Kevin Williams,
+        Wesley Mason for bugfixes and extensions.
+        
+        
+        
+        
+        ====================
+        Handler Installation
+        ====================
+        
+        By default the install function looks for the password file at
+        ~/.buildout/.httpauth and installs a basic auth opener.
+        
+        It does not fail if the file cannot be found:
+        
+            >>> import os
+            >>> from p01.buildouthttp.buildouthttp import install
+            >>> install()
+        
+        We can supply the path to the file for testing.
+        
+            >>> install(pwd_path='a')
+        
+        If the file cannot be parsed an exception is raised:
+        
+            >>> fp = os.path.join(tmp,'pwd.txt')
+            >>> import os
+            >>> f = open(fp, 'w')
+            >>> _ = f.write('The realm,https://example.com/ something')
+            >>> f.close()
+            >>> install(pwd_path=fp)
+            Traceback (most recent call last):
+            ...
+            RuntimeError: Authentication file cannot be parsed ...pwd.txt:1
+        
+        Some working examples:
+        
+            >>> f = open(fp, 'w')
+            >>> _ = f.write('The realm,https://example.com/,username,password')
+            >>> f.close()
+            >>> install(pwd_path=fp)
+            >>> f = open(fp, 'w')
+            >>> _ = f.write('The realm,https://example.com/,username,password\n\n\n')
+            >>> f.close()
+            >>> install(pwd_path=fp)
+            >>> f = open(fp, 'w')
+            >>> _ = f.write('')
+            >>> f.close()
+            >>> install(pwd_path=fp)
+        
+        Now let's try with the ``.httpauth`` file in the buildout directory:
+        
+            >>> buildout_dir = os.path.join(tmp, 'test-buildout')
+            >>> os.mkdir(buildout_dir)
+            >>> buildout = {'buildout': {'directory': buildout_dir}}
+            >>> install(buildout=buildout)
+            >>> buildout_fp = os.path.join(buildout_dir, '.httpauth')
+            >>> f = open(buildout_fp, 'w')
+            >>> _ = f.write('The realm,https://example.com/ not valid')
+            >>> f.close()
+            >>> install(buildout=buildout)
+            Traceback (most recent call last):
+            ...
+            RuntimeError: Authentication file cannot be parsed ...None:1
+            >>> f = open(buildout_fp, 'w')
+            >>> _ = f.write('The realm,https://example.com/,username,password')
+            >>> f.close()
+            >>> install(buildout=buildout)
+        
+        Then with the file passed in and the file from the buildout directory:
+        
+            >>> f = open(fp, 'w')
+            >>> _ = f.write('The realm,https://example.com/,username,password')
+            >>> f.close()
+            >>> install(buildout=buildout, pwd_path=fp)
+        
+        unload externsion:
+        
+            >>> from p01.buildouthttp.buildouthttp import unload
+            >>> unload()
+        
+        
+        =======
+        CHANGES
+        =======
+        
+        1.0.3 (2025-07-14)
+        ------------------
+        
+        - bugfix; support HOME location for .buildout/.httpauth file
+        
+        
+        1.0.2 (2025-07-01)
+        ------------------
+        
+        - make python 3 compatible
+        
+        
+        1.0.1 (2015-11-27)
+        ------------------
+        
+        - bugfix: fix url opener setup
+        
+        
+        1.0.0 (2015-11-23)
+        ------------------
+        
+        - fix url handling troubles based on python 2.7.10 and zc.buildout > 2.2
+        
+        - initial copy of lovely.buildouthttp
+        
+Keywords: Zope3 z3c p01 buildout http authentication
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Zope Public License
+Classifier: Programming Language :: Python
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Framework :: Zope3
+Provides-Extra: test
