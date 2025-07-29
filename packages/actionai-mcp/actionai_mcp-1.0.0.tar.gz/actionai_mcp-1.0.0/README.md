@@ -1,0 +1,143 @@
+# ActionAI MCP Python Client
+
+ActionAI MCP HTTP client for Claude Desktop and other MCP-compatible applications.
+
+## Installation
+
+### Using uvx (Recommended)
+
+```bash
+# Test connection
+uvx actionai-mcp --test
+
+# Use with environment variables
+MCP_SERVER_URL=http://localhost:8089/mcp ACTIONAI_API_KEY=client-access-key-2024 uvx actionai-mcp --test
+```
+
+### Using pip
+
+```bash
+pip install actionai-mcp
+actionai-mcp --test
+```
+
+## Configuration
+
+### Environment Variables
+
+- `MCP_SERVER_URL`: URL of the ActionAI MCP HTTP service (default: `http://localhost:8089/mcp`)
+- `MCP_TIMEOUT`: Request timeout in seconds (default: `30`)
+- `ACTIONAI_API_KEY`: API key for ActionAI service authentication (default: `client-access-key-2024`)
+
+### Claude Desktop Configuration
+
+Add this to your Claude Desktop MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "actionai-mcp": {
+      "command": "uvx",
+      "args": ["actionai-mcp"],
+      "env": {
+        "MCP_SERVER_URL": "http://localhost:8089/mcp",
+        "ACTIONAI_API_KEY": "client-access-key-2024"
+      }
+    }
+  }
+}
+```
+
+### Augment Code Configuration
+
+Add this to your Augment Code MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "actionai-mcp": {
+      "command": "uvx",
+      "args": ["actionai-mcp"],
+      "env": {
+        "MCP_SERVER_URL": "http://localhost:8089/mcp",
+        "ACTIONAI_API_KEY": "client-access-key-2024"
+      }
+    }
+  }
+}
+```
+
+### Cursor Configuration
+
+Add this to your Cursor MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "actionai-mcp": {
+      "command": "uvx",
+      "args": ["actionai-mcp"],
+      "env": {
+        "MCP_SERVER_URL": "http://localhost:8089/mcp",
+        "ACTIONAI_API_KEY": "client-access-key-2024"
+      }
+    }
+  }
+}
+```
+
+## Usage
+
+### Test Connection
+
+```bash
+# Test with default settings
+uvx actionai-mcp --test
+
+# Test with custom URL
+uvx actionai-mcp http://localhost:8089/mcp --test
+
+# Test with environment variables
+MCP_SERVER_URL=http://localhost:8089/mcp uvx actionai-mcp --test
+```
+
+### Command Line Options
+
+```bash
+uvx actionai-mcp --help
+```
+
+Options:
+- `--test, -t`: Test connection to MCP server
+- `--version, -v`: Show version information
+- `--help, -h`: Show help message
+
+## Development
+
+### Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/actionai-mcp-client.git
+cd actionai-mcp-client/mcp/python-package
+
+# Install in development mode
+pip install -e .
+
+# Test
+actionai-mcp --test
+```
+
+### Publishing
+
+```bash
+# Build the package
+python -m build
+
+# Upload to PyPI
+python -m twine upload dist/*
+```
+
+## License
+
+MIT License - see LICENSE file for details.
