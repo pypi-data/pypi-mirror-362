@@ -1,0 +1,37 @@
+<style>
+form[action="{{ item.url }}"] button {
+  border-radius: calc(infinity * 1px);
+  line-height: 0;
+}
+</style>
+
+<form
+  action="{{ item.url }}"
+  method="{{ form_method|default:'post' }}"
+  {% if disabled %}inert{% endif %}
+>
+  {% csrf_token %}
+  {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+  <button
+    type="submit"
+    {% if disabled %}disabled{% endif %}
+  >
+    {% with provider=item.provider.name %}
+      {% if provider == "Google" %}
+        {% include 'icons/google.html' %}
+      {% elif provider == "Microsoft" %}
+        {% include 'icons/microsoft.html' %}
+      {% elif provider == "Facebook" %}
+        {% include 'icons/facebook.html' %}
+      {% elif provider == "LinkedIn" %}
+        {% include 'icons/linkedin.html' %}
+      {% endif %}
+
+      {% if provider in "Google Microsoft Facebook LinkedIn" %}
+        <span class="visually-hidden">{{ item.label }}</span>
+      {% else %}
+        {{ item.label }}
+      {% endif %}
+    {% endwith %}
+  </button>
+</form>
