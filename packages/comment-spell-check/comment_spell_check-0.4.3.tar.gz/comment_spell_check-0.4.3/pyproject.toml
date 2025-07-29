@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=7.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comment_spell_check"
+authors = [
+  { name="David Chen", email="dchen@mail.nih.gov" },
+]
+description = "A script to automatically spell checks comments of a codebase."
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies", "version"]
+
+[project.urls]
+"Homepage" = "https://github.com/SimpleITK/CommentSpellCheck"
+"Bug Tracker" = "https://github.com/SimpleITK/CommentSpellCheck"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.scripts]
+comment_spell_check = "comment_spell_check.comment_spell_check:main"
+
+[tool.setuptools.package-data]
+"*" = ["*.txt"]
+
+[tool.setuptools_scm]
+local_scheme = "dirty-tag"
+
+[tool.flake8]
+max-line-length = 88
+ignore = ['E203', 'W503']
+max_complexity = 25
