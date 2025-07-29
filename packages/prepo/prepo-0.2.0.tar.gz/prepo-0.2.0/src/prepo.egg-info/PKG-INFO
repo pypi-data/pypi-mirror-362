@@ -1,0 +1,136 @@
+Metadata-Version: 2.4
+Name: prepo
+Version: 0.2.0
+Summary: A Python package with automated data type detection, KNN imputation, outlier removal, and multiple scaling methods using type-safe enum architecture
+Home-page: https://github.com/erikhox/prepo
+Author: Erik Hoxhaj
+Author-email: Erik Hoxhaj <erik.hoxhaj@outlook.com>
+Maintainer-email: Erik Hoxhaj <erik.hoxhaj@outlook.com>
+License: MIT
+Project-URL: Homepage, https://github.com/erikhox/prepo
+Project-URL: Bug Reports, https://github.com/erikhox/prepo/issues
+Project-URL: Source, https://github.com/erikhox/prepo
+Project-URL: Documentation, https://github.com/erikhox/prepo#readme
+Project-URL: Changelog, https://github.com/erikhox/prepo/blob/main/CHANGELOG.md
+Keywords: pandas,preprocessing,data-science,feature-engineering,machine-learning,automation,type-detection,knn-imputation,scaling,outlier-detection,cli,polars,pyarrow
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas>=1.3.0
+Requires-Dist: numpy>=1.20.0
+Requires-Dist: scikit-learn>=1.0.0
+Requires-Dist: scipy>=1.7.0
+Requires-Dist: python-dateutil>=2.8.0
+Provides-Extra: performance
+Requires-Dist: polars>=0.20.0; extra == "performance"
+Requires-Dist: pyarrow>=10.0.0; extra == "performance"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest-xvfb>=3.0.0; extra == "dev"
+Requires-Dist: coverage>=7.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: isort>=5.12.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: pre-commit>=3.0.0; extra == "dev"
+Requires-Dist: coverage-badge>=1.1.0; extra == "dev"
+Provides-Extra: cli
+Requires-Dist: click>=8.0.0; extra == "cli"
+Provides-Extra: all
+Requires-Dist: polars>=0.20.0; extra == "all"
+Requires-Dist: pyarrow>=10.0.0; extra == "all"
+Requires-Dist: click>=8.0.0; extra == "all"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# Prepo
+
+A Python package for preprocessing pandas DataFrames, with a focus on automatic data type detection, cleaning, and scaling.
+
+## Installation
+
+```bash
+pip install prepo
+```
+
+## Usage
+
+```python
+import pandas as pd
+from prepo import FeaturePreProcessor
+
+# Create a processor instance
+processor = FeaturePreProcessor()
+
+# Load your data
+df = pd.read_csv('data/raw/your_data.csv')
+
+# Process the data
+processed_df = processor.process(
+    df, 
+    drop_na=True,           # Drop rows with missing values
+    scaler_type='standard', # Scale numeric features using standard scaling
+    remove_outlier=True     # Remove outliers
+)
+
+# Save the processed data
+processed_df.to_csv('data/processed/processed_data.csv', index=False)
+```
+
+## Data Type Detection
+
+The package automatically detects the following data types:
+
+- **temporal**: Date and time columns
+- **binary**: Columns with only two unique values
+- **percentage**: Columns with values between 0 and 1, or columns with names containing "perc", "rating", etc.
+- **price**: Columns with names containing "price", "cost", "revenue", etc.
+- **id**: Columns with names ending or starting with "id"
+- **numeric**: General numeric columns
+- **string**: Short text columns
+- **text**: Long text columns
+
+## Project Structure
+
+```
+prepo/
+├── data/               # Data directory
+│   ├── raw/            # Raw data files
+│   ├── processed/      # Processed data files
+│   └── test/           # Test data files
+├── src/                # Source code
+│   └── prepo/          # Main package
+│       ├── __init__.py        # Package initialization
+│       └── preprocessor.py    # Core preprocessing functionality
+├── tests/              # Test directory
+│   ├── __init__.py     # Test package initialization
+│   └── test_preprocessor.py  # Tests for preprocessor
+├── examples/           # Example scripts
+│   └── basic_usage.py  # Basic usage example
+├── README.md           # Project documentation
+├── LICENSE             # License information
+└── setup.py            # Package installation script
+```
+
+## Demo
+[preposc.streamlit.app](https://preposc.streamlit.app/)
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
