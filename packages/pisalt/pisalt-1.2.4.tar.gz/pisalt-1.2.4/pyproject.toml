@@ -1,0 +1,22 @@
+[project]
+name = "pisalt"
+dynamic = ["version", "description", "readme", "license", "authors", "keywords", "urls"]
+
+classifiers = [
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Rust",
+]
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+python-source = "source"
+python-packages = ["pisalt"]
+module-name = "pisalt.__internal__"
+exclude = ["Cargo.lock"]
+skip-auditwheel = false
+bindings = "pyo3"
+strip = true
