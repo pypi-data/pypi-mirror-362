@@ -1,0 +1,2 @@
+- add tests
+- put the input into st.form
