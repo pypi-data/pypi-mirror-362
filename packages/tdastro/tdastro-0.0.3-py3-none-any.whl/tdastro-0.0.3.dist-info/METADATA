@@ -1,0 +1,118 @@
+Metadata-Version: 2.4
+Name: tdastro
+Version: 0.0.3
+Author-email: LINCC Frameworks <lincc-frameworks-team@lists.lsst.org>
+License: MIT License
+        
+        Copyright (c) 2024 LINCC Frameworks
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Source Code, https://github.com/lincc-frameworks/tdastro
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: astropy
+Requires-Dist: cdshealpix
+Requires-Dist: citation-compass>=0.0.3
+Requires-Dist: dust_extinction
+Requires-Dist: extinction>=0.4.7
+Requires-Dist: jax
+Requires-Dist: matplotlib
+Requires-Dist: nested-pandas
+Requires-Dist: numpy>2.0
+Requires-Dist: pandas
+Requires-Dist: pooch
+Requires-Dist: pzflow
+Requires-Dist: scipy
+Requires-Dist: sncosmo
+Provides-Extra: dev
+Requires-Dist: asv==0.6.4; extra == "dev"
+Requires-Dist: fsspec[http]; extra == "dev"
+Requires-Dist: jupyter; extra == "dev"
+Requires-Dist: pre-commit; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Dynamic: license-file
+
+# TDAstro
+
+Time-Domain Forward-Modeling for the Rubin Era
+
+[![Template](https://img.shields.io/badge/Template-LINCC%20Frameworks%20Python%20Project%20Template-brightgreen)](https://lincc-ppt.readthedocs.io/en/latest/)
+
+[![PyPI](https://img.shields.io/pypi/v/tdastro?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/tdastro/)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/lincc-frameworks/tdastro/smoke-test.yml)](https://github.com/lincc-frameworks/tdastro/actions/workflows/smoke-test.yml)
+[![Codecov](https://codecov.io/gh/lincc-frameworks/tdastro/branch/main/graph/badge.svg)](https://codecov.io/gh/lincc-frameworks/tdastro)
+[![Benchmarks](https://img.shields.io/github/actions/workflow/status/lincc-frameworks/tdastro/asv-main.yml?label=benchmarks)](https://lincc-frameworks.github.io/tdastro/)
+[![Read the Docs](https://img.shields.io/readthedocs/tdastro)](https://tdastro.readthedocs.io/)
+
+
+## Introduction
+
+Realistic light curve simulations are essential to many time-domain problems. 
+Simulations are needed to evaluate observing strategy, characterize biases, 
+and test pipelines. TDAstro aims to provide a flexible, scalable, and user-friendly
+time-domain simulation software with realistic effects and survey strategies.
+
+The software package consists of multiple stages:
+1. A flexible framework for consistently sampling model parameters (and hyper-parameters),
+2. Realistic models of time varying phenomena (such as supernovae and AGNs),
+3. Effect models (such as dust extinction), and
+4. Survey characteristics (such as cadence, filters, and noise).
+
+For an overview of the package, we recommend starting with introduction notebook 
+(at `notebooks/introduction.ipynb`).
+
+
+## Dev Guide - Getting Started
+
+Before installing any dependencies or writing code, it's a great idea to create a
+virtual environment such as `venv`
+
+```
+>> python3 -m venv ~/envs/tdastro
+>> source ~/envs/tdastro/bin/activate
+```
+
+Once you have created a new environment, you can install this project for local
+development using the following commands:
+
+```
+>> pip install -e .'[dev]'
+>> pre-commit install
+```
+
+Notes:
+1. The single quotes around `'[dev]'` may not be required for your operating system.
+2. `pre-commit install` will initialize pre-commit for this local repository, so
+   that a set of tests will be run prior to completing a local commit. For more
+   information, see the Python Project Template documentation on 
+   [pre-commit](https://lincc-ppt.readthedocs.io/en/latest/practices/precommit.html)
+
+## Acknowledgements
+
+This project is supported by Schmidt Sciences.
