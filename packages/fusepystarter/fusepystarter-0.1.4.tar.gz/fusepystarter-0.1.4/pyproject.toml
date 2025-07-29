@@ -1,0 +1,97 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/.github", "/docs", "/tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src", "configs"]
+
+[tool.hatch.version]
+path = "src/__init__.py"
+
+[tool.hatch]
+installer = "uv"
+
+[project]
+name = "fusepystarter"
+description = "A modern Python project forge with pre-configured tooling and CI/CD."
+dynamic = ["version"]
+authors = [{ name = "Sunil Ghimire", email = "sunil.ghimire@fusemachines.com" }]
+readme = "README.rst"
+requires-python = ">=3.12"
+dependencies = [
+  "cookiecutter>=2.6.0",
+  "dynaconf>=3.2.11",
+  "fire>=0.7.0",
+  "setuptools>=80.9.0",
+  "toml>=0.10.2",
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+[dependency-groups]
+dev = [
+  "coverage>=7.9.1",
+  "mypy>=1.16.1",
+  "pre-commit>=4.2.0",
+  "pytest>=8.4.0",
+  "pytest-cov>=6.2.1",
+  "ruff>=0.11.13",
+  "sphinx-rtd-theme>=3.0.2",
+  "tox>=4.27.0",
+]
+
+[project.scripts]
+fusepystarter = "src.cookiecutter.packaging:main"
+
+[project.urls]
+Homepage = "https://sunil-fm.github.io/FusePyStarter/"
+Repository = "https://github.com/sunil-fm/FusePyStarter"
+Documentation = "https://sunil-fm.github.io/FusePyStarter/"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+addopts = "--cov --cov-report=term-missing"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+  # Have to re-enable the standard pragma
+  "pragma: no cover",
+
+  # Don't complain about missing debug-only code:
+  "def __repr__",
+  "if self.debug",
+
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+
+  # Don't complain if non-runnable code isn't run:
+  "if 0:",
+  "if __name__ == .__main__.:",
+
+  # Don't complain about fire commands
+  "fire.Fire",
+]
+fail_under = 90
+ignore_errors = true

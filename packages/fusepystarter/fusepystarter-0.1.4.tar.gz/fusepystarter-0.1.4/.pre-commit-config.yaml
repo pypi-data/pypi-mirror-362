@@ -1,0 +1,188 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        name: Check for added large files
+        description: Prevent giant files from being committed
+        entry: check-added-large-files
+        args: [--maxkb=500]
+
+      - id: check-ast
+        name: Check Python AST
+        description: Check whether the files parse as valid Python
+        entry: check-ast
+        types: [python]
+
+      - id: check-case-conflict
+        name: Check for case conflicts
+        description: Check for files that would conflict due to filename case differences
+        entry: check-case-conflict
+
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+        description: Check for files that contain merge conflict strings
+        entry: check-merge-conflict
+        types: [text]
+
+      - id: debug-statements
+        name: Debug statements (Python)
+        description: Check for debugger imports and `breakpoint()` calls
+        entry: debug-statement-hook
+        types: [python]
+
+      - id: end-of-file-fixer
+        name: Fix end of files
+        description: Ensures that a file ends with a newline
+        entry: end-of-file-fixer
+        types: [text]
+        exclude: \.py$ # Excludes all Python files
+        stages: [pre-commit, pre-push, manual]
+
+      - id: mixed-line-ending
+        name: Mixed line ending
+        description: Replaces or checks mixed line endings
+        entry: mixed-line-ending
+        args: [--fix=lf]
+        types: [text]
+
+      - id: no-commit-to-branch
+        name: Don't commit to branch
+        description: Prevent commits to protected branches (e.g. `main`)
+        entry: no-commit-to-branch
+        args: [--branch=main, --branch=master]
+        pass_filenames: false
+        always_run: true
+
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+        description: Trims trailing whitespace
+        entry: trailing-whitespace-fixer
+        types: [text]
+        stages: [pre-commit, pre-push, manual]
+
+      - id: check-yaml
+        name: Check YAML files
+        description: Validate YAML syntax
+        entry: check-yaml
+        args: [--unsafe]
+
+      - id: check-json
+        name: Check JSON files
+        description: Validate JSON syntax
+        entry: check-json
+
+      - id: check-toml
+        name: Check TOML files
+        description: Validate TOML syntax
+        entry: check-toml
+
+      - id: detect-private-key
+        name: Detect private key
+        description: Detects accidental commits of private keys
+        entry: detect-private-key
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.7.15
+    hooks:
+      - id: uv-lock
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.0
+    hooks:
+      - id: ruff
+        name: Ruff Linter
+        exclude: ^(tests|src/cookiecutter|{{cookiecutter.project_slug}})/
+        types_or: [python, pyi]
+        args:
+          - --fix
+          - --exit-non-zero-on-fix
+      - id: ruff-format
+        name: Ruff Formatter
+        exclude: ^(tests|src/cookiecutter|{{cookiecutter.project_slug}})/
+        types_or: [python, pyi]
+        args: []
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.16.1
+    hooks:
+      - id: mypy
+        name: Mypy Type Checker
+        entry: mypy
+        args:
+          - --disallow-untyped-defs
+          - --ignore-missing-imports
+        exclude: ^(docs|tests|src/cookiecutter|{{cookiecutter.project_slug}})/
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.2.0
+    hooks:
+      - id: conventional-pre-commit
+        name: Git Conventional Commit Message
+        stages: [commit-msg]
+        args:
+          [
+            --strict,
+            --force-scope,
+            --verbose,
+            feat,
+            fix,
+            chore,
+            refactor,
+            docs,
+            style,
+            test,
+            perf,
+            ci,
+            build,
+            revert,
+          ]
+
+  - repo: https://github.com/jsh9/pydoclint
+    rev: 0.6.7
+    hooks:
+      - id: pydoclint
+        name: Check Google Style type Docstring
+        args:
+          - --style=google
+          - --arg-type-hints-in-docstring=True
+          - --arg-type-hints-in-signature=True
+          - --check-arg-order=True
+          - --skip-checking-short-docstrings=False
+          - --skip-checking-raises=False
+          - --check-return-types=True
+          - --require-return-section-when-returning-nothing=True
+          - --require-yield-section-when-yielding-nothing=True
+          - --check-yield-types=True
+          - --check-class-attributes=True
+          - --should-document-private-class-attributes=True
+          - --should-document-star-arguments=True
+          - --check-style-mismatch=True
+          - --exclude='\.git|\.tox|tests|data|docs|src/cookiecutter|{{cookiecutter.project_slug}}'
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+        name: Check short description of Docstring
+        additional_dependencies: [flake8-docstrings]
+        args: [--docstring-convention=google, --max-line-length=100]
+        files: ^src/
+        exclude: ^src/cookiecutter|^{{cookiecutter.project_slug}}/
+
+  - repo: local
+    hooks:
+      - id: install-dependencies
+        name: Install Dependencies
+        entry: uv pip install -e .
+        language: python
+        always_run: true
+        pass_filenames: false
+
+      - id: test
+        name: Run tests
+        entry: uv run pytest
+        language: python
+        args: ["--maxfail=1", "--disable-warnings", "-q"]
+        always_run: true
+        pass_filenames: false
