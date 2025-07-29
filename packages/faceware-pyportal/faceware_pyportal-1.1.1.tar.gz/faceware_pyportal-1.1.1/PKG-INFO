@@ -1,0 +1,81 @@
+Metadata-Version: 2.1
+Name: faceware-pyportal
+Version: 1.1.1
+Summary: Allow programmatic access to Faceware Cloud Portal via Python library
+Home-page: https://facewaretech.com/
+License: MIT
+Author: Faceware Dev Team
+Author-email: dev@facewaretech.com
+Maintainer: Alex Udrescu
+Maintainer-email: alex.udrescu@image-metrics.com
+Requires-Python: >=3.8,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Dist: aiohttp (>=3.10.11,<4.0.0)
+Requires-Dist: aiolimiter (>=1.1.0,<2.0.0)
+Requires-Dist: asyncio (>=3.4.3,<4.0.0)
+Requires-Dist: pydantic (>=2.10.2,<3.0.0)
+Requires-Dist: setuptools (>=65,<80.9.1) ; python_version >= "3.12"
+Requires-Dist: tenacity (>=8.3.0,<9.0.0)
+Requires-Dist: tomlkit (>=0.12.5,<0.13.0)
+Project-URL: Documentation, https://docs.facewaretech.com/
+Description-Content-Type: text/markdown
+
+
+This is a python library for submitting new jobs & downloading results of processed jobs from Faceware Portal.
+
+
+## Installation and Prerequisites
+
+This library requires 
+- Faceware Portal Account and Access Token
+- python >= 3.8
+
+```bash
+  pip install faceware-pyportal
+```
+    
+## Usage
+
+You can find general usage documentation at [https://docs.facewaretech.com/](https://docs.facewaretech.com).
+
+
+```python
+import logging
+from faceware.pyportal.job import TrackingModel
+from faceware.pyportal.job_result import JobStatus
+from faceware.pyportal import PortalClient
+
+# set your desired logging level
+logging.basicConfig(level=logging.INFO)
+
+client = PortalClient(
+    access_token="{YOUR-ACCESS-TOKEN}",
+    organization_id="{YOUR-ORGANIZATION-ID}"
+    parent_logger=logging.getLogger('pyportal') # Optional
+)
+
+project = await client.get_project("{PROJECT-ID}")
+
+job = await project.submit_job(
+    actor_name="Sample"
+    tracking_model=TrackingModel.STATIC_CAM,
+    video_file_path="samples/Video.mp4",
+    calibration_image_file_path="samples/Calibration.jpg"
+)
+
+while await job.get_status() not in [JobStatus.COMPLETED, JobStatus.FAILED]:
+    print("waiting for job status to change")
+
+if job.status is JobStatus.COMPLETED:
+    await job.download_retargeting_file('samples/tracked.fwr')
+```
+
+### Support
+
+For support, email support@facewaretech.com
+
