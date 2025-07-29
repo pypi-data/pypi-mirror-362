@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling<=1.18.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fame3r"
+version = "1.0.4"
+description = "FAME3R: a re-implementation of the FAME3 model"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+  {name = "Roxane Jacob", email = "roxane.axel.jacob@univie.ac.at"},
+]
+
+dependencies = [
+  "CDPKit==1.2.3",
+  "joblib==1.4.2",
+  "numpy>=1.26.4, <2.0.0",
+  "pandas>=2.2.2",
+  "scikit-learn>=1.5.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build",
+  "black",
+  "flake8",
+  "isort",
+  "mypy",
+  "pydocstyle",
+  "pylint",
+  "pytest",
+]
+
+[project.scripts]
+fame3r-cv-hp-search = "scripts.cv_hp_search:main"
+fame3r-infer = "scripts.infer:main"
+fame3r-test = "scripts.test:main"
+fame3r-train = "scripts.train:main"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "fame3r",
+  "scripts",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+  "fame3r",
+  "scripts",
+]
+
+[tool.pylint.messages_control]
+disable = [
+    "no-member", # needed because CDPKit does not include module stub files
+    "too-few-public-methods",
+    "duplicate-code",
+    "too-many-locals",
+    "too-many-statements",
+    "consider-using-enumerate",
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+ignore_missing_imports = true
