@@ -1,0 +1,197 @@
+# Spegel Configuration
+# Reflect the web through AI - see content from every angle
+
+[settings]
+default_view = "terminal"     # Which view to show first
+max_history = 50             # URL history limit  
+stream_delay = 0.01          # Streaming delay for AI responses (seconds)
+app_title = "Spegel"         # Application title
+
+[ai]
+# Default LLM model - LiteLLM will automatically detect API keys
+# Examples:
+# - "gpt-4o-mini" (OpenAI)
+# - "claude-3-5-haiku-20241022" (Anthropic)
+# - "gemini/gemini-2.5-flash-lite-preview-06-17" (Google)
+# - "ollama/llama3.2" (Local Ollama)
+default_model = "gemini/gemini-2.5-flash-lite-preview-06-17"
+
+[ui]
+show_icons = true            # Show emoji icons in tabs
+compact_mode = false         # Smaller UI elements
+
+# View definitions - order determines tab sequence and hotkey numbers
+[[views]]
+id = "raw"
+name = "Raw View"
+hotkey = "1"
+order = 1
+enabled = true
+auto_load = true             # Raw view always auto-loads
+description = "Clean HTML rendering (no LLM)"
+icon = "📄"
+prompt = ""  # Empty = no LLM processing
+
+[[views]]
+id = "terminal"
+name = "Terminal"
+hotkey = "2"
+order = 2
+enabled = true
+auto_load = true             # Terminal view auto-loads (user's preferred default)
+description = "Terminal-optimized markdown for efficient browsing"
+icon = "💻"
+prompt = """Transform this webpage into the perfect terminal browsing experience! 
+**OUTPUT FORMAT: Clean, compact markdown optimized for small terminal windows**
+
+**TERMINAL OPTIMIZATION RULES:**
+- **Width**: Keep lines under 80 characters for narrow terminals
+- **Hierarchy**: Use clear heading structure (##, ###) for easy scanning
+- **Density**: Pack maximum information in minimum space
+- **Navigation**: Make ALL important links clickable [text](url)
+- **Readability**: Use bullet points, numbered lists, and tables for structure
+
+**CONTENT PRIORITIES:**
+1. **Essential Info First** - Most important content at the top
+2. **Scannable Structure** - Headers, bullets, short paragraphs
+3. **Action-Oriented** - What can the user DO here? Make it clickable
+4. **Remove Fluff** - Cut marketing speak, keep substance
+5. **Preserve Links** - Every useful link should be clickable
+
+**FORMAT STRUCTURE:**
+# [Page Title](main-url)
+
+## 📋 Quick Summary
+(2-3 lines of what this page is about)
+
+## 🔗 Key Actions
+- [Primary action](url) - Brief description
+- [Secondary action](url) - Brief description
+
+## 📊 Main Content
+(Organized content with headers, bullets, tables as needed)
+
+## 🔍 More Links
+- [Related link](url)
+- [Another resource](url)
+
+**TERMINAL-FRIENDLY FEATURES:**
+- Use `code blocks` for technical terms
+- Create tables for structured data
+- Use **bold** for emphasis, *italics* sparingly
+- Keep paragraphs short (2-3 sentences max)
+- Use horizontal rules (---) to separate sections
+- Avoid extra linebreaks, they take a lot of vertical space.
+- No links in headers, the markdown renderer can't support it.
+- Do not assume the width of the screen, do not add linebreaks in sentences.
+Make this webpage PERFECT for someone browsing in a small terminal window!"""
+
+[[views]]
+id = "summary"
+name = "Summary"
+hotkey = "3"
+order = 3
+enabled = true
+auto_load = false            # Load on-demand only
+description = "AI-powered content summary with navigable links"
+icon = "📋"
+model = "gpt-4o-mini"        # Override default model for this view (optional)
+prompt = """Create a comprehensive but concise summary of this webpage content.
+
+**OUTPUT FORMAT: Use markdown with clickable links [text](url)**
+
+**SUMMARY STRUCTURE:**
+
+## 📖 Main Topic
+(1-2 sentences explaining what this page is about)
+
+## 🎯 Key Points
+- **Point 1**: Brief explanation with [relevant link](url) if applicable
+- **Point 2**: Another key insight or finding
+- **Point 3**: Important detail or conclusion
+
+## 🔗 Important Links
+- [Primary resource](url) - Brief description
+- [Secondary resource](url) - What this leads to
+- [Related content](url) - Why this matters
+
+## 💡 Takeaways
+(2-3 bullet points of the most important information)
+
+**GUIDELINES:**
+- Keep it concise but comprehensive
+- Focus on actionable information
+- Include relevant statistics, dates, or key facts
+- Make all referenced content clickable
+- Highlight what makes this content valuable or unique
+- If it's a news article, include who, what, when, where, why
+- If it's a product page, include key features and benefits
+- If it's documentation, include main concepts and next steps
+
+Keep it brief but comprehensive with clear, navigable formatting."""
+
+[[views]]
+id = "eli5"
+name = "ELI5"
+hotkey = "4"
+order = 4
+enabled = true
+auto_load = false            # Load on-demand only
+description = "Explain content in simple, kid-friendly terms"
+icon = "🎉"
+prompt = """Explain this webpage content like I'm 5 years old! 
+
+**OUTPUT FORMAT: Use simple markdown with fun emojis and easy links [text](url)**
+
+Make it super simple and fun:
+- Use **really simple words** that a 5-year-old would understand
+- Add **fun emojis** 🎉 to make it exciting
+- Explain **why things are cool or important**
+- Use comparisons to things kids know (like toys, games, animals)
+- Make any links clickable with simple descriptions: [Cool thing to see](url)
+
+Structure it like:
+## 🌟 What is this about?
+(Simple explanation in kid-friendly language)
+
+## 🤔 Why is this cool?
+(Why someone should care, using simple examples)
+
+## 🎮 What can you do here?
+(Actions/links in simple terms)
+
+## 🧠 What did you learn?
+(Key takeaways in simple language)
+
+Use lots of emojis, simple sentences, and make everything sound exciting and fun! If it's technical, compare it to things kids understand like building blocks, toy cars, or video games.
+
+Remember: NO big words, NO complex concepts, just fun and simple explanations!""" 
+
+[[views]]
+id = "recipe"
+name = "Recipe"
+hotkey = "5"
+order = "5"
+enabled = true
+auto_load = false
+description = "Get to the point in recipes"
+icon = "🍳"
+prompt = """Parse a recipe and extract only the essential parts.
+Format the output like this:
+
+# Ingredients
+* 1 tbsp salt  
+* 400 g beef  
+
+# Steps
+1. Preheat the oven to 200°C (Gas Mark 6).  
+2. Wash and chop the carrots.  
+-----
+**Instructions:**
+
+* Use **metric units** (not imperial).
+* inches -> cm 
+* pounds -> kg
+* cups -> dl 
+* Keep the output **clean and minimal** — no extra commentary, tips, or nutrition facts.
+* Include the servings."""                              
