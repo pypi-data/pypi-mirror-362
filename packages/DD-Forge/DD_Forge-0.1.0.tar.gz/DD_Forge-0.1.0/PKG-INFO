@@ -1,0 +1,135 @@
+Metadata-Version: 2.1
+Name: DD_Forge
+Version: 0.1.0
+Summary: A Flask application for Device Driver Generation and Automation with private PyPI
+Author-email: Karthikeyan D <karthikeyan.dhanasekar@multicorewareinc.com>, Surendhar K <surendhar.kamalakannan@multicorewareinc.com>, Surieya N <surieya.natarajan@multicorewareinc.com>, Gladson K <gladson.kalanjiadurai@multicorewareinc.com>
+Description-Content-Type: text/markdown
+
+
+
+```markdown
+# DD Forge AI — Driver Generation Flask App
+
+DD Forge AI is a Flask-based web application for generating, integrating, and packaging device drivers for SoCs based on user-selected interface, device, and OS type. It supports AI-assisted driver generation, Docker-based SDK building, and Redis + Celery task queue for background processing.
+
+---
+
+## 🔧 Features
+
+- 📄 Flask frontend to submit driver generation requests.
+- 🧠 Remote AI-based driver generation via SSH.
+- 🐳 Dockerfile auto-update and SDK build inside containers.
+- 🛠️ Integration with GitHub-based driver repository.
+- 📦 SDK output is compressed and made downloadable.
+- 🪄 Celery + Redis used for background job queuing and cancellation.
+- 📜 SQLAlchemy ORM with PostgreSQL for job tracking.
+
+---
+
+## 📁 Project Structure
+
+```
+
+DD\_Forge\_AI/
+├── app.py                  # Flask entry point
+├── ai\_model\_run.py         # Remote AI model execution and result fetch
+├── celery\_worker.py        # Celery task worker (Docker build + integration)
+├── driver\_select.py        # GitHub API + devices.json-based driver fetch
+├── models.py               # SQLAlchemy DB models
+├── templates/              # HTML templates (Flask)
+├── static/                 # Static files like devices.json
+├── Dockerfile.template     # Used to generate build-specific Dockerfiles
+├── run\_container.sh        # SDK integration script
+├── run\_container\_ai.sh     # SDK integration script (AI mode)
+└── build\_logs/             # Log output for each job
+
+````
+
+---
+
+## 🚀 Getting Started
+
+### 1. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+````
+
+### 2. Start Redis Server
+
+```bash
+redis-server
+```
+
+### 3. Initialize PostgreSQL
+
+Ensure PostgreSQL is running and a database `dd_forge_db` is created with:
+
+* **User**: `dd_user`
+* **Password**: `dd_pass`
+
+Or update the `engine = create_engine(...)` line in `models.py`.
+
+### 4. Start Celery Worker
+
+```bash
+celery -A celery_worker.celery worker --loglevel=info
+```
+
+### 5. Run the Flask App
+
+```bash
+python app.py
+```
+
+Access the app at: [http://localhost:5000](http://localhost:5000)
+
+---
+
+## 📡 API Endpoints
+
+| Endpoint              | Method | Description                      |
+| --------------------- | ------ | -------------------------------- |
+| `/`                   | GET    | Home form UI                     |
+| `/form`               | POST   | Trigger SDK driver build         |
+| `/generate_ai_driver` | POST   | Generate drivers remotely via AI |
+| `/status/<job_id>`    | GET    | Get build status                 |
+| `/download`           | GET    | Download generated SDK           |
+| `/view-dockerfile`    | GET    | View auto-generated Dockerfile   |
+
+---
+
+## 🔐 Authentication & Security
+
+* Make sure to secure the Flask app and Redis server for production deployment.
+
+---
+
+## ✅ TODOs & Improvements
+
+* Add proper error pages in the frontend.
+* Stream real-time logs to the frontend via WebSocket.
+* Add job retry and expiry logic in Celery.
+* Secure SSH and SCP in `ai_model_run.py` using SSH keys or vault.
+
+---
+
+## 📄 License
+
+This project is intended for internal usage within embedded SDK toolchains. Licensing terms TBD.
+
+---
+
+## 🙏 Acknowledgements
+
+* Flask (Python web framework)
+* Celery + Redis (Asynchronous task queue)
+* SQLAlchemy (ORM)
+* Docker (Build + integration)
+* GitHub API (Driver fetch automation)
+
+```
+
+---
+
+
