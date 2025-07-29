@@ -1,0 +1,50 @@
+[build-system]
+requires = ['setuptools', 'wheel']
+build-backend = "setuptools.build_meta"
+
+[project]
+name='peskytm'
+dynamic = ["version"]
+description = 'Unmount pesky Time Machine Volumes'
+readme = "README.md"
+authors = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
+maintainers = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
+keywords = ['OSX', 'time machine']
+license = 'AGPL-1.0-or-later'
+
+dependencies = [
+  'click>=8.2.1',
+]
+
+[project.optional-dependencies]
+test = [
+    'mypy==1.16.1',
+    'mypy-extensions==1.1.0',
+    'types-Deprecated==1.2.9.20240311',
+    'html-testRunner~=1.2.1',
+]
+
+deploy = [
+    "wheel==0.45.1",
+    "setuptools==75.7.0",
+    "twine==6.0.1",
+    "build==1.2.2.post1",
+    "pkginfo==1.12.1.2",
+    "buildlackey>=1.8.2"
+]
+
+[project.urls]
+Repository = 'https://github.com/hasii2011/peskytm'
+
+[tool.setuptools.packages.find]
+where = ['src']
+
+[tool.setuptools.package-data]
+'peskytm.resources' = ['loggingConfiguration.json']
+
+[tool.setuptools.dynamic]
+version = {attr = 'peskytm.__version__'}
+
+[project.scripts]
+
+peskytm = "peskytm.peskytm:commandHandler"
