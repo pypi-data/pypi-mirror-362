@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DynamoDB Viewer</title>
+</head>
+<body>
+  <h2>DynamoDB Logs</h2>
+  <pre id="log-output">Loading...</pre>
+
+  <script>
+    async function fetchLogs() {
+      const configRes = await fetch('config.json');
+      const config = await configRes.json();
+      const apiUrl = `https://${config.apiId}.execute-api.${config.region}.amazonaws.com/prod/frontend`;
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      document.getElementById("log-output").textContent = JSON.stringify(data, null, 2);
+    }
+
+    fetchLogs();
+  </script>
+</body>
+</html>
