@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: interval-tools
+Version: 0.16.0
+Summary: Utility functions and classes used in applications of Interval Design.
+Author-email: Michael Lyu <lvyao.china@gmail.com>
+Project-URL: Homepage, https://github.com/interval-design/python-tools
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: orjson>=3
+Provides-Extra: objectid
+Requires-Dist: pymongo>=4; extra == "objectid"
+Dynamic: license-file
+
+# Python Tools for Applications of Interval Design
+
+## Requirements
+
+Python 3.11+
+
+## Installation
+
+```sh
+pip install interval-tools
+```
+
+Or if you want to use
+[ObjectId](https://www.mongodb.com/docs/manual/reference/bson-types/#objectid)
+as a unique identifier for `Entity` or `Aggregate`, run
+
+```sh
+pip install "interval-tools[objectid]"
+```
+
+## Quickstart
+
+```pycon
+>>> from interval.utils import batched
+>>> for batch in batched('ABCDEFG', 3):
+...     print(batch)
+...
+('A', 'B', 'C')
+('D', 'E', 'F')
+('G',)
+```
