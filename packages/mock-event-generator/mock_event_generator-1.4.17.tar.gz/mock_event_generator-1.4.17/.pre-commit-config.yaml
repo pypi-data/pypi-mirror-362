@@ -1,0 +1,90 @@
+exclude: ^mock_event_generator/_vendor/
+
+repos:
+- repo: https://github.com/asottile/pyupgrade
+  rev: "v3.19.0"
+  hooks:
+  - id: pyupgrade
+    args: ["--py39-plus"]
+
+- repo: https://github.com/hadialqattan/pycln
+  rev: "v2.5.0"
+  hooks:
+  - id: pycln
+    args:
+    - --all
+
+- repo: https://github.com/pre-commit/mirrors-isort
+  rev: 'v5.10.1'
+  hooks:
+  - id: isort
+    args:
+    - --profile=black
+
+- repo: https://github.com/psf/black
+  rev: '24.10.0'
+  hooks:
+  - id: black
+    args:
+    - --skip-string-normalization
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: 'v5.0.0'
+  hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-yaml
+    exclude: ^k8s/meg/templates/
+    args: ['--unsafe']
+#  - id: check-added-large-files
+  - id: double-quote-string-fixer
+  - id: check-merge-conflict
+  - id: debug-statements
+
+- repo: https://github.com/pycqa/flake8
+  rev: '7.1.1'
+  hooks:
+  - id: flake8
+    name: flake 8 (src)
+    args:
+    - --max-line-length=88
+    # D106 missing docstring in public nested class
+    # D401 first line should be in imperative mood
+    # E203 whitespace before ':' (black incompatibility)
+    - --extend-ignore=D106,D401,E203
+    additional_dependencies:
+    - flake8-docstrings
+    files: ^mock_event_generator/
+
+- repo: https://github.com/pycqa/flake8
+  rev: '7.1.1'
+  hooks:
+  - id: flake8
+    name: flake 8 (tests)
+    args:
+    - --max-line-length=88
+    # E501 Line too long
+    - --extend-ignore=E501
+    files: ^(tests|e2e)/
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: 'v1.13.0'
+  hooks:
+  - id: mypy
+    additional_dependencies:
+    - --extra-index-url=https://git.ligo.org/api/v4/projects/11906/packages/pypi/simple
+    - apischema
+    - cryptography
+    - lxml-stubs
+    - data-science-types
+    - pytest-mock
+    - pytest-gracedb>=0.7.2
+    - trio-typing
+    - typer
+    - types-freezegun
+    - types-requests
+    args:
+    - --strict
+    - --show-error-codes
+    - --enable-error-code=ignore-without-code
+    - --no-warn-unused-ignores

@@ -1,0 +1,217 @@
+stages:
+- pre-commit tests
+- unit tests
+- build and publish
+- e2e tests
+- docs
+
+workflow:
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_TAG != null || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH)
+
+variables:
+  PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.cache/pip"
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+
+cache:
+  key: "${CI_JOB_NAME}"
+  paths:
+  - .cache/pip
+
+pre-commits:
+  stage: pre-commit tests
+  allow_failure: true
+  needs: []
+  image: python:3.11
+  interruptible: true
+  before_script:
+  - pip install pre-commit
+  - pre-commit install
+  - echo "machine git.ligo.org login gitlab-ci-token password $CI_JOB_TOKEN" > ~/.netrc
+  - chmod 600 ~/.netrc
+  script:
+  - pre-commit run --all-files
+
+.unit-test-template:
+  stage: unit tests
+  needs: []
+  interruptible: true
+  before_script:
+  - echo "machine git.ligo.org login gitlab-ci-token password $CI_JOB_TOKEN" > ~/.netrc
+  - chmod 600 ~/.netrc
+  - pip install --extra-index-url ${CI_API_V4_URL}/projects/11906/packages/pypi/simple .[tests]
+  script:
+  - pytest
+
+unit-tests/3.11:
+  extends: .unit-test-template
+  image: python:3.11
+
+unit-tests/3.12:
+  extends: .unit-test-template
+  image: python:3.12
+
+unit-tests/3.13:
+  extends: .unit-test-template
+  image: python:3.13
+
+build and publish test package:
+  stage: build and publish
+  needs: []
+  image: python:3.11
+  interruptible: true
+  before_script:
+  - pip install twine build setuptools_scm
+  script:
+  - python -m build
+  - echo "PACKAGE_VERSION=$(python3 -msetuptools_scm)" >> build.env
+  # silence errors when the package has already been uploaded
+  - set +e; TWINE_PASSWORD=$CI_JOB_TOKEN TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/* &> output.log;
+    exit_status=$?;
+    cat output.log;
+    if [ $exit_status -ne 0 ];
+    then
+      grep "400 Bad Request" output.log > /dev/null;
+    fi
+  artifacts:
+    reports:
+      dotenv: build.env
+  rules:
+  - if: $CI_COMMIT_TAG == null
+
+build and publish release package:
+  stage: build and publish
+  needs: []
+  image: python:3.11
+  interruptible: true
+  before_script:
+  - pip install twine build setuptools_scm
+  script:
+  - python -m build
+  - twine upload --username __token__ --password $PYPI_API_TOKEN dist/*.tar.gz dist/*.whl
+  rules:
+  - if: $CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/
+
+.docker-image-template:
+  image: docker:latest
+  tags:
+  - cit
+  interruptible: true
+  before_script:
+  - docker info
+  - echo $CI_JOB_TOKEN | docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
+  - if [ -z $CI_COMMIT_TAG ];
+    then
+      CONTAINER_IMAGE=$CONTAINER_TEST_IMAGE;
+    else
+      CONTAINER_IMAGE=$CONTAINER_RELEASE_IMAGE;
+    fi
+
+build and publish test image:
+  extends: .docker-image-template
+  stage: build and publish
+  needs:
+  - job: build and publish test package
+    artifacts: true
+  script:
+  - echo "machine git.ligo.org login gitlab-ci-token password $CI_JOB_TOKEN" > ~/.netrc
+  - chmod 600 ~/.netrc
+  - chmod 600 $LIGO_CERTIFICATE_PATH
+  - DOCKER_BUILDKIT=1 docker build
+        --file k8s/Dockerfile
+        --pull
+        --build-arg BUILD_ENV=test
+        --build-arg PACKAGE_VERSION
+        --secret id=netrc,src=$HOME/.netrc
+        --secret id=x509,src=$LIGO_CERTIFICATE_PATH
+        --progress=plain
+        -t $CONTAINER_IMAGE .
+  - docker push $CONTAINER_IMAGE
+  rules:
+  - if: $CI_COMMIT_TAG == null
+
+build and publish release image:
+  extends: .docker-image-template
+  stage: build and publish
+  needs: [build and publish release package]
+  script:
+  - chmod 600 $LIGO_CERTIFICATE_PATH
+  - export PACKAGE_VERSION=${CI_COMMIT_TAG:1}
+  - DOCKER_BUILDKIT=1 docker build
+    --file k8s/Dockerfile
+    --pull
+    --build-arg BUILD_ENV=release
+    --build-arg PACKAGE_VERSION
+    --secret id=x509,src=$LIGO_CERTIFICATE_PATH
+    --progress=plain
+    -t ${CONTAINER_RELEASE_IMAGE%latest}$PACKAGE_VERSION
+    -t $CONTAINER_IMAGE .
+  - docker push ${CONTAINER_RELEASE_IMAGE%latest}$PACKAGE_VERSION
+  - docker push $CONTAINER_IMAGE
+  rules:
+  - if: $CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/
+
+e2e-tests:
+  extends: .docker-image-template
+  stage: e2e tests
+  variables:
+    GIT_STRATEGY: none
+  script:
+  - docker pull $CONTAINER_IMAGE
+  - docker run $CONTAINER_IMAGE meg cache list | tee /dev/stderr | grep "── G587369"
+
+e2e-tests/cnaf:
+  extends: .docker-image-template
+  stage: e2e tests
+  allow_failure: true
+  services:
+  - name: docker:dind
+    entrypoint: ["dockerd-entrypoint.sh", "--tls=false"]
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://localhost:2375
+    DOCKER_TLS_CERTDIR: ""
+    GIT_STRATEGY: none
+  tags:
+  - k8s-cnaf
+  script:
+  - docker pull $CONTAINER_IMAGE
+  - docker run --rm $CONTAINER_IMAGE meg cache list | tee /dev/stderr | grep "── G587369"
+  - docker run --rm -v $LIGO_CERTIFICATE_PATH:/tmp/x509up_u1000 $CONTAINER_IMAGE
+    meg create G587367 --target cnaf 2>&1 | tee /dev/stderr | grep "Created G587367 ->"
+
+.pages-template:
+  stage: docs
+  needs: []
+  interruptible: true
+  image: python:3.10
+  before_script:
+  - pip install -r docs/requirements.txt
+  script:
+  - mkdocs build
+  - mv site public
+  artifacts:
+    paths:
+    - public
+
+pages:
+  extends: .pages-template
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    changes:
+    - mkdocs.yml
+    - docs/**/*
+
+pages-review:
+  extends: .pages-template
+  environment:
+    name: pages-review/$CI_COMMIT_REF_SLUG
+    url: "https://emfollow.docs.ligo.org/-/mock-event-generator/-/jobs/$CI_JOB_ID/artifacts/public/index.html"
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG != null
+    when: never
+  - changes:
+    - mkdocs.yml
+    - docs/**/*

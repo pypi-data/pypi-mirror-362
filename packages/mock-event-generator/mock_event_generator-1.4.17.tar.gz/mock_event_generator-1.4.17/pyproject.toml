@@ -1,0 +1,123 @@
+[build-system]
+requires = [
+    "setuptools>=64",
+    "setuptools_scm[toml]>=6.2",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mock_event_generator"
+authors = [
+    {name = "Roberto De Pietri", email = "roberto.depietri@unipr.it"},
+    {name = "Pierre Chanial", email = "pierre.chanial@apc.in2p3.fr"},
+]
+maintainers = [
+    {name = "Roberto De Pietri", email = "roberto.depietri@unipr.it"},
+    {name = "Pierre Chanial", email = "pierre.chanial@apc.in2p3.fr"},
+]
+description = "Re-create gravitational wave pipeline events by time-shifting existing ones."
+readme = "README.md"
+keywords = [
+    "scientific computing",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "apischema",
+    "click < 8.2.0", # Fix a bug in 8.2.0 https://github.com/fastapi/typer/discussions/1215
+    "numpy",
+    "matplotlib",
+    "astropy",
+    "mocpy",
+    "certifi",
+    "cryptography",
+    "lalsuite",      # Remove this line when https://git.ligo.org/kipp.cannon/python-ligo-lw/-/issues/25 is fixed.
+    "ligo-gracedb",  # Basic auth has been removed in 2.8.0
+    "ligo-skymap",
+    "lxml",
+    "data-science-types",
+    "igwn-ligolw",
+    "requests",
+    "trio",
+    "typer[all]",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = [
+    "lalsuite",
+    "pytest",
+    "pytest-cov",
+    "pytest-gracedb >= 0.7.2",
+    "pytest-mock",
+    "pytest-socket",
+    "pytest-trio",
+    "pytest-freezegun",
+    "responses",
+    "setuptools_scm[toml]",
+]
+
+[project.scripts]
+meg = "mock_event_generator.cli:meg"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "except ImportError:",
+    "raise NotImplementedError",
+    "if typing.TYPE_CHECKING:",
+]
+omit = [
+    "mock_event_generator/_vendor/*",
+]
+show_missing = true
+skip_covered = true
+
+[tool.isort]
+known_first_party = ["ligo", "mock_event_generator", "pytest_gracedb"]
+
+[[tool.mypy.overrides]]
+module = [
+    "astropy.*",
+    "lal",
+    "ligo",
+    "ligo.gracedb.*",
+    "igwn_ligolw.*",
+    "ligo.skymap.*",
+    "numpy",
+    "mocpy",
+    "matplotlib",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "mock_event_generator._vendor.*"
+ignore_errors = true
+
+[tool.pytest.ini_options]
+addopts = "-ra -q --cov=mock_event_generator --disable-socket --allow-unix-socket"
+filterwarnings = [
+    'ignore:distutils Version classes are deprecated:DeprecationWarning',
+    'ignore:No x509 credentials found:UserWarning',
+    'ignore:Authentication credentials not found:UserWarning',
+]
+testpaths = [
+    "tests",
+]
+trio_mode = true
+
+[tool.setuptools.packages.find]
+include = ["mock_event_generator*"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+fallback_version = "0.0.0"

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: meg
+spec:
+  serviceName: meg
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meg
+  template:
+    metadata:
+      labels:
+        app: meg
+    spec:
+      hostNetwork: true
+      {{- if .Values.meg.gracedb.hostAliases }}
+      hostAliases:
+        {{- toYaml $.Values.meg.gracedb.hostAliases | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: meg
+          image: {{ .Values.meg.image }}
+          imagePullPolicy: IfNotPresent
+          args:
+            - sh
+            - -c
+            - |
+              /usr/local/bin/meg ca-certificate /tmp/ca.crt &&
+              sleep infinity
+          volumeMounts:
+            - name: meg-data
+              mountPath: /home/meguser
+            - name: gracedb-ca
+              mountPath: /tmp/ca.crt
+              subPath: ca.crt
+      volumes:
+         - name: gracedb-ca
+           secret:
+             secretName: {{ .Values.meg.gracedb.caSecret }}
+  volumeClaimTemplates:
+    - metadata:
+        name: meg-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: {{ .Values.meg.storageClassName }}
