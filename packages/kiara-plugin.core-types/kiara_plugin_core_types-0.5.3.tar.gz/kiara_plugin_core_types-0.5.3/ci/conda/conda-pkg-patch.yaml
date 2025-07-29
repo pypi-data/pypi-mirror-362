@@ -1,0 +1,19 @@
+channels:
+  - dharpa
+  - conda-forge
+
+host_requirements:
+  - python
+  - pip
+  - hatchling
+  - hatch-vcs
+
+test:
+  imports:
+    - kiara_plugin.core_types
+  source_files:
+    - tests/
+    - examples/
+  commands:
+    - kiara module list
+    - kiara run date.extract_from_string text=2022-02-02 -c conda_test_job
