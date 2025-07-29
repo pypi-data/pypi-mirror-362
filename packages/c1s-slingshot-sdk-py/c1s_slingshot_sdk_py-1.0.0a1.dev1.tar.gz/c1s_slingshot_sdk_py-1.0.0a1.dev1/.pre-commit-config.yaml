@@ -1,0 +1,34 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.12.2
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args: [--fix]
+      # Run the formatter.
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0 # Use the ref you want to point at
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: pretty-format-json
+        args:
+          - "--autofix"
+          - "--indent=4"
+      - id: requirements-txt-fixer
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: uv run pyright
+        language: system
+        types: [python]
+        require_serial: true
+
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+      - id: gitlint
+        stages: [commit-msg]

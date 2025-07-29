@@ -1,0 +1,101 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatch-vcs", "hatchling"]
+
+[project]
+authors = [{ "name" = "Capital One Software" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python",
+]
+dependencies = [
+    "backoff>=2.2.1",
+    "httpx>=0.23",
+    # Pin critical transitive dependencies to ensure compatibility
+    "certifi>=2021.10.8", # httpx
+    "idna>=2.8",          # httpx
+    "sniffio>=1.2.0",     # httpx
+    "anyio>=2.0.0",       # httpx
+]
+description = "Slingshot SDK"
+name = "c1s-slingshot-sdk-py"
+readme = "README.md"
+requires-python = ">=3.9,<3.14"
+dynamic = [
+    "version",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/slingshot"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file="src/slingshot/__version__.py"
+
+[project.urls]
+Home = "https://github.com/capitalone/c1-slingshot-sdk-py"
+
+
+[tool.ruff]
+exclude = ["artifacts/*"]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+ignore = ["B903", "D100", "D104", "E501"]
+preview = true
+select = [
+    "ASYNC",
+    "B",
+    "C9",
+    "D",
+    "E",
+    "F",
+    "I",
+    "PLE",
+    "RUF",
+    "TID",
+    "UP",
+    "W",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+
+[tool.pyright]
+pythonPlatform = "All"
+pythonVersion = "3.9"
+reportUnnecessaryTypeIgnoreComment = "error"
+typeCheckingMode = "standard"
+useLibraryCodeForTypes = true
+
+[dependency-groups]
+dev = [
+    "gitlint>=0.19.1",
+    "pre-commit>=3.5.0",
+    "pyright>=1.1.402",
+    "pytest>=8.3.5",
+    "ruff>=0.12.2",
+    "ty>=0.0.1a14",
+    # Pin dev-only transitive dependencies
+    "colorama>=0.4.0",      # pytest
+    "iniconfig>=1.1.0",     # pytest
+    "packaging>=21.0",      # pytest
+    "pyparsing>=2.4.0",     # pytest
+    "pytest-httpx>=0.35.0",
+]
