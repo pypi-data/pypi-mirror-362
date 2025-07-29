@@ -1,0 +1,42 @@
+image: archlinux
+packages:
+  - python-build
+  - python-pipx
+  - python-pre-commit
+  - python-setuptools-scm
+  - python-tox
+  - python-wheel
+  - twine
+sources:
+  - https://github.com/pimutils/todoman
+secrets:
+  - 4db20548-55bc-4769-b6fe-005b20a4efb4 # PyPI token.
+environment:
+  CODECOV_TOKEN: a4471483-7f55-411a-bf2f-f65a91013dc4
+  CI: true
+tasks:
+  - check-python:
+      python --version | grep 'Python 3.13'
+  - setup: |
+      pipx install codecov
+      echo "export PATH=/home/build/.local/bin:$PATH" >> $HOME/.buildenv
+  - test: |
+      cd todoman
+      tox -e py
+      codecov
+  - test-pyicu: |
+      cd todoman
+      tox -e pyicu
+      codecov
+  - test-repl: |
+      cd todoman
+      tox -e repl
+      codecov
+  - package: |
+      cd todoman
+      git fetch --tags
+      python -m build --no-isolation
+      git describe --exact-match --tags || complete-build
+  - publish: |
+      cd todoman
+      twine upload --non-interactive dist/*

@@ -1,0 +1,114 @@
+[project]
+name = "todoman"
+authors = [
+    {name = "Hugo Osvaldo Barrera", email = "hugo@whynothugo.nl"},
+]
+description = "A simple icalendar-based todo manager."
+readme = "README.rst"
+requires-python = ">=3.9"
+keywords = ["todo", "task", "icalendar", "cli"]
+license = "ISC"
+license-files = ["LICENCE"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Console :: Curses",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Office/Business :: Scheduling",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "click>=7.1,<9.0",
+    "click-log>=0.2.1",
+    "humanize",
+    "icalendar>=4.0.3",
+    "parsedatetime",
+    "python-dateutil",
+    "pyxdg",
+    "urwid",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+lint = [
+    "ruff",
+    "mypy",
+    "types-pytz",
+    "types-python-dateutil",
+]
+test = [
+    "freezegun",
+    "hypothesis",
+    "pytest",
+    "pytest-cov",
+    "pytz",
+]
+docs = [
+    "sphinx-click",
+    "sphinx_rtd_theme",
+]
+repl = [
+    "click-repl>=0.1.6",
+]
+
+[project.urls]
+homepage = "https://github.com/pimutils/todoman"
+documentation = "https://todoman.readthedocs.io/"
+changelog = "https://github.com/pimutils/todoman/blob/main/CHANGELOG.rst"
+issues = "https://github.com/pimutils/todoman/issues"
+
+[project.scripts]
+todo = "todoman.cli:cli"
+
+[tool.setuptools]
+packages = ["todoman"]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "W",
+    "B",
+    "I",
+    "UP",
+    "N",
+    "ANN",
+    # "A",
+    "C4",
+    "PT",
+    "SIM",
+    "TID",
+]
+ignore = [
+  "ANN002",  # Annotations for *args
+  "ANN003",  # Annotations for **kwargs
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+required-imports = ["from __future__ import annotations"]
+
+[build-system]
+requires = ["setuptools>=77", "wheel", "setuptools_scm>=6.2"]
+
+[tool.setuptools_scm]
+write_to = "todoman/version.py"
+version_scheme = "no-guess-dev"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+addopts = "--cov=todoman --cov-report=term-missing --color=yes --verbose"
+
+[tool.coverage.report]
+exclude_lines = [
+    "if TYPE_CHECKING:",
+]
