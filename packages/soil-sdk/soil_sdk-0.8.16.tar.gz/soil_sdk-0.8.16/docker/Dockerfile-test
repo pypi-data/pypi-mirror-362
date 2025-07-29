@@ -1,0 +1,11 @@
+FROM registry.gitlab.com/amalfianalytics/devops/docker/amalfi-docker-python-node-test:latest
+RUN apt-get update -qq
+RUN apt-get install git -y -qq > /dev/null
+WORKDIR /app
+RUN pip install pre-commit
+COPY .pre-commit-config.yaml .pre-commit-config.yaml
+# Install pre-commit linters.
+RUN git init && git add . && pre-commit run || true
+COPY . .
+RUN pip install -e .[dev]
+RUN npm install -g pyright@1.1.387

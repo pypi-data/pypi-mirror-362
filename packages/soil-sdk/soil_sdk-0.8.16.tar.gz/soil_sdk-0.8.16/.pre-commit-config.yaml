@@ -1,0 +1,43 @@
+default_stages: [commit, push]
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.6.5
+    hooks:
+      # Run the linter.
+      - id: ruff
+        name: ruff (linter fix)
+        args: [--config, .ruff.toml, --fix, --verbose]
+      # Run the formatter.
+      - id: ruff-format
+        name: ruff-format (formatter)
+        args: [--config, .ruff.toml, --verbose]
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.9
+    hooks:
+      - id: bandit
+        name: bandit
+        description: "Bandit is a tool for finding common security issues in Python code"
+        entry: bandit
+        language: python
+        types: [python]
+        exclude: "(test/.*)|(docs/.*)"
+        args: [--configfile, bandit.yml]
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright (types)
+        entry: bash -c  'pyright -p pyrightconfig.json'
+        language: system
+      - id: unittest
+        name: unittest (testing)
+        entry: bash -c 'PY_ENV=test coverage run --source=soil,soil_cli -m unittest discover -s test'
+        language: system
+        pass_filenames: false
+      - id: coverage
+        name: coverage (testing)
+        entry: coverage report -m
+        language: python
+        types: [python]
+        pass_filenames: false
+        verbose: true

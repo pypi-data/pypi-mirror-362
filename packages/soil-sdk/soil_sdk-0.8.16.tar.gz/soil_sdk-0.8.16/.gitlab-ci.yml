@@ -1,0 +1,53 @@
+image: node:16.15-alpine
+
+stages:
+  - test
+  - build
+  - deploy
+
+build:pypi:
+  image: python:3.12.5
+  stage: build
+  tags:
+    - amalfi-runner
+  before_script:
+    - apt-get update
+    - pip install build setuptools_scm
+  script:
+    - echo "CI_COMMIT_TAG ${CI_COMMIT_TAG}"
+    - export SETUPTOOLS_SCM_PRETEND_VERSION=${CI_COMMIT_TAG:-0.0.0}
+    - echo "SETUPTOOLS_SCM_PRETEND_VERSION ${SETUPTOOLS_SCM_PRETEND_VERSION}"
+    - rm -rf dist/*
+    - pip install setuptools_scm  # Add this line
+    - python -m build --sdist --wheel --outdir dist/
+    - ls -l dist/
+  only:
+    - master
+    - tags
+  artifacts:
+    paths:
+      - dist/
+
+deploy:pypi:
+  image: python:3.12
+  stage: deploy
+  needs: ["build:pypi"]
+  tags:
+    - amalfi-runner
+  script:
+    - pip install twine
+    - twine upload dist/* -u __token__ -p $PYPI_TOKEN
+  when: manual
+  only:
+    - master
+    - tags
+
+test:
+  tags:
+    - soil-runner
+  stage: test
+  script:
+    - docker login -u $CI_DOCKER_READ_USER -p $CI_DOCKER_READ_PASSWORD $CI_REGISTRY
+    - docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)
+    - docker build -f docker/Dockerfile-test . -t test-docker-soil-sdk
+    - docker-compose -f docker/docker-compose-test.yml up --abort-on-container-exit --exit-code-from tester
