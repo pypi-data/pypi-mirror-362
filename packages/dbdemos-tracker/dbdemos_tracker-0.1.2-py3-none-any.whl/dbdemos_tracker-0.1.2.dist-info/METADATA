@@ -1,0 +1,178 @@
+Metadata-Version: 2.1
+Name: dbdemos-tracker
+Version: 0.1.2
+Summary: A tracking library for Databricks demo analytics.
+Home-page: https://github.com/databricks-field-eng/dbdemos-tracker
+Author: Databricks
+Author-email: quentin.ambard@databricks.com
+License: Databricks license
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests >=2.25.0
+Requires-Dist: databricks-sdk >=0.8.0
+Provides-Extra: dev
+Requires-Dist: fastapi >=0.68.0 ; extra == 'dev'
+Requires-Dist: pytest >=6.0 ; extra == 'dev'
+Requires-Dist: pytest-cov >=2.0 ; extra == 'dev'
+Requires-Dist: black >=21.0 ; extra == 'dev'
+Requires-Dist: flake8 >=3.8 ; extra == 'dev'
+Provides-Extra: test
+Requires-Dist: pytest >=6.0 ; extra == 'test'
+Requires-Dist: pytest-cov >=2.0 ; extra == 'test'
+Requires-Dist: fastapi >=0.68.0 ; extra == 'test'
+Requires-Dist: httpx >=0.24.0 ; extra == 'test'
+
+# dbdemos-tracker
+
+A Python library for tracking Databricks demo analytics.
+
+## Installation
+
+```bash
+pip install dbdemos-tracker
+```
+
+## Usage
+
+### Basic Demo Tracking
+
+```python
+from dbdemos_tracker import Tracker
+
+### App Usage Tracking
+
+```python
+from dbdemos_tracker import Tracker
+
+# Create tracker for app
+tracker = Tracker("your-workspace-id")
+
+# Track app views
+tracker.track_app_view("user@databricks.com", "app-name", "/dashboard")
+
+```
+
+### FastAPI Middleware
+
+```python
+from fastapi import FastAPI
+from dbdemos_tracker import Tracker
+
+app = FastAPI()
+
+# Add middleware to track all requests automatically
+app.middleware("http")(Tracker.create_fastapi_middleware("app-name"))
+
+# Or with a custom workspace client
+from databricks.sdk import WorkspaceClient
+workspace_client = WorkspaceClient()
+app.middleware("http")(Tracker.create_fastapi_middleware("app-name", workspace_client))
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int):
+    return {"item_id": item_id}
+```
+
+**Complete Example:**
+
+```python
+from fastapi import FastAPI
+from dbdemos_tracker import Tracker
+
+# Create FastAPI app
+app = FastAPI(title="My Demo App")
+
+# Add tracking middleware - this will track ALL requests automatically
+app.middleware("http")(Tracker.create_fastapi_middleware("app-name"))
+
+# Your API endpoints
+@app.get("/")
+def home():
+    return {"message": "Welcome to my demo app"}
+
+@app.post("/data")
+def process_data(data: dict):
+    # This request will be automatically tracked
+    return {"processed": data}
+
+@app.get("/users/{user_id}")
+def get_user(user_id: str):
+    # This request will also be automatically tracked
+    return {"user_id": user_id, "name": "John Doe"}
+
+# Run with: uvicorn main:app --reload
+```
+
+### Streamlit Integration
+
+**EXPERIMENTAL - NOT TESTED - REACH OUT FOR HELP ON #field-demos**
+
+**Automatic Interceptor (Recommended):**
+```python
+import streamlit as st
+from dbdemos_tracker import Tracker
+
+# Setup automatic tracking - call this once at the top of your app
+Tracker.setup_streamlit_interceptor("app-name")
+
+# Your Streamlit app - all interactions are automatically tracked!
+st.title("My Demo App")
+
+# These will be automatically tracked:
+if st.button("Process Data"):
+    st.write("Data processed!")
+
+name = st.text_input("Enter your name")
+age = st.slider("Age", 0, 100, 25)
+option = st.selectbox("Choose option", ["A", "B", "C"])
+enabled = st.checkbox("Enable feature")
+
+# Set user email for tracking (optional)
+st.session_state.user_email = "user@databricks.com"
+```
+
+**Manual Tracking (if needed):**
+```python
+# Track specific interactions manually
+Tracker.track_streamlit_app("app-name")
+```
+
+## Configuration
+
+### Disable Tracking
+
+```python
+# Disable tracking globally
+Tracker.enable_tracker = False
+
+# Re-enable when needed
+Tracker.enable_tracker = True
+```
+
+### Email Filtering
+
+The tracker automatically filters emails to only track Databricks email addresses (`@databricks.com`). Non-Databricks emails are ignored for privacy.
+
+### Test Workspace
+
+Tracking is automatically disabled for test workspace ID `1660015457675682`.
+
+## Features
+
+- Track demo usage analytics
+- Configurable tracking enable/disable
+- Automatic Databricks email filtering
+- Error handling with timeout protection
+- FastAPI middleware for automatic request tracking
+- Streamlit integration for app interaction tracking
+- Support for both notebook and app path tracking
+- User hash generation for privacy
+
+## License
+
+Databricks License 
