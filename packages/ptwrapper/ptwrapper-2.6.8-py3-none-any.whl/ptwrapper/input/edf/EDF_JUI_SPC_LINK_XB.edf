@@ -1,0 +1,51 @@
+# *********************************************************
+# *                                                       *
+# *               EXPERIMENT DEFINITION FILE              *
+# *                   JUICE X BAND LINK                   *
+# *                                                       *
+# *********************************************************
+
+# Experiment definition
+Experiment: XB_LINK "JUICE X band link"
+
+# Data flow
+Dataflow: FROM SSMM
+
+# ------------------------------------------------
+# Set X Band link states
+# ------------------------------------------------
+
+Mode: DISABLED "No downlink"
+   Nominal_power    : 0 [Watts]
+   Nominal_data_rate: 0 [Kbits/s]
+   
+Mode: DUMP_HGA "Downlink throught HGA antenna"
+   Nominal_data_rate: 0 [Kbits/s]
+   Nominal_power    : 0 [Watts]
+
+Mode: DUMP_MGA "Downlink throught MGA antenna"
+   Nominal_data_rate: 0 [Kbits/s]
+   Nominal_power    : 0 [Watts]
+
+
+# ------------------------------------------------
+# Set X Band link state action
+# ------------------------------------------------
+
+# Ka Band link mode parameter
+Parameter: STATE
+Raw_type : ENUM
+Eng_type : TEXT
+Default_value: DISABLED [ENG]
+   Parameter_value :   0  DISABLED
+   Parameter_update: MODE DISABLED
+   Parameter_value :   1  DUMP_HGA
+   Parameter_update: MODE DUMP_HGA
+   Parameter_value :   2  DUMP_MGA
+   Parameter_update: MODE DUMP_MGA
+
+# Action set X band link mode
+Global_actions: SET_XB_LINK_STATE
+
+Action: SET_XB_LINK_STATE
+   Action_parameters: STATE

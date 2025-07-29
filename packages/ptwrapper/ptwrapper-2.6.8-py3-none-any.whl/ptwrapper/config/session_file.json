@@ -1,0 +1,122 @@
+{
+    "sessionConfiguration": {
+		"simulationConfiguration":
+        {
+            "timeStep":5
+        },
+        "attitudeSimulationConfiguration":
+        {
+            "kernelsList":
+            {
+                "baselineRelPath":"kernels",
+                "fileList": []
+            },
+            "baselineRelPath":"config/age",
+            "ageConfigFileName": "cfg_agm_jui.xml",
+            "fixedDefinitionsFile": "cfg_agm_jui_fixed_definitions.xml",
+            "predefinedBlockFile": "cfg_agm_jui_predefined_block.xml",
+            "eventDefinitionsFile": "cfg_agm_jui_event_definitions.xml"
+        },
+        "instrumentSimulationConfiguration": {
+           "baselineRelPath":  "config/ise",
+           "unitFileName":     "units.def",
+           "configFileName":   "eps.cfg",
+           "eventDefFileName": "events.juice.def"
+        },
+        "inputFiles": {
+          "baselineRelPath": "input",
+          "xmlPtrPath": "PTR_PT_V1.ptx",
+          "segmentTimelineFilePath": "itl/TOP_timelines.itl",
+          "modellingConfiguration": {
+            "baselineRelPath": "edf",
+            "edfFileName": "TOP_experiments.edf",
+            "observationDefFileName": ""
+          },
+          "eventTimelineFilePath": "TOP_events.evf"
+        },
+        "outputFiles":
+        {
+            "baselineRelPath":"outputs",
+            "ckAttitudeFilePath":"juice_sc_ptr.bc",
+            "ckSaFilePath": "juice_sa_ptr.bc",
+            "ckMgaFilePath": "juice_mga_ptr.bc",
+            "ckConfig":
+            {
+                "ckFrameId":  -28001,
+                "ckTimeStep": 15
+            },
+            "attitudeXmlPtr": "ptr_resolved.ptx",
+            "txtAttitudeFilePath": "quaternions.csv",
+            "saDataFilePath": "juice_sa_ptr.csv",
+            "mgaDataFilePath": "juice_mga_ptr.csv",
+            "powerFilePath": "power.csv",
+
+            "powerConfig": {
+                "powerTimeStep": 30
+            },
+            "dataPacks": [
+                      {
+                          "filePath": "theOsvePtrLogger",
+                          "type": "CALLBACK",
+                          "fields": [
+                                      {
+                                        "type": "time",
+                                        "format": "utc"
+                                      },
+                                      {
+                                        "type": "MAPPS",
+                                        "overlayId": "ATT_QUAT_VALUE",
+                                        "label": "qs"
+                                      },
+                                      {
+                                        "type": "MAPPS",
+                                        "overlayId": "ATT_QUAT_AXIS1",
+                                        "label": "q1"
+                                      },
+                                      {
+                                        "type": "MAPPS",
+                                        "overlayId": "ATT_QUAT_AXIS2",
+                                        "label": "q2"
+                                      },
+                                      {
+                                        "type": "MAPPS",
+                                        "overlayId": "ATT_QUAT_AXIS3",
+                                        "label": "q3"
+                                      },
+                                      {
+                                        "type": "MAPPS",
+                                        "overlayId": "TOTAL_BODY_RATE",
+                                        "label": "sc_rate"
+                                      },
+                                      {
+                                      "type": "MAPPS",
+                                      "overlayId": "AGM_PROFILE",
+                                      "agmEventIndex": 0,
+                                      "agmEventMode": "STATE",
+                                      "label": "px_illumination"
+                                      },
+                                      {
+                                      "type": "MAPPS",
+                                      "overlayId": "AGM_PROFILE",
+                                      "agmEventIndex": 1,
+                                      "agmEventMode": "STATE",
+                                      "label": "pz_illumination"
+                                      },
+                                      {
+                                      "type": "MAPPS",
+                                      "overlayId": "AGM_PROFILE",
+                                      "agmEventIndex": 2,
+                                      "agmEventMode": "STATE",
+                                      "label": "janus_sun_exclusion"
+                                      }
+                          ]
+                      }
+                   ]
+        },
+        "logging":
+        {
+            "stdOutLogLevel": "INFO",
+            "jsonLogFile": "log.json"
+        }
+    }
+}

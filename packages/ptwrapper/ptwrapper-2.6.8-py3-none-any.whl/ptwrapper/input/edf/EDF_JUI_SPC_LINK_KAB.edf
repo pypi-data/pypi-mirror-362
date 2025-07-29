@@ -1,0 +1,63 @@
+# *********************************************************
+# *                                                       *
+# *               EXPERIMENT DEFINITION FILE              *
+# *                   JUICE KA BAND LINK                  *
+# *                                                       *
+# *********************************************************
+
+# Experiment definition
+Experiment: KAB_LINK "JUICE Ka band link"
+
+# Data flow
+Dataflow: FROM_DS SSMM SCIENCE
+
+# ------------------------------------------------
+# Set Ka Band link states
+# ------------------------------------------------
+
+Mode: DISABLED "No downlink"
+   Nominal_power    : 0 [Watts]
+   Nominal_data_rate: 0 [Kbits/s]
+
+Mode: DUMP_20_HGA "Downlink throught HGA antenna at 20 deg elevation"
+   Nominal_data_rate: 0 [Kbits/s]
+   Nominal_power    : 0 [Watts]
+
+Mode: DUMP_20_MGA "Downlink throught MGA antenna at 20 deg elevation"
+   Nominal_data_rate: 0 [Kbits/s]
+   Nominal_power    : 0 [Watts]
+
+Mode: DUMP_50_HGA "Downlink throught HGA antenna at 50 deg elevation"
+   Nominal_data_rate: 0 [Kbits/s]
+   Nominal_power    : 0 [Watts]
+
+Mode: DUMP_50_MGA "Downlink throught MGA antenna at 50 deg elevation"
+   Nominal_data_rate: 0 [Kbits/s]
+   Nominal_power    : 0 [Watts]
+
+
+# ------------------------------------------------
+# Set Ka Band link state action
+# ------------------------------------------------
+
+# Ka Band link mode parameter
+Parameter: STATE
+Raw_type : ENUM
+Eng_type : TEXT
+Default_value: DISABLED [ENG]
+   Parameter_value :   0  DISABLED
+   Parameter_update: MODE DISABLED
+   Parameter_value :   1  DUMP_20_HGA
+   Parameter_update: MODE DUMP_20_HGA
+   Parameter_value :   2  DUMP_20_MGA
+   Parameter_update: MODE DUMP_20_MGA
+   Parameter_value :   3  DUMP_50_HGA
+   Parameter_update: MODE DUMP_50_HGA
+   Parameter_value :   4  DUMP_50_MGA
+   Parameter_update: MODE DUMP_50_MGA
+
+# Action set Ka band link mode
+Global_actions: SET_KAB_LINK_STATE
+
+Action: SET_KAB_LINK_STATE
+   Action_parameters: STATE

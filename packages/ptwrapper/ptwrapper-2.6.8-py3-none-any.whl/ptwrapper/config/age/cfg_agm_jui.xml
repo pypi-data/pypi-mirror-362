@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AGMConfig>
+
+  <IntegrationValues>
+
+    <Integration id="missionSetup" type="STRING">
+      Juice
+    </Integration>
+
+    <Integration id="relTimeEventName" type="STRING">
+      TEST
+    </Integration>
+
+  </IntegrationValues>
+
+
+  <Parameters>
+
+    <!-- Error reporting configuration -->
+    <Param id="ER_MAXNROFMESSAGES" type="PT_INT" description="Maximum number of messages to report" unit="-">
+      1000
+    </Param>
+    <Param id="ER_SEVERITYTHRESHOLD" type="PT_SEVERITY" description="Code for choosing the minimum severity level to report a given message" unit="-">
+      info
+    </Param>
+
+
+    <!-- Spacecraft characterisation (from FDDB v7 considering Midddle of Life propellant) -->
+    <Param id="SC_INERTIA" type="PT_MAT33" description="S/C inertia tensor" unit="kg*m^2">
+      <!-- xx, xy, xz,
+           yx, yy, yz,
+           zx, zy, zz -->
+      27755,  -96, -1265,
+        -96, 9682,   122,
+      -1265,  122,  26290
+    </Param>
+
+    <!-- Reaction wheels characterisation -->
+    <Param id="RW_SC2RW" type="PT_MATRW" description="S/C to RW orientation matrix" unit="-">
+      <!-- 1x, 1y, 1z,
+           2x, 2y, 2z,
+           3x, 3y, 3z,
+           4x, 4y, 4z -->
+      -0.763, 0.458, 0.456,
+      -0.763, 0.458, -0.456,
+      -0.763, -0.458, 0.456,
+      -0.763, -0.458, -0.456
+    </Param>
+    <Param id="RW_SCANGMOMMAX" type="PT_DOUBLE" description="Maximum S/C angular momentum to be managed by the RWs" unit="N*m*s">
+      6.0
+    </Param>
+
+
+    <!-- Slew estimation algorithm -->
+    <Param id="SE_SLEWNROFSEG" type="PT_SLEWFIT" description="Code for choosing the number of segments of the slew fitting. (This parameter switches between two different implementations based on a 1-segment (3rd order) polynomial fit 1-segment or a 3-segments (2nd order)." unit="-">
+      1segment
+    </Param>
+    <Param id="SE_SLEWPATH" type="PT_SLEWPATH" description="Code for choosing the slew path. This parameter switches between different implementations based either on the sun-line algorithm: SP_SUN_LINE_MX to avoid the Sun on the +X and Y panels, or SP_SUN_LINE_PX to avoid the Sun on the -X and Y panels, or on the eigen-axis algorithm: SP_EIGEN_AXIS to minimise angular inertia." unit="-">
+      sunLineMX
+    </Param>
+    <Param id="SE_SUNREFPERCENT" type="PT_DOUBLE" description="Reference time for Sun direction along the slew duration. Value ranges from 0% at slew start time to 100% at slew end time." unit="%">
+      0.0
+    </Param>
+    <Param id="SE_DURATIONMIN" type="PT_DOUBLE" description="Minimum slew duration allowed (In case the estimated slew is shorter than this value)." unit="s">
+      120.0
+    </Param>
+    <Param id="SE_DURATIONMAX" type="PT_DOUBLE" description="Maximum slew duration allowed to shorten estimation. (In case the slew to be estimated has an initial guess duration longer than this value)." unit="s">
+      7200.0
+    </Param>
+    <Param id="SE_ACCURACY" type="PT_DOUBLE" description="Accuracy for the slew duration estimation. It is the value used to define when further divisions of the time slot provided for the slew estimation during the binary or half-interval search won&apos;t deliver more accuracy to the result." unit="s">
+      1.0
+    </Param>
+    <Param id="SE_MARGINPERCENT" type="PT_DOUBLE" description="Margin to be applied on the estimated slew duration. This is the percentage value that the estimated duration is extended to increase feasibility beyond the slew checker results." unit="%">
+      10.0
+    </Param>
+    <Param id="SE_MARGINDELTA" type="PT_DOUBLE" description="Extra time to be added on the estimated slew duration. This is the amount of time that the estimated duration is further extended after being scaled by the percentage provided by SE_MARGINPERCENT." unit="s">
+      0.0
+    </Param>
+    <Param id="SE_REPORT_SLEW_SOLUTION" type="PT_BOOL" description="Flag to indicate whether if slew solutions (before/after) should be reported to the user in order to void attitude constraint breaks (for example, momentum, torque, etc.).. Default is False." unit="False/True">
+      true
+    </Param>
+    <Param id="SE_SLEW_SOLUTION_ACCURACY" type="PT_DOUBLE" description="Indicates the time accuracy in seconds at which the algorithm should stop looking for a solution. 1 minute could be a reasonable time accuracy. The higher the accuracy the longer the time the algorithm will try to find a solution, and therefore, it has an impact in the performance." unit="s">
+      60.0
+    </Param>
+
+
+    <!-- Attitude generation algorithms -->
+    <Param id="AG_DURATIONMIN" type="PT_DOUBLE" description="Minimum block duration allowed." unit="s">
+      60.0
+    </Param>
+    <Param id="AG_PROFILETIMESTEP" type="PT_DOUBLE" description="Time step for the attitude profile generation." unit="s">
+      1.0
+    </Param>
+    <Param id="AG_GENCKDATATYPE" type="PT_STRING" description="Indicates AGM to generate CK Type 5 (CK5) or Type 6 (CK6) kernels. The default value is CK6." unit="">
+      CK6
+    </Param>
+    <Param id="AG_SETTLINGTIMEBEFORE" type="PT_DOUBLE" description="Settling time at the start of a science pointing block." unit="s">
+      0.0
+    </Param>
+    <Param id="AG_SETTLINGTIMEAFTER" type="PT_DOUBLE" description="Settling time at the end of a science pointing block, used only for visualization." unit="s">
+      60.0
+    </Param>
+    <Param id="AG_COMPSETTLINGTIMEBEFORE" type="PT_DOUBLE" description="Settling time or Tranquilization time at the start of each composite internal science pointing slot (only used for visualization purpose)." unit="s">
+      0.0
+    </Param>
+    <Param id="AG_COMPSETTLINGTIMEAFTER" type="PT_DOUBLE" description="Settling time at the end of each composite internal science pointing slot (only used for visualization purposes)." unit="s">
+      60.0
+    </Param>
+    <Param id="AG_GAPDURATIONMIN" type="PT_DOUBLE" description="Minimum gap duration in timeline to try filling with the default pointing" unit="s">
+      900.0
+    </Param>
+    <Param id="AG_FILLGAPSSTARTANDEND" type="PT_BOOL" description="Add default pointing if there is no pointing request between the scenario start time and the first block and the last block and the end of the scenario." unit="False/True">
+      true
+    </Param>
+    <Param id="AG_MERGEBLOCKSWITHDEFAULTBLOCK" type="PT_BOOL" description="Flag to merge blocks with the default block" unit="False/True">
+      true
+    </Param>
+    <Param id="AG_SOLARARRAYSDIR" type="PT_VEC3" description="Reference direction for power optimised solar arrays orientation" unit="-">
+      <!-- x, y, z -->
+      0, 1, 0
+    </Param>
+
+
+    <!-- Attitude constraints check -->
+    <Param id="AC_POINTINGDURATIONMIN" type="PT_DOUBLE" description="Minimum duration of a pointing block (whatever is between block; in the PTR file). This includes the SLEWs and the Engineering activities like OCMs and WOLs" unit="s">
+      120.0
+    </Param>
+    <Param id="AC_SLEWDURATIONMIN" type="PT_DOUBLE" description="Minimum allowed slew duration (The minimum block duration takes the precedence. This parameter is there only for backward compatibility." unit="s">
+      120.0
+    </Param>
+    <Param id="AC_GSEPSLEWDURATIONMIN" type="PT_DOUBLE" description="Minimum duration of a slew block before/after a GSEP block" unit="s">
+      7200.0
+    </Param>
+    <Param id="AC_COMPOSITEDURATIONMIN" type="PT_DOUBLE" description="Minimum duration of each composite internal pointing slot" unit="s">
+      60.0
+    </Param>
+    <Param id="AC_COMPOSITETIMEBEFORE" type="PT_DOUBLE" description="Minimum time required in composite pointing blocks before the offset rotations" unit="s">
+      0.0
+    </Param>
+    <Param id="AC_COMPOSITETIMEAFTER" type="PT_DOUBLE" description="Minimum time required in composite pointing blocks after the offset rotations" unit="s">
+      0.0
+    </Param>
+    <Param id="AC_FLIPDURATION" type="PT_DOUBLE" description="NadirPowerOptimize flip duration" unit="s">
+      6.0
+    </Param>
+    <Param id="AC_FLIPMARGIN" type="PT_DOUBLE" description="Magin from the beginning or the end of the pointing" unit="s">
+      6.0
+    </Param>
+    <Param id="AC_FLIPACCELERATION" type="PT_DOUBLE" description="" unit="s">
+      6.0
+    </Param>
+    <Param id="AC_WOLDURATION" type="PT_DOUBLE" description="This is the standard wheel offloading maintenance block duration. The WOL duration cannot be below this value.k" unit="s">
+      600.0
+    </Param>
+    <Param id="AC_CHECKTIMESTEP" type="PT_DOUBLE" description="Time step for the attitude constraints checking" unit="s">
+      1.0
+    </Param>
+    <Param id="AC_SCANGVELMAX" type="PT_DOUBLE" description="Maximum angular velocity allowed for the S/C (This value is used by the slew duration estimation algorithm only). If the parameter is provided by axis via AC_SCANGVELMAXAXIS then the value is 0 = DISABLED" unit="deg/s">
+      0
+    </Param>
+    <Param id="AC_SCANGVELMAXAXIS" type="PT_VEC3" description="Maximum angular velocity allowed per axis for the S/C, 0 = DISABLED AXIS" unit="deg/s">
+      0.1, 0.32, 0.1
+    </Param>
+    <Param id="AC_SCANGACCMAX" type="PT_DOUBLE" description="Maximum angular acceleration allowed for the S/C (This value is used by the slew duration estimation algorithm only). If the parameter is provided by axis via AC_SCANGACCMAXAXIS then the value is 0 = DISABLED" unit="deg/s^2">
+      0
+    </Param>
+    <Param id="AC_SCANGACCMAXAXIS" type="PT_VEC3" description="Maximum angular acceleration allowed per axis for the S/C, 0 = DISABLED AXIS" unit="deg/s^2">
+      0.0004, 0.0012, 0.0004
+    </Param>
+
+    <!-- Attitude constraints check: ROTATION WHEELS-->
+    <Param id="AC_RWTORQUEMIN" type="PT_VECRW" description="This is a parameter for a Legacy Model not used in the simulation but present for backwards compatibility. Minimum torque allowed for each Reaction Wheel. These values are used in the slew duration calculation algorithm that is independent on past and future spacecraft state." unit="N*m">
+      <!-- w1, w2, w3, w4 -->
+      0, 0, 0, 0
+    </Param>
+    <Param id="AC_RWTORQUEMAX" type="PT_VECRW" description="This is a parameter for a Legacy Model not used in the simulation but present for backwards compatibility. Maximum torque allowed for each Reaction Wheel. These values are used in the slew duration calculation algorithm that is independent on past and future spacecraft state." unit="N*m">
+      <!-- w1, w2, w3, w4 -->
+      0.0, 0.0, 0.0, 0.0
+    </Param>
+    <Param id="AC_RW_WMM_GGT_TGT_OBJ" type="PT_STRING" description="" unit="">
+      JUPITER
+    </Param>
+    <Param id="AC_RW_WMM_GGT_METHOD" type="PT_STRING" description="Defines single or multibody GGT computation method: [SINGLE_BODY, HILL_SPHERE], DEFAULT: SINGLE_BODY" unit="">
+      HILL_SPHERE
+    </Param>
+    <Param id="AC_RWEXCURSIONMIN" type="PT_VECRW" description="Minimum wheel excursion allowed for each RW" unit="N*m*s">
+      <!-- w1, w2, w3, w4 -->
+      0, 0, 0, 0
+    </Param>
+    <Param id="AC_RWEXCURSIONMAX" type="PT_VECRW" description="Maximum wheel excursion allowed for each RW" unit="N*m*s">
+      <!-- w1, w2, w3, w4 -->
+      0, 0, 0, 0
+    </Param>
+    <Param id="AC_RW_WMM_ENABLED" type="PT_VECRW" description="Flag that indicates the simulator to take into account the corresponding reaction wheel in the wheel momentum simulation. The wheel momentum simulation algorithm takes into account the previous spacecraft state." unit="-">
+      <!-- w1, w2, w3, w4 -->
+      1, 1, 1, 0
+    </Param>
+    <Param id="AC_RW_WMM_RESET_ON_ERROR" type="PT_BOOL" description="Flag for reseting accumulated data on a Wheel Momentum Management error" unit="False/True">
+      false
+    </Param>
+    <Param id="AC_RW_WMM_MOMENTUMMIN" type="PT_VECRW" description="This is the lower limit of the momentum that can be absorbed by the corresponding reaction wheel. This value is used when the 3 reaction wheels are active. In case of 3 reaction wheels there is only one solution to redistribute the momentum among the wheels. For that reason we can check each wheel individually. If the value is set to 0 it indicates that there should be no zero-crossing for the RW." unit="N*m*s">
+      <!-- w1, w2, w3, w4 -->
+      -60.0, -60.0, -60.0, 0.0
+    </Param>
+    <Param id="AC_RW_WMM_MOMENTUMMAX" type="PT_VECRW" description="This is the upper limit of the momentum that can be absorbed by the corresponding reaction wheel. This value is used when the 3 reaction wheels are active. In case of 3 reaction wheels there is only one solution to redistribute the momentum among the wheels. For that reason we can check each wheel individually." unit="N*m*s">
+      <!-- w1, w2, w3, w4 -->
+      60.0, 60.0, 60.0, 0.0
+    </Param>
+    <Param id="AC_RW_WMM_MOMENTUMINIT" type="PT_VECRW" description="Initial wheel momentum state for each RW" unit="N*m*s">
+      <!-- w1, w2, w3, w4 -->
+      0.0, 0.0, 0.0, 0.0
+    </Param>
+    <Param id="AC_RW_WMM_MAXASSMOMENTUM" type="PT_DOUBLE" description="This is the absolute maximum momentum that the combination of all the wheels can handle. This value is used when the 4 reaction wheels are active. In fact in this case there is no one solution that allows to distribute the momentum among the wheels. We assume a total value that is less than the optimal but makes sure that there is a valid combination available." unit="N*m*s">
+      88.0
+    </Param>
+    <Param id="AC_RW_WMM_TORQUEMIN" type="PT_VECRW" description="Lower limit of the torque that can be applied instantaneously to the corresponding reaction wheel for the wheel momentum simulation. The wheel momentum simulation algorithm takes into account the previous spacecraft state in order to compute the spacecraft loads." unit="N*m">
+      <!-- w1, w2, w3, w4 -->
+      -0.14, -0.14, -0.14, 0.0
+    </Param>
+    <Param id="AC_RW_WMM_TORQUEMAX" type="PT_VECRW" description="Upper limit of the torque that can be applied instantaneously to the corresponding reaction wheel for the wheel momentum simulation. The wheel momentum simulation algorithm takes into account the previous spacecraft state in order to compute the spacecraft loads." unit="N*m">
+      <!-- w1, w2, w3, w4 -->
+      0.14, 0.14, 0.14, 0.0
+    </Param>
+
+    <!-- Attitude constraints check: SA -->
+    <Param id="AC_SA_ROT_ZREF" type="PT_VEC3" description="" unit="">
+      <!-- x, y, z -->
+      0, 0, 1
+    </Param>
+    <Param id="AC_SA_ROT_MAX" type="PT_DOUBLE" description="Maximum Solar Array rotation respect to the AG_sa_rot_zero_dir; that is the 0 reference." unit="deg">
+      180.0
+    </Param>
+    <Param id="AC_SA_ROT_MIN" type="PT_DOUBLE" description="Minimum Solar Array rotation respect to the AG_sa_rot_zero_dir; that is the 0 reference." unit="deg">
+      -180.0
+    </Param>
+
+    <!-- Attitude constraints check: HGA -->
+    <Param id="AC_HGAELANGMIN" type="PT_DOUBLE" description="Minimum elevation angle allowed for the HGA" unit="deg">
+      0
+    </Param>
+    <Param id="AC_HGAELANGMAX" type="PT_DOUBLE" description="Maximum elevation angle allowed for the HGA" unit="deg">
+      0
+    </Param>
+    <Param id="AC_HGAELANGVELMAX" type="PT_DOUBLE" description="Maximum elevation angular velocity allowed for the HGA" unit="deg/s">
+      0
+    </Param>
+    <Param id="AC_HGAELANGACCMAX" type="PT_DOUBLE" description="Maximum elevation angular acceleration allowed for the HGA" unit="deg/s^2">
+      0
+    </Param>
+    <Param id="AC_HGAAZANGMIN" type="PT_DOUBLE" description="Minimum azimuth angle allowed for the HGA" unit="deg">
+      0
+    </Param>
+    <Param id="AC_HGAAZANGMAX" type="PT_DOUBLE" description="Maximum azimuth angle allowed for the HGA" unit="deg">
+      0
+    </Param>
+    <Param id="AC_HGAAZANGVELMAX" type="PT_DOUBLE" description="Maximum azimuth angular velocity allowed for the HGA" unit="deg/s">
+      0
+    </Param>
+    <Param id="AC_HGAAZANGACCMAX" type="PT_DOUBLE" description="Maximum azimuth angular acceleration allowed for the HGA" unit="deg/s^2">
+      0
+    </Param>
+    <Param id="AC_HGASHADEMASK" type="PT_MASK" description="Shading azimuth/elevation envelope for the HGA" unit="deg">
+      <!-- azimut, elevation -->
+      0, 0
+    </Param>
+    <Param id="AC_HGAPLUMEMASK" type="PT_MASK" description="Plume impingement azimuth/elevation envelope for the HGA" unit="deg">
+      <!-- azimut, elevation -->
+      0, 0
+    </Param>
+    <Param id="AC_HGAREPOSDURATION" type="PT_DOUBLE" description="Duration of the HGA repositioning" unit="s">
+      0
+    </Param>
+    <Param id="AC_HGAREPOSDURATIONMIN" type="PT_DOUBLE" description="Minimum duration of a block to allow HGA repositioning" unit="s">
+      0
+    </Param>
+    <Param id="AC_HGA2SC" type="PT_MAT33" description="" unit="">
+      <!-- xx, xy, xz,
+           yx, yy, yz,
+           zx, zy, zz -->
+      0, 0, 0,
+      0, 0, 0,
+      0, 0, 0
+    </Param>
+
+
+    <!-- Attitude constraints check: MGA -->
+    <Param id="AC_MGADEFAULTREQUEST" type="PT_STRING" description="MGA Default request type: [stow, track]" unit="">
+       stow
+    </Param>
+    <Param id="AC_MGAELANGMIN" type="PT_DOUBLE" description="Minimum elevation angle allowed for the MGA" unit="deg">
+      0
+    </Param>
+    <Param id="AC_MGAELANGMAX" type="PT_DOUBLE" description="Maximum elevation angle allowed for the MGA" unit="deg">
+      360
+    </Param>
+    <Param id="AC_MGAELANGVELMAX" type="PT_DOUBLE" description="Maximum elevation angular velocity allowed for the MGA" unit="deg/s">
+      0.02
+    </Param>
+    <Param id="AC_MGAELANGACCMAX" type="PT_DOUBLE" description="Maximum elevation angular acceleration allowed for the MGA. Value should be 0.0001 but is set to 99999 due to simple track or stowed model" unit="deg/s^2">
+      99999
+    </Param>
+    <Param id="AC_MGAAZANGMIN" type="PT_DOUBLE" description="Minimum azimuth angle allowed for the MGA" unit="deg">
+      -180
+    </Param>
+    <Param id="AC_MGAAZANGMAX" type="PT_DOUBLE" description="Maximum azimuth angle allowed for the MGA" unit="deg">
+      20
+    </Param>
+    <Param id="AC_MGAAZANGVELMAX" type="PT_DOUBLE" description="Maximum azimuth angular velocity allowed for the MGA" unit="deg/s">
+      0.05
+    </Param>
+    <Param id="AC_MGAAZANGACCMAX" type="PT_DOUBLE" description="Maximum azimuth angular acceleration allowed for the MGA. Value should be 0.0001 but is set to 99999 due to simple track or stowed model" unit="deg/s^2">
+      99999
+    </Param>
+    <Param id="AC_MGAFOV" type="PT_DOUBLE" description="" unit="deg">
+      20
+    </Param>
+    <Param id="AC_MGA2SC" type="PT_MAT33" description="" unit="">
+      <!-- xx, xy, xz,
+            yx, yy, yz,
+            zx, zy, zz -->
+      0, 1, 0,
+      -1, 0, 0,
+      0, 0, 1
+    </Param>
+
+    <!-- Attitude constraints check: BLOCKS SKIPPING -->
+    <Param id="AC_SKIPSLEWBLOCKS" type="PT_BOOL" description="Flag to skip slew blocks during the attitude profiles checking" unit="False/True">
+      false
+    </Param>
+    <Param id="AC_SKIPMAINTBLOCKS" type="PT_BOOL" description="Flag to skip maintenance blocks during the attitude profiles checking. In general the maintenance block are free blocks where Flight Dynamics will plan the mainteinance activities. Considering that the attitude cannot be predicted in advance for that block we consider a default attitude and we disable the checks. In fact Flight Dynamics will make sure that the final attitude will be valid." unit="False/True">
+      true
+    </Param>
+
+
+    <!-- Event windows computation configuration -->
+    <Param id="EW_COMPUTETIMESTEP" type="PT_DOUBLE" description="Time step for the event windows computation" unit="s">
+      1
+    </Param>
+    <Param id="EW_PROFILETIMESTEP" type="PT_DOUBLE" description="Default time step for the parameter profiles" unit="s">
+      120.0
+    </Param>
+
+
+    <!-- Environment data cache/buffer configuration -->
+    <Param id="ED_USECACHE" type="PT_BOOL" description="Flag to cache the environment data for performance optimisation" unit="False/True">
+      true
+    </Param>
+    <Param id="ED_USEBUFFER" type="PT_BOOL" description="Flag to buffer the environment data for performance optimisation" unit="False/True">
+      false
+    </Param>
+    <Param id="ED_NOTINBUFFERERROR" type="PT_BOOL" description="Flag to raise an error if the requested element is not in the buffer" unit="False/True">
+      true
+    </Param>
+    <Param id="ED_GENERATETIMESTEP" type="PT_DOUBLE" description="Time step for the buffer generation process and minimum element time step" unit="s">
+      6.0
+    </Param>
+
+  </Parameters>
+
+
+  <Objects>
+    <Object parserName="SC" mnemonic="SPACECRAFT" spiceName="JUICE" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0"/>
+    <Object parserName="Sun" mnemonic="SUN" spiceName="SUN" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="1.3271240000E+20"/>
+    <Object parserName="Mercury" mnemonic="MERCURY" spiceName="MERCURY" isBody="true" bufferPos="false" bufferPosTimeStep="300.0" bufferVel="false" bufferVelTimeStep="300.0" gravity="0" orbitingName="Sun"/>
+    <Object parserName="Venus" mnemonic="VENUS" spiceName="VENUS" isBody="true" bufferPos="true" bufferPosTimeStep="300.0" bufferVel="true" bufferVelTimeStep="300.0" gravity="3.2485880000E+14" orbitingName="Sun"/>
+    <Object parserName="Earth" mnemonic="EARTH" spiceName="EARTH" isBody="true" bufferPos="true" bufferPosTimeStep="300.0" bufferVel="true" bufferVelTimeStep="300.0" gravity="3.9860120000E+14" orbitingName="Sun"/>
+    <Object parserName="Moon" mnemonic="MOON" spiceName="MOON" isBody="true" bufferPos="false" bufferPosTimeStep="300.0" bufferVel="false" bufferVelTimeStep="300.0" gravity="0" orbitingName="Earth" eclipseEvt="SUN_OCC_MOON_TRANSIT" penumbraEvt="SUN_PEN_MOON_TRANSIT" penumbraFactor="0.5"/>
+    <Object parserName="Saturn" mnemonic="SATURN" spiceName="SATURN BARYCENTER" isBody="true" bufferPos="false" bufferPosTimeStep="600.0" bufferVel="false" bufferVelTimeStep="1200.0" gravity="0" orbitingName="Sun"/>
+    <Object parserName="Uranus" mnemonic="URANUS" spiceName="URANUS BARYCENTER" isBody="true" bufferPos="false" bufferPosTimeStep="600.0" bufferVel="false" bufferVelTimeStep="1200.0" gravity="0" orbitingName="Sun"/>
+    <Object parserName="Neptune" mnemonic="NEPTUNE" spiceName="NEPTUNE BARYCENTER" isBody="true" bufferPos="false" bufferPosTimeStep="600.0" bufferVel="false" bufferVelTimeStep="1200.0" gravity="0" orbitingName="Sun"/>
+    <Object parserName="Pluto" mnemonic="PLUTO" spiceName="PLUTO BARYCENTER" isBody="true" bufferPos="false" bufferPosTimeStep="600.0" bufferVel="false" bufferVelTimeStep="1200.0" gravity="0" orbitingName="Sun"/>
+    <Object parserName="Jupiter" mnemonic="JUPITER" spiceName="JUPITER" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="1.2668653499E+17" orbitingName="Sun" isTargetObj="true" isReferenceObj="true" eclipseEvt="SUN_OCC_JUPITER_TRANSIT" penumbraEvt="SUN_PEN_JUPITER_TRANSIT"/>
+    <Object parserName="Callisto" mnemonic="CALLISTO" spiceName="CALLISTO" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="7.1808100000E+12" orbitingName="Jupiter" eclipseEvt="SUN_OCC_CALLISTO_TRANSIT"/>
+    <Object parserName="Europa" mnemonic="EUROPA" spiceName="EUROPA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="3.2034200000E+12" orbitingName="Jupiter" eclipseEvt="SUN_OCC_EUROPA_TRANSIT"/>
+    <Object parserName="Ganymede" mnemonic="GANYMEDE" spiceName="GANYMEDE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="9.8878300000E+12" orbitingName="Jupiter" eclipseEvt="SUN_OCC_GANYMEDE_TRANSIT"/>
+    <Object parserName="Io" mnemonic="IO" spiceName="IO" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Amalthea" mnemonic="AMALTHEA" spiceName="AMALTHEA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Thebe" mnemonic="THEBE" spiceName="THEBE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Adrastea" mnemonic="ADRASTEA" spiceName="ADRASTEA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Metis" mnemonic="METIS" spiceName="METIS" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Ananke" mnemonic="ANANKE" spiceName="ANANKE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Harpalyke" mnemonic="HARPALYKE" spiceName="HARPALYKE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Iocaste" mnemonic="IOCASTE" spiceName="IOCASTE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Praxidike" mnemonic="PRAXIDIKE" spiceName="PRAXIDIKE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Thyone" mnemonic="THYONE" spiceName="THYONE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Hermippe" mnemonic="HERMIPPE" spiceName="HERMIPPE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Euanthe" mnemonic="EUANTHE" spiceName="EUANTHE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Euporie" mnemonic="EUPORIE" spiceName="EUPORIE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Orthosie" mnemonic="ORTHOSIE" spiceName="ORTHOSIE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Mneme" mnemonic="MNEME" spiceName="MNEME" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Thelxinoe" mnemonic="THELXINOE" spiceName="THELXINOE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Helike" mnemonic="HELIKE" spiceName="HELIKE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2010_J2" mnemonic="S2010_J2" spiceName="S2010_J2" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2016_J1" mnemonic="S2016_J1" spiceName="S2016_J1" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J18" mnemonic="S2003_J18" spiceName="S2003_J18" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Eupheme" mnemonic="EUPHEME" spiceName="EUPHEME" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2017_J3" mnemonic="S2017_J3" spiceName="S2017_J3" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2017_J7" mnemonic="S2017_J7" spiceName="S2017_J7" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2017_J9" mnemonic="S2017_J9" spiceName="S2017_J9" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J2" mnemonic="S2003_J2" spiceName="S2003_J2" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J12" mnemonic="S2003_J12" spiceName="S2003_J12" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J16" mnemonic="S2003_J16" spiceName="S2003_J16" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2021_J1" mnemonic="S2021_J1" spiceName="S2021_J1" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2021_J2" mnemonic="S2021_J2" spiceName="S2021_J2" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2021_J3" mnemonic="S2021_J3" spiceName="S2021_J3" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2022_J3" mnemonic="S2022_J3" spiceName="S2022_J3" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Carme" mnemonic="CARME" spiceName="CARME" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Taygete" mnemonic="TAYGETE" spiceName="TAYGETE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Chaldene" mnemonic="CHALDENE" spiceName="CHALDENE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Kalyke" mnemonic="KALYKE" spiceName="KALYKE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Erinome" mnemonic="ERINOME" spiceName="ERINOME" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Isonoe" mnemonic="ISONOE" spiceName="ISONOE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Aitne" mnemonic="AITNE" spiceName="AITNE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Kale" mnemonic="KALE" spiceName="KALE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Pasithee" mnemonic="PASITHEE" spiceName="PASITHEE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Arche" mnemonic="ARCHE" spiceName="ARCHE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Kallichore" mnemonic="KALLICHORE" spiceName="KALLICHORE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Eukelade" mnemonic="EUKEKADE" spiceName="EUKEKADE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Herse" mnemonic="HERSE" spiceName="HERSE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2010_J1" mnemonic="S2010_J1" spiceName="S2010_J1" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Eirene" mnemonic="EIRENE" spiceName="EIRENE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J19" mnemonic="S2003_J19" spiceName="S2003_J19" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2017_J2" mnemonic="S2017_J2" spiceName="S2017_J2" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2017_J5" mnemonic="S2017_J5" spiceName="S2017_J5" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2017_J8" mnemonic="S2017_J8" spiceName="S2017_J8" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2011_J1" mnemonic="S2011_J1" spiceName="S2011_J1" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J9" mnemonic="S2003_J9" spiceName="S2003_J9" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J10" mnemonic="S2003_J10" spiceName="S2003_J10" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J24" mnemonic="S2003_J24" spiceName="S2003_J24" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2018_J3" mnemonic="S2018_J3" spiceName="S2018_J3" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2021_J4" mnemonic="S2021_J4" spiceName="S2021_J4" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2021_J5" mnemonic="S2021_J5" spiceName="S2021_J5" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2021_J6" mnemonic="S2021_J6" spiceName="S2021_J6" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2016_J3" mnemonic="S2016_J3" spiceName="S2016_J3" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2022_J1" mnemonic="S2022_J1" spiceName="S2022_J1" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2022_J2" mnemonic="S2022_J2" spiceName="S2022_J2" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Pasiphae" mnemonic="PASIPHAE" spiceName="PASIPHAE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Sinope" mnemonic="SINOPE" spiceName="SINOPE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Callirrhoe" mnemonic="CALLIRRHOE" spiceName="CALLIRRHOE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Megaclite" mnemonic="MEGACLITE" spiceName="MEGACLITE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Autonoe" mnemonic="AUTONOE" spiceName="AUTONOE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Eurydome" mnemonic="EURYDOME" spiceName="EURYDOME" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Sponde" mnemonic="SPONDE" spiceName="SPONDE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Hegemone" mnemonic="HEGEMONE" spiceName="HEGEMONE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Aoede" mnemonic="AOEDE" spiceName="AOEDE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Cyllene" mnemonic="CYLLENE" spiceName="CYLLENE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Kore" mnemonic="KORE" spiceName="KORE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2011_J2" mnemonic="S2011_J2" spiceName="S2011_J2" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Philophrosyne" mnemonic="PHILOPHROSYNE" spiceName="PHILOPHROSYNE" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2017_J1" mnemonic="S2017_J1" spiceName="S2017_J1" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2017_J6" mnemonic="S2017_J6" spiceName="S2017_J6" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J4" mnemonic="S2003_J4" spiceName="S2003_J4" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2003_J23" mnemonic="S2003_J23" spiceName="S2003_J23" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2016_J4" mnemonic="S2016_J4" spiceName="S2016_J4" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Themisto" mnemonic="THEMISTO" spiceName="THEMISTO" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Himalia" mnemonic="HIMALIA" spiceName="HIMALIA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Elara" mnemonic="ELARA" spiceName="ELARA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Lysithea" mnemonic="LYSITHEA" spiceName="LYSITHEA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Leda" mnemonic="LEDA" spiceName="LEDA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Dia" mnemonic="DIA" spiceName="DIA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Pandia" mnemonic="PANDIA" spiceName="PANDIA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Ersa" mnemonic="ERSA" spiceName="ERSA" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2011_J3" mnemonic="S2011_J3" spiceName="S2011_J3" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2018_J2" mnemonic="S2018_J2" spiceName="S2018_J2" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Carpo" mnemonic="CARPO" spiceName="CARPO" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="S2018_J4" mnemonic="S2018_J4" spiceName="S2018_J4" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="Valetudo" mnemonic="VALETUDO" spiceName="VALETUDO" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="88P" mnemonic="88P" spiceName="88P" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="218P" mnemonic="218P" spiceName="218P" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="24P" mnemonic="24P" spiceName="24P" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="22P" mnemonic="22P" spiceName="22P" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="19P" mnemonic="19P" spiceName="19P" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="2P" mnemonic="2P" spiceName="2P" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="10P" mnemonic="10P" spiceName="10P" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="C_2021_G2" mnemonic="C_2021_G2" spiceName="C_2021_G2" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="C_2023_H5" mnemonic="C_2023_H5" spiceName="C_2023_H5" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="C_2023_R1" mnemonic="C_2023_R1" spiceName="C_2023_R1" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+    <Object parserName="C_2024_E1" mnemonic="C_2024_E1" spiceName="C_2024_E1" isBody="true" bufferPos="true" bufferPosTimeStep="60.0" bufferVel="true" bufferVelTimeStep="60.0" gravity="0"/>
+  </Objects>
+
+
+  <Frames>
+    <Frame parserName="EME2000" mnemonic="EME" spiceName="J2000" bufferAtt="false" bufferAttTimeStep="0" isReferenceFrame="true"/>
+    <Frame parserName="SUN" mnemonic="CBE" spiceName="IAU_SUN" bufferAtt="true" bufferAttTimeStep="120.0"/>
+    <Frame parserName="JUPITER" mnemonic="CBE" spiceName="IAU_JUPITER" bufferAtt="true" bufferAttTimeStep="120.0"/>
+    <Frame parserName="SC" mnemonic="SBF" spiceName="JUICE_SPACECRAFT" bufferAtt="false" bufferAttTimeStep="0"/>
+    <Frame parserName="EUROPA" mnemonic="CBE" spiceName="IAU_EUROPA" bufferAtt="false" bufferAttTimeStep="0"/>
+    <Frame parserName="GANYMEDE" mnemonic="CBE" spiceName="IAU_GANYMEDE" bufferAtt="false" bufferAttTimeStep="0"/>
+    <Frame parserName="CALLISTO" mnemonic="CBE" spiceName="IAU_CALLISTO" bufferAtt="false" bufferAttTimeStep="0"/>
+    <Frame parserName="IO" mnemonic="CBE" spiceName="IAU_IO" bufferAtt="false" bufferAttTimeStep="0"/>
+  </Frames>
+
+</AGMConfig>

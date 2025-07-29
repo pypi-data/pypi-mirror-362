@@ -1,0 +1,246 @@
+Metadata-Version: 2.3
+Name: ptwrapper
+Version: 2.6.8
+Summary: A Pointing Tool OSVE wrapper
+License: European Space Agency Public License (ESA-PL) Permissive (Type 3) – v2.4
+Author: Marc Costa
+Author-email: marc.costa@ext.esa.int
+Requires-Python: >=3.8,<4.0
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Typing :: Typed
+Requires-Dist: numpy (>=1.26.4)
+Requires-Dist: osve (==2.6.8)
+Requires-Dist: spiceypy (>=5.1.2)
+Project-URL: Documentation, https://juicesoc.esac.esa.int/panel/#/navigation/help
+Project-URL: Homepage, https://juigitlab.esac.esa.int/core-system/uplink/auxiliary-tools/ptwrapper
+Project-URL: Repository, https://juigitlab.esac.esa.int/core-system/uplink/auxiliary-tools/ptwrapper
+Description-Content-Type: text/markdown
+
+# Pointing Tool Wrapper
+
+A JUICE SOC [Pointing Tool](https://juicept.esac.esa.int/) wrapper (`PTwrapper`) for WINDOWS, LINUX, and MACOSX to be 
+used in a local computer.
+
+Allows to simulate a Pointing Timeline Request (PTR) and to generate the corresponding SPICE CK, resolved PTR, 
+available Power, and quaternions dump file.
+
+`PTWrapper` is based on OSVE and mainly provides a shortcut to use the required functionalities and setup limited
+to simulate PTRs. You can find more information on OSVE [here](https://juigitlab.esac.esa.int/core-system/uplink/phs/osve).
+
+
+### Documentation
+
+There is not PTWrapper specific documentation besides this README file. But extensive documentation on OSVE and on
+the Pointing Tool exists as provided hereunder:
+
+- [JUICE SOC Toolkit Help Pointing Tool](https://juicesoc.esac.esa.int/help/pdt/).
+- [JUICE SOC Toolkit Help OSVE](https://juicesoc.esac.esa.int/help/osve/)
+
+
+#### Pointing Request Log
+
+The only particulars worth mentioning that are not present in the help of the PTWrapper API is the fact that the
+PTWrapper generates a special log file that is designed to help the Pointing Design process.
+
+This log is provided as an HTML and as a JSON file. The HTML can be visualized directly with any web browser whereas
+the JSON file can be used to plug it in other tools (such as the Pointing Tool web app itself.)
+
+This log provides a list of Attitude simulation WARNINGS and ERRORS sorted per designer instrument. It also includes the
+errors that happen during the slew block before or after a given pointing block.
+
+
+#### A Note on Eclipses
+
+An eclipse will result in a reduction of the solar arrays available power.
+
+By design, the JUICE SOC Attitude Generator Module (AGM), integrated in OSVE does not calculate eclipses (i.e. when
+a body is in between JUICE and the Sun), instead eclipses are provided via an event file that is trajectory dependent. 
+These event files are available for the trajectories in use. The trajectory is identified by PTWrapper by searching
+for the SPICE frames kernel thar provides trajectory events in the used meta-kernel; because of this it is
+extremely recommended to always use the meta-kernels provided by the JUICE SOC.
+
+
+## Installation
+
+```shx
+pip install ptwrapper
+```
+
+## Development and testing
+
+* Clone this repository
+* Requirements:
+  * Python 3.7+
+* Create a virtual environment and install the dependencies
+
+```shx
+pip install -e .
+```
+
+Run the tests with in the `tests` directory with:
+
+```shell
+python3 -m unittest
+```
+
+
+## Using the library
+
+After installing the library can be used with its CLI or with the Python Shell.
+
+
+### Command line interface (recommended)
+
+The package has a CLI entry point:
+
+```shell
+  ptwrapper -h
+usage: ptwrapper [-h] [-m META_KERNEL] [-p PTR] [-w WORKING_DIR] [-o OUTPUT_DIR] [-t TIME_STEP] [-np] [-sa] [-mga] [-q] [-f] [-v]
+
+Pointing Tool Wrapper (PTWrapper) simulates a PTR and generates the corresponding resolved PTR, SPICE CK kernels, and other attitude related files. PTWrapper uses OSVE to
+simulate the PTR.
+
+options:
+  -h, --help            show this help message and exit
+  -m META_KERNEL, --meta-kernel META_KERNEL
+                        [MANDATORY] Path to the SPICE Meta-kernel (MK) file
+  -p PTR, --ptr PTR     [MANDATORY] Path to the Pointing Timeline Request (PTR) file.
+  -w WORKING_DIR, --working-dir WORKING_DIR
+                        Path to the working directory. Default is the current directory.
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
+                        Path to the output directory. Default is the current directory.
+  -t TIME_STEP, --time-step TIME_STEP
+                        Simulation time step in seconds. Default is 5s.
+  -pw, --power          Calculate the available power and compare it with the one generated from the SPICE meta-kernel. Default is that the Available Power is not calculated.
+  -sa, --sa-ck          Generate the Solar Arrays SPICE CK.
+  -mga, --mga-ck        Generate the Medium Gain Antenna SPICE CK.
+  -q, --quaternions     Calculate the quaternions.
+  -ro, --remove-obs-comp
+                        Remove the observation compatibility checks from the simulation.
+  -rc, --remove-checks  Remove all the constraint and observation compatibility checks from the simulation (enhances performance).
+  -f, --fixed-definitions
+                        Print the AGM Fixed Definitions in use for PTR design.
+  -d, --debug           Keep all setup files of the OSVE simulation.
+  -v, --version         Print OSVE, AGM, and EPS libraries version.
+```
+
+> **WARNING:** Remember that the input `mk` needs to have an adequate 
+> relative or absolute path for its `PATH_VALUES` variable value.
+
+A couple of examples are provided hereunder. First specifying the output directory:
+
+```shell
+ptwrapper -m data/kernels/juice_mini_local.tm -p data/ptr_test.xml
+[INFO]    <PTWR>                      PTWrapper session execution
+[WARNING] <PTWR>                      No JUICE Crema reference found: eclipses not taken into account.
+[INFO]    <OSVE>                      OSVE Version 2.4.5a2
+[INFO]    <OSVE>                      AGM Version  9.3.16_4fc4bbf9
+[INFO]    <OSVE>                      EPS Version  9.3.16_4fc4bbf9
+[INFO]    <AGE >                      Attitude Generation Module initialization started
+[INFO]    <AGE >                      AGE module setup started
+[INFO]    <AGE >                      AGE module setup successfully completed
+[INFO]    <AGE >                      Attitude Generation Module initialization completed
+[INFO]    <ISE >                      Experiment Planning System initialization started
+[INFO]    <ISE >                      Experiment Planning System initialization completed
+[INFO]    <OSVE>                      Load Event File: "TOP__events.evf"
+[INFO]    <OSVE>                      Load Timeline File: "TOP_timelines.itl"
+[WARNING] <OSVE>                      Not AGM object has eclipse/umbra or penumbra events defined.
+[INFO]    <AGE >                      Loading Attitude Timeline
+[INFO]    <AGM > 2030-10-15T03:40:00Z WMM HILL_SPHERE: Initial target body Sun
+[INFO]    <AGE >                      Checking Attitude Timeline
+[INFO]    <AGE >                      Initializing Attitude Timeline
+[====================================================================================================] 100 %
+[WARNING] <OSVE>                      Attitude Timeline starts after Operations Timeline
+[WARNING] <OSVE>                      Attitude Timeline ends before Operations Timeline
+[INFO]    <OSVE>                      STARTING SIMULATION
+[INFO]    <OSVE>                      Experiment Timeline Time Period 2022-08-26T01:53:51 - 2035-10-05T00:44:43
+[INFO]    <OSVE>                      Attitude Timeline Time Period 2030-10-15T03:40:00Z - 2030-10-15T04:15:00Z
+[INFO]    <OSVE>                      Simulation Timeline Time Period 2030-10-15T03:40:00Z - 2030-10-15T04:15:00Z
+[WARNING] <ISE >                      TimelineExecutor: 47 timeline entries skipped at initialisation
+[INFO]    <ISE >                      Entries defined before start time 15-October-2030_03:40:00
+[INFO]    <OSVE>                      Simulation Time Step 5s
+[INFO]    <OSVE>                      Simulation Output Time Step 5s
+[INFO]    <OSVE>                      Simulation FINISHED, Timeline Time Period 2030-10-15T03:40:00Z - 2030-10-15T04:15:00Z
+[WARNING] <ISE >                      TimelineExecutor: 5712 timeline entries not executed at completion
+[INFO]    <ISE >                      Entries defined after end time 15-October-2030_04:15:00
+[INFO]    <AGE >                      TOTAL ENERGY for POINTING block from 2030-10-15T03:40:00Z to 2030-10-15T04:15:00Z
+[INFO]    <AGE >                      Attitude from actual PTR: 834.043 Wh (834.043 Wh)
+[INFO]    <AGE >                      Attitude from loaded CK: 834.042 Wh (834.042 Wh)
+[INFO]    <OSVE>                      SIMULATION FINISHED
+[INFO]    <OSVE>                      XML PTR file: "ptr_resolved.ptx" generated
+[INFO]    <OSVE>                      Generating SC CK file with the following USER DEFINED parameters:
+[INFO]    <OSVE>                      SC CK SCLK Id: -28999
+[INFO]    <OSVE>                      SC CK frame ID:  -28001
+[INFO]    <OSVE>                      SC CK time step: 5 s
+[INFO]    <AGE >                      Writing SC Attitude Spice CK File: juice_sc_ptr.bc
+[INFO]    <OSVE>                      SC CK file: "juice_sc_ptr.bc" generated
+[INFO]    <OSVE>                      POWER CSV file: "power.csv" generated
+[INFO]    <PTWR>                      The PTR has no errors, no PTR log is created
+[INFO]    <PTWR>                      Renaming power.csv to ptr_test_power.csv
+[INFO]    <PTWR>                      Renaming ptr_resolved.ptx to ptr_test_resolved.ptx
+[INFO]    <PTWR>                      Renaming juice_sc_ptr.bc to juice_sc_ptr_test_v01.bc
+[INFO]    <PTWR>                      Renaming log.json to ptr_test_osve_log.json
+[INFO]    <PTWR>                      Cleaning up OSVE execution files and directories
+[INFO]    <PTWR>                      PTWrapper session ended successfully
+```
+
+This will generate the following output files.
+
+```shell
+.
+|-- juice_sc_ptr_test_v01.bc
+|-- ptr_test_osve_log.json
+|-- ptr_test_power.csv
+`-- ptr_test_resolved.ptx
+```
+
+### Python Shell
+
+A basic test of the library for a PTR processing is provided. The sample creates in the working directory a structure 
+folder to invoke the execution and dumps inside the OUTPUT folder the expected products (SPICE CK, resolved PTR, 
+available Power, and quaternions CSV)
+
+```
+from ptwrapper import simulation
+
+ptr_content = """<prm>
+   <body>
+      <segment>
+         <data>
+            <timeline frame="SC">
+               <block ref="OBS">
+                  <startTime>2030-10-15T03:40:00</startTime>
+                  <endTime>2030-10-15T04:15:00</endTime>
+                  <attitude ref="track">
+                     <boresight ref="SC_Zaxis"/>
+                     <target ref="Jupiter"/>
+                     <phaseAngle ref="powerOptimised">
+                        <yDir>false</yDir>
+                     </phaseAngle>
+                     </attitude>
+                     <metadata>
+                        <comment>Track Power Optimised C3.0</comment>
+                     </metadata>
+               </block>
+            </timeline>
+         </data>
+     </segment>
+   </body>
+</prm>
+"""
+mk_path = 'metakernel.tm'
+simulation(mk_path, ptr_content)
+```
+
