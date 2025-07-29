@@ -1,0 +1,30 @@
+[build-system]
+requires = ['setuptools']
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bscli"
+version = "0.2.1"
+authors = [
+    { name="Ciske Harsema", email="Ciske.Harsema@ru.nl" },
+    { name="Job Doesburg", email="Job.Doesburg@ru.nl" }
+]
+description = "Brightspace CLI, grading automation and management system."
+dependencies = [
+    "brightspace-api",
+    "patool",
+    "jsonschema"
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+
+[project.scripts]
+bscli = "bscli.main:main"
+
+[tool.setuptools.package-data]
+bscli = ["data/**"]
+
+[tool.setuptools.packages.find]
+where = ['.']
+include = ['bscli*']
