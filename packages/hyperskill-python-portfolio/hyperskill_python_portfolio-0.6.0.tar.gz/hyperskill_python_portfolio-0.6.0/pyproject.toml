@@ -1,0 +1,139 @@
+[project]
+name = "hyperskill-python-portfolio"
+dynamic = ["version"]
+description = "My journey through Hyperskill, captured in a portfolio of Python projects. Each solution is refactored for quality, tested with pytest, and statically checked with mypy."
+authors = [
+    { name = "Jegors Čemisovs", email = "jegors.cemisovs@gmail.com" },
+]
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Education",
+]
+dependencies = [
+    "requests"
+]
+
+[project.urls]
+Homepage = "https://github.com/rabestro/hyperskill-python-portfolio"
+Repository = "https://github.com/rabestro/hyperskill-python-portfolio.git"
+Issues = "https://github.com/rabestro/hyperskill-python-portfolio/issues"
+Documentation = "https://rabestro.github.io/hyperskill-python-portfolio/"
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "mypy",
+    "radon",
+    "pytest>=8.4.1",
+    "types-requests",
+]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    #    "mkdocstrings-python"
+]
+
+[project.scripts]
+loancalc = "hyperskill_python_portfolio.loancalc.main:main"
+hangman = "hyperskill_python_portfolio.hangman.main:main"
+rps = "hyperskill_python_portfolio.rps.main:main"
+billsplitter = "hyperskill_python_portfolio.billsplitter.main:main"
+chatbot = "hyperskill_python_portfolio.chatbot.main:main"
+zookeeper = "hyperskill_python_portfolio.zookeeper.main:main"
+coffeemachine = "hyperskill_python_portfolio.coffee_machine.main:main"
+honestcalc = "hyperskill_python_portfolio.honest_calculator.main:main"
+cconverter = "hyperskill_python_portfolio.currency_converter.main:main"
+
+# ==============================================================================
+# Tooling Configuration
+# ==============================================================================
+
+[tool.uv]
+package = true
+index-strategy = "unsafe-best-match"
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+exclude = ["src/hyperskill_python_portfolio/_version.py"]
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle: Enforces style rules (e.g., indentation, line length).
+    "F", # Pyflakes: Detects logical errors (e.g., unused imports, undefined names).
+    "I", # isort: Ensures imports are neatly sorted and organized.
+    "UP", # pyupgrade: Automatically rewrites code to use modern Python syntax.
+    "B", # flake8-bugbear: Finds likely bugs and design problems.
+    "C4", # flake8-comprehensions: Pushes for more idiomatic list/dict/set comprehensions.
+    "D", # pydocstyle: Enforces standards for docstring formatting.
+    "TID", # flake8-tidy-imports: Restricts relative imports to enforce a clean architecture.
+    "RUF", # Ruff-specific rules: Catches ambiguities and improves code clarity.
+]
+ignore = []
+
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+]
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true
+
+
+[tool.mypy]
+mypy_path = "src"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = "-ra -q --strict-markers"
+
+
+[tool.radon]
+exclude = ["tests", "docs"]
+cc_min = "B"
+mi_min = 70
+
+# ==============================================================================
+# Build System Configuration
+# ==============================================================================
+
+[build-system]
+requires = ["setuptools>=80.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "src/hyperskill_python_portfolio/_version.py"

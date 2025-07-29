@@ -1,0 +1,35 @@
+name: Publish Python Package to PyPI
+
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+  
+jobs:
+  publish-to-pypi:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/hyperskill-python-portfolio
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.7.20"
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Build the package
+        run: uv build
+
+      - name: Publish to PyPI
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: uv publish
