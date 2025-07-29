@@ -1,0 +1,260 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
+[project]
+name = "crackerjack"
+version = "0.24.9"
+description = "Crackerjack: code quality toolkit"
+readme = "README.md"
+keywords = [
+    "bandit",
+    "black",
+    "creosote",
+    "mypy",
+    "pyright",
+    "pytest",
+    "refurb",
+    "ruff",
+]
+license.text = "BSD-3-CLAUSE"
+maintainers = [
+    { name = "lesleslie", email = "les@wedgwoodwebworks.com" },
+]
+
+authors = [
+    { name = "lesleslie", email = "les@wedgwoodwebworks.com" },
+]
+requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: POSIX",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+dependencies = [
+    "autotyping>=24.9",
+    "hatchling>=1.25",
+    "keyring>=25.6",
+    "pre-commit>=4.2",
+    "pydantic>=2.11.7",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1",
+    "pytest-benchmark>=5.1",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+    "pytest-timeout>=2.4",
+    "pytest-xdist>=3.8",
+    "pyyaml>=6.0.2",
+    "rich>=14",
+    "tomli-w>=1.2",
+    "typer>=0.16",
+    "uv>=0.7.20",
+]
+urls.documentation = "https://github.com/lesleslie/crackerjack"
+urls.homepage = "https://github.com/lesleslie/crackerjack"
+urls.repository = "https://github.com/lesleslie/crackerjack"
+
+[dependency-groups]
+dev = [
+    "pyyaml>=6.0.2",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+fix = true
+unsafe-fixes = true
+
+show-fixes = true
+output-format = "full"
+format.docstring-code-format = true
+lint.extend-select = [
+    "C901",
+    "D",
+    "F",    # pyflakes
+    "I",
+    "UP",   # pyupgrade (includes F-string conversion)
+]
+lint.ignore = [
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+    "E402",
+    "F821",
+    "UP040",
+]
+lint.fixable = [ "ALL" ]
+lint.unfixable = [  ]
+lint.isort.no-lines-before = [
+    "first-party",
+]
+lint.mccabe.max-complexity = 13
+lint.pydocstyle.convention = "google"
+
+[tool.codespell]
+skip = "*/data/*"
+quiet-level = 3
+ignore-words-list = "crate,uptodate,nd,nin"
+
+[tool.pyproject-fmt]
+column_width = 120
+indent = 4
+
+[tool.pytest.ini_options]
+# Core pytest configuration
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+python_files = [ "test_*.py", "*_test.py" ]
+testpaths = [ "tests", "crackerjack" ]
+python_classes = [ "Test*" ]
+python_functions = [ "test_*" ]
+
+# Markers
+markers = [
+    "unit: marks test as a unit test",
+    "benchmark: mark test as a benchmark (disables parallel execution)",
+    "integration: marks test as an integration test",
+]
+
+# Default timeout settings
+timeout = 300
+timeout_method = "thread"
+
+# Test command options
+addopts = "--cov=crackerjack --cov-report=term --cov-fail-under=42"
+
+# Filter out benchmark warnings when xdist is active
+filterwarnings = [
+    "ignore::pytest_benchmark.logger.PytestBenchmarkWarning",
+]
+
+[tool.pytest.benchmark]
+disable_gc = true
+warmup = false
+warmup_iterations = 0
+min_rounds = 1
+max_time = 5.0
+
+[tool.coverage.run]
+branch = false
+source = [ "crackerjack" ]
+data_file = ".coverage"
+parallel = false
+omit = [
+    "*/tests/*",
+    "*/site-packages/*",
+    "*/__pycache__/*",
+    "*/__init__.py",
+    "*/_version.py",
+    "*/conftest.py",
+    "*/test_*.py",
+    "*/_test.py",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+    "except ImportError",
+    "def __str__",
+    "@abstractmethod",
+]
+ignore_errors = false
+
+[tool.pyright]
+verboseOutput = true
+include = [
+    "crackerjack",
+]
+exclude = [
+    "scratch",
+]
+extraPaths = [
+    ".venv/lib/python3.13/site-packages/",
+]
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+reportOptionalMemberAccess = false
+reportOptionalCall = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportInvalidTypeForm = false
+reportUnknownLambdaType = false
+reportUnknownParameterType = "warning"
+reportPrivateUsage = false
+pythonVersion = "3.13"
+
+[tool.uv]
+keyring-provider = "subprocess"
+publish-url = "https://upload.pypi.org/legacy/"
+check-url = "https://pypi.org/simple/"
+
+[tool.vulture]
+min_confidence = 86
+paths = [ "crackerjack" ]
+ignore_names = [ "cls" ]
+
+[tool.creosote]
+paths = [
+    "crackerjack",
+]
+deps-file = "pyproject.toml"
+exclude-deps = [
+    "autotyping",
+    "hatchling",
+    "pre-commit",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-xdist",
+    "pytest-benchmark",
+    "pyfiglet",
+    "pyyaml",
+    "uv",
+    "tomli-w",
+    "google-crc32c",
+    "pytest-timeout",
+    "keyring",
+    "inflection",
+    "pydantic-settings",
+]
+
+[tool.refurb]
+enable_all = true
+quiet = true
+
+[tool.bandit]
+target = [
+    "crackerjack",
+]
+skips = [
+    "B101",
+    "B301",
+    "B311",
+    "B403",
+    "B404",
+    "B602",
+    "B603",
+    "B607",
+    "B704",
+]
