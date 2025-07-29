@@ -1,0 +1,13 @@
+#!python
+#
+# Copyright 2025 One Identity LLC.
+# ALL RIGHTS RESERVED.
+#
+from invoke import Collection, Program
+from safeguard.sessions.plugin import __version__ as plugin_sdk_version
+from safeguard.sessions.plugin_impl.tasks import tasks
+
+
+program = Program(namespace=Collection.from_module(tasks), version=plugin_sdk_version)
+
+program.run()
