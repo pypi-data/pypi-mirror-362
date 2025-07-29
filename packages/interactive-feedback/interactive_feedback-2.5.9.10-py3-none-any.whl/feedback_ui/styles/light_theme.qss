@@ -1,0 +1,474 @@
+/* feedback_ui/styles/light_theme.qss */
+
+/* 全局字体和基础窗口样式 (Global Font and Base Window Styles) */
+* {
+    font-family: 'Segoe UI', 'Microsoft YaHei UI', Arial, sans-serif;
+    outline: none; /* 移除焦点时的虚线框 (Remove dotted focus outline) */
+    font-size: 13pt;
+    font-weight: 400;
+}
+
+
+
+QMainWindow, QDialog {
+    background-color: #f0f0f0;
+}
+
+QWidget {
+    background-color: #f0f0f0;
+    color: #111111;
+}
+
+QGroupBox {
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    background-color: transparent;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 0 8px;
+    color: #777777;
+    font-weight: bold;
+}
+
+/* 提示文字区域标签 - 描述区域 (颜色和内边距) */
+SelectableLabel[class="prompt-label"] {
+    color: #111111;
+    padding: 2px;
+    /* font-size is now set dynamically */
+}
+
+/* Markdown元素样式 - 浅色主题 */
+SelectableLabel h1, SelectableLabel h2, SelectableLabel h3,
+SelectableLabel h4, SelectableLabel h5, SelectableLabel h6 {
+    color: inherit;
+    margin: 0.2em 0;
+    font-weight: bold;
+}
+
+SelectableLabel h1 {
+    font-size: 1.4em;
+}
+
+SelectableLabel h2 {
+    font-size: 1.2em;
+}
+
+SelectableLabel h3 {
+    font-size: 1.1em;
+}
+
+SelectableLabel strong, SelectableLabel b {
+    font-weight: bold;
+    color: inherit;
+}
+
+SelectableLabel em, SelectableLabel i {
+    font-style: italic;
+    color: inherit;
+}
+
+/* 代码元素样式 - 浅色主题 */
+/* 代码颜色: #4A90E2 (蓝色) */
+
+/* 内联代码样式 - 增强特异性以覆盖内联样式 */
+SelectableLabel .code-inline,
+SelectableLabel span[style*="Courier New"],
+SelectableLabel span[style*="font-family:'Courier New'"],
+SelectableLabel span[style*='font-family:"Courier New"'],
+SelectableLabel code {
+    color: #4A90E2 !important;
+    background-color: rgba(220, 220, 220, 0.4) !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+}
+
+/* 代码块样式 */
+SelectableLabel .code-block,
+SelectableLabel pre {
+    color: #4A90E2 !important;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    display: inline !important;
+}
+
+/* 代码块内的span元素 */
+SelectableLabel pre span {
+    color: #4A90E2 !important;
+}
+
+/* QTextEdit 代码样式支持 - 浅色主题优化版本 */
+QTextEdit code, QTextEdit pre, FeedbackTextEdit code, FeedbackTextEdit pre {
+    color: #4A90E2 !important;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+}
+
+QTextEdit code, FeedbackTextEdit code {
+    background-color: rgba(220, 220, 220, 0.4) !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+}
+
+QTextEdit pre, FeedbackTextEdit pre {
+    background-color: rgba(220, 220, 220, 0.2) !important;
+    padding: 8px !important;
+    border-radius: 4px !important;
+    border-left: 3px solid #4A90E2 !important;
+}
+
+SelectableLabel blockquote {
+    border-left: 3px solid #cccccc;
+    padding-left: 10px;
+    margin: 0.5em 0;
+    color: inherit;
+    font-style: italic;
+}
+
+/* 提示文字区域标签 - SelectableLabel 类 (只应用于描述区域) */
+QScrollArea SelectableLabel {
+    color: #111111; /* 深黑色，与输入框文字一致 */
+    font-size: 16pt; /* 比输入框的13pt更大一些 */
+}
+
+/* 选项区域的标签样式 (颜色) */
+SelectableLabel[class="option-label"] {
+    color: #666666; /* 更明显的灰色，适合亮色主题 */
+    /* font-size is now set dynamically */
+}
+
+/* ClickableLabel from clickable_label.py */
+ClickableLabel {
+    color: #111111;
+    selection-background-color: #d0e4f8;
+    selection-color: #111111;
+}
+AtIconLabel {
+    background-color: transparent;
+}
+
+QPushButton {
+    background-color: #e1e1e1; 
+    color: #111111; 
+    border: 1px solid #adadad;
+    border-radius: 6px; 
+    padding: 8px 16px; 
+    font-weight: bold;
+    min-width: 120px; 
+    min-height: 36px;
+}
+QPushButton:hover { background-color: #cccccc; }
+QPushButton:pressed { background-color: #bbbbbb; }
+QPushButton:disabled { background-color: #dcdcdc; color: #999999; }
+
+QPushButton#submit_button {
+    background-color: #ffffff; /* Match the text edit background */
+    color: #212121; /* Dark text for contrast */
+    border: 1px solid #c0c0c0; /* A subtle border to define the button */
+    padding: 12px 20px; 
+    font-weight: bold;
+    border-radius: 15px; 
+    min-height: 60px;
+}
+QPushButton#submit_button:hover { 
+    background-color: #fafafa; /* Very slight change on hover */
+    border-color: #b0b0b0;
+}
+QPushButton#submit_button:pressed { 
+    background-color: #f5f5f5; /* A bit darker when pressed */
+    border-color: #a0a0a0;
+}
+
+QPushButton#secondary_button, QPushButton#delete_canned_item_button {
+    background-color: #f9f9f9; 
+    color: #333333; 
+    border: 1px solid #cccccc;
+    padding: 5px 10px; 
+    min-height: 32px;
+    min-width: 100px; 
+    max-height: 32px;
+}
+QPushButton#secondary_button:hover, QPushButton#delete_canned_item_button:hover {
+    background-color: #eeeeee; border: 1px solid #bbbbbb;
+}
+QPushButton#secondary_button:pressed, QPushButton#delete_canned_item_button:pressed {
+    background-color: #dddddd;
+}
+QPushButton#delete_canned_item_button { 
+    background-color: #fce8e6; color: #a50e0e; border: 1px solid #f5c6cb;
+    min-width: 40px; 
+}
+QPushButton#delete_canned_item_button:hover { background-color: #f8d7da; border-color: #f1b0b7; }
+QPushButton#delete_canned_item_button:pressed { background-color: #f4c2c7; }
+
+QPushButton#pin_window_active {
+    background-color: #d0d0d0; /* A noticeable but harmonious grey */
+    color: #000000; /* Black text for strong contrast on grey */
+    border: 1px solid #a0a0a0; /* A darker grey border */
+    padding: 5px 10px;
+    min-height: 32px;
+    min-width: 100px;
+    max-height: 32px;
+}
+QPushButton#pin_window_active:hover { background-color: #c8c8c8; }
+QPushButton#pin_window_active:pressed { background-color: #b8b8b8; }
+
+/* V4.0 优化按钮样式现在通过主题感知的内联样式动态应用 */
+
+/* V4.0 新增：输入框内的优化图标按钮样式 - 浅色主题 */
+QPushButton#optimization_icon_button {
+    background-color: #1976d2;
+    color: white;
+    border: 1px solid #1565c0;
+    border-radius: 16px; /* 圆形按钮 */
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 32px;
+    max-width: 32px;
+    min-height: 32px;
+    max-height: 32px;
+}
+QPushButton#optimization_icon_button:hover {
+    background-color: #1565c0;
+    border: 1px solid #0d47a1;
+}
+QPushButton#optimization_icon_button:pressed {
+    background-color: #0d47a1;
+    border: 1px solid #01579b;
+}
+QPushButton#optimization_icon_button:disabled {
+    background-color: #e0e0e0;
+    color: #bdbdbd;
+    border: 1px solid #cccccc;
+}
+
+/* 优化按钮容器样式 */
+QWidget#optimization_container {
+    background-color: transparent;
+}
+
+QTextEdit, FeedbackTextEdit {
+    background-color: #ffffff; 
+    color: #111111;
+    border: 1px solid #cccccc; 
+    border-radius: 10px; 
+    padding: 12px;
+    selection-background-color: #d0e4f8; 
+    selection-color: #111111;
+    min-height: 250px;
+    /* font-size is now set dynamically */
+}
+
+/* 为输入框中的文字添加光圈效果 */
+QTextEdit::edit, FeedbackTextEdit::edit {
+    text-shadow: 0 0 2px rgba(0, 120, 215, 0.4);  /* 浅蓝色光晕效果 */
+    color: #000000;
+}
+
+QTextEdit:hover, FeedbackTextEdit:hover { border: 1px solid #bbbbbb; }
+QTextEdit:focus, FeedbackTextEdit:focus { 
+    border: 2px solid #c0c0c0; /* Use a soft, silver-grey for focus */
+    padding: 11px; 
+}
+
+/* 选项区域的标签样式 */
+QWidget QCheckBox, QCheckBox {
+    color: #666666; /* 灰色 */
+    spacing: 8px;
+    min-height: 28px;
+    padding: 1px;
+}
+QWidget QCheckBox::indicator, QCheckBox::indicator {
+    width: 22px; height: 22px; border: 1px solid #adadad;
+    border-radius: 4px; background-color: #fdfdfd;
+}
+QWidget QCheckBox::indicator:checked, QCheckBox::indicator:checked {
+    background-color: #6B6B6B !important;
+    border: 2px solid #777777 !important;
+    image: none; /* Crucial for SVG background-image to work */
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'><path fill='%23ffffff' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/></svg>");
+    background-position: center; background-repeat: no-repeat;
+}
+QWidget QCheckBox::indicator:hover:!checked, QCheckBox::indicator:hover:!checked {
+    border: 1px solid #777777; background-color: #fafafa;
+}
+QWidget QCheckBox::indicator:checked:hover, QCheckBox::indicator:checked:hover {
+    background-color: #777777 !important; border-color: #888888 !important;
+}
+
+/* QRadioButton 样式 - 浅色主题 */
+QRadioButton {
+    color: #666666; /* 与复选框文字颜色一致 */
+    spacing: 8px;
+    min-height: 28px;
+    padding: 1px;
+}
+QRadioButton::indicator {
+    width: 22px; height: 22px;
+    border: 1px solid #adadad;
+    border-radius: 11px; /* 圆形 */
+    background-color: #fdfdfd;
+}
+QRadioButton::indicator:checked {
+    background-color: #fdfdfd;
+    border: 2px solid #6B6B6B;
+    /* 使用径向渐变创建圆点效果 */
+    background-image: radial-gradient(circle, #6B6B6B 30%, transparent 32%);
+}
+QRadioButton::indicator:hover:!checked {
+    border: 1px solid #777777;
+    background-color: #fafafa;
+}
+QRadioButton::indicator:checked:hover {
+    border-color: #777777;
+    background-image: radial-gradient(circle, #777777 30%, transparent 32%);
+}
+
+
+
+QFrame[frameShape="4"] /* HLine */ {
+    color: #dcdcdc; max-height: 1px; margin: 10px 0;
+    background-color: #dcdcdc; border: none;
+}
+QScrollArea { background-color: transparent; border: none; }
+QScrollBar:vertical { background: transparent; width: 8px; margin: 0px; }
+QScrollBar::handle:vertical { background: rgba(0,0,0,0.15); min-height: 20px; border-radius: 4px; }
+QScrollBar::handle:vertical:hover { background: rgba(0,0,0,0.25); }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
+
+FeedbackTextEdit > QWidget {
+    background-color: #e9ecef;
+    border-top: 1px solid #dcdcdc;
+    border-radius: 0 0 10px 10px;
+    padding: 8px;
+}
+
+ImagePreviewWidget {
+    background-color: #e9ecef;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    margin: 2px;
+}
+ImagePreviewWidget:hover {
+    border: 1px solid #0078d4;
+}
+
+/* Dialog specific styles */
+ManageCannedResponsesDialog QListWidget, 
+SelectCannedResponseDialog QListWidget, 
+DraggableListWidget {
+    padding: 5px; 
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc; 
+    border-radius: 4px; 
+    color: #111111;
+}
+ManageCannedResponsesDialog QListWidget::item, 
+SelectCannedResponseDialog QListWidget::item, 
+DraggableListWidget::item {
+    border-bottom: 1px solid #eeeeee; padding: 6px; margin: 1px;
+}
+ManageCannedResponsesDialog QListWidget::item:hover, 
+SelectCannedResponseDialog QListWidget::item:hover, 
+DraggableListWidget::item:hover {
+    background-color: #f5f5f5;
+}
+ManageCannedResponsesDialog QListWidget::item:selected, 
+SelectCannedResponseDialog QListWidget::item:selected, 
+DraggableListWidget::item:selected {
+    background-color: #e8f0fe; border: none;
+}
+ManageCannedResponsesDialog QListWidget::item:focus, 
+SelectCannedResponseDialog QListWidget::item:focus, 
+DraggableListWidget::item:focus {
+    background-color: #e8f0fe; border: none;
+}
+
+ManageCannedResponsesDialog QLineEdit, 
+SelectCannedResponseDialog QLineEdit {
+    padding: 8px;
+    background-color: #ffffff; 
+    color: #111111; 
+    border: 1px solid #cccccc; 
+    border-radius: 4px;
+}
+
+/* Labels within dialogs */
+ManageCannedResponsesDialog QLabel, 
+SelectCannedResponseDialog QLabel {
+    color: #555555;
+}
+SelectCannedResponseDialog QLabel#DialogTitleLabel {
+    font-weight: bold; 
+    color: #111111;
+    font-size: 14pt;
+}
+SelectCannedResponseDialog QLabel#DialogHintLabel {
+    color: #777777;
+    font-size: 11pt;
+}
+
+/* CheckBox within SelectCannedResponseDialog */
+SelectCannedResponseDialog QCheckBox {
+    color: #111111; 
+    spacing: 8px;
+}
+SelectCannedResponseDialog QCheckBox::indicator {
+    width: 18px; height: 18px; border: 1px solid #adadad;
+    border-radius: 3px; background-color: #fdfdfd;
+}
+SelectCannedResponseDialog QCheckBox::indicator:checked {
+    background-color: #555555; border: 1px solid #666666;
+     background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'><path fill='%23ffffff' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/></svg>");
+    background-position: center; background-repeat: no-repeat;
+}
+ 
+/* QLabel within DraggableListWidget items (for text display) */
+DraggableListWidget QLabel {
+    color: #111111;
+}
+
+/* QSplitter 样式 (Splitter Styles) - 精致版本 */
+QSplitter {
+    background-color: transparent;
+}
+
+/* 精致的分割器样式，与按钮悬停颜色一致 */
+QSplitter[objectName="mainSplitter"]::handle,
+QSplitter::handle {
+    background-color: #cccccc;  /* 与按钮悬停颜色一致 */
+    border: none;
+    border-radius: 2px;
+    margin: 2px 4px;
+}
+
+QSplitter[objectName="mainSplitter"]::handle:horizontal,
+QSplitter::handle:horizontal {
+    width: 6px;
+    min-width: 6px;
+    max-width: 6px;
+}
+
+QSplitter[objectName="mainSplitter"]::handle:vertical,
+QSplitter::handle:vertical {
+    height: 6px;
+    min-height: 6px;
+    max-height: 6px;
+}
+
+QSplitter[objectName="mainSplitter"]::handle:hover,
+QSplitter::handle:hover {
+    background-color: #dddddd;  /* 悬停时稍亮 */
+}
+
+QSplitter[objectName="mainSplitter"]::handle:pressed,
+QSplitter::handle:pressed {
+    background-color: #bbbbbb;  /* 按下时稍暗 */
+}
