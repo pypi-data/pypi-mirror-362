@@ -1,0 +1,38 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="translate_package",
+    version="0.1.4",
+    author="Oumar Kane",
+    packages=find_packages(),
+    author_email="oumar.kane@univ-thies.sn",
+    description="Contain functions and classes to efficiently train a sequence to sequence to translate between two languages.",
+    install_requires=[
+        "accelerate",
+        "torch",
+        "spacy",
+        "nltk",
+        "gensim",
+        "furo",
+        "streamlit",
+        "tokenizers",
+        "tensorboard",
+        "evaluate",
+        "transformers",
+        "pandas",
+        "numpy",
+        "scikit-learn",
+        "matplotlib",
+        "plotly",
+        "sacrebleu",
+        "nlpaug",
+        "wandb",
+        "pytorch-lightning",
+        "selenium",
+        "sentencepiece",
+        "peft",
+        "rouge-score",
+        "sacrebleu",
+        "wolof-translate"
+    ],
+)
