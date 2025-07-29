@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="custom_info_value_tree" model="ir.ui.view">
+    <field name="name">custom_info.value tree</field>
+    <field name="model">custom_info.value</field>
+    <field name="arch" type="xml">
+        <tree create="false" delete="false">
+            <field name="sequence" invisible="1" />
+            <field name="res_id" invisible="1" />
+            <field name="model" invisible="1" />
+            <field name="detail_id" invisible="1" />
+            <field name="allowed_option_ids" invisible="1" widget="many2many_tags" />
+            <field name="property_id" />
+            <field name="value" />
+        </tree>
+    </field>
+</record>
+
+<record id="custom_info_value_form" model="ir.ui.view">
+    <field name="model">custom_info.value</field>
+    <field name="arch" type="xml">
+        <form>
+            <group name="custom_info_1">
+                <field name="sequence" invisible="1" />
+                <field name="res_id" invisible="1" />
+                <field name="model" invisible="1" />
+                <field name="detail_id" invisible="1" />
+                <field name="property_id" />
+                <field name="field_type" invisible="1" />
+                <field name="value" invisible="1" />
+                <field
+                        name="value_str"
+                        string="Value"
+                        attrs="{'invisible':[('field_type','!=','str')]}"
+                    />
+                <field
+                        name="value_int"
+                        string="Value"
+                        attrs="{'invisible':[('field_type','!=','int')]}"
+                    />
+                <field
+                        name="value_float"
+                        string="Value"
+                        attrs="{'invisible':[('field_type','!=','float')]}"
+                    />
+                <field
+                        name="value_bool"
+                        string="Value"
+                        attrs="{'invisible':[('field_type','!=','bool')]}"
+                    />
+                <field
+                        name="value_date"
+                        string="Value"
+                        attrs="{'invisible':[('field_type','!=','date')]}"
+                    />
+                <field
+                        name="value_datetime"
+                        string="Value"
+                        attrs="{'invisible':[('field_type','!=','datetime')]}"
+                    />
+                <field
+                        name="allowed_option_ids"
+                        invisible="1"
+                        widget="many2many_tags"
+                    />
+                <field
+                        name="value_id"
+                        string="Value"
+                        domain="[('id','in',allowed_option_ids)]"
+                        attrs="{'invisible':[('field_type','!=','id')]}"
+                    />
+                <field
+                        name="value_ids"
+                        string="Value"
+                        widget="many2many_tags"
+                        attrs="{'invisible':[('field_type','!=','ids')]}"
+                    />
+            </group>
+        </form>
+    </field>
+</record>
+</odoo>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="custom_info_property_tree" model="ir.ui.view">
+    <field name="model">custom_info.property</field>
+    <field name="arch" type="xml">
+        <tree>
+            <field name="code" />
+            <field name="name" />
+            <field name="field_type" />
+        </tree>
+    </field>
+</record>
+
+
+<record id="custom_info_property_form" model="ir.ui.view">
+    <field name="model">custom_info.property</field>
+    <field name="arch" type="xml">
+        <form>
+            <header />
+            <div name="div_smart_buttons" class="oe_button_box" />
+            <sheet>
+                <group name="grp_1">
+                    <field name="name" />
+                    <field name="code" />
+                    <field name="active" />
+                    <field name="field_type" />
+                    <field
+                            name="option_set_id"
+                            attrs="{'required':[('field_type','in',['id','ids'])], 'invisible':[('field_type','not in',['id','ids'])]}"
+                        />
+                    <field
+                            name="option_ids"
+                            widget="many2many_tags"
+                            attrs="{'invisible':[('field_type','not in',['id','ids'])]}"
+                        />
+                </group>
+                <notebook>
+                    <page name="note" string="Note">
+                        <field name="note" />
+                    </page>
+                </notebook>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record id="custom_info_property_search" model="ir.ui.view">
+    <field name="model">custom_info.property</field>
+    <field name="arch" type="xml">
+        <search>
+            <field name="name" />
+            <field name="code" />
+            <field name="field_type" />
+        </search>
+    </field>
+</record>
+
+<record id="custom_info_property_action" model="ir.actions.act_window">
+    <field name="name">Custom Information Properties</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">custom_info.property</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem
+        id="custom_info_property_menu"
+        name="Properties"
+        action="custom_info_property_action"
+        parent="menu_custom_information"
+        sequence="40"
+    />
+
+</odoo>

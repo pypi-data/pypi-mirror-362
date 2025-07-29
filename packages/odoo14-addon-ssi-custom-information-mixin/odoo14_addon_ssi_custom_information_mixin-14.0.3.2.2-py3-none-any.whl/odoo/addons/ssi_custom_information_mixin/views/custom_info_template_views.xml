@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+<record id="custom_info_template_tree" model="ir.ui.view">
+    <field name="model">custom_info.template</field>
+    <field name="arch" type="xml">
+        <tree>
+            <field name="name" />
+            <field name="model_id" />
+        </tree>
+    </field>
+</record>
+
+<record id="custom_info_template_form" model="ir.ui.view">
+    <field name="model">custom_info.template</field>
+    <field name="arch" type="xml">
+        <form>
+            <header />
+            <div name="div_smart_buttons" class="oe_button_box" />
+            <sheet>
+              <group name="group_1" colspan="4" col="2">
+                  <group name="group_1_1" colspan="1" col="2">
+                      <field name="company_id" groups="base.group_multi_company" />
+                      <field name="name" />
+                      <field name="model_id" />
+                      <field name="model" />
+                  </group>
+                  <group name="group_1_2">
+                      <field name="sequence" />
+                      <field name="active" />
+                  </group>
+              </group>
+              <notebook>
+                  <page name="detail" string="Details">
+                      <field name="detail_ids">
+                          <tree editable="top">
+                              <field name="sequence" widget="handle" />
+                              <field name="property_id" />
+                              <field name="category_id" />
+                          </tree>
+                      </field>
+                  </page>
+                  <page name="computation" string="Computation">
+                      <group name="computation_1" colspan="4" col="2">
+                          <field name="computation_method" colspan="4" />
+                          <field
+                                    name="domain"
+                                    colspan="4"
+                                    attrs="{'invisible': [('computation_method', '=', 'use_python')]}"
+                                    widget="domain"
+                                    options="{'model': 'model', 'in_dialog': True}"
+                                />
+                          <field
+                                    name="python_code"
+                                    colspan="4"
+                                    widget="ace"
+                                    attrs="{'invisible': [('computation_method', '=', 'use_domain')]}"
+                                />
+                      </group>
+                  </page>
+                  <page name="note" string="Note">
+                      <group name="group_note_1" colspan="4" col="2">
+                          <field name="note" colspan="4" nolabel="1" />
+                      </group>
+                  </page>
+                </notebook>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record id="custom_info_template_search" model="ir.ui.view">
+    <field name="model">custom_info.template</field>
+    <field name="arch" type="xml">
+        <search>
+          <field name="name" />
+          <field name="model_id" />
+          <group name="group1">
+              <filter
+                        name="dom_python"
+                        string="Python Based Computation"
+                        domain="[('computation_method','=','use_python')]"
+                    />
+              <filter
+                        name="dom_domain"
+                        string="Domain Based Computation"
+                        domain="[('computation_method','=','use_domain')]"
+                    />
+          </group>
+          <group name="group2">
+              <filter
+                        name="grp_model"
+                        string="Model"
+                        context="{'group_by':'model_id'}"
+                    />
+          </group>
+        </search>
+    </field>
+</record>
+
+<record id="custom_info_template_action" model="ir.actions.act_window">
+    <field name="name">Custom Information Templates</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">custom_info.template</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem
+        id="custom_info_template_menu"
+        name="Templates"
+        action="custom_info_template_action"
+        parent="menu_custom_information"
+        sequence="90"
+    />
+</odoo>

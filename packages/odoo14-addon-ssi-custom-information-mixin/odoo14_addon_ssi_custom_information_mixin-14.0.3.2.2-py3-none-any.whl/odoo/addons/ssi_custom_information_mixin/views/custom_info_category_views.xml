@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="custom_info_category_tree" model="ir.ui.view">
+    <field name="model">custom_info.category</field>
+    <field name="arch" type="xml">
+        <tree>
+            <field name="sequence" widget="handle" />
+            <field name="code" />
+            <field name="name" />
+        </tree>
+    </field>
+</record>
+
+<record id="custom_info_category_form" model="ir.ui.view">
+    <field name="model">custom_info.category</field>
+    <field name="arch" type="xml">
+        <form>
+            <header />
+            <div name="div_smart_buttons" class="oe_button_box" />
+            <sheet>
+                <group name="group1">
+                    <field name="name" />
+                    <field name="code" />
+                    <field name="active" />
+                    <field name="sequence" />
+                </group>
+                <notebook>
+                    <page name="note" string="Note">
+                        <field name="note" />
+                    </page>
+                </notebook>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record id="custom_info_category_search" model="ir.ui.view">
+    <field name="model">custom_info.category</field>
+    <field name="arch" type="xml">
+        <search>
+            <field name="name" />
+            <field name="code" />
+        </search>
+    </field>
+</record>
+
+<record id="custom_info_category_action" model="ir.actions.act_window">
+    <field name="name">Custom Information Categories</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">custom_info.category</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem
+        id="custom_info_category_menu"
+        name="Categories"
+        action="custom_info_category_action"
+        parent="menu_custom_information"
+        sequence="10"
+    />
+
+</odoo>
