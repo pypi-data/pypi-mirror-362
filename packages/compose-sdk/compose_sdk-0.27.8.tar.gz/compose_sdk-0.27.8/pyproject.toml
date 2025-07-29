@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "compose-sdk"
+version = "0.27.8"
+description = "The open-source SDK for building custom internal tools."
+authors = ["Atul Jalan <atul@composehq.com>"]
+maintainers = ["Atul Jalan <atul@composehq.com>"]
+readme = "README.md"
+package-mode = true
+keywords = ["internal tool", "internal app", "ui builder", "tool", "app", "ui"]
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/compose-dev/compose"
+homepage = "https://github.com/compose-dev/compose/tree/main/packages/sdk/python"
+
+[[tool.poetry.packages]]
+include = "compose_sdk/"
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+websockets = "^15.0"
+pandas = "^2.0"
+typing-extensions = "^4.12.2"
+orjson = "^3.10.15"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+pytest-asyncio = "^0.24.0"
+pytest-benchmark = "^5.1.0"
+mypy = "^1.14.0"
+black = "^25.1.0"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "class"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
