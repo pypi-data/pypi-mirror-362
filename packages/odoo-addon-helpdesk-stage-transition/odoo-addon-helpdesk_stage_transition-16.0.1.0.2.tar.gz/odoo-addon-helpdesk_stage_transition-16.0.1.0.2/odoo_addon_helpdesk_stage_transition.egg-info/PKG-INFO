@@ -1,0 +1,120 @@
+Metadata-Version: 2.1
+Name: odoo-addon-helpdesk-stage-transition
+Version: 16.0.1.0.2
+Summary: Allows to define transitions between helpdesk ticket stages and adds buttons to the helpdesk ticket form to trigger them. This module also disables drag and drop in the kanban view.
+Home-page: https://somit.coop
+Author: Som IT Cooperatiu SCCL
+License: AGPL-3
+Classifier: Programming Language :: Python
+Classifier: Framework :: Odoo
+Classifier: Framework :: Odoo :: 16.0
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Requires-Python: >=3.10
+
+..
+   Copyright <YEAR> <COPYRIGHT HOLDER>
+
+..
+   License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+
+###########################
+ Helpdesk Stage Transition
+###########################
+
+This module enhances the Odoo Helpdesk application by allowing
+administrators to define specific, allowed transitions between ticket
+stages. It also provides visual cues and interaction changes to enforce
+these transitions.
+
+**Table of contents**
+
+.. contents:: `Contents`
+   :local:
+
+**********
+ Overview
+**********
+
+The standard Odoo Helpdesk module allows users to move tickets between
+any stages freely, including dragging and dropping in the Kanban view.
+This module introduces a more controlled workflow by:
+
+#. **Defining Allowed Transitions**: On each Helpdesk Ticket Stage, you
+   can specify which other stages are valid "next stages".
+
+#. **Dynamic Transition Buttons**: In the Helpdesk Ticket form view,
+   instead of a selectable `Stage` field, buttons are dynamically
+   generated in the header for each valid next stage based on the
+   current stage's configuration. These buttons will always have a
+   'primary' style.
+
+#. **Restricting Stage Field**: The standard `Stage` field in the ticket
+   form is made invisible and readonly, forcing users to use the
+   transition buttons.
+
+#. **Disabling Kanban Drag-and-Drop**: To maintain workflow integrity,
+   dragging and dropping tickets between stages in the Kanban view is
+   disabled.
+
+#. **Visual Configuration for Stages**: In the list/tree view of
+   Helpdesk Ticket Stages, new fields `Next Stages` are available for
+   quick overview and configuration.
+
+***************
+ Configuration
+***************
+
+To configure stage transitions:
+
+#. Navigate to `Helpdesk > Configuration > Stages`.
+
+#. Select a stage to configure or create a new one.
+
+#. In the form view, under the **Stage Transitions** section, you will
+   find: * `Next stages`: A many2many field where you can select one or
+   more stages that a ticket can transition to from the current stage.
+   If no stages are selected here, any transition is implicitly allowed
+   from this stage (standard Odoo behavior for this stage).
+
+*******
+ Usage
+*******
+
+-  **Ticket Form View**: * When a helpdesk ticket is in a particular
+   stage, the header will display buttons corresponding to the `Next
+   stages` configured for that current stage. * Clicking one of these
+   buttons will move the ticket to the respective new stage. * The
+   standard `Stage` field (dropdown or status bar) will not be directly
+   editable through the usual means.
+
+-  **Ticket Kanban View**: * Tickets cannot be dragged and dropped
+   between columns (stages).
+
+-  **Stage List/Tree View**: * Administrators can see the configured
+   `Next Stages` directly in the list of stages.
+
+*************
+ Bug Tracker
+*************
+
+Do not contact contributors directly about support or help with
+technical issues.
+
+*********
+ Credits
+*********
+
+Authors
+=======
+
+-  Som IT Cooperatiu SCCL
+
+Contributors
+============
+
+-  nicolasramos
+
+Maintainers
+===========
+
+This module is maintained by Som IT Cooperatiu SCCL.
