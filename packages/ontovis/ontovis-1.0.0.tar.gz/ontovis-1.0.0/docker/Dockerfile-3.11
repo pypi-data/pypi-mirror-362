@@ -1,0 +1,28 @@
+FROM python:3.11-slim-bookworm
+
+COPY docker/install.sh /install.sh
+RUN /install.sh
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+ENV UV_LINK_MODE=copy
+
+# Sync the project into a new environment, asserting the lockfile is up to date
+WORKDIR /app
+
+# Install dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project
+
+# Copy the project into the image
+ADD . /app
+
+# Sync the project
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked
+
+COPY docker/entrypoint.sh /app/entrypoint.sh
+
+ENTRYPOINT ["tini", "-g", "--", "/app/entrypoint.sh"]
