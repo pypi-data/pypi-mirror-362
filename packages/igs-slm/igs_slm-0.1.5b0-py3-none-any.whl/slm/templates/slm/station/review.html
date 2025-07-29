@@ -1,0 +1,463 @@
+<!--
+
+Template for View/Diff page.
+
+-->
+
+{% extends "slm/station/base.html" %}
+{% load slm i18n static %}
+
+{% block head %}
+    {{ block.super }}
+
+    {% comment %}there is a bug in diff-match-patch where nodejs snippet at the end throws an error - this code allows that to proceed silently{% endcomment %}
+    <script>
+        var module = {exports: {}}
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff-match-patch/1.0.5/index.min.js" integrity="sha512-s/r2YIRA8VD7KT0c9uJqKrZFrNFgKlOPeLyVXp7noa6+F8vw5LMvR+hxteawjCpp6+5A4nTYoWtwLcXEJW1YzA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+{% endblock head %}
+
+{% block action_content %}
+<div class="container">
+  <!-- Title -->
+  <div class="d-flex justify-content-between mt-4 pb-3 mx-5 border-bottom">
+      <h2>Review and Submit</h2>
+      <div id="review-actions">
+        <button id="slm-reject-changes" name="reject" class="btn btn-danger" {% if not can_publish or not site.review_requested %}style="display: none"{% endif %} tabindex="0" data-bs-toggle="modal" data-bs-target="#slm-reject-modal" data-backdrop="false">{% trans 'Reject Changes' %}</button>
+        <button name="revert" onclick="revert();" class="btn btn-danger" title="{% trans 'Revert all unpublished changes to their published state.' %}" {% if not needs_publish or not site.last_publish %}style="display: none"{% endif %}>{% trans 'Revert' %}</button>
+        <button name="publish" onclick="publish();" class="btn btn-primary" {% if not can_publish or not needs_publish %}style="display: none"{% endif %}>{% trans 'Publish' %}</button>
+        <button name="submit" onclick="submit();" class="btn btn-primary" {% if can_publish or not needs_publish or not is_publishable %}style="display: none"{% endif %} {% if site.review_requested %}disabled{% endif %}>{% if site.review_requested %}{% trans 'Pending Review' %}{% else %}{% if SLM_ORG_NAME %}{% trans 'Submit to' %} {{SLM_ORG_NAME}}{% else %}{% trans 'Submit for Review' %}{% endif %}{% endif %}</button>
+      </div>
+  </div>
+
+  <!-- View/Diff Comparison -->
+  <div id="slm-review-diff-container">
+    <div class="d-flex justify-content-between mb-2">
+        <div
+            id="slm-review-backward"
+            class="d-flex justify-content-between"
+        >
+            <button class="btn btn-primary mx-1" name="back" aria-label="Skip Backward"><i class="bi bi-skip-backward"></i></button>
+            <div class="d-flex justify-content-center form-group">
+                <label for="slm-review-backward-input" style="display: none">Backward</label>
+                <input class="form-control" type="datetime-local" id="slm-review-backward-input" name="back">
+            </div>
+            <button class="btn btn-primary mx-1" name="forward" aria-label="Skip Forward"><i class="bi bi-skip-forward"></i></button>
+        </div>
+        <div class="form-group d-flex justify-space-between align-items-center">
+            <label for="slm-review-format-input" style="display: none">Site Log Format:</label>
+            <select id="slm-review-format-input" class="form-control">
+                {% for format in log_formats %}
+                <option value="{{ format.value }}" {% if format == default_format %}selected{% endif %}>{{ format.label }}</option>
+                {% endfor %}
+            </select>
+            <div class="form-check form-switch ms-3">
+                <label for="slm-review-diff-toggle" class="form-check-label" style="display: none">Toggle Diff Only:</label>
+                <input class="form-check-input" type="checkbox" id="slm-review-diff-toggle" title="{% trans 'Toggle Difference Only' %}">
+            </div>
+        </div>
+        <div
+            id="slm-review-forward"
+            class="d-flex justify-content-between form-group"
+        >
+            <button class="btn btn-primary mx-1" name="back"><i class="bi bi-skip-backward"></i></button>
+            <div class="d-flex justify-content-center">
+                <label for="slm-review-forward-input" style="display: none">Forward</label>
+                <input class="form-control" type="datetime-local" id="slm-review-forward-input" name="forward" min="{{ back_current|strip_ms }}">
+            </div>
+            <button class="btn btn-primary mx-1" name="forward"><i class="bi bi-skip-forward"></i></button>
+        </div>
+    </div>
+    <pre id="slm-review-diff"></pre>
+  </div>
+</div>
+
+<div class="modal fade" id="slm-reject-modal" tabindex="-1" aria-labelledby="filter-label" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label for="id_text" class="modal-title fs-5" id="filter-label">{% trans "Why are you rejecting these updates?" %}</label>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center">
+                <form id="slm-reject-text-input">
+                    {{ richtextform.media }}
+                    {{ richtextform.text }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger me-auto" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+                <button id="slm-reject-updates" type="button" class="btn btn-primary" data-bs-dismiss="modal">{% trans "Reject" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ review_stack|json_script:"slm-review-stack" }}
+
+<script>
+    const reviewActions = $('#review-actions');
+    const submitBtn = reviewActions.find('button[name="submit"]');
+    const publishBtn = reviewActions.find('button[name="publish"]');
+    const rejectBtn = reviewActions.find('button[name="reject"]');
+    const revertBtn = reviewActions.find('button[name="revert"]');
+    const rejectSubmit = $('#slm-reject-updates');
+
+    const reviewStack = JSON.parse(
+        document.getElementById('slm-review-stack').textContent
+    );
+    for (const [fmt, editStack] of Object.entries(reviewStack)) {
+        let idx = 0;
+        for (const edit of editStack) {
+            if (edit[0] !== null) {
+                reviewStack[fmt][idx] = [new Date(Date.parse(edit[0])), edit[1]];
+            }
+            idx++;
+        }
+    }
+
+    let navBtn = $('button#select-{{ station }}');
+
+    const rejectModal = new bootstrap.Modal(
+        document.getElementById('slm-reject-modal'), {
+             // fix a focus bug with some of the ckeditor widgets when inside
+            // a bootstrap modal - suggested solutions for bootstrap 3 no
+            // longer works in bootstrap 5
+            focus: false,
+        	show: false
+        }
+    );
+
+    const updateButtonState = function(site) {
+        rejectBtn.hide();
+        submitBtn.hide();
+        publishBtn.hide();
+        revertBtn.hide();
+        let status = slm.SiteLogStatus.get(site.status);
+        if (status === slm.SiteLogStatus.UPDATED) {
+            revertBtn.show();
+        }
+        if (site.can_publish) {
+            if (site.review_requested) {
+                rejectBtn.show();
+                publishBtn.show();
+            } else if (
+                status === slm.SiteLogStatus.UPDATED ||
+                status === slm.SiteLogStatus.PROPOSED ||
+                status === slm.SiteLogStatus.EMPTY
+            ) {
+                publishBtn.show();
+            }
+        } else {
+            if (site.review_requested) {
+                submitBtn.html("{% trans 'Pending Review' %}");
+                submitBtn.prop('disabled', true);
+                submitBtn.show();
+            } else if (site.status !== 3) {
+                submitBtn.html(
+                    "{% if SLM_ORG_NAME %}{% trans 'Submit to' %} {{SLM_ORG_NAME}}" +
+                    "{% else %}{% trans 'Submit for Review' %}{% endif %}"
+                );
+                submitBtn.prop('disabled', false);
+                submitBtn.show();
+            }
+        }
+    }
+
+    const updateStatus = function(site) {
+        navBtn.removeClass(
+            slm.SiteLogStatus.get(navBtn.data('slmStatus')).css
+        );
+        navBtn.data('slmStatus', site.status);
+        navBtn.addClass(slm.SiteLogStatus.get(site.status).css);
+        slm.updateAlertBell(site);
+    }
+
+    const submit = function() {
+        const body = $('body');
+        body.css('cursor', 'progress');
+        slm.requestReview({{ site.id }}).done(
+            function(data, status, jqXHR) {
+                body.css('cursor', 'default');
+                updateButtonState(data);
+                updateStatus(data);
+            }
+        ).fail(
+            function(jqXHR, textStatus, errorThrown) {
+                body.css('cursor', 'default');
+                body.html(jqXHR.responseText);
+                console.log(jqXHR);
+            }
+        );
+    }
+
+    const publish = function() {
+        let finish = slm.processing(publishBtn);
+        slm.publish({{site.id}}).done(
+            function(data, status, jqXHR) {
+                updateButtonState(data);
+                updateStatus(data);
+                finish();
+            }
+        ).fail(
+            function(jqXHR, textStatus, errorThrown) {
+                //alert(`{% trans 'Failed to submit' %}: ${jqXHR.responseText}`);
+                finish();
+                $('body').html(jqXHR.responseText);
+                console.log(jqXHR);
+            }
+        );
+    }
+
+    const revert = function() {
+        let finish = slm.processing(revertBtn);
+        slm.revert({{site.id}}).done(
+            function(data, status, jqXHR) {
+                updateButtonState(data);
+                updateStatus(data);
+                finish();
+            }
+        ).fail(
+            function(jqXHR, textStatus, errorThrown) {
+                //alert(`{% trans 'Failed to submit' %}: ${jqXHR.responseText}`);
+                finish();
+                $('body').html(jqXHR.responseText);
+                console.log(jqXHR);
+            }
+        );
+    }
+
+    rejectSubmit.on('click', function() {
+        slm.rejectReview(
+            {{ site.id }},
+            CKEDITOR.instances['id_text'].getData()
+        ).done(
+            function(data, status, jqXHR) {
+                updateStatus(data);
+                rejectBtn.hide();
+            }
+        ).fail(
+            function(jqXHR, textStatus, errorThrown) {
+                //alert(`{% trans 'Reject failed:' %}: ${jqXHR.responseText}`);
+                $('body').html(jqXHR.responseText);
+                console.log(jqXHR);
+            }
+        );
+    });
+
+
+    const diffContainer = $("#slm-review-diff");
+    const formatInput = $('#slm-review-format-input');
+    const backwardInput = $('#slm-review-backward-input');
+    const forwardInput = $('#slm-review-forward-input');
+    const diffToggle = $('#slm-review-diff-toggle');
+
+    const backwardBack = $('#slm-review-backward button[name="back"]');
+    const backwardForward = $('#slm-review-backward button[name="forward"]');
+
+    const forwardBack = $('#slm-review-forward button[name="back"]');
+    const forwardForward = $('#slm-review-forward button[name="forward"]');
+
+    const content = {};
+    for (const [fmt, _] of Object.entries(reviewStack)) {
+        content[fmt] = {
+            forward: '',
+            backward: ''
+        }
+    }
+
+    const getIndex = function(date_str) {
+        const datetime = new Date(Date.parse(date_str))
+        const stack = reviewStack[slm.SiteLogFormat.get(parseInt(formatInput.val())).value];
+        let idx = 0;
+        for (const edit of stack) {
+            if (edit[0] !== null && datetime > edit[0]) {
+                return idx;
+            }
+            idx++;
+        }
+        return idx;
+    }
+
+    const disable = function(element, disabled) {
+        if (disabled) {
+            element.attr('disabled', true);
+        } else {
+            element.removeAttr('disabled');
+        }
+    }
+
+    const showLines = function() {
+        if (diffToggle.is(':checked')) {
+            $('span.slm-diff-equal').hide();
+        } else {
+            $('span.slm-diff-equal').show();
+        }
+    }
+
+    const initDiff = function() {
+        const format = slm.SiteLogFormat.get(parseInt(formatInput.val()));
+        let fwd = content[format.value].forward;
+        let bck = content[format.value].backward;
+        if (format === slm.SiteLogFormat.GEODESY_ML) {
+            if (fwd) {
+                fwd = new XMLSerializer().serializeToString(fwd.documentElement);
+            }
+            if (bck) {
+                bck = new XMLSerializer().serializeToString(bck.documentElement);
+            }
+        }
+        slm.showDiff(fwd, bck, diffContainer, 'line');
+        showLines();
+    }
+
+    const setDiff = function(back, forward) {
+        $('body').css('cursor', 'progress');
+        const format = slm.SiteLogFormat.get(parseInt(formatInput.val()));
+        const formatSwitch = slm.SiteLogFormat.get(
+            formatInput.data('slmReviewFormat')
+        ) !== format;
+        formatInput.data('slmReviewFormat', format.value);
+        const finish = function() {
+            initDiff();
+            $('body').css('cursor', 'default');
+        }
+        let stack = reviewStack[format.value];
+        if (stack.length === 0) {
+            $('body').css('cursor', 'default');
+            return;  // nothing to diff
+        }
+        let backFetched = !formatSwitch && backwardInput.data('slmReviewIndex') === back;
+        let forwardFetched = !formatSwitch && forwardInput.data('slmReviewIndex') === forward;
+        if (backFetched && forwardFetched) {
+            $('body').css('cursor', 'default');
+            return finish();
+        }
+        if (!backFetched) {
+            backwardInput.data('slmReviewIndex', back);
+            backwardBack.data('slmNext', back + 1);
+            backwardForward.data('slmNext', back - 1);
+
+            if (stack.length > back) {
+                slm.setDateTimeWidget(backwardInput, stack[back][0]);
+                $.ajax({
+                    url: slm.urls.reverse(
+                        'slm_public_api:archive-detail',
+                        {kwargs: {pk: stack[back][1]}}
+                    )
+                }).done(function (data, status, jqXHR) {
+                    backFetched = true;
+                    content[format.value].backward = data;
+                    if (forwardFetched) {
+                        finish();
+                    }
+                });
+            } else {
+                backwardInput.val(null);
+                backFetched = true;
+                content[format.value].backward = '';
+                if (forwardFetched) {
+                    finish();
+                }
+            }
+        }
+
+        if (!forwardFetched) {
+            slm.setDateTimeWidget(forwardInput, stack[forward][0]);
+            forwardInput.data('slmReviewIndex', forward);
+            forwardBack.data('slmNext', forward + 1);
+            forwardForward.data('slmNext', forward - 1);
+            let request;
+            if (stack[forward][0] !== null) {
+                request = $.ajax({
+                    url: slm.urls.reverse(
+                        'slm_public_api:archive-detail',
+                        {kwargs: {pk: stack[forward][1]}}
+                    )
+                });
+            } else {
+                request = $.ajax({
+                    url: slm.urls.reverse(
+                        'slm_edit_api:download-detail',
+                        {
+                            kwargs: {
+                                site: '{{station}}',
+                                format: format.ext
+                            },
+                            query: {'unpublished': true}
+                        }
+                    )
+                });
+            }
+            request.done(function (data, status, jqXHR) {
+                content[format.value].forward = data;
+                forwardFetched = true;
+                if (backFetched) {finish();}
+            });
+        }
+
+        for (const [fmt, fmtStack] of Object.entries(reviewStack)) {
+            if (fmtStack.length < back) {
+                $(`#slm-review-format-input > option[value=${fmt}]`).attr('disabled', true);
+            } else {
+                $(`#slm-review-format-input > option[value=${fmt}]`).removeAttr('disabled');
+            }
+        }
+        disable(backwardBack, back >= stack.length);
+        disable(forwardBack, (back - 1) < (forward + 1));
+        disable(backwardForward, (forward + 1) > (back - 1));
+        disable(forwardForward, forward === 0);
+        if (stack.length > (forward+1) && stack[forward+1][0] !== null) {
+            slm.setDateTimeWidget(backwardInput, stack[forward+1][0], 'max');
+        } else {
+            backwardInput.attr('max', backwardInput.val());
+        }
+        if (stack.length > (back-1) && stack[back-1][0] !== null) {
+            slm.setDateTimeWidget(forwardInput, stack[back-1][0], 'min');
+        } else {
+            forwardInput.attr('min', forwardInput.val());
+        }
+    }
+
+    const backClick = function() {
+        setDiff(
+            $(this).data('slmNext'),
+            forwardInput.data('slmReviewIndex')
+        );
+    }
+    const forwardClick = function() {
+        setDiff(
+            backwardInput.data('slmReviewIndex'),
+            $(this).data('slmNext'),
+        );
+    }
+
+    formatInput.change(function() {
+        setDiff(
+            backwardInput.data('slmReviewIndex'),
+            forwardInput.data('slmReviewIndex')
+        );
+    });
+
+    diffToggle.change(showLines);
+    backwardInput.change(function() {
+        setDiff(
+            getIndex(backwardInput.val()),
+            forwardInput.data('slmReviewIndex')
+        );
+    });
+    forwardInput.change(function() {
+        setDiff(
+            backwardInput.data('slmReviewIndex'),
+            getIndex(forwardInput.val())
+        );
+    });
+    backwardBack.click(backClick);
+    backwardForward.click(backClick);
+    forwardBack.click(forwardClick);
+    forwardForward.click(forwardClick);
+
+    setDiff(1, 0);
+</script>
+{% endblock %}

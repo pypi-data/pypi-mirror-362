@@ -1,0 +1,57 @@
+{% extends "slm/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block page_content %}
+    <div class="container mb-5">
+        <!-- Title -->
+        <div class="mt-5 mb-4 pb-3 border-bottom">
+            <h1>{% translate "User Profile" %}</h1>
+        </div>
+
+        {% include "slm/messages.html" %}
+
+        <div class="form-group px-5 m-5">
+
+            {% crispy user_form %}
+            <br/>
+            <br/>
+            {% crispy profile_form %}
+
+            <!-- Cancel/Save Buttons -->
+            <br/>
+            <div id="update" class="d-grid gap-2 d-flex justify-content-between">
+              <button id="profile-update-btn" type='submit' onclick="updateProfile()" name='update' class="btn btn-success">
+                {% translate "Update" %}
+              </button>
+            </div>
+
+            <script>
+                const userForm = $('form#slm-user-form');
+                const profileForm = $('form#slm-user-profile-form');
+                const updateBtn = $('#profile-update-btn');
+                const updateProfile = function() {
+                    let data = slm.formToObject(userForm);
+                    data.profile = slm.formToObject(profileForm);
+                    $.ajax({
+                        url: "{% url 'slm_edit_api:profile-detail' pk=request.user.pk %}",
+                        method: 'PATCH',
+                        data: JSON.stringify(data),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json"
+                    }).done(
+                        function(data, status, jqXHR) {
+                            window.location = "{% url 'slm:profile' %}";
+                        }
+                    ).fail(
+                        function(jqXHR, textStatus, errorThrown) {
+                            //alert(`{% trans 'Delete failed:' %}: ${jqXHR.responseText}`);
+                            $('body').html(jqXHR.responseText);
+                            console.log(jqXHR);
+                        }
+                    );
+                }
+            </script>
+        </div>
+    </div>
+
+{% endblock %}
