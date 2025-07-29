@@ -1,0 +1,100 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="bda.plone.ldap">
+
+  <include package="Products.CMFCore" />
+
+
+  <genericsetup:registerProfile
+    name="install-base"
+    title="LDAP Plugin for PAS - Base Plone Integration"
+    directory="profiles/base"
+    description="Extension profile for pas.plugins.ldap Base Plone Integration (Do not install this direct)."
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <genericsetup:registerProfile
+    name="default"
+    title="LDAP/ Active Directory Support"
+    directory="profiles/plone5"
+    description="pas.plugins.ldap support for users and groups from ldap/active directory."
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <genericsetup:registerProfile
+    name="uninstall"
+    title="Uninstall LDAP Plugin for PAS"
+    directory="profiles/uninstall"
+    description="Uninstalls the pas.plugins.ldap add-on."
+    provides="Products.GenericSetup.interfaces.EXTENSION"
+    post_handler=".setuphandlers.uninstall" />
+
+  <genericsetup:upgradeStep
+    source="1"
+    destination="2"
+    title="Unregister broken old persistent import step"
+    profile="pas.plugins.ldap.plonecontrolpanel:default"
+    handler=".upgrades.remove_persistent_import_step_from_base_profile" />
+
+  <utility
+    factory=".HiddenProfiles"
+    provides="Products.CMFPlone.interfaces.INonInstallable"
+    name="pas-plugins-ldap" />
+
+  <browser:page
+    name="plone_ldapcontrolpanel"
+    for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+    class=".controlpanel.LDAPControlPanel"
+    template="controlpanel.pt"
+    permission="cmf.ManagePortal" />
+
+  <browser:page
+    name="plone_ldapinspector"
+    for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+    class=".inspector.LDAPInspector"
+    template="inspector.pt"
+    permission="cmf.ManagePortal" />
+
+  <browser:page
+    name="plone_ldapusers"
+    for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+    class=".inspector.LDAPInspector"
+    attribute="users_children"
+    permission="cmf.ManagePortal" />
+
+  <browser:page
+    name="plone_ldapgroups"
+    for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+    class=".inspector.LDAPInspector"
+    attribute="groups_children"
+    permission="cmf.ManagePortal" />
+
+  <browser:page
+    name="plone_ldapnodeattributes"
+    for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+    class=".inspector.LDAPInspector"
+    attribute="node_attributes"
+    permission="cmf.ManagePortal" />
+
+  <adapter
+    factory=".exportimport.LDAPPluginXMLAdapter"
+    for="..interfaces.ILDAPPlugin
+         Products.GenericSetup.interfaces.ISetupEnviron" />
+
+  <genericsetup:importStep
+    name="pas.plugins.ldap.settings"
+    title="LDAP Settings"
+    description="Imports LDAP Settings"
+    handler=".exportimport.import_settings">
+      <depends name="componentregistry" />
+      <depends name="plonepas" />
+  </genericsetup:importStep>
+
+  <genericsetup:exportStep
+    name="pas.plugins.ldap"
+    title="LDAP Settings"
+    description="Exports LDAP Settings"
+    handler=".exportimport.export_settings" />
+
+</configure>

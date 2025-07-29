@@ -1,0 +1,47 @@
+<div tal:replace="structure here/manage_page_header">Header</div>
+<div tal:define="manage_tabs_message options/manage_tabs_message | nothing"
+    tal:replace="structure here/manage_tabs">Tabs</div>
+
+<script type="text/javascript" src="++plone++static/components/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="yafowil.plone.js"></script>
+<link type="text/css" rel="stylesheet" href="yafowil.plone.css" ></link>
+
+<style>
+    .field,
+    .ldap-manage-form {
+        margin-bottom: 25px;
+    }
+    #form-ldapsettings .field input {
+        width: 35em;
+    }
+    #form-ldapsettings .field input.checkbox {
+        width: auto;
+    }
+    #form-ldapsettings .field .dictwidget input {
+        width: 16em;
+    }
+</style>
+
+<main class="container-fluid">
+
+    <h2>Connection Test</h2>
+    <p tal:define="state view/connection_test;
+                           state_ok python:state[0];
+                           state_msg python:state[1]">
+        <strong tal:content="python: state_ok and 'OK' or 'ERROR'"
+                tal:attributes="style python: state_ok and 'color:green' or 'color:red'"
+                >state</strong>: <span tal:content="state_msg">msg</span>
+
+    </p>
+
+    <h2>Manage LDAP/AD plugin properties for id <i tal:content="context/getId">id</i></h2>
+
+    <p class="form-help">
+    Set properties for users and groups from LDAP/ActiveDirectory using the <a href="https://pypi.org/project/pas.plugins.ldap/">pas.plugins.ldap</a> plugin.
+    </p>
+    <div class="ldap-manage-form" tal:content="structure python:view.form()">
+    form
+    </div>
+
+</main>
+<div tal:replace="structure here/manage_page_footer">Footer</div>
