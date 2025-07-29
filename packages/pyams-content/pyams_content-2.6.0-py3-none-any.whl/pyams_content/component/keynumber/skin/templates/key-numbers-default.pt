@@ -1,0 +1,30 @@
+<tal:var i18n:domain="pyams_content"
+		 tal:define="items context.get_visible_items();
+					 (has_items, keynumbers) tales:boolean_iter(items);"
+		 tal:condition="has_items">
+	<h3 tal:define="title i18n:context.title"
+		tal:condition="title"
+		class="position-relative border-bottom pb-2 mt-4">
+		${title}
+		<span class="position-absolute underline"></span>
+	</h3>
+	<div class="card-deck">
+		<div class="card"
+			 tal:repeat="number keynumbers">
+			<div class="card-body pt-1">
+				<h5 class="card-title bg-secondary text-white-50 mx-n3 px-3 py-2"
+					tal:define="label i18n:number.label"
+					tal:condition="label">
+					${label}
+				</h5>
+				<p class="card-text text-center">
+					<span class="h4 text-success">${i18n:number.number}</span>
+					<span class="h5">${i18n:number.unit}</span>
+				</p>
+				<p class="card-text">
+					<small class="text-muted">${i18n:number.text}</small>
+				</p>
+			</div>
+		</div>
+	</div>
+</tal:var>

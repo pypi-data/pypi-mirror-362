@@ -1,0 +1,72 @@
+<section class="rounded-lg flex-fill d-flex flex-column" i18n:domain="pyams_content"
+		 data-ams-modules="modal plugins">
+	<h2 class="d-flex flex-wrap pl-3"
+		tal:define="title view.title"
+		tal:condition="title">
+		<span tal:condition="title.startswith('<')"
+			  class="flex-grow-1">${structure:title}</span>
+		<span tal:condition="not:title.startswith('<')"
+			  class="flex-grow-1" i18n:translate="">${title}</span>
+		<i tal:omit-tag="">${structure:provider:pyams.toolbar}</i>
+	</h2>
+	<i tal:omit-tag="">${structure:provider:pyams.help}</i>
+	<form class="ams-form review-main flex-grow-1 d-flex flex-column"
+		  method="post"
+		  action="${tales:absolute_url(context, 'add-review-comment.json')}"
+		  data-ams-reset-after-submit="true"
+		  data-async>
+		<div id="review-messages-view"
+			 class="review-body flex-grow-1 m-0 overflow-auto"
+			 data-ams-callback="MyAMS.content.review.initPage">
+			<ul id="review-messages"
+				class="list-unstyled list-striped m-0 h-0">
+				<li tal:repeat="comment view.comments"
+					class="d-flex flex-row m-0 px-3 py-2">
+					<tal:var define="principal view.get_principal(comment.owner);
+						 			 avatar view.get_avatar(principal);">
+						<tal:if condition="avatar">
+							<img class="avatar mt-1" alt=""
+								 src="${tales:absolute_url(avatar, '++thumb++square:32x32.png')}" />
+						</tal:if>
+						<tal:if condition="not:avatar">
+							<i class="fa fa-lg fa-user avatar text-center mt-2"></i>
+						</tal:if>
+						<div class="mx-3">
+							<div>
+								<tal:if condition="comment.comment_type=='request'">
+									<span i18n:translate="">Review query from</span>
+								</tal:if>
+								<strong class="text-info">${principal.title}</strong>
+								<tal:if condition="comment.is_reviewer_comment">
+									<span i18n:translate="">(as reviewer)</span>
+								</tal:if>
+								<time class="hint align-base"
+									  data-ams-hint-gravity="w" data-ams-hint-offset="5"
+									  tal:attributes="title view.get_date(comment)">
+									${view.get_age(comment).lower()}
+								</time>
+							</div>
+							<div tal:condition="comment.comment_type=='request'">
+								<span i18n:translate="">Selected reviewers:</span>&nbsp;
+								${comment.reviewers}
+							</div>
+							${structure:tales:html(comment.comment)}
+						</div>
+					</tal:var>
+				</li>
+			</ul>
+		</div>
+		<fieldset class="border m-2 mt-3">
+			<legend class="border" i18n:translate="">New comment</legend>
+			<textarea class="form-control textarea-widget text-field required"
+					  name="comment"
+					  placeholder="Your comment..." i18n:attributes="placeholder"
+					  rows="6"></textarea>
+			<footer>
+				<button class="btn btn-primary btn-sm" type="submit" i18n:translate="">
+					Add comment
+				</button>
+			</footer>
+		</fieldset>
+	</form>
+</section>

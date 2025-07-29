@@ -1,0 +1,24 @@
+<div class="m-2 d-flex flex-column border rounded media-thumbnail" i18n:domain="pyams_content"
+	 id="media_${tales:cache_key(context)}"
+	 data-ams-element-name="${context.__name__}">
+	<a class="d-flex align-items-center justify-content-center flex-grow-1 thumbnail p-2"
+	   href="${view.get_thumbnail_target()}/"
+	   title="${i18n:context.title}"
+	   data-toggle="modal">
+		<tal:var define="thumbnails tales:thumbnails(context.data)">
+			<tal:if condition="thumbnails">
+				<img tal:define="thumbnail thumbnails.get_thumbnail('128x128');
+								 timestamp tales:timestamp(thumbnail);
+								 src tales:absolute_url(thumbnail);"
+					 src="${src}?_=${timestamp}"
+					 alt="${i18n:context.alt_title}" />
+			</tal:if>
+			<tal:if condition="not:thumbnails">
+				<img src="/--static--/pyams_file/img/unknown.png" />
+			</tal:if>
+		</tal:var>
+	</a>
+	<div class="text-center mx-auto mb-2">
+		${structure:provider:pyams.context_actions}
+	</div>
+</div>

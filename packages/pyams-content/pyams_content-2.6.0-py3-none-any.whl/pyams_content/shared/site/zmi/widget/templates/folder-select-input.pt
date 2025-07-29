@@ -1,0 +1,27 @@
+<div i18n:domain="pyams_content"
+	 tal:define="js tales:resource_path('pyams_content.zmi:content_js')"
+	 data-ams-modules='{
+	 	"content": {
+	 		"src": "${js}"
+	 	}
+	}'>
+	<input type="hidden"
+		   id="${view.id}"
+		   name="${view.name}"
+		   class="${view.klass}"
+		   lang="${view.lang}"
+		   value="${view.value}"
+		   disabled="${view.disabled}"
+		   onchange="${view.onchange}"
+		   readonly="${view.readonly}"
+		   size="${view.size}"
+		   maxlength="${view.maxlength}" />
+	<div class="treeview border p-1"
+		 id="${view.id}_treeview"
+		 data-ams-treeview-data="${context.get_folders_tree(permission=view.permission)}"
+		 data-ams-treeview-show-border="false"
+		 data-ams-treeview-levels="3"
+		 data-ams-treeview-toggle-unselectable="false"
+		 data-ams-treeview-node-selected="MyAMS.content.widget.treeview.selectFolder"
+		 data-ams-treeview-node-unselected="MyAMS.content.widget.treeview.unselectFolder"></div>
+</div>

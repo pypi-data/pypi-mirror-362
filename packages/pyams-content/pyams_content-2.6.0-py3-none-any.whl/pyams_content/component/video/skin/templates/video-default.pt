@@ -1,0 +1,18 @@
+<div class="video-external">
+    <h2 tal:define="title i18n:context.title"
+        tal:condition="title">
+        ${title}
+    </h2>
+    <p tal:define="description i18n:context.description"
+       tal:condition="description">
+        ${structure:tales:html(description)}
+    </p>
+    <div>
+        ${structure:view.render_video()}
+        <ul class="d-flex justify-content-end mt-1 mx-0 py-1 px-2 legend list-inline list-separated small text-white-50">
+            <li tal:define="author context.author"
+                tal:condition="author"
+                data-separator="/">© ${author}</li>
+        </ul>
+    </div>
+</div>

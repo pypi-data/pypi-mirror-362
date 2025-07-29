@@ -1,0 +1,34 @@
+<div class="wrapper-alerts w-100"
+	 aria-hidden="true" i18n:domain="pyams_content"
+	 tal:define="alerts view.get_alerts();
+				 (has_alerts, visible_alerts) tales:boolean_iter(alerts);"
+	 tal:condition="has_alerts">
+	<div class="alert-item d-flex w-100 my-1 px-3 justify-content-between bg-danger text-white"
+		 data-alert-id="${tales:cache_key(alert)}"
+		 data-alert-maximum-interval="${alert.maximum_interval or 0}"
+		 tal:repeat="alert visible_alerts">
+		<div>
+			<p class="alert-icon m-0 py-3">
+				<span class="font-weight-bold">
+					${view.get_gravity(alert)} :
+					${i18n:alert.title}
+				</span>
+				<tal:if define="target alert.target"
+						condition="target is not None"> -
+					<a href="${tales:relative_url(target)}"
+					   i18n:translate="">Read more</a>
+				</tal:if>
+				<tal:if define="url alert.external_url"
+						condition="url"> -
+					<a href="${url}"
+					   i18n:translate="">Read more</a>
+				</tal:if>
+			</p>
+			<p class="small mt-n2"
+			   tal:define="body i18n:alert.body"
+			   tal:condition="body">
+				${structure:tales:html(body)}
+			</p>
+		</div>
+	</div>
+</div>

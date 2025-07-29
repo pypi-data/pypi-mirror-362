@@ -1,0 +1,18 @@
+<tal:var define="settings view.settings" i18n:domain="pyams_content">
+	${structure:view.get_setting(settings, 'title')}
+	${structure:view.get_setting(settings, 'name')}
+	${structure:view.get_setting(settings, 'charge')}
+	${structure:view.get_setting(settings, 'company')}
+	${structure:view.get_setting(settings, 'contact_email')}
+	${structure:view.get_setting(settings, 'phone_number')}
+	${structure:view.get_setting(settings, 'contact_form')}
+	${structure:view.get_setting(settings, 'address', renderer='text')}
+	<tal:if condition="settings.position">
+		<div class="text-truncate"
+			 tal:define="gps_position settings.position.wgs_coordinates">
+			<small><strong i18n:translate="">GPS position:</strong></small>
+			<i18n:var translate="">longitude=</i18n:var>${'{:.6f}'.format(gps_position['longitude'])},
+			<i18n:var translate="">latitude=</i18n:var>${'{:.6f}'.format(gps_position['latitude'])}
+		</div>
+	</tal:if>
+</tal:var>

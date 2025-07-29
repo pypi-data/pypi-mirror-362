@@ -1,0 +1,42 @@
+<div class="col mb-3 px-0 break-avoid"
+	 tal:define="target_url view.url;
+				 renderer_settings view.view.renderer_settings;
+				 button_title i18n:renderer_settings.button_title;"
+	 i18n:domain="pyams_content">
+	<div class="card h-100">
+		<tal:if define="illustration tales:pyams_illustration(context)"
+		        condition="renderer_settings.display_illustrations and illustration">
+			<a href="${target_url}">
+				<tal:if define="image i18n:illustration.data;
+								alt_title i18n:illustration.alt_title;
+								selections view.view.renderer_settings.thumb_selection;"
+						condition="image">
+					${structure:tales:picture(image,
+											  selections=selections,
+											  alt=alt_title,
+											  css_class='result_media card-img-top w-100')}
+				</tal:if>
+			</a>
+		</tal:if>
+		<div class="card-body"
+			 tal:define="title view.title;
+						 header view.header;"
+			 tal:condition="title or header">
+			<h3 class="card-title"
+				tal:condition="title">
+				${title}
+			</h3>
+			<p class="card-text"
+			   tal:condition="header">
+				${structure:header}
+			</p>
+		</div>
+		<div class="card-footer text-right"
+			 tal:condition="button_title and target_url">
+			<a class="btn btn-info btn-md mx-auto" role="button"
+			   href="${target_url}">
+				${button_title}
+			</a>
+		</div>
+	</div>
+</div>

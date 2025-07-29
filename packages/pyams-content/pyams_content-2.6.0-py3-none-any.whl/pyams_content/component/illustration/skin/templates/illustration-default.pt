@@ -1,0 +1,27 @@
+<div class="illustration"
+	 tal:define="settings view.settings;">
+	<h3 tal:define="title i18n:context.title"
+		tal:condition="title">
+		${title}
+	</h3>
+	<div class="position-relative"
+		 tal:define="image i18n:context.data;
+					 alt_title i18n:context.alt_title;
+					 selections settings.thumb_selection;"
+		 tal:condition="image">
+		${structure:tales:picture(image,
+								  selections=selections,
+								  alt=alt_title,
+								  css_class='d-block w-100')}
+		<ul class="d-flex m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+			tal:define="author context.author;"
+			tal:condition="author">
+			<li tal:condition="author" data-separator="/">© ${author}</li>
+		</ul>
+	</div>
+	<p class="description mt-1 px-2 text-secondary small"
+	   tal:define="description i18n:context.description"
+	   tal:condition="description">
+		${structure:tales:html(description)}
+	</p>
+</div>

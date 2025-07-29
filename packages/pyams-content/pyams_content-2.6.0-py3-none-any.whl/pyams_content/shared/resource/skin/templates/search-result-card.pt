@@ -1,0 +1,57 @@
+<div class="col mb-3 break-avoid"
+	 tal:define="target_url view.url;
+				 renderer_settings view.view.renderer_settings;
+				 button_title i18n:renderer_settings.button_title;"
+	 i18n:domain="pyams_content">
+	<div class="card h-100">
+		<tal:if define="illustration tales:pyams_illustration(context)"
+		        condition="renderer_settings.display_illustrations and illustration">
+			<a href="${target_url}">
+				<tal:if define="image i18n:illustration.data;
+								alt_title i18n:illustration.alt_title;"
+						condition="image">
+					${structure:tales:picture(image,
+											  xs_thumb='portrait', xs_width=12,
+											  sm_thumb='portrait', sm_width=3,
+											  md_thumb='portrait', md_width=2,
+											  lg_thumb='portrait', lg_width=2,
+											  xl_thumb='portrait', xl_width=2,
+											  alt=alt_title,
+											  css_class='result_media card-img-top w-100')}
+				</tal:if>
+			</a>
+		</tal:if>
+		<div class="card-body"
+			 tal:define="title view.title;
+						 header view.header;
+						 publication_date view.publication_date if renderer_settings.display_publication_date else None;"
+			 tal:condition="title or header">
+			<a class="text-body"
+			   href="${target_url}">
+				<h3 class="card-title ${'mb-0' if publication_date else None}"
+					tal:condition="title">
+					${title}
+				</h3>
+				<div tal:condition="publication_date"
+					 class="mb-2">
+					<i class="small">${publication_date}</i>
+				</div>
+				<div tal:condition="renderer_settings.display_tags"
+					 class="tags position-relative">
+					${structure:tales:tags(context)}
+				</div>
+				<p class="card-text"
+				   tal:condition="header">
+					${structure:header}
+				</p>
+			</a>
+		</div>
+		<div class="card-footer text-right"
+			 tal:condition="button_title and target_url">
+			<a class="btn btn-info btn-md mx-auto" role="button"
+			   href="${target_url}">
+				${button_title}
+			</a>
+		</div>
+	</div>
+</div>
