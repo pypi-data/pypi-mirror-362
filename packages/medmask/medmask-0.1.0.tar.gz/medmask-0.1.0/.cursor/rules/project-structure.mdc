@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# MedMask Project Structure
+
+A medical image segmentation mask processing library with core functionality in `medmask/`.
+
+## Current Code Structure
+
+**medmask/core** - Core data structures and algorithms
+- `segmask.py`: `SegmentationMask` class for mask storage, queries, and lazy initialization
+- `mapping.py`: `LabelMapping` for bidirectional label-to-name mapping
+
+**medmask/storage** - File persistence for segmentation masks
+- `archivefile.py`: `MaskArchive` for multi-mask binary *.mska* archive files
+- `maskfile.py`: `MaskFile` for single-mask *.msk* files with convenience functions
+- Provides `save_mask`, `load_mask` helper functions
+
+**medmask/compression** - Compression codec registry
+- `__init__.py`: Codec registration and `get_codec` interface
+- `zstd_codec.py`: Zstandard compression implementation
+
+**medmask/utils** - Utility functions
+- `utils.py`: Helper functions including `match_allowed_values` for efficient pixel filtering
+
+## Main Classes and Functions
+
+```python
+# Core classes
+from medmask import SegmentationMask, LabelMapping
+
+# Storage - Archive operations (multiple masks)
+from medmask import MaskArchive
+archive = MaskArchive('organs.mska', mode='w', space=space)
+archive.add_segmask(mask, 'liver')
+
+# Storage - Single mask file operations
+from medmask import MaskFile, save_mask, load_mask
+save_mask(mask, 'liver.msk')
+mask = load_mask('liver.msk')
+
+# Or using MaskFile directly
+mask_file = MaskFile('liver.msk', mode='w', space=space)
+mask_file.save_segmask(mask)
+```
+
+## Key Features
+
+- **Compression**: 50+ compression ratio using Zstandard
+- **Performance**: 16x faster read operations  
+- **File Types**: Single masks (*.msk*) and multi-mask archives (*.mska*)
+- **Semantic mapping**: Built-in name-to-label conversion
+- **Overlapping masks**: Multi-granularity organ combinations
+- **Lazy loading**: Memory-efficient on-demand construction
