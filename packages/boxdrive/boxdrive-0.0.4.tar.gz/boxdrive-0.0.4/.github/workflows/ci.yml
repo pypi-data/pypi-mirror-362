@@ -1,0 +1,74 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+# If new code is pushed to a PR branch, then cancel in progress workflows for that PR. Ensures that
+# we don't waste CI time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/common-setup
+      - name: ruff format
+        run: uv run ruff format --check
+
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/common-setup
+      - name: ruff check
+        run: uv run ruff check
+
+  mypy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/common-setup
+      - name: mypy
+        run: uv run mypy .
+
+  unit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/common-setup
+      - name: tests/unit
+        run: uv run pytest tests/unit/ -v
+
+  e2e:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/common-setup
+      - uses: ./.github/actions/start-fastapi-server
+        with:
+          port: 8000
+      - name: tests/e2e
+        run: uv run pytest tests/e2e/ -v
+        env:
+          S3_ENDPOINT_URL: http://127.0.0.1:8000
+
+  third-party-s3-tests:
+    name: tests/third_party/s3-tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/common-setup
+      - uses: ./.github/actions/start-fastapi-server
+        with:
+          port: 8000
+      - name: tests/third_party/s3-tests
+        run: |
+          cd tests/third_party/s3-tests
+          uv run tox -- s3tests_boto3/functional/test_s3.py -m inmemory
+        env:
+          S3TEST_CONF: s3tests.conf
