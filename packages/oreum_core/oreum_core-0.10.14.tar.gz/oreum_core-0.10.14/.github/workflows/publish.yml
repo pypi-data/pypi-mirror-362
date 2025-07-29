@@ -1,0 +1,72 @@
+name: pub
+on:
+  release:
+    types:
+      - created
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build package from source
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        platform: ["ubuntu-latest"]
+        python-version: ["3.12"]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Build package
+        run: make build
+
+
+  test-pub:
+    name: All-in-one build & publish package to TestPyPi and test install it
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build and Publish package to TestPyPI
+        env:
+          FLIT_USERNAME: __token__
+          FLIT_PASSWORD: ${{ secrets.TESTPYPI_TOKEN_OREUM_CORE_GITHUB }}
+        run: make test-pub
+      - name: Test download and install package from TestPyPI
+        env:
+          VVERSION: '${{ github.ref_name }}'
+        run: |
+          sleep 10
+          make test-dl-ins
+
+
+  pub:
+    name: All-in-one build & publish package to PyPi
+    needs: [build, test-pub]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build and Publish package to PyPI
+        env:
+          FLIT_USERNAME: __token__
+          FLIT_PASSWORD: ${{ secrets.PYPI_TOKEN_OREUM_CORE_GITHUB }}
+        run: make pub
+
+
+# NOTE
+# This will execute upon release created
+# using the contents of the master branch at that point
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-pull_request_target-workflow-when-a-pull-request-merges
