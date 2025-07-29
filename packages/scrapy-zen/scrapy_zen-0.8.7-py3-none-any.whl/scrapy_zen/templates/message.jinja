@@ -1,0 +1,27 @@
+{%- if monitors_failed %}
+{%- set bot_name = bot_name | replace('_', '-') %}
+**Spider `{{ data.spider.name }}` Failed** <`{{bot_name}}`>
+`{{ result.monitors_failed_results|length }}` error(s) detected{% else %}
+{{ "🎉"}} "`{{ data.spider.name }}`" spider finished! {{ "\n" }}
+{% endif %}
+
+{%- if include_error_messages and monitors_failed -%}
+```python
+{% for f_result in result.monitors_failed_results %}
+{{ "❌" }} `{{ f_result.monitor.name }}`
+{% endfor %}
+```
+{% endif %}
+
+{%- if critical_logs %}
+```python
+===== CRITICAL =====
+{{ critical_logs }}
+```
+{%- endif %}
+{%- if error_logs %}
+```python
+===== ERROR =====
+{{ error_logs }}
+```
+{%- endif %}
