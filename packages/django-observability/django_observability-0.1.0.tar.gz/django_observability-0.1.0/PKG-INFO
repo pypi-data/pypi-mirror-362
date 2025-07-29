@@ -1,0 +1,168 @@
+Metadata-Version: 2.4
+Name: django-observability
+Version: 0.1.0
+Summary: A Django middleware for observability with OpenTelemetry, Prometheus, and structured logging
+Home-page: https://github.com/mahdighadiriii/django-observability
+Author: Mahdi Ghadiri
+Author-email: Mahdi Ghadiri <mahdighadiriafzal@gmail.com>
+License: MIT License
+        
+        Copyright (c) 2025 Mahdi
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 3.2
+Classifier: Framework :: Django :: 4.0
+Classifier: Framework :: Django :: 4.1
+Classifier: Framework :: Django :: 4.2
+Classifier: Framework :: Django :: 5.0
+Classifier: Framework :: Django :: 5.1
+Classifier: Framework :: Django :: 5.2
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Monitoring
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: django<6.0,>=3.2
+Requires-Dist: setuptools<81
+Requires-Dist: opentelemetry-api==1.21.0
+Requires-Dist: opentelemetry-sdk==1.21.0
+Requires-Dist: opentelemetry-instrumentation-django==0.42b0
+Requires-Dist: opentelemetry-instrumentation-psycopg2==0.42b0
+Requires-Dist: opentelemetry-instrumentation-redis==0.42b0
+Requires-Dist: opentelemetry-instrumentation-requests==0.42b0
+Requires-Dist: opentelemetry-exporter-otlp-proto-grpc==1.21.0
+Requires-Dist: opentelemetry-exporter-jaeger-thrift==1.21.0
+Requires-Dist: opentelemetry-exporter-zipkin==1.21.0
+Requires-Dist: prometheus-client<1.0.0,>=0.17.0
+Requires-Dist: structlog<26.0.0,>=23.1.0
+Requires-Dist: psycopg2-binary>=2.9.3
+Requires-Dist: redis>=4.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-django>=4.8.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.1; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: black>=23.7.0; extra == "dev"
+Requires-Dist: isort>=5.12.0; extra == "dev"
+Requires-Dist: mypy>=1.5.1; extra == "dev"
+Requires-Dist: requests-mock>=1.11.0; extra == "dev"
+Requires-Dist: pre-commit>=3.3.3; extra == "dev"
+Requires-Dist: ruff>=0.4.3; extra == "dev"
+Requires-Dist: opentelemetry-exporter-jaeger-thrift==1.21.0; extra == "dev"
+Provides-Extra: sqlite
+Requires-Dist: opentelemetry-instrumentation-sqlite3==0.42b0; extra == "sqlite"
+Provides-Extra: mysql
+Requires-Dist: opentelemetry-instrumentation-mysql==0.42b0; extra == "mysql"
+Provides-Extra: memcached
+Requires-Dist: opentelemetry-instrumentation-memcached==0.42b0; extra == "memcached"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# Django Observability
+
+A production-ready Django middleware for comprehensive observability, integrating **OpenTelemetry** for distributed tracing, **Prometheus** for metrics, and **structured logging** with correlation ID tracking.
+
+## Features
+- **Distributed Tracing**: Track request flows across services using OpenTelemetry with support for Jaeger, Zipkin, or OTLP exporters.
+- **Metrics Collection**: Expose Prometheus metrics for HTTP requests, response sizes, and active request counts.
+- **Structured Logging**: Log requests, responses, and exceptions in JSON format with correlation IDs.
+- **Async Support**: Compatible with synchronous and asynchronous Django views.
+- **Configurable**: Customize via Django settings or environment variables.
+- **Non-Intrusive**: Minimal performance overhead with graceful error handling.
+
+## Installation
+Install the package:
+```bash
+pip install django-observability
+```
+
+Add to `INSTALLED_APPS` in `settings.py`:
+```python
+INSTALLED_APPS = [
+    ...,
+    'django_observability',
+]
+```
+
+Add the middleware to `MIDDLEWARE` in `settings.py`:
+```python
+MIDDLEWARE = [
+    ...,
+    'django_observability.middleware.ObservabilityMiddleware',
+]
+```
+
+Configure in `settings.py` (optional):
+```python
+DJANGO_OBSERVABILITY = {
+    'TRACING_ENABLED': True,
+    'METRICS_ENABLED': True,
+    'LOGGING_ENABLED': True,
+    'SERVICE_NAME': 'my-django-app',
+    'OTEL_EXPORTER': {
+        'endpoint': 'http://localhost:4317',
+        'protocol': 'grpc',
+    },
+}
+```
+
+Add the metrics endpoint in `urls.py`:
+```python
+from django.urls import path
+from django_observability.metrics import metrics_view
+
+urlpatterns = [
+    path('metrics/', metrics_view, name='metrics'),
+]
+```
+
+## Documentation
+Detailed guides are available in the [docs/](docs/) folder:
+- [Installation](docs/installation.md)
+- [Configuration](docs/configuration.md)
+- [Usage](docs/usage.md)
+- [Contributing](docs/contributing.md)
+
+## Examples
+- `examples/basic_django_app/`: Minimal Django app showcasing observability setup.
+- `examples/advanced_config/`: Advanced configuration with custom metrics and tracing.
+
+## Requirements
+- Python 3.10+
+- Django 3.2 to 5.x
+- See `requirements/base.txt` for full dependencies.
+
+## Contributing
+Contributions are welcome! See [CONTRIBUTING.md](docs/contributing.md) for details on setting up the development environment, code style, and submitting pull requests.
+
+## License
+MIT License. See [LICENSE](LICENSE) for details.
