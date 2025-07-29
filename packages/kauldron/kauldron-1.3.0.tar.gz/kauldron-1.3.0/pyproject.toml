@@ -1,0 +1,95 @@
+[project]
+name = "kauldron"
+description = "Kauldron is a ML research library optimized for quick iteration and modularity."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [{name = "kauldron authors", email="kauldron@google.com"}]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: Apache Software License",
+    "Intended Audience :: Science/Research",
+]
+keywords = []
+
+# pip dependencies of the project
+dependencies = [
+    "absl-py",
+    "altair",
+    "chex",
+    "clu",
+    "einops",
+    "etils[edc,enp,epath,epy,etree]",
+    "flax",
+    "grain ; sys_platform != 'win32'",
+    "graphviz",
+    "immutabledict",
+    "jax",
+    "jaxtyping",
+    "lark",
+    "mediapy",
+    "ml_collections",
+    "numpy",
+    "opencv-python",  # speeds up pygrain image loading
+    "optax",
+    "orbax-checkpoint",
+    "pandas",
+    "scikit-image",
+    "scikit-learn",
+    "tabulate",  # used by pandas.DataFrame.to_markdown (for logging context)
+    "tensorflow",
+    "tensorflow_datasets>=4.9.7",
+    "tqdm",
+    "typeguard>=4.4.1",
+    "typing_extensions",
+    "xmanager",
+]
+
+# This is set automatically by flit using `kauldron.__version__`
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/google-research/kauldron"
+repository = "https://github.com/google-research/kauldron"
+documentation = "https://kauldron.readthedocs.io"
+
+# Other: `documentation`, `changelog`
+
+[project.optional-dependencies]
+# Development deps (unittest, linting, formating,...)
+# Installed through `pip install .[dev]`
+dev = [
+    "pytest",
+    "pytest-xdist",
+    "hypothesis==6.80.0",
+    "pylint>=2.6.0",
+    "pyink",
+]
+# Installed through `pip install .[docs]`
+docs = [
+    # Install `apitree` with all extensions (sphinx, theme,...)
+    "sphinx-apitree[ext]",
+]
+
+[tool.pyink]
+# Formatting configuration to follow Google style-guide
+line-length = 80
+preview = true
+pyink-indentation = 2
+pyink-use-majority-quotes = true
+
+[build-system]
+# Build system specify which backend is used to build/install the project (flit,
+# poetry, setuptools,...). All backends are supported by `pip install`
+requires = ["flit_core >=3.8,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.sdist]
+# Flit specific options (files to exclude from the PyPI package).
+# If using another build backend (setuptools, poetry), you can remove this
+# section.
+exclude = [
+  # Do not release tests files on PyPI
+  "**/*_test.py",
+]
