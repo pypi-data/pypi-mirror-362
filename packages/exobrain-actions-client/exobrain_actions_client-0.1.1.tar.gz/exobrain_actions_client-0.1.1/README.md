@@ -1,0 +1,104 @@
+# exobrain-actions-client
+
+[![License: Private](https://img.shields.io/badge/license-private-red)](LICENSE.md)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/release/python-3120/)
+
+This package provides a REST API client for interacting with the Exobrain Actions API.
+
+Key features:
+
+- Access to various API resources such as version status and health checks (ping).
+- Retrieval, triggering, or updating of action data specific to a service or organization.
+- Standardized HTTP calls to different API endpoints (version, health, action data, calculation triggers, KPI updates).
+
+## Development workflow
+
+### Prerequisites
+
+Before starting development, make sure you have the following tools installed:
+
+- **[Hatch](https://hatch.pypa.io/)**: a modern Python project, environment, and packaging manager.
+
+- **[uv](https://github.com/astral-sh/uv)**: a fast Python package installer and resolver.
+
+### Project Structure
+
+- **Code:** Place your models in `exobrain/actions/client/`.
+- **Tests:** Add your tests in `tests/`.
+
+### Development Commands
+
+All tasks (testing, linting, type checking, packaging, etc.) are managed via **hatch** environments and scripts:
+
+#### 1. Installing Dependencies
+
+Install all dependencies (including development tools):
+
+```shell
+hatch env create
+```
+
+#### 2. Running Tests
+
+Launch all tests using `pytest`:
+
+```shell
+hatch test
+```
+
+#### 3. Linting and Formatting
+
+Format your code:
+
+```shell
+hatch fmt -f
+```
+
+Check code style:
+
+```shell
+hatch fmt
+```
+
+#### 4. Type Checking
+
+Run type checks with `mypy`:
+
+```shell
+hatch run types:check
+```
+
+#### 5. Coverage
+
+Check test coverage with:
+
+```shell
+hatch test --cover
+```
+
+#### 6. Building the Package
+
+Build the package for distribution:
+
+```shell
+hatch build
+```
+
+#### 7. Releasing
+
+The release process uses **uv** and Github Actions.
+
+- For pre-release on TestPyPI: push a tag with `rc` or `beta` in the version (`0.1rc1`, `0.2b1` etc.).
+- For release: push a tag type `v0.1` (main release) on `main` branch.
+- Configure secrets for PyPI tokens in repository settings (`PYPI_TOKEN`, `TEST_PYPI_TOKEN`).
+
+### Continuous Integration
+
+All pushes and pull requests on `main` or `development` branches trigger the Continuous Integration pipeline  
+(see `.github/workflows/` directory for details).
+
+---
+
+## License
+
+This project is private and confidential.
