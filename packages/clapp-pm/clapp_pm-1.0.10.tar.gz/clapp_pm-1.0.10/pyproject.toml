@@ -1,0 +1,122 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clapp-pm"
+dynamic = ["version"]
+description = "Lightweight cross-language app manager for Python and Lua"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Melih Burak Memiş", email = "mburakmemiscy@gmail.com"},
+]
+maintainers = [
+    {name = "Melih Burak Memiş", email = "mburakmemiscy@gmail.com"},
+]
+keywords = [
+    "package-manager",
+    "app-manager", 
+    "python",
+    "lua",
+    "cross-language",
+    "cli",
+    "lightweight",
+    "desktop",
+    "applications"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Software Distribution",
+    "Topic :: Utilities",
+    "Environment :: Console",
+    "Natural Language :: Turkish",
+    "Natural Language :: English",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.31.0",
+    "typing-extensions>=4.0.0; python_version<'3.10'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+    "pre-commit>=2.20.0",
+]
+
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "coverage>=6.0.0",
+]
+
+[project.scripts]
+clapp = "main:main"
+
+[project.urls]
+Homepage = "https://github.com/mburakmmm/clapp"
+Repository = "https://github.com/mburakmmm/clapp"
+Documentation = "https://github.com/mburakmmm/clapp/blob/main/README.md"
+"Bug Tracker" = "https://github.com/mburakmmm/clapp/issues"
+"Package Repository" = "https://github.com/mburakmmm/clapp-packages"
+Changelog = "https://github.com/mburakmmm/clapp/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = {attr = "version.__version__"}
+
+[tool.setuptools.packages.find]
+exclude = ["tests*", "apps*", "packages-repo-files*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.md", "*.txt"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | apps
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+addopts = "--cov=. --cov-report=html --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+exclude = [
+    "apps/",
+    "packages-repo-files/",
+    "tests/",
+] 
