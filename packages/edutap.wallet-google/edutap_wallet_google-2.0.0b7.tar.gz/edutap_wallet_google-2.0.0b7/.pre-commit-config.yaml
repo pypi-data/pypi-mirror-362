@@ -1,0 +1,64 @@
+ci:
+    autofix_prs: false
+    autoupdate_schedule: monthly
+    skip: [check-manifest, pyroma]
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+    - id: check-ast
+    - id: check-json
+    - id: check-toml
+    - id: debug-statements
+    - id: check-case-conflict
+    - id: check-docstring-first
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.20.0
+    hooks:
+    -   id: pyupgrade
+-   repo: https://github.com/pycqa/isort
+    rev: 6.0.1
+    hooks:
+    -   id: isort
+-   repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+    -   id: black
+-   repo: https://github.com/PyCQA/flake8
+    rev: 7.2.0
+    hooks:
+    -   id: flake8
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.16.0
+    hooks:
+      - id: mypy
+        args: ['--explicit-package-bases']
+        additional_dependencies:
+        - "pytest-stub"
+        - "google-auth-stubs"
+        - "pydantic"
+        - "pydantic_settings"
+        - "fastapi"
+        - "httpx"
+        - "freezegun"
+-   repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+    -   id: codespell
+        additional_dependencies:
+          - tomli
+-   repo: https://github.com/mgedmin/check-manifest
+    rev: "0.50"
+    hooks:
+    -   id: check-manifest
+-   repo: https://github.com/regebro/pyroma
+    rev: "4.2"
+    hooks:
+    -   id: pyroma
+-   repo: https://github.com/mgedmin/check-python-versions
+    rev: "0.22.1"
+    hooks:
+    -   id: check-python-versions
+        args: ['--only', 'pyproject.toml']

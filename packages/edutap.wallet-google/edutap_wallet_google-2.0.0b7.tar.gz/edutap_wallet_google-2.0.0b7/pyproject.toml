@@ -1,0 +1,120 @@
+[project]
+name = "edutap.wallet-google"
+version = "2.0.0b7"
+description = "Library for Google Wallet Communication"
+keywords = ["wallet", "google", "api", "pass", 'fastapi', 'digital identity']
+readme = "README.md"
+authors = [
+    {name = "Alexander Loechel", email = "Alexander.Loechel@lmu.de"},
+    {name = "Philipp Auersperg-Castell", email = "phil@bluedynamics.com"},
+    {name = "Jens Klein", email = "jk@kleinundpartner.at"},
+    {name = "Robert Niederreiter", email = "office@squarewave.at"},
+]
+requires-python = ">=3.10"
+license = { text = "EUPL 1.2" }
+# TODO for PEP 639 https://peps.python.org/pep-0639
+# -> when implemented in PyPI, twine, pyroma, etc.
+# add license-expression = EUPL-1.2
+# add license-file = LICENSE
+# remove license field
+# remove License classifier
+
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "cryptography",
+    "google-auth[requests]",
+    "pydantic-settings",
+    "pydantic[email]>=2.0",
+  ]
+
+[project.urls]
+Source = "https://github.com/edutap-eu/edutap.wallet_google"
+Issues = "https://github.com/edutap-eu/edutap.wallet_google/issues"
+Documentation = "https://docs.edutap.eu/packages/edutap_wallet_google/index.html"
+
+[project.optional-dependencies]
+callback = [
+    "fastapi",
+    "httpx",
+]
+test = [
+    "edutap.wallet-google[callback]",
+    "pytest-cov",
+    "pytest-explicit",
+    "pytest",
+    "requests-mock",
+    "tox",
+]
+typecheck  = [
+    "google-auth-stubs",
+    "mypy",
+    "pytest-stub",
+    "types-cryptography",
+]
+develop = [
+    "pdbpp",
+    "ipython",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+generate-fernet-key = "edutap.wallet_google.utils:generate_fernet_key"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/edutap"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+addopts = "--cov=edutap.wallet_google --cov-report term --cov-report html"
+markers = [
+    "integration: Test are running against the real Google Wallet API, needs account configuration. (deselect with '-m \"not integration\"')",
+]
+# https://pypi.org/project/pytest-explicit/
+explicit-only = [
+    "integration",
+]
+
+[tool.mypy]
+mypy_path = "./src:./tests"
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = [
+    "cryptography.*",
+]
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "plone"
+src_paths = ["src", "tests"]
+
+[tool.black]
+target-version = ["py310"]
+include = "src tests"
+
+[tool.codespell]
+ignore-words-list = "discreet,"
+
+[tool.check-manifest]
+ignore = [
+    ".editorconfig",
+    ".pre-commit-config.yaml",
+    "tox.ini",
+    ".flake8",
+]
