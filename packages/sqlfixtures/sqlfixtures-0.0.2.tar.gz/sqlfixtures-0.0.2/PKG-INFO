@@ -1,0 +1,167 @@
+Metadata-Version: 2.4
+Name: sqlfixtures
+Version: 0.0.2
+Summary: Create test fixtures against an SQL database
+Author-email: Oliver Cope <oliver@redgecko.org>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/x-rst
+License-File: LICENSE.txt
+Requires-Dist: embrace
+Dynamic: license-file
+
+SQLFixtures
+===========
+
+Create database entries for your test scripts.
+
+Example usage
+---------------
+
+First, set up a SQLite database. This should work with almost any SQL
+database. We're using sqlite3 because it is built in.
+
+.. code:: python
+
+    import sqlite3  # or any db-api compatible database
+
+    conn = sqlite3.connect(":memory:")
+    conn.execute(
+        """
+        CREATE TABLE users (id INTEGER PRIMARY KEY, name text, active int)
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE groups (id INTEGER PRIMARY KEY, name text)
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE group_members (user_id INT, group_id INT)
+        """
+    )
+
+
+Now import ``sqlfixtures`` and create a ``sqlfixtures.SQLFixture`` object:
+
+.. code:: python
+
+    import sqlfixtures
+    fix = sqlfixtures.SQLFixture(conn)
+
+Inserting data from dicts is the simplest way to start using ``sqlfixtures``:
+
+.. code:: python
+
+    # Insert rows
+    with fix.insert("users", {"name": "Angus"}) as user:
+        assert user.name == "Angus"
+        print("Inserted user", user)
+
+This outputs::
+
+    Inserted user {'id': 1, 'name': 'Angus', 'active': None}
+
+Updating works in a similar way:
+
+.. code:: python
+
+    with fix.insert("users", {"name": "Angus"}) as user:
+        assert user.name == "Angus"
+        with fix.update("users", {"name": "Alice"}, where={"id": user.id}) as user:
+            assert user.name == "Alice"
+            print(user)
+
+Outputting::
+
+    {'id': 1, 'name': 'Alice', 'active': None}
+
+
+The declarative API allows more expressivity:
+
+.. code:: python
+
+    angus = sqlfixtures.Insertable("users", name="angus", active=1)
+    with sqlfixtures.apply_to_fixture(fix, [angus]) as users:
+        assert users[0].name == "Angus"
+        print(user)
+
+::
+
+    [{'id': 1, 'name': 'Angus', 'active': 1}]
+
+Once an insertable object has been created it can be copied and customized just
+by calling it:
+
+.. code:: python
+    
+    User = sqlfixtures.Insertable("users", active=1)
+    angus = User(name="Angus")
+    alice = User(name="Alice")
+    with sqlfixtures.apply_to_fixture(fix, [angus, alice]) as users:
+        assert users[0].name == "Angus"
+        assert users[1].name == "Alice"
+        print(users)
+
+::
+
+    [{'id': 1, 'name': 'Angus', 'active': 1}, {'id': 2, 'name': 'Alice', 'active': 1}]
+
+It can be more convenient to pass the list of Insertables as a dict:
+
+.. code:: python
+    
+    with sqlfixtures.apply_to_fixture(fix, {"angus": angus, "alice": alice}) as users:
+        print(users)
+
+::
+
+    {
+        "angus": {'id': 1, 'name': 'Angus', 'active': 1},
+        "alice": {'id': 2, 'name': 'Alice', 'active': 1}
+    }
+
+
+The declarative API allows you to reference columns that are populated by the
+database, for example using an auto-increment ``id`` field as a foreign key in
+another table:
+
+.. code:: python
+
+    administrators = sqlfixtures.Insertable("groups", name="administrators")
+    alice_is_admin = sqlfixtures.Insertable(
+        "group_members", user_id=alice.id, group_id=administrators.id
+    )
+    with sqlfixtures.apply_to_fixture(fix, [alice, administrators, alice_is_admin]) as rows:
+        print(rows)
+
+::
+
+    [
+        {'id': 1, 'name': 'Alice', 'active': 1},
+        {'id': 1, 'name': 'administrators'},
+        {'user_id': 1, 'group_id': 1}
+    ]
+
+Values can also be set from callable objects:
+
+.. code:: python
+
+    names = iter(["alice", "bob", "carol"])
+    User = sqlfixtures.Insertable("users", active=1, name=lambda: next(names))
+    with sqlfixtures.apply_to_fixture(fix, [User(), User(), User()]) as users:
+        assert users[0].name == "alice"
+        assert users[1].name == "bob"
+        assert users[2].name == "carol"
+        print(users)
+
+::
+
+    [
+        {'id': 1, 'name': 'alice', 'active': 1},
+        {'id': 2, 'name': 'bob', 'active': 1},
+        {'id': 3, 'name': 'carol', 'active': 1}
+    ]
