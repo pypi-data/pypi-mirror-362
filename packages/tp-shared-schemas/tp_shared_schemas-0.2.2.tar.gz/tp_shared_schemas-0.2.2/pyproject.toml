@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "tp-shared-schemas"
+version = "0.2.2"
+description = "Pydantic cхемы для всех проектов"
+readme = "README.md"
+packages = [{ include = "tp_shared_schemas", from="src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.12"
+pydantic = ">=2.11.7,<3.0.0"
+tp-helper = ">=0.4.34,<0.5.0"
+pre-commit = "^4.2.0"
+[tool.ruff]
+line-length = 88
+target-version = "py313"  # или "py312" для Python 3.12
+fix = true
+
+[tool.ruff.lint]
+# Основные категории правил:
+select = [
+    "E",   # pycodestyle (стиль)
+    "F",   # pyflakes (ошибки исполнения)
+    "I",   # isort (сортировка импортов)
+    "UP",  # pyupgrade (обновление синтаксиса)
+    "B",   # bugbear (потенциальные баги)
+    "A",   # flake8-builtins (конфликты с встроенными именами)
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+
+# Исключить специфичные или часто неактуальные предупреждения
+ignore = [
+    "B008",   # Depends(...) в аргументах FastAPI — безопасно и распространённо
+    "E501",   # Длина строки — игнорируем, т.к. используем black с line-length = 88
+    "SIM117", # Вложенные async with — читаемость в некоторых случаях важнее
+]
