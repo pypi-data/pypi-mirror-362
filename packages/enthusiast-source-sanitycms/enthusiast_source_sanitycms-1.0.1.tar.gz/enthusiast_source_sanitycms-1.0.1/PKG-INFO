@@ -1,0 +1,41 @@
+Metadata-Version: 2.3
+Name: enthusiast-source-sanitycms
+Version: 1.0.1
+Summary: A plugin for Enthusiast that provides a SanityCMS documents importer.
+Author: Kuba Szczęśniak
+Author-email: kuba.szczesniak@upsidelab.io
+Requires-Python: >=3.9,<4.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: enthusiast-common (>=1,<2)
+Requires-Dist: requests (>=2.32.3,<3.0.0)
+Description-Content-Type: text/markdown
+
+# Enthusiast Source Sanity CMS
+
+This Enthusiast plugin enables the import of document data from Sanity CMS.
+
+# Usage
+Assumption: schema type looks like this:
+```
+export default {
+    name: "blogPost",
+    type: "document",
+    title: "Blog Post",
+    fields: [
+      { name: "title", type: "string", title: "Title" },
+      { name: "content", type: "array", title: "Content", of: [{ type: "block" }] },
+    ],
+  };
+```
+Fetch all blog posts using below commands:
+```
+from source import SanityCMSDocumentSource
+s = SanityCMSDocumentSource(1, {'project_id': 'your-project-id-here', 'dataset': 'production', 'schema_type': 'blogPost', 'title_field_name': 'title', 'content_field_name': 'content'})
+s.fetch()
+```
+
