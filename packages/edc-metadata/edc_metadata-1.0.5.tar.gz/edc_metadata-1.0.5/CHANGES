@@ -1,0 +1,59 @@
+
+0.3.79
+------
+- review and change indexes on CRF/Requisition models
+- convert unique_together to UniqueConstraint
+- refactor Creator classes to refer differentiate between
+  `metadata` model instance and `source` model instance
+- typing hints
+
+0.3.63
+------
+- add RuleGroup Meta class attribute `predicates`.
+- fix so that rule evaluator compiles a unique list of app_labels
+  when selecting RuleGroups to run.
+
+0.3.54
+------
+- refactor `MetadataRefresher` and `MetadataGetter`
+- `update_metadata` management command:
+   - add options to update metadata only
+   - add options to update references only
+   - fix issue where rules are re-run and reset metadata to NEW even though source
+     model instance exists
+- ModelAdmin:
+  - link to subject dashboard, carry search/filter attrs from dashboard
+  - rename to CRF collection status, Requisition collection status
+  - add ModelForm
+  - fix redirects not going to changelist
+  - show model verbose name instead of label_lower
+
+0.3.53
+------
+- update code to handle model managers other than `on_site`
+- carry `site` FK model instance from reference object and never
+  set using get_current_site() method.
+- improvements to management command `update_metadata`
+- remove verbose warnings
+
+0.3.22
+======
+- fix issue where PRN objects are added as required by default for all visits
+- fix not reseting PRN's after delete
+- update build metadata
+
+0.3.21
+======
+- fix metadata validator returning multiple objects returned when validating requisition metadata
+
+0.3.20
+======
+
+0.3.19
+======
+- add CHANGES.rst
+- refactor metadata refresh command and class
+- improve handling of metadata when refreshing
+  from a change in visit schedule, model class name, and
+  so on
+- check model class exists, model class is registered in admin
