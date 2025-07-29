@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantum-generative-adversarial-networks-pro"
+version = "0.1.0"
+description = "Quantum-enhanced GAN framework for high-fidelity synthetic data generation"
+authors = [{ name = "Krishna Bajpai", email = "bajpaikrishna715@gmail.com" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+keywords = ["quantum computing", "generative adversarial networks", "machine learning", "qiskit", "pennylane"]
+
+dependencies = [
+    "qiskit>=1.0.0",
+    "pennylane>=0.30.0",
+    "torch>=1.12.0",
+    "torchvision>=0.13.0",
+    "numpy>=1.21.0",
+    "matplotlib>=3.5.0",
+    "scikit-learn>=1.1.0",
+    "scipy>=1.8.0",
+    "tqdm>=4.64.0",
+    "typer[all]>=0.9.0",
+    "pillow>=9.0.0",
+    "pandas>=1.4.0",
+    "seaborn>=0.11.0",
+]
+
+[project.optional-dependencies]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.20.0",
+    "mkdocs-jupyter>=0.24.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "flake8>=5.0.0",
+    "pre-commit>=2.20.0",
+]
+jupyter = [
+    "jupyter>=1.0.0",
+    "ipykernel>=6.15.0",
+    "ipywidgets>=8.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/krish567366/quantum-generative-adversarial-networks-pro"
+Documentation = "https://krish567366.github.io/quantum-generative-adversarial-networks-pro/"
+Repository = "https://github.com/krish567366/quantum-generative-adversarial-networks-pro"
+Issues = "https://github.com/krish567366/quantum-generative-adversarial-networks-pro/issues"
+
+[project.scripts]
+qgans-pro = "qgans_pro.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["qgans_pro*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
