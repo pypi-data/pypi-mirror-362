@@ -1,0 +1,60 @@
+# SecureSpeak AI Python SDK
+
+The official Python SDK for SecureSpeak AI — Professional deepfake detection with 99.7% accuracy.
+
+## Installation
+
+```bash
+pip install securespeakai-sdk
+```
+
+## Quick Start
+
+```python
+from securespeak import SecureSpeakClient
+
+# Initialize client with your API key
+client = SecureSpeakClient("your-api-key-here")
+
+# Analyze a local audio file
+result = client.analyze_file("suspicious_audio.wav")
+
+# Check if it's a deepfake
+if result['is_deepfake']:
+    print(f"DEEPFAKE DETECTED! Confidence: {result['confidence_score']}%")
+else:
+    print(f"Authentic audio. Confidence: {result['confidence_score']}%")
+```
+
+## Available Methods
+
+- `analyze_file(file_path)` - Analyze local audio files
+- `analyze_url(url)` - Analyze audio from URLs
+- `analyze_live(file_path)` - Real-time analysis with per-second billing
+
+## Response Format
+
+All methods return a JSON response containing:
+- `is_deepfake` (boolean) - Whether the audio is detected as fake
+- `confidence_score` (float) - Confidence percentage (0-100)
+- `authenticity_score` (float) - Score from 0.0 (fake) to 1.0 (authentic)
+- `analysis_time_ms` (integer) - Processing time in milliseconds
+
+## Requirements
+
+- Python 3.7 or higher
+- Valid SecureSpeak AI API key
+
+## Documentation
+
+For complete documentation, examples, pricing, and API reference, visit: https://securespeakai.com/docs
+
+## Support
+
+- Website: https://securespeakai.com
+- Dashboard: https://securespeakai.com/dashboard
+- Support: https://securespeakai.com/support
+
+## License
+
+MIT License
