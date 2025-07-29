@@ -1,0 +1,33 @@
+services:
+  meraki_dashboard_exporter:
+    image: ghcr.io/rknightion/meraki-dashboard-exporter:latest
+    container_name: meraki-dashboard-exporter
+    restart: unless-stopped
+    ports:
+      - "9099:9099"
+    environment:
+      # Required: Meraki API key
+      - MERAKI_API_KEY=${MERAKI_API_KEY}
+      # Optional: Specific organization ID
+      - MERAKI_EXPORTER_ORG_ID=${MERAKI_EXPORTER_ORG_ID:-}
+      # Optional: Log level (default INFO)
+      - MERAKI_EXPORTER_LOG_LEVEL=${MERAKI_EXPORTER_LOG_LEVEL:-INFO}
+      # Optional: Device types to collect (comma-separated)
+      # - MERAKI_EXPORTER_DEVICE_TYPES=${MERAKI_EXPORTER_DEVICE_TYPES:-MS,MR,MV,MT}
+      # Optional: OpenTelemetry settings
+      - MERAKI_EXPORTER_OTEL_ENABLED=${MERAKI_EXPORTER_OTEL_ENABLED:-false}
+      - MERAKI_EXPORTER_OTEL_ENDPOINT=${MERAKI_EXPORTER_OTEL_ENDPOINT:-}
+      - MERAKI_EXPORTER_OTEL_SERVICE_NAME=${MERAKI_EXPORTER_OTEL_SERVICE_NAME:-meraki-dashboard-exporter}
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:9099/health').raise_for_status()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    user: "1000:1000"

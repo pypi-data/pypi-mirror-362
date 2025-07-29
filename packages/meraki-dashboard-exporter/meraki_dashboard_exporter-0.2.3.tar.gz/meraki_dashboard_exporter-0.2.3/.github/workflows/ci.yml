@@ -1,0 +1,133 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux - multiple architectures via QEMU emulation for some tests
+          - os: ubuntu-latest
+            python-version: "3.13"
+            arch: x64
+
+          # macOS - Intel
+          - os: macos-13  # Intel-based macOS
+            python-version: "3.13"
+            arch: x64
+
+          # macOS - Apple Silicon
+          - os: macos-latest  # ARM64-based macOS
+            python-version: "3.13"
+            arch: arm64
+
+          # Windows - Intel only (ARM not available on GitHub Actions)
+          - os: windows-latest
+            python-version: "3.13"
+            arch: x64
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      # Ultra-fast dependency install & caching
+      - name: Set up uv
+        uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3.1
+        with:
+          python-version: ${{ matrix.python-version }}
+          activate-environment: true
+          enable-cache: true
+
+      - name: Install project (incl. dev extras)
+        run: uv sync
+
+      - name: Lint & format (Ruff)
+        # Only run on one platform to save time
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          uv run ruff format --check .
+          uv run ruff check --output-format=github .
+
+      - name: Type-check (mypy)
+        # Only run on one platform to save time
+        if: matrix.os == 'ubuntu-latest'
+        run: uv run mypy .
+
+      - name: Run tests
+        env:
+          PYTHONPATH: .
+        run: uv run pytest --cov=meraki_dashboard_exporter --cov-report=xml
+
+      - name: Upload coverage
+        if: success() && matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: rknightion/meraki-dashboard-exporter
+          files: coverage.xml
+
+  docker-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+
+      - name: Build Docker image (multi-arch test)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: .
+          # Test building for multiple architectures to catch issues early
+          platforms: linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x
+          push: false
+          load: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            PY_VERSION=3.13
+
+      - name: Build and test Docker image (amd64 only for execution)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: meraki-dashboard-exporter:test
+          cache-from: type=gha
+          build-args: |
+            PY_VERSION=3.13
+
+      - name: Test Docker image startup
+        env:
+          MERAKI_API_KEY: "00000000000000000000000000000000deadbeef"
+        run: |
+          # Test that the image can start and show help
+          docker run --rm -e MERAKI_API_KEY meraki-dashboard-exporter:test --help || true
+
+          # Test image metadata
+          docker inspect meraki-dashboard-exporter:test | jq '.[0].Config.Labels'
+
+          # Verify non-root user
+          docker run --rm -e MERAKI_API_KEY meraki-dashboard-exporter:test whoami | grep -q exporter
