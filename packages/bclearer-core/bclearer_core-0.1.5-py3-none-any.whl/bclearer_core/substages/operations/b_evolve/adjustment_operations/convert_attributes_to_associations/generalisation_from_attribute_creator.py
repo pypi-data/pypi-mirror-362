@@ -1,0 +1,60 @@
+from bclearer_core.constants.standard_constants import (
+    DEFAULT_NULL_VALUE,
+)
+from bclearer_core.nf.types.nf_column_types import (
+    NfColumnTypes,
+)
+from bclearer_core.substages.operations.common.ea_guid_from_nf_uuid_creator import (
+    create_ea_guid_from_nf_uuid,
+)
+from bclearer_interop_services.ea_interop_service.general.nf_ea.com.common_knowledge.column_types.nf_ea_com_column_types import (
+    NfEaComColumnTypes,
+)
+from bclearer_interop_services.ea_interop_service.nf_ea_common.common_knowledge.ea_connector_types import (
+    EaConnectorTypes,
+)
+from bclearer_interop_services.tuple_service.tuple_attribute_value_getter import (
+    get_tuple_attribute_value_if_required,
+)
+from bclearer_orchestration_services.identification_services.uuid_service.uuid_helpers.uuid_factory import (
+    create_new_uuid,
+)
+
+
+def create_generalisation_from_attribute_to_type(
+    attribute_to_convert_tuple: tuple,
+    type_nf_uuid: str,
+) -> dict:
+    generalisation_nf_uuid = (
+        create_new_uuid()
+    )
+
+    generalisation_ea_guid = create_ea_guid_from_nf_uuid(
+        nf_uuid=generalisation_nf_uuid,
+    )
+
+    generalisation_supplier_nf_uuid = (
+        type_nf_uuid
+    )
+
+    generalisation_client_nf_uuid = get_tuple_attribute_value_if_required(
+        owning_tuple=attribute_to_convert_tuple,
+        attribute_name=NfEaComColumnTypes.ELEMENT_COMPONENTS_CLASSIFYING_EA_CLASSIFIER.column_name,
+    )
+
+    ea_generalisation_dictionary = {
+        NfEaComColumnTypes.EXPLICIT_OBJECTS_EA_GUID.column_name: generalisation_ea_guid,
+        NfColumnTypes.NF_UUIDS.column_name: generalisation_nf_uuid,
+        NfEaComColumnTypes.ELEMENTS_SUPPLIER_PLACE1_END_CONNECTORS.column_name: generalisation_supplier_nf_uuid,
+        NfEaComColumnTypes.ELEMENTS_CLIENT_PLACE2_END_CONNECTORS.column_name: generalisation_client_nf_uuid,
+        NfEaComColumnTypes.CONNECTORS_DIRECTION_TYPE_NAME.column_name: "Source -> Destination",
+        NfEaComColumnTypes.CONNECTORS_ELEMENT_TYPE_NAME.column_name: EaConnectorTypes.GENERALIZATION.type_name,
+        NfEaComColumnTypes.CONNECTORS_SOURCE_CARDINALITY.column_name: DEFAULT_NULL_VALUE,
+        NfEaComColumnTypes.CONNECTORS_DEST_CARDINALITY.column_name: DEFAULT_NULL_VALUE,
+        NfEaComColumnTypes.STEREOTYPEABLE_OBJECTS_EA_OBJECT_STEREOTYPES.column_name: [],
+        NfEaComColumnTypes.REPOSITORIED_OBJECTS_EA_REPOSITORY.column_name: DEFAULT_NULL_VALUE,
+        NfEaComColumnTypes.EXPLICIT_OBJECTS_EA_OBJECT_NAME.column_name: DEFAULT_NULL_VALUE,
+        NfEaComColumnTypes.EXPLICIT_OBJECTS_EA_OBJECT_NOTES.column_name: DEFAULT_NULL_VALUE,
+    }
+
+    return ea_generalisation_dictionary
