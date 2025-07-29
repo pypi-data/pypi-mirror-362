@@ -1,0 +1,95 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tagent"
+version = "0.5.0"
+description = "TAgent - Modular AI Agent Framework with Dynamic Tool Discovery"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "TAgent Development Team", email = "tagent@example.com"}
+]
+maintainers = [
+    {name = "TAgent Development Team", email = "tagent@example.com"}
+]
+keywords = ["ai", "agent", "llm", "automation", "framework"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "pydantic>=2.0.0",
+    "litellm>=1.0.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "pytest>=7.0.0", 
+    "pytest-cov>=4.0.0",
+    "mypy>=1.0.0",
+    "isort>=5.0.0",
+    "build>=0.8.0",
+    "twine>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/tagent2"
+Documentation = "https://github.com/yourusername/tagent2"
+Repository = "https://github.com/yourusername/tagent2.git"
+"Bug Tracker" = "https://github.com/yourusername/tagent2/issues"
+
+[project.scripts]
+tagent = "tagent.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+tagent = ["*.md"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+line_length = 88
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v --cov=src --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["**/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+]
