@@ -1,0 +1,277 @@
+image:
+  repository_prefix: "harbor.cta-observatory.org/dpps/dpps"
+  pullPolicy: IfNotPresent
+
+dev:
+  # -- run tests in the container
+  run_tests: true
+  # -- sleep after test to allow interactive development
+  sleep: false
+  # -- mount the repo volume to test the code as it is being developed
+  mount_repo: true
+
+  # -- tag of the image used to run helm tests
+  client_image_tag:
+
+  # -- if true, a long-running client container will start *instead* of a test container
+  start_long_running_client: false
+
+  # -- user to run the container as. needs to be the same as local user if writing to repo directory
+  runAsUser: 1000
+  runAsGroup: 1000
+
+  # -- number of parallel test jobs for pytest
+  n_test_jobs: 1
+
+  # -- Pipelines versions used in the tests
+  pipelines:
+    datapipe:
+      version: v0.2.1
+    calibpipe:
+      version: v0.2.0
+
+
+bdms:
+  # -- Whether to deploy BDMS
+  enabled: true
+  configure_test_setup: true
+  safe_to_bootstrap_rucio: true
+
+  cert-generator-grid:
+    enabled: true
+
+  rucio-server:
+    exposeErrorLogs: false
+    replicaCount: 1
+    authRucioHost: rucio-server.local
+
+    ftsRenewal:
+      enabled: false
+
+    config:
+      database:
+        default: "postgresql://rucio:XcL0xT9FgFgJEc4i3OcQf2DMVKpjIWDGezqcIPmXlM@dpps-postgresql:5432/rucio"
+
+    readinessProbe:
+      initialDelaySeconds: 40
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 15
+
+    livenessProbe:
+      initialDelaySeconds: 40
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 15
+
+    ingress:
+      enabled: true
+      hosts:
+      - rucio-server.local
+
+    service:
+      type: ClusterIP
+      port: 443
+      targetPort: 443
+      protocol: TCP
+      name: https
+
+    useSSL: true
+
+    httpd_config:
+      grid_site_enabled: "True"
+
+    optional_config:
+      RUCIO_CFG_BOOTSTRAP_USERPASS_IDENTITY: "dpps"
+      RUCIO_CFG_BOOTSTRAP_USERPASS_PWD: "secret"
+      RUCIO_CFG_BOOTSTRAP_X509_IDENTITY: "CN=DPPS User"
+      RUCIO_CFG_BOOTSTRAP_X509_EMAIL: "dpps-test@cta-observatory.org"
+      RUCIO_CFG_POLICY_PACKAGE: "bdms_rucio_policy"
+      RUCIO_CFG_COMMON_EXTRACT_SCOPE: "ctao_bdms"
+      RUCIO_CFG_POLICY_LFN2PFN_ALGORITHM_DEFAULT: "ctao_bdms"
+
+
+  rucio-daemons:
+    conveyorTransferSubmitterCount: 1
+
+    config:
+      database:
+      # TODO: generate random, avoid repeating
+        default: "postgresql://rucio:XcL0xT9FgFgJEc4i3OcQf2DMVKpjIWDGezqcIPmXlM@dpps-postgresql:5432/rucio"
+
+  postgresql:
+    global:
+      postgresql:
+        auth:
+          username: rucio
+          password: "XcL0xT9FgFgJEc4i3OcQf2DMVKpjIWDGezqcIPmXlM"
+          database: rucio
+
+  database:
+    default: "postgresql://rucio:XcL0xT9FgFgJEc4i3OcQf2DMVKpjIWDGezqcIPmXlM@dpps-postgresql:5432/rucio"
+
+
+wms:
+  # -- Whether to deploy WMS
+  enabled: true
+  cert-generator-grid:
+    enabled: false
+
+  # This configuration of interface between WMS and BDMS.
+  # The ConfigMap is created by BDMS chart. The name should match the name of the ConfigMap in BDMS chart given the release name.
+  rucio:
+    enabled: true
+    rucioConfig: "dpps-bdms-rucio-config"
+
+  cvmfs:
+    enabled: true
+    publish_docker_images:
+      - "harbor.cta-observatory.org/dpps/datapipe:v0.2.1"
+      - "harbor.cta-observatory.org/dpps/calibpipe:v0.2.0"
+
+# dpps-level generator
+cert-generator-grid:
+  enabled: false
+  generatePreHooks: true
+
+
+
+# observability
+
+global:
+  image:
+    registry: harbor.cta-observatory.org/proxy_cache
+
+grafana:
+  enabled: true
+
+  testFramework:
+    enabled: false
+
+  persistentVolume:
+    size: 100Mi
+  retention: "1d"
+
+  prometheus-node-exporter:
+    enabled: false
+
+  adminUser: "admin"
+  adminPassword: "admin"
+
+
+prometheus:
+  enabled: true
+
+loki:
+  enabled: true
+
+  # this is a minimal configuration for loki; the goal of the UC is not to test diverse loki features,
+  # but to make sure that loki can collect meaningful logs from the DPPS components
+
+  # needed to run in rancher
+  # global:
+  #   dnsService: "rke2-coredns-rke2-coredns"
+
+  loki:
+    commonConfig:
+      replication_factor: 1
+    schemaConfig:
+      configs:
+        - from: "2024-04-01"
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+    pattern_ingester:
+        enabled: true
+    limits_config:
+      allow_structured_metadata: true
+      volume_enabled: true
+    ruler:
+      enable_api: true
+
+    auth_enabled: false
+
+  test:
+    enabled: false
+
+  monitoring:
+    selfMonitoring:
+      enabled: false
+      grafanaAgent:
+        installOperator: false
+      lokiCanary:
+        enabled: false
+
+  minio:
+    enabled: true
+
+  deploymentMode: SingleBinary
+
+  rollout_operator:
+    enabled: false
+
+  singleBinary:
+    replicas: 1
+
+  # Zero out replica counts of other deployment modes
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+
+  ingester:
+    replicas: 0
+  querier:
+    replicas: 0
+  queryFrontend:
+    replicas: 0
+  queryScheduler:
+    replicas: 0
+  distributor:
+    replicas: 0
+  compactor:
+    replicas: 0
+  indexGateway:
+    replicas: 0
+  bloomCompactor:
+    replicas: 0
+  bloomGateway:
+    replicas: 0
+
+
+fluent-bit:
+  enabled: true
+  config:
+    rbac:
+      create: true
+      eventsAccess: true
+
+    inputs: |
+      [INPUT]
+          Name tail
+          Path /var/log/containers/*.log
+          multiline.parser docker, cri
+          Tag kube.*
+          Mem_Buf_Limit 5MB
+          Buffer_Chunk_Size 1
+          Refresh_Interval 1
+          Skip_Long_Lines On
+
+
+    outputs: |
+      [FILTER]
+          Name grep
+          Match *
+
+      [OUTPUT]
+          Name        loki
+          Match       *
+          Host        dpps-loki-gateway
+          port        80
+          tls         off
+          tls.verify  off
