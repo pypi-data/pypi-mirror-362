@@ -1,0 +1,252 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+]
+
+[project]
+name = "jinja2-async-environment"
+version = "0.14.4"
+description = ""
+readme = "README.md"
+license.text = "BSD-3-Clause"
+authors = [
+    { name = "lesleslie", email = "les@wedgwoodwebworks.com" },
+]
+requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: AsyncIO",
+    "Framework :: FastAPI",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Typing :: Typed",
+]
+dependencies = [
+    "anyio>=4.9",
+    "jinja2>=3.1.6",
+    "redis>=3.5.3",
+]
+
+[dependency-groups]
+dev = [
+    "crackerjack>=0.22.5",
+    "twine>=6.1",
+]
+
+[tool.black]
+target-version = [
+    "py312",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+fix = true
+unsafe-fixes = true
+show-fixes = true
+output-format = "full"
+
+format.docstring-code-format = true
+lint.extend-select = [
+    "C901",
+    "D",
+    "F",
+    "I",
+    "UP",
+]
+lint.ignore = [
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+    "E402",
+    "F821",
+    "UP040",
+]
+lint.fixable = [
+    "ALL",
+]
+lint.unfixable = [  ]
+lint.isort.no-lines-before = [
+    "first-party",
+]
+lint.mccabe.max-complexity = 13
+lint.pydocstyle.convention = "google"
+
+[tool.codespell]
+skip = "*/data/*"
+quiet-level = 3
+ignore-words-list = "crate,uptodate,nd"
+
+[tool.pyproject-fmt]
+column_width = 120
+indent = 4
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+testpaths = [
+    "tests",
+    "jinja2_async_environment",
+]
+python_classes = [
+    "Test*",
+]
+python_functions = [
+    "test_*",
+]
+markers = [
+    "unit: marks test as a unit test",
+    "benchmark: mark test as a benchmark (disables parallel execution)",
+    "integration: marks test as an integration test",
+]
+timeout = 300
+timeout_method = "thread"
+addopts = "--cov=jinja2_async_environment --cov-report=term --cov-fail-under=42"
+filterwarnings = [
+    "ignore::pytest_benchmark.logger.PytestBenchmarkWarning",
+]
+
+[tool.pytest.benchmark]
+disable_gc = true
+warmup = false
+warmup_iterations = 0
+min_rounds = 1
+max_time = 5.0
+
+[tool.coverage.run]
+branch = false
+source = [
+    "jinja2_async_environment",
+]
+data_file = ".coverage"
+parallel = false
+omit = [
+    "*/tests/*",
+    "*/site-packages/*",
+    "*/__pycache__/*",
+    "*/__init__.py",
+    "*/_version.py",
+    "*/conftest.py",
+    "*/test_*.py",
+    "*/_test.py",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+    "except ImportError",
+    "def __str__",
+    "@abstractmethod",
+]
+ignore_errors = false
+
+[tool.pyright]
+verboseOutput = true
+include = [
+    "jinja2_async_environment",
+]
+exclude = [
+    "scratch",
+]
+extraPaths = [
+    ".venv/lib/python3.13/site-packages/",
+]
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+reportOptionalMemberAccess = false
+reportOptionalCall = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportInvalidTypeForm = false
+reportUnknownLambdaType = false
+reportUnknownParameterType = "warning"
+reportPrivateUsage = false
+pythonVersion = "3.13"
+
+[tool.creosote]
+paths = [
+    "jinja2_async_environment",
+]
+deps-file = "pyproject.toml"
+exclude-deps = [
+    "uv",
+    "pydantic-settings",
+    "pyfiglet",
+    "pytest-asyncio",
+    "pytest",
+    "pytest-mock",
+    "tomli-w",
+    "hatchling",
+    "pytest-benchmark",
+    "autotyping",
+    "pytest-cov",
+    "pre-commit",
+    "pytest-timeout",
+    "keyring",
+    "pytest-xdist",
+    "inflection",
+    "pyyaml",
+    "google-crc32c",
+]
+
+[tool.refurb]
+enable_all = true
+quiet = true
+
+[tool.bandit]
+target = [
+    "jinja2_async_environment",
+]
+skips = [
+    "B704",
+    "B404",
+    "B607",
+    "B301",
+    "B603",
+    "B101",
+    "B311",
+    "B403",
+    "B602",
+]
+
+[tool.vulture]
+min_confidence = 86
+paths = [
+    "jinja2_async_environment",
+]
+ignore_names = [
+    "cls",
+]
+
+[tool.uv]
+keyring-provider = "subprocess"
+index-url = "https://pypi.org/simple/"
+publish-url = "https://upload.pypi.org/legacy/"
+check-url = "https://pypi.org/simple/"
+
+[tool.uv.sources]
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://upload.pypi.org/legacy/"
+check-url = "https://pypi.org/simple/"
