@@ -1,0 +1,36 @@
+name: Test on Push on Linux64
+
+on:
+  push:
+
+# Required shell entrypoint to have properly configured bash shell
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  linux:
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        python-version: ["3.13"]  # latest only
+      fail-fast: false
+    name: Linux Python ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: activestorage
+          environment-file: environment.yml
+          python-version: ${{ matrix.python-version }}
+          miniforge-version: "latest"
+          use-mamba: true
+          mamba-version: "2.0.5"  # https://github.com/conda-incubator/setup-miniconda/issues/392
+      - run: conda --version
+      - run: python -V
+      - run: pip install -e .
+      - run: conda list
+      - run: pytest -n 2 -m "not slow" --junitxml=report-1.xml
+      - uses: codecov/codecov-action@v5

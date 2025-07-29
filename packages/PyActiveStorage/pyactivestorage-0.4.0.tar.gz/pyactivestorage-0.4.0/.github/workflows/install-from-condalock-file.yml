@@ -1,0 +1,43 @@
+name: Conda-lock Install
+on:
+  push:
+    branches:
+      - main
+  # run the test only if the PR is to main
+  # turn it on if required
+  # pull_request:
+  #   branches:
+  #     - main
+  schedule:
+    - cron: '0 0 * * *'
+
+# Required shell entrypoint to have properly configured bash shell
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  linux:
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+      fail-fast: false
+    name: Linux Python ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: activestorage-fromlock
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+      - run: conda --version
+      - run: which python
+      - run: python -V
+      - run: conda create --name activestorage-fromlock --file conda-linux-64.lock
+      - run: which python
+      - run: pip --version
+      - run: pip install -e .
+      - run: pytest
