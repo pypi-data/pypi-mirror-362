@@ -1,0 +1,77 @@
+[tool.poetry]
+name = "lynceus"
+version = "1.1.4"
+description = "Lynceus is a sophisticated and resilient Python toolbox designed to serve as the foundational core layer of your Python applications. It offers features like configuration file management with inheritance and automatic JSON loading, seamless logger configuration, efficient session management, and unified file handling for both local and remote storage. By providing a plethora of utilities, Lynceus allows developers to skip the mundane setup and focus directly on what truly matters."
+readme = "README.md"
+authors = ["Bertrand BENOIT <contact@bertrand-benoit.net>"]
+packages = [
+    { include = "lynceus" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://gitlab.com/bertrand-benoit/lynceus/-/issues"
+
+[tool.poetry.dependencies]
+python = ">=3.10.0,<4"
+
+python-gitlab = "~=4.5"
+PyGithub = "~=2.1"
+flake8 = "~=7.0"
+pylint = "~=3.2"
+
+
+
+
+pandas = "~=2.2"
+
+requests = "~=2.31"
+click = "~=8.1"
+pyarrow = "^19.0.0"
+fsspec = "~=2024.03"
+s3fs = { version = "~=2024.03", extras = ["boto3"] }
+aiobotocore = { version = "==2.17.0", extras = ["boto3"] }
+importlib-metadata = "^7.0.1"
+setuptools = "^75.8"
+
+[tool.poetry.group.dev.dependencies]
+coverage = { version = "^7.4", extras = ["toml"] }
+pyupgrade = "^3.15.0"
+pytest = ">=7.2,<8.0"
+pytest-asyncio = ">=0.21,<1.0"
+
+
+
+
+
+
+
+
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+data_file = ".coverage/coverage_data_file"
+parallel = true
+source = ["lynceus"]
+
+
+
+[tool.coverage.report]
+exclude_also = [
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+asyncio_mode = "auto"
+testpaths = [
+    "tests",
+]
