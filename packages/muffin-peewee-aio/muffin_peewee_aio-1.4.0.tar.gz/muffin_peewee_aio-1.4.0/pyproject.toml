@@ -1,0 +1,114 @@
+[tool.poetry]
+name = "muffin-peewee-aio"
+version = "1.4.0"
+description = "Peewee-AIO integration for Muffin framework"
+readme = "README.rst"
+license = "MIT"
+authors = ["Kirill Klenov <horneds@gmail.com>"]
+keywords = ["peewee", "sql", "orm", "asyncio", "muffin"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Framework :: AsyncIO",
+]
+homepage = "https://github.com/klen/muffin-peewee"
+repository = "https://github.com/klen/muffin-peewee"
+packages = [{ include = "muffin_peewee" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+muffin = "*"
+peewee = "^3"
+peewee-aio = "*"
+peewee-migrate = "^1"
+typing-extensions = { version = "*", python = "<3.11" }
+
+# Optional dependencies
+aiopg = { version = "*", optional = true }
+asyncpg = { version = "*", optional = true }
+aiomysql = { version = "*", optional = true }
+aiosqlite = { version = "*", optional = true }
+
+[tool.poetry.extras]
+aiopg = ["aiopg"]
+asyncpg = ["asyncpg"]
+aiomysql = ["aiomysql"]
+aiosqlite = ["aiosqlite"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-aio = "*"
+pytest-mypy = "*"
+aiosqlite = "*"
+uvicorn = "*"
+ruff = "*"
+black = "*"
+pre-commit = "*"
+pendulum = "*"
+
+[tool.pytest.ini_options]
+addopts = "-xsv"
+log_cli = true
+
+[tool.mypy]
+packages = ["muffin_peewee", "tests"]
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310,py311,py312,py313
+
+[testenv]
+deps = -e .[tests]
+commands =
+	pytest --mypy tests
+"""
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+exclude = [".venv", "docs", "example"]
+select = ["ALL"]
+ignore = [
+  "D",
+  "UP",
+  "ANN",
+  "DJ",
+  "EM",
+  "RSE",
+  "SLF",
+  "RET",
+  "TRY",
+  "S101",
+  "PLR2004",
+  "PLR0912",
+  "N804",
+  "A003",
+  "TRY003",
+  "COM812",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ARG"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312", "py313"]
+preview = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
