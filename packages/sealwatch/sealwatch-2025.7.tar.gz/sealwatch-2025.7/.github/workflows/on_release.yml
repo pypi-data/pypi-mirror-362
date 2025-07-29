@@ -1,0 +1,112 @@
+name: Release CI/CD # workflow name
+on: # trigger
+  release:
+    types:
+      - created
+  workflow_dispatch:  # <- allows manual triggering
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Set Github Workspace
+        uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Python 3.10  # set architecture and Python3
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist
+          manylinux: auto
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ strategy.job-index }}-binary
+          path: ./dist/sealwatch*.whl
+
+  make_sdist:
+    name: Make source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Optional, use if you use setuptools_scm
+          submodules: true  # Optional, use if you have submodules
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ strategy.job-index }}-source
+          path: dist/*.tar.gz
+
+  unit_tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest # runner
+    needs: [build_wheels, make_sdist]
+    steps: # tasks
+      - name: Set Github Workspace # access Github Workspace
+        uses: actions/checkout@v2
+      - name: Set up Python 3.10 # set architecture and Python3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+          architecture: "x64" # architecture
+      - name: Downloads artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: artifact-*-binary
+          merge-multiple: true
+          path: dist
+      - name: Install wheel
+        run: |
+          pip install numpy scipy jpeglib h5py pandas pillow torch torchvision tqdm parameterized conseal scikit-learn
+          pip install --find-links ./dist sealwatch --no-index --prefer-binary
+      - name: Remove local sealwatch to test installed wheel
+        run: rm -rf sealwatch
+      - name: Run unittests
+        shell: bash
+        run: |
+          python -m unittest
+      - name: Print log
+        shell: bash
+        if: always()
+        run: |
+          if [ -f test.log ]; then cat test.log; fi
+
+  upload_to_pypi:
+    name: Upload to PyPi
+    needs: [build_wheels, make_sdist, unit_tests]
+    runs-on: ubuntu-latest
+    # if: ${{github.event_name == 'release' && github.event.action == 'created'}}
+    steps:
+      - name: Downloads artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: artifact-*
+          merge-multiple: true
+          path: dist
+      - name: Publish on PyPI
+        uses: pypa/gh-action-pypi-publish@v1.4.1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          verbose: true
