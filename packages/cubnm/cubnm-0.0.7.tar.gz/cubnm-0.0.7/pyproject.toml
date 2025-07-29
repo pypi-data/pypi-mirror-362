@@ -1,0 +1,68 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools",
+    "numpy<2,>=1.20",
+    "versioneer[toml]"
+]
+
+[project]
+name = "cubnm"
+license = {file = "LICENSE"}
+dependencies = [
+    "numpy<2,>=1.20",
+    "scipy",
+    "pandas",
+    "pymoo==0.6",
+    "tabulate",
+    "matplotlib",
+    "seaborn"
+]
+requires-python = ">=3.7"
+description = "A toolbox for brain network modeling on GPUs "
+readme = "README.rst"
+authors = [
+    {name = "Amin Saberi", email="amnsbr@gmail.com"}
+]
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Developers',
+    'Programming Language :: C',
+    'Programming Language :: C++',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'Operating System :: Unix',
+    'Environment :: GPU :: NVIDIA CUDA',
+    'Topic :: Scientific/Engineering',
+]
+dynamic = ["version"]
+
+[project.scripts]
+cubnm = "cubnm.cli:main"
+
+[project.optional-dependencies]
+cupy-cuda11x = ["cupy-cuda11x", "numba"]
+cupy-cuda12x = ["cupy-cuda12x", "numba"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.cibuildwheel]
+before-all = "bash {project}/tools/cibw_before_all.sh {project}"
+# add miniconda to path to enable `conda`
+# (at the end to avoid overriding cibw's Python)
+environment = { PATH="$PATH:/opt/miniconda/bin" }
+manylinux-x86_64-image = "sameli/manylinux2014_x86_64_cuda_11.8"
+build-verbosity = 3
+skip = ["pp*", "*-manylinux_i686", "*musllinux*"]
+build = ["*-manylinux_x86_64"]
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "src/cubnm/_version.py"
+versionfile_build = "cubnm/_version.py"
+tag_prefix = "v"
+parentdir_prefix = ""
