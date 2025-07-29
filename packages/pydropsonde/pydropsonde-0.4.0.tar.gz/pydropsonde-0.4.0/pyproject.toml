@@ -1,0 +1,87 @@
+[project]
+name = "pydropsonde"
+repository = "https://github.com/atmdrops/pydropsonde"
+documentation = "https://atmdrops.github.io/pydropsonde/"
+description = "Tools to process dropsonde data"
+authors = [{name="Geet George", email= "geet.george@mpimet.mpg.de"}]
+maintainers = [
+    {name="Helene Gloeckner", email="helene.gloeckner@mpimet.mpg.de"},
+    {name="Theresa Mieslinger", email="theresa.mieslinger@mpimet.mpg.de"},
+    {name="Nina Robbins", email="nina.robbins@mpimet.mpg.de"},
+]
+readme = "README.md"
+license = "MIT"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+]
+packages = [{include = "pydropsonde"}]
+requires-python = ">3.10"
+dynamic=[]
+
+
+dependencies = [
+    "PyYAML",
+    "aiohttp",
+    "bottleneck",
+    "circle-fit",
+    "flox",
+    "fsspec!=0.9.0",
+    "llvmlite>=0.40",
+    "moist-thermodynamics",
+    "netcdf4",
+    "numpy",
+    "numba>=0.50",
+    "numcodecs",
+    "pyproj",
+    "pandas",
+    "requests",
+    "scipy",
+    "tqdm",
+    "xarray",
+    "xhistogram",
+    "zarr (>2.0.0,<3.0.0)",
+]
+version = "0.4.0"
+
+[tool.poetry]
+
+[tool.poetry.group.test.dependencies]
+pytest = "*"
+pytest-watch = "*"
+
+[tool.poetry-dynamic-versioning]
+enable = false
+vcs = "git"
+
+[tool.poetry.scripts]
+pydropsonde = 'pydropsonde.main:main'
+
+[tool.poetry.requires-plugins]
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
+
+[tool.poetry-dynamic-versioning.files."pydropsonde/_version.py"]
+persistent-substitution = true
+initial-content ="""
+  TYPE_CHECKING = False
+  if TYPE_CHECKING:
+      from typing import Tuple, Union
+      VERSION_TUPLE = Tuple[Union[int, str], ...]
+  else:
+      VERSION_TUPLE = object
+
+  version: str
+  __version__: str
+  __version_tuple__: VERSION_TUPLE
+  version_tuple: VERSION_TUPLE
+
+  __version__ = '0.0.0'
+  __version_tuple__ = (0, 0, 0)
+  """
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
