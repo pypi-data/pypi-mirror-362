@@ -1,0 +1,54 @@
+[package]
+name = "starknet-devnet-core"
+version = "0.4.1"
+edition.workspace = true
+repository.workspace = true
+license-file.workspace = true
+description = "Starknet core logic for devnet"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lints]
+workspace = true
+
+[dependencies]
+blockifier = { workspace = true, features = ["transaction_serde"]}
+cairo-lang-starknet-classes = { workspace = true }
+clap = { workspace = true }
+ethers = { workspace = true }
+starknet_api = { workspace = true }
+thiserror = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+starknet-types-core = { workspace = true }
+starknet-rs-signers = { workspace = true }
+starknet-rs-core = { workspace = true }
+starknet-types = { workspace = true }
+rand = { workspace = true }
+rand_mt = { workspace = true }
+tracing = { workspace = true }
+indexmap = { workspace = true }
+url = { workspace = true }
+nonzero_ext = { workspace = true }
+parking_lot = { workspace = true }
+tokio = { workspace = true }
+
+# necessary for installing reqwest in Docker
+openssl = { workspace = true }
+
+cargo-platform = { workspace = true }
+
+[dev-dependencies]
+hex = { workspace = true }
+starknet-types = { workspace = true, features = ["testing"] }
+
+[features]
+test_utils = []
+
+[package.metadata.cargo-machete]
+ignored = [
+    # read note above
+    "openssl",
+    "cargo-platform"
+]
