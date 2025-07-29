@@ -1,0 +1,32 @@
+# This example uses the manual configuration of the 'create.database' module, instead of the
+# 'create.database.from.file_bundle' operation, which would also be possible (but would not be
+# configurable, as this is.
+
+pipeline_name: import.database.from.csv_files
+doc: |
+  Create a database value from a folder of csv files.
+
+  Each file will represent a table in the database.
+
+steps:
+  - module_type: import.local.file_bundle
+    module_config:
+      include_file_types:
+        - ".csv"
+    step_id: import_csv_files
+  - module_type: create.database
+    module_config:
+      include_source_metadata: false
+      source_type: file_bundle
+      target_type: database
+      ignore_errors: false
+      include_source_file_content: false
+    step_id: create_database
+    input_links:
+      file_bundle: import_csv_files.file_bundle
+
+input_aliases:
+  import_csv_files.path: path
+
+output_aliases:
+  create_database.database: database

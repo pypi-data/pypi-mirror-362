@@ -1,0 +1,24 @@
+{
+  "pipeline_name": "import.table.from.local_file_path",
+  "doc": "Import a table from a file on the local filesystem.",
+  "steps": [
+    {
+      "module_type": "import.local.file",
+      "step_id": "import_file"
+    },
+    {
+      "module_type": "create.table.from.file",
+      "step_id": "create_table_from_file",
+      "input_links": {
+        "file": "import_file.file"
+      }
+    }],
+  "input_aliases": {
+    "import_file.path": "path",
+    "create_table_from_file.first_row_is_header": "first_row_is_header"
+  },
+  "output_aliases": {
+    "import_file.file": "imported_file",
+    "create_table_from_file.table": "table"
+  }
+}

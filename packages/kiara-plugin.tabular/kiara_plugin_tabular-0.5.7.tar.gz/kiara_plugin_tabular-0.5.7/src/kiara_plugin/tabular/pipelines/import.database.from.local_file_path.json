@@ -1,0 +1,23 @@
+{
+  "pipeline_name": "import.database.from.local_file_path",
+  "doc": "Import a database from a csv file.",
+  "steps": [
+    {
+      "module_type": "import.local.file",
+      "step_id": "import_file"
+    },
+    {
+      "module_type": "create.database.from.file",
+      "step_id": "create_database_from_file",
+      "input_links": {
+        "file": "import_file.file"
+      }
+    }],
+  "input_aliases": {
+    "import_file.path": "path"
+  },
+  "output_aliases": {
+    "import_file.file": "imported_file",
+    "create_database_from_file.database": "database"
+  }
+}
