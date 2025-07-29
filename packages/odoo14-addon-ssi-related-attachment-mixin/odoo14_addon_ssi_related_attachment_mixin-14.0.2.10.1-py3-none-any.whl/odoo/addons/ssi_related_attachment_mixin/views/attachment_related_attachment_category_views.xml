@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+<odoo>
+    <record id="attachment_related_attachment_category_view_search" model="ir.ui.view">
+        <field name="name">attachment.related.attachment.category.view.search</field>
+        <field name="model">attachment.related_attachment_category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code" />
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+
+    <record id="attachment_related_attachment_category_view_tree" model="ir.ui.view">
+        <field name="name">attachment.related.attachment.category.view.tree</field>
+        <field name="model">attachment.related_attachment_category</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" />
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="attachment_related_attachment_category_view_form" model="ir.ui.view">
+        <field name="name">attachment.related.attachment.category.view.form</field>
+        <field name="model">attachment.related_attachment_category</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" style="width: 300px;" name="buttons" />
+                    <group name="group_1" colspan="4" col="2">
+                        <group name="group_1_1" colspan="1" col="2">
+                            <field name="code" />
+                            <field name="name" />
+                            <field name="active" widget="boolean_toggle" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="page_description" string="Description">
+                            <field name="description" colspan="4" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record
+        id="attachment_related_attachment_category_action"
+        model="ir.actions.act_window"
+    >
+        <field name="name">Related Attachment Categories</field>
+        <field name="res_model">attachment.related_attachment_category</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+        id="attachment_related_attachment_category_menu"
+        name="Categories"
+        parent="menu_related_attachment"
+        action="attachment_related_attachment_category_action"
+        sequence="10"
+    />
+
+</odoo>

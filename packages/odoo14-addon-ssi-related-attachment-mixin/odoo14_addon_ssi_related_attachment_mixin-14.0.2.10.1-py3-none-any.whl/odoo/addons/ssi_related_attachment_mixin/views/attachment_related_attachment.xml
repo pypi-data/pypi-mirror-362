@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+<odoo>
+    <record id="attachment_related_attachment_view_form" model="ir.ui.view">
+        <field name="name">attachment.related.attachment - form</field>
+        <field name="model">attachment.related_attachment</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <header>
+                    <button
+                        name="%(ssi_related_attachment_mixin.attachment_related_attachment_import_action)d"
+                        string="Upload/Select Attachment"
+                        type="action"
+                        icon="fa-upload"
+                        attrs="{'invisible':[('attachment_id','!=', False)]}"
+                    />
+                    <button
+                        name="action_unlink_attachment"
+                        string="Unlink Attachment"
+                        type="object"
+                        icon="fa-unlink"
+                        confirm="Unlink Attachment. Are you sure?"
+                        attrs="{'invisible':['|', ('attachment_id','=', False), ('verified','=', True)]}"
+                    />
+                    <button
+                        name="action_delete_attachment"
+                        string="Erase Attachment"
+                        type="object"
+                        icon="fa-eraser"
+                        confirm="Erase Attachment. Are you sure?"
+                        attrs="{'invisible':['|', ('attachment_id','=', False), ('verified','=', True)]}"
+                    />
+                    <button
+                        name="action_verify_attachment"
+                        string="Verify Attachment"
+                        type="object"
+                        icon="fa-check"
+                        confirm="Verify Attachment. Are you sure?"
+                        attrs="{'invisible':['|',('verify_ok','=',False),('attachment_id','=', False)]}"
+                    />
+                    <button
+                        name="action_unverify_attachment"
+                        title="Unverify Attachment"
+                        type="object"
+                        icon="fa-times"
+                        confirm="Unverify Attachment. Are you sure?"
+                        attrs="{'invisible':[('unverify_ok','=', False)]}"
+                    />
+                </header>
+                <sheet>
+                    <group name="group_1" colspan="4" col="2">
+                        <field name="category_id" />
+                        <field name="attachment_id" invisible="1" />
+                        <field name="datas_fname" invisible="1" />
+                        <field
+                            name="attachment_data"
+                            widget="binary"
+                            filename="datas_fname"
+                        />
+                        <field name="verify_method" invisible="1" />
+                        <field name="verify_user_ids" widget="many2many_tags_avatar" />
+                        <field name="user_id" />
+                        <field name="date" string="Verified Date" />
+                        <field
+                            name="date_manual"
+                            readonly="1"
+                            string="Verified Date Manual"
+                        />
+                        <field name="verify_ok" invisible="1" />
+                        <field name="unverify_ok" invisible="1" />
+                        <field name="verified" invisible="1" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="attachment_related_attachment_view_tree" model="ir.ui.view">
+        <field name="name">attachment.related.attachment.tree</field>
+        <field name="model">attachment.related_attachment</field>
+        <field name="arch" type="xml">
+            <tree string="Related Attachment" editable="bottom">
+                <field name="category_id" />
+                <field name="attachment_id" invisible="1" />
+                <field name="datas_fname" invisible="0" />
+                <field name="verify_method" invisible="1" />
+                <field
+                    name="verify_user_ids"
+                    widget="many2many_tags_avatar"
+                    optional="hide"
+                />
+                <field name="user_id" />
+                <field name="date" string="Verified Date" />
+                <field name="date_manual" readonly="1" string="Verified Date Manual" />
+                <field name="verify_ok" invisible="1" />
+                <field name="unverify_ok" invisible="1" />
+                <field name="verified" invisible="1" />
+                <button
+                    name="%(ssi_related_attachment_mixin.attachment_related_attachment_import_action)d"
+                    title="Upload/Select Attachment"
+                    type="action"
+                    icon="fa-upload"
+                    attrs="{'invisible':[('attachment_id','!=', False)]}"
+                />
+                <button
+                    name="action_unlink_attachment"
+                    title="Unlink Attachment"
+                    type="object"
+                    icon="fa-unlink"
+                    confirm="Unlink Attachment. Are you sure?"
+                    attrs="{'invisible':['|', ('attachment_id','=', False), ('verified','=', True)]}"
+                />
+                <button
+                    name="action_delete_attachment"
+                    title="Erase Attachment"
+                    type="object"
+                    icon="fa-eraser"
+                    confirm="Erase Attachment. Are you sure?"
+                    attrs="{'invisible':['|', ('attachment_id','=', False), ('verified','=', True)]}"
+                />
+                <button
+                    name="action_verify_attachment"
+                    title="Verify Attachment"
+                    type="object"
+                    icon="fa-check"
+                    confirm="Verify Attachment. Are you sure?"
+                    attrs="{'invisible':['|',('verify_ok','=',False),('attachment_id','=', False)]}"
+                />
+                <button
+                    name="action_unverify_attachment"
+                    title="Unverify Attachment"
+                    type="object"
+                    icon="fa-times"
+                    confirm="Unverify Attachment. Are you sure?"
+                    attrs="{'invisible':[('unverify_ok','=', False)]}"
+                />
+            </tree>
+        </field>
+    </record>
+
+    <record id="attachment_related_attachment_view_kanban" model="ir.ui.view">
+        <field name="name">attachment.related.attachment - kanban</field>
+        <field name="model">attachment.related_attachment</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="category_id" />
+                <field name="user_id" />
+                <field name="date" />
+                <field name="date_manual" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="row">
+                                <div class="col-8">
+                                    <strong>
+                                        <span>
+                                            <t t-esc="record.category_id.value" />
+                                        </span>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-muted">
+                                    <span>
+                                        Verified By:
+                                        <t t-esc="record.user_id.value" />
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-muted">
+                                    <span>
+                                        Verified Date:
+                                        <t t-esc="record.date.value" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+</odoo>

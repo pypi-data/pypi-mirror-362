@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="related_attachment_page">
+        <page name="page_related_attachment" string="Related Attachment">
+            <button
+                name="action_reload_rel_attachment_template"
+                string="Template"
+                type="object"
+                class="oe_highlight"
+                icon="fa-refresh"
+            />
+            <group name="grp_related_attachment_1" colspan="4" col="2">
+                <field name="num_of_related_attachment" string="All" />
+                <field name="num_of_verified_related_attachment" string="Verified" />
+                <field
+                    name="num_of_unverified_related_attachment"
+                    string="Unverified"
+                />
+                <field name="related_attchment_status" string="State" />
+                <field
+                    name="allowed_related_attachment_template_ids"
+                    widget="many2many_tags"
+                    string="Template"
+                    invisible="1"
+                />
+                <field
+                    name="related_attachment_template_id"
+                    domain="[('id','in',allowed_related_attachment_template_ids)]"
+                    string="Template"
+                />
+            </group>
+            <field
+                name="related_attachment_ids"
+                nolabel="1"
+                readonly="1"
+                force_save="1"
+                options="{'always_reload': True}"
+            />
+            <button
+                name="action_reload_rel_attachment_detail"
+                string="Attachments"
+                type="object"
+                class="oe_highlight"
+                icon="fa-refresh"
+            />
+        </page>
+    </template>
+</odoo>

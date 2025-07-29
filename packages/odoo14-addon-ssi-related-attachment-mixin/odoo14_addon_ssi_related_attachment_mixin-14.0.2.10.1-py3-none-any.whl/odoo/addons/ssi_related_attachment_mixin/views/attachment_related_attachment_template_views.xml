@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+<odoo>
+    <record id="attachment_related_attachment_template_view_search" model="ir.ui.view">
+        <field name="name">attachment.related.attachment.template.view.search</field>
+        <field name="model">attachment.related_attachment_template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="model_id" />
+                <group name="group2">
+                    <filter
+                        name="grp_model"
+                        string="Model"
+                        context="{'group_by':'model_id'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="attachment_related_attachment_template_view_tree" model="ir.ui.view">
+        <field name="name">attachment.related.attachment.template.view.tree</field>
+        <field name="model">attachment.related_attachment_template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="model_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="attachment_related_attachment_template_view_form" model="ir.ui.view">
+        <field name="name">attachment.related.attachment.template.view.form</field>
+        <field name="model">attachment.related_attachment_template</field>
+        <field name="arch" type="xml">
+            <form>
+                <header />
+                <sheet>
+                  <div class="oe_button_box" style="width: 300px;" name="buttons" />
+                    <group name="group_1" colspan="4" col="2">
+                        <group name="group_1_1" colspan="1" col="2">
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                            <field name="name" />
+                            <field name="model_id" />
+                            <field name="model" />
+                        </group>
+                        <group name="group_1_2">
+                            <field name="sequence" />
+                            <field name="active" widget="boolean_toggle" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="page_detail" string="Details">
+                            <group name="group_detail_1" colspan="4" col="2">
+                                <field
+                                    name="detail_ids"
+                                    colspan="4"
+                                    nolabel="1"
+                                    context="{'active_test': False}"
+                                >
+                                    <tree>
+                                        <field name="sequence" widget="handle" />
+                                        <field name="active" widget="boolean_toggle" />
+                                        <field name="category_id" />
+                                        <field name="verify_method" />
+                                        <field name="verify_user_ids" />
+                                        <field name="verify_group_ids" />
+                                        <field name="python_code" />
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page name="page_computation" string="Computation">
+                            <group name="group_computation_1" colspan="4" col="2">
+                                <field name="python_code" colspan="4" widget="ace" />
+                            </group>
+                        </page>
+                        <page name="page_note" string="Note">
+                            <group name="group_note_1" colspan="4" col="2">
+                                <field name="note" colspan="4" nolabel="1" />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record
+        id="attachment_related_attachment_template_action"
+        model="ir.actions.act_window"
+    >
+        <field name="name">Related Attachment Templates</field>
+        <field name="res_model">attachment.related_attachment_template</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+        id="attachment_related_attachment_template_menu"
+        name="Templates"
+        parent="menu_related_attachment"
+        action="attachment_related_attachment_template_action"
+        sequence="20"
+    />
+
+</odoo>

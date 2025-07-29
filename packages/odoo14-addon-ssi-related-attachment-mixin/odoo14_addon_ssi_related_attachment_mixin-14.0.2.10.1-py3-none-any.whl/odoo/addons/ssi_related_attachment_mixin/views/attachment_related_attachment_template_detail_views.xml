@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html). -->
+<odoo>
+<record id="attachment_related_attachment_template_detail_view_tree" model="ir.ui.view">
+    <field name="name">attachment.related.attachment.template.detail.view.tree</field>
+    <field name="model">attachment.related_attachment_template_detail</field>
+    <field name="arch" type="xml">
+        <tree>
+            <field name="sequence" widget="handle" />
+            <field name="template_id" />
+            <field name="active" widget="boolean_toggle" />
+            <field name="category_id" />
+            <field name="verify_method" />
+            <field name="verify_user_ids" />
+            <field name="verify_group_ids" />
+            <field name="python_code" />
+        </tree>
+    </field>
+</record>
+
+<record id="attachment_related_attachment_template_detail_view_form" model="ir.ui.view">
+    <field name="name">attachment.related.attachment.template.detail.view.form</field>
+    <field name="model">attachment.related_attachment_template_detail</field>
+    <field name="arch" type="xml">
+        <form>
+            <header />
+            <sheet>
+                <group name="group_1" colspan="4" col="2">
+                    <group name="group_1_1" colspan="1" col="2">
+                        <field name="company_id" groups="base.group_multi_company" />
+                        <field name="sequence" />
+                        <field name="category_id" />
+                    </group>
+                    <group name="group_1_2">
+                        <field name="active" widget="boolean_toggle" />
+                    </group>
+                </group>
+                <notebook>
+                    <page name="page_verifier" string="Verifier">
+                        <group name="group_verifier_1" colspan="4" col="2">
+                            <field name="verify_method" colspan="4" />
+                            <field
+                                    name="verify_user_ids"
+                                    colspan="4"
+                                    attrs="{
+                                        'invisible': [('verify_method', '!=', 'use_user'), ('verify_method', '!=', 'use_both')],
+                                        'required': ['|', ('verify_method', '=', 'use_user'), ('verify_method', '=', 'use_both')]}"
+                                    widget="many2many_tags"
+                                />
+                            <field
+                                    name="verify_group_ids"
+                                    colspan="4"
+                                    attrs="{
+                                        'invisible': [('verify_method', '!=', 'use_group'), ('verify_method', '!=', 'use_both')],
+                                        'required': ['|', ('verify_method', '=', 'use_group'), ('verify_method', '=', 'use_both')]}"
+                                    widget="many2many_tags"
+                                />
+                            <field
+                                    name="python_code"
+                                    colspan="4"
+                                    widget="ace"
+                                    attrs="{'invisible': [('verify_method', '&lt;&gt;', 'use_python')]}"
+                                />
+                        </group>
+                    </page>
+                </notebook>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record
+        id="attachment_related_attachment_template_detail_action"
+        model="ir.actions.act_window"
+    >
+    <field name="name">Related Attachment Template Details</field>
+    <field name="res_model">attachment.related_attachment_template_detail</field>
+    <field name="view_mode">tree,form</field>
+    <field name="context">{'active_test': False}</field>
+</record>
+
+<menuitem
+        id="attachment_related_attachment_template_detail_menu"
+        name="Template Details"
+        parent="menu_related_attachment"
+        action="attachment_related_attachment_template_detail_action"
+        sequence="30"
+    />
+</odoo>
