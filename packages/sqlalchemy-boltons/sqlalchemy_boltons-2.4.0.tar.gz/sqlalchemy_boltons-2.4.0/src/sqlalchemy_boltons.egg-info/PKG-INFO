@@ -1,0 +1,162 @@
+Metadata-Version: 2.1
+Name: sqlalchemy-boltons
+Version: 2.4.0
+Summary: Utilities that should've been inside SQLAlchemy but aren't
+Author-email: Eduard Christian Dumitrescu <eduard.c.dumitrescu@gmail.com>
+Maintainer-email: Eduard Christian Dumitrescu <eduard.c.dumitrescu@gmail.com>
+License: MIT
+Project-URL: Homepage, https://hydra.ecd.space/deaduard/sqlalchemy_boltons/
+Project-URL: Changelog, https://hydra.ecd.space/deaduard/sqlalchemy_boltons/file?name=CHANGELOG.md&ci=trunk
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: AUTHORS.md
+
+# sqlalchemy_boltons
+
+SQLAlchemy is great. However, it doesn't have everything built-in. Some important things are missing, and need to be
+"bolted on".
+
+(Name inspired from [boltons](https://pypi.org/project/boltons/). Not affiliated.)
+
+## sqlite
+
+SQLAlchemy doesn't automatically fix pysqlite's broken transaction handling. This module implements the
+[usual fix](https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#serializable-isolation-savepoints-transactional-ddl)
+for that well-known broken behaviour, and also adds extra features on top of that.
+
+You can [customize](https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.Engine.execution_options),
+on a per-engine or per-connection basis:
+
+- `x_sqlite_begin_mode`: The type of transaction to be started, such as "BEGIN" or
+  "[BEGIN IMMEDIATE](https://www.sqlite.org/lang_transaction.html)" (or
+  "[BEGIN CONCURRENT](https://www.sqlite.org/cgi/src/doc/begin-concurrent/doc/begin_concurrent.md)" someday maybe).
+- `x_sqlite_foreign_keys`: The [foreign-key enforcement setting](https://www.sqlite.org/foreignkeys.html). Can be
+  `True`, `False`, or `"defer"`.
+- `x_sqlite_journal_mode`: The [journal mode](https://www.sqlite.org/pragma.html#pragma_journal_mode) such as
+  `"DELETE"` or `"WAL"`.
+
+Here's a minimal example:
+
+```python
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy_boltons.sqlite import create_engine_sqlite
+
+engine = create_engine_sqlite(
+    "file.db",
+    journal_mode="WAL",
+    timeout=0.5,
+    create_engine_args={"echo": True},
+)
+
+# Configure the engine to use a plain "BEGIN" to start transactions and
+# and to use deferred enforcement of foreign keys (recommended!)
+engine = engine.execution_options(
+    x_sqlite_begin_mode=None, x_sqlite_foreign_keys="defer"
+)
+
+# Make a separate engine for write transactions using "BEGIN IMMEDIATE"
+# for eager locking.
+engine_w = engine.execution_options(x_sqlite_begin_mode="IMMEDIATE")
+
+# Construct a sessionmaker for each engine.
+Session = sessionmaker(engine)
+SessionW = sessionmaker(engine_w)
+
+# read-only transaction
+with Session() as session:
+    session.execute(select(...))
+
+# lock the database eagerly for writing
+with SessionW() as session:
+    session.execute(update(...))
+```
+
+## orm
+
+### orm.RelationshipComparator
+
+Somedays you really wish you could write something like:
+
+```python
+# Find every parent that has at least one child.
+Parent1 = aliased(Parent)
+select(Parent1).where(
+    exists().select_from(Child).where(Child.parent == Parent1)  # this doesn't work
+)
+```
+
+But it doesn't work. You get an exception. You try various other things but it just won't produce the right subquery.
+You find tons of people online saying you must resign yourself to writing the explicit filtering condition, writing out
+`.where(Child.parent_id == Parent1.id)`. Like a caveman. Why even bother using an ORM at this point? If you're lucky,
+you find yourself reading mail archives from [a decade ago](https://groups.google.com/g/sqlalchemy/c/R-qOlzzVi0o/m/NtFswgJioDIJ)
+with somewhat of a solution, but it's not obvious how to make it work with table
+[aliases](https://docs.sqlalchemy.org/en/20/orm/queryguide/api.html#sqlalchemy.orm.aliased). Despair is setting in.
+
+But lucky you, you can now use this library:
+
+```python
+from sqlalchemy_boltons.orm import RelationshipComparator as Rel
+
+# Find every parent that has at least one child.
+Parent1 = aliased(Parent)
+select(Parent1).where(
+    exists().select_from(Child).where(Rel(Child.parent) == Parent1)
+)  #                                  ^^^^            ^
+```
+
+Hope is restored. This even works on self-referential tables!
+
+### orm.IdKey
+
+`IdKey` holds the primary key information for an ORM instance. This is useful for passing a reference to an ORM object
+across different sessions and/or threads. This is implemented in terms of `Session.identity_key` and `Session.get`, so
+you don't have to mess around with `Session.merge`.
+
+```python
+with Session() as s1:
+    instance = s1.execute(sa.select(MyClass).where(...)).one()
+    key = IdKey.from_instance(instance)
+
+# ...later, maybe in a different thread:
+with Session() as s2:
+    instance = key.get_one(s2)  # raises sqlalchemy.exc.NoResultFound if object doesn't exist anymore
+```
+
+## core
+
+### `core.bytes_startswith(sql_expr, prefix: bytes)`
+
+This function constructs a SQL expression equivalent to ``sql_expr.startswith(prefix)`` but using comparison operators
+instead. The intended use case is efficiently searching a BLOB-like column that has an index on it.
+
+## temporary_table
+
+Create a temporary table so you can write things like:
+
+```python
+from sqlalchemy import sa
+from sqlalchemy_boltons.temporary import temporary_table
+
+tmp_table_def = Table("ids", sa.MetaData(), sa.Column("id", Integer))
+
+...
+
+my_ids = [1, 23, 4, 5, 67, 89]
+
+with Session() as s:
+    with temporary_table(s, tmp_table_def) as tmp:
+        s.execute(sa.insert(tmp), [{"id": x} for x in my_ids])
+        results = s.execute(sa.select(SomeTable).join(tmp, tmp.c.id == SomeTable.id)).all()
+```
+
+## reset
+
+PostgreSQL and MS SQL both require additional things to be done to fully clean up before reusing a connection. A mere "ROLLBACK" is insufficient. By default, SQLAlchemy [doesn't](https://github.com/sqlalchemy/sqlalchemy/issues/8693) do those things.
+
+```python
+from sqlalchemy_boltons.reset import install_reset_auto
+
+engine = create_engine(..., pool_reset_on_return=False)
+install_reset_auto(engine)
+```
