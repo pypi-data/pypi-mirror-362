@@ -1,0 +1,46 @@
+Metadata-Version: 2.4
+Name: numpyencoder
+Version: 0.3.2
+Summary: Python JSON encoder for handling Numpy data types.
+Author-email: "Hunter M. Allen" <allenhm@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/hmallen/numpyencoder
+Keywords: numpy,json,encoder
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.14.3
+Requires-Dist: packaging>=20.0
+Dynamic: license-file
+
+# numpyencoder
+
+Custom Python JSON encoder for handling Numpy data types.
+
+**Example Use:**
+
+```python
+from numpyencoder import NumpyEncoder
+
+numpy_data = np.array([0, 1, 2, 3])
+
+with open(json_file, 'w') as file:
+    json.dump(
+        numpy_data,
+        file,
+        indent=4,
+        sort_keys=True,
+        separators=(', ', ': '),
+        ensure_ascii=False,
+        cls=NumpyEncoder
+    )
+```
+
+## Installation
+
+```
+pip install numpyencoder==0.3.2
+```
+
