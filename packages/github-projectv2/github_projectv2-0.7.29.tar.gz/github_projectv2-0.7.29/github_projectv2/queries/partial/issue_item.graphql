@@ -1,0 +1,117 @@
+id
+__typename
+assignees(first: 100) {
+    edges {
+        node {
+        id
+        email
+        login
+        name
+        }
+    }
+}
+author {
+    login
+    ... on User {
+        id
+        email
+        login
+        name
+    }
+}
+body
+closed
+closedAt
+createdAt
+labels(first: 100) {
+edges {
+    node {
+    id
+    name
+    description
+    }
+}
+}
+number
+title
+updatedAt
+url
+repository {
+    {% include "partial/repository.graphql" %}
+}
+{% if options['includeTimelineEvents'] %}
+{% include "partial/issue-timeline-events.graphql" %}
+{% endif %}
+{% if options['includeComments'] %}
+comments(first: 100) {
+    edges {
+    node {
+        ... on IssueComment {
+            id
+            author {
+            login
+            ... on User {
+                id
+                email
+                login
+                name
+            }
+            }
+            body
+            createdAt
+            updatedAt
+        }
+    }
+    }
+}
+{% endif %}
+{% if options['includeCommits'] %}
+{% endif %}
+{% if options['includeTrackedInIssues'] %}
+trackedInIssues(first: 100) {
+    edges {
+    node {
+        id
+        title
+        url
+        number
+        closed
+    }
+    }
+}
+{% endif %}
+{% if options['includeTrackedIssues'] %}
+trackedIssues(first: 100) {
+    edges {
+    node {
+        id
+        title
+        url
+        number
+        closed
+    }
+    }
+}
+{% endif %}
+{% if options['includeFields'] %}
+projectItems(first: 100) {
+    edges {
+        node {
+            id
+            __typename
+            project {
+                id
+                title
+                number
+            }
+            fieldValues(first: 30) {
+                edges {
+                    node {
+                        {% include "partial/fields.graphql" %}
+                    }
+                }
+            }
+        }
+    }
+}
+{% endif %}
