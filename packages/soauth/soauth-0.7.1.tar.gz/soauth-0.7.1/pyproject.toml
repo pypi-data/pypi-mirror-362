@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "soauth"
+version = "0.7.1"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic",
+    "pydantic-settings",
+    "sqlmodel",
+    "psycopg_binary",
+    "asyncpg",
+    "psycopg",
+    "sqlalchemy[asyncio]",
+    "pyjwt[crypto]",
+    "cryptography",
+    "bcrypt",
+    "httpx",
+    "xxhash",
+    "fastapi",
+    "structlog",
+    "uuid7",
+    "jinja2",
+    "python-multipart",
+    "uvicorn",
+    "cachetools"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+    "coverage",
+    "pytest-cov",
+    "pre-commit",
+    "testcontainers[postgres]",
+    "pdoc",
+    "aiosqlite"
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+soauth = ["soauth/app/templates/*.html"]  # Or use **/*.html for nested folders
+
+
+[project.scripts]
+soauth = "soauth.scripts.cli:main"
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.coverage.run]
+source = [
+    "soauth",
+]
