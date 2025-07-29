@@ -1,0 +1,207 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hipercow"
+description = "The High Performance Computing Workbench, for Python. Set up cluster environments and jobs. Moos not yet included."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Rich FitzJohn", email = "r.fitzjohn@imperial.ac.uk" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "click",
+  "click-repl",
+  "defusedxml",
+  "keyring",
+  "pydantic",
+  "requests",
+  "rich",
+  "taskwait",
+  "typing_extensions",
+]
+dynamic = ["version"]
+
+[project.urls]
+Documentation = "https://mrc-ide.github.io/hipercow-py"
+Issues = "https://github.com/mrc-ide/hipercow-py/issues"
+Source = "https://github.com/mrc-ide/hipercow-py"
+
+[project.scripts]
+hipercow = "hipercow.cli:cli_safe"
+
+[tool.hatch.version]
+path = "src/hipercow/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "pytest",
+  "pytest-cov",
+  "pytest-mock",
+  "pytest-explicit",
+  "responses",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests} --run-all"
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=hipercow --cov=tests {args}"
+no-cov = "cov --no-cov {args}"
+cov-report-xml = [
+  "- coverage combine",
+  "coverage xml",
+]
+cov-ci = [
+  "test-cov",
+  "cov-report-xml",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13"]
+
+[tool.hatch.envs.lint]
+extra-dependencies = [
+  "black>=23.1.0",
+  "mypy>=1.0.0",
+  "ruff>=0.0.243",
+  "types-defusedxml",
+]
+[tool.hatch.envs.lint.scripts]
+typing = "mypy --install-types --non-interactive {args:src tests}"
+style = [
+  "ruff check {args:.}",
+   "black --check --diff {args:.}",
+]
+fmt = [
+  "black {args:.}",
+  "ruff check --fix {args:.}",
+  "style",
+]
+all = [
+  "style",
+  "typing",
+]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = [
+  "src/hipercow/__about__.py",
+  "tests/helpers.py",
+]
+
+[tool.coverage.paths]
+hipercow = ["src/hipercow", "*/hipercow/src/hipercow"]
+tests = ["tests", "*/hipercow/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.black]
+line-length = 80
+skip-string-normalization = true
+
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C",
+  "D",
+  "DTZ",
+  "E",
+  "EM",
+  "F",
+  "FBT",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "Q",
+  "RUF",
+  "S",
+  "T",
+  "TID",
+  "UP",
+  "W",
+  "YTT",
+]
+ignore = [
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "FBT003",
+  # Ignore checks for possible passwords
+  "S105", "S106", "S107",
+  # Ignore complexity
+  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+  # Don't require docstrings everywhere for now
+  "D100", "D101", "D102", "D103", "D104", "D105", "D107",
+  # Ignore shadowing
+  "A001", "A002", "A003",
+  # Allow pickle
+  "S301",
+  # Allow subprocess (https://github.com/astral-sh/ruff/issues/4045)
+  "S603",
+  "S607", # don't use full path names for executables
+  # Allow print until we find the alternative to R's cli
+  "T201"
+]
+
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+markers = [
+   "slow: slower integration tests",
+]
+explicit-only = [
+    "slow",
+]
+
+[tool.hatch.envs.docs]
+extra-dependencies = [
+  "mkdocs-click",
+  "mkdocs-material",
+  "mkdocs-spellcheck[all]",
+  "mkdocstrings-python",
+]
+
+[tool.hatch.envs.docs.scripts]
+build = "mkdocs build {args}"
+serve = "mkdocs serve {args}"
