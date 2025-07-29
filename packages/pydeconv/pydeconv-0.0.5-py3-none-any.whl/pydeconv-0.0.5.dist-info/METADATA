@@ -1,0 +1,183 @@
+Metadata-Version: 2.4
+Name: pydeconv
+Version: 0.0.5
+Summary: Python implementation of deconvolution algorithms
+Project-URL: Source, https://github.com/owkin/PyDeconv
+Project-URL: Documentation, https://owkin.github.io/PyDeconv/
+Project-URL: Issues, https://github.com/owkin/PyDeconv/issues
+Author-email: Yann Rodriguez <yann.rodriguez@owkin.com>
+License-File: LICENSE
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Requires-Dist: anndata>=0.11.2
+Requires-Dist: cvxopt>=1.3.2
+Requires-Dist: loguru>=0.7.3
+Requires-Dist: matplotlib>=3.10.0
+Requires-Dist: mkdocs-dracula-theme>=1.0.7
+Requires-Dist: quadprog>=0.1.13
+Requires-Dist: requests>=2.32.3
+Requires-Dist: scikit-learn>=1.6.1
+Requires-Dist: statsmodels>=0.14.4
+Requires-Dist: tqdm>=4.67.1
+Provides-Extra: scvi
+Requires-Dist: scvi-tools[autotune]>=1.3.1.post1; extra == 'scvi'
+Provides-Extra: torch
+Requires-Dist: torch>=2.6.0; extra == 'torch'
+Description-Content-Type: text/markdown
+
+<div style="text-align: center;">
+<pre>
+           ██████╗  ██╗   ██╗  ██████╗  ███████╗  ██████╗  ██████╗  ███╗   ██╗ ██╗   ██╗
+           ██╔══██╗ ╚██╗ ██╔╝  ██╔══██╗ ██╔════╝ ██╔════╝ ██╔═══██╗ ████╗  ██║ ██║   ██║
+           ██████╔╝  ╚████╔╝   ██║  ██║ █████╗   ██║      ██║   ██║ ██╔██╗ ██║ ██║   ██║
+           ██╔═══╝    ╚██╔╝    ██║  ██║ ██╔══╝   ██║      ██║   ██║ ██║╚██╗██║ ╚██╗ ██╔╝
+           ██║         ██║     ██████╔╝ ███████╗ ╚██████╗ ╚██████╔╝ ██║ ╚████║  ╚████╔╝
+           ╚═╝         ╚═╝     ╚═════╝  ╚══════╝  ╚═════╝  ╚═════╝  ╚═╝  ╚═══╝   ╚═══╝  
+</pre>
+</div>
+<p align="center"><em>Python implementation of bulk RNAseq deconvolution algorithms</em></p>
+<div align="center">
+ <a href="https://pypi.owkin.com/#/package/PyDeconv" target="_blank">
+ </a>
+ <img src="https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue?logo=python" />
+ <a href="https://docs.astral.sh/uv/" target="_blank">
+  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/assets/badge/v0.json" />
+ </a>
+</div>
+
+# How to install
+
+# package
+
+```shell
+pip install pydeconv
+```
+
+# dev
+
+```shell
+uv sync --all-groups --all-extras
+```
+
+# How to use
+
+ ```python
+from pydeconv import SignatureMatrix
+from pydeconv.model import OLS, NNLS, DWLS, Tape, Scaden, MixupVI, NuSVR, RLR, WNNLS
+from adata import AnnData
+
+signature_matrix = SignatureMatrix.load("path/to/signature_matrix.csv") # index: gene names, column: cell types
+solver = NNLS(signature_matrix)
+
+adata = AnnData("path/to/adata.h5ad") # index: sample_id, columns: gene_names
+adata.layers["raw_counts"] = ... # apply your preprocessing step (check rnaxplorer)
+
+cell_prop = solver.transform(adata, layer="raw_counts", ratio=True)
+```
+
+# How to use (full)
+
+## 1. Load an already registered signature matrix
+
+```python
+from pydeconv.signature_matrix.registry import sig_matrix_laughney_lung_cancer
+signature_matrix = sig_matrix_laughney_lung_cancer()
+```
+
+> [!NOTE]
+> Checkout [here](https://github.com/owkin/PyDeconv/blob/main/src/pydeconv/signature_matrix/registry.py) for more description of other registered signature matrix.
+
+## 2. Load a custom signature matrix
+
+```python
+from pydeconv import SignatureMatrix
+signature_matrix = SignatureMatrix.load("path/to/signature_matrix.csv") #index: gene names, column: cell types
+```
+
+> [!NOTE]
+> For the moment only `.csv` format is supported. You can add any kwargs arguments from `pd.read_csv` after the path.
+
+## 3. Predict
+
+```python
+from pydeconv.model import Tape, Scaden
+
+adata = AnnData("path/to/adata.h5ad") # index: sample_id, columns: gene_names
+adata.layers["counts_sum"] = ...
+
+solver = Scaden(weights_version="cti_2nd_level_granularity")
+cell_prop = solver.transform(adata, layer="counts_sum", ratio=True)
+```
+
+> [!NOTE]
+> The model will check that you have the corresponding gene names in your input data.
+
+## 4. Predict (signature based method)
+
+```python
+from pydeconv.model import OLS, NNLS, DWLS
+
+signature_matrix = ...
+adata = AnnData("path/to/adata.h5ad")
+adata.layers["relative_counts"] = ...
+
+solver = DWLS(signature_matrix)
+cell_prop = solver.transform(adata, layer="relative_counts", ratio=True)
+```
+
+# Benchmark
+
+We benchmarked the performance of several deconvolution algorithms on the CTI dataset, including our developed method *MixUpVI*.
+This repository and the proposed methods are part of the following paper: [Joint probabilistic modeling of pseudobulk and single-cell transcriptomics enables accurate estimation of cell type composition](https://www.biorxiv.org/content/10.1101/2025.05.28.656123v1), published in the *Generative AI & Biology* workshop of ICML, 2025.
+
+The results are shown below.
+
+To run the benchmark, you can use the following command:
+
+```bash
+python benchmark/run_benchmark.py
+```
+
+> [!NOTE]
+> The repository only provides inference capabilities. It does not provide capabilities to train *MixUpVI* and other deep learning methods, or create signature matrices.
+> Therefore, we provide the weights from the trained models presented in the publication, and pre-computed signature matrices.
+> To use these models on other datasets, one must provide their own weights and/or pre-computed signature matrices.
+
+## Results 1st granularity
+
+<img src="assets/benchmark_granularities_results_1st_level_granularity_patients.png" alt="benchmark_results_1st" width="80%">
+
+## Results 2nd granularity
+
+<img src="assets/benchmark_granularities_results_2nd_level_granularity_patients.png" alt="benchmark_results_1st" width="80%">
+
+> [!NOTE]
+> These results are computed and guaranteed using the `adata.raw.X` layer of the CTI dataset available on [cellxgene](https://cellxgene.cziscience.com/collections/62ef75e4-cbea-454e-a0ce-998ec40223d3).
+> It will be automatically downloaded when running the benchmark.
+
+# Cite
+
+If you found our work useful in your research, please consider citing it at:
+
+```
+@inproceedings{
+grouard2025joint,
+title={Joint Probabilistic Modeling of Pseudobulk and Single-Cell Transcriptomics Enables Accurate Estimation of Cell Composition},
+author={Simon Grouard and Khalil Ouardini and Yann Rodriguez and Jean-Philippe Vert and Almudena Espin-Perez},
+booktitle={ICML 2025 Generative AI and Biology (GenBio) Workshop},
+year={2025},
+url={https://openreview.net/forum?id=JhDJ0MGo2z}
+}
+```
