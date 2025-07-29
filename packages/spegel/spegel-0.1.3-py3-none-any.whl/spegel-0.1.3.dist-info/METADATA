@@ -1,0 +1,163 @@
+Metadata-Version: 2.4
+Name: spegel
+Version: 0.1.3
+Summary: Spegel - Reflect the web through AI. A terminal browser with multiple AI-powered views.
+Project-URL: Homepage, https://github.com/simedw/spegel
+Project-URL: Repository, https://github.com/simedw/spegel
+Project-URL: Bug Tracker, https://github.com/simedw/spegel/issues
+Project-URL: Documentation, https://github.com/simedw/spegel#readme
+Author-email: Simon Edwardsson <simon.edwardsson@gmail.com>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: ai,browser,llm,terminal,textual,tui,web
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Internet :: WWW/HTTP :: Browsers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Terminals
+Classifier: Topic :: Text Processing :: Markup :: HTML
+Requires-Python: >=3.11
+Requires-Dist: beautifulsoup4>=4.13.4
+Requires-Dist: html2text>=2025.4.15
+Requires-Dist: litellm>=1.54.0
+Requires-Dist: lxml>=5.4.0
+Requires-Dist: pydantic>=2.7.1
+Requires-Dist: python-dotenv>=1.1.0
+Requires-Dist: requests>=2.32.4
+Requires-Dist: textual>=3.3.0
+Provides-Extra: dev
+Requires-Dist: pytest-asyncio>=0.21.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: ruff>=0.8.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Spegel - Reflect the web through AI
+
+Automatically rewrites the websites into markdown optimised for viewing in the terminal.
+Read intro blog post [here](https://simedw.com/2025/06/23/introducing-spegel/)
+
+This is a proof-of-concept, bugs are to be expected but feel free to raise an issue or pull request.
+
+##  Screenshot
+Sometimes you don't want to read through someone's life story just to get to a recipe
+![Recipe Example](https://simedw.com/2025/06/23/introducing-spegel/images/recipe_example.png)
+
+
+## Installation
+
+Requires Python 3.11+
+
+```bash
+$ pip install spegel
+```
+or clone the repo and install it in editable mode
+
+```bash
+# Clone and enter the directory
+$ git clone https://github.com/simedw/spegel.git
+$ cd spegel
+
+# Install dependencies and the CLI
+$ pip install -e .
+```
+
+## API Keys
+Spegel is using [litellm](https://github.com/BerriAI/litellm), which allows the use of the  common LLMs, both local and external. 
+
+By default `Gemini 2.5 Flash Lite` is used, which requires you to set the `GEMINI_API_KEY`, see [env_example.txt](/env_example.txt)
+
+
+## Usage
+
+### Launch the browser
+
+```bash
+spegel                # Start with welcome screen
+spegel bbc.com        # Open a URL immediately
+```
+
+Or, equivalently:
+
+```bash
+python -m spegel      # Start with welcome screen
+python -m spegel bbc.com
+```
+
+### Basic controls
+- `/`         – Open URL input
+- `Tab`/`Shift+Tab` – Cycle links
+- `Enter`     – Open selected link
+- `e`         – Edit LLM prompt for current view
+- `b`         – Go back
+- `q`         – Quit
+
+## Editing settings
+
+Spegel loads settings from a TOML config file. You can customize views, prompts, and UI options.
+
+**Config file search order:**
+1. `./.spegel.toml` (current directory)
+2. `~/.spegel.toml`
+3. `~/.config/spegel/config.toml`
+
+To edit settings:
+1. Copy the example config:
+   ```bash
+   cp example_config.toml .spegel.toml
+   # or create ~/.spegel.toml
+   ```
+2. Edit `.spegel.toml` in your favorite editor.
+
+Example snippet:
+```toml
+[settings]
+default_view = "terminal"
+app_title = "Spegel"
+
+[ai]
+default_model="gpt-4.1-nano"
+
+[[views]]
+id = "raw"
+name = "Raw View"
+hotkey = "1"
+order  = "1"
+prompt = ""
+
+[[views]]
+id = "terminal"
+name = "Terminal"
+hotkey = "2"
+order = "2"
+prompt = "Transform this webpage into the perfect terminal browsing experience! ..."
+model="claude-3-5-haiku-20241022"
+```
+
+## Local Models with Ollama
+
+To run with a local model using Ollama, first pull and serve your desired model:
+
+```bash
+$ ollama pull llama2
+$ ollama serve
+```
+Then set the model in `.spegel.toml` as follows:
+
+```toml
+model = "ollama/llama2"
+```
+Ollama supports models like Llama, Mistral, and many others.
+
+## License
+MIT License - see LICENSE file for details.
+
+
+For more, see the code or open an issue!
