@@ -1,0 +1,62 @@
+#
+# (c) 2025, Yegor Yakubovich, yegoryakubovich.com, personal@yegoryakybovich.com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+from nexium_api import route
+
+from .. import CreateKYCResponseData, CreateKYCRequestData, \
+    ConfirmKYCRequestData, ConfirmKYCResponseData, RejectKYCResponseData, \
+    RejectKYCRequestData, GetKYCRequestData, GetKYCResponseData
+from .base import Router
+
+
+class KYCRouter(Router):
+    facade_service = 'KYCFacadeService'
+    prefix = '/kyc'
+
+    @route(
+        path='/get',
+        request_data=GetKYCRequestData,
+        response_data=GetKYCResponseData,
+        response_field='kyc',
+    )
+    async def get(self):
+        pass
+
+    @route(
+        path='/create',
+        request_data=CreateKYCRequestData,
+        response_data=CreateKYCResponseData,
+        response_field='kyc',
+    )
+    async def create(self):
+        pass
+
+    @route(
+        path='/confirm',
+        request_data=ConfirmKYCRequestData,
+        response_data=ConfirmKYCResponseData,
+    )
+    async def confirm(self):
+        pass
+
+    @route(
+        path='/reject',
+        request_data=RejectKYCRequestData,
+        response_data=RejectKYCResponseData,
+    )
+    async def reject(self):
+        pass
