@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools >= 72.0", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]  # list of folders that contain the packages (["."] by default)
+
+[tool.setuptools.dynamic]
+dependencies = {file = "requirements.txt"}
+
+[tool.setuptools.package-data]
+"*" = ["logo.png", "*.json", "*.csv", "README.md"]
+"holowizard.pipe.scripts.config" = ["*.ini", "*.yaml", "*.yml", "**/*.yaml", "**/*.yml"]
+"holowizard.pipe.templates" = ["*.html"]
+"holowizard.pipe" = ["*.yaml"]
+
+[project]
+name="holowizard"
+dynamic = ["version", "dependencies"]
+requires-python = ">=3.11,<3.12"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "holowizard/forge/LICENSE", "holowizard/core/LICENSE", "holowizard/livereco_server/LICENSE", "holowizard/pipe/LICENSE"]
+keywords = ["near-field holography", "phase retrieval", "tomography"]
+
+authors = [
+  {name = "Johannes Dora", email = "johannes.dora@desy.de"},
+  {name = "Johannes Hagemann", email = "johannes.hagemann@desy.de"},
+  {name = "André Lopes", email="andre.lopes@hereon.de"},
+  {name = "Johannes Hagemann", email = "johannes.hagemann@desy.de"},
+  {name = "Silja Flenner", email="silja.flenner@hereon.de"},
+  {name = "Johannes Grün", email="johannes.gruen@desy.de"},
+  {name = "Sebastian Eberle", email="sebastian.eberle@desy.de"},
+  {name = "Cem Cinar", email = "cem.cinar@tuhh.de"}
+]
+classifiers = [
+  "Programming Language :: Python"
+]
+
+maintainers = [
+  {name = "Johannes Dora", email = "johannes.dora@desy.de"},
+  {name = "André Lopes", email="andre.lopes@hereon.de"},
+  {name = "Johannes Grün", email="johannes.gruen@desy.de"},
+  {name = "Sebastian Eberle", email="sebastian.eberle@desy.de"},
+  {name = "Johannes Hagemann", email = "johannes.hagemann@desy.de"}
+]
+
+[project.urls]
+Repository = "https://github.com/DESY-FS-PETRA/holowizard"
+Paper_ASRM = "https://doi.org/10.1364/OE.514641"
+Paper_Autofocus = "https://doi.org/10.1364/OE.544573"
+Zenodo = "https://doi.org/10.5281/zenodo.8349364"
+
+[tool.setuptools_scm]
+
+[project.scripts]
+holowizard_forge_generate_data = "holowizard.forge.scripts.generate_data:main"
+holowizard_forge_create_testconfig = "holowizard.forge.scripts.create_testconfig:main"
+holowizard_livereco_server_start = "holowizard.livereco_server.server.main:main"
+holowizard_core_create_examples = "holowizard.core.scripts.create_examples:main"
+holowizard_pipe_start = "holowizard.pipe.scripts.holopipe:main"
+holowizard_pipe_reconstruct_scan = "holowizard.pipe.script.reco:main"
+
+
