@@ -1,0 +1,57 @@
+name: Build Sphinx Docs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      ollama:
+        image: ollama/ollama:latest
+        ports:
+          - 11434:11434
+        volumes:
+          - /home/runner/work/.ollama/:/root/.ollama
+        options: >-
+          --name ollama
+          --health-cmd "ollama ps"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Allow cache to extract as root
+        run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
+
+      - name: Cache Ollama Models
+        id: cache-models
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/work/.ollama/models
+          key: models
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[gen]
+
+      - name: Build Sphinx documentation
+        run: |
+          sphinx-build -b html docs/source docs/build/html
+
+      - name: DEBUG Output updated source file
+        run: |
+          cat docs/source/test.rst
