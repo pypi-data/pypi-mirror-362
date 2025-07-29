@@ -1,0 +1,100 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "musicgen-unified"
+version = "2.0.0"
+description = "Simple, clean instrumental music generation with MusicGen"
+readme = "README.md"
+authors = [{name = "Bright Liu", email = "brightliu@college.harvard.edu"}]
+license = "MIT"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "torch>=2.0.0",
+    "transformers>=4.30.0",
+    "scipy>=1.7.0",
+    "numpy>=1.21.0",
+    "soundfile>=0.12.0",
+    "librosa>=0.10.0",
+    "pydub>=0.25.0",
+    "typer[all]>=0.9.0",
+    "rich>=13.0.0",
+    "pandas>=1.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Bright-L01/musicgen-unified"
+Documentation = "https://github.com/Bright-L01/musicgen-unified#readme"
+Repository = "https://github.com/Bright-L01/musicgen-unified"
+Issues = "https://github.com/Bright-L01/musicgen-unified/issues"
+
+[project.optional-dependencies]
+api = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.23.0",
+    "python-multipart>=0.0.6",
+]
+web = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.23.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+gpu = [
+    "flash-attn>=2.0.0",
+    "xformers>=0.0.20",
+]
+
+[project.scripts]
+musicgen = "musicgen.cli:main"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 88
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v --cov=musicgen --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true

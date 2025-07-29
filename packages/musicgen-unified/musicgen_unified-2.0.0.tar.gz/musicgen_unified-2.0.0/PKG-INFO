@@ -1,0 +1,238 @@
+Metadata-Version: 2.4
+Name: musicgen-unified
+Version: 2.0.0
+Summary: Simple, clean instrumental music generation with MusicGen
+Home-page: https://github.com/Bright-L01/musicgen-unified
+Author: Bright Liu
+Author-email: Bright Liu <brightliu@college.harvard.edu>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/Bright-L01/musicgen-unified
+Project-URL: Documentation, https://github.com/Bright-L01/musicgen-unified#readme
+Project-URL: Repository, https://github.com/Bright-L01/musicgen-unified
+Project-URL: Issues, https://github.com/Bright-L01/musicgen-unified/issues
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Multimedia :: Sound/Audio :: Sound Synthesis
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch>=2.0.0
+Requires-Dist: transformers>=4.30.0
+Requires-Dist: scipy>=1.7.0
+Requires-Dist: numpy>=1.21.0
+Requires-Dist: soundfile>=0.12.0
+Requires-Dist: librosa>=0.10.0
+Requires-Dist: pydub>=0.25.0
+Requires-Dist: typer[all]>=0.9.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pandas>=1.3.0
+Provides-Extra: api
+Requires-Dist: fastapi>=0.100.0; extra == "api"
+Requires-Dist: uvicorn[standard]>=0.23.0; extra == "api"
+Requires-Dist: python-multipart>=0.0.6; extra == "api"
+Provides-Extra: web
+Requires-Dist: fastapi>=0.100.0; extra == "web"
+Requires-Dist: uvicorn[standard]>=0.23.0; extra == "web"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Provides-Extra: gpu
+Requires-Dist: flash-attn>=2.0.0; extra == "gpu"
+Requires-Dist: xformers>=0.0.20; extra == "gpu"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# MusicGen Unified - v2.0
+
+[![PyPI version](https://badge.fury.io/py/musicgen-unified.svg)](https://badge.fury.io/py/musicgen-unified)
+[![Python](https://img.shields.io/pypi/pyversions/musicgen-unified.svg)](https://pypi.org/project/musicgen-unified/)
+[![License](https://img.shields.io/pypi/l/musicgen-unified.svg)](https://github.com/Bright-L01/musicgen-unified/blob/main/LICENSE)
+[![CI](https://github.com/Bright-L01/musicgen-unified/actions/workflows/ci.yml/badge.svg)](https://github.com/Bright-L01/musicgen-unified/actions/workflows/ci.yml)
+[![Downloads](https://pepy.tech/badge/musicgen-unified)](https://pepy.tech/project/musicgen-unified)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+A clean, focused implementation of Facebook's MusicGen for instrumental music generation.
+
+## What This Is
+
+- **Simple**: Just music generation, no unnecessary complexity
+- **Fast**: GPU-optimized for 10x realtime generation
+- **Practical**: CLI, API, and web interface included
+- **Deployable**: One-click AWS deployment
+
+## What This Isn't
+
+- Not for vocal/singing generation (MusicGen doesn't support it)
+- Not a microservices architecture (it's a simple tool)
+- Not a research framework (it's for practical use)
+
+## Quick Start
+
+```bash
+# Install
+pip install musicgen-unified
+
+# Generate music
+musicgen generate "upbeat jazz piano" --duration 30
+
+# Start web interface
+musicgen serve
+
+# Start API
+musicgen api
+```
+
+## Features
+
+- ✅ Text-to-music generation
+- ✅ Extended generation (>30 seconds)
+- ✅ Batch processing from CSV
+- ✅ GPU acceleration
+- ✅ Web interface
+- ✅ REST API
+- ✅ AWS deployment ready
+
+## Installation
+
+```bash
+# Basic installation
+pip install musicgen-unified
+
+# With GPU support
+pip install musicgen-unified[gpu]
+
+# Development
+git clone https://github.com/yourusername/musicgen-unified
+cd musicgen-unified
+pip install -e ".[dev]"
+```
+
+## Usage
+
+### Command Line
+
+```bash
+# Basic generation
+musicgen generate "smooth jazz saxophone" -o jazz.mp3
+
+# Extended generation
+musicgen generate "epic orchestral" --duration 120 -o epic.mp3
+
+# Batch processing
+musicgen batch playlist.csv --output-dir music/
+```
+
+### Python API
+
+```python
+from musicgen import MusicGenerator
+
+# Initialize
+generator = MusicGenerator(device="cuda")
+
+# Generate music
+audio, sample_rate = generator.generate(
+    "ambient electronic",
+    duration=30.0
+)
+
+# Save
+generator.save_audio(audio, sample_rate, "output.mp3")
+```
+
+### Web Interface
+
+```bash
+musicgen serve --port 8080
+# Open http://localhost:8080
+```
+
+### REST API
+
+```bash
+musicgen api --port 8000
+
+# Generate music
+curl -X POST http://localhost:8000/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "classical piano", "duration": 30}'
+```
+
+## Deployment
+
+### Docker
+
+```bash
+docker build -t musicgen .
+docker run -p 8080:8080 --gpus all musicgen
+```
+
+### AWS
+
+```bash
+# Configure AWS credentials
+aws configure
+
+# Deploy
+./deployment/deploy_aws.sh
+```
+
+## Architecture
+
+```
+musicgen-unified/
+├── musicgen/
+│   ├── generator.py    # Core generation with GPU optimization
+│   ├── batch.py        # Batch processing
+│   ├── prompt.py       # Prompt engineering
+│   ├── api.py          # FastAPI server
+│   ├── cli.py          # CLI interface
+│   └── utils.py        # Utilities
+├── static/             # Web UI files
+├── tests/              # Test suite
+└── deployment/         # Deployment scripts
+```
+
+## Performance
+
+- **GPU**: 10x faster than realtime
+- **CPU**: 1x realtime (approximate)
+- **Memory**: <1GB base, ~4GB with large model
+- **Startup**: <10 seconds
+
+## Models
+
+- `small`: Fast, lower quality (300M parameters)
+- `medium`: Balanced (1.5B parameters)
+- `large`: Best quality (3.3B parameters)
+
+## Contributing
+
+We welcome contributions! Please see CONTRIBUTING.md for guidelines.
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Acknowledgments
+
+- Facebook Research for MusicGen
+- The open source community
+
+## Support
+
+- Issues: GitHub Issues
+- Discussions: GitHub Discussions
+- Email: support@example.com
