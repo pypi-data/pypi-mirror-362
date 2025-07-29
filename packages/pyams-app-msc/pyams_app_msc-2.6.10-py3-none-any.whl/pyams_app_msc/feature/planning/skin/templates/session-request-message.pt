@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" i18n:domain="pyams_app_msc">
+<head>
+	<title i18n:translate="">
+		[<tal:var i18n:name="service_name" tal:content="settings.service_name">Service name</tal:var>]
+		New session request
+	</title>
+	<meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8" />
+	<meta charset="utf-8" />
+	<style>
+		html,
+		body,
+		p,
+		pre {
+			font-family: Ubuntu, Verdana, Arial, Helvetica, sans-serif;
+			font-size: 13px;
+			color: #333;
+		}
+		pre {
+			border-left: 2px solid #346597;
+			padding-left: 10px;
+		}
+		pre.noborder {
+			border-left: none;
+			padding-left: 0;
+		}
+	</style>
+</head>
+<body>
+	<p i18n:translate="">Hello,</p>
+	<p i18n:translate="">
+		You have received a new session request from <span i18n:name="sender" tal:content="sender.title">sender</span>
+		(<span i18n:name="establishment" tal:content="profile.establishment">establishment</span>), based on the
+		following criteria:
+	</p>
+	<ul>
+		<li><span i18n:translate="">Activity:</span> ${data.movie_title}</li>
+		<li><span i18n:translate="">First proposed date:</span> ${data.start_date_1.strftime('%c')}</li>
+		<li tal:define="start_date_2 data.start_date_2" tal:condition="start_date_2">
+			<span i18n:translate="">Second proposed date:</span> ${start_date_2.strftime('%c')}
+		</li>
+		<li tal:define="start_date_3 data.start_date_3" tal:condition="start_date_3">
+			<span i18n:translate="">Third proposed date:</span> ${start_date_3.strftime('%c')}
+		</li>
+		<li tal:condition="audience is not None">
+			<span i18n:translate="">Audience: </span> ${audience.name}
+		</li>
+		<li><span i18n:translate="">Nb participants:</span> ${data.nb_participants}</li>
+		<li><span i18n:translate="">Nb accompanists:</span> ${data.nb_accompanists}</li>
+		<li><span i18n:translate="">Nb groups:</span> ${data.nb_groups}</li>
+		<li><span i18n:translate="">Cultural pass:</span> ${'oui' if data.cultural_pass else 'non'}</li>
+	</ul>
+	<p tal:condition="data.comments"
+	   i18n:translate="">
+		<span i18n:name="sender" tal:content="sender.title">sender</span> added the following message to his
+		request:
+	</p>
+	<pre tal:condition="data.comments"
+		 style="padding: 5px 20px;">${data.comments}</pre>
+	<p i18n:translate="">You just have to reply to this email to contact the request sender.</p>
+	<p i18n:translate="">Thank you.</p>
+	<br />
+	<pre class="noborder" tal:content="settings.signature">signature</pre>
+</body>
+</html>

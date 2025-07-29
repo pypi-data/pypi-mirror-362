@@ -1,0 +1,27 @@
+<h2 i18n:domain="pyams_app_msc" i18n:translate="">
+	Please select a theater
+</h2>
+<div class="row">
+	<tal:loop repeat="theater view.get_theaters()">
+		<div class="col col-6 col-md-4 p-2">
+			<div class="card">
+				<a href="${tales:absolute_url(theater, 'admin')}">
+					<tal:img define="illustration tales:pyams_illustration(theater);
+									 image i18n:illustration.data;"
+							 condition="illustration">
+						${structure:tales:picture(image,
+												  xs_thumb='pano', xs_width=6,
+												  sm_thumb='pano', sm_width=6,
+												  md_thumb='pano', md_width=4,
+												  lg_thumb='pano', lg_width=4,
+												  xl_thumb='pano', xl_width=4,
+												  css_class='card-img-top')}
+					</tal:img>
+					<div class="card-body">
+						${i18n:theater.title}
+					</div>
+				</a>
+			</div>
+		</div>
+	</tal:loop>
+</div>

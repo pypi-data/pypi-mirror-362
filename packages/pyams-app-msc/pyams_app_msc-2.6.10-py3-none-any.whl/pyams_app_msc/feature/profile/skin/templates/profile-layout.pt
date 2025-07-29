@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="${request.locale_name}">
+<head prefix="og:http://ogp.me/ns# article:http://ogp.me/ns/article# fb:http://ogp.me/ns/fb#">
+	<i tal:omit-tag="">${structure:tales:metas}</i>
+	<i tal:omit-tag="">${tales:resources}</i>
+</head>
+<body class="${tales:skin_container_class}">
+	<div class="page">
+		<!-- Page header -->
+		<div tal:define="header provider:pyams_portal.header(ignore_missing=True);
+						 header_class tales:template_header_class"
+			 tal:condition="header"
+			 id="header"
+			 class="header ${header_class or 'container'}" style="opacity: 1;">
+			${structure:header}
+		</div>
+		<!-- End page header -->
+
+		<!-- Main panel -->
+		<div id="main"
+		     class="main m-0" role="main">
+			<!-- Content -->
+			<div class="content container d-lg-flex" style="opacity: 1;">
+				<!--[if lt IE 9]>
+				<h1 i18n:translate="">Your browser is too old. Please install version 9 or higher of Internet Explorer.</h1>
+				<![endif]-->
+				<!-- navigation -->
+				${structure:provider:msc.navigation}
+				<!-- end navigation -->
+				<div class="flex-grow-1">
+					${structure:provider:pagelet}
+				</div>
+			</div>
+			<!-- end content -->
+		</div>
+		<!-- end main panel -->
+
+		<!-- Page footer -->
+		<div tal:define="footer provider:pyams_portal.footer(ignore_missing=True);
+						 footer_class tales:template_footer_class;"
+			 tal:condition="footer"
+			 id="footer"
+			 class="footer ${footer_class or 'container'}" style="opacity: 1;">
+			${structure:footer}
+		</div>
+		<!-- End page footer -->
+
+		<!-- Alerts -->
+		<i tal:omit-tag="">${structure:provider:pyams_content.alerts(ignore_missing=True)}</i>
+		<!-- End alerts -->
+	</div>  <!-- page -->
+</body>
+</html>

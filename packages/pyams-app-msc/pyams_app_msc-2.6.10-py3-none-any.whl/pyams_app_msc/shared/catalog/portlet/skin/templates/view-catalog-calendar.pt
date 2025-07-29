@@ -1,0 +1,36 @@
+<div i18n:domain="pyams_app_msc"
+	 tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 items settings.get_items(request);
+				 count next(items);
+				 aggregations next(items);
+				 (has_items, results) tales:boolean_iter(items);
+				 identity request.identity or {};
+				 authenticated 'system.Authenticated' in identity.get('principals', ());">
+	<h3 tal:define="title i18n:settings.title"
+		tal:condition="title"
+		class="position-relative border-bottom pb-2 mt-4">
+		${title}
+		<span class="position-absolute underline"></span>
+	</h3>
+	<div class="row">
+		<div class="${renderer_settings.filters_css_class}">
+			<i tal:omit-tag="">
+				${structure:provider:filters_default(renderer_settings=renderer_settings, aggregations=aggregations)}
+			</i>
+			<tal:if condition="authenticated">
+				<a tal:define="url view.get_session_request_url(context)"
+				   tal:condition="url"
+				   class="btn btn-primary w-100 my-3"
+				   href="${url}"
+				   i18n:translate="">
+					Ask for new session
+				</a>
+			</tal:if>
+		</div>
+		<div class="${renderer_settings.calendar_css_class}">
+			<div class="calendar w-100"
+				 data-calendar-config='${view.get_calendar_config(results)}'></div>
+		</div>
+	</div>
+</div>

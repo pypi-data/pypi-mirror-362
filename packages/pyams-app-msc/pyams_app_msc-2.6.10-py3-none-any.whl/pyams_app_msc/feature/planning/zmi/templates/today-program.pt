@@ -1,0 +1,99 @@
+<section class="rounded-lg ${getattr(view, 'section_class', '')}"
+		 tal:omit-tag="getattr(view, 'hide_section', False)"
+		 tal:define="js tales:resource_path('pyams_app_msc.zmi:msc')"
+		 data-ams-modules='{
+		    "plugins": "plugins",
+		    "msc": {
+		        "src": "${js}"
+		    }
+		 }'
+		 i18n:domain="pyams_app_msc">
+	<h2 class="bg-secondary-modal d-flex flex-wrap pl-3 py-2-modal"
+		tal:define="title view.title"
+		tal:condition="title">
+		<a tal:define="back_url view.back_url | nothing"
+		   tal:condition="back_url"
+		   class="mr-1"
+		   href="${back_url}" data-ams-target="${getattr(view, 'back_url_target', '#content')}">
+			<i class="fas fa-fw fa-backward hint"
+			   data-original-title="Back to previous page"
+			   i18n:attributes="data-original-title"></i>
+		</a>
+		<span tal:condition="title.startswith('<')"
+			  class="flex-grow-1">${structure:title}</span>
+		<span tal:condition="not:title.startswith('<')"
+			  class="flex-grow-1" i18n:translate="">${title}</span>
+		<i tal:omit-tag="">${structure:provider:pyams.toolbar}</i>
+	</h2>
+	<div class="pt-3 px-3 pb-0"
+		 tal:define="items view.get_sessions();
+					 (has_sessions, sessions) tales:boolean_iter(items);">
+		<tal:loop repeat="(date, date_sessions) sessions">
+			<div class="card col-12 mb-3 px-0">
+				<div class="card-header bg-secondary">
+					<span class="text-dark">
+						<i tal:omit-tag="">${view.format_date(date)}</i>
+					</span>
+				</div>
+				<div class="card-body py-2">
+					<tal:loop repeat="session date_sessions">
+						<tal:var define="items view.get_bookings(session);
+										 (has_bookings, bookings) tales:boolean_iter(items);">
+							<a class="text-dark"
+							   href="${tales:absolute_url(session, 'properties.html')}"
+							   data-toggle="modal">
+								<i tal:omit-tag="">${view.format_time(session.start_date)}</i>
+								<span tal:define="room session.get_room()">
+									&ndash; ${room.name} &ndash;
+								</span>
+								<span class="font-weight-bold">${session.get_label()}</span>
+								<tal:if condition="session.version">
+									(${view.get_version(session)})
+								</tal:if>
+							</a><br/>
+							<ul class="my-0"
+								tal:condition="has_bookings">
+								<li class="py-2"
+									tal:repeat="booking bookings">
+									<a class="text-dark"
+									   href="${tales:absolute_url(booking, 'properties.html')}" data-toggle="modal"
+									   tal:define="(principal, profile) booking.get_recipient()">
+										<tal:if condition="profile">
+											${profile.establishment}
+											(${profile.get_structure_type()}, ${profile.establishment_address.city if profile.establishment_address else '- -'})
+												&ndash; <strong>${principal.title}</strong> (${profile.phone_number or '- -'})
+										</tal:if>
+										<tal:if condition="not:profile">
+											<span i18n:translate="">(unregistered user profile: <strong i18n:name="principal_id">${principal.id}</strong>)</span>
+										</tal:if>
+									</a>
+									<tal:if condition="booking.cultural_pass">
+										<img title="Cultural pass" alt="" i18n:attributes="title"
+											 class="position-absolute mx-3 mt-n2 hint"
+											 src="/--static--/msc/img/pass-culture.webp"
+											 width="32" height="32" />
+									</tal:if><br />
+									<i class="fa fa-fw fa-sm fa-arrow-right"></i>
+									<tal:var i18n:translate="">
+										<tal:var i18n:name="groups" content="view.get_groups(booking)"></tal:var>:
+										<tal:var i18n:name="participants" content="booking.nb_participants"></tal:var> participants,
+										<tal:var i18n:name="accompanists" content="booking.nb_accompanists"></tal:var> accompanists
+									</tal:var>
+								</li>
+							</ul>
+							<span tal:condition="not:has_bookings" i18n:translate="">
+								There is no confirmed booking for this session.
+							</span>
+						</tal:var>
+						<hr class="my-2"
+							tal:condition="not:repeat['session'].end()" />
+					</tal:loop>
+				</div>
+			</div>
+		</tal:loop>
+		<div class="alert alert-info"
+			 tal:condition="not:has_sessions">
+			<p i18n:translate="">There is no session planned for the selected period.</p>
+		</div>
+	</div>
+</section>

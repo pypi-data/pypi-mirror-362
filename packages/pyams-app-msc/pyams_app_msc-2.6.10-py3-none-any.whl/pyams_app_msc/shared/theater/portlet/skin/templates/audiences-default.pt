@@ -1,0 +1,70 @@
+<tal:var define="settings view.settings;"
+		 i18n:domain="pyams_app_msc">
+	<nav id="main-navigation"
+	     class="audiences nav d-none d-lg-flex align-items-center">
+		<ul class="sf-menu d-flex flex-row flex-grow-1 justify-content-around"
+			tal:define="parent settings.get_parent(context);
+						href tales:absolute_url(parent);">
+			<tal:loop repeat="audience settings.get_audiences(context)">
+				<li class="menu-item ${'active' if audience.__name__ in request.params.getall('audience') else ''}">
+					<a class="nav-link"
+					   href="#">
+						${i18n:audience.name}
+					</a>
+					<ul class="sub-menu">
+						<li>
+							<a href="${href}/calendar.html?audience=${audience.__name__}" i18n:translate="">
+								Calendar
+							</a>
+						</li>
+						<li>
+							<a href="${href}/movies.html?audience=${audience.__name__}" i18n:translate="">
+								Movies list
+							</a>
+						</li>
+					</ul>
+				</li>
+			</tal:loop>
+		</ul>
+	</nav>
+	<nav id="mobile-navigation"
+		 class="d-flex d-lg-none mr-4 align-items-center float-right">
+		<div class="d-flex align-items-stretch position-relative">
+			<div class="mobile-menu-button"></div>
+			<div class="d-none d-sm-flex align-items-center border-left">
+				<div class="mobile-menu-title px-4" i18n:translate="">Navigation</div>
+			</div>
+			<div class="mobile-menu-inner position-absolute">
+				<ul id="mobile-menu" class="py-2">
+					<li class="menu-item py-1 ${'active' if (request.path == '/') else None}">
+						<a href="/" i18n:translate="">Home</a>
+					</li>
+					<tal:loop repeat="audience settings.get_audiences(context)">
+						<li class="menu-item border-top py-1"
+							tal:define="href tales:absolute_url(context)">
+							<a class="nav-link"
+							   href="#">
+								${i18n:audience.name}
+							</a>
+							<ul class="sub-menu small py-1"
+								tal:define="ul_selected audience.__name__ == request.params.get('audience')">
+								<li tal:define="li_selected ul_selected and request.view_name=='calendar.html'"
+									class="${'selected' if li_selected else None}">
+									<a href="${href}/calendar.html?audience=${audience.__name__}" i18n:translate="">
+										Calendar
+									</a>
+								</li>
+								<li tal:define="li_selected ul_selected and request.view_name=='movies.html'"
+									class="${'selected' if li_selected else None}">
+									<a href="${href}/movies.html?audience=${audience.__name__}" i18n:translate="">
+										Movies list
+									</a>
+								</li>
+							</ul>
+						</li>
+					</tal:loop>
+				</ul>
+			</div>
+		</div>
+	</nav>
+</tal:var>

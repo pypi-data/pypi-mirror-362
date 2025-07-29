@@ -1,0 +1,34 @@
+<section class="inner-table border-0" i18n:domain="pyams_content"
+		 id="gallery_${tales:cache_key(context)}"
+		 tal:define="content_js tales:resource_path('pyams_content.zmi:content_js');
+					 msc_js tales:resource_path('pyams_app_msc.zmi:msc');"
+		 data-ams-modules='{
+			"content": "${content_js}",
+			"msc": {
+				"src": "${msc_js}"
+			}
+		 }'>
+	<fieldset class="border position-relative"
+			  data-ams-modules="plugins">
+		<legend class="switcher"
+				data-ams-switcher-state="${'open' if len(context.keys()) > 0 else 'closed'}"
+				i18n:translate="">Gallery medias</legend>
+		<div>
+			<div class="actions-container position-absolute">
+				${structure:provider:pyams.toolbar(context=view.gallery)}
+			</div>
+			<i tal:omit-tag="">${structure:provider:pyams.help}</i>
+			<div tal:define="can_edit request.has_permission(view.edit_permission, context=context);"
+				 class="d-flex flex-wrap ${'sortable dropzone' if can_edit else ''} gallery"
+				 data-ams-location="${tales:absolute_url(context)}"
+				 data-ams-sortable-stop="MyAMS.content.galleries.sortMedias"
+				 data-ams-dropzone-url="${tales:absolute_url(context, 'upload-medias-files.json')}"
+				 data-ams-dropzone-accepted-files="image/*,audio/*,video/*,application/zip,application/x-gzip,application/x-bzip2,application/x-tar">
+				<div class="dz-message"></div>
+				<tal:loop repeat="media context.values()">
+					${structure:provider:gallery-media-thumbnail(context=media)}
+				</tal:loop>
+			</div>
+		</div>
+	</fieldset>
+</section>

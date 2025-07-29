@@ -1,0 +1,53 @@
+<div class="page-header d-flex flex-row justify-content-between align-items-center"
+	 tal:define="settings view.settings"
+	 i18n:domain="pyams_app_msc">
+	<tal:if condition="settings.display_logo">
+		<div class="logo mx-3 my-2"
+			 tal:define="(target, logo) view.logo"
+			 tal:condition="logo">
+			<a href="${tales:absolute_url(target)}"
+			   title="Home" i18n:attributes="title"
+			   tal:define="thumbnails tales:thumbnails(logo);
+						   logo_thumbnail thumbnails.get_thumbnail('h100');">
+				${structure:tales:picture(logo_thumbnail,
+										  xl_width=1, lg_width=1, md_width=2, sm_width=0, xs_width=0,
+										  alt='Logo', css_class='logo-img')}
+			</a>
+		</div>
+	</tal:if>
+	<div tal:condition="settings.display_context_title"
+		 class="flex-grow-1">
+		<div class="h1 align-content-center">${view.title}</div>
+	</div>
+	<div class="user-profile-menu mx-3"
+		 tal:condition="settings.display_profile_link">
+		<tal:x switch="view.authenticated">
+			<a tal:case="False"
+			   class="hint"
+			   data-placement="bottom"
+			   title="Login..." i18n:attributes="title"
+			   href="/login.html">
+				<i class="fa fa-faw fa-2x fa-md-3x far fa-user-circle"></i>
+			</a>
+			<div tal:case="True"
+				 class="dropdown">
+				<i class="fa fa-faw fa-2x fa-md-3x fas fa-user-circle dropdown-toggle text-primary"
+				   data-toggle="dropdown" aria-expanded="false"></i>
+				<div class="dropdown-menu dropdown-menu-right">
+					<tal:loop repeat="menu view.admin_menus">
+						${structure:menu.render()}
+						<div tal:condition="repeat['menu'].end"
+							 class="dropdown-divider"></div>
+					</tal:loop>
+					<a class="dropdown-item pl-3"
+					   href="/my-profile.html"
+					   i18n:translate="">User profile</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item pl-3"
+					   href="/logout"
+					   i18n:translate="">Logout</a>
+				</div>
+			</div>
+		</tal:x>
+	</div>
+</div>

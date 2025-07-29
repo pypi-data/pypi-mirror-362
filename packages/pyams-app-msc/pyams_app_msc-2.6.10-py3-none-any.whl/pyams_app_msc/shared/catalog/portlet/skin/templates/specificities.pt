@@ -1,0 +1,193 @@
+<div class="mt-3 clearfix" i18n:domain="pyams_app_msc"
+	 tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 field_names context.field_names;
+				 info view.entry_info;
+				 description info.description;
+				 release_year info.release_year;
+				 original_country info.original_country;
+				 original_title info.original_title;
+				 original_language info.original_language;
+				 producer info.producer;
+				 writer info.writer;
+				 director info.director;
+				 composer info.composer;
+				 actors info.actors;
+				 awards info.awards;
+				 duration info.duration;
+				 synopsis info.synopsis;
+				 audience request.params.get('audience');
+				 identity request.identity or {};
+				 authenticated 'system.Authenticated' in identity.get('principals', ());
+				 illustration tales:pyams_illustration(context);">
+	<tal:if condition="illustration or renderer_settings.display_sessions">
+		<div class="float-sm-right col-10 col-sm-4 col-lg-3 offset-1 offset-sm-0 mb-3"
+			 tal:define="data i18n:illustration.data;
+						 alt i18n:illustration.alt_title;"
+			 tal:condition="data or renderer_settings.display_sessions">
+			<tal:if condition="data">
+				<a tal:define="thumbnails tales:thumbnails(data);
+							   target thumbnails.get_thumbnail('800x600');"
+				   href="${tales:absolute_url(data)}"
+				   data-toggle="modal"
+				   data-target="#illustration_${tales:cache_key(context)}">
+					${structure:tales:picture(data,
+											  lg_width=3, md_width=4, sm_width=10, xs_width=10,
+											  css_class='img_responsive', alt=alt)}
+				</a>
+				<div class="modal fade" aria-hidden="true"
+				     id="illustration_${tales:cache_key(context)}">
+					<div class="modal-dialog modal-dialog-scrollable modal-lg">
+						<div class="modal-content">
+							<div class="modal-header py-2">
+								<h6 class="modal-title">
+									${i18n:context.title}
+								</h6>
+								<button type="button" class="close" data-dismiss="modal">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body p-0">
+								<div class="position-relative">
+									${structure:tales:picture(data, alt=illustration.alt_title)}
+									<ul class="d-flex flex-nowrap m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+										tal:define="title i18n:illustration.title;
+													author illustration.author;"
+										tal:condition="title or author">
+										<li tal:condition="title" data-separator="/">${title}</li>
+										<li tal:condition="author" data-separator="/">© ${author}</li>
+									</ul>
+								</div>
+							</div>
+							<p class="description my-1 px-2 text-secondary small"
+							   tal:define="description i18n:illustration.description"
+							   tal:condition="description">
+								${structure:tales:html(description)}
+							</p>
+						</div>
+					</div>
+				</div>
+			</tal:if>
+			<tal:if condition="renderer_settings.display_sessions">
+				<div class="d-flex flex-column"
+					 tal:define="iter_sessions view.get_sessions();
+								 (has_sessions, sessions) tales:boolean_iter(iter_sessions)">
+					<div tal:condition="has_sessions"
+						 id="sessions_${tales:cache_key(item)}"
+						 class="mt-2">
+						<tal:loop repeat="session sessions">
+							<a class="btn btn-primary w-100 mb-1"
+							   tal:define="session_id tales:cache_key(session);
+										   params {'session_id': session_id, 'audience': audience};
+										   url tales:canonical_url(context, 'booking-new.html', params);"
+							   href="${url if authenticated else '#'}">
+								<i tal:omit-tag=""
+								   tal:define="version view.get_version(session)"
+								   tal:condition="version">
+									${version}<br/>
+								</i>
+								<i tal:omit-tag="">${tales:format_datetime(session.start_date, put_prefix=False, format_string='%a %d %B - %Hh%M')}</i>
+								<tal:if condition="renderer_settings.display_free_seats">
+									<i tal:omit-tag=""
+									   tal:define="(free, capacity) view.get_free_seats(session)">
+										<br/>
+										<tal:var i18n:translate="">
+											<tal:var i18n:name="seats">${free}</tal:var>
+											seats
+										</tal:var>
+									</i>
+								</tal:if>
+							</a>
+						</tal:loop>
+					</div>
+					<div class="mt-2"
+						 tal:define="next_period view.get_next_booking_period()"
+						 tal:condition="next_period">
+						<span class="btn-sm w-100 text-left font-italic">
+							<i class="fa fas fa-caret-right"></i>
+							${next_period}
+						</span>
+					</div>
+					<tal:if define="url view.get_session_request_url(context)"
+					        condition="url">
+						<a tal:condition="authenticated"
+						   class="btn btn-primary w-100 my-3"
+						   href="${url}">
+							<tal:if condition="has_sessions"
+									i18n:translate="">
+								Ask for another session
+							</tal:if>
+							<tal:if condition="not:has_sessions"
+									i18n:translate="">
+								Ask for a new session
+							</tal:if>
+						</a>
+						<div tal:condition="not:authenticated"
+							 class="alert alert-warning my-1 p-2"
+							 i18n:translate="">
+							You must be <a href="/login.html" i18n:translate="" i18n:name="role">authenticated</a> to
+							create a booking request!
+						</div>
+					</tal:if>
+				</div>
+			</tal:if>
+		</div>
+	</tal:if>
+	<dl class="row dl-horizontal col-12 ${'col-md-8' if (illustration or renderer_settings.display_sessions) else ''} lh-11">
+		<tal:loop repeat="field field_names">
+			<tal:case switch="field">
+				<tal:if case="'description'" condition="description">
+					<dd class="col-12 px-0">${structure:tales:html(description, 'oid_to_href;glossary')}</dd>
+				</tal:if>
+				<tal:if case="'release_year'" condition="release_year">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Release year:</dt>
+					<dd class="col-md-8 pl-0">${release_year}</dd>
+				</tal:if>
+				<tal:if case="'original_country'" condition="original_country">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Original country:</dt>
+					<dd class="col-md-8 pl-0">${original_country}</dd>
+				</tal:if>
+				<tal:if case="'original_title'" condition="original_title">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Original title:</dt>
+					<dd class="col-md-8 pl-0">${original_title}</dd>
+				</tal:if>
+				<tal:if case="'original_language'" condition="original_language">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Original language:</dt>
+					<dd class="col-md-8 pl-0">${view.get_language(original_language)}</dd>
+				</tal:if>
+				<tal:if case="'producer'" condition="producer">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Producer:</dt>
+					<dd class="col-md-8 pl-0">${producer}</dd>
+				</tal:if>
+				<tal:if case="'writer'" condition="writer">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Writer:</dt>
+					<dd class="col-md-8 pl-0">${writer}</dd>
+				</tal:if>
+				<tal:if case="'director'" condition="director">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Director:</dt>
+					<dd class="col-md-8 pl-0">${director}</dd>
+				</tal:if>
+				<tal:if case="'composer'" condition="composer">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Composer:</dt>
+					<dd class="col-md-8 pl-0">${composer}</dd>
+				</tal:if>
+				<tal:if case="'actors'" condition="actors">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Actors:</dt>
+					<dd class="col-md-8 pl-0">${actors}</dd>
+				</tal:if>
+				<tal:if case="'awards'" condition="awards">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Awards:</dt>
+					<dd class="col-md-8 pl-0">${awards}</dd>
+				</tal:if>
+				<tal:if case="'duration'" condition="duration">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Duration:</dt>
+					<dd class="col-md-8 pl-0">${view.get_duration(duration)}</dd>
+				</tal:if>
+				<tal:if case="'synopsis'" condition="synopsis">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Synopsis:</dt>
+					<dd class="col-md-8 pl-0">${structure:tales:html(synopsis)}</dd>
+				</tal:if>
+			</tal:case>
+		</tal:loop>
+	</dl>
+</div>
