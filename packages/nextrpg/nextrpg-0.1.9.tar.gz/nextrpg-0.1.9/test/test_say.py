@@ -1,0 +1,12 @@
+from nextrpg import SayEvent, Scene
+from test.util import MockCharacterDrawing
+
+
+def test_say() -> None:
+    event = SayEvent(
+        generator=None,
+        scene=Scene(),
+        character_or_scene=MockCharacterDrawing(),
+        message="",
+    )
+    assert event._text_top_left
