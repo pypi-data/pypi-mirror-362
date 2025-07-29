@@ -1,0 +1,86 @@
+[project]
+name = "simple_openid_connect"
+description = "Simple and opinionated OpenID-Connect relying party and resource server implementation"
+authors = [{ name = "lilly", email = "li@lly.sh" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Environment :: Other Environment",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Intended Audience :: Developers",
+    "Topic :: Internet",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Internet :: WWW/HTTP :: Session",
+    "Topic :: Security",
+    "Topic :: Utilities",
+]
+dynamic = ["version"]
+requires-python = "~=3.9"
+dependencies = [
+    "cryptojwt~=1.8",
+    "furl~=2.1",
+    "pydantic~=2.6",
+    "requests~=2.31",
+]
+
+[project.optional-dependencies]
+django = [
+    "django>=4.2",
+]
+djangorestframework = [
+    "djangorestframework~=3.14",
+]
+
+[project.urls]
+Home = "https://github.com/fsinfuhh/py_simple_openid_connect"
+Source = "https://github.com/fsinfuhh/py_simple_openid_connect"
+Documentations = "https://simple-openid-connect.readthedocs.io/en/stable/"
+
+[project.scripts]
+"show-openid-tokens" = "simple_openid_connect.scripts.show_openid_tokens:main"
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.sdist]
+exclude = [
+    ".git-crypt",
+    "tests/secrets.yml",
+    "src/manage.py",
+    "src/simple_openid_connect/integrations/django/settings.py",
+    "src/simple_openid_connect/integrations/django/wsgi.py",
+    "src/simple_openid_connect/integrations/django/asgi.py",
+]
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
+files = ["src/simple_openid_connect"]
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["cryptojwt.*", "furl"]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "simple_openid_connect.integrations.django.settings"
+
+[tool.pytest.ini_options]
+pythonpath = "src tests/django_test_project"
+markers = [
+    # run these tests by passing --run-interactive to pytest
+    "interactive: Tests that require user interaction and are only run explicitly",
+]
+testpaths = "tests tests/django_test_project/django_test_project/tests"
+explicit-only = [
+    "interactive",
+]
+log_cli = true
+log_cli_level = "info"
+django_find_project = false
+DJANGO_SETTINGS_MODULE = "django_test_project.settings_test"
