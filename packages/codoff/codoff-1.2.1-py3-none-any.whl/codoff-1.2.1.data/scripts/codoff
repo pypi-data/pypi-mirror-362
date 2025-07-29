@@ -1,0 +1,114 @@
+#!python
+
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+import os
+import sys
+import argparse
+from codoff import codoff
+import traceback
+import importlib.metadata
+
+version = "NA"
+try:
+	package_name = "codoff"
+	version = str(importlib.metadata.version(package_name))
+except importlib.metadata.PackageNotFoundError:
+	pass	
+
+def create_parser():
+	""" Parse arguments """
+	parser = argparse.ArgumentParser(description="""
+	Program: codoff
+	Author: Rauf Salamzade
+	Affiliation: Kalan Lab, UW Madison, Department of Medical Microbiology and Immunology
+	
+	This program compares the codon-usage distribution of a focal-region/BGC to the codon usage of 
+	the background genome. It will report the cosine distance and Spearman correlation between the 
+	two profiles, as well as an empirical P-value for whether the codon usage is siginficantly different
+	between the focal region and background genome. Only CDS features which are of length divisible 
+	by 3 will be considered. 
+									 
+	Two modes of input are supported:
+									 
+	1. (WORKS FOR BOTH EUKARYOTES & BACTERIA) Focal region and full-genome provided as GenBank files with 
+	   CDS features (compatible with antiSMASH outputs). Multiple focal region GenBank files can be provided, 
+	   e.g. consider a biosynthetic gene cluster split across multiple scaffolds due to assembly fragmentation. 
+																		 
+	   Example command: 
+									 
+	   $ codoff -f Sw_LK413/NZ_JALXLO020000001.1.region001.gbk -g Sw_LK413/LK413.gbk
+									 
+	2. (WORKS ONLY FOR BACTERIA) Full genome is provided as a FASTA or GenBank file. If CDS features are missing
+	   gene calling is performed using pyrodigal. Afterwards, the focal region is determined through user
+	   speciefied coordinates.
+	
+	   Example command:
+									 
+	   $ codoff -s NZ_JALXLO020000001.1 -a 341425 -b 388343 -g Sw_LK413/LK413.fna 
+ 
+	""", formatter_class=argparse.RawTextHelpFormatter)
+
+	parser.add_argument('-g', '--full-genome', help="Path to a full-genome in GenBank or FASTA format. If GenBank file provided, CDS features are required.", required=True, default=None)
+	parser.add_argument('-s', '--scaffold', help="Scaffold identifier for focal region.", required=False, default=None)
+	parser.add_argument('-a', '--start-coord', type=int, help="Start coordinate for focal region.", required=False, default=None)
+	parser.add_argument('-b', '--end-coord', type=int, help="End coordinate for focal region.", required=False, default=None)
+	parser.add_argument('-f', '--focal-genbanks', nargs='+', help="Path to focal region GenBank(s) for isolate. Locus tags must match with tags in full-genome GenBank.", required=False, default=None)
+	parser.add_argument('-o', '--outfile', help="Path to output file [Default is standard output].", required=False, default="stdout")
+	parser.add_argument('-p', '--plot-outfile', help="Plot output file name (will be in SVG format). If not provided, no plot will be made.", required=False, default=None)
+	parser.add_argument('-v', '--version', action='store_true', help="Print version and exist", required=False, default=False)
+	args = parser.parse_args()
+	return args
+
+valid_bases = set(['A', 'C', 'G', 'T'])
+def main():
+	"""
+	Void function which runs primary workflow for program.
+	"""
+
+	sys.stderr.write('Running version ' + str(version) + ' of codoff!\n')
+	if len(sys.argv)>1 and ('-v' in set(sys.argv) or '--version' in set(sys.argv)):
+		sys.exit(0)
+
+	"""
+	PARSE INPUTS
+	"""
+	myargs = create_parser()
+
+	full_genome_file = os.path.abspath(myargs.full_genome)
+	focal_scaffold = myargs.scaffold
+	focal_start_coord = myargs.start_coord
+	focal_end_coord = myargs.end_coord
+	focal_genbank_files = myargs.focal_genbanks
+	outfile = myargs.outfile
+	plot_outfile = myargs.plot_outfile
+
+	"""
+	START WORKFLOW
+	"""
+	
+	if focal_genbank_files != None:
+		codoff.codoff_main_gbk(
+			full_genome_file=full_genome_file,
+			focal_genbank_files=focal_genbank_files,
+			outfile=outfile,
+			plot_outfile=plot_outfile,
+			verbose=True
+		)
+	elif focal_scaffold != None and focal_start_coord != None and focal_end_coord != None:
+		codoff.codoff_main_coords(
+			full_genome_file=full_genome_file,
+			focal_scaffold=focal_scaffold,
+			focal_start_coord=focal_start_coord,
+			focal_end_coord=focal_end_coord,
+			outfile=outfile,
+			plot_outfile=plot_outfile,
+			verbose=True
+		)
+	else:
+		sys.stderr.write('Error: Insuffient input provided!\n')
+		sys.exit(1)
+	
+if __name__ == '__main__':
+	main()
