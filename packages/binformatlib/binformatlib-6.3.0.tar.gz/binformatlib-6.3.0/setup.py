@@ -1,0 +1,152 @@
+from setuptools import setup, find_packages
+
+setup(
+    name='binformatlib',
+    version='6.3.0',
+    description='A beginner-friendly binary format packing/unpacking module with full hex and byte control.',
+    long_description_content_type='text/markdown',
+    long_description="""
+# binformatlib
+
+**Version**: 6.3.0  
+**Author**: jony eldry  
+**License**: MIT
+
+`binformatlib` is a lightweight and beginner-friendly Python library for packing and unpacking binary files with full control over bytes and hexadecimal representations. It supports recursive nested field structures, custom EOF markers, and encodes the full file as hex for maximum readability and integrity.
+
+---
+
+## ✨ Features
+
+- Convert values (strings, integers, bytes, lists, etc.) into binary-safe formats
+- Pack structured data dictionaries into hex-encoded binary files
+- Unpack hex-encoded binary files back into nested Python dictionaries
+- Flat field key formatting using dot notation (e.g., `header.version`)
+- Optional custom EOF marker
+- Simple to use and extend
+
+---
+
+## 📦 Installation
+
+You can install `binformatlib` via `pip`:
+
+```bash
+pip install binformatlib
+```
+
+---
+
+## 🚀 Quick Start
+
+### Packing a File
+
+```python
+from binformatlib import pack
+
+format = {
+    "meta": {
+        "version": 1,
+        "author": "jony"
+    },
+    "data": None,
+    "end of file": "<EOF>"
+}
+
+pack(format, "output.bin", "Hello, World!")
+```
+
+### Unpacking a File
+
+```python
+from binformatlib import unpack
+
+data = unpack("output.bin")
+print(data)
+```
+
+---
+
+## 🔧 Internals
+
+### `_to_bytes(value)`
+
+Converts input of type `str`, `int`, `bytes`, `list`, or `None` into a `bytes` object.
+
+### `_flatten_fields(dict, prefix='')`
+
+Recursively flattens nested dictionaries into key-value pairs using dot notation.
+
+### `pack(format: dict, output_file: str, data: str) -> bool`
+
+Serializes and hex-encodes a structured dictionary with data into a `.bin` file.
+
+### `unpack(input_file: str) -> dict`
+
+Reconstructs the original nested dictionary from a packed `.bin` file.
+
+### `tohex(value)`
+
+Converts a string to its hexadecimal representation.
+
+### `fromhex(hex_string: bytes)`
+
+Converts a hexadecimal-encoded bytestring back to raw bytes.
+
+---
+
+## 🧪 Example
+
+```bash
+$ python binformatlib.py
+{'data': b'test'}
+```
+
+---
+
+## 📁 File Format
+
+Each line in the binary file follows the format:
+
+```ini
+key=hexvalue\n
+```
+
+Where `key` can use dot-notation (e.g., `meta.version`) and `hexvalue` is the hex string of the binary-encoded data.
+
+---
+
+## 🛠 Development
+
+Clone and run locally:
+
+```bash
+git clone https://github.com/yourusername/binformatlib.git
+cd binformatlib
+python binformatlib.py
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## ✉️ Contact
+
+**Author**: jony eldry  
+**Email**: umayashinderu@gmail.com""",
+    author='jony eldry',
+    author_email='umayashinderu@gmail.com',
+    py_modules=['binformatlib'],
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Topic :: File Formats',
+        'Topic :: Software Development :: Libraries',
+    ],
+    python_requires='>=3.6',
+)
