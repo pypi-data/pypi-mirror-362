@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=41", "wheel", "setuptools-git-versioning>=2.0,<3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[project]
+name = "m3-tox-docker"
+description = "Manage lifecycle of docker containers during Tox test runs"
+readme = "README.rst"
+requires-python = ">=3.8"
+license = "BSD-4-Clause"
+maintainers = [
+    {name = "Dan Crosta", email = "dcrosta@late.am"}
+]
+dependencies = [
+    "docker>=4.0,<8.0",
+    "tox>=4.0.0,<5.0",
+]
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Plugins",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Testing",
+]
+
+[project.urls]
+Homepage = "https://github.com/tox-dev/tox-docker"
+
+[project.entry-points.tox]
+docker = "tox_docker"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.flake8]
+application-import-names = "tox_docker"
+exclude = ["_version.py"]
+# ignore = ["D100", "D104", "D107", "E501", "W503"]
+max-complexity = 10
+max-line-length = 88
+select = ["C", "E", "F", "W", "B", "B9"]
+
+[tool.isort]
+atomic = true
+force_grid_wrap = false
+from_first = true
+include_trailing_comma = true
+multi_line_output = 3
+order_by_type = false
+
+[tool.mypy]
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+follow_imports = "silent"
+ignore_missing_imports = true
