@@ -1,0 +1,34 @@
+[project]
+name = "umnet-napalm"
+version = "1.1.11"
+description = "A custom version of NAPALM for UMnet"
+authors = [
+    {name = "Amy Liebowitz",email = "amylieb@umich.edu"}
+]
+readme = "README.md"
+
+[project.entry-points."nornir.plugins.connections"]
+umnet_napalm = "umnet_napalm.nornir_plugins.connections:UMnetNapalm"
+
+[project.entry-points."nornir.plugins.runners"]
+multiprocess= "umnet_napalm.nornir_plugins.runners:MultiProcessRunner"
+
+[project.scripts]
+umnet-napalm-get='umnet_napalm.cli.umnet_napalm_get:main'
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+napalm = ">=4.0.0,<5.0.0"
+xmltodict = "^0.14.2"
+pan-python = "^0.25.0"
+
+[tool.poetry.dev-dependencies]
+black = "^24.10.0"
+pytest = "^8.3.4"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.12"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
