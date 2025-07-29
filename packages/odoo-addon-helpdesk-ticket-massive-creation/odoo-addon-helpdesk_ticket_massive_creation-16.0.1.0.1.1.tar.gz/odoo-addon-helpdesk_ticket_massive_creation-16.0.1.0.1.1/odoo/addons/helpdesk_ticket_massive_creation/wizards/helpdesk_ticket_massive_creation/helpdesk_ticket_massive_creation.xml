@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Wizard to create tickets massively -->
+        <record id="view_form_helpdesk_ticket_massive_creation_wizard" model="ir.ui.view">
+            <field name="name">Massive ticket creation from wizard</field>
+            <field name="model">helpdesk.ticket.massive.creation.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Helpdesk Ticket">
+                    <sheet>
+                        <div class="oe_structure">
+                            <div class="oe_title">
+                                <h3 class="o_row">
+                                    <field name="name" placeholder="New subject..." />
+                                </h3>
+                            </div>
+                            <group name="main">
+                                <group>
+                                    <field name="team_id" />
+                                    <field name="user_ids" invisible="1" />
+                                    <field name="user_id" />
+                                </group>
+                                <group>
+                                    <field name="category_id" />
+                                    <field
+                                        name="tag_ids"
+                                        widget="many2many_tags"
+                                        options="{'no_create_edit': True, 'color_field': 'color',}"
+                                    />
+                                    <field name="priority" widget="priority" />
+                                </group>
+                            </group>
+                            <notebook>
+                                <page string="Description" name="description">
+                                    <field name="description" widget="html" />
+                                </page>
+                            </notebook>
+                        </div>
+                    </sheet>
+                    <footer>
+                        <button type="object"
+                            name="button_create"
+                            string="Create"
+                            confirm="Are you sure you want to create these tickets?" />
+                        <button special="cancel" string="Cancel" class="btn-secondary" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action to open the wizard -->
+        <record id="action_create_helpdesk_ticket_massively" model="ir.actions.act_window">
+            <field name="name">Create tickets massively</field>
+            <field name="res_model">helpdesk.ticket.massive.creation.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'default_partner_ids': active_ids}</field>
+        </record>
+
+        <!-- Server action to trigger the wizard from res.partner -->
+        <record id="action_res_partner_create_helpdesk_ticket_massively" model="ir.actions.server">
+            <field name="name">Create tickets massively</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="binding_model_id" ref="base.model_res_partner" />
+            <field name="state">code</field>
+            <field name="code">
+                action = {
+                    'type': 'ir.actions.act_window',
+                    'name': 'Create Tickets Massively',
+                    'res_model': 'helpdesk.ticket.massive.creation.wizard',
+                    'view_mode': 'form',
+                    'target': 'new',
+                    'context': {'default_partner_ids': env.context.get('active_ids', [])},
+                }
+            </field>
+        </record>
+
+        <!-- Server action to trigger the wizard from contract.contract -->
+        <record id="action_contract_contract_create_helpdesk_ticket_massively"
+            model="ir.actions.server">
+            <field name="name">Create tickets massively</field>
+            <field name="model_id" ref="contract.model_contract_contract" />
+            <field name="binding_model_id" ref="contract.model_contract_contract" />
+            <field name="state">code</field>
+            <field name="code">
+                action = {
+                    'type': 'ir.actions.act_window',
+                    'name': 'Create tickets massively',
+                    'res_model': 'helpdesk.ticket.massive.creation.wizard',
+                    'view_mode': 'form',
+                    'target': 'new',
+                    'context': {'default_contract_ids': env.context.get('active_ids', [])},
+                }
+            </field>
+        </record>
+    </data>
+</odoo>
