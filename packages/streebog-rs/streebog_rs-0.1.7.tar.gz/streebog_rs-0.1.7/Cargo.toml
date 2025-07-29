@@ -1,0 +1,33 @@
+[package]
+name = "streebog_rs"
+version = "0.1.0"
+edition = "2024"
+
+
+[lib]
+name = "streebog_rs"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+encoding_rs = "0.8.35"
+hex = "0.4.3"
+pyo3 = { version = "0.25.0", features = ["extension-module"], optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.0"
+hex-literal = "0.4"
+
+[features]
+default = ["python"]
+python = ["pyo3", "pyo3/extension-module"]
+simd = []
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+opt-level = 1
