@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkswancustomenvironments=self.webpackChunkswancustomenvironments||[]).push([[509],{509:(n,t,s)=>{s.r(t),s.d(t,{default:()=>e});const e={id:"swancustomenvironments:plugin",description:"Extension to provide support for custom environments",autoStart:!0,activate:n=>{console.log("JupyterLab extension swancustomenvironments is activated!")}}}}]);
