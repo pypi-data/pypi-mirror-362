@@ -1,0 +1,42 @@
+{# vim: set ft=jinja :#}
+{% extends "base.html.j2" %}
+{% block title %}
+{{ song.title|default('') }} - {{ song.artist|default('') }}
+{% endblock %}
+{% block songheader %}
+{# This supports up to 999 songs in a book with unique IDs. Should be enough. #}
+<h1 class="title" id="title_{{ '%03d' % song.id }}">{{ song.title|default('') }} - {{ song.artist|default('') }}</h1>
+{% endblock %}
+
+{% block content %}
+{% if song.meta.capo %}
+<span class="capo">to play along with the original, capo at {{ song.meta.capo }}</span>
+{% endif %}
+{{ song.body }}
+{% endblock %}
+{% if diagrams %}
+  {# song.chords is now a list of pychord.Chord objects, hence the crd.chord code #}
+  {% if song.chords|length > 10 %}
+    {% block overflow %}
+      {% for crd in song.chords[10:] %}
+<article class="chord_diagram"> {% include 'svg/%s.svg'|format(crd.chord|safe_name) %} </article>
+      {% endfor %}
+    {% endblock %}
+  {% endif %}
+  {% block chords %}
+    {% for crd in song.chords[:10] %}
+<article class="chord_diagram"> {% include 'svg/%s.svg'|format(crd.chord|safe_name) %} </article>
+    {% endfor %}
+  {% endblock %}
+{% else %}
+<!-- show_diagrams = {{ show_diagrams }} -->
+{% endif %}
+{% block footer %}
+{% if navigation %}
+{% if output == "html" %}
+  <a class="left" href="{{ song._prev }}" accesskey="p">previous</a>
+  <a class="right" href="{{ song._next }}" accesskey="n">next</a>
+{% endif %}
+  <a class="middle" href="{{ index_target|default('../index.html') }}" accesskey="i">return to index</a>
+{% endif %}
+{% endblock %}
