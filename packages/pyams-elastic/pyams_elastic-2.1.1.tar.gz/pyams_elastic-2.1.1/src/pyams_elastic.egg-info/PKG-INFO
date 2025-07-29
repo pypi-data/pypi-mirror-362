@@ -1,0 +1,184 @@
+Metadata-Version: 2.1
+Name: pyams-elastic
+Version: 2.1.1
+Summary: PyAMS integration package for Elasticsearch
+Home-page: https://pyams.readthedocs.io
+Author: Thierry Florac
+Author-email: tflorac@ulthar.net
+License: ZPL
+Keywords: Pyramid PyAMS
+Classifier: License :: OSI Approved :: Zope Public License
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python
+Classifier: Framework :: Pyramid
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Provides-Extra: test
+License-File: LICENSE
+
+=====================
+PyAMS elastic package
+=====================
+
+.. contents::
+
+
+What is PyAMS?
+==============
+
+PyAMS (Pyramid Application Management Suite) is a small suite of packages written for applications
+and content management with the Pyramid framework.
+
+**PyAMS** is actually mainly used to manage web sites through content management applications (CMS,
+see PyAMS_content package), but many features are generic and can be used inside any kind of web
+application.
+
+All PyAMS documentation is available on `ReadTheDocs <https://pyams.readthedocs.io>`_; source code
+is available on `Gitlab <https://gitlab.com/pyams>`_ and pushed to `Github
+<https://github.com/py-ams>`_. Doctests are available in the *doctests* source folder.
+
+
+What is PyAMS elastic?
+======================
+
+PyAMS_elastic is an extension package for PyAMS to provide support for Elasticsearch; it's a fork
+of *pyramid_es* package, adapted to use last Elasticsearch features and Elasticsearch-DSL package
+(see `Elasticsearch <https://elasticsearch-py.readthedocs.io>` and `Elasticsearch-DSL
+<https://elasticsearch-dsl.readthedocs.io>`). It is also using more components of the components
+architecture.
+
+Compared with *pyramid_es*, it's no more Python 2 compliant, and adds a few features like
+aggregations support in Elasticsearch queries. Deprecated Elasticsearch features have also been
+removed from package.
+
+A PyAMS scheduler task info is also provided by this package; it allows running Elasticsearch
+queries on a regular basis, and to send notifications if expected results are not received.
+
+
+Running PyAMS_elastic unit tests
+================================
+
+Unit tests relies on an "elasticsearch" entry to be used with Gitlab-CI services. If you want to
+run unit tests locally, you must have an entry in your "hosts" file pointing to your Elasticsearch
+server.
+
+
+Changelog
+=========
+
+2.1.1
+-----
+ - updated tests
+
+2.1.0
+-----
+ - added support for PyAMS_scheduler pipeline tasks
+ - added support for Python 3.12
+
+2.0.4
+-----
+ - removed empty module
+
+2.0.3
+-----
+ - updated client API key configuration to handle base64 encoded keys and
+   login:password type keys
+
+2.0.2
+-----
+ - updated PyAMS_scheduler interfaces
+ - updated dependencies
+
+2.0.1
+-----
+ - updated french translation
+
+2.0.0
+-----
+ - upgraded to Pyramid 2.0
+ - upgraded to Elasticsearch 8.x
+
+1.6.7
+-----
+ - updated output of Elasticsearch re-indexation task
+ - updated tasks docstrings
+
+1.6.6
+-----
+ - updated translations
+
+1.6.5
+-----
+ - use pagination and bulk API in Elasticsearch re-indexation task
+ - replace 'body' parameter with named arguments
+
+1.6.4
+-----
+ - restored all unit tests
+
+1.6.3
+-----
+ - updated unit tests (still partially disabled!)
+
+1.6.2
+-----
+ - disabled some unit tests because of strange behaviour with Gitlab's Docker
+
+1.6.1
+-----
+ - updated re-indexation task status on failure
+
+1.6.0
+-----
+ - added PyAMS scheduler task to handler partial Elasticsearch re-indexation
+ - added support for PyAMS dynamic text formatters into Elasticsearch client index name
+
+1.5.2
+-----
+ - restored deleted services in Gitlab CI configuration
+
+1.5.1
+-----
+ - use new SQLAlchemy structure to get access to mappings registry
+ - added support for Python 3.11
+
+1.5.0
+-----
+ - allow usage of dynamic text formatters into scheduler Elasticsearch tasks
+
+1.4.1
+-----
+ - use new scheduler task execution status on failure
+
+1.4.0
+-----
+ - added certificates management options when creating Elasticsearch client, available in
+   Pyramid configuration file
+
+1.3.1
+-----
+ - updated CI for Python 3.10
+
+1.3.0
+-----
+ - added SSL settings to client configuration
+ - added Elasticsearch update API support
+ - allow overriding of configuration file settings with named arguments when creating
+   custom Elasticsearch client
+ - added support for Python 3.10
+
+1.2.1
+-----
+ - remove some Elasticsearch (> 7.15) deprecation warnings using named arguments
+
+1.2.0
+-----
+ - use PyAMS_utils transaction manager
+
+1.1.0
+-----
+ - updated task add and edit forms title
+ - updated package include scan
+
+1.0.0
+-----
+ - initial release
