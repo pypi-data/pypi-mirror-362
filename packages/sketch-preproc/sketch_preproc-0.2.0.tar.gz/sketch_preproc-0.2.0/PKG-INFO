@@ -1,0 +1,215 @@
+Metadata-Version: 2.4
+Name: sketch-preproc
+Version: 0.2.0
+Summary: Sketch preprocessing pipelines with edge detection presets
+Author: Sketch Preproc Team
+License: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: opencv-python>=4.10
+Requires-Dist: opencv-contrib-python>=4.10
+Requires-Dist: torch>=2.2
+Requires-Dist: kornia>=0.7
+Requires-Dist: scikit-image>=0.19
+Requires-Dist: sknw
+Requires-Dist: numpy>=1.20
+Requires-Dist: scipy>=1.7
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: pillow>=9.0
+Requires-Dist: matplotlib>=3.5
+Provides-Extra: dev
+Requires-Dist: black>=23.0; extra == "dev"
+Requires-Dist: flake8>=6.0; extra == "dev"
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+
+# Sketch Preprocessing Package
+
+A Python package providing sketch preprocessing pipelines for edge detection and mask extraction with a spectrum of edge detection presets.
+
+> **⚠️ Note**: The V4 pipeline is deprecated and will be removed in v1.0.0. Please use the V3 pipeline (default) for all new projects.
+
+## Installation
+
+```bash
+# For development
+pip install -e ./sketch_preproc
+
+# For production
+pip install sketch-preproc
+```
+
+## Quick Start
+
+```python
+from sketch_preproc import preprocess
+
+# Use preset 5 (balanced, general purpose) - V3 is the default
+result = preprocess(ref_image, user_image, preset=5)
+
+# Access the masks
+primary_mask = result["primary_mask"]
+detail_mask = result["detail_mask"]
+shade_mask = result["shade_mask"]  # Always None for V3
+```
+
+## Edge Detection Spectrum Presets
+
+The package includes 10 presets ranging from minimal to maximal edge detection:
+
+1. **Bare bones** - Absolute minimal, only strongest edges
+2. **Minimal** - Very fine lines, architectural/technical
+3. **Fine** - Clean sketches with fine lines
+4. **Balanced fine** - Good for simple subjects
+5. **Balanced** - General purpose default
+6. **Balanced detailed** - Good for complex subjects
+7. **Detailed** - Captures interior details
+8. **Very detailed** - Includes subtle features
+9. **Comprehensive** - Captures almost everything
+10. **Maximal** - Maximum detail, may include noise
+
+## Usage Examples
+
+### Using Numeric Presets
+
+```python
+from sketch_preproc import preprocess
+import cv2
+
+# Load images
+ref_img = cv2.imread("reference.jpg")
+user_img = cv2.imread("sketch.jpg")
+
+# Minimal edges (preset 1)
+result_minimal = preprocess(ref_img, user_img, preset=1)
+
+# Balanced for general use (preset 5)
+result_balanced = preprocess(ref_img, user_img, preset=5)
+
+# Maximum detail (preset 10)
+result_maximal = preprocess(ref_img, user_img, preset=10)
+
+# Save results
+cv2.imwrite("edges_minimal.png", result_minimal["primary_mask"])
+cv2.imwrite("edges_balanced.png", result_balanced["primary_mask"])
+cv2.imwrite("edges_maximal.png", result_maximal["primary_mask"])
+```
+
+### Choosing Pipeline Version
+
+```python
+# Use V3 pipeline (default, recommended)
+result = preprocess(ref_img, user_img, preset=5)
+
+# Use V4 pipeline (deprecated, not recommended)
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)  # Suppress warning
+result_v4 = preprocess(ref_img, user_img, pipeline="v4", preset=7)
+```
+
+> **Note**: V4 pipeline is deprecated. It provides an additional shade mask but at the cost of slower processing and potentially noisier results. V3 is recommended for all use cases.
+
+### Using Named Presets
+
+```python
+# Use specific named preset
+result = preprocess(ref_img, user_img, preset="spectrum_03_fine")
+
+# Use default presets
+result_v3 = preprocess(ref_img, user_img, preset="default_v3")
+result_v4 = preprocess(ref_img, user_img, preset="default_v4")
+```
+
+### Custom Configuration
+
+```python
+from sketch_preproc.common.config import PreprocCfg
+
+# Create custom config based on preset 5
+config = PreprocCfg(
+    alpha=0.7,
+    tau_primary=0.30,
+    tau_detail=0.20,
+    tau_lo_primary=0.18,
+    tau_lo_detail=0.12
+)
+
+result = preprocess(ref_img, user_img, config=config)
+```
+
+### List Available Presets
+
+```python
+from sketch_preproc import list_presets
+
+# List all presets
+all_presets = list_presets()
+for key, desc in all_presets.items():
+    print(f"{key}: {desc}")
+
+# List only V3 presets (recommended)
+v3_presets = list_presets(pipeline="v3")
+```
+
+## Choosing the Right Preset
+
+- **Presets 1-3**: Use for technical drawings, architectural sketches, or when you need very clean lines
+- **Presets 4-6**: General purpose, good balance between detail and noise
+- **Presets 7-9**: Use for artistic sketches with lots of detail or texture
+- **Preset 10**: Maximum detail extraction, useful for analysis but may include noise
+
+## Pipeline Information
+
+### V3 Pipeline (Recommended)
+- Produces two masks: primary and detail
+- Faster processing
+- Cleaner results with less noise
+- Suitable for all use cases
+- This is the default and recommended pipeline
+
+### V4 Pipeline (Deprecated)
+- **⚠️ Deprecated**: Will be removed in version 1.0.0
+- Produces three masks: primary, detail, and shade
+- Slower processing due to additional preprocessing steps
+- May produce noisier results
+- Only use if you specifically need the shade mask for legacy compatibility
+
+## Input Formats
+
+The package accepts multiple input formats:
+- File paths (string or Path object)
+- NumPy arrays (BGR format)
+- Raw bytes (JPEG/PNG encoded)
+
+```python
+# From file
+result = preprocess("ref.jpg", "sketch.png", preset=5)
+
+# From numpy array
+import cv2
+ref_img = cv2.imread("ref.jpg")
+user_img = cv2.imread("sketch.jpg")
+result = preprocess(ref_img, user_img, preset=5)
+
+# From bytes
+with open("ref.jpg", "rb") as f:
+    ref_bytes = f.read()
+with open("sketch.jpg", "rb") as f:
+    user_bytes = f.read()
+result = preprocess(ref_bytes, user_bytes, preset=5)
+```
+
+## Output Format
+
+All pipelines return a dictionary with:
+- `primary_mask`: Primary edge mask (uint8 numpy array)
+- `detail_mask`: Detail edge mask (uint8 numpy array)
+- `shade_mask`: Shade mask (uint8 numpy array, None for V3)
+- `debug`: Dictionary with intermediate processing results
+
+## Requirements
+
+- Python 3.8+
+- OpenCV with contrib modules (opencv-contrib-python)
+- PyTorch
+- See `pyproject.toml` for full dependencies
