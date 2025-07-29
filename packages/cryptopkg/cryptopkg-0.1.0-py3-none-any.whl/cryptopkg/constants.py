@@ -1,0 +1,1 @@
+SIZE_RANDOM_NONCE = 12  # Обычно 12 для AES-GCM
