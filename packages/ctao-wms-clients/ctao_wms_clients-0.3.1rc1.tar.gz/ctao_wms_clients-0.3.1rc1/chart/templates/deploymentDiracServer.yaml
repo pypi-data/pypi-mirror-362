@@ -1,0 +1,227 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wms.fullname" . }}-dirac-server
+  labels:
+    {{- include "wms.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "wms.fullname" . }}-dirac-server
+spec:
+  selector:
+    matchLabels:
+      {{- include "wms.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name:  {{ include "wms.fullname" . }}-dirac-server
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "wms.labels" . | nindent 8 }}
+        app.kubernetes.io/name:  {{ include "wms.fullname" . }}-dirac-server
+    spec:
+      hostname: dirac-server
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {}
+
+      containers:
+        - name: {{ include "wms.fullname" . }}-dirac-server
+          image: "{{ .Values.image.repository_prefix }}-server:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - bash
+            - -c
+            - |
+              set -xe
+
+              echo "$(date -Is) Starting"
+
+              echo "$(date -Is) Installing ssh key to access CE"
+              cp -fv /etc/diracuser_sshkey.pub /home/dirac/.ssh/diracuser_sshkey.pub
+              cp -fv /etc/diracuser_sshkey /home/dirac/.ssh/diracuser_sshkey
+              chown -R dirac:dirac /home/dirac/.ssh
+              chmod 600 /home/dirac/.ssh/diracuser_sshkey
+              chmod 644 /home/dirac/.ssh/diracuser_sshkey.pub
+
+              DB_ROOT_PASSWORD=dirac-db-root
+
+              # wait for database to be ready
+              while true; do
+                if mysql --host dirac-db -uroot -p$DB_ROOT_PASSWORD -e "show databases"; then
+                  break
+                fi
+                echo "Waiting for database to be ready"
+                sleep 10
+              done
+
+              {{ if .Values.resetDatabase }}
+              echo "$(date -Is) Dropping databases"
+              # TODO: set password in secret
+              mysql --host dirac-db -uroot -p$DB_ROOT_PASSWORD -e "show databases" | \
+              grep -v Database | \
+              grep -v mysql| \
+              grep -v information_schema | \
+              grep -v performance_schema | \
+              awk '{print "drop database `" $1 "`;select sleep(0.1);"}' | \
+              mysql --host dirac-db --host dirac-db -uroot -p$DB_ROOT_PASSWORD
+              {{ end }}
+
+              echo "$(date -Is) Running install_site.sh"
+              /home/dirac/install_site.sh
+
+              echo "$(date -Is) Done install_site.sh"
+
+              echo "$(date -Is) Running configure.py resources.conf"
+              python configure.py resources.conf -c yes
+              echo "$(date -Is) Done configure.py resources.conf"
+
+              echo "$(date -Is) Enabling site CTAO.CI.de"
+              # allow site exits with error status about, non-existent proxy even if local authentication works
+              set +o pipefail
+              site_output=$(dirac-admin-allow-site "CTAO.CI.de" "Enable CTAO.CI.de" -o /DIRAC/Security/UseServerCertificate=True 2>&1 || true)
+              echo "$site_output"
+              echo "$site_output" | grep -q 'CTAO.CI.de .* Active'
+
+              echo "$(date -Is) Running dirac-restart-component WorkloadManagement"
+              dirac-restart-component WorkloadManagement
+              echo "$(date -Is) WorkloadManagement restarted"
+
+              find /opt/dirac/ -wholename '*/log/current' | xargs tail -f
+
+          volumeMounts:
+          - name: cafile
+            subPath: ca.pem
+            mountPath: /etc/grid-security/certificates/dpps_test_ca.pem
+          - name: cafile
+            subPath: ca.pem
+            mountPath: /etc/grid-security/certificates/74df993b.0
+          - name: cafile
+            subPath: dpps_test_ca.crl.r0
+            mountPath: /etc/grid-security/certificates/74df993b.r0
+          - name: cafile
+            subPath: dpps_test_ca.crl.r0
+            mountPath: /etc/grid-security/certificates/dpps_test_ca.crl.r0
+          - name: dpps-certkey-600
+            subPath: hostcert.pem
+            mountPath: /opt/dirac/etc/grid-security/hostcert.pem
+          - name: dpps-certkey-400
+            subPath: hostkey.pem
+            mountPath: /opt/dirac/etc/grid-security/hostkey.pem
+          - name: diracuser-sshkey-600
+            subPath: ssh-diracuser_sshkey
+            mountPath: /etc/diracuser_sshkey
+          - name: diracuser-sshkey-644
+            subPath: ssh-diracuser_sshkey.pub
+            mountPath: /etc/diracuser_sshkey.pub
+          - name: dirac-config
+            subPath: resources.conf
+            mountPath: /home/dirac/resources.conf
+          - name: dirac-config
+            mountPath: /opt/dirac/dirac-installation.cfg
+            subPath: dirac-installation.cfg
+          {{ if .Values.rucio.enabled }}
+          - name: rucio-config
+            mountPath: /opt/rucio/etc
+          {{ end }}
+          env:
+          - name: DIRAC_X509_HOST_KEY
+            value: /opt/dirac/etc/grid-security/hostkey.pem
+          - name: DIRAC_X509_HOST_CERT
+            value: /opt/dirac/etc/grid-security/hostcert.pem
+
+          ports:
+          - name: dips-jobmanager
+            containerPort: 9132
+            protocol: TCP
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+
+          readinessProbe:
+            tcpSocket:
+              port: 9132
+            initialDelaySeconds: 60
+            failureThreshold: 20
+            periodSeconds: 30
+
+          livenessProbe:
+            tcpSocket:
+              port: 9132
+            initialDelaySeconds: 60
+            failureThreshold: 10
+            periodSeconds: 30
+
+      volumes:
+      # TODO: use generic function for cert
+      - name: cafile
+        secret:
+          defaultMode: 420
+          secretName: {{ template "certprefix" . }}-server-cafile
+      - name: dpps-certkey-600
+        secret:
+          defaultMode: 0600
+          secretName: {{ template "certprefix" . }}-dirac-server-hostkey
+      - name: dpps-certkey-400
+        secret:
+          defaultMode: 0400
+          secretName: {{ template "certprefix" . }}-dirac-server-hostkey
+      - name: diracuser-sshkey-600
+        secret:
+          defaultMode: 0600
+          secretName: {{ .Release.Name }}-diracuser-sshkey
+      - name: diracuser-sshkey-644
+        secret:
+          defaultMode: 0644
+          secretName: {{ .Release.Name }}-diracuser-sshkey
+      - name: dirac-config
+        configMap:
+          name: {{ .Release.Name }}-dirac-config
+
+      {{ if .Values.rucio.enabled }}
+      - name: rucio-config
+        configMap:
+          name: {{ .Values.rucio.rucioConfig }}
+      {{ end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: dirac-server
+spec:
+  selector:
+    app.kubernetes.io/name:  {{ include "wms.fullname" . }}-dirac-server
+  ports:
+    - protocol: TCP
+      port: 8443
+      targetPort: 8443
+      name: https
+
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: http
+
+    {{ range untilStep 9100 9200 1 }}   # start stop step
+    - port: {{ . }}
+      targetPort: {{ . }}
+      name: exposed-port-{{ . }}
+    {{ end }}

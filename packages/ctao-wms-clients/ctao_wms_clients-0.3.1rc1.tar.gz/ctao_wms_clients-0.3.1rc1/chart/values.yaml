@@ -1,0 +1,123 @@
+# Default values for wms.
+# These default values are currently the ones
+# used for local development and testing, they are NOT INTENDED FOR PRODUCTION.
+#
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Image settings.
+image:
+  # -- Prefix of the repository, pods will use <repository_prefix>-{server,client,ce}
+  repository_prefix: "harbor.cta-observatory.org/dpps/wms"
+  # -- Image tag, if not set, the chart's appVersion will be used
+  tag:
+  pullPolicy: IfNotPresent
+
+# -- Settings for local development
+dev:
+  # -- run tests in the container
+  run_tests: true
+  # -- sleep after test to allow interactive development
+  sleep: false
+  # -- mount the repo volume to test the code as it is being developed
+  mount_repo: true
+
+  # -- tag of the image used to run helm tests
+  client_image_tag:
+
+
+# -- Setting for the main DIRAC server pod
+dirac_server:
+  # -- Recreates DIRAC database from scratch. Useful at first installation, but destructive on update: should be changed immediately after the first installation.
+  resetDatabase: true
+
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+
+
+# -- Configuration for the bitnami mariadb subchart. Disable if DIRAC database is provided externally.
+mariadb:
+  enabled: true
+  auth:
+    rootPassword: "dirac-db-root"
+  initdbScripts:
+    create-user.sql: |
+      CREATE USER IF NOT EXISTS 'Dirac'@'%' IDENTIFIED BY 'dirac-db';
+
+
+# -- Settings for the certificate generator
+cert-generator-grid:
+  enabled: true
+  generatePreHooks: true
+
+
+# -- A simple SSH compute element for testing
+test_ce:
+  enabled: true
+  resources: {}
+
+rucio:
+  enabled: false
+
+# -- Configuration for the cvmfs subchart, included for testing
+cvmfs:
+  enabled: true
+  publish_docker_images:
+    - "harbor.cta-observatory.org/proxy_cache/library/python:3.12-slim"
+
+
+# -- Secrets needed to access image registries
+imagePullSecrets:
+  - name: harbor-pull-secret
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # -- If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
