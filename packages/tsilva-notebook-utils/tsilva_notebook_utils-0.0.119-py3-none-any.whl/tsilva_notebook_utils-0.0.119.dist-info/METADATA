@@ -1,0 +1,263 @@
+Metadata-Version: 2.4
+Name: tsilva_notebook_utils
+Version: 0.0.119
+Summary: Utility functions for Jupyter/Colab notebooks
+Author: Tiago Silva
+License-File: LICENSE
+Requires-Python: >=3.6
+Requires-Dist: bokeh
+Requires-Dist: datasets
+Requires-Dist: huggingface-hub
+Requires-Dist: imageio>=2.0.0
+Requires-Dist: ipython>=7.0.0
+Requires-Dist: numpy>=1.19.0
+Requires-Dist: opencv-python>=4.0.0
+Requires-Dist: pynvml
+Requires-Dist: python-dotenv
+Requires-Dist: pytorch-lightning
+Requires-Dist: scikit-learn
+Requires-Dist: tqdm>=4.0.0
+Provides-Extra: all
+Requires-Dist: bokeh; extra == 'all'
+Requires-Dist: datasets; extra == 'all'
+Requires-Dist: google-colab; extra == 'all'
+Requires-Dist: huggingface-hub; extra == 'all'
+Requires-Dist: imageio; extra == 'all'
+Requires-Dist: imageio-ffmpeg; extra == 'all'
+Requires-Dist: matplotlib; extra == 'all'
+Requires-Dist: numpy; extra == 'all'
+Requires-Dist: openai; extra == 'all'
+Requires-Dist: opencv-python; extra == 'all'
+Requires-Dist: pillow; extra == 'all'
+Requires-Dist: python-dotenv; extra == 'all'
+Requires-Dist: pytorch-lightning; extra == 'all'
+Requires-Dist: requests; extra == 'all'
+Requires-Dist: scikit-learn; extra == 'all'
+Requires-Dist: seaborn; extra == 'all'
+Requires-Dist: stable-baselines3; extra == 'all'
+Requires-Dist: torch; extra == 'all'
+Requires-Dist: torchvision; extra == 'all'
+Requires-Dist: tqdm; extra == 'all'
+Requires-Dist: umap-learn; extra == 'all'
+Requires-Dist: wandb; extra == 'all'
+Provides-Extra: colab
+Requires-Dist: google-colab; extra == 'colab'
+Requires-Dist: python-dotenv; extra == 'colab'
+Requires-Dist: tqdm; extra == 'colab'
+Provides-Extra: datasets
+Requires-Dist: datasets; extra == 'datasets'
+Requires-Dist: pillow; extra == 'datasets'
+Requires-Dist: torch; extra == 'datasets'
+Requires-Dist: torchvision; extra == 'datasets'
+Provides-Extra: github
+Requires-Dist: requests; extra == 'github'
+Provides-Extra: gymnasium
+Requires-Dist: imageio; extra == 'gymnasium'
+Requires-Dist: numpy; extra == 'gymnasium'
+Requires-Dist: pillow; extra == 'gymnasium'
+Requires-Dist: pytorch-lightning; extra == 'gymnasium'
+Requires-Dist: stable-baselines3; extra == 'gymnasium'
+Requires-Dist: torch; extra == 'gymnasium'
+Requires-Dist: wandb; extra == 'gymnasium'
+Provides-Extra: huggingface
+Requires-Dist: huggingface-hub; extra == 'huggingface'
+Requires-Dist: torch; extra == 'huggingface'
+Provides-Extra: lightning
+Requires-Dist: pillow; extra == 'lightning'
+Requires-Dist: pytorch-lightning; extra == 'lightning'
+Requires-Dist: torch; extra == 'lightning'
+Requires-Dist: torchvision; extra == 'lightning'
+Provides-Extra: notifications
+Requires-Dist: requests; extra == 'notifications'
+Provides-Extra: openrouter
+Requires-Dist: openai; extra == 'openrouter'
+Provides-Extra: plots
+Requires-Dist: bokeh; extra == 'plots'
+Requires-Dist: matplotlib; extra == 'plots'
+Requires-Dist: pillow; extra == 'plots'
+Requires-Dist: scikit-learn; extra == 'plots'
+Requires-Dist: seaborn; extra == 'plots'
+Requires-Dist: torch; extra == 'plots'
+Requires-Dist: umap-learn; extra == 'plots'
+Provides-Extra: torch
+Requires-Dist: numpy; extra == 'torch'
+Requires-Dist: pillow; extra == 'torch'
+Requires-Dist: torch; extra == 'torch'
+Requires-Dist: torchvision; extra == 'torch'
+Provides-Extra: video
+Requires-Dist: imageio-ffmpeg; extra == 'video'
+Requires-Dist: opencv-python; extra == 'video'
+Requires-Dist: torch; extra == 'video'
+Requires-Dist: torchvision; extra == 'video'
+Provides-Extra: wandb
+Requires-Dist: torch; extra == 'wandb'
+Requires-Dist: wandb; extra == 'wandb'
+Description-Content-Type: text/markdown
+
+# 🧰 tsilva-notebook-utils
+
+🔬 Handy utilities for enhancing your Jupyter and Google Colab notebooks
+
+## 📖 Overview
+
+`tsilva-notebook-utils` is a collection of utility functions designed to make working with Jupyter and Google Colab notebooks more efficient. It provides tools for video rendering, notification systems, and Colab-specific features like automatic disconnection after idle periods.
+
+## 🛠️ Usage
+
+### Video Rendering
+
+```python
+from tsilva_notebook_utils import render_video
+
+# Render a simple video from frames
+frames = [frame1, frame2, frame3]  # List of numpy arrays
+video = render_video(frames, fps=30, scale=1.5)
+display(video)
+
+# Render frames with labels
+labeled_frames = [(frame1, "Start"), (frame2, "Middle"), (frame3, "End")]
+video = render_video(labeled_frames, fps=24)
+display(video)
+
+# Compare multiple videos side by side
+from tsilva_notebook_utils import render_videos
+render_videos([(video1_frames, "Original"), (video2_frames, "Processed")])
+```
+
+### Google Colab Utilities
+
+```python
+from tsilva_notebook_utils import disconnect_after_timeout
+
+# Automatically disconnect Colab after 5 minutes of inactivity
+disconnect_after_timeout(timeout_seconds=300)
+```
+
+### Notifications
+
+Send notifications to [PopDesk](https://github.com/tsilva/popdesk) notification server:
+
+```python
+from tsilva_notebook_utils import send_popdesk_notification
+
+# Send a notification when your long-running notebook task completes
+send_popdesk_notification(
+    url="https://your-popdesk-url",
+    auth_token="your-auth-token",
+    title="Training Complete",
+    message="Your model has finished training with 95% accuracy"
+)
+```
+
+## � Development & Releases
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/tsilva/tsilva-notebook-utils.git
+cd tsilva-notebook-utils
+
+# Install in development mode
+pip install -e .
+
+# Run tests
+python -m pytest tests/
+```
+
+### Version Management
+
+This project uses automated version bumping with `bump2version`. Version numbers are automatically updated across all relevant files.
+
+#### Local Version Bumping
+
+Use the provided scripts for local development:
+
+```bash
+# Bump patch version (0.0.115 → 0.0.118)
+make bump-patch
+# or
+python bump_version.py patch
+
+# Bump minor version (0.0.115 → 0.1.0)
+make bump-minor
+# or
+python bump_version.py minor
+
+# Bump major version (0.0.115 → 1.0.0)
+make bump-major
+# or
+python bump_version.py major
+```
+
+#### Automated Releases
+
+**🎯 Recommended: GitHub Actions Release Workflow**
+
+1. Go to the [GitHub Actions](../../actions) tab
+2. Select "Release and Publish" workflow
+3. Click "Run workflow"
+4. Choose your release type:
+   - **patch**: Bug fixes (0.0.115 → 0.0.118)
+   - **minor**: New features (0.0.115 → 0.1.0)
+   - **major**: Breaking changes (0.0.115 → 1.0.0)
+   - **prerelease**: Beta versions (0.0.115 → 0.0.118-alpha.1)
+5. Click "Run workflow"
+
+**What happens automatically:**
+- ✅ Version bumped in `pyproject.toml` and `__init__.py`
+- ✅ Git commit created with version bump message
+- ✅ Git tag created (e.g., `v0.0.118`)
+- ✅ Package built and published to [PyPI](https://pypi.org/project/tsilva-notebook-utils/)
+- ✅ GitHub release created with release notes
+
+#### Manual Release Process
+
+If you prefer manual control:
+
+```bash
+# 1. Bump version locally
+make bump-patch  # or bump-minor, bump-major
+
+# 2. Build the package
+make build
+
+# 3. Publish to PyPI (requires PYPI_API_TOKEN)
+make publish
+```
+
+### Release Notes
+
+Recent releases can be found on the [Releases page](../../releases).
+
+#### Version History
+- **v0.0.115**: Current version with automated release workflow
+- **v0.0.114**: Previous stable version
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`make test`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+### Available Make Commands
+
+```bash
+make help          # Show all available commands
+make install       # Install package in development mode
+make test          # Run tests
+make bump-patch    # Bump patch version
+make bump-minor    # Bump minor version
+make bump-major    # Bump major version
+make build         # Build the package
+make publish       # Build and publish to PyPI
+make clean         # Clean build artifacts
+```
+
+## �📄 License
+
+This project is licensed under the [MIT License](LICENSE).
