@@ -1,0 +1,36 @@
+## Higher priority and recommended standard for the future
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+## Dependencies here will be installed automatically
+## '-' used in name but '_' used in folder name
+[project]
+name = "napari-stereoTis"
+version = "0.3.0"
+description = "Used to mask cells or tissues for spatial transcriptomes"
+authors = [{name = "Qi Fang", email = "fangqi@genomics.cn"}]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "napari[all]",
+  "magicgui",
+  "numpy",
+  "scikit-image",
+  "opencv-python",
+  "pandas",
+  "matplotlib"
+]
+
+## Required field, otherwise napari cannot call the plugin
+[project.entry-points."napari.manifest"]
+napari-stereoTis = "napari_stereoTis:napari.yaml"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["napari_stereoTis"]
+
+## Required, indicates to include yaml in the release package,
+## otherwise yaml will be lost and napari cannot find the plugin
+[tool.setuptools.package-data]
+napari_stereoTis = ["napari.yaml"]
