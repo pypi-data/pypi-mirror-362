@@ -1,0 +1,153 @@
+Metadata-Version: 2.4
+Name: drizzlepac
+Version: 3.10.0
+Summary:  HST image combination using the drizzle algorithm to combine astronomical images, to model image distortion, to remove cosmic rays, and generally to improve the fidelity of data in the final image. 
+Author: Megan Sosey, Warren Hack, Christopher Hanley, Chris Sontag, Mihai Cara, Michael Dulude, Michele De La Pena, Steven Goldman
+License: BSD 3-Clause License
+        
+        Copyright (c) 2024, Association of Universities for Research in Astronomy (AURA)
+        All rights reserved.
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+        * Redistributions of source code must retain the above copyright notice, this
+          list of conditions and the following disclaimer.
+        
+        * Redistributions in binary form must reproduce the above copyright notice,
+          this list of conditions and the following disclaimer in the documentation
+          and/or other materials provided with the distribution.
+        
+        * Neither the name of the copyright holder nor the names of its
+          contributors may be used to endorse or promote products derived from
+          this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+        AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+        IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+        FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+        DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+        SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+        CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+        OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+        
+Project-URL: tracker, https://github.com/spacetelescope/drizzlepac/issues
+Project-URL: documentation, https://drizzlepac.readthedocs.io/en/latest
+Project-URL: source, https://github.com/spacetelescope/drizzlepac
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Astronomy
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.11
+Description-Content-Type: text/x-rst
+License-File: LICENSE.txt
+Requires-Dist: astropy>=5.0.4
+Requires-Dist: fitsblender>=0.4.2
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: stsci.tools>=4.0
+Requires-Dist: stsci.image>=2.3.7
+Requires-Dist: stsci.imagestats>=1.8.2
+Requires-Dist: stsci.skypac>=1.0.9
+Requires-Dist: stsci.stimage
+Requires-Dist: stwcs>=1.7.4
+Requires-Dist: tweakwcs>=0.8.7
+Requires-Dist: stregion>=1.1.7
+Requires-Dist: requests
+Requires-Dist: scikit-learn>=0.20
+Requires-Dist: simplify-polyline
+Requires-Dist: bokeh
+Requires-Dist: pandas
+Requires-Dist: spherical_geometry>=1.2.22
+Requires-Dist: astroquery>=0.4
+Requires-Dist: astrocut<=0.9
+Requires-Dist: photutils>=2.0.0
+Requires-Dist: lxml
+Requires-Dist: PyPDF2
+Requires-Dist: scikit-image>=0.14.2
+Requires-Dist: numpy>2.0
+Provides-Extra: docs
+Requires-Dist: sphinx; extra == "docs"
+Requires-Dist: stsci_rtd_theme; extra == "docs"
+Requires-Dist: packaging; extra == "docs"
+Requires-Dist: tomli; extra == "docs"
+Requires-Dist: numpydoc; extra == "docs"
+Requires-Dist: sphinx_automodapi; extra == "docs"
+Requires-Dist: graphviz; extra == "docs"
+Requires-Dist: astrocut; extra == "docs"
+Requires-Dist: tables; extra == "docs"
+Provides-Extra: test
+Requires-Dist: ci_watson; extra == "test"
+Requires-Dist: crds; extra == "test"
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: pytest-remotedata; extra == "test"
+Dynamic: license-file
+
+# Drizzlepac
+
+[![Build Status](https://github.com/spacetelescope/drizzlepac/actions/workflows/ci.yml/badge.svg)](https://github.com/spacetelescope/drizzlepac/actions/workflows/ci.yml)
+[![Documentation Status](https://readthedocs.org/projects/drizzlepac/badge/?version=latest)](http://drizzlepac.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/spacetelescope/drizzlepac/branch/master/graph/badge.svg)](https://codecov.io/gh/spacetelescope/drizzlepac)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3743274.svg)](https://doi.org/10.5281/zenodo.3743274)
+
+Nightly regression test results are run using [github actions](https://github.com/spacetelescope/RegressionTests/actions/workflows/drizzlepac.yml).
+
+The use of this software on HST data is described at:
+
+    http://drizzlepac.stsci.edu/
+
+A complete description of the documented interfaces in the code itself 
+can be found at:
+
+    http://drizzlepac.readthedocs.io
+
+
+# Installation
+
+## Conda (Recommended)
+
+`Drizzlepac` is installed when you install the `stenv` conda environment (a replacement for `astroconda`). Select your desired release and follow the instructions on the [`stenv` installation page](https://stenv.readthedocs.io/en/latest/getting_started.html). 
+
+## Install with pip
+
+```bash
+$ pip install git+https://github.com/spacetelescope/drizzlepac.git
+```
+The option `--no-use-pep517` MAY be required in order to correctly build 
+the C extensions with `pip` versions up to 22.2, after commenting out 
+the `build-backend` from the `pyproject.toml` config file.
+
+Support for installing using `pip` is still evolving, so use of this 
+command is provided on an experimental basis for now.
+
+## From Source
+
+### Clone this repository
+```bash
+$ git clone https://github.com/spacetelescope/drizzlepac
+$ cd drizzlepac
+```
+
+### Build the documentation
+
+*Note:* If you intend to use `drizzlepac`'s embedded help feature from within
+an interactive `python` or `ipython` session, we recommend you do not skip
+this step.
+
+```bash
+$ cd doc/
+$ make html
+```
+
+### Install DrizzlePac
+
+```bash
+$ python setup.py install
+```
