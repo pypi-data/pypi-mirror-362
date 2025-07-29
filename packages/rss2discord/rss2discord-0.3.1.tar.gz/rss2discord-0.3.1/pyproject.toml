@@ -1,0 +1,43 @@
+[project]
+name = "rss2discord"
+version = "0.3.1"
+description = "A bot for feeding RSS feeds to Discord channels"
+authors = [
+    {name = "fluffy",email = "fluffy@beesbuzz.biz"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "feedparser (>=6.0.11,<7.0.0)",
+    "html-to-markdown (>=1.6.0,<2.0.0)",
+    "atomicwrites (>=1.4.1,<2.0.0)",
+    "requests (>=2.32.4,<3.0.0)",
+    "beautifulsoup4 (>=4.13.4,<5.0.0)",
+]
+
+[project.urls]
+homepage = "https://github.com/fluffy-critter/rss2discord"
+issues = "https://github.com/fluffy-critter/rss2discord/issues"
+sponsor = "https://github.com/sponsors/fluffy-critter"
+funding = "https://ko-fi.com/fluffycritter"
+mastodon = "https://plush.city/@fluffy"
+discord = "https://beesbuzz.biz/discord"
+
+[tool.poetry]
+include = [
+    { path = "rss2discord/__version__.py", format = ["sdist", "wheel"] }
+]
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.3.2"
+pylint = "^3.3.7"
+mypy = "^1.16.1"
+types-requests = "^2.32.4.20250611"
+isort = "^6.0.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+rss2discord = 'rss2discord:main'
