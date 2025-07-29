@@ -1,0 +1,71 @@
+# Config file for setuptools build system
+# replaces setup.py
+# run with `python -m build`
+
+# files are added in 3 steps:
+# 1. python packages: all packages specified in [tool.setuptools.packages.find]
+# 2. git top level repo files: added by [tool.setuptools_scm]
+# 3. MANIFEST.in
+
+# specify setuptools for build and add git plugin for reading version
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"] # scm after 2022
+build-backend = "setuptools.build_meta"
+
+# project metadata and config
+[project]
+name = "XGEE"
+authors = [
+    { name = "Matthias Brunner", email = "matthias.brunner@ils.uni-stuttgart.de" },
+    { name = "Andreas Waldvogel", email = "andreas.waldvogel@ils.uni-stuttgart.de" },
+]
+description = "eXtensible Graphical EMOF Editor - a framework for graphical editing single page web-applications"
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = ["EMOF", "editor", "web-application", "modeling", "graphical"]
+license = { text = "MIT License" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+]
+# specify 'version' and 'requirements' as dynamic
+dynamic = ["version", "dependencies"]
+
+[tool.setuptools_scm] # enables setuptools_scm, should read from tag
+# debug with `python -m setuptools_scm`
+# writes out version to _version.py, which is read by xgee 
+version_file = "xgee/_version.py"
+# additionally adds all files in top level repo, but not in submodules -> adding files in MANIFEST.in
+
+[tool.setuptools.dynamic] # reads dependencies from requirements.txt
+dependencies = {file = ["requirements.txt"]}
+# throws a `install_requires` overwritten warning, but works
+
+# define the python packages to pack
+# automatic discovery: had problems with venv and older builds
+# [tool.setuptools.packages]
+# find = {}
+
+# packages = ["xgee", "xgee.eoqserver"] # still throws lots of "Package would be ignored" warnings, seems not easy to get rid of them
+# include-package-data = true # true by default
+
+[tool.setuptools.packages.find]
+# All the following settings are optional:
+where = ["."]  # ["."] by default
+include = ["xgee*"]  # ["*"] by default
+namespaces = false  # true by default
+
+# [tool.setuptools.package-data]
+# "*" = ["*"] # allows to include all files in all packages. every folder is a package with namespace = true, which is default, for some reason does not go to deepest level -> use MANIFEST.in instead
+
+# entrypoint: allows to run xgee from command line in addition to python -m xgee
+[project.scripts]
+xgee = "xgee.xgee:main"
+
+[project.urls]
+Homepage = "https://xgee.de"
+Documentation = "https://docs.xgee.de/"
+Repository = "https://gitlab.com/xgee/xgee-core"

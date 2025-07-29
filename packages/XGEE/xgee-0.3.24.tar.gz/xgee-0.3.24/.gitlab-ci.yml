@@ -1,0 +1,60 @@
+# CI for building and publishing XGEE packages. 
+# always builds, only deploys if a tag (new version) is pushed
+
+# Based on this template:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
+
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# explicit sequence of stages, is actually also default sequence
+stages:
+  - build
+  - deploy
+
+# all jobs inherit from default
+default:
+  image: python:latest # will directly complain if new version is not working. Temporarily switch back to make work again. 
+  # https://pip.pypa.io/en/stable/topics/caching/
+  cache:
+    paths:
+      - .cache/pip
+  before_script:
+      - pip install virtualenv
+      - virtualenv venv
+      - source venv/bin/activate
+
+
+build:
+  stage: build
+  before_script:
+    - python --version ; pip --version # For debugging. Was not printed when in defaults before_script. 
+    # get submodules, https with CI_JOB_TOKEN instead of ssh
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/".insteadOf "ssh://git@gitlab.com/"
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/".insteadOf "git@gitlab.com/"
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/".insteadOf "git@gitlab.com:"
+    - git submodule foreach --recursive 'git config --local url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/".insteadOf "ssh://git@gitlab.com/"'
+    - git submodule foreach --recursive 'git config --local url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/".insteadOf "git@gitlab.com/"'
+    - git submodule foreach --recursive 'git config --local url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/".insteadOf "git@gitlab.com:"'
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
+    - pip install build 
+  script:
+    - python -m build
+  artifacts: # store these folders for next stage
+    paths:
+      - dist
+      - xgee # for debugging reasons
+    expire_in: 1 week # latest never expires
+
+
+release:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_TAG # run only if a tag is pushed. We use tags in the format 'v0.3.8' for versioning. 
+  script: 
+    - pip install twine
+    - twine upload --username $TWINE_USERNAME --password $TWINE_PASSWORD_AW dist/*
