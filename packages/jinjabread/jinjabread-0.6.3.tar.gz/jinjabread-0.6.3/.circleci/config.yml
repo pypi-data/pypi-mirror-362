@@ -1,0 +1,71 @@
+version: 2.1
+_definitions:
+  - &semver_pattern /^\d+\.\d+\.\d+.*/
+executors:
+  python:
+    docker:
+      - image: cimg/python:3.12.1
+jobs:
+  test-python:
+    executor: python
+    steps:
+      - checkout
+      - run:
+          name: Create virtual environment
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install pip pip-tools --upgrade
+            pip-sync requirements.txt
+      - run:
+          name: Check style
+          command: |
+            . venv/bin/activate
+            black --check .
+      - run:
+          name: Run tests
+          command: |
+            . venv/bin/activate
+            coverage run --source jinjabread -m unittest discover .
+            coverage report
+            coverage html
+      - store_artifacts:
+          path: htmlcov
+  publish-python-package:
+    executor: python
+    steps:
+      - checkout
+      - run:
+          name: Create virtual environment
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install pip pip-tools --upgrade
+            pip-sync requirements.txt
+      - run:
+          name: Create build
+          command: |
+            . venv/bin/activate
+            python -m build
+      - run:
+          name: Upload build
+          command: |
+            . venv/bin/activate
+            python -m twine upload dist/*
+workflows:
+  main:
+    jobs:
+      - test-python:
+          filters:
+            tags:
+              only: *semver_pattern
+      - publish-python-package:
+          context:
+            - jinjabread-prod
+          requires:
+            - test-python
+          filters:
+            tags:
+              only: *semver_pattern
+            branches:
+              ignore: /.*/
