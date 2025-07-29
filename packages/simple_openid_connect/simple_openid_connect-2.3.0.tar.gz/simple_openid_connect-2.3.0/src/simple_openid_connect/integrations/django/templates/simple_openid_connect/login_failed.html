@@ -1,0 +1,80 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenID Login Failed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="{% static "simple_openid_connect/login_failed.css" %}">
+</head>
+<body>
+<main>
+    <div id="easy-container">
+        <h1>Could not log you in</h1>
+        <p id="generic-description">
+            The application attempted to log you in using an external Identity Provider.
+            This failed for a reason that is described in the <i>Technical Details</i> block below.<br>
+            Usually these kinds of errors are temporary and can be reinitiating the authentication procedure.
+            Please do so with the button below but if the error persists, contact your administrator.
+        </p>
+
+        <a href="{% url "simple_openid_connect:login" %}">
+            <button>Retry Authentication</button>
+        </a>
+    </div>
+
+    <details>
+        <summary>Technical Details</summary>
+        <div>
+            <h2>{{ technical_msg }}</h2>
+            <p>{{ technical_description }}</p>
+
+            {% if auth_failed_error.error_description %}
+                <p>{{ auth_failed_error.error_description }}</p>
+            {% endif %}
+            {% if auth_failed_error.error_uri %}
+                <p>See <i>{{ auth_failed_error.error_uri }}</i> for more information</p>
+            {% endif %}
+
+            {% if token_error_response.error_description %}
+                <p>{{ token_error_response.error_description }}</p>
+            {% endif %}
+            {% if token_error_response.error_uri %}
+                <p>See <i>{{ token_error_response.error_uri }}</i> for more information</p>
+            {% endif %}
+
+            {% if id_token_validation_error %}
+                <p>{{ id_token_validation_error.msg }}</p>
+            {% endif %}
+
+            <table id="config-table">
+                <tr>
+                    <th colspan="2">Configuration Parameters</th>
+                </tr>
+                <tr>
+                    <td>OpenID Issuer</td>
+                    <td><code>{{ openid_settings.OPENID_ISSUER }}</code></td>
+                </tr>
+                <tr>
+                    <td>OpenID Client-ID</td>
+                    <td><code>{{ openid_settings.OPENID_CLIENT_ID }}</code></td>
+                </tr>
+                <tr>
+                    <td>OpenID Scope</td>
+                    <td><code>{{ openid_settings.OPENID_SCOPE }}</code></td>
+                </tr>
+                <tr>
+                    <td>Used Redirect URI</td>
+                    <td><code>{{ auth_redirect_url }}</code></td>
+                </tr>
+                <tr>
+                    <td>Maximum allowed time for logging in</td>
+                    <td>{{ openid_settings.OPENID_LOGIN_TIMEOUT }}s</td>
+                </tr>
+            </table>
+        </div>
+    </details>
+</main>
+</body>
+</html>
