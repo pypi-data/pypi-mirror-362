@@ -1,0 +1,61 @@
+Metadata-Version: 2.4
+Name: logservice
+Version: 0.1.1
+Summary: Reusable CloudWatch log sender
+Author: Naveenkumar Koppala
+Author-email: naveenkumar.k@tnsservices.com
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: aioboto3>=10.0.0
+Requires-Dist: pydantic<2.11.3,>=1.10.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# logservice
+
+An async Python module for sending structured JSON logs to AWS CloudWatch Logs from any Python application, including FastAPI, Flask, background workers, and CLI tools.
+
+---
+
+## ðŸ“¦ Installation
+
+Install directly from PyPI:
+
+```bash
+pip install logservice
+
+from fastapi import FastAPI
+from logservice import AsyncCloudWatchLogService, LogEntry
+
+app = FastAPI()
+
+log_service = AsyncCloudWatchLogService(
+    aws_access_key="...",
+    aws_secret_key="...",
+    region_name="us-east-1",
+    log_group_name="app-logs",
+    log_stream_name="login-events"
+)
+
+@app.post("/login")
+async def login():
+    await log_service.log(LogEntry(
+        level="INFO",
+        message="User logged in",
+        service_name="LoginService",
+        extra={"user_id": 123}"
+    ))
+    return {"message": "Logged"}
+```
