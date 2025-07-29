@@ -1,0 +1,49 @@
+[project]
+name = "candle_api"
+version = "0.0.9"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+    { name = "Yu He", email = "auheyu@mail.scut.edu.cn" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: C",
+    "Programming Language :: C++",
+    "Typing :: Typed"
+]
+
+[project.urls]
+Documentation = "https://github.com/BIRLab/candle_api#readme"
+Issues = "https://github.com/BIRLab/candle_api/issues"
+Source = "https://github.com/BIRLab/candle_api"
+
+[build-system]
+requires = [
+    "setuptools",
+    "cmake"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["candle_api_pybind11"]
+include = ["candle_api"]
+namespaces = false
+
+[tool.cibuildwheel]
+build-frontend = "build"
+skip = [
+    "*-musllinux*",
+    "pp*",
+]
+
+[tool.cibuildwheel.linux]
+before-build = "yum -y install libudev-devel"
