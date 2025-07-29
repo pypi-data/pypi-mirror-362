@@ -1,0 +1,166 @@
+Metadata-Version: 2.4
+Name: syft-perm
+Version: 0.3.92
+Summary: Minimal utilities for managing SyftBox file permissions
+Author-email: OpenMined <info@openmined.org>
+License: Apache-2.0
+Project-URL: Homepage, https://github.com/OpenMined/syft-perm
+Project-URL: Documentation, https://github.com/OpenMined/syft-perm#readme
+Project-URL: Repository, https://github.com/OpenMined/syft-perm
+Project-URL: Issues, https://github.com/OpenMined/syft-perm/issues
+Keywords: syftbox,permissions,privacy,federated-learning
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Security
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: fastapi>=0.104.0
+Requires-Dist: loguru>=0.7.3
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: requests>=2.31.0
+Requires-Dist: uvicorn[standard]>=0.24.0
+Requires-Dist: watchdog>=6.0.0
+Requires-Dist: websockets>=15.0.1
+Provides-Extra: syftbox
+Requires-Dist: syft-core; extra == "syftbox"
+Provides-Extra: display
+Requires-Dist: tabulate>=0.9.0; extra == "display"
+Provides-Extra: server
+Requires-Dist: fastapi>=0.104.0; extra == "server"
+Requires-Dist: uvicorn>=0.24.0; extra == "server"
+Requires-Dist: loguru>=0.7.0; extra == "server"
+Requires-Dist: watchdog>=3.0.0; extra == "server"
+Requires-Dist: websockets>=12.0; extra == "server"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: isort; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: nbformat>=5.9.0; extra == "dev"
+Requires-Dist: nbconvert>=7.16.0; extra == "dev"
+Requires-Dist: ipykernel>=6.29.0; extra == "dev"
+Dynamic: license-file
+
+[![CI](https://github.com/OpenMined/syft-perm/actions/workflows/test.yml/badge.svg)](https://github.com/OpenMined/syft-perm/actions/workflows/test.yml)
+[![PyPI version](https://img.shields.io/pypi/v/syft-perm.svg)](https://pypi.org/project/syft-perm/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/syft-perm.svg)](https://pypi.org/project/syft-perm/)
+[![Python versions](https://img.shields.io/pypi/pyversions/syft-perm.svg)](https://pypi.org/project/syft-perm/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![License](https://img.shields.io/github/license/OpenMined/syft-perm.svg)](https://github.com/OpenMined/syft-perm/blob/main/LICENSE)
+
+# SyftPerm
+
+**File permission management for SyftBox made simple.**
+
+SyftPerm provides intuitive Python APIs for managing SyftBox file permissions with powerful pattern matching, inheritance, and debugging capabilities.
+
+## 📚 **[Complete Documentation](https://openmined.github.io/syft-perm/)**
+
+## Installation
+
+```bash
+pip install syft-perm
+```
+
+## Quick Start
+
+```python
+import syft_perm as sp
+
+# Open a file or folder
+file = sp.open("my_data.txt")
+
+# Grant permissions (higher levels include lower ones)
+file.grant_read_access("reviewer@external.org")
+file.grant_write_access("colleague@company.com")  # Gets read + write
+file.grant_admin_access("boss@company.com")       # Gets everything
+
+# Use patterns for multiple files
+project = sp.open("my_project/")
+project.grant_write_access("*.py", "dev@company.com")
+project.grant_read_access("docs/**/*.md", "*")  # Public docs
+
+# Debug permissions
+print(file.explain_permissions("colleague@company.com"))
+
+# Check access
+if file.has_write_access("colleague@company.com"):
+    print("Colleague can modify this file")
+
+# Display beautiful permission tables in Jupyter notebooks
+file._repr_html_()  # Shows permissions table with compliance info
+```
+
+## Permission Hierarchy
+
+- **Read** - View file contents
+- **Create** - Read + create new files  
+- **Write** - Read + Create + modify existing files
+- **Admin** - Read + Create + Write + manage permissions
+
+## Key Features
+
+- **🎯 Intuitive Permission Hierarchy** - Higher permissions include all lower ones
+- **🌟 Powerful Pattern Matching** - Use `*.py`, `docs/**/*.md` to control multiple files
+- **🔍 Nearest-Node Algorithm** - Predictable inheritance from closest permission rules
+- **🐛 Built-in Debugging** - Trace exactly why permissions work or don't work
+- **📁 Folder-Level Efficiency** - Set permissions once on directories, files inherit automatically
+- **🎮 Interactive Web Editor** - Google Drive-style permission management interface
+
+## Beautiful Table Display
+
+SyftPerm provides rich table displays for Jupyter notebooks:
+
+```python
+# Display permissions table with compliance information
+file._repr_html_()  # Shows user permissions, file limits, and compliance status
+
+# The table includes:
+# • User permissions (Read/Create/Write/Admin)
+# • File size vs limits
+# • File type compliance (directories, symlinks)
+# • Overall compliance status
+# • Direct link to web editor
+```
+
+## Web Editor
+
+For non-technical users, SyftPerm includes a web interface:
+
+```python
+# Get editor URL for any file or folder
+url = sp.get_editor_url("my_project/")
+print(f"Edit permissions at: {url}")
+```
+
+## Learn More
+
+- **[5-Minute Quick Start](https://openmined.github.io/syft-perm/quickstart.html)** - Get productive immediately
+- **[Comprehensive Tutorials](https://openmined.github.io/syft-perm/tutorials/)** - Master advanced features
+- **[API Reference](https://openmined.github.io/syft-perm/api/)** - Complete Python API docs
+
+## Requirements
+
+- Python 3.9+
+- Works on Windows, macOS, and Linux
+
+## Contributing
+
+1. Check out our [GitHub Issues](https://github.com/OpenMined/syft-perm/issues)
+2. Read the [Contributing Guide](CONTRIBUTING.md)
+3. Join the [OpenMined Community](https://openmined.org/)
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
