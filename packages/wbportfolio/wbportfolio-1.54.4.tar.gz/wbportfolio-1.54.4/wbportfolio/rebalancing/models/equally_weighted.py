@@ -1,0 +1,29 @@
+from decimal import Decimal
+
+from wbfdm.models import InstrumentPrice
+
+from wbportfolio.pms.typing import Portfolio
+from wbportfolio.rebalancing.base import AbstractRebalancingModel
+from wbportfolio.rebalancing.decorators import register
+
+
+@register("Equally Weighted Rebalancing")
+class EquallyWeightedRebalancing(AbstractRebalancingModel):
+    def is_valid(self) -> bool:
+        return (
+            len(self.effective_portfolio.positions) > 0
+            and InstrumentPrice.objects.filter(
+                date=self.trade_date, instrument__in=self.effective_portfolio.positions_map.keys()
+            ).exists()
+        )
+
+    def get_target_portfolio(self) -> Portfolio:
+        positions = []
+        nb_assets = len(self.effective_portfolio.positions)
+        for position in self.effective_portfolio.positions:
+            positions.append(
+                position.copy(
+                    weighting=Decimal(1 / nb_assets), date=self.trade_date, asset_valuation_date=self.trade_date
+                )
+            )
+        return Portfolio(positions)
