@@ -1,0 +1,9 @@
+TARGET_NEVER_SCANNED_OUTPUT = "NEVER_SCANNED"
+SCANS_NO_START_DATE_OUTPUT = "NOT_AVAILABLE"
+UNKNOWN_VALUE_OUTPUT = "UNKNOWN"
+
+# API query_param flag that returns custom 404 response
+# Helps with performance and user feedback
+ID_404_VALIDATION = "is_id_404_validation"
+
+DATETIME_METAVAR = "ISO_8601_DATETIME"
