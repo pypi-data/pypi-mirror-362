@@ -1,0 +1,102 @@
+[project]
+name = "mindlogger-data-export"
+version = "0.1.3"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Gabriel Schubiner", email = "gabriel.schubiner@childmind.org" },
+]
+requires-python = ">=3.11"
+dependencies = [
+    "lark>=1.2.2",
+    "packaging>=24.2",
+    "polars>=1.31.0",
+    "tyro>=0.9.5",
+    "xlsxwriter>=3.2.5",
+]
+
+[project.scripts]
+mindlogger-data-export = "mindlogger_data_export:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
+    "marimo[lsp]>=0.13.15",
+    "mypy>=1.15.0",
+    "pyarrow>=19.0.0",
+    "pytest>=8.3.4",
+    "pytest-datafiles>=3.0.0",
+    "ruff>=0.9.6",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.ruff.lint]
+extend-select = [
+    "A",
+    "ARG",
+    "B",
+    "C4",
+    "C90",
+    "COM",
+    "D",
+    "ERA",
+    "FA",
+    "FBT",
+    "FLY",
+    "FURB",
+    "G",
+    "I",
+    "ICN",
+    "ISC",
+    "LOG",
+    "N",
+    "PIE",
+    "PL",
+    "PT",
+    "PTH",
+    "PYI",
+    "RET",
+    "RSE",
+    "S",
+    "T20",
+    "TRY",
+    "UP",
+]
+
+extend-ignore = [
+    "COM812",
+    "COM819",
+    "D107",
+    "D203",
+    "D206",
+    "D213",
+    "D300",
+    "ISC001",
+    "ISC002",
+    "TRY003",
+    "ERA001",
+]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**/*.py" = ["S101", "SLF001", "INP001", "D103", "ERA001"]
+"scripts/*.py" = ["T20", "D100", "N803", "B018", "ERA001", "PLR0913", "FBT003"]
+"scripts/*.ipynb" = [
+    "C901",
+    "D103",
+    "ERA001",
+    "FBT002",
+    "PLR2004",
+    "PLR0912",
+    "PLR0915",
+    "PTH118",
+    "T20",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
