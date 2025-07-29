@@ -1,0 +1,17 @@
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  publish:
+    runs-on: based-alpine
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        run: |
+          uv sync
+          uv build
+      - name: publish
+        run: |
+          uv publish --token ${{ secrets.PYPI_TOKEN }}
+
