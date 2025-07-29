@@ -1,0 +1,98 @@
+[tool.poetry]
+name = "muffin-kafka"
+version = "0.7.1"
+description = "Kafka Integration for Muffin framework"
+readme = "README.md"
+license = "MIT"
+authors = ["Kirill Klenov <horneds@gmail.com>"]
+homepage = "https://github.com/klen/muffin-kafka"
+repository = "https://github.com/klen/muffin-kafka"
+keywords = ["kafka", "asyncio", "asgi", "muffin"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Internet :: WWW/HTTP",
+  "Framework :: AsyncIO",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+muffin = "^0"
+aiokafka = { version = "*", extras = ["lz4"] }
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+ipdb = "*"
+pre-commit = "*"
+pytest = "*"
+pytest-aio = "*"
+pytest-mypy = "*"
+ruff = "*"
+
+[tool.pytest.ini_options]
+addopts = "-lxsv"
+log_cli = true
+
+[tool.mypy]
+packages = ["muffin_kafka"]
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310,py311,py312,py313,pypy310
+
+[testenv]
+deps = -e .[tests]
+commands =
+	pytest --mypy tests.py
+
+[testenv:pypy310]
+deps = -e .[tests]
+commands =
+	pytest tests.py
+"""
+
+[tool.ruff]
+fix = true
+line-length = 100
+target-version = "py310"
+exclude = [".venv", "docs", "examples"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "A003",
+  "ANN",
+  "D",
+  "DJ",
+  "EM",
+  "G004",
+  "N804",
+  "PLR0912",
+  "PLR2004",
+  "RET",
+  "RSE",
+  "S101",
+  "SLF",
+  "TRY003",
+  "UP",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py313"]
+preview = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
