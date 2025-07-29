@@ -1,0 +1,119 @@
+name: napari-stereoTis
+display_name: stereoTis
+visibility: public
+categories: ["Annotation", "Segmentation"]
+
+contributions:
+  commands:
+    - id: napari-stereoTis.background
+      title: Background
+      python_name: napari_stereoTis._background:input_background
+    - id: napari-stereoTis.input_cells
+      title: Cells
+      python_name: napari_stereoTis._background:input_cells
+    - id: napari-stereoTis.input_nucleus
+      title: Nucleus
+      python_name: napari_stereoTis._background:input_nucleus
+    - id: napari-stereoTis.input_cytoplasm
+      title: Cytoplasm
+      python_name: napari_stereoTis._background:input_cytoplasm
+
+    - id: napari-stereoTis.run_cellpose
+      title: Run Cellpose
+      python_name: napari_stereoTis._cellpose:run_cellpose
+
+    - id: napari-stereoTis.signature_load
+      title: Load Signature (CSV with Header)
+      python_name: napari_stereoTis._signature:signature_load
+    - id: napari-stereoTis.signature_plot
+      title: Plot Signature
+      python_name: napari_stereoTis._signature:signature_plot
+    - id: napari-stereoTis.signature_segment
+      title: Segment Signature
+      python_name: napari_stereoTis._signature:signature_segment
+
+    - id: napari-stereoTis.cells_load
+      title: Load Signature (CSV with Header)
+      python_name: napari_stereoTis._cellAgg:cells_load
+    - id: napari-stereoTis.cls_optics
+      title: Plot Signature
+      python_name: napari_stereoTis._cellAgg:cls_optics
+    - id: napari-stereoTis.cls_optimize
+      title: Segment Signature
+      python_name: napari_stereoTis._cellAgg:cls_optimize
+
+    - id: napari-stereoTis.save
+      title: Save
+      python_name: napari_stereoTis._utils:save_selected_labels
+
+  widgets:
+    - command: napari-stereoTis.background  # note, same as command.id above
+      display_name: Background
+      # autogenerate: true
+    - command: napari-stereoTis.input_cells
+      display_name: Cells
+    - command: napari-stereoTis.input_nucleus
+      display_name: Nucleus
+    - command: napari-stereoTis.input_cytoplasm
+      display_name: Cytoplasm
+    
+    - command: napari-stereoTis.run_cellpose
+      display_name: Run Cellpose
+
+    - command: napari-stereoTis.signature_load
+      display_name: Load Signature (CSV with Header)
+    - command: napari-stereoTis.signature_plot
+      display_name: Plot Signature
+    - command: napari-stereoTis.signature_segment
+      display_name: Segment Signature
+
+    - command: napari-stereoTis.cells_load
+      display_name: Load Target Cells (CSV with Header)
+    - command: napari-stereoTis.cls_optics
+      display_name: Cluster Cells with OPTICS
+    - command: napari-stereoTis.cls_optimize
+      display_name: Optimize Cluster Labels
+
+    - command: napari-stereoTis.save
+      display_name: Save Selected Labels
+
+  menus:
+    napari/layers/visualize:
+      - submenu: stereoTis-background
+    stereoTis-background:
+      - command: napari-stereoTis.background
+      - command: napari-stereoTis.input_cells
+      - command: napari-stereoTis.input_nucleus
+      - command: napari-stereoTis.input_cytoplasm
+      
+    napari/layers/annotate:
+      - submenu: stereoTis-cellpose
+    stereoTis-cellpose:
+      - command: napari-stereoTis.run_cellpose
+
+    napari/layers/segment:
+      - submenu: stereoTis-signature
+    stereoTis-signature:
+      - command: napari-stereoTis.signature_load
+      - command: napari-stereoTis.signature_plot
+      - command: napari-stereoTis.signature_segment
+
+    napari/layers/classify:
+      - submenu: stereoTis-cells
+    stereoTis-cells:
+      - command: napari-stereoTis.cells_load
+      - command: napari-stereoTis.cls_optics
+      - command: napari-stereoTis.cls_optimize
+
+    napari/file/io_utilities:
+      - command: napari-stereoTis.save
+
+  submenus:
+    - id: stereoTis-background
+      label: Reading Pictures & Labels for StereoTis
+    - id: stereoTis-cellpose
+      label: Cellpose
+    - id: stereoTis-signature
+      label: Gene Signature
+    - id: stereoTis-cells
+      label: Cells Aggregates
