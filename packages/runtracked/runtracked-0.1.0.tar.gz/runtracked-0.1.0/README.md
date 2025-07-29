@@ -1,0 +1,102 @@
+# Terminal Running Tracker
+
+A minimalist, terminal-based running tracker built with Python and `curses`. Log your daily runs, track performance metrics, and visualize trends — all from your terminal.
+
+---
+
+## Features
+
+- Log daily running data: distance, pace, heart rate, cadence
+- Mark quality runs
+- View 15-day trend line charts (distance, heart rate, pace)
+- Keyboard-driven navigation and editing
+- Data stored locally in a CSV file
+- Fully offline, no cloud, no accounts
+
+| Date       | Dist | Pace | HR  | Cad | ✓ |
+|------------|------|------|-----|-----|---|
+| 2025-07-04 |  8.0 | 6:10 | 153 | 174 | ✓ |
+| 2025-07-03 | 12.0 | 6:30 | 158 | 171 |   |
+
+Last 15 Days - Distance  
+12.0 -●--------●-----  
+10.0 -●---●----●-----  
+ 8.0 -●--------●-----
+
+---
+
+## Requirements
+
+- Python 3.8+
+- Terminal that supports `curses` (Unix, macOS, or Windows Terminal/WSL)
+
+---
+
+## 🚀 Installation
+
+```bash
+# Pip
+pip install runtracked
+
+# (Optional) GitHub
+git clone https://github.com/bearenbey/run-tracker.git
+cd run-tracker
+pip install .
+runtracked
+```
+
+---
+
+## Usage
+
+↑ / ↓: Navigate entries  
+Enter: Edit selected entry  
+D: Delete selected entry  
+Q: Quit and save  
+
+Data is saved to `runs.csv` in the project folder.
+
+---
+
+## Data Format (CSV)
+
+Each run entry is stored with the following fields:
+
+| Field        | Description             |
+|--------------|-------------------------|
+| date         | ISO format (YYYY-MM-DD) |
+| distance     | Kilometers              |
+| pace         | Minutes per km          |
+| heart_rate   | Average heart rate      |
+| cadence      | Steps per minute        |
+| quality      | 1 = quality run         |
+
+---
+
+## Dev Notes
+
+- ASCII-only characters are used for full terminal compatibility.
+- Charts scale dynamically to fit screen height.
+- No external dependencies required beyond Python standard library.
+
+---
+
+## License
+
+This program is free software: you can redistribute it and/or modify  
+it under the terms of the GNU General Public License as published by  
+the Free Software Foundation, either version 3 of the License, or  
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,  
+but WITHOUT ANY WARRANTY; without even the implied warranty of  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the  
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License  
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+© 2025 Eren Öğrül [termapp@pm.me](mailto:termapp@pm.me)
+
+
+
