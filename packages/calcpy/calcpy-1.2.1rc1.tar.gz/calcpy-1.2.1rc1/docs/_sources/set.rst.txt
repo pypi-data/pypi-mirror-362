@@ -1,0 +1,88 @@
+Set Operations
+==============
+
+``calcpy`` provides a set of set operations that extend the built-in Python set operations, including ``union``, ``intersection``, ``difference``, ``symmetric_difference``, ``issubset``, ``issuperset``, and ``isdisjoint``. 
+
+The extended APIs have the following features:
+
+- **Preserve order**: Unlike Python's built-in set operations which don't guarantee order, `calcpy` preserves the original order of elements.
+
+- **Support object types**: Works with ``list``, ``tuple``, ``set``, ``str``, ``np.ndarray``, ``pd.Series``, ``pd.DataFrame``, and more.
+
+- **Support multiple arguments**: Most operations can take any number of arguments.
+
+- **Support customizable comparison**: You can provide customed comparison functions via the keyword parameter ``key``.
+
+
+--------------
+Example Usages
+--------------
+
+Merge three lists:
+
+.. code:: python
+
+    >>> from calcpy import union
+    >>> union([1, 3, 5, 7], [2, 3, 4], [7, 8, 9])
+    [1, 3, 5, 7, 2, 4, 8, 9]
+
+Intersection of tuples:
+
+.. code:: python
+
+    >>> from calcpy import intersection
+    >>> intersection((1, 3, 5, 7), (3, 4, 5), (5, 7, 9))
+    (5,)
+
+Symmetric difference among strings:
+
+.. code:: python
+
+    >>> from calcpy import symmetric_difference
+    >>> symmetric_difference("abc", "bcd", "cde")
+    'ace'
+
+
+-------------------------
+Working with Dictionaries
+-------------------------
+The set operations of ``calcpy`` have special behavior when working with dictionaries:
+
+**Union with Dictionaries:**
+When using ``union()`` with dictionaries, it merges them while preserving keys from the first dictionary in case of conflicts:
+
+.. code:: python
+
+    >>> from calcpy import union
+    >>> union({"a": 1, "b": 2}, {"b": 3, "c": 4})
+    {"a": 1, "b": 2, "c": 4}
+
+This differs from Python's dictionary union operator (|), which would use the value from the second dictionary for conflicting keys.
+
+**Intersection and Difference with Dictionaries:**
+When using ``intersection()`` and ``difference()`` with dictionaries, the operations are performed on the dictionary keys. For example:
+When the first argument is a ``dict`` and subsequent arguments are ``list`` s, ``intersection()`` and ``difference()`` operate on the dictionary keys:
+
+.. code:: python
+
+    >>> from calcpy import intersection, difference
+    >>> intersection({"a": 1, "b": 2, "c": 3}, ["a", "b", "d"])
+    {"a": 1, "b": 2}
+    >>> difference({"a": 1, "b": 2, "c": 3}, ["a"], ["d"])
+    {"b": 2, "c": 3}
+
+
+------------------
+Set Operation APIs
+------------------
+
+.. autofunction:: calcpy.contains
+.. autofunction:: calcpy.difference
+.. autofunction:: calcpy.intersection
+.. autofunction:: calcpy.isdisjoint
+.. autofunction:: calcpy.ispropersubset
+.. autofunction:: calcpy.ispropersuperset
+.. autofunction:: calcpy.issubset
+.. autofunction:: calcpy.issuperset
+.. autofunction:: calcpy.symmetric_difference
+.. autofunction:: calcpy.union

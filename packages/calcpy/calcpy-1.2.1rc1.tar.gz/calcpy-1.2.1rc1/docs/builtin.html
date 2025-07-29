@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Extension of Builtin Functions &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Output Decorators" href="fill.html" />
+    <link rel="prev" title="Functional Programming" href="fun.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fill.html" title="Output Decorators"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fun.html" title="Functional Programming"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">calcpy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Extension of Builtin Functions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="extension-of-builtin-functions">
+<h1>Extension of Builtin Functions<a class="headerlink" href="#extension-of-builtin-functions" title="Link to this heading">¶</a></h1>
+<p>Following extended versions of built-in functions are provided.</p>
+<p>The function name may be sufficed with <code class="docutils literal notranslate"><span class="pre">_</span></code> to avoid name conflict with Python keywords and built-in functions.</p>
+<section id="callable-creators">
+<h2>Callable Creators<a class="headerlink" href="#callable-creators" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.arggetter">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">arggetter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=raise</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_op.html#arggetter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.arggetter" title="Link to this definition">¶</a></dt>
+<dd><p>Return a callable object that fetches the argument(s) from its operand.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*keys</strong> (<em>int</em><em> | </em><em>str</em>) – If it is an <code class="docutils literal notranslate"><span class="pre">int</span></code> (can be negative), it is the index of the positional argument to be fetched.
+If it is a <code class="docutils literal notranslate"><span class="pre">str</span></code>, it is the name of keyword argument to be fetched.</p></li>
+<li><p><strong>default</strong> – Default value to return when the argument is not found.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>callable</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>IndexError</strong> – Raises when the argument is not found and the default is not set.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Get the first positional argument.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">getter</span> <span class="o">=</span> <span class="n">arggetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getter</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+<span class="go">&#39;a&#39;</span>
+</pre></div>
+</div>
+<p>Get the positional arguments and keyword arguments.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">getter</span> <span class="o">=</span> <span class="n">arggetter</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getter</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+<span class="go">(&#39;c&#39;, &#39;a&#39;, &#39;b&#39;, &#39;value&#39;)</span>
+</pre></div>
+</div>
+<p>Get the positional arguments and keyword arguments with default values.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">getter</span> <span class="o">=</span> <span class="n">arggetter</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getter</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+<span class="go">(&#39;c&#39;, &#39;a&#39;, &#39;b&#39;, &#39;default&#39;, &#39;value&#39;, &#39;default&#39;)</span>
+</pre></div>
+</div>
+<p>Raise an error if the index is out of range and the default is not set.
+&gt;&gt;&gt; getter = arggetter(0, 1, 2)
+&gt;&gt;&gt; getter(“A”, key=”value”)
+Traceback (most recent call last):
+…
+IndexError: positional argument index is out of range</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.attrgetter">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">attrgetter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*attrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=raise</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_op.html#attrgetter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.attrgetter" title="Link to this definition">¶</a></dt>
+<dd><p>Return a callable object that fetches the given attribute(s) from its operand.</p>
+<p>Fully compatible with Python’s built-in <code class="docutils literal notranslate"><span class="pre">operator.attrgetter</span></code>,
+and furthermore support an optional default value when a named attr is not found.</p>
+<p class="rubric">Examples</p>
+<p>Get attributes with default values.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="s1">&#39;last&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="s1">&#39;Zhiqing&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="o">.</span><span class="n">last</span> <span class="o">=</span> <span class="s1">&#39;Xiao&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">person</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Person&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;city&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">person</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">person</span><span class="o">.</span><span class="n">city</span> <span class="o">=</span> <span class="s1">&#39;Beijing&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">attrgetter</span><span class="p">(</span><span class="s1">&#39;name.first&#39;</span><span class="p">,</span> <span class="s1">&#39;name.middle&#39;</span><span class="p">,</span> <span class="s1">&#39;name.last&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">(</span><span class="n">person</span><span class="p">)</span>
+<span class="go">(&#39;Zhiqing&#39;, &#39;&#39;, &#39;Xiao&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">attrgetter</span><span class="p">(</span><span class="s1">&#39;name.first&#39;</span><span class="p">,</span> <span class="s1">&#39;city&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">(</span><span class="n">person</span><span class="p">)</span>
+<span class="go">(&#39;Zhiqing&#39;, &#39;Beijing&#39;)</span>
+</pre></div>
+</div>
+<p>It will raise errors when the default is not set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">attrgetter</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">type object &#39;builtin_function_or_method&#39; has no attribute &#39;hello&#39;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.attrgetter">https://docs.python.org/3/library/operator.html#operator.attrgetter</a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.itemgetter">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">itemgetter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=raise</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_op.html#itemgetter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.itemgetter" title="Link to this definition">¶</a></dt>
+<dd><p>Return a callable object that fetches the given item(s) from its operand.</p>
+<p>Fully compatible with Python’s builtin <code class="docutils literal notranslate"><span class="pre">operator.itemgetter</span></code>,
+and furthermore support multi-level item and an optional default value when a item is not found.</p>
+<p class="rubric">Examples</p>
+<p>Get multiple items with default values.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">person</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;first&#39;</span><span class="p">:</span> <span class="s1">&#39;Zhiqing&#39;</span><span class="p">,</span> <span class="s1">&#39;last&#39;</span><span class="p">:</span> <span class="s1">&#39;Xiao&#39;</span><span class="p">},</span> <span class="s1">&#39;city&#39;</span><span class="p">:</span> <span class="s1">&#39;Beijing&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">itemgetter</span><span class="p">([</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;first&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;middle&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;last&#39;</span><span class="p">],</span> <span class="s1">&#39;city&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">(</span><span class="n">person</span><span class="p">)</span>
+<span class="go">(&#39;Zhiqing&#39;, &#39;&#39;, &#39;Xiao&#39;, &#39;Beijing&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p>It will raise errors when the default is not set.
+&gt;&gt;&gt; itemgetter(4)([1, 2, 3])
+Traceback (most recent call last):
+…
+IndexError: list index out of range</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.itemgetter">https://docs.python.org/3/library/operator.html#operator.itemgetter</a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.methodcaller">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">methodcaller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_op.html#methodcaller"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.methodcaller" title="Link to this definition">¶</a></dt>
+<dd><p>Fully compatible with Python’s built-in <code class="docutils literal notranslate"><span class="pre">operator.methodcaller</span></code>.</p>
+<p>Support <code class="docutils literal notranslate"><span class="pre">pandas</span></code> accessor.</p>
+<p>Can be decorated by <code class="docutils literal notranslate"><span class="pre">calcpy.fillerr</span></code> when needed to resolve the case where method name is not found.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">methodcaller</span><span class="p">(</span><span class="s2">&quot;str.upper&quot;</span><span class="p">)(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">0    A</span>
+<span class="go">1    B</span>
+<span class="go">dtype: object</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.methodcaller">https://docs.python.org/3/library/operator.html#operator.methodcaller</a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.constantcreator">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">constantcreator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_op.html#constantcreator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.constantcreator" title="Link to this definition">¶</a></dt>
+<dd><p>Callable that returns the same constant when it is called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Constant value to be returned.</p></li>
+<li><p><strong>copy</strong> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, return a new copy of the constant value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Callable object that returns <code class="docutils literal notranslate"><span class="pre">value</span></code>, ignoring its parameters.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Always return the string <code class="docutils literal notranslate"><span class="pre">&quot;value&quot;</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">creator</span> <span class="o">=</span> <span class="n">constantcreator</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">creator</span><span class="p">()</span>
+<span class="go">&#39;value&#39;</span>
+</pre></div>
+</div>
+<p>Create a pd.DataFrame whose elements are all empty lists.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">constantcreator</span><span class="p">([]))</span>
+<span class="go">    A</span>
+<span class="go">0  []</span>
+<span class="go">1  []</span>
+<span class="go">2  []</span>
+</pre></div>
+</div>
+<p>Return a new copy when <code class="docutils literal notranslate"><span class="pre">copy=True</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">constantcreator</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)()</span> <span class="ow">is</span> <span class="n">df</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="checkers">
+<h2>Checkers<a class="headerlink" href="#checkers" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.argchecker">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">argchecker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_op.html#argchecker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.argchecker" title="Link to this definition">¶</a></dt>
+<dd><p>Return a callable object to check the existences of argument(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*keys</strong> (<em>int</em><em> | </em><em>str</em>) – If it is an <code class="docutils literal notranslate"><span class="pre">int</span></code> (can be negative), it is the index of the positional argument to be fetched.
+If it is a <code class="docutils literal notranslate"><span class="pre">str</span></code>, it is the name of keyword argument to be fetched.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool | tuple[bool]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">getter</span> <span class="o">=</span> <span class="n">argchecker</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getter</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+<span class="go">(True, True, True, False, True, False)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.attrchecker">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">attrchecker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_op.html#attrchecker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.attrchecker" title="Link to this definition">¶</a></dt>
+<dd><p>Return a callable object to check the existence of the given attribute(s).</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">attrchecker</span><span class="p">(</span><span class="s2">&quot;mro&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+<span class="go">(True, False)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">attrchecker</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;path.sep&quot;</span><span class="p">,</span> <span class="s2">&quot;sep.path&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="p">(</span><span class="n">os</span><span class="p">)</span>
+<span class="go">(True, True, False)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.itemchecker">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">itemchecker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_op.html#itemchecker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.itemchecker" title="Link to this definition">¶</a></dt>
+<dd><p>Return a callable object to check the existence of the given item(s).</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;first&quot;</span><span class="p">:</span> <span class="s2">&quot;Zhiqing&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">:</span> <span class="s2">&quot;Xiao&quot;</span><span class="p">},</span> <span class="s2">&quot;city&quot;</span><span class="p">:</span> <span class="s2">&quot;Beijing&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">itemchecker</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;first&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;middle&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">],</span> <span class="s2">&quot;city&quot;</span><span class="p">,</span> <span class="s2">&quot;sex&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">(True, False, True, True, False)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">itemchecker</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">(True, True, False)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Extension of Builtin Functions</a><ul>
+<li><a class="reference internal" href="#callable-creators">Callable Creators</a><ul>
+<li><a class="reference internal" href="#calcpy.arggetter"><code class="docutils literal notranslate"><span class="pre">arggetter()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.attrgetter"><code class="docutils literal notranslate"><span class="pre">attrgetter()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.itemgetter"><code class="docutils literal notranslate"><span class="pre">itemgetter()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.methodcaller"><code class="docutils literal notranslate"><span class="pre">methodcaller()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.constantcreator"><code class="docutils literal notranslate"><span class="pre">constantcreator()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#checkers">Checkers</a><ul>
+<li><a class="reference internal" href="#calcpy.argchecker"><code class="docutils literal notranslate"><span class="pre">argchecker()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.attrchecker"><code class="docutils literal notranslate"><span class="pre">attrchecker()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.itemchecker"><code class="docutils literal notranslate"><span class="pre">itemchecker()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="fun.html"
+                          title="previous chapter">Functional Programming</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="fill.html"
+                          title="next chapter">Output Decorators</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/builtin.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fill.html" title="Output Decorators"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fun.html" title="Functional Programming"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">calcpy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Extension of Builtin Functions</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

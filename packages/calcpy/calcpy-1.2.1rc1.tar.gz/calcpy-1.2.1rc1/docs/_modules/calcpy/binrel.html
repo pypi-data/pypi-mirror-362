@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>calcpy.binrel &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=0f882399" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy.binrel</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calcpy.binrel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Binary relationship.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+
+<div class="viewcode-block" id="sym_part">
+<a class="viewcode-back" href="../../order.html#calcpy.binrel.sym_part">[docs]</a>
+<span class="k">def</span> <span class="nf">sym_part</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="o">/</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the symmetric part of a binary relationship.</span>
+
+<span class="sd">    Returns r(a, b) and r(b, a) for relationship r(a, b).</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        r (Callable[[Any, Any], bool]): binary relationship,</span>
+<span class="sd">            a callable that accepts two positional arguments and returns a bool.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Callable[[Any, Any], bool]:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; def fracle(a, b):  # &lt;= on fractional part</span>
+<span class="sd">        ...     return (a % 1) &lt;= (b % 1)</span>
+<span class="sd">        &gt;&gt;&gt; fraceq = sym_part(fracle)   # == on fractional part</span>
+<span class="sd">        &gt;&gt;&gt; fraceq(0.5, 1.5)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; fraceq(0.1, 2.3)</span>
+<span class="sd">        False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">r</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> <span class="n">r</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fun</span></div>
+
+
+
+<div class="viewcode-block" id="asym_part">
+<a class="viewcode-back" href="../../order.html#calcpy.binrel.asym_part">[docs]</a>
+<span class="k">def</span> <span class="nf">asym_part</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="o">/</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the asymmetric part of a binary relationship.</span>
+
+<span class="sd">    Returns r(a, b) and not r(b, a) for relationship r(a, b).</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        r (Callable[[Any, Any], bool]): binary relationship,</span>
+<span class="sd">            a callable that accepts two positional arguments and returns a bool.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Callable[[Any, Any], bool]:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; def fracle(a, b):  # &lt;= on fractional part</span>
+<span class="sd">        ...     return (a % 1) &lt;= (b % 1)</span>
+<span class="sd">        &gt;&gt;&gt; fraclt = asym_part(fracle)   # == on fractional part</span>
+<span class="sd">        &gt;&gt;&gt; fraclt(0.5, 1.5)</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; fraclt(0.1, 2.3)</span>
+<span class="sd">        True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">r</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">r</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fun</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy.binrel</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

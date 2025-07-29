@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Pandas Operations &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Collection Operations" href="collect.html" />
+    <link rel="prev" title="Python-Numpy-Pandas Compatible Functions" href="nppd.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="collect.html" title="Collection Operations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nppd.html" title="Python-Numpy-Pandas Compatible Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">calcpy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Pandas Operations</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="pandas-operations">
+<h1>Pandas Operations<a class="headerlink" href="#pandas-operations" title="Link to this heading">¶</a></h1>
+<section id="operations-on-series-and-dataframes">
+<h2>Operations on Series and DataFrames<a class="headerlink" href="#operations-on-series-and-dataframes" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.pd.extend">
+<span class="sig-prename descclassname"><span class="pre">calcpy.pd.</span></span><span class="sig-name descname"><span class="pre">extend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/pd.html#extend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.pd.extend" title="Link to this definition">¶</a></dt>
+<dd><p>Add index values if the index values are not present.</p>
+<p>This API is simliar to <code class="docutils literal notranslate"><span class="pre">pd.DataFrame.reindex()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> (<em>pd.Series</em><em> | </em><em>pd.DataFrame</em>) – Input data.</p></li>
+<li><p><strong>labels</strong> (<em>list</em><em> | </em><em>tuple</em><em>, </em><em>optional</em>) – New labels / index to conform the axis specified by.</p></li>
+<li><p><strong>index</strong> (<em>list</em><em> | </em><em>tuple</em><em>, </em><em>optional</em>) – index names.</p></li>
+<li><p><strong>columns</strong> (<em>list</em><em> | </em><em>tuple</em><em>, </em><em>optional</em>) – column names.
+only work for DataFrame.</p></li>
+<li><p><strong>axis</strong> (<em>int</em><em> | </em><em>str</em><em>, </em><em>optional</em>) – axis to extend.
+0: index, 1: columns.
+only work for DataFrame.</p></li>
+<li><p><strong>kwargs</strong> – keyword arguments to be passed to <code class="docutils literal notranslate"><span class="pre">pd.DataFrame.reindex()</span></code>,
+including <code class="docutils literal notranslate"><span class="pre">copy</span></code>, <code class="docutils literal notranslate"><span class="pre">level</span></code>, <code class="docutils literal notranslate"><span class="pre">fill_value</span></code>, <code class="docutils literal notranslate"><span class="pre">limit</span></code>, and <code class="docutils literal notranslate"><span class="pre">tolerance</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.Series | pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extend</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="go">0    1.0</span>
+<span class="go">1    1.0</span>
+<span class="go">2    NaN</span>
+<span class="go">dtype: float64</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extend</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">])</span>
+<span class="go">      A    B    C</span>
+<span class="go">0   1.0  2.0  NaN</span>
+<span class="go">1   1.0  2.0  NaN</span>
+<span class="go">2   NaN  NaN  NaN</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.pd.prioritize">
+<span class="sig-prename descclassname"><span class="pre">calcpy.pd.</span></span><span class="sig-name descname"><span class="pre">prioritize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/pd.html#prioritize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.pd.prioritize" title="Link to this definition">¶</a></dt>
+<dd><p>Put some index values at the begining of the index.</p>
+<p>If the index is already in the index, the index will be moved to the begining.
+If the index is not in the index, the index will be added to the index.</p>
+<p>This API is simliar to <code class="docutils literal notranslate"><span class="pre">pd.Series.reindex()</span></code> and <code class="docutils literal notranslate"><span class="pre">pd.DataFrame.reindex()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> (<em>pd.Series</em><em> | </em><em>pd.DataFrame</em>) – Input data.</p></li>
+<li><p><strong>labels</strong> (<em>list</em><em> | </em><em>tuple</em><em>, </em><em>optional</em>) – New labels / index to conform the axis specified by</p></li>
+<li><p><strong>index</strong> (<em>list</em><em> | </em><em>tuple</em><em>, </em><em>optional</em>) – index names</p></li>
+<li><p><strong>columns</strong> (<em>list</em><em> | </em><em>tuple</em><em>, </em><em>optional</em>) – column names.
+only work for DataFrame.</p></li>
+<li><p><strong>axis</strong> (<em>int</em><em> | </em><em>str</em><em>, </em><em>optional</em>) – axis to extend.
+0: index, 1: columns.
+only work for DataFrame.</p></li>
+<li><p><strong>kwargs</strong> – keyword arguments to be passed to <code class="docutils literal notranslate"><span class="pre">pd.DataFrame.reindex()</span></code>,
+including <code class="docutils literal notranslate"><span class="pre">copy</span></code>, <code class="docutils literal notranslate"><span class="pre">level</span></code>, <code class="docutils literal notranslate"><span class="pre">fill_value</span></code>, <code class="docutils literal notranslate"><span class="pre">limit</span></code>, and <code class="docutils literal notranslate"><span class="pre">tolerance</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.Series | pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prioritize</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="go">1    1.0</span>
+<span class="go">2    NaN</span>
+<span class="go">0    1.0</span>
+<span class="go">dtype: float64</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prioritize</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">])</span>
+<span class="go">     A   C    B</span>
+<span class="go">1  1.0 NaN  2.0</span>
+<span class="go">2  NaN NaN  NaN</span>
+<span class="go">0  1.0 NaN  2.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.pd.stack">
+<span class="sig-prename descclassname"><span class="pre">calcpy.pd.</span></span><span class="sig-name descname"><span class="pre">stack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/pd.html#stack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.pd.stack" title="Link to this definition">¶</a></dt>
+<dd><p>Stack a <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> or <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> with <code class="docutils literal notranslate"><span class="pre">future_stack</span></code> behavior.</p>
+<p>Stack and silence the <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code> “The prevoius implementation of stack is deprecated”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> (<em>pd.DataFrame</em>)</p></li>
+<li><p><strong>**kwargs</strong> – Keyword arguments to be passed to <code class="docutils literal notranslate"><span class="pre">pd.DataFrame.stack()</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.Series | pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stack</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">0 A  1</span>
+<span class="go">  B  2</span>
+<span class="go">dtype: int64</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="conventions-between-series-dataframes-and-dictionaries">
+<h2>Conventions between Series/DataFrames and Dictionaries<a class="headerlink" href="#conventions-between-series-dataframes-and-dictionaries" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.convert_nested_dict_to_dataframe">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">convert_nested_dict_to_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/pd.html#convert_nested_dict_to_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.convert_nested_dict_to_dataframe" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a nested dictionary to a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em>) – Nested dict.</p></li>
+<li><p><strong>index_cols</strong> (<em>int</em><em> | </em><em>str</em><em> | </em><em>(</em><em>list</em><em> | </em><em>tuple</em><em>)</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Index names.</p></li>
+<li><p><strong>columns</strong> (<em>int</em><em> | </em><em>(</em><em>list</em><em> | </em><em>tuple</em><em>)</em><em>[</em><em>str</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Column names.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;J&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convert_nested_dict_to_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">   0  1  2</span>
+<span class="go">0  A  H  1</span>
+<span class="go">1  A  J  2</span>
+<span class="go">2  E  D  3</span>
+<span class="go">3  E  T  4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convert_nested_dict_to_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+<span class="go">     x</span>
+<span class="go">v c</span>
+<span class="go">A H  1</span>
+<span class="go">  J  2</span>
+<span class="go">E D  3</span>
+<span class="go">  T  4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.convert_series_to_nested_dict">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">convert_series_to_nested_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/pd.html#convert_series_to_nested_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.convert_series_to_nested_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a <code class="docutils literal notranslate"><span class="pre">pd.Series</span></code> to a nested dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>series</strong> (<em>pd.Series</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]})</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">])[</span><span class="s2">&quot;C&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">convert_series_to_nested_dict</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="go">{1: {2: 4, 3: 5}}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Pandas Operations</a><ul>
+<li><a class="reference internal" href="#operations-on-series-and-dataframes">Operations on Series and DataFrames</a><ul>
+<li><a class="reference internal" href="#calcpy.pd.extend"><code class="docutils literal notranslate"><span class="pre">extend()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.pd.prioritize"><code class="docutils literal notranslate"><span class="pre">prioritize()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.pd.stack"><code class="docutils literal notranslate"><span class="pre">stack()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conventions-between-series-dataframes-and-dictionaries">Conventions between Series/DataFrames and Dictionaries</a><ul>
+<li><a class="reference internal" href="#calcpy.convert_nested_dict_to_dataframe"><code class="docutils literal notranslate"><span class="pre">convert_nested_dict_to_dataframe()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.convert_series_to_nested_dict"><code class="docutils literal notranslate"><span class="pre">convert_series_to_nested_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="nppd.html"
+                          title="previous chapter">Python-Numpy-Pandas Compatible Functions</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="collect.html"
+                          title="next chapter">Collection Operations</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pd.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="collect.html" title="Collection Operations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nppd.html" title="Python-Numpy-Pandas Compatible Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">calcpy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Pandas Operations</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

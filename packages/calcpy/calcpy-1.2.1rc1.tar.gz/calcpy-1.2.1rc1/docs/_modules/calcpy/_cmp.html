@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>calcpy._cmp &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=0f882399" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy._cmp</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calcpy._cmp</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Comparison.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cmp_to_key</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+
+
+<div class="viewcode-block" id="key_to_cmp">
+<a class="viewcode-back" href="../../cmp.html#calcpy.key_to_cmp">[docs]</a>
+<span class="k">def</span> <span class="nf">key_to_cmp</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a key function to a comparison function.</span>
+<span class="sd">    The comparison function will compare two objects based on the key function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        key (callable): A function that takes an object and returns a value that can be compared.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable: A comparison function that takes two objects and</span>
+<span class="sd">            returns 1 if the first is greater than or equal to the second,</span>
+<span class="sd">            -1 if the first is less than the second, and 0 if they are equal.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; cmp = key_to_cmp(len)</span>
+<span class="sd">        &gt;&gt;&gt; cmp(&quot;Hello&quot;, &quot;World&quot;)</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; cmp(&quot;Hello&quot;, &quot;Python&quot;)</span>
+<span class="sd">        -1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">cmp</span></div>
+
+
+
+<div class="viewcode-block" id="eq_to_cmp">
+<a class="viewcode-back" href="../../cmp.html#calcpy.eq_to_cmp">[docs]</a>
+<span class="k">def</span> <span class="nf">eq_to_cmp</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an equality function to a comparison function.</span>
+
+<span class="sd">    The comparison function will return 0 if the two objects are equal, and 1 otherwise.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        eq (callable): A function that takes at least two arguments and</span>
+<span class="sd">            returns True if the first two arguments are equal, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable: A comparison function that takes two objects and</span>
+<span class="sd">            returns 1 if the first is greater than or equal to the second,</span>
+<span class="sd">            -1 if the first is less than the second, and 0 if they are equal.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This function is experimental and may be changed in the future.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; cmp = eq_to_cmp(operator.eq)</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 2)</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 1)</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; cmp(2, 1)</span>
+<span class="sd">        1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">eq</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">cmp</span></div>
+
+
+
+<div class="viewcode-block" id="ne_to_cmp">
+<a class="viewcode-back" href="../../cmp.html#calcpy.ne_to_cmp">[docs]</a>
+<span class="k">def</span> <span class="nf">ne_to_cmp</span><span class="p">(</span><span class="n">ne</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a non-equality function to a comparison function.</span>
+
+<span class="sd">    The comparison function will return 0 if the two objects are not equal, and 1 otherwise.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        ne (callable): A function that takes two arguments and</span>
+<span class="sd">            returns True if the first two arguments are not equal, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable: A comparison function that takes two objects and</span>
+<span class="sd">            returns 1 if the first is greater than or equal to the second,</span>
+<span class="sd">            -1 if the first is less than the second, and 0 if they are equal.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This function is experimental and may be changed in the future.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; cmp = ne_to_cmp(operator.ne)</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 2)</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 1)</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; cmp(2, 1)</span>
+<span class="sd">        1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">ne</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">cmp</span></div>
+
+
+
+<div class="viewcode-block" id="lt_to_cmp">
+<a class="viewcode-back" href="../../cmp.html#calcpy.lt_to_cmp">[docs]</a>
+<span class="k">def</span> <span class="nf">lt_to_cmp</span><span class="p">(</span><span class="n">lt</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a less-than function to a comparison function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        lt (callable): A function that takes at least two arguments and</span>
+<span class="sd">            returns True if the first is less than the second, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable: A comparison function that takes two objects and</span>
+<span class="sd">            returns 1 if the first is greater than or equal to the second,</span>
+<span class="sd">            -1 if the first is less than the second, and 0 if they are equal.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; cmp = lt_to_cmp(operator.lt)</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 2)</span>
+<span class="sd">        -1</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 1)</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; cmp(2, 1)</span>
+<span class="sd">        1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">lt</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">lt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">cmp</span></div>
+
+
+
+<div class="viewcode-block" id="le_to_cmp">
+<a class="viewcode-back" href="../../cmp.html#calcpy.le_to_cmp">[docs]</a>
+<span class="k">def</span> <span class="nf">le_to_cmp</span><span class="p">(</span><span class="n">le</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a less-than-or-equal-to function to a comparison function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        le (callable): A function that takes at least two arguments and</span>
+<span class="sd">            returns True if the first is less than or equal to the second, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable: A comparison function that takes two objects and</span>
+<span class="sd">            returns 1 if the first is greater than or equal to the second,</span>
+<span class="sd">            -1 if the first is less than the second, and 0 if they are equal.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; cmp = le_to_cmp(operator.le)</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 2)</span>
+<span class="sd">        -1</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 1)</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; cmp(2, 1)</span>
+<span class="sd">        1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">le</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">le</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">cmp</span></div>
+
+
+
+<div class="viewcode-block" id="gt_to_cmp">
+<a class="viewcode-back" href="../../cmp.html#calcpy.gt_to_cmp">[docs]</a>
+<span class="k">def</span> <span class="nf">gt_to_cmp</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a greater-than function to a comparison function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        gt (callable): A function that takes at least two arguments and</span>
+<span class="sd">            returns True if the first is greater than the second, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable: A comparison function that takes two objects and</span>
+<span class="sd">            returns 1 if the first is greater than or equal to the second,</span>
+<span class="sd">            -1 if the first is less than the second, and 0 if they are equal.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; cmp = gt_to_cmp(operator.gt)</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 2)</span>
+<span class="sd">        -1</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 1)</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; cmp(2, 1)</span>
+<span class="sd">        1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">gt</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">gt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">cmp</span></div>
+
+
+
+<div class="viewcode-block" id="ge_to_cmp">
+<a class="viewcode-back" href="../../cmp.html#calcpy.ge_to_cmp">[docs]</a>
+<span class="k">def</span> <span class="nf">ge_to_cmp</span><span class="p">(</span><span class="n">ge</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a greater-than-or-equal-to function to a comparison function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        ge (callable): A function that takes at least two arguments and</span>
+<span class="sd">            returns True if the first is greater than or equal to the second, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable: A comparison function that takes two objects and</span>
+<span class="sd">            returns 1 if the first is greater than or equal to the second,</span>
+<span class="sd">            -1 if the first is less than the second, and 0 if they are equal.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; cmp = ge_to_cmp(operator.ge)</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 2)</span>
+<span class="sd">        -1</span>
+<span class="sd">        &gt;&gt;&gt; cmp(1, 1)</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; cmp(2, 1)</span>
+<span class="sd">        1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">ge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">cmp</span></div>
+
+
+
+<div class="viewcode-block" id="eq_to_key">
+<a class="viewcode-back" href="../../cmp.html#calcpy.eq_to_key">[docs]</a>
+<span class="k">def</span> <span class="nf">eq_to_key</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an equality function to a key function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        eq (callable): A function that takes two at least arguments and</span>
+<span class="sd">            returns True if the arguments are equal, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This function is experimental and may change in the future.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmp</span> <span class="o">=</span> <span class="n">eq_to_cmp</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">cmp_to_key</span><span class="p">(</span><span class="n">cmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">key</span></div>
+
+
+
+<div class="viewcode-block" id="ne_to_key">
+<a class="viewcode-back" href="../../cmp.html#calcpy.ne_to_key">[docs]</a>
+<span class="k">def</span> <span class="nf">ne_to_key</span><span class="p">(</span><span class="n">ne</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an equality function to a key function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        eq (callable): A function that takes two arguments and</span>
+<span class="sd">            returns True if the arguments are equal, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This function is experimental and may change in the future.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmp</span> <span class="o">=</span> <span class="n">ne_to_cmp</span><span class="p">(</span><span class="n">ne</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">cmp_to_key</span><span class="p">(</span><span class="n">cmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">key</span></div>
+
+
+
+<div class="viewcode-block" id="lt_to_key">
+<a class="viewcode-back" href="../../cmp.html#calcpy.lt_to_key">[docs]</a>
+<span class="k">def</span> <span class="nf">lt_to_key</span><span class="p">(</span><span class="n">lt</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a less-than function to a key function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        lt (callable): A function that takes two arguments and</span>
+<span class="sd">            returns True if the first is less than the second, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import operator</span>
+<span class="sd">        &gt;&gt;&gt; key = lt_to_key(operator.lt)</span>
+<span class="sd">        &gt;&gt;&gt; sorted([3, 1, 2], key=key)</span>
+<span class="sd">        [1, 2, 3]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmp</span> <span class="o">=</span> <span class="n">lt_to_cmp</span><span class="p">(</span><span class="n">lt</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">cmp_to_key</span><span class="p">(</span><span class="n">cmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">key</span></div>
+
+
+
+<div class="viewcode-block" id="le_to_key">
+<a class="viewcode-back" href="../../cmp.html#calcpy.le_to_key">[docs]</a>
+<span class="k">def</span> <span class="nf">le_to_key</span><span class="p">(</span><span class="n">le</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a less-than-or-equal-to function to a key function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        le (callable): A function that takes two arguments and</span>
+<span class="sd">            returns True if the first is less than or equal to the second, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import operator</span>
+<span class="sd">        &gt;&gt;&gt; key = le_to_key(operator.le)</span>
+<span class="sd">        &gt;&gt;&gt; sorted([3, 1, 2], key=key)</span>
+<span class="sd">        [1, 2, 3]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmp</span> <span class="o">=</span> <span class="n">le_to_cmp</span><span class="p">(</span><span class="n">le</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">cmp_to_key</span><span class="p">(</span><span class="n">cmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">key</span></div>
+
+
+
+<div class="viewcode-block" id="gt_to_key">
+<a class="viewcode-back" href="../../cmp.html#calcpy.gt_to_key">[docs]</a>
+<span class="k">def</span> <span class="nf">gt_to_key</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a greater-than function to a key function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        gt (callable): A function that takes two arguments and</span>
+<span class="sd">            returns True if the first is greater than the second, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import operator</span>
+<span class="sd">        &gt;&gt;&gt; key = gt_to_key(operator.gt)</span>
+<span class="sd">        &gt;&gt;&gt; sorted([3, 1, 2], key=key)</span>
+<span class="sd">        [1, 2, 3]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmp</span> <span class="o">=</span> <span class="n">gt_to_cmp</span><span class="p">(</span><span class="n">gt</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">cmp_to_key</span><span class="p">(</span><span class="n">cmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">key</span></div>
+
+
+
+<div class="viewcode-block" id="ge_to_key">
+<a class="viewcode-back" href="../../cmp.html#calcpy.ge_to_key">[docs]</a>
+<span class="k">def</span> <span class="nf">ge_to_key</span><span class="p">(</span><span class="n">ge</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a greater-than-or-equal-to function to a key function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        ge (callable): A function that takes two arguments and</span>
+<span class="sd">            returns True if the first is greater than or equal to the second, False otherwise.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import operator</span>
+<span class="sd">        &gt;&gt;&gt; key = ge_to_key(operator.ge)</span>
+<span class="sd">        &gt;&gt;&gt; sorted([3, 1, 2], key=key)</span>
+<span class="sd">        [1, 2, 3]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmp</span> <span class="o">=</span> <span class="n">ge_to_cmp</span><span class="p">(</span><span class="n">ge</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">cmp_to_key</span><span class="p">(</span><span class="n">cmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">key</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_cmp_to_gleten</span><span class="p">(</span><span class="n">gleten_name</span><span class="p">):</span>
+    <span class="c1"># gleten is short for the collections of [&quot;le&quot;, &quot;lt&quot;, &quot;ge&quot;, &quot;gt&quot;, &quot;eq&quot;, &quot;ne&quot;].</span>
+
+    <span class="k">def</span> <span class="nf">from_cmp</span><span class="p">(</span><span class="n">cmp</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+            <span class="n">gleten</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">gleten_name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">gleten</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span>
+    <span class="n">from_cmp</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;cmp_to_</span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">from_cmp</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> \
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Convert a cmp= function to a </span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2">= function.</span>
+
+<span class="s2">        Parameters:</span>
+<span class="s2">            cmp (callable): A comparison function that takes two arguments and</span>
+<span class="s2">                returns -1, 0, or 1 when the first is less than, equal to, or greater than the second.</span>
+
+<span class="s2">        Returns:</span>
+<span class="s2">            callable:</span>
+
+<span class="s2">        Examples:</span>
+<span class="s2">            &gt;&gt;&gt; def cmp(a, b):</span>
+<span class="s2">            ...     return (a &gt; b) - (a &lt; b)</span>
+<span class="s2">            &gt;&gt;&gt; </span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2"> = cmp_to_</span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2">(cmp)</span>
+<span class="s2">            &gt;&gt;&gt; </span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2">(1, 2)</span>
+<span class="s2">            </span><span class="si">{</span><span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span><span class="w"> </span><span class="n">gleten_name</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span><span class="si">}</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">from_cmp</span>
+
+
+<span class="n">cmp_to_eq</span> <span class="o">=</span> <span class="n">_cmp_to_gleten</span><span class="p">(</span><span class="s2">&quot;eq&quot;</span><span class="p">)</span>
+<span class="n">cmp_to_ne</span> <span class="o">=</span> <span class="n">_cmp_to_gleten</span><span class="p">(</span><span class="s2">&quot;ne&quot;</span><span class="p">)</span>
+<span class="n">cmp_to_lt</span> <span class="o">=</span> <span class="n">_cmp_to_gleten</span><span class="p">(</span><span class="s2">&quot;lt&quot;</span><span class="p">)</span>
+<span class="n">cmp_to_le</span> <span class="o">=</span> <span class="n">_cmp_to_gleten</span><span class="p">(</span><span class="s2">&quot;le&quot;</span><span class="p">)</span>
+<span class="n">cmp_to_gt</span> <span class="o">=</span> <span class="n">_cmp_to_gleten</span><span class="p">(</span><span class="s2">&quot;gt&quot;</span><span class="p">)</span>
+<span class="n">cmp_to_ge</span> <span class="o">=</span> <span class="n">_cmp_to_gleten</span><span class="p">(</span><span class="s2">&quot;ge&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_key_to_gleten</span><span class="p">(</span><span class="n">gleten_name</span><span class="p">):</span>
+    <span class="c1"># gleten is short for the collections of [&quot;le&quot;, &quot;lt&quot;, &quot;ge&quot;, &quot;gt&quot;, &quot;eq&quot;, &quot;ne&quot;].</span>
+
+    <span class="k">def</span> <span class="nf">from_key</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">key</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+            <span class="n">gleten</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">gleten_name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">gleten</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span>
+    <span class="n">from_key</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;key_to_</span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">from_key</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> \
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Convert a key= function to a </span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2"> function.</span>
+
+<span class="s2">        Parameters:</span>
+<span class="s2">            key (callable):</span>
+
+<span class="s2">        Returns:</span>
+<span class="s2">            callable: A function that takes two arguments and returns True or False based on the comparison.</span>
+
+<span class="s2">        Examples:</span>
+<span class="s2">            &gt;&gt;&gt; </span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2"> = key_to_</span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2">(len)</span>
+<span class="s2">            &gt;&gt;&gt; </span><span class="si">{</span><span class="n">gleten_name</span><span class="si">}</span><span class="s2">(&quot;Hello&quot;, &quot;World&quot;)</span>
+<span class="s2">            </span><span class="si">{</span><span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span><span class="w"> </span><span class="n">gleten_name</span><span class="p">)(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span><span class="si">}</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">from_key</span>
+
+
+<span class="n">key_to_eq</span> <span class="o">=</span> <span class="n">_key_to_gleten</span><span class="p">(</span><span class="s2">&quot;eq&quot;</span><span class="p">)</span>
+<span class="n">key_to_ne</span> <span class="o">=</span> <span class="n">_key_to_gleten</span><span class="p">(</span><span class="s2">&quot;ne&quot;</span><span class="p">)</span>
+<span class="n">key_to_lt</span> <span class="o">=</span> <span class="n">_key_to_gleten</span><span class="p">(</span><span class="s2">&quot;lt&quot;</span><span class="p">)</span>
+<span class="n">key_to_le</span> <span class="o">=</span> <span class="n">_key_to_gleten</span><span class="p">(</span><span class="s2">&quot;le&quot;</span><span class="p">)</span>
+<span class="n">key_to_gt</span> <span class="o">=</span> <span class="n">_key_to_gleten</span><span class="p">(</span><span class="s2">&quot;gt&quot;</span><span class="p">)</span>
+<span class="n">key_to_ge</span> <span class="o">=</span> <span class="n">_key_to_gleten</span><span class="p">(</span><span class="s2">&quot;ge&quot;</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy._cmp</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

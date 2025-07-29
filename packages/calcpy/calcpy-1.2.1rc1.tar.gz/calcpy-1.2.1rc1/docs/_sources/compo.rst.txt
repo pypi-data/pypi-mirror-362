@@ -1,0 +1,322 @@
+.. _compo:
+
+Function Composition
+====================
+
+`Function composition` combines multiple functions into a single function. For example, we can compose two functions :math:`f(x)` and :math:`g(x)` into a new function :math:`h(x)` such that :math:`h(x) = f(g(x))`.
+
+``calcpy`` can convert a Python function to a component for future function compositions. The component can be passed around, just like other callable objects.
+
+`Example:` Below codes combine the components ``calcpy.add`` and ``calcpy.itemgetter`` to a composed callable ``combo``. When the ``combo`` is called with the argument ``[3, 4, 5]``, it returns ``16`` since ``itergetter(1)([3, 4, 5])`` returns ``4``, ``itemgetter(2, default=3)([3, 4, 5])`` returns ``5``, and ``add([4, 7, 5])`` return ``16``. Note that ``add`` and ``itemgetter`` are imported after the composition mode is enabled by ``calcpy.enable_composition()``. And the component ``itemgetter`` is used twice and the two calls are executed independently.
+
+.. code:: python
+
+    >>> from calcpy import enable_composition
+    >>> enable_composition()
+    >>> from calcpy import add, itemgetter
+    >>> combo = add(itemgetter(1), 7, itemgetter(2, default=3))
+    >>> combo([3, 4, 5])
+    16
+
+
+----------------
+Composition Mode
+----------------
+
+The feature of function composition works only when the composition mode is enabled. The composition mode is a global setting that affects all functions in the current module.
+
+By default, the composition mode is disabled, meaning that no function compositions are allowed.
+
+To use the function composition feature, you need to enable the composition mode. The composition mode can be enabled by ``calcpy.enable_composition()``, and can be disabled by ``calcpy.disable_composition()``.
+
+The composition mode contains three aspects:
+
+- **args** (`bool`): whether to composite positional arguments.
+- **kwargs** (`bool`): whether to composite keyword arguments.
+- **force_callable** (`bool`): whether to force the results to be callable, even when there are no child callable. If ``True``, the composited function will always be a callable. Otherwise, it is a callable only when one positional argument or one keyword argument is a callable.
+
+Composition mode can be configured by the following APIs:
+
+.. autofunction:: calcpy.set_composition_mode
+.. autofunction:: calcpy.disable_composition
+.. autofunction:: calcpy.enable_composition
+.. autofunction:: calcpy.disable_args_composition
+.. autofunction:: calcpy.enable_args_composition
+.. autofunction:: calcpy.disable_kwargs_composition
+.. autofunction:: calcpy.enable_kwargs_composition
+.. autofunction:: calcpy.disable_force_callable
+.. autofunction:: calcpy.enable_force_callable
+.. autofunction:: calcpy.args_composition_enabled
+.. autofunction:: calcpy.kwargs_composition_enabled
+.. autofunction:: calcpy.composition_enabled
+.. autofunction:: calcpy.composition_mode_context
+
+--------------
+Make Component
+--------------
+
+.. autofunction:: calcpy.componentize
+
+--------------------------------------------
+Shorthand Functions that Support Composition
+--------------------------------------------
+
+You need to enable the composition mode before `import` the shorthand functions. If those functions are imported before the composition mode is enabled, they will not be composable.
+
+:py:meth:`calcpy.abs_`: adapted from `operator.abs() <https://docs.python.org/3/library/operator.html#operator.abs>`_.
+
+:py:meth:`calcpy.acos`: adapted from `math.acos() <https://docs.python.org/3/library/math.html#math.acos>`_.
+
+:py:meth:`calcpy.acosh`: adapted from `math.acosh() <https://docs.python.org/3/library/math.html#math.acosh>`_.
+
+:py:meth:`calcpy.add`
+
+:py:meth:`calcpy.all_`
+
+:py:meth:`calcpy.and_`
+
+:py:meth:`calcpy.any_`
+
+:py:meth:`calcpy.asin`: adapted from `math.asin() <https://docs.python.org/3/library/math.html#math.asin>`_.
+
+:py:meth:`calcpy.asinh`: adapted from `math.asinh() <https://docs.python.org/3/library/math.html#math.asinh>`_.
+
+:py:meth:`calcpy.atan`: adapted from `math.atan() <https://docs.python.org/3/library/math.html#math.atan>`_.
+
+:py:meth:`calcpy.atan2`: adapted from `math.atan2() <https://docs.python.org/3/library/math.html#math.atan2>`_.
+
+:py:meth:`calcpy.bin_`: adapted from `bin() <https://docs.python.org/3/library/functions.html#bin>`_.
+
+:py:meth:`calcpy.bool_`: adapted from `bool() <https://docs.python.org/3/library/functions.html#bool>`_.
+
+:py:meth:`calcpy.ceil`: adapted from `math.ceil() <https://docs.python.org/3/library/math.html#math.ceil>`_.
+
+:py:meth:`calcpy.comb`: adapted from `math.comb() <https://docs.python.org/3/library/math.html#math.comb>`_.
+
+:py:meth:`calcpy.concat`
+
+:py:meth:`calcpy.contains`: adapted from `operator.contains() <https://docs.python.org/3/library/operator.html#operator.contains>`_.
+
+:py:meth:`calcpy.cos`: adapted from `math.cos() <https://docs.python.org/3/library/math.html#math.cos>`_.
+
+:py:meth:`calcpy.cosh`: adapted from `math.cosh() <https://docs.python.org/3/library/math.html#math.cosh>`_.
+
+:py:meth:`calcpy.countOf`: adapted from `operator.countOf() <https://docs.python.org/3/library/operator.html#operator.countOf>`_.
+
+:py:meth:`calcpy.count_unique`
+
+:py:meth:`calcpy.crbt`
+
+:py:meth:`calcpy.cycleperm`
+
+:py:meth:`calcpy.degrees`: adapted from `math.degrees() <https://docs.python.org/3/library/math.html#math.degrees>`_.
+
+:py:meth:`calcpy.dict_`: adapted from `dict() <https://docs.python.org/3/library/functions.html#dict>`_.
+
+:py:meth:`calcpy.difference`
+
+:py:meth:`calcpy.distinct`
+
+:py:meth:`calcpy.dist`: adapted from `math.dist() <https://docs.python.org/3/library/math.html#math.dist>`_.
+
+:py:meth:`calcpy.divmod_`: adapted from `divmod() <https://docs.python.org/3/library/functions.html#divmod>`_.
+
+:py:meth:`calcpy.eq`
+
+:py:meth:`calcpy.erf`: adapted from `math.erf() <https://docs.python.org/3/library/math.html#math.erf>`_.
+
+:py:meth:`calcpy.erfc`: adapted from `math.erfc() <https://docs.python.org/3/library/math.html#math.erfc>`_.
+
+:py:meth:`calcpy.exp`: adapted from `math.exp() <https://docs.python.org/3/library/math.html#math.exp>`_.
+
+:py:meth:`calcpy.exp2`: adapted from `math.exp2() <https://docs.python.org/3/library/math.html#math.exp2>`_.
+
+:py:meth:`calcpy.expm1`: adapted from `math.expm1() <https://docs.python.org/3/library/math.html#math.expm1>`_.
+
+:py:meth:`calcpy.factorial`: adapted from `math.factorial() <https://docs.python.org/3/library/math.html#math.factorial>`_.
+
+:py:meth:`calcpy.fillnan`
+
+:py:meth:`calcpy.fillnone`
+
+:py:meth:`calcpy.float_`: adapted from `float() <https://docs.python.org/3/library/functions.html#float>`_.
+
+:py:meth:`calcpy.floor`: adapted from `math.floor() <https://docs.python.org/3/library/math.html#math.efloor>`_.
+
+:py:meth:`calcpy.floordiv`: adapted from `operator.floordiv() <https://docs.python.org/3/library/operator.html#operator.floordiv>`_.
+
+:py:meth:`calcpy.fma`
+
+:py:meth:`calcpy.format_`: adapted from `format() <https://docs.python.org/3/library/functions.html#format>`_.
+
+:py:meth:`calcpy.gamma`: adapted from `math.gamma() <https://docs.python.org/3/library/math.html#math.gamma>`_.
+
+:py:meth:`calcpy.gcd`
+
+:py:meth:`calcpy.ge`
+
+:py:meth:`calcpy.getitem`: adapted from `operator.getitem() <https://docs.python.org/3/library/operator.html#operator.getitem>`_.
+
+:py:meth:`calcpy.gt`
+
+:py:meth:`calcpy.hex_`: adapted from `hex() <https://docs.python.org/3/library/functions.html#hex>`_.
+
+:py:meth:`calcpy.index`: adapted from `operator.index() <https://docs.python.org/3/library/operator.html#operator.index>`_..
+
+:py:meth:`calcpy.indexOf`: adapted from `operator.indexOf() <https://docs.python.org/3/library/operator.html#operator.indexOf>`_.
+
+:py:meth:`calcpy.int_`: adapted from `int() <https://docs.python.org/3/library/functions.html#int>`_.
+
+:py:meth:`calcpy.intersection`
+
+:py:meth:`calcpy.inv`: adapted from `operator.inv() <https://docs.python.org/3/library/operator.html#operator.inv>`_.
+
+:py:meth:`calcpy.is_`: adapted from `operator.is_() <https://docs.python.org/3/library/operator.html#operator.is_>`_.
+
+:py:meth:`calcpy.is_not`: adapted from `operator.is_not() <https://docs.python.org/3/library/operator.html#operator.is_not>`_.
+
+:py:meth:`calcpy.isclose`: adapted from `math.isclose() <https://docs.python.org/3/library/math.html#math.isclose>`_.
+
+:py:meth:`calcpy.isdisjoint`
+
+:py:meth:`calcpy.isfinite`: adapted from `math.isfinite() <https://docs.python.org/3/library/math.html#math.isfinite>`_.
+
+:py:meth:`calcpy.isinf`: adapted from `math.isinf() <https://docs.python.org/3/library/math.html#math.isinf>`_.
+
+:py:meth:`calcpy.isinstance_`: adapted from `isinstance() <https://docs.python.org/3/library/functions.html#isinstance>`_.
+
+:py:meth:`calcpy.ispropersubset`
+
+:py:meth:`calcpy.ispropersuperset`
+
+:py:meth:`calcpy.isqrt`: adapted from `math.isqrt() <https://docs.python.org/3/library/math.html#math.isqrt>`_.
+
+:py:meth:`calcpy.issubset`
+
+:py:meth:`calcpy.issuperset`
+
+:py:meth:`calcpy.lcm`
+
+:py:meth:`calcpy.le`
+
+:py:meth:`calcpy.len_`: adapted from `len() <https://docs.python.org/3/library/functions.html#len>`_.
+
+:py:meth:`calcpy.lgamma`: adapted from `math.lgamma() <https://docs.python.org/3/library/math.html#math.lgamma>`_.
+
+:py:meth:`calcpy.list_`: adapted from `list() <https://docs.python.org/3/library/stdtypes.html#list>`_.
+
+:py:meth:`calcpy.log`: adapted from `math.log() <https://docs.python.org/3/library/math.html#math.log>`_.
+
+:py:meth:`calcpy.log2`: adapted from  `math.log2() <https://docs.python.org/3/library/math.html#math.log2>`_.
+
+:py:meth:`calcpy.log10`: adapted from `math.log10() <https://docs.python.org/3/library/math.html#math.log10>`_.
+
+:py:meth:`calcpy.log1p`: adapted from `math.log1p() <https://docs.python.org/3/library/math.html#math.log1p>`_.
+
+:py:meth:`calcpy.lshift`: adapted from `operator.lshift() <https://docs.python.org/3/library/operator.html#operator.lshift>`_.
+
+:py:meth:`calcpy.lt`
+
+:py:meth:`calcpy.matmul`
+
+:py:meth:`calcpy.matprod`
+
+:py:meth:`calcpy.max_`: adapted from `max() <https://docs.python.org/3/library/functions.html#max>`_.
+
+:py:meth:`calcpy.maximal`
+
+:py:meth:`calcpy.min_`: adapted from `min() <https://docs.python.org/3/library/functions.html#min>`_.
+
+:py:meth:`calcpy.min_repetend_len`
+
+:py:meth:`calcpy.minimial`
+
+:py:meth:`calcpy.mod`: adapted from `operator.mod() <https://docs.python.org/3/library/operator.html#operator.mod>`_.
+
+:py:meth:`calcpy.mul`
+
+:py:meth:`calcpy.ne`
+
+:py:meth:`calcpy.neg`: adapted from `operator.neg() <https://docs.python.org/3/library/operator.html#operator.neg>`_.
+
+:py:meth:`calcpy.never`
+
+:py:meth:`calcpy.not_`: adapted from `operator.not_() <https://docs.python.org/3/library/operator.html#operator.not_>`_.
+
+:py:meth:`calcpy.oct_`: adapted from `oct() <https://docs.python.org/3/library/functions.html#oct>`_.
+
+:py:meth:`calcpy.odd`
+
+:py:meth:`calcpy.or_`
+
+:py:meth:`calcpy.ord_`: adapted from `ord() <https://docs.python.org/3/library/functions.html#ord>`_.
+
+:py:meth:`calcpy.perm`
+
+:py:meth:`calcpy.pos`: adapted from `operator.pos() <https://docs.python.org/3/library/operator.html#operator.pos>`_.
+
+:py:meth:`calcpy.pow_`: adapted from `operator.pow() <https://docs.python.org/3/library/operator.html#operator.pow>`_.
+
+:py:meth:`calcpy.prioritize`
+
+:py:meth:`calcpy.prod`: adapted from `math.prod() <https://docs.python.org/3/library/math.html#math.prod>`_.
+
+:py:meth:`calcpy.radians`: adapted from `math.radians() <https://docs.python.org/3/library/math.html#math.radians>`_.
+
+:py:meth:`calcpy.range_`: adapted from `range() <https://docs.python.org/3/library/stdtypes.html#typesseq-range>`_.
+
+:py:meth:`calcpy.remainder`: adapted from `math.remainder() <https://docs.python.org/3/library/math.html#math.remainder>`_.
+
+:py:meth:`calcpy.round_`: adapted from `round() <https://docs.python.org/3/library/functions.html#round>`_.
+
+:py:meth:`calcpy.rshift`: adapted from `operator.rshift() <https://docs.python.org/3/library/operator.html#operator.rshift>`_.
+
+:py:meth:`calcpy.same`
+
+:py:meth:`calcpy.set_`: adapted from `set() <https://docs.python.org/3/library/stdtypes.html#set>`_.
+
+:py:meth:`calcpy.setitem`: adapted from `operator.setitem() <https://docs.python.org/3/library/operator.html#operator.setitem>`_.
+
+:py:meth:`calcpy.sorted_`: adapted from `sorted() <https://docs.python.org/3/library/stdtypes.html#sorted>`_.
+
+:py:meth:`calcpy.sqrt`: adapted from `math.sqrt() <https://docs.python.org/3/library/math.html#math.sqrt>`_.
+
+:py:meth:`calcpy.str_`: adapted from `str() <https://docs.python.org/3/library/stdtypes.html#str>`_.
+
+:py:meth:`calcpy.sub`: adapted from `operator.sub() <https://docs.python.org/3/library/operator.html#operator.sub>`_.
+
+:py:meth:`calcpy.sum_`: adapted from `sum() <https://docs.python.org/3/library/functions.html#sum>`_.
+
+:py:meth:`calcpy.sumprod`
+
+:py:meth:`calcpy.swap`
+
+:py:meth:`calcpy.symmetric_difference`
+
+:py:meth:`calcpy.tan`: adapted from `math.tan() <https://docs.python.org/3/library/math.html#math.tan>`_.
+
+:py:meth:`calcpy.tanh`: adapted from `math.tanh() <https://docs.python.org/3/library/math.html#math.tanh>`_.
+
+:py:meth:`calcpy.truediv`: adapted from `operator.truediv() <https://docs.python.org/3/library/operator.html#operator.truediv>`_.
+
+:py:meth:`calcpy.truth`: adapted from `operator.truth() <https://docs.python.org/3/library/operator.html#operator.truth>`_.
+
+:py:meth:`calcpy.tuple_`: adapted from `tuple() <https://docs.python.org/3/library/stdtypes.html#tuple>`_.
+
+:py:meth:`calcpy.type_`: adapted from `type() <https://docs.python.org/3/library/functions.html#type>`_.
+
+:py:meth:`calcpy.union`
+
+:py:meth:`calcpy.unique`
+
+:py:meth:`calcpy.xor`
+
+:py:meth:`calcpy.zip_`: adapted from `zip() <https://docs.python.org/3/library/functions.html#zip>`_.
+
+
+-------------------
+Chained Composition
+-------------------
+
+.. autofunction:: calcpy.fun.skewer
+.. autofunction:: calcpy.fun.repeat

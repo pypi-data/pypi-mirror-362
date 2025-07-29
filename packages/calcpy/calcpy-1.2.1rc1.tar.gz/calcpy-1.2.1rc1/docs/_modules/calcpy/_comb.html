@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>calcpy._comb &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=0f882399" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy._comb</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calcpy._comb</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Combinatorics.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="bellpartition">
+<a class="viewcode-back" href="../../comb.html#calcpy.bellpartition">[docs]</a>
+<span class="k">def</span> <span class="nf">bellpartition</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get possible paritions of values.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        values (list | tuple | set): Values to partition.</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        list[list | tuple | set]: Parition of values</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        `&lt;https://docs.sympy.org/latest/modules/functions/combinatorial.html#sympy.functions.combinatorial.numbers.bell&gt;`_</span>
+<span class="sd">        `&lt;https://oeis.org/A000110&gt;`_</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Partition a list.</span>
+
+<span class="sd">        &gt;&gt;&gt; for partition in bellpartition([0, 1, 2]):</span>
+<span class="sd">        ...     print(partition)</span>
+<span class="sd">        [[0, 1, 2]]</span>
+<span class="sd">        [[0], [1, 2]]</span>
+<span class="sd">        [[0, 1], [2]]</span>
+<span class="sd">        [[0, 2], [1]]</span>
+<span class="sd">        [[0], [1], [2]]</span>
+
+<span class="sd">        Partition a tuple.</span>
+
+<span class="sd">        &gt;&gt;&gt; for partition in bellpartition((&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;)):</span>
+<span class="sd">        ...     print(partition)</span>
+<span class="sd">        [(&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;)]</span>
+<span class="sd">        [(&#39;a&#39;,), (&#39;b&#39;, &#39;c&#39;, &#39;d&#39;)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;b&#39;), (&#39;c&#39;, &#39;d&#39;)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;c&#39;, &#39;d&#39;), (&#39;b&#39;,)]</span>
+<span class="sd">        [(&#39;a&#39;,), (&#39;b&#39;,), (&#39;c&#39;, &#39;d&#39;)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;b&#39;, &#39;c&#39;), (&#39;d&#39;,)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;d&#39;), (&#39;b&#39;, &#39;c&#39;)]</span>
+<span class="sd">        [(&#39;a&#39;,), (&#39;b&#39;, &#39;c&#39;), (&#39;d&#39;,)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;b&#39;, &#39;d&#39;), (&#39;c&#39;,)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;c&#39;), (&#39;b&#39;, &#39;d&#39;)]</span>
+<span class="sd">        [(&#39;a&#39;,), (&#39;b&#39;, &#39;d&#39;), (&#39;c&#39;,)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;b&#39;), (&#39;c&#39;,), (&#39;d&#39;,)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;c&#39;), (&#39;b&#39;,), (&#39;d&#39;,)]</span>
+<span class="sd">        [(&#39;a&#39;, &#39;d&#39;), (&#39;b&#39;,), (&#39;c&#39;,)]</span>
+<span class="sd">        [(&#39;a&#39;,), (&#39;b&#39;,), (&#39;c&#39;,), (&#39;d&#39;,)]</span>
+
+<span class="sd">        Partition a set.</span>
+
+<span class="sd">        &gt;&gt;&gt; for partition in bellpartition({False, True}):</span>
+<span class="sd">        ...     print(partition)</span>
+<span class="sd">        [{False, True}]</span>
+<span class="sd">        [{False}, {True}]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="p">[]</span>
+        <span class="k">return</span>
+
+    <span class="n">type_</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">value0</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">remaining_values</span> <span class="o">=</span> <span class="n">type_</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+    <span class="k">for</span> <span class="n">subsets</span> <span class="ow">in</span> <span class="n">bellpartition</span><span class="p">(</span><span class="n">remaining_values</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">subset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subsets</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="p">[</span><span class="n">type_</span><span class="p">([</span><span class="n">value0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">subset</span><span class="p">))]</span> <span class="o">+</span> <span class="n">subsets</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">subsets</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">yield</span> <span class="p">[</span><span class="n">type_</span><span class="p">([</span><span class="n">value0</span><span class="p">])]</span> <span class="o">+</span> <span class="n">subsets</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy._comb</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

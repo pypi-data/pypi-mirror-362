@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Function Composition &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Functional Programming" href="fun.html" />
+    <link rel="prev" title="Installation" href="install.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fun.html" title="Functional Programming"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">calcpy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Function Composition</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="function-composition">
+<span id="compo"></span><h1>Function Composition<a class="headerlink" href="#function-composition" title="Link to this heading">¶</a></h1>
+<p><cite>Function composition</cite> combines multiple functions into a single function. For example, we can compose two functions <span class="math notranslate nohighlight">\(f(x)\)</span> and <span class="math notranslate nohighlight">\(g(x)\)</span> into a new function <span class="math notranslate nohighlight">\(h(x)\)</span> such that <span class="math notranslate nohighlight">\(h(x) = f(g(x))\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">calcpy</span></code> can convert a Python function to a component for future function compositions. The component can be passed around, just like other callable objects.</p>
+<p><cite>Example:</cite> Below codes combine the components <code class="docutils literal notranslate"><span class="pre">calcpy.add</span></code> and <code class="docutils literal notranslate"><span class="pre">calcpy.itemgetter</span></code> to a composed callable <code class="docutils literal notranslate"><span class="pre">combo</span></code>. When the <code class="docutils literal notranslate"><span class="pre">combo</span></code> is called with the argument <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">4,</span> <span class="pre">5]</span></code>, it returns <code class="docutils literal notranslate"><span class="pre">16</span></code> since <code class="docutils literal notranslate"><span class="pre">itergetter(1)([3,</span> <span class="pre">4,</span> <span class="pre">5])</span></code> returns <code class="docutils literal notranslate"><span class="pre">4</span></code>, <code class="docutils literal notranslate"><span class="pre">itemgetter(2,</span> <span class="pre">default=3)([3,</span> <span class="pre">4,</span> <span class="pre">5])</span></code> returns <code class="docutils literal notranslate"><span class="pre">5</span></code>, and <code class="docutils literal notranslate"><span class="pre">add([4,</span> <span class="pre">7,</span> <span class="pre">5])</span></code> return <code class="docutils literal notranslate"><span class="pre">16</span></code>. Note that <code class="docutils literal notranslate"><span class="pre">add</span></code> and <code class="docutils literal notranslate"><span class="pre">itemgetter</span></code> are imported after the composition mode is enabled by <code class="docutils literal notranslate"><span class="pre">calcpy.enable_composition()</span></code>. And the component <code class="docutils literal notranslate"><span class="pre">itemgetter</span></code> is used twice and the two calls are executed independently.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcpy</span> <span class="kn">import</span> <span class="n">enable_composition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">enable_composition</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcpy</span> <span class="kn">import</span> <span class="n">add</span><span class="p">,</span> <span class="n">itemgetter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">combo</span> <span class="o">=</span> <span class="n">add</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">7</span><span class="p">,</span> <span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">combo</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">16</span>
+</pre></div>
+</div>
+<section id="composition-mode">
+<h2>Composition Mode<a class="headerlink" href="#composition-mode" title="Link to this heading">¶</a></h2>
+<p>The feature of function composition works only when the composition mode is enabled. The composition mode is a global setting that affects all functions in the current module.</p>
+<p>By default, the composition mode is disabled, meaning that no function compositions are allowed.</p>
+<p>To use the function composition feature, you need to enable the composition mode. The composition mode can be enabled by <code class="docutils literal notranslate"><span class="pre">calcpy.enable_composition()</span></code>, and can be disabled by <code class="docutils literal notranslate"><span class="pre">calcpy.disable_composition()</span></code>.</p>
+<p>The composition mode contains three aspects:</p>
+<ul class="simple">
+<li><p><strong>args</strong> (<cite>bool</cite>): whether to composite positional arguments.</p></li>
+<li><p><strong>kwargs</strong> (<cite>bool</cite>): whether to composite keyword arguments.</p></li>
+<li><p><strong>force_callable</strong> (<cite>bool</cite>): whether to force the results to be callable, even when there are no child callable. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the composited function will always be a callable. Otherwise, it is a callable only when one positional argument or one keyword argument is a callable.</p></li>
+</ul>
+<p>Composition mode can be configured by the following APIs:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.set_composition_mode">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">set_composition_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_callable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#set_composition_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.set_composition_mode" title="Link to this definition">¶</a></dt>
+<dd><p>Set composition mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to enable composition for positional arguments.
+The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, meaning that the current status will be kept.</p></li>
+<li><p><strong>kwargs</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to enable composition for keyword arguments
+The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, meaning that the current status will be kept.</p></li>
+<li><p><strong>force_callable</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to force return results to be callable
+The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, meaning that the current status will be kept.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">set_composition_mode</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force_callable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.disable_composition">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">disable_composition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#disable_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.disable_composition" title="Link to this definition">¶</a></dt>
+<dd><p>Disable <code class="docutils literal notranslate"><span class="pre">args</span></code> composition and <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> composition.</p>
+<p>Alias of <code class="docutils literal notranslate"><span class="pre">set_composition_mode(args=False,</span> <span class="pre">kwargs=False)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.enable_composition">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">enable_composition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#enable_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.enable_composition" title="Link to this definition">¶</a></dt>
+<dd><p>Enable args composition and kwargs composition.</p>
+<p>Alias of <code class="docutils literal notranslate"><span class="pre">set_composition_mode(args=True,</span> <span class="pre">kwargs=True)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.disable_args_composition">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">disable_args_composition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#disable_args_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.disable_args_composition" title="Link to this definition">¶</a></dt>
+<dd><p>Disable <code class="docutils literal notranslate"><span class="pre">args</span></code> composition.</p>
+<p>Alias of <code class="docutils literal notranslate"><span class="pre">set_composition_mode(args=False)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.enable_args_composition">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">enable_args_composition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#enable_args_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.enable_args_composition" title="Link to this definition">¶</a></dt>
+<dd><p>Enable <code class="docutils literal notranslate"><span class="pre">args</span></code> composition.</p>
+<p>Alias of <code class="docutils literal notranslate"><span class="pre">set_composition_mode(args=True)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.disable_kwargs_composition">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">disable_kwargs_composition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#disable_kwargs_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.disable_kwargs_composition" title="Link to this definition">¶</a></dt>
+<dd><p>Disable <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> composition.</p>
+<p>Alias of <code class="docutils literal notranslate"><span class="pre">set_composition_mode(kwargs=False)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.enable_kwargs_composition">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">enable_kwargs_composition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#enable_kwargs_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.enable_kwargs_composition" title="Link to this definition">¶</a></dt>
+<dd><p>Enable <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> composition.</p>
+<p>Alias of <code class="docutils literal notranslate"><span class="pre">set_composition_mode(kwargs=True)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.disable_force_callable">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">disable_force_callable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#disable_force_callable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.disable_force_callable" title="Link to this definition">¶</a></dt>
+<dd><p>Disable force callable.</p>
+<p>Alias of <code class="docutils literal notranslate"><span class="pre">set_composition_mode(force_callable=False)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.enable_force_callable">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">enable_force_callable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#enable_force_callable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.enable_force_callable" title="Link to this definition">¶</a></dt>
+<dd><p>Enable force callable.</p>
+<p>Alias of <code class="docutils literal notranslate"><span class="pre">set_composition_mode(force_callable=True)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.args_composition_enabled">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">args_composition_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#args_composition_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.args_composition_enabled" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> when <code class="docutils literal notranslate"><span class="pre">args</span></code> composition is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.kwargs_composition_enabled">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">kwargs_composition_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#kwargs_composition_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.kwargs_composition_enabled" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> when <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> composition is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.composition_enabled">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">composition_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#composition_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.composition_enabled" title="Link to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> when <code class="docutils literal notranslate"><span class="pre">args</span></code> composition or <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> composition or force callable is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.composition_mode_context">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">composition_mode_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_callable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#composition_mode_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.composition_mode_context" title="Link to this definition">¶</a></dt>
+<dd><p>Context manager to temporarily set composite mode in a <code class="docutils literal notranslate"><span class="pre">with</span></code> statement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>bool</em>) – whether to enable composition for positional arguments</p></li>
+<li><p><strong>kwargs</strong> (<em>bool</em>) – whether to enable composition for keyword arguments</p></li>
+<li><p><strong>force_callable</strong> (<em>bool</em>) – whether to force return results to be callable</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">force_callable_enabled</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">composition_mode_context</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force_callable</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">force_callable_enabled</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">force_callable_enabled</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="make-component">
+<h2>Make Component<a class="headerlink" href="#make-component" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.componentize">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">componentize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">how</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_compo.html#componentize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.componentize" title="Link to this definition">¶</a></dt>
+<dd><p>Decorate a callable function so that it becomes a building block of function composition.</p>
+<p>Need to enable composition mode before using this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>how</strong> – Callable object that combines multiple results.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>callable</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">calcpy</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">enable_composition</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_</span> <span class="o">=</span> <span class="n">componentize</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">7</span><span class="p">,</span> <span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">))([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">min_</span> <span class="o">=</span> <span class="n">componentize</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">min_</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">7</span><span class="p">,</span> <span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">))([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">min_</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">disable_composition</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="shorthand-functions-that-support-composition">
+<h2>Shorthand Functions that Support Composition<a class="headerlink" href="#shorthand-functions-that-support-composition" title="Link to this heading">¶</a></h2>
+<p>You need to enable the composition mode before <cite>import</cite> the shorthand functions. If those functions are imported before the composition mode is enabled, they will not be composable.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.abs_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.abs">operator.abs()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.acos()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.acos">math.acos()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.acosh()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.acosh">math.acosh()</a>.</p>
+<p><a class="reference internal" href="math.html#calcpy.add" title="calcpy.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.add()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.all_" title="calcpy.all_"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.all_()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.and_" title="calcpy.and_"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.and_()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.any_" title="calcpy.any_"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.any_()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.asin()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.asin">math.asin()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.asinh()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.asinh">math.asinh()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.atan()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.atan">math.atan()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.atan2()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.atan2">math.atan2()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.bin_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#bin">bin()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.bool_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool">bool()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.ceil()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.ceil">math.ceil()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.comb()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.comb">math.comb()</a>.</p>
+<p><a class="reference internal" href="collect.html#calcpy.concat" title="calcpy.concat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.concat()</span></code></a></p>
+<p><a class="reference internal" href="set.html#calcpy.contains" title="calcpy.contains"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.contains()</span></code></a>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.contains">operator.contains()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.cos()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.cos">math.cos()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.cosh()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.cosh">math.cosh()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.countOf()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.countOf">operator.countOf()</a>.</p>
+<p><a class="reference internal" href="seq.html#calcpy.count_unique" title="calcpy.count_unique"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.count_unique()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.crbt" title="calcpy.crbt"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.crbt()</span></code></a></p>
+<p><a class="reference internal" href="seq.html#calcpy.cycleperm" title="calcpy.cycleperm"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.cycleperm()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.degrees()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.degrees">math.degrees()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.dict_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#dict">dict()</a>.</p>
+<p><a class="reference internal" href="set.html#calcpy.difference" title="calcpy.difference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.difference()</span></code></a></p>
+<p><a class="reference internal" href="seq.html#calcpy.distinct" title="calcpy.distinct"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.distinct()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.dist()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.dist">math.dist()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.divmod_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#divmod">divmod()</a>.</p>
+<p><a class="reference internal" href="cmp.html#calcpy.eq" title="calcpy.eq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.eq()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.erf()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.erf">math.erf()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.erfc()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.erfc">math.erfc()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.exp()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.exp">math.exp()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.exp2()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.exp2">math.exp2()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.expm1()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.expm1">math.expm1()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.factorial()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.factorial">math.factorial()</a>.</p>
+<p><a class="reference internal" href="fill.html#calcpy.fillnan" title="calcpy.fillnan"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.fillnan()</span></code></a></p>
+<p><a class="reference internal" href="fill.html#calcpy.fillnone" title="calcpy.fillnone"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.fillnone()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.float_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#float">float()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.floor()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.efloor">math.floor()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.floordiv()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.floordiv">operator.floordiv()</a>.</p>
+<p><a class="reference internal" href="math.html#calcpy.fma" title="calcpy.fma"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.fma()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.format_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#format">format()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.gamma()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.gamma">math.gamma()</a>.</p>
+<p><a class="reference internal" href="math.html#calcpy.gcd" title="calcpy.gcd"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.gcd()</span></code></a></p>
+<p><a class="reference internal" href="cmp.html#calcpy.ge" title="calcpy.ge"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.ge()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.getitem()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.getitem">operator.getitem()</a>.</p>
+<p><a class="reference internal" href="cmp.html#calcpy.gt" title="calcpy.gt"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.gt()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.hex_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#hex">hex()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.index()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.index">operator.index()</a>..</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.indexOf()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.indexOf">operator.indexOf()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.int_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#int">int()</a>.</p>
+<p><a class="reference internal" href="set.html#calcpy.intersection" title="calcpy.intersection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.intersection()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.inv()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.inv">operator.inv()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.is_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.is_">operator.is_()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.is_not()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.is_not">operator.is_not()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.isclose()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isclose">math.isclose()</a>.</p>
+<p><a class="reference internal" href="set.html#calcpy.isdisjoint" title="calcpy.isdisjoint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.isdisjoint()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.isfinite()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isfinite">math.isfinite()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.isinf()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isinf">math.isinf()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.isinstance_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#isinstance">isinstance()</a>.</p>
+<p><a class="reference internal" href="set.html#calcpy.ispropersubset" title="calcpy.ispropersubset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.ispropersubset()</span></code></a></p>
+<p><a class="reference internal" href="set.html#calcpy.ispropersuperset" title="calcpy.ispropersuperset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.ispropersuperset()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.isqrt" title="calcpy.isqrt"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.isqrt()</span></code></a>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isqrt">math.isqrt()</a>.</p>
+<p><a class="reference internal" href="set.html#calcpy.issubset" title="calcpy.issubset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.issubset()</span></code></a></p>
+<p><a class="reference internal" href="set.html#calcpy.issuperset" title="calcpy.issuperset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.issuperset()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.lcm" title="calcpy.lcm"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.lcm()</span></code></a></p>
+<p><a class="reference internal" href="cmp.html#calcpy.le" title="calcpy.le"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.le()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.len_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#len">len()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.lgamma()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.lgamma">math.lgamma()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.list_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list">list()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.log()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.log">math.log()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.log2()</span></code>: adapted from  <a class="reference external" href="https://docs.python.org/3/library/math.html#math.log2">math.log2()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.log10()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.log10">math.log10()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.log1p()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.log1p">math.log1p()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.lshift()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.lshift">operator.lshift()</a>.</p>
+<p><a class="reference internal" href="cmp.html#calcpy.lt" title="calcpy.lt"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.lt()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.matmul" title="calcpy.matmul"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.matmul()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.matprod" title="calcpy.matprod"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.matprod()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.max_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#max">max()</a>.</p>
+<p><a class="reference internal" href="order.html#calcpy.maximal" title="calcpy.maximal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.maximal()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.min_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#min">min()</a>.</p>
+<p><a class="reference internal" href="seq.html#calcpy.min_repetend_len" title="calcpy.min_repetend_len"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.min_repetend_len()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.minimial()</span></code></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.mod()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.mod">operator.mod()</a>.</p>
+<p><a class="reference internal" href="math.html#calcpy.mul" title="calcpy.mul"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.mul()</span></code></a></p>
+<p><a class="reference internal" href="cmp.html#calcpy.ne" title="calcpy.ne"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.ne()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.neg()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.neg">operator.neg()</a>.</p>
+<p><a class="reference internal" href="math.html#calcpy.never" title="calcpy.never"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.never()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.not_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.not_">operator.not_()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.oct_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#oct">oct()</a>.</p>
+<p><a class="reference internal" href="math.html#calcpy.odd" title="calcpy.odd"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.odd()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.or_" title="calcpy.or_"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.or_()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.ord_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#ord">ord()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.perm()</span></code></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.pos()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.pos">operator.pos()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.pow_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.pow">operator.pow()</a>.</p>
+<p><a class="reference internal" href="seq.html#calcpy.prioritize" title="calcpy.prioritize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.prioritize()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.prod()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.prod">math.prod()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.radians()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.radians">math.radians()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.range_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#typesseq-range">range()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.remainder()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.remainder">math.remainder()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.round_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#round">round()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.rshift()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.rshift">operator.rshift()</a>.</p>
+<p><a class="reference internal" href="seq.html#calcpy.same" title="calcpy.same"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.same()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.set_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set">set()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.setitem()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.setitem">operator.setitem()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.sorted_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#sorted">sorted()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.sqrt()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.sqrt">math.sqrt()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.str_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str">str()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.sub()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.sub">operator.sub()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.sum_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#sum">sum()</a>.</p>
+<p><a class="reference internal" href="math.html#calcpy.sumprod" title="calcpy.sumprod"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.sumprod()</span></code></a></p>
+<p><a class="reference internal" href="seq.html#calcpy.swap" title="calcpy.swap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.swap()</span></code></a></p>
+<p><a class="reference internal" href="set.html#calcpy.symmetric_difference" title="calcpy.symmetric_difference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.symmetric_difference()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.tan()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.tan">math.tan()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.tanh()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/math.html#math.tanh">math.tanh()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.truediv()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.truediv">operator.truediv()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.truth()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.truth">operator.truth()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.tuple_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple()</a>.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.type_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#type">type()</a>.</p>
+<p><a class="reference internal" href="set.html#calcpy.union" title="calcpy.union"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.union()</span></code></a></p>
+<p><a class="reference internal" href="seq.html#calcpy.unique" title="calcpy.unique"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.unique()</span></code></a></p>
+<p><a class="reference internal" href="math.html#calcpy.xor" title="calcpy.xor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.xor()</span></code></a></p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">calcpy.zip_()</span></code>: adapted from <a class="reference external" href="https://docs.python.org/3/library/functions.html#zip">zip()</a>.</p>
+</section>
+<section id="chained-composition">
+<h2>Chained Composition<a class="headerlink" href="#chained-composition" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.fun.skewer">
+<span class="sig-prename descclassname"><span class="pre">calcpy.fun.</span></span><span class="sig-name descname"><span class="pre">skewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">callables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/fun.html#skewer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.fun.skewer" title="Link to this definition">¶</a></dt>
+<dd><p>Composite multiple callables into one callable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*callables</strong> (<em>callable</em>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A callable that calls all callables in order.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">minmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">skewered</span> <span class="o">=</span> <span class="n">skewer</span><span class="p">(</span><span class="n">minmax</span><span class="p">,</span> <span class="n">mul</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">skewered</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">15</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.fun.repeat">
+<span class="sig-prename descclassname"><span class="pre">calcpy.fun.</span></span><span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/fun.html#repeat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.fun.repeat" title="Link to this definition">¶</a></dt>
+<dd><p>Repeat a callable n times.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – Number of times to repeat.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a callable that swaps a callable so that it is called n times.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[callable, callable]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Apply on a function.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">repeated</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)(</span><span class="nb">abs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repeated</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<p>Use as a decorator.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@repeat</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Function Composition</a><ul>
+<li><a class="reference internal" href="#composition-mode">Composition Mode</a><ul>
+<li><a class="reference internal" href="#calcpy.set_composition_mode"><code class="docutils literal notranslate"><span class="pre">set_composition_mode()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.disable_composition"><code class="docutils literal notranslate"><span class="pre">disable_composition()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.enable_composition"><code class="docutils literal notranslate"><span class="pre">enable_composition()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.disable_args_composition"><code class="docutils literal notranslate"><span class="pre">disable_args_composition()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.enable_args_composition"><code class="docutils literal notranslate"><span class="pre">enable_args_composition()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.disable_kwargs_composition"><code class="docutils literal notranslate"><span class="pre">disable_kwargs_composition()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.enable_kwargs_composition"><code class="docutils literal notranslate"><span class="pre">enable_kwargs_composition()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.disable_force_callable"><code class="docutils literal notranslate"><span class="pre">disable_force_callable()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.enable_force_callable"><code class="docutils literal notranslate"><span class="pre">enable_force_callable()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.args_composition_enabled"><code class="docutils literal notranslate"><span class="pre">args_composition_enabled()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.kwargs_composition_enabled"><code class="docutils literal notranslate"><span class="pre">kwargs_composition_enabled()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.composition_enabled"><code class="docutils literal notranslate"><span class="pre">composition_enabled()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.composition_mode_context"><code class="docutils literal notranslate"><span class="pre">composition_mode_context()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#make-component">Make Component</a><ul>
+<li><a class="reference internal" href="#calcpy.componentize"><code class="docutils literal notranslate"><span class="pre">componentize()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#shorthand-functions-that-support-composition">Shorthand Functions that Support Composition</a></li>
+<li><a class="reference internal" href="#chained-composition">Chained Composition</a><ul>
+<li><a class="reference internal" href="#calcpy.fun.skewer"><code class="docutils literal notranslate"><span class="pre">skewer()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.fun.repeat"><code class="docutils literal notranslate"><span class="pre">repeat()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="install.html"
+                          title="previous chapter">Installation</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="fun.html"
+                          title="next chapter">Functional Programming</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/compo.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fun.html" title="Functional Programming"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">calcpy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Function Composition</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

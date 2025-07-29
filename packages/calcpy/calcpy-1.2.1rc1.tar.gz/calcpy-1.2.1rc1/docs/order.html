@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Order Theory &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Classes" href="cls.html" />
+    <link rel="prev" title="Comparers" href="cmp.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="cls.html" title="Classes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cmp.html" title="Comparers"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">calcpy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Order Theory</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="order-theory">
+<h1>Order Theory<a class="headerlink" href="#order-theory" title="Link to this heading">¶</a></h1>
+<section id="parition-of-binary-relationship">
+<h2>Parition of Binary Relationship<a class="headerlink" href="#parition-of-binary-relationship" title="Link to this heading">¶</a></h2>
+<p>A binary relationship <span class="math notranslate nohighlight">\(R\)</span> can be partitioned into two disjoint components: symmetric part <span class="math notranslate nohighlight">\(I_R\)</span> and asymmetric part <span class="math notranslate nohighlight">\(P_R\)</span> according to the following definition:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}I_R = \{(x,y) \in R \mid (x,y) \in R \text{ and } (y,x) \in R \}\\P_R = \{(x,y) \in R \mid (x,y) \in R \text{ and } (y,x) \notin R \}\end{aligned}\end{align} \]</div>
+<p>Below are APIs that implement this partition.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.binrel.sym_part">
+<span class="sig-prename descclassname"><span class="pre">calcpy.binrel.</span></span><span class="sig-name descname"><span class="pre">sym_part</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/binrel.html#sym_part"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.binrel.sym_part" title="Link to this definition">¶</a></dt>
+<dd><p>Get the symmetric part of a binary relationship.</p>
+<p>Returns r(a, b) and r(b, a) for relationship r(a, b).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>r</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>bool</em><em>]</em>) – binary relationship,
+a callable that accepts two positional arguments and returns a bool.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Callable[[Any, Any], bool]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">fracle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>  <span class="c1"># &lt;= on fractional part</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">b</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fraceq</span> <span class="o">=</span> <span class="n">sym_part</span><span class="p">(</span><span class="n">fracle</span><span class="p">)</span>   <span class="c1"># == on fractional part</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fraceq</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fraceq</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.binrel.asym_part">
+<span class="sig-prename descclassname"><span class="pre">calcpy.binrel.</span></span><span class="sig-name descname"><span class="pre">asym_part</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/binrel.html#asym_part"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.binrel.asym_part" title="Link to this definition">¶</a></dt>
+<dd><p>Get the asymmetric part of a binary relationship.</p>
+<p>Returns r(a, b) and not r(b, a) for relationship r(a, b).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>r</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>bool</em><em>]</em>) – binary relationship,
+a callable that accepts two positional arguments and returns a bool.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Callable[[Any, Any], bool]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">fracle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>  <span class="c1"># &lt;= on fractional part</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">b</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fraclt</span> <span class="o">=</span> <span class="n">asym_part</span><span class="p">(</span><span class="n">fracle</span><span class="p">)</span>   <span class="c1"># == on fractional part</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fraclt</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fraclt</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="simple">
+<dt>See also:</dt><dd><p><a class="reference external" href="https://www.columbia.edu/~md3405/DT_Order_15.pdf">https://www.columbia.edu/~md3405/DT_Order_15.pdf</a></p>
+</dd>
+</dl>
+</section>
+<section id="maximials-and-minimals-of-posets">
+<h2>Maximials and Minimals of Posets<a class="headerlink" href="#maximials-and-minimals-of-posets" title="Link to this heading">¶</a></h2>
+<p>Below are APIs to find maximials and minimals of a poset. They have the keyword <code class="docutils literal notranslate"><span class="pre">lt</span></code> for less-than relationship. If you have less-than-or-equal-to relationship, you can use <code class="docutils literal notranslate"><span class="pre">calcpy.binrel.asym_part()</span></code> to convert it to less-than relationship.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.maximal">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">maximal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_po.html#maximal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.maximal" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the maximal elements of a poset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> (<em>iterable</em>) – Values to find the maximal elements.</p></li>
+<li><p><strong>lt</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>bool</em><em>]</em>) – Less-than checker.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Maximal elements.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">isproperfactor</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">(</span><span class="n">b</span> <span class="o">%</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a</span> <span class="o">!=</span> <span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maximal</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="n">lt</span><span class="o">=</span><span class="n">isproperfactor</span><span class="p">)</span>
+<span class="go">[5, 6, 7, 8, 9]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="calcpy.minimal">
+<span class="sig-prename descclassname"><span class="pre">calcpy.</span></span><span class="sig-name descname"><span class="pre">minimal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calcpy/_po.html#minimal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calcpy.minimal" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the minimal elements of a poset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> (<em>iterable</em>) – Values to find the minimal elements.</p></li>
+<li><p><strong>lt</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>bool</em><em>]</em>) – Less-than checker.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Minimal elements.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">isproperfactor</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">(</span><span class="n">b</span> <span class="o">%</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a</span> <span class="o">!=</span> <span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">minimal</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="n">lt</span><span class="o">=</span><span class="n">isproperfactor</span><span class="p">)</span>
+<span class="go">[2, 3, 5, 7]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Order Theory</a><ul>
+<li><a class="reference internal" href="#parition-of-binary-relationship">Parition of Binary Relationship</a><ul>
+<li><a class="reference internal" href="#calcpy.binrel.sym_part"><code class="docutils literal notranslate"><span class="pre">sym_part()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.binrel.asym_part"><code class="docutils literal notranslate"><span class="pre">asym_part()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#maximials-and-minimals-of-posets">Maximials and Minimals of Posets</a><ul>
+<li><a class="reference internal" href="#calcpy.maximal"><code class="docutils literal notranslate"><span class="pre">maximal()</span></code></a></li>
+<li><a class="reference internal" href="#calcpy.minimal"><code class="docutils literal notranslate"><span class="pre">minimal()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="cmp.html"
+                          title="previous chapter">Comparers</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="cls.html"
+                          title="next chapter">Classes</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/order.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="cls.html" title="Classes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cmp.html" title="Comparers"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">calcpy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Order Theory</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

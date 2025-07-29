@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>calcpy._compo &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=0f882399" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy._compo</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calcpy._compo</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Function composition.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="n">_modes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force_callable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="set_composition_mode">
+<a class="viewcode-back" href="../../compo.html#calcpy.set_composition_mode">[docs]</a>
+<span class="k">def</span> <span class="nf">set_composition_mode</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_callable</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set composition mode.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        args (bool, optional): whether to enable composition for positional arguments.</span>
+<span class="sd">            The default is ``None``, meaning that the current status will be kept.</span>
+<span class="sd">        kwargs (bool, optional): whether to enable composition for keyword arguments</span>
+<span class="sd">            The default is ``None``, meaning that the current status will be kept.</span>
+<span class="sd">        force_callable (bool, optional): whether to force return results to be callable</span>
+<span class="sd">            The default is ``None``, meaning that the current status will be kept.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; set_composition_mode(args=False, kwargs=False, force_callable=False)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span>
+    <span class="k">if</span> <span class="n">force_callable</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force_callable</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;force_callable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">force_callable</span></div>
+
+
+
+<div class="viewcode-block" id="disable_composition">
+<a class="viewcode-back" href="../../compo.html#calcpy.disable_composition">[docs]</a>
+<span class="k">def</span> <span class="nf">disable_composition</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disable ``args`` composition and ``kwargs`` composition.</span>
+
+<span class="sd">    Alias of ``set_composition_mode(args=False, kwargs=False)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_composition_mode</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="enable_composition">
+<a class="viewcode-back" href="../../compo.html#calcpy.enable_composition">[docs]</a>
+<span class="k">def</span> <span class="nf">enable_composition</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enable args composition and kwargs composition.</span>
+
+<span class="sd">    Alias of ``set_composition_mode(args=True, kwargs=True)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_composition_mode</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="disable_args_composition">
+<a class="viewcode-back" href="../../compo.html#calcpy.disable_args_composition">[docs]</a>
+<span class="k">def</span> <span class="nf">disable_args_composition</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disable ``args`` composition.</span>
+
+<span class="sd">    Alias of ``set_composition_mode(args=False)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_composition_mode</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="enable_args_composition">
+<a class="viewcode-back" href="../../compo.html#calcpy.enable_args_composition">[docs]</a>
+<span class="k">def</span> <span class="nf">enable_args_composition</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enable ``args`` composition.</span>
+
+<span class="sd">    Alias of ``set_composition_mode(args=True)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_composition_mode</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="disable_kwargs_composition">
+<a class="viewcode-back" href="../../compo.html#calcpy.disable_kwargs_composition">[docs]</a>
+<span class="k">def</span> <span class="nf">disable_kwargs_composition</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disable ``kwargs`` composition.</span>
+
+<span class="sd">    Alias of ``set_composition_mode(kwargs=False)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_composition_mode</span><span class="p">(</span><span class="n">kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="enable_kwargs_composition">
+<a class="viewcode-back" href="../../compo.html#calcpy.enable_kwargs_composition">[docs]</a>
+<span class="k">def</span> <span class="nf">enable_kwargs_composition</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enable ``kwargs`` composition.</span>
+
+<span class="sd">    Alias of ``set_composition_mode(kwargs=True)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_composition_mode</span><span class="p">(</span><span class="n">kwargs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="disable_force_callable">
+<a class="viewcode-back" href="../../compo.html#calcpy.disable_force_callable">[docs]</a>
+<span class="k">def</span> <span class="nf">disable_force_callable</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disable force callable.</span>
+
+<span class="sd">    Alias of ``set_composition_mode(force_callable=False)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_composition_mode</span><span class="p">(</span><span class="n">force_callable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="enable_force_callable">
+<a class="viewcode-back" href="../../compo.html#calcpy.enable_force_callable">[docs]</a>
+<span class="k">def</span> <span class="nf">enable_force_callable</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enable force callable.</span>
+
+<span class="sd">    Alias of ``set_composition_mode(force_callable=True)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_composition_mode</span><span class="p">(</span><span class="n">force_callable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="args_composition_enabled">
+<a class="viewcode-back" href="../../compo.html#calcpy.args_composition_enabled">[docs]</a>
+<span class="k">def</span> <span class="nf">args_composition_enabled</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` when ``args`` composition is enabled.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="kwargs_composition_enabled">
+<a class="viewcode-back" href="../../compo.html#calcpy.kwargs_composition_enabled">[docs]</a>
+<span class="k">def</span> <span class="nf">kwargs_composition_enabled</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` when ``kwargs`` composition is enabled.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">force_callable_enabled</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` when force callable is enabled.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;force_callable&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="composition_enabled">
+<a class="viewcode-back" href="../../compo.html#calcpy.composition_enabled">[docs]</a>
+<span class="k">def</span> <span class="nf">composition_enabled</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` when ``args`` composition or ``kwargs`` composition or force callable is enabled.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;force_callable&quot;</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="composition_mode_context">
+<a class="viewcode-back" href="../../compo.html#calcpy.composition_mode_context">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">composition_mode_context</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_callable</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager to temporarily set composite mode in a ``with`` statement.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        args (bool): whether to enable composition for positional arguments</span>
+<span class="sd">        kwargs (bool): whether to enable composition for keyword arguments</span>
+<span class="sd">        force_callable (bool): whether to force return results to be callable</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; force_callable_enabled()</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; with composition_mode_context(args=False, kwargs=False, force_callable=True):</span>
+<span class="sd">        ...     force_callable_enabled()</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; force_callable_enabled()</span>
+<span class="sd">        False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">saved_modes</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">_modes</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="k">if</span> <span class="n">force_callable</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_modes</span><span class="p">[</span><span class="s2">&quot;force_callable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">force_callable</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">,</span> <span class="s2">&quot;kwargs&quot;</span><span class="p">,</span> <span class="s2">&quot;force_callable&quot;</span><span class="p">]:</span>
+            <span class="n">_modes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">saved_modes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">callable_arguments</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether the argument will lead to a callable result.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        *args: values or callable objects.</span>
+<span class="sd">        **kwargs: keyword arguments, either values or callable objects.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; callable_arguments(1, 2, 3)</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; enable_composition()</span>
+<span class="sd">        &gt;&gt;&gt; callable_arguments(sum)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; disable_composition()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">force_callable_enabled</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">args_composition_enabled</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">kwargs_composition_enabled</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwarg</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">kwarg</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">composite_callable</span><span class="p">(</span><span class="n">how</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine multiple callables into a single callable, using a combining function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        how : Callable object that combines multiple results.</span>
+<span class="sd">        *args : Callable objects or values.</span>
+<span class="sd">        **kwargs : Keyword arguments to pass to the callables.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A callable object.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from calcpy import itemgetter</span>
+<span class="sd">        &gt;&gt;&gt; enable_composition()</span>
+<span class="sd">        &gt;&gt;&gt; composite_callable(max, itemgetter(1), 7, itemgetter(2, default=3))([3, 4, 5])</span>
+<span class="sd">        7</span>
+<span class="sd">        &gt;&gt;&gt; composite_callable(min, itemgetter(1), 7, itemgetter(2, default=3))([3, 4, 5])</span>
+<span class="sd">        4</span>
+<span class="sd">        &gt;&gt;&gt; composite_callable(max, 3, 4, 5)()</span>
+<span class="sd">        5</span>
+<span class="sd">        &gt;&gt;&gt; disable_composition()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="o">*</span><span class="n">args_</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_</span><span class="p">):</span>
+        <span class="n">_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args_composition_enabled</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+                <span class="n">_arg</span> <span class="o">=</span> <span class="n">arg</span><span class="p">(</span><span class="o">*</span><span class="n">args_</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_arg</span> <span class="o">=</span> <span class="n">arg</span>
+            <span class="n">_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_arg</span><span class="p">)</span>
+        <span class="n">_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwarg</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">kwargs_composition_enabled</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">kwarg</span><span class="p">):</span>
+                <span class="n">_kwarg</span> <span class="o">=</span> <span class="n">kwarg</span><span class="p">(</span><span class="o">*</span><span class="n">args_</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_kwarg</span> <span class="o">=</span> <span class="n">kwarg</span>
+            <span class="n">_kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_kwarg</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">how</span><span class="p">(</span><span class="o">*</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">f</span>
+
+
+<span class="k">def</span> <span class="nf">composite</span><span class="p">(</span><span class="n">how</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine multiple callables into a single callable, using a combining function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        how : Callable object that combines multiple results.</span>
+<span class="sd">        *args : Callable objects or values.</span>
+<span class="sd">        **kwargs : Keyword arguments to pass to the callables.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from calcpy import itemgetter</span>
+<span class="sd">        &gt;&gt;&gt; enable_composition()</span>
+<span class="sd">        &gt;&gt;&gt; composite(max, itemgetter(1), 7, itemgetter(2, default=3))([3, 4, 5])</span>
+<span class="sd">        7</span>
+<span class="sd">        &gt;&gt;&gt; composite(min, itemgetter(1), 7, itemgetter(2, default=3))([3, 4, 5])</span>
+<span class="sd">        4</span>
+<span class="sd">        &gt;&gt;&gt; composite(max, 3, 4, 5)</span>
+<span class="sd">        5</span>
+<span class="sd">        &gt;&gt;&gt; disable_composition()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">callable_arguments</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">composite_callable</span><span class="p">(</span><span class="n">how</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">how</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="componentize">
+<a class="viewcode-back" href="../../compo.html#calcpy.componentize">[docs]</a>
+<span class="k">def</span> <span class="nf">componentize</span><span class="p">(</span><span class="n">how</span><span class="p">,</span> <span class="o">/</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorate a callable function so that it becomes a building block of function composition.</span>
+
+<span class="sd">    Need to enable composition mode before using this function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        how : Callable object that combines multiple results.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from calcpy import itemgetter</span>
+<span class="sd">        &gt;&gt;&gt; enable_composition()</span>
+<span class="sd">        &gt;&gt;&gt; max_ = componentize(max)</span>
+<span class="sd">        &gt;&gt;&gt; max_(itemgetter(1), 7, itemgetter(2, default=3))([3, 4, 5])</span>
+<span class="sd">        7</span>
+<span class="sd">        &gt;&gt;&gt; min_ = componentize(min)</span>
+<span class="sd">        &gt;&gt;&gt; min_(itemgetter(1), 7, itemgetter(2, default=3))([3, 4, 5])</span>
+<span class="sd">        4</span>
+<span class="sd">        &gt;&gt;&gt; min_(3, 4, 5)</span>
+<span class="sd">        3</span>
+<span class="sd">        &gt;&gt;&gt; disable_composition()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">composition_enabled</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">how</span>  <span class="c1"># avoid mess up function signature and docstring</span>
+    <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">composite</span><span class="p">,</span> <span class="n">how</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">getcomponent</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">component</span> <span class="o">=</span> <span class="n">componentize</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">component</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy._compo</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

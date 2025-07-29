@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>calcpy.pd &#8212; calcpy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=0f882399" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy.pd</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calcpy.pd</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Extensions to pandas.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">inf</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas.core.generic</span> <span class="kn">import</span> <span class="n">NDFrame</span>
+
+<span class="kn">from</span> <span class="nn">._collect</span> <span class="kn">import</span> <span class="n">convert_nested_dict_to_nested_list</span>
+
+
+<span class="k">def</span> <span class="nf">_extend_index</span><span class="p">(</span><span class="n">old_index</span><span class="p">,</span> <span class="n">new_index</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;extend&quot;</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">._set</span> <span class="kn">import</span> <span class="n">union</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;extend&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">union</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">old_index</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_index</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;prioritize&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">union</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">new_index</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">old_index</span><span class="p">))</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mode must be &#39;extend&#39; or &#39;prioritize&#39;&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_extend</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;extend&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">]:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="k">elif</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;columns&quot;</span><span class="p">]:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;axis must be 0 or 1&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_extend_index</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_extend_index</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<div class="viewcode-block" id="extend">
+<a class="viewcode-back" href="../../pd.html#calcpy.pd.extend">[docs]</a>
+<span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add index values if the index values are not present.</span>
+
+<span class="sd">    This API is simliar to ``pd.DataFrame.reindex()``.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        frame (pd.Series | pd.DataFrame): Input data.</span>
+<span class="sd">        labels (list | tuple, optional): New labels / index to conform the axis specified by.</span>
+<span class="sd">        index (list | tuple, optional): index names.</span>
+<span class="sd">        columns (list | tuple, optional): column names.</span>
+<span class="sd">            only work for DataFrame.</span>
+<span class="sd">        axis (int | str, optional): axis to extend.</span>
+<span class="sd">            0: index, 1: columns.</span>
+<span class="sd">            only work for DataFrame.</span>
+<span class="sd">        kwargs: keyword arguments to be passed to ``pd.DataFrame.reindex()``,</span>
+<span class="sd">            including ``copy``, ``level``, ``fill_value``, ``limit``, and ``tolerance``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.Series | pd.DataFrame:</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; s = pd.Series(1, index=[0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; extend(s, index=[1, 2])</span>
+<span class="sd">        0    1.0</span>
+<span class="sd">        1    1.0</span>
+<span class="sd">        2    NaN</span>
+<span class="sd">        dtype: float64</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({&quot;A&quot;: 1, &quot;B&quot;: 2}, index=[0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; extend(df, index=[1, 2], columns=[&quot;A&quot;, &quot;C&quot;])</span>
+<span class="sd">              A    B    C</span>
+<span class="sd">        0   1.0  2.0  NaN</span>
+<span class="sd">        1   1.0  2.0  NaN</span>
+<span class="sd">        2   NaN  NaN  NaN</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">_extend</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;extend&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="prioritize">
+<a class="viewcode-back" href="../../pd.html#calcpy.pd.prioritize">[docs]</a>
+<span class="k">def</span> <span class="nf">prioritize</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Put some index values at the begining of the index.</span>
+
+<span class="sd">    If the index is already in the index, the index will be moved to the begining.</span>
+<span class="sd">    If the index is not in the index, the index will be added to the index.</span>
+
+<span class="sd">    This API is simliar to ``pd.Series.reindex()`` and ``pd.DataFrame.reindex()``.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        frame (pd.Series | pd.DataFrame): Input data.</span>
+<span class="sd">        labels (list | tuple, optional): New labels / index to conform the axis specified by</span>
+<span class="sd">        index (list | tuple, optional): index names</span>
+<span class="sd">        columns (list | tuple, optional): column names.</span>
+<span class="sd">            only work for DataFrame.</span>
+<span class="sd">        axis (int | str, optional): axis to extend.</span>
+<span class="sd">            0: index, 1: columns.</span>
+<span class="sd">            only work for DataFrame.</span>
+<span class="sd">        kwargs: keyword arguments to be passed to ``pd.DataFrame.reindex()``,</span>
+<span class="sd">            including ``copy``, ``level``, ``fill_value``, ``limit``, and ``tolerance``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.Series | pd.DataFrame:</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; s = pd.Series(1, index=[0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; prioritize(s, index=[1, 2])</span>
+<span class="sd">        1    1.0</span>
+<span class="sd">        2    NaN</span>
+<span class="sd">        0    1.0</span>
+<span class="sd">        dtype: float64</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({&quot;A&quot;: 1, &quot;B&quot;: 2}, index=[0, 1])</span>
+<span class="sd">        &gt;&gt;&gt; prioritize(df, index=[1, 2], columns=[&quot;A&quot;, &quot;C&quot;])</span>
+<span class="sd">             A   C    B</span>
+<span class="sd">        1  1.0 NaN  2.0</span>
+<span class="sd">        2  NaN NaN  NaN</span>
+<span class="sd">        0  1.0 NaN  2.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">_extend</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;prioritize&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="stack">
+<a class="viewcode-back" href="../../pd.html#calcpy.pd.stack">[docs]</a>
+<span class="k">def</span> <span class="nf">stack</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stack a ``pd.Series`` or ``pd.DataFrame`` with ``future_stack`` behavior.</span>
+
+<span class="sd">    Stack and silence the ``FutureWarning`` &quot;The prevoius implementation of stack is deprecated&quot;.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        frame (pd.DataFrame):</span>
+<span class="sd">        **kwargs: Keyword arguments to be passed to ``pd.DataFrame.stack()``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.Series | pd.DataFrame:</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({&quot;A&quot;: 1, &quot;B&quot;: 2}, index=[0])</span>
+<span class="sd">        &gt;&gt;&gt; stack(df)</span>
+<span class="sd">        0 A  1</span>
+<span class="sd">          B  2</span>
+<span class="sd">        dtype: int64</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dropna</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;dropna&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">future_stack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">dropna</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dropna</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="convert_nested_dict_to_dataframe">
+<a class="viewcode-back" href="../../pd.html#calcpy.pd.convert_nested_dict_to_dataframe">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_nested_dict_to_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">index_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a nested dictionary to a ``pd.DataFrame``.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        data (dict): Nested dict.</span>
+<span class="sd">        index_cols (int | str | (list | tuple)[str], optional): Index names.</span>
+<span class="sd">        columns (int | (list | tuple)[str]], optional): Column names.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame:</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; data = {&quot;A&quot;: {&quot;H&quot;: 1, &quot;J&quot;: 2}, &quot;E&quot;: {&quot;D&quot;: 3, &quot;T&quot;: 4}}</span>
+<span class="sd">        &gt;&gt;&gt; convert_nested_dict_to_dataframe(data)</span>
+<span class="sd">           0  1  2</span>
+<span class="sd">        0  A  H  1</span>
+<span class="sd">        1  A  J  2</span>
+<span class="sd">        2  E  D  3</span>
+<span class="sd">        3  E  T  4</span>
+<span class="sd">        &gt;&gt;&gt; convert_nested_dict_to_dataframe(data, index_cols=[&quot;v&quot;, &quot;c&quot;], columns=[&quot;x&quot;])</span>
+<span class="sd">             x</span>
+<span class="sd">        v c</span>
+<span class="sd">        A H  1</span>
+<span class="sd">          J  2</span>
+<span class="sd">        E D  3</span>
+<span class="sd">          T  4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">index_cols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">index_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">index_cols</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index_cols</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">index_count</span> <span class="o">=</span> <span class="n">index_cols</span>
+        <span class="n">index_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">index_cols</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index_cols</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">index_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">index_cols</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">index_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">column_count</span> <span class="o">=</span> <span class="n">inf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">column_count</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">column_count</span> <span class="o">=</span> <span class="n">columns</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">column_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+    <span class="n">maxdepth</span> <span class="o">=</span> <span class="n">index_count</span> <span class="o">+</span> <span class="n">column_count</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">lst</span> <span class="o">=</span> <span class="n">convert_nested_dict_to_nested_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="n">maxdepth</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">index_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">index_count</span><span class="p">)))</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">index_cols</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="convert_series_to_nested_dict">
+<a class="viewcode-back" href="../../pd.html#calcpy.pd.convert_series_to_nested_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_series_to_nested_dict</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="o">/</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a ``pd.Series`` to a nested dictionary.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        series (pd.Series):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict:</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; s = pd.DataFrame({&quot;A&quot;: 1, &quot;B&quot;: [2, 3], &quot;C&quot;: [4, 5]}).set_index([&quot;A&quot;, &quot;B&quot;])[&quot;C&quot;]</span>
+<span class="sd">        &gt;&gt;&gt; convert_series_to_nested_dict(s)</span>
+<span class="sd">        {1: {2: 4, 3: 5}}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">NDFrame</span><span class="p">):</span>  <span class="c1"># recursive end, in this case the input is not series</span>
+        <span class="k">return</span> <span class="n">series</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">arg0</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_series_to_nested_dict</span><span class="p">(</span><span class="n">arg0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">calcpy  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">calcpy.pd</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>
