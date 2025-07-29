@@ -1,0 +1,141 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reweighing &mdash; Orange3 Fairness  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1a78d301" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adversarial Debiasing" href="adversarial-debiasing.html" />
+    <link rel="prev" title="Dataset Bias" href="dataset-bias.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Orange3 Fairness
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="as-fairness-data.html">As Fairness Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset-bias.html">Dataset Bias</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reweighing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="adversarial-debiasing.html">Adversarial Debiasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="equalized-odds-postprocessing.html">Equalized Odds Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="weighted-logistic-regression.html">Weighted Logistic Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="combine-preprocessors.html">Combine Preprocessors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Orange3 Fairness</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Reweighing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/widgets/reweighing.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="reweighing">
+<h1>Reweighing<a class="headerlink" href="#reweighing" title="Link to this heading"></a></h1>
+<p>Applies the reweighing algorithm to the dataset.</p>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>Data: reference dataset</p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>Preprocessed Data: reference dataset with a meta-attribute <code class="docutils literal notranslate"><span class="pre">weights</span></code> added to it.</p></li>
+<li><p>Preprocessor: a preprocessor trained on the reference dataset.</p></li>
+</ul>
+<p><strong>Reweighing</strong> is a widget that mitigates bias in a dataset by assigning weights to individual instances in a way that encourages the model to prioritize learning from underrepresented groups while de-emphasizing overrepresented groups. This widget can be used in two ways:</p>
+<ul class="simple">
+<li><p>When the user provides the data as an input this widget will apply the reweighing algorithm to the dataset and output the preprocessed dataset with the meta-attribute <code class="docutils literal notranslate"><span class="pre">weights</span></code> added to it. The user can then use the preprocessed dataset as an input to other widgets. It will also output a preprocessor that can be used to apply the same transformation to a subset of the dataset.</p></li>
+<li><p>This widget can also be provided as an input to a learner widget. In this case the widget will be applied to any of the training datasets that are provided as an input to the learner widget.</p></li>
+</ul>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>The first example shows how the <strong>Reweighing</strong> widget can be used to preprocess a dataset. First load a fairness dataset, in this case we will use the compas analysis dataset. We than split the dataset into a training and testing set using the <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Sampler</span></code> widget. We connect the training set to the <strong>Reweighing</strong> widget which will train the algorithm and create a preprocessor. The preprocessor can be connected to the <code class="docutils literal notranslate"><span class="pre">Apply</span> <span class="pre">Domain</span></code> widget along with the testing set to apply the same transformation to the testing set. The preprocessed testing set can then be connected to the <code class="docutils literal notranslate"><span class="pre">Dataset</span> <span class="pre">Bias</span></code> widget to evaluate the bias of the dataset.</p>
+<p><img alt="../_images/reweighing-dataset-example.png" src="../_images/reweighing-dataset-example.png" /></p>
+<p>The second example demonstrates how to use the <strong>Reweighing</strong> widget as a preprocessor for a learner widget. We use it by connecting it and any other preprocessors we want to use into the <code class="docutils literal notranslate"><span class="pre">Combine</span> <span class="pre">Preprocessors</span></code> widget which we connect into the <code class="docutils literal notranslate"><span class="pre">Weighted</span> <span class="pre">Logistic</span> <span class="pre">Regression</span></code> widget. We then connect a dataset with fairness attributes and the learner into the <code class="docutils literal notranslate"><span class="pre">Test</span> <span class="pre">&amp;</span> <span class="pre">Score</span></code> widget to evaluate the performance of the learner. In the evaluation results we can see the performance of the learner as well as the fairness metrics for its predictions.</p>
+<p><img alt="../_images/reweighing-preprocessor-example.png" src="../_images/reweighing-preprocessor-example.png" /></p>
+<p>Note, in this example we used the <a class="reference internal" href="weighted-logistic-regression.html"><span class="doc">Weighted Logistic Regression</span></a> and the <a class="reference internal" href="combine-preprocessors.html"><span class="doc">Combine preprocessors</span></a> widgets which are described in their respective sections.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dataset-bias.html" class="btn btn-neutral float-left" title="Dataset Bias" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="adversarial-debiasing.html" class="btn btn-neutral float-right" title="Adversarial Debiasing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Laboratory of Bioinformatics, Faculty of Computer Science, University of Ljubljana.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
