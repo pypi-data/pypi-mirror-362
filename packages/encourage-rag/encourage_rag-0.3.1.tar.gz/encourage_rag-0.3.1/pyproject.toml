@@ -1,0 +1,119 @@
+[project]
+
+description = "ENCOURAGE"
+name = "encourage-rag"
+version = "0.3.1"
+readme = "README.md"
+requires-python = ">= 3.12"
+authors = [{ name = "dida Datenschmiede GmbH", email = "info@dida.do" }]
+dependencies = [
+    "jinja2",
+    "PyYAML",
+    "httpx>=0.26.0",
+    "httpcore>=0.15.0",
+    "tomlkit>=0.13.0",
+    "llama-index-vector-stores-qdrant",
+    "llama-index-vector-stores-chroma>=0.4.1",
+    "typer>=0.12.4",
+    "types-PyYAML",
+    "types-requests",
+    "tqdm==4.66.4",
+    "pre-commit",
+    "qdrant-client",
+    "uv==0.4.28",
+    "vllm>=0.8.4",
+    "pydantic>=2.9.2",
+    "sentence-transformers>=3.2.1",
+    "fastembed>=0.4.1",
+    "tornado>=6.4.1",
+    "evaluate>=0.4.3",
+    "ir-measures>=0.3.4",
+    "sacrebleu>=2.4.3",
+    "bert-score>=0.3.13",
+    "absl-py>=2.1.0",
+    "rouge-score>=0.1.2",
+    "nltk>=3.9.1",
+    "mlflow>=2.18.0",
+    "chromadb>=1.0.10",
+    "litellm>=1.53.3",
+    "outlines>=0.1.11",
+    "accelerate",
+    "datasets>=3.5.0",
+    "rank-bm25>=0.2.2",
+    "smolagents>=1.14.0",
+    "opentelemetry-exporter-otlp-proto-grpc==1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "jupyterlab>=4.0",
+    "jupytext>=1.16.3",
+    "notebook>=7.4.2",
+    "matplotlib>=3.9.1",
+    "ipywidgets>=8.1.5",
+]
+ci = [
+    "ruff",
+    "isort",
+    "pytest",
+    "jsondiff",
+    "pytest-cov>=5.0.0",
+    "pytest-mock",
+    "faker",
+]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["encourage*"]
+
+
+[tool.pytest.ini_options]
+norecursedirs = ["docs", "*.egg-info", ".git", ".tox"]
+testpaths = "src/tests"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::RuntimeWarning",
+    "ignore:.*PyType_Spec with a metaclass that has custom tp_new.*:DeprecationWarning",
+    "ignore:.*Support for class-based `config` is deprecated.*:DeprecationWarning",
+    "ignore:.*Mean of empty slice.*:RuntimeWarning",
+    "ignore:.*invalid value encountered in scalar divide.*:RuntimeWarning",
+]
+addopts = "-v -ra --cov=encourage"
+pythonpath = ["."]
+
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+line-length = 100
+lint.select = ["E", "F", "W", "I", "D", "A", "N", "B", "SIM", "C4", "TID"]
+lint.ignore = [
+    "E741", # Ambiguous variable name
+    "D213", # Multi-line docstring summary should start at the second line
+    "D105", # Missing docstring in magic method
+    "D107", # Missing docstring in __init__
+    "D203", # 1 blank line required before class docstring
+    "D401", # First line should be in imperative mood; try rephrasing
+    "D407", # Missing dashed underline after section
+    "D406", # Section name should end with a newline
+    "D106", # Missing docstring in public nested class
+    "B006", # Do not use mutable data structures for argument defaults
+    "B008", # Do not perform function calls in argument defaults
+    "B905", # `zip()` without an explicit `strict=` parameter
+]
+
+[tool.ruff.format]
+exclude = ["*.ipynb"]
+
+[tool.ruff.lint.per-file-ignores]
+"test_*.py" = ["D", "E402"]
+"__init__.py" = ["D"]
+
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
