@@ -1,0 +1,43 @@
+Metadata-Version: 2.4
+Name: cryptopkg
+Version: 0.1.0
+Summary: A universal package for symmetric encryption (AES-GCM) and hashing (SHA256).
+Author-email: Grigor Khachatryan <grigor777001@yandex.ru>
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: pycryptodome>=3.19.0
+
+# cryptopkg
+
+Универсальный пакет для симметричного шифрования (AES-GCM) и хеширования (SHA256).
+
+## Установка зависимостей
+
+```
+pip install pycryptodome
+```
+
+## Использование
+
+```python
+from cryptopkg import CryptoLogic
+
+key = b'some_32_byte_key________________'  # 32 байта для AES-256
+crypto = CryptoLogic(key)
+
+# Шифрование
+enc = crypto.encrypt('секретное сообщение')
+print(enc)
+
+# Дешифрование
+plain = crypto.decrypt(enc)
+print(plain)
+
+# Хеширование
+h = CryptoLogic.generate_hash('some data')
+print(h)
+```
+
+## Важно
+- Ключ должен быть 16, 24 или 32 байта (AES-128/192/256).
+- Не храните ключи в коде, используйте переменные окружения.
