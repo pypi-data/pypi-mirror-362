@@ -1,0 +1,130 @@
+{% set raw_services = [] %}
+{% if use_redis %}{% set raw_services = raw_services + ['RedisService()'] %}{% endif %}
+{% if use_db %}{% set raw_services = raw_services + ['DBService()'] %}{% endif %}
+{% if use_scheduler %}{% set raw_services = raw_services + ['SchedulerService()'] %}{% endif %}
+{%- if raw_services | length == 1 %}
+{% set ctx_create %}
+ctx = Context({{ raw_services[0] }})
+{% endset %}
+{%- elif raw_services %}
+{% set ctx_create %}
+ctx = Context(
+    {{ raw_services | join(',\n    ') }}
+)
+{% endset %}
+{%- else %}
+{% set ctx_create %}
+ctx = Context()
+{% endset %}
+{%- endif %}
+{% set ctx_shared %}
+{{ ctx_create }}
+properties = DefaultBotProperties(parse_mode=SULGUK_PARSE_MODE)
+{% if storage_type == "redis" %}
+storage = RedisStorage(redis=ctx.redis, key_builder=DefaultKeyBuilder())
+{% else %}
+storage = MemoryStorage()
+{% endif %}
+
+ctx.bot = Bot(BOT_TOKEN, default=properties)
+ctx.dp = Dispatcher(storage=storage, ctx=ctx)
+{% endset %}
+{%- if use_webhook %}
+from contextlib import asynccontextmanager
+
+import uvicorn
+{% endif %}
+from aiogram import Dispatcher, Bot
+from aiogram.client.default import DefaultBotProperties
+{% if storage_type == "redis" %}
+from aiogram.fsm.storage.base import DefaultKeyBuilder
+{% endif %}
+{% if storage_type == "redis" %}
+from aiogram.fsm.storage.redis import RedisStorage
+{% else %}
+from aiogram.fsm.storage.memory import MemoryStorage
+{% endif %}
+{% if use_webhook %}
+from fastapi import FastAPI
+{% endif %}
+from sulguk import SULGUK_PARSE_MODE
+
+{% if use_webhook %}
+from .app import routes
+{% endif %}
+from .bot import middlewares, handlers, commands
+{% if use_webhook %}
+from .config import APP_HOST, APP_PORT, BOT_TOKEN, WEBHOOK_URL
+{% else %}
+from .config import BOT_TOKEN
+{% endif %}
+from .context import Context
+{% if use_db %}
+from .services.db import DBService
+{% endif %}
+{% if use_redis %}
+from .services.redis import RedisService
+{% endif %}
+{% if use_scheduler %}
+from .services.scheduler import SchedulerService
+{% endif %}
+
+
+async def on_startup(ctx: Context) -> None:
+    for service in ctx.services:
+        await service.start()
+
+    middlewares.register(ctx.dp, ctx.bot)
+    handlers.register(ctx.dp)
+    {% if use_webhook %}
+    routes.add(ctx.app)
+    {% endif %}
+
+    await commands.setup(ctx.bot)
+    {% if use_webhook %}
+    await ctx.bot.set_webhook(WEBHOOK_URL)
+    {% endif %}
+
+
+async def on_shutdown(ctx: Context) -> None:
+    await commands.delete(ctx.bot)
+    {% if use_webhook %}
+    await ctx.bot.delete_webhook()
+    {% endif %}
+    await ctx.bot.session.close()
+
+    for service in reversed(ctx.services):
+        await service.shutdown()
+
+
+{% if use_webhook %}
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+{{ ctx_shared | indent(4, true) }}
+    ctx.app = _app
+    _app.state.ctx = ctx  # type: ignore[attr-defined]
+
+    await on_startup(ctx)
+    try:
+        yield
+    finally:
+        await on_shutdown(ctx)
+{% else %}
+async def main() -> None:
+{{ ctx_shared | indent(4, true) }}
+    ctx.dp.startup.register(on_startup)
+    ctx.dp.shutdown.register(on_shutdown)
+    allowed_updates = ctx.dp.resolve_used_update_types()
+    await ctx.dp.start_polling(ctx.bot, allowed_updates=allowed_updates)
+{% endif %}
+
+
+if __name__ == "__main__":
+    {% if use_webhook %}
+    app = FastAPI(lifespan=lifespan)
+    uvicorn.run(app, host=APP_HOST, port=APP_PORT)
+    {% else %}
+    import asyncio
+
+    asyncio.run(main())
+    {% endif %}

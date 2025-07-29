@@ -1,0 +1,39 @@
+aiogram~=3.21.0
+babel~=2.17.0
+cachetools~=5.5.2
+Jinja2==3.1.6
+sulguk==0.8.0
+environs~=14.2.0
+pydantic>=2.7.0,<3.0.0
+PyYAML~=6.0.2
+
+{% if use_webhook %}
+fastapi~=0.115.0
+uvicorn~=0.35.0
+starlette~=0.46.0
+
+{% endif %}
+{% if use_db %}
+SQLAlchemy~=2.0.0
+alembic~=1.16.4
+{% if db_type == "PostgreSQL" %}
+asyncpg~=0.30.0
+{% elif db_type == "MySQL" %}
+aiomysql~=0.2.0
+{% elif db_type == "SQLite" %}
+aiosqlite~=0.21.0
+{% endif %}
+
+{% endif %}
+{% if use_redis %}
+redis~=6.2.0
+
+{% endif %}
+{% if use_scheduler %}
+APScheduler~=3.11.0
+
+{% endif %}
+{% if use_admin %}
+starlette-admin~=0.15.1
+
+{% endif %}
