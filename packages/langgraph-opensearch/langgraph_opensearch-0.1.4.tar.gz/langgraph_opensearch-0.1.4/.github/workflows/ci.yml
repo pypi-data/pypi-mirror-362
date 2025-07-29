@@ -1,0 +1,70 @@
+name: CI - Secure OpenSearch Manual Startup
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      OSS_HOST: localhost
+      OSS_PORT: 9200
+      OSS_USER: admin
+      OSS_PASS: ${{ secrets.OSS_ADMIN_PASS }}
+      CI: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Start OpenSearch container (secure)
+        run: |
+          docker run -d --name opensearch \
+            -p 9200:9200 \
+            -e "discovery.type=single-node" \
+            -e "OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OSS_PASS}" \
+            -e "bootstrap.memory_lock=true" \
+            -e "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" \
+            opensearchproject/opensearch:2.13.0
+
+      - name: Wait for OpenSearch to be ready
+        run: |
+          echo "Waiting for OpenSearch to be available..."
+          for i in {1..30}; do
+            if curl -k -u admin:"$OSS_PASS" https://localhost:9200 >/dev/null 2>&1; then
+              echo "✅ OpenSearch is up!"
+              break
+            fi
+            echo "⏳ OpenSearch not ready yet... retrying in 5s"
+            sleep 5
+          done
+          echo "⚠️ OpenSearch readiness timeout reached after 30 tries" >&2
+
+
+      - name: Install Hatch and create dev environment
+        run: |
+          pip install --upgrade hatch
+          hatch env create dev
+  
+      - name: Run tests
+        run: |
+          hatch run dev:pytest --maxfail=1 --disable-warnings
+
+      - name: Print OpenSearch logs on failure
+        if: failure()
+        run: docker logs opensearch || true
+
+      - name: Stop OpenSearch container
+        if: always()
+        run: |
+          docker stop opensearch
+          docker rm opensearch
