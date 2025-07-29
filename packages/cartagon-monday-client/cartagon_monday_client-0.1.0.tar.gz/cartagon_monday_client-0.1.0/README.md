@@ -1,0 +1,69 @@
+# monday-client
+
+Cliente Python para la API GraphQL de Monday.com.
+
+## Instalación
+
+```bash
+pip install monday-client
+
+
+
+## Guía rápida de métodos
+
+```python
+from monday_client.client import MondayClient
+
+# Inicialización del cliente
+token = "TU_TOKEN"
+monday = MondayClient(api_key=token)
+
+# 1) Test de conexión
+print(monday.test_connection())  # True si la clave es válida y la API responde
+
+# 2) Listar tableros
+boards = monday.get_boards(limit=5, page=1)
+for b in boards:
+    print(f"{b['id']}: {b['name']}")
+
+# 3) Recuperar todos los ítems de un board (paginación automática)
+items = monday.get_all_items(board_id=123456789, limit=100)
+print(f"Total ítems: {len(items)}")
+
+# 4) Filtrar ítems por valor de columna
+filtered = monday.get_items_by_column_value(
+    board_id=123456789,
+    column_id="status",
+    value="Done",
+    operator="any_of",  # any_of, not_any_of, equals, contains_text, etc.
+    limit=10
+)
+print(filtered)
+
+# 5) Crear un nuevo ítem
+new_item = monday.create_item(
+    board_id=123456789,
+    item_name="Tarea de ejemplo",
+    column_values={"status": {"label": "Stuck"}}
+)
+print("Nuevo ítem:", new_item)
+
+# 6) Actualizar una columna simple
+resp1 = monday.update_simple_column_value(
+    item_id=987654321,
+    board_id=123456789,
+    column_id="text_column",
+    value="Texto actualizado"
+)
+print("Update simple:", resp1)
+
+# 7) Actualizar varias columnas a la vez
+resp2 = monday.update_multiple_column_values(
+    item_id=987654321,
+    board_id=123456789,
+    column_values={
+        "status": {"label": "Done"},
+        "priority": {"label": "High"}
+    }
+)
+print("Update multiple:", resp2)
