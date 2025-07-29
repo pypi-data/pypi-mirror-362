@@ -1,0 +1,38 @@
+[project]
+name = "python-bugger"
+description = "Practice debugging, by intentionally introducing bugs into an existing codebase."
+readme = "README.md"
+version = "0.5.2"
+requires-python = ">=3.9"
+
+dependencies = ["libcst", "click"]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.1.0",
+    "build>=1.2.1",
+    "pytest>=8.3.0",
+    "pytest-xdist>=3.7.0",
+    "twine>=5.1.1",
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+py-bugger = "py_bugger.cli.cli:cli"
+
+[project.urls]
+"Documentation" = "https://py-bugger.readthedocs.io/en/latest/"
+"GitHub" = "https://github.com/ehmatthes/py-bugger"
+"Changelog" = "https://github.com/ehmatthes/py-bugger/blob/main/CHANGELOG.md"
+
+[tool.black]
+# Sample code for tests sometimes require nonstandard formatting.
+extend-exclude = "tests/sample_code"
