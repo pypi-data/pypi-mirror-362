@@ -1,0 +1,49 @@
+{% set pyproject = load_file_data(
+  '../pyproject.toml',
+  'toml',
+  from_recipe_dir=True) %}
+{% set project = pyproject.get('project') %}
+{% set urls = project.get('urls') %}
+{% set name = project.get('name') %}
+{% set version_match = load_file_regex(
+  load_file="../src/sparkpolars/_version.py",
+    from_recipe_dir=True,
+    regex_pattern="__version__ = version = '(.+)'") %}
+{% set version = version_match[1] %}
+{% set build_number = 0 %}
+
+package:
+  name: {{ name }}
+  version: "{{ version }}"
+
+source:
+  path : ../
+
+build:
+  number: {{ build_number }}
+  noarch: python
+  script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
+
+requirements:
+  host:
+    - pip
+    - "python >=3.10"
+    - "setuptools >=64"
+    - setuptools_scm
+    - wheel
+  run:
+    - "python >=3.10"
+    - "pyspark >=3.3.0"
+    - "polars >=1.0"
+
+about:
+  home: "{{ urls.get('Homepage') }}"
+  license: MIT
+  license_family: MIT
+  summary: "{{ project.get('description') }}"
+  dev_url: "{{ urls.get('Source') }}"
+
+extra:
+  recipe-maintainers:
+    - skanderboudawara
+
