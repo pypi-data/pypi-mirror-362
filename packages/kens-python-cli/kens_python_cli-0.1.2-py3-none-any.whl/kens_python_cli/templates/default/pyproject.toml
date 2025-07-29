@@ -1,0 +1,139 @@
+[project]
+name = "{{ project_name }}"
+version = "0.1.0"
+description = "{{ project_description }}"
+{% if author_name %}authors = [
+    {name = "{{ author_name }}"{% if author_email %}, email = "{{ author_email }}"{% endif %}}
+]{% endif %}
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">={{ python_version }}"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: {{ python_version }}",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: System Shells",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.0.0",
+    "pydantic>=2.5.0",
+    "platformdirs>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    {% if include_tests %}"pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",{% endif %}
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    {% if include_pre_commit %}"pre-commit>=3.0.0",{% endif %}
+]
+
+[project.scripts]
+{{ project_name.replace('-', '_') }} = "{{ package_name }}.main:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/{{ package_name }}/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    {% if include_tests %}"/tests",{% endif %}
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{ package_name }}"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py{{ python_version.replace('.', '') }}"
+src = ["src"{% if include_tests %}, "tests"{% endif %}]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C90", # mccabe complexity
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "S",   # flake8-bandit
+    "A",   # flake8-builtins
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "S101", # Use of assert
+    "S603", # subprocess untrusted input
+    "S607", # Starting a process with a partial executable path
+]
+
+{% if include_tests %}[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+{% endif %}
+
+[tool.mypy]
+python_version = "{{ python_version }}"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+{% if include_tests %}[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+{% endif %}
+
+{% if include_tests %}[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov={{ package_name }}",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=80",
+    "-v",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+{% endif %}
