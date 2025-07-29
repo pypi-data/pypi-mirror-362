@@ -1,0 +1,48 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  test-pipelines:
+    name: Test Pipeline - ${{ matrix.assay }}
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        assay: ["atac", "chip-rx", "chip", "rna-rx", "rna", "snp", 'cat', 'meth', 'mcc']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Setup Conda environment and install SeqNado
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: testing.yml
+          miniforge-version: latest
+          use-mamba: true
+
+      - name: Install SeqNado package
+        shell: bash -el {0}
+        run: |
+          pip install .
+          
+          # Verify installation
+          python -c "import seqnado; print(f'SeqNado installed at: {seqnado.__file__}')"
+          which seqnado-init
+          python -c "import pytest; print(f'pytest version: {pytest.__version__}')"
+
+      - name: Setup Apptainer runtime
+        uses: eWaterCycle/setup-apptainer@v2
+        with:
+          apptainer-version: 1.3.4
+
+      - name: Run SeqNado pipeline test for ${{ matrix.assay }}
+        shell: bash -el {0}
+        env:
+          TMPDIR: /tmp
+          SEQNADO_CONFIG: "${{ github.workspace }}/tests/genome_config.json"
+        run: |
+          python -m pytest tests/test_pipelines.py::test_pipeline[${{ matrix.assay }}] -vv -s --cores 4
