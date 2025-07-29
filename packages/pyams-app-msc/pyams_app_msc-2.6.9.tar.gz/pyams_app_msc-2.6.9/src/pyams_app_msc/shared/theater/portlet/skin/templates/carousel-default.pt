@@ -1,0 +1,73 @@
+<div tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 slot_config view.slot_configuration;
+				 carousel_id tales:cache_key(settings);"
+	 i18n:domain="pyams_app_msc">
+	<div class="row">
+		<div class="col-6">
+			<h3 class="mb-3">${i18n:settings.title}</h3>
+		</div>
+		<div class="col-6 text-right">
+			<tal:if condition="renderer_settings.display_controls">
+				<a class="btn btn-sm btn-primary mb-3 mr-1" role="button"
+				   href="#carousel_${carousel_id}"
+				   data-slide="prev">
+					<i class="fa fa-fw fa-arrow-left align-text-bottom"></i>
+				</a>
+				<a class="btn btn-sm btn-primary mb-3" role="button"
+				   href="#carousel_${carousel_id}"
+				   data-slide="next">
+					<i class="fa fa-fw fa-arrow-right align-text-bottom"></i>
+				</a>
+			</tal:if>
+		</div>
+		<div class="col-12">
+			<div id="carousel_${carousel_id}"
+			     class="${renderer_settings.css_class} slide ${'carousel-fade' if renderer_settings.fade_effect else ''}"
+			     data-ride="${'carousel' if renderer_settings.automatic_slide else 'false'}"
+			     data-interval="${'false' if not renderer_settings.automatic_slide else None}"
+			     data-touch="${'false' if not renderer_settings.enable_touch else None}">
+				<div class="carousel-inner">
+					<tal:loop repeat="group tales:grouped_iter(settings.theaters, 3)">
+						<div class="carousel-item ${'active' if repeat['group'].start() else ''}">
+							<div class="row">
+								<tal:loop repeat="theater group">
+									<div tal:condition="theater is not None"
+										 class="${renderer_settings.cards_css_class}">
+										<a class="card"
+										   href="${tales:absolute_url(theater)}"
+										   tal:define="illustration tales:pyams_navigation_illustration(theater)"
+										   tal:condition="illustration">
+											<tal:if define="image i18n:illustration.data;
+															alt_title i18n:illustration.alt_title;"
+													condition="image">
+												${structure:tales:picture(image,
+																		  xs_thumb=renderer_settings.thumb_selection,
+																		  xs_width=slot_config.xs_width,
+																		  sm_thumb=renderer_settings.thumb_selection,
+																		  sm_width=slot_config.sm_width,
+																		  md_thumb=renderer_settings.thumb_selection,
+																		  md_width=slot_config.md_width,
+																		  lg_thumb=renderer_settings.thumb_selection,
+																		  lg_width=slot_config.lg_width,
+																		  xl_thumb=renderer_settings.thumb_selection,
+																		  xl_width=slot_config.xl_width,
+																		  css_class='img-fluid w-100')}
+											</tal:if>
+											<div class="card-body">
+												<h4 class="card-title">
+													${i18n:theater.title}
+												</h4>
+												<p class="card-text">${view.get_location(theater)}</p>
+											</div>
+										</a>
+									</div>
+								</tal:loop>
+							</div>
+						</div>
+					</tal:loop>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

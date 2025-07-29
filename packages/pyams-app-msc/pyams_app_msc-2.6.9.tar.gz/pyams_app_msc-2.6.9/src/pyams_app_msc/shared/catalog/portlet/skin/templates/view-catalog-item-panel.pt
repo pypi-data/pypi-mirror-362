@@ -1,0 +1,90 @@
+<tal:var define="settings view.view.settings;
+				 renderer_settings view.view.renderer_settings;
+				 audience request.params.get('audience');
+				 params {'audience': audience};
+				 target_url view.view.get_url(context, query=params);
+				 identity request.identity or {};
+				 authenticated 'system.Authenticated' in identity.get('principals', ());"
+		 i18n:domain="pyams_app_msc">
+	<div class="position-relative"
+		 tal:define="illustration tales:pyams_navigation_illustration(context);"
+		 tal:condition="illustration">
+		<a href="${target_url}">
+			${structure:tales:pyams_card_datatype(context)}
+			<tal:if define="image i18n:illustration.data;
+	                        alt_title i18n:illustration.alt_title;
+	                        selections renderer_settings.thumb_selection;"
+	                condition="image">
+				${structure:tales:picture(image,
+										  selections=selections,
+										  alt=alt_title,
+										  css_class='w-100')}
+			</tal:if>
+		</a>
+	</div>
+	<div>
+		<a href="${target_url}">
+			<h4 class="mt-2">${view.title}</h4>
+		</a>
+		<a href="${target_url}"
+		   tal:define="header view.header"
+		   tal:condition="header">
+			<div class="header text-body">
+				${structure:header}
+			</div>
+		</a>
+	</div>
+	<tal:if condition="renderer_settings.display_sessions">
+		<div class="d-flex flex-column"
+			 tal:define="iter_sessions view.view.get_sessions(context);
+						 (has_sessions, sessions) tales:boolean_iter(iter_sessions);">
+			<tal:if condition="has_sessions">
+				<a class="btn btn-sm w-100 text-left" role="button"
+				   href="#"
+				   data-toggle="popover"
+				   data-target="sessions_${tales:cache_key(context)}"
+				   data-trigger="focus">
+					<i class="fa fas fa-caret-right"></i>
+					<i i18n:translate="">Next sessions</i>
+				</a>
+				<div id="sessions_${tales:cache_key(context)}"
+				     class="d-none">
+					<tal:loop repeat="session sessions">
+						<a class="btn btn-primary w-100 mb-1"
+						   tal:define="session_id tales:cache_key(session);
+									   params {'session_id': session_id, 'audience': audience};
+									   url tales:canonical_url(context, 'booking-new.html', params);"
+	                       href="${url if authenticated else '#'}">
+							<i tal:omit-tag=""
+							   tal:define="version view.view.get_version(session)"
+							   tal:condition="version">
+							${version}<br/>
+							</i>
+							<i tal:omit-tag="">${tales:format_datetime(session.start_date, put_prefix=False, format_string='%a %d %B - %Hh%M')}</i>
+							<tal:if condition="renderer_settings.display_free_seats">
+								<i tal:omit-tag=""
+								   tal:define="(free, capacity) view.view.get_free_seats(session)">
+									<br/>
+									<tal:var i18n:translate=""><tal:var i18n:name="seats">${free}</tal:var> seats</tal:var>
+								</i>
+							</tal:if>
+						</a>
+					</tal:loop>
+					<div class="alert alert-warning my-1 p-2"
+						 tal:condition="not:authenticated"
+						 i18n:translate="">
+						You must be <a href="/login.html" i18n:translate="" i18n:name="role">authenticated</a> to create a
+						booking request!
+					</div>
+				</div>
+			</tal:if>
+			<tal:var define="next_period view.view.get_next_booking_period(context)"
+			         condition="next_period">
+				<span class="btn-sm w-100 text-left font-italic">
+					<i class="fa fas fa-caret-right"></i>
+					${next_period}
+				</span>
+			</tal:var>
+		</div>
+	</tal:if>
+</tal:var>

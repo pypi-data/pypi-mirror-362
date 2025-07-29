@@ -1,0 +1,26 @@
+<div i18n:domain="pyams_app_msc">
+	<div tal:define="catalog_entry view.catalog_entry"
+		 tal:condition="catalog_entry is not None"
+		 class="alert alert-info">
+		<a tal:define="audience request.params.get('audience')"
+		   href="${tales:canonical_url(catalog_entry, audience=audience)}"
+		   target="_blank"><i18n:var translate="">Display movie info</i18n:var></a>
+		<i class="fa fas fa-external-link"></i>
+	</div>
+	<div class="alert alert-info">
+		<span i18n:translate="">Session date: <strong i18n:name="date">${view.start_date}</strong>.</span>
+		<tal:if define="version view.get_version()"
+		        condition="version"><br />
+			<span i18n:translate="">Proposed version: <strong i18n:name="version">${version}</strong></span>
+		</tal:if>
+		<tal:if define="session view.session"
+				condition="session and session.audiences"><br />
+			<span i18n:translate="">Target audiences: <strong i18n:name="audiences">${view.get_audiences()}</strong></span>
+		</tal:if>
+	</div>
+	<div class="alert alert-warning"
+		 tal:define="comments view.view.session.comments"
+		 tal:condition="comments">
+		${structure:tales:html(comments)}
+	</div>
+</div>
