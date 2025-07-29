@@ -1,0 +1,110 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sklearn-raster"
+dynamic = ["version"]
+description = "Spatial raster prediction with scikit-learn estimators."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Aaron Zuspan", email = "aaron.zuspan@oregonstate.edu" },
+    { name = "Matt Gregory", email = "matt.gregory@oregonstate.edu" }
+]
+keywords = []
+dependencies = [
+    "numpy",
+    "dask[diagnostics,dataframe]",
+    "scikit-learn",
+    "typing-extensions",
+]
+
+[project.optional-dependencies]
+datasets = [
+    "sknnr",
+    "xarray",
+    "rioxarray", 
+    "rasterio", 
+    "pooch",
+]
+tutorials = [
+    "sklearn-raster[datasets]",
+    "ipykernel",
+    "matplotlib",
+]
+
+[project.urls]
+Homepage = "https://github.com/lemma-osu/sklearn-raster"
+
+[tool.hatch.version]
+path = "src/sklearn_raster/__init__.py"
+
+[tool.hatch.build]
+exclude = ["src/sklearn_raster/datasets/data/"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sklearn_raster"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src"]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "pre-commit",
+    "sklearn-raster[datasets]",
+]
+
+[tool.hatch.envs.test]
+dependencies = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-xdist",
+    "freezegun",
+    "xarray-regressions",
+    "sklearn-raster[datasets]",
+]
+
+[tool.hatch.envs.tutorials]
+dependencies = [
+    "sklearn-raster[tutorials]",
+]
+
+[tool.hatch.envs.test.scripts]
+all = "pytest . {args} --doctest-modules"
+cov = "pytest . --cov=src/sklearn_raster {args} --doctest-modules"
+
+[tool.hatch.envs.test_matrix]
+template = "test"
+
+[[tool.hatch.envs.test_matrix.matrix]]
+python = ["3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.docs]
+dependencies = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]"
+]
+
+[tool.hatch.envs.docs.scripts]
+serve = "mkdocs serve --config-file docs/mkdocs.yml"
+build = "mkdocs build --config-file docs/mkdocs.yml"
+
+[tool.ruff]
+fix = true
+show-fixes = true
+
+[tool.ruff.lint]
+select = ["E", "I", "F", "B", "FA", "UP", "PT", "Q", "RET", "SIM", "PERF"]
+isort.known-first-party = ["sklearn_raster"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.coverage.report]
+exclude_also = [
+    # Ignore TYPE_CHECKING blocks
+    "if TYPE_CHECKING:"
+]
