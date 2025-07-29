@@ -1,0 +1,39 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+    "cibuildwheel==2.23.3"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hello_world_xprees1"
+version = "0.0.0a0"
+requires-python = ">=3.9"
+description = "Python C extension example"
+readme = "README.md"
+
+[tool.cibuildwheel]
+environment = { PYPY_LOCAL_URL = "file:///d:/yuanbaoge/downloads/pypy3.11-v3.7.19-win64.zip" }
+
+skip = "pp* cp36* cp37* cp38*"
+
+[[tool.cibuildwheel.overrides]]
+# 3.9-3.10 配置
+select = "cp39-* cp310-*"
+skip = "*-win32_arm64 *-linux_aarch64"
+
+[[tool.cibuildwheel.overrides]]
+# 3.11-3.13 配置
+select = "cp311-* cp312-* cp313-*"
+skip = "*-win32_arm64"
+
+[[tool.cibuildwheel.overrides]]
+# 3.14 特殊配置
+select = "cp314-*"
+skip = "*-win32 *-manylinux_* *-musllinux_*"
+
+[[tool.cibuildwheel.overrides]]
+# PyPy 配置
+select = "pp310-* pp311-*"
+environment = {CIBW_PYPY_URLS = "file:///d:/yuanbaoge/downloads/pypy3.11-v3.7.19-win64.zip",CIBW_BUILD = "pp310-win_amd64 pp311-win_amd64"}
