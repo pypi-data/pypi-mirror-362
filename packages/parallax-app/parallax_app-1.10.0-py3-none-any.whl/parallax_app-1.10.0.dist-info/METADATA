@@ -1,0 +1,145 @@
+Metadata-Version: 2.1
+Name: parallax-app
+Version: 1.10.0
+Summary: GUI software for photogrammetry-assisted probe targeting in electrophysiology
+Author-email: Hanna Lee <hanna.lee@alleninstitute.org>
+License: MIT
+Keywords: parallax
+Classifier: Programming Language :: Python :: 3
+Requires-Python: ~=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pip
+Requires-Dist: PyQt5 >=5.15
+Requires-Dist: pyqtgraph
+Requires-Dist: opencv-python
+Requires-Dist: scipy
+Requires-Dist: pandas
+Requires-Dist: scikit-image
+Requires-Dist: requests
+Requires-Dist: scikit-learn
+Requires-Dist: plotly
+Requires-Dist: PyQtWebEngine
+Requires-Dist: aiohttp
+Provides-Extra: camera
+Requires-Dist: spinnaker-python ; extra == 'camera'
+Provides-Extra: dev
+Requires-Dist: parallax-app[linters] ; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: Sphinx ; extra == 'docs'
+Requires-Dist: sphinxcontrib-video ; extra == 'docs'
+Requires-Dist: sphinx-jinja ; extra == 'docs'
+Requires-Dist: furo ; extra == 'docs'
+Requires-Dist: docutils ; extra == 'docs'
+Provides-Extra: linters
+Requires-Dist: codespell ; extra == 'linters'
+Requires-Dist: coverage ; extra == 'linters'
+Requires-Dist: flake8 ; extra == 'linters'
+Requires-Dist: interrogate ; extra == 'linters'
+Requires-Dist: isort ; extra == 'linters'
+Requires-Dist: pytest-mock ; extra == 'linters'
+
+# Parallax
+
+![Parallax](ui/ParallaxReadMe.png)
+
+Parallax is a graphical user interface designed to streamline the process of 
+setting up and performing acute *in vivo* electrophysiology experiments.
+
+**Documentation**: [parallax.readthedocs.io](https://parallax.readthedocs.io/en/latest/index.html).
+
+### Prerequisites
+- **Python==3.8** (Recommended to install via 
+[Anaconda](https://www.anaconda.com/products/individual) or 
+[Miniconda](https://docs.conda.io/en/latest/miniconda.html))
+  -  Python 3.8 is required for the Spinnaker library.
+- PySpin (for Linux or Mac OS users)
+- [Spinnaker SDK](https://www.teledynevisionsolutions.com/products/spinnaker-sdk)
+
+
+### Installation
+1. Create a virtual environment with **Python 3.8** and activate it:
+- On Windows:
+```bash
+conda create -n parallax python=3.8
+conda activate parallax
+```
+
+2. To install Parallax into a fresh environment, run:
+```bash
+pip install parallax-app
+```
+
+To upgrade to the latest version, run:
+```bash
+pip install parallax-app --upgrade
+```
+
+3. To install the camera interface:
+```bash
+pip install parallax-app[camera]
+```
+
+#### Additional Setup for Linux and macOS
+* Download the Spinnaker SDK package for your system [here](https://flir.app.boxcn.net/v/SpinnakerSDK)
+* Follow the installation instructions in the README
+* Install the Python bindings found alongside the SDK package
+
+### Running Parallax
+```bash
+python -m parallax
+```
+
+### Optional: Enable SuperPoint + SuperGlue Reticle Detection
+Parallax supports reticle detection using SuperPoint + LightGlue.
+To enable reticle detection using SuperPoint + SuperGlue, you must manually download 'SuperGluePretrainedNetwork' pretrained models.
+
+The SuperGluePretrainedNetwork is not included in this repository and is distributed under its own licensing terms.
+Please review their [license](https://github.com/magicleap/SuperGluePretrainedNetwork) before use.
+
+Manual Setup Instructions
+Clone the repository into the external/ folder in your Parallax project root:
+```bash
+pip install git+https://github.com/AllenNeuralDynamics/sfm.git@main
+git clone https://github.com/magicleap/SuperGluePretrainedNetwork.git external/SuperGluePretrainedNetwork
+```
+Verify your folder structure looks like this:
+```bash
+parallax/
+├── external/
+│   └── SuperGluePretrainedNetwork/
+│       └── models/
+│           ├── superpoint.py
+│           └── weights/
+│               ├── superpoint_v1.pth
+│               └── superglue_indoor.pth
+```
+
+### For developers:
+1. Clone the repository:
+```bash
+git clone https://github.com/AllenNeuralDynamics/parallax.git
+```
+2. Install the package along with dev dependencies:
+```bash
+pip install -e .[dev]
+```
+
+### Documentation
+1. To install the dependencies:
+```bash
+pip install -e .[docs]
+```
+2. Then to create the documentation html files, run:
+```bash
+sphinx-build -b html docs/ docs/_build
+```
+
+### Support and Contribution
+If you encounter any problems or would like to contribute to the project, 
+please submit an [Issue](https://github.com/AllenNeuralDynamics/parallax/issues) 
+on GitHub.
+
+### License
+Parallax is licensed under the MIT License. For more details, see 
+the [LICENSE](LICENSE) file.
