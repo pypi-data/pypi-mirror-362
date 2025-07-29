@@ -1,0 +1,227 @@
+{% load i18n static crispy_forms_tags %}
+
+<div id="slm-station-container" class="slm-scroll-container p-2">
+    
+    <div class="pt-3 px-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center"> 
+            <h5 class="text-center mb-0"><b><span id="slm-num-stations">{{ num_sites }}</span></b> Stations</h5>
+            <a id="filter-stations" class="btn btn-{% if not station_filter %}outline-{% endif %}primary filter-popover" role="button" tabindex="0" data-bs-toggle="modal" data-bs-target="#filter" data-backdrop="false">
+                Filter <i class="bi bi-filter"></i>
+            </a>
+        </div>
+
+        <!-- Search bar -->
+        <form class="d-flex my-2 w-100">
+            <input
+                class="form-control"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                id="station-search"
+            >
+        </form>
+    </div>
+
+    <hr/>
+
+    <!-- List of stations -->
+    <div
+        id='slm-station-list'
+        class="list-group overflow-auto vh-100 no-scrollbar"
+        data-slm-page=0
+        data-slm-page-size={{page_size|default:30}}
+    >
+        {% if station %}
+        <button
+            class="btn mono active {{ site.status.css }}"
+            id="select-{{ station }}"
+            name="station"
+            value="{{ station }}"
+            data-bs-toggle="pill"
+            type="submit"
+            role="tab"
+            data-slm-flags={{ site.num_flags }}
+            data-slm-status={{ site.status.value }}
+            data-slm-alert={{ station_alert_level.value }}
+            aria-selected="true"><span>{{ station }}</span> <span class="badge rounded-pill bg-danger slm-error-badge" {% if not site.num_flags %}style="display: none"{% endif %}>{{site.num_flags}}</span> <i class="bi bi-bell-fill slm-alert-bell {{ station_alert_level.css }}" {% if station_alert_level is None %}style="display: none"{% endif %}></i></button>
+        {% endif %}
+        <div class="p-2 p-lg-5 d-flex justify-content-center" style="display: none">
+            <div class="slm-loader"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filter" tabindex="-1" aria-labelledby="filter-label" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="filter-label">Filter Station List</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body ui-front">
+                {% crispy filter_form %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+                <button id="clear-filter" type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">{% trans "Clear Filters" %}</button>
+                <button id="apply-filter" type="button" class="btn btn-success" data-bs-dismiss="modal">{% trans "Apply Filters" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const filterForm = new slm.Form($('div#filter form'));
+
+    let keyupTimeoutID = 0;
+    const stationFilter = $('#slm-station-filter');
+    function drawStations(position, data, filtered, total) {
+
+        if (filtered !== null) {
+            $('#slm-num-stations').html(filtered);
+        }
+
+        function getBadge(station) {
+            if (station.hasOwnProperty('num_flags') && station.num_flags) {
+                return `<span class="badge rounded-pill bg-danger slm-error-badge">${station.num_flags}</span>`;
+            }
+            return `<span class="badge rounded-pill bg-danger slm-error-badge" style="display: none">${station.num_flags}</span>`;
+        }
+
+        function getAlertBell(station) {
+            if (station.hasOwnProperty('max_alert') && station.max_alert !== null) {
+                let alert = slm.AlertLevel.get(station.max_alert);
+                return `<i class="bi bi-bell-fill slm-alert-bell ${ alert.css }"></i>`
+            }
+            return `<i class="bi bi-bell-fill slm-alert-bell" style="display: none"></i>`
+        }
+
+        for (const station of data) {
+            //if (station.name === '{{ station }}') continue;
+            let active = '';
+            let selected = 'false';
+            const editLink = slm.urls.reverse("{{ link_view }}", {kwargs: {station: station.name}});
+            const status = slm.SiteLogStatus.get(station.status);
+            const level = station.max_alert !== null ? slm.AlertLevel.get(station.max_alert) : null;
+            let pos = position;
+            if (station.name === '{{ station }}') {
+                if (
+                    position.parent().children(
+                        `#select-${ station.name }`
+                    ).length)
+                { continue; }
+                active = 'active';
+                selected = 'true';
+                pos = position.parent().children().first();
+            }
+            $(
+                `<button onclick="window.location.href='${editLink}'"
+                    class="btn mono ${active} ${status.css}"
+                    id="select-${station.name}" name="station"
+                    value="${station.name}"
+                    data-bs-toggle="pill"
+                    type="submit"
+                    role="tab"
+                    data-slm-flags=${station.num_flags}
+                    data-slm-status=${status.val}
+                    data-slm-alert=${level ? level.val : null}
+                    aria-selected="${selected}"><span>${station.name}</span> ${getBadge(station)} ${getAlertBell(station)}</button>`
+            ).insertBefore(pos);
+        }
+    }
+    $(document).ready(function() {
+
+        const stationList = $("#slm-station-list");
+        const searchInput = $('#station-search');
+        const filterInput = $("#apply-filter");
+        const filterStations = $("#filter-stations");
+        const clearFilter = $('#clear-filter');
+
+        function init() {
+            slm.initInfiniteScroll(
+                stationList,
+                stationList,
+                $('#slm-station-list .slm-loader'),
+                "slm_edit_api:stations-list",
+                {},
+                {},
+                drawStations
+            );
+            slm.stationFilterChanged(stationList.data('slmQuery'));
+        }
+
+        searchInput.keypress(function (event) {
+            if (event.key === "Enter") {
+                searchInput.blur();
+                return false;
+            }
+        });
+        searchInput.on('input', function() {
+            clearTimeout(keyupTimeoutID);
+            keyupTimeoutID = setTimeout(function() {
+                stationList.find('button').not('.active').remove();
+                // replace below line with above one to keep current station in the
+                // list regardless of filter
+                //stationList.find('button').not(`#select-{{ station }}`).remove();
+                let query = stationList.data('slmQuery') || {};
+                if (searchInput.val()) {
+                    query.name = searchInput.val();
+                } else {
+                    if (query.hasOwnProperty('name')) {
+                        delete query.name;
+                    }
+                }
+                stationList.data('slmPage', 0);
+                stationList.data('slmQuery', query);
+                init();
+            }, 500);
+        });
+
+        const getQuery = function() {
+            const query = filterForm.data;
+            if (searchInput.val()) {
+                query.name = searchInput.val();
+            }
+            if (query.hasOwnProperty('csrfmiddlewaretoken')) {
+                delete query['csrfmiddlewaretoken'];
+            }
+            return query;
+        }
+
+        const applyFilter = function() {
+            stationList.find('button').not('.active').remove();
+            let query = getQuery();
+            if (filterForm.hasChanged()) {
+                filterStations.removeClass("btn-outline-primary").addClass("btn-primary");
+            } else {
+                filterStations.removeClass("btn-primary").addClass("btn-outline-primary");
+            }
+            // uncomment to keep current station in the list regardless of filter
+            //{% if site %}query.id = [{{site.pk}}];{% endif %}
+            stationList.data('slmPage', 0);
+            stationList.data('slmQuery', query);
+            filterForm.persist();
+            init();
+        }
+
+        filterInput.click(applyFilter);
+
+        clearFilter.on('click', function() {
+            filterForm.clear();
+            applyFilter();
+        });
+
+        if (!filterForm.hasChanged()) {
+            /**
+             * If the form differs from its clear state, then url parameters
+             * set values on it and we should not revive it from session
+             * storage.
+             */
+            filterForm.revive();
+        }
+        applyFilter();
+    });
+
+</script>

@@ -1,0 +1,44 @@
+version: '3.0'
+
+scanning-settings:
+  max-depth: 6
+  exclude: [
+    "uv.lock",  # exclude this because if it exists it will contain dev deps
+    "pyproject.toml",  # exclude because it includes dev deps
+    "**/pyproject.toml",  # exclude this because it is a template
+  ]
+  include-files:
+    - path: ./requirements.txt
+      file-type: requirements.txt
+
+report:
+  dependency-vulnerabilities:
+    enabled: true
+    auto-ignore-in-report:
+      python:
+        environment-results: true
+        unpinned-requirements: true
+      cvss-severity: []
+      vulnerabilities:
+        70612:
+          reason: We do not use untrusted Jinja2 templates.
+          expires: '2050-01-01'
+
+fail-scan-with-exit-code:
+  dependency-vulnerabilities:
+    enabled: true
+    fail-on-any-of:
+      cvss-severity:
+        - high
+        - critical
+        - medium
+      exploitability:
+        - high
+        - critical
+        - medium
+
+security-updates:
+  dependency-vulnerabilities:
+    auto-security-updates-limit:
+      - patch
+

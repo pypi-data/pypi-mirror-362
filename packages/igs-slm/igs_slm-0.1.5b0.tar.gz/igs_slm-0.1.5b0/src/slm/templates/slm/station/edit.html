@@ -1,0 +1,275 @@
+<!--
+
+Template for station page (once station is selected).
+
+NOTE:
+Add new section capability is not functional.
+
+-->
+
+{% extends "slm/station/base.html" %}
+{% load widget_tweaks slm i18n %}
+
+{% block action_content %}
+<!-- Station Metadata Forms -->
+<div class="row">
+
+    <!-- Site Log Sections Sidebar Menu -->
+    <div class="col-3">
+      <div id='slm-form-menu' class="nav flex-shrink-0 nav-pills" role="tablist" aria-orientation="vertical">
+        <!-- Section 0 -->
+          {% for name, section in sections.items %}
+                {% if section.active %}
+                    {% set_global 'active_section' forloop.counter0 %}
+                {% endif %}
+                <button
+                    class="nav-link {{ section.status.css }} {% if section.active and not section.subsections %}active{% endif %} {{ section.id }}"
+                    id="{{ section.id }}-tab"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#{{ section.id }}-menu"
+                    type="button"
+                    role="tab"
+                    aria-controls="{{ section.id }}-menu"
+                    aria-selected="{% if section.active %}true{% else %}false{% endif %}"
+                    data-slm-status={{ section.status.value }}
+                    data-slm-flags={{ section.flags }}
+                    data-slm-section="{{ section.id }}"
+                    data-slm-parent="select-{{ station }}"
+                    {% if not section.subsections %}onclick="window.location='{% url "slm:edit" station=station section=section.id %}'"{% endif %}
+                >
+                      <span class="section-number">{{ forloop.counter0 }}</span>{{ name }}{% if section.subsections %}<i class="bi bi-chevron-down"></i>{% endif %}
+                      <span class="badge rounded-pill bg-danger slm-error-badge" {% if not section.flags %}style="display: none"{% endif %}>
+                        {{ section.flags }}
+                      </span>
+                </button>
+                {% if section.subsections %}
+                <div class="{% if not section.active %}collapse{% endif %} w-100" id="{{ section.id }}-menu">
+                {% for subname, subsection in section.subsections.items %}
+                    {% if subsection.active %}
+                    {% set_global 'active_subsection' forloop.counter %}
+                    {% endif %}
+                  <button
+                      class="nav-link ms-4 {{ subsection.status.css }} {% if subsection.active %}active{% endif %} {{ subsection.id }}"
+                      id="{{ section.id }}-{{ subsection.id }}-tab"
+                      data-bs-toggle="pill"
+                      data-bs-target="#{{ section.id }}-{{ subsection.id }}-tab"
+                      type="button"
+                      role="tab"
+                      aria-controls="{{ section.id }}-{{ subsection.id }}-tab"
+                      aria-selected="{% if subsection.active %}true{% else %}false{% endif %}"
+                      data-slm-status={{ subsection.status.value }}
+                      data-slm-flags={{ subsection.flags }}
+                      data-slm-section="{{ subsection.id }}"
+                      {% if subsection.group %}data-slm-group="{{ subsection.group }}"{% endif %}
+                      data-slm-parent="{{ section.id }}-tab"
+                      onclick="window.location='{% url "slm:edit" station=station section=subsection.id %}'"
+                  >
+                      <span class="section-number">{{ forloop.parentloop.counter0 }}.{{ forloop.counter }}</span>{{ subname }}
+                      <span class="badge rounded-pill bg-danger slm-error-badge" {% if not subsection.flags %}style="display: none"{% endif %}>
+                        {{ subsection.flags }}
+                      </span>
+                  </button>
+                {% endfor %}
+                </div>
+                {% endif %}
+            {% endfor %}
+      </div>
+    </div>
+
+    <!-- End of Site Log Sections Sidebar Menu -->
+
+    <!-- Site Log Section Content -->
+    {% get_global 'active_section' as active_section %}
+    {% get_global 'active_subsection' as active_subsection %}
+    <div class="tab-content col-9 p-5" id="section-content">
+        <!-- Form Title-->
+        {% if section_name %}
+            <div class="section_header mb-4 pb-3 border-bottom">
+              <span class="slm-section-header">{{ section_name }}</span>
+            </div>
+        <!-- Section 0 Content -->
+        {% if multi %}
+        <div id="add-{{ section_id }}" class="d-grid gap-2 mb-2 d-flex justify-content-between">
+          <button type='submit' name='add' class="btn btn-success">
+            {% translate "Add Section" %}
+          </button>
+        </div>
+        <div class="accordion slm-form-stack" id="accordion-{{ section_id }}">
+        {% for form in forms %}
+            {% if not forloop.first %}
+                {% with form_inst_id=section_id|to_id:forloop.counter %}
+                    <div class="accordion-item">
+                        <h2 id="heading-{{ form_inst_id }}" class="accordion-header">
+                            <button id="{{ form.instance.subsection }}" class="slm-subsection {{ form.instance.mod_status.css }} {% if form.instance.is_deleted %}slm-section-deleted{% endif %} accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-{{ form_inst_id }}" data-slm-flags={{ form.flags|length }} data-slm-parent="{% if parent %}{{ parent }}-{% endif %}{{ section_id }}-tab" data-slm-status={{ form.instance.mod_status.value }} aria-expanded="true" aria-controls="accordion-{{ form_inst_id }}">
+                                <span class="section-number" {% if form.instance.is_deleted %}style="display: none"{% endif %}>{% if active_section %}{{ active_section }}.{% endif %}{% if active_subsection %}{{ active_subsection}}.{% endif %}{{ form.form_number }}</span><span><span class="slm-heading">{{ form.instance.heading }}</span> <span class="badge rounded-pill bg-danger slm-error-badge" {% if not form.flags %}style="display: none"{% endif %}>{{ form.flags|length }}</span></span><span class="slm-effective">{% if form.instance.effective %}{{ form.instance.effective }}</span>{% endif %}
+                            </button>
+                        </h2>
+                        <div id="accordion-{{ form_inst_id }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ form_inst_id }}" data-bs-parent="#accordion-{{ section_id }}">
+                          <div class="accordion-body">
+                            {% with flag_id=section_id|to_id:form.instance.id|to_id:"flags" %}
+                            {{ form.instance.flags }}
+                            {{ form.media.css }}
+                            {{ form.media.js }}
+                            {{ form.flags|json_script:flag_id }}
+                            {% include 'slm/station/form.html' with form=form form_id=form_inst_id flag_id=flag_id %}
+                            {% endwith %}
+                          </div>
+                        </div>
+                    </div>
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+        </div>
+
+        <div id="new-form" style="display: none">
+            <div class="accordion-item">
+                <h2 id="heading-new_form_id" class="accordion-header">
+                    <button class="slm-subsection accordion-button" type="button" data-bs-toggle="collapse" data-slm-parent="{% if parent %}{{ parent }}-{% endif %}{{ section_id }}-tab" data-slm-status={{ SiteLogStatus.EMPTY.value }} aria-expanded="true">
+                        <span><span class="section-number">{% if active_section %}{{ active_section }}.{% endif %}{% if active_subsection %}{{ active_subsection}}.{% endif %}0</span><span><span class="slm-heading">{% translate "New" %}</span> <span class="badge rounded-pill bg-danger slm-error-badge" style="display: none">0</span></span></span><span class="slm-effective"></span>
+                    </button>
+                </h2>
+                <div id="accordion-new_form_id" class="accordion-collapse collapse show" data-bs-parent="#accordion-{{ section_id }}">
+                    <div class="accordion-body">
+                        {% include 'slm/station/form.html' with form=forms|first form_id='new_form_id' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ copy_last_on_add|json_script:"copy-last-on-add" }}
+
+        <script>
+            const hash = $(location).attr('hash');
+            if (hash) {
+                const btn = $(`button${hash}`);
+                btn.removeClass('collapsed');
+                $(btn.attr('data-bs-target')).addClass('show');
+            }
+
+            // initialize photo gallery
+            $('#photo-container [data-fancybox="gallery"]').fancybox({
+                buttons: [
+                    'download',
+                    'thumbs',
+                    'zoom',
+                    'fullScreen',
+                    'close'
+                ],
+                loop: false,
+                protect: true
+            });
+
+            const copyLast = JSON.parse(
+                document.getElementById('copy-last-on-add').textContent
+            );
+            if (typeof newIdx === 'undefined') {
+                var newIdx = {{ forms|length }};
+            }
+
+            $("#add-{{ section_id }} > button").click(function() {
+                let formId = `{{ section_id }}-new-${newIdx}`;
+                let stack = $("#accordion-{{ section_id }}");
+                let lastForm = $('form.slm-form').first();
+                let newNumber = slm.incrSectionNumber(
+                    lastForm.closest('.accordion-item').find('span.section-number').text()
+                );
+                let initial = slm.formToObject(lastForm, copyLast);
+                const newForm = $('#new-form').children().first().clone();
+                newForm.find('script').each(function() {
+                    const newScript = document.createElement('script');
+                    //newScript.type = 'module';
+                    $(newScript).html($(this).html().replaceAll('new_form_id', formId));
+                    $(this).replaceWith(newScript);
+                });
+                newForm.find('[id*="new_form_id"]').each(function() {
+                    const newId = $(this).attr('id').replace('new_form_id', formId);
+                    newForm.find(
+                        `label[for="${$(this).attr('id')}"]`
+                    ).attr('for', newId);
+                    $(this).attr('id', newId);
+                });
+                const accordionBtn = newForm.find('button.accordion-button');
+                accordionBtn.find('span.section-number').text(newNumber);
+                accordionBtn.attr('data-bs-target', `#accordion-${formId}`);
+                accordionBtn.attr('aria-controls', `accordion-${formId}`);
+                newForm.find(`#accordion-${formId}`).attr('aria-labelledby', `heading-${formId}`);
+                stack.prepend(newForm);
+                slm.initForm($(`#site-${formId}`), initial);
+                $(`#site-${formId} div.slm-flag`).hide();
+                $(`#site-${formId} a[data-bs-toggle="tooltip"]`).tooltip();
+                $(`#site-${formId} a[data-bs-toggle="popover"]`).popover();
+                newIdx += 1;
+            });
+        </script>
+        {% elif forms %}
+            {% with form=forms|first %}
+              {% with flag_id=section_id|to_id:form.instance.id|to_id:"flags" %}
+              {{ form.media.css }}
+              {{ form.media.js }}
+              {{ form.flags|json_script:flag_id }}
+              {% include 'slm/station/form.html' with form=form form_id=section_id flag_id=flag_id %}
+              {% endwith %}
+            </div>
+        {% endwith %}
+      {% endif %}
+    {% else %}
+    <div class="row">
+        <div class="col-6">
+            {% block station_info_block %}
+            {% endblock station_info_block %}
+        </div>
+        <div class="col-6">
+            {% block station_info_block2 %}
+            <img class="slm-station-location" src=""/>
+            {% endblock station_info_block2 %}
+        </div>
+    </div>
+    <div class="row my-5">
+        {% block station_images %}
+        {% if station_images %}
+
+        {% load slm static i18n %}
+
+        <div class="col-12">
+            <h2>{% trans "Images" %}</h2>
+            <hr/>
+            <div id="photo-container">
+                {% for photo in station_images %}
+                <div class="card">
+                    <div class="card-image">
+                        <a href="{{ photo.edit_link }}" data-fancybox="gallery" data-caption="{{ photo.description|default:photo.name }} - {{ photo.created.date|default:photo.timestamp.date }}">
+                            <img src="{{ photo.edit_thumbnail_link }}" alt="Photos" style="image-orientation: none">
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endblock %}
+    </div>
+    <div class="row my-5">
+        {% block station_attachments %}
+        {% if station_attachments %}
+        <div class="col-12">
+            <h2>{% trans "Attachments" %}</h2>
+            <hr/>
+            {% for attachment_row in station_attachments|split_rows:3 %}
+                <div class="row my-2">
+                    {% for attachment in attachment_row %}
+                    <div class="col-4 d-flex justify-content-center" style="text-align: center">
+                        <a href="{{attachment.edit_link}}" download>
+                            <i class="slm-attachment {{attachment.mimetype|file_icon}}" style="font-size: 120px;"></i>
+                            <p>{{attachment.name}}</p>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endblock %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% load slm compress i18n %}
+
+<pre id="slm-parsed-legacy">{% for line in file|file_lines %}{% with idx=forloop.counter0 %}
+<span data-line-number={{ idx }}>{{ findings|clear_prefix:idx|get_part:line }}<span class="{{ findings|finding_class:idx }}" {% if findings|finding_content:idx %}data-bs-toggle="popover" title="{{ findings|finding_title:idx }}" data-bs-custom-class="{{ findings|finding_class:idx }}" data-bs-html="true" data-bs-content="<pre>{{ findings|finding_content:idx }}</pre>"{% endif %}>{{ findings|marked_part:idx|get_part:line }}</span>{{ findings|clear_postfix:idx|get_part:line }}</span>{% endwith %}{% endfor %}
+</pre>
+
+{% compress css inline %}
+<style>
+    pre#slm-parsed-legacy {
+        background-color: ghostwhite;
+    }
+    pre#slm-parsed-legacy span.slm-parse-error {
+        background-color: #dc3545;
+    }
+    pre#slm-parsed-legacy span.slm-parse-error:hover {
+        width: 100%;
+        background-color: darkred;
+        color: white;
+        cursor: pointer;
+    }
+    pre#slm-parsed-legacy span.slm-parse-warning {
+        background-color: orange;
+    }
+    pre#slm-parsed-legacy span.slm-parse-warning:hover {
+        width: 100%;
+        background-color: darkorange;
+        color: white;
+        cursor: pointer;
+    }
+    pre#slm-parsed-legacy span.slm-parse-ignore {
+        background-color: lightgrey;
+    }
+    pre#slm-parsed-legacy span.slm-parse-ignore:hover {
+        width: 100%;
+        background-color: darkgray;
+        color: white;
+        cursor: pointer;
+    }
+
+    div.popover.slm-parse-error h3 {
+        background-color: darkred;
+        color: white;
+    }
+
+    div.popover.slm-parse-warning h3 {
+        background-color: darkorange;
+        color: white;
+    }
+
+    div.popover.slm-parse-ignore h3 {
+        background-color: darkgray;
+        color: white;
+    }
+    
+    .popover-body pre {
+      white-space: pre-wrap;       /* CSS3 */
+      white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+      white-space: -pre-wrap;      /* Opera 4-6 */
+      white-space: -o-pre-wrap;    /* Opera 7 */
+      word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    }
+}
+
+</style>
+{% endcompress css %}
+
+{{findings | json_script:"slm-parse-findings"}}
+
+{% compress js inline %}
+<script type="text/javascript">
+
+    const findings = JSON.parse(
+        document.getElementById('slm-parse-findings').textContent
+    );
+
+</script>
+{% endcompress js %}
