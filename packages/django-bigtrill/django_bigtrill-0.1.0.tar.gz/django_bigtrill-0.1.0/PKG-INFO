@@ -1,0 +1,104 @@
+Metadata-Version: 2.4
+Name: django-bigtrill
+Version: 0.1.0
+Summary: A Django app (more like 2 scripts) that will aid you to switch from using the default Django Auth User model to a custom User model in an existing Django project.
+Author-email: Alexander Invictus <alexanderking.aa@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/AlexanderInvictus/django_bigtrill
+Keywords: django,auth,custom user,migration
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: Framework :: Django
+Requires-Python: >=3
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: Django>=3.2
+Dynamic: license-file
+
+## django-bigtrill
+
+**django-bigtrill** is a Django utility to help you migrate from the default Django `User` model to a custom user model in an existing project. It automates the process, making it safer and easier to switch without manual errors.
+
+---
+
+### Features
+
+- Detects and updates references to the default Django `User` model
+- Creates a new custom user model in your chosen app
+- Updates settings and migrations automatically
+- Provides admin integration for the new user model
+
+---
+
+### Installation
+
+Clone or copy the `django-bigtrill` directory into your Django project.
+
+---
+
+### Usage
+
+1. **Configure**: Create a file named `bigtrill_settings.py` in the directory where you will run the start command. This file is required and must contain the following variables:
+
+   - `PYTHON`: Your Python command (e.g., `python` or `python3`)
+   - `MANAGE_PY_FILE`: Path to your `manage.py`
+   - `COPY_MODEL`: Desired name for your custom user model
+   - `NEW_AUTH_APP_LABEL`: App label for the new user model
+   - `INSTALLED_APPS_SETTINGS_FILE_PATH`: Absolute path to your main `settings.py` or where the `INSTALLED_APPS` is defined.
+   - `AUTH_USER_MODEL_PATH`: Path to where `AUTH_USER_MODEL` is defined
+   - `DEFAULT_DJANGO_USER_MODEL_FILE_PATHS`: List of files referencing the default user model (optional)
+   - `BASE_DIR`: Absolute path to your project root
+
+   Example:
+
+   ```python
+   # bigtrill_settings.py
+   PYTHON = "python"
+   MANAGE_PY_FILE = "manage.py"
+   COPY_MODEL = "CustomUser"
+   NEW_AUTH_APP_LABEL = "accounts"
+   INSTALLED_APPS_SETTINGS_FILE_PATH = "<absolute path to your settings.py>"
+   AUTH_USER_MODEL_PATH = INSTALLED_APPS_SETTINGS_FILE_PATH
+   FILES_TO_SEARCH = []
+   BASE_DIR = "<absolute path to your project root>"
+   GITIGNORE_PATH = ".gitignore"
+   ```
+
+2. **Run the start script**:
+
+   ```bash
+   python bigtrill/start.py
+   ```
+
+   Follow the prompts. The script will:
+
+   - Search for references to the default user model
+   - Create a new app and custom user model
+   - Update settings and run migrations
+   - Update imports and references
+
+3. **Review and test**:
+   - Check your code and migrations
+   - Test your application thoroughly
+
+---
+
+### Notes
+
+- **Backup your project and database before running!**
+- Do not run on production without testing.
+- After migration, update any manual references to the old user model.
+- Remove temporary files and update your main settings as needed.
+  Remove temporary files (such as `bigtrill_temp_settings.py`) and move any definitions from them (e.g., `AUTH_USER_MODEL`) to your desired location in your main `settings.py` file to follow Django project conventions.
+
+---
+
+### License
+
+MIT
+
+---
+
+### Author
+
+Alexander Invictus (<alexanderking.aa@gmail.com>)
