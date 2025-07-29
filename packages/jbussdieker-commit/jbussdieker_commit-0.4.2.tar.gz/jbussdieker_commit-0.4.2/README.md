@@ -1,0 +1,110 @@
+# jbussdieker-commit
+
+A modern Python development toolkit plugin for generating conventional commit messages using AI. This plugin integrates with the jbussdieker CLI framework to provide intelligent, context-aware commit message generation.
+
+## 🚀 Features
+
+- **AI-Powered Commit Messages**: Uses OpenAI's GPT-4 to generate conventional commit messages
+- **Context-Aware**: Analyzes staged changes and project context for better commit messages
+- **Conventional Commits**: Follows the [Conventional Commits](https://www.conventionalcommits.org/) specification
+- **Interactive Editing**: Opens your default editor to review and modify generated messages
+- **Dry Run Mode**: Preview generated commit messages without creating commits
+- **Multi-Project Support**: Automatically detects project type (Python, Node.js, Rust, etc.)
+
+## 📦 Installation
+
+```bash
+pip install jbussdieker-commit --upgrade
+```
+
+## 🔧 Prerequisites
+
+- Python 3.9 or higher
+- Git repository with staged changes
+- OpenAI API key (set as `OPENAI_API_KEY` environment variable or configured in jbussdieker)
+
+## 🎯 Usage
+
+### Basic Usage
+
+1. Stage your changes:
+   ```bash
+   git add .
+   ```
+
+2. Generate and create a commit:
+   ```bash
+   jbussdieker commit
+   ```
+
+### Dry Run Mode
+
+Preview the generated commit message without creating a commit:
+
+```bash
+jbussdieker commit --dry-run
+```
+
+### Configuration
+
+The plugin uses your jbussdieker configuration for the OpenAI API key. You can set it in your config file or use the `OPENAI_API_KEY` environment variable.
+
+## 📋 Generated Commit Format
+
+The plugin generates commits following the conventional commit format:
+
+```
+<type>(<scope>): <description>
+
+- <change 1>
+- <change 2>
+- <change 3>
+```
+
+### Supported Types
+
+- `feat`: New features
+- `fix`: Bug fixes
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+- `perf`: Performance improvements
+- `ci`: CI/CD changes
+- `build`: Build system changes
+- `revert`: Reverting previous commits
+
+## 🔍 How It Works
+
+1. **Analyzes Staged Changes**: Reads `git diff --cached` to understand what's being committed
+2. **Gathers Context**: Collects project information (branch, recent commits, project type)
+3. **Generates Message**: Uses OpenAI GPT-4 to create a conventional commit message
+4. **Interactive Review**: Opens your default editor for final review and editing
+5. **Creates Commit**: Executes `git commit` with the final message
+
+## 🛠️ Development
+
+This plugin is part of the jbussdieker ecosystem. It integrates seamlessly with the jbussdieker CLI framework.
+
+### Project Structure
+
+```
+src/jbussdieker/commit/
+├── __init__.py
+├── cli.py          # CLI interface and argument parsing
+└── util.py         # Core functionality
+```
+
+## 📝 License
+
+This project is licensed under **MIT**.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📚 Related
+
+- [jbussdieker](https://pypi.org/project/jbussdieker/) - The main CLI framework
+- [Conventional Commits](https://www.conventionalcommits.org/) - Commit message specification
