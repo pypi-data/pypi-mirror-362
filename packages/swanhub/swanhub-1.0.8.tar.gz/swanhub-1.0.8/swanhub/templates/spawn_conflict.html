@@ -1,0 +1,51 @@
+{% extends "page.html" %}
+
+{% block main %}
+<style>
+  .btn-secondary {color: white; background-color: #fc6404;}
+  .btn-secondary:hover {color: white; background-color: #e64a00;}
+</style>
+
+<div class="container">
+  <div class="row">
+    <div class="swan-info">
+      <div id="swan-loader">
+        <div class="loader-circle">
+          <img src="{{ static_url('swan/logos/' + swan_logo_filename) }}">
+        </div>
+        <div class="loader-line-mask" hidden>
+          <div class="loader-line"></div>
+        </div>
+        <span class="text">
+          <p class="extra">
+            A session is running already. Do you want to stop it or go to it?
+          </p>
+          <div class="extra" id="swan-options">
+            <button type="button" class="btn btn-secondary">Stop session</button>
+            <button type="button" class="btn btn-primary">Go to session</button>
+          </div>
+        </span>
+      </div>
+    </div>
+    <br><br>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script type="text/javascript">
+require(["jquery"], function ($) {
+  $('#swan-options .btn-secondary').on('click', function() {
+    const query_params = window.location.search ? '&' + window.location.search.substring(1) : '';
+    window.location.replace('{{base_url}}home?changeconfig' + query_params);
+  });
+
+  $('#swan-options .btn-primary').on('click', function() {
+    window.location.replace(window.location.origin + "/{{ next_url }}");
+  });
+});
+
+</script>
+{% endblock %}
