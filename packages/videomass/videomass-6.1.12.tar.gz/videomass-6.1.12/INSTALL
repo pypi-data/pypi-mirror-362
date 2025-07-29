@@ -1,0 +1,103 @@
+
+VIDEOMASS INSTALLATION INSTRUCTIONS AND BUILDINGS
+
+==============================
+Executable packages availables
+==============================
+
+If you are not a developer and just want to install Videomass on your operating
+system, please visit the following page:
+
+    https://jeanslack.github.io/Videomass/download_installation.html
+
+
+=============================
+Base application dependencies
+=============================
+
+    Requires:
+        - Python >=3.9.0
+        - wxPython >=4.0.7
+        - PyPubSub >=4.0.3
+        - requests >=2.28.1
+        - FFmpeg (included ffplay and ffprobe) >=5.1
+
+
+=========================
+Run from source directory
+=========================
+
+Videomass can be run without installing by extracting the source archive
+and executing the "launcher" script inside the source Videomass directory.
+
+    cd Videomass (source directory)
+
+    python launcher
+
+Videomass can also be imported from the Python3 console (interactive mode):
+
+    >>> from videomass import gui_app
+    >>> gui_app.main()
+
+
+=====================================
+Compiles language translation catalog
+=====================================
+
+By default Videomass does not include the compiled catalog for language
+translations, i.e. `videomass.mo` files, especially on development source code.
+If you want to compile the language catalog to make the translations available
+on Videomass, use one of the following options based on your operating system
+requirements:
+
+Using `generate_MO_files.sh` shell script (only for Linux, FreeBSD, MacOs)
+--------------------------------------------------------------------------
+
+    Requires:
+        - shell (/bin/bash)
+        - msgfmt (from GNU-gettext)
+
+    cd Videomass (source directory)
+
+    ./develop/gettext_utils/generate_MO_files.sh
+
+
+Using `babelutils.py` python script (multi-platform)
+----------------------------------------------------
+
+    Requires:
+        - babel (also installable via pip)
+
+    cd Videomass (source directory)
+
+    python3 develop/gettext_utils/babelutils.py --compile-catalogs --output-dir videomass/data/locale --domain videomass
+
+
+======================
+Installation using pip
+======================
+
+    -----------------------------------------------------------------------
+    If you are a Linux/FreeBSD user, the standard installation procedure
+    will not install wxPython, as wxPython's PyPi wheels provides support for
+    Windows and MacOS only. Please install wxPython manually using your OS's
+    package manager.
+
+    Then, this assumes a virtual environment activated using python-venv
+    module with `--system-site-package` option to share wxPython module
+    installed in your OS,
+    like this:
+
+        python -m venv --system-site-packages --upgrade-deps VENV
+
+        source VENV/bin/activate
+    ------------------------------------------------------------------------
+
+python -m pip install videomass
+
+OR, inside source directory:
+
+    python -m pip install -r requirements.txt
+
+Please, Visit the Wiki page for more info:
+<https://github.com/jeanslack/Videomass/wiki/Installation-using-pip>
