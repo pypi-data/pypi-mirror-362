@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Extend the form view of helpdesk.ticket -->
+        <record id="helpdesk_ticket_form_view_lead_conversion_inherit" model="ir.ui.view">
+            <field name="name">helpdesk.ticket.convert.button</field>
+            <field name="model">helpdesk.ticket</field>
+            <field name="inherit_id" ref="helpdesk_mgmt.ticket_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header/field[@name='stage_id']" position="before">
+
+                    <field name="crm_lead_id" invisible="True"/>
+                    <field name="stage_id_closed" invisible="True"/>
+
+                    <!-- Button for conversion to CRM LEAD -->
+                    <button
+                        name="convert_to_lead"
+                        string=" Convert into CRM Lead"
+                        icon="fa-handshake-o"
+                        type="object"
+                        class="btn-default"
+                        attrs="{'invisible': ['|', '|', ('crm_lead_id', '!=', False), ('id', '=', False), ('stage_id_closed', '=', True)]}"
+                    />
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

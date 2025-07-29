@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+   
+        <!-- Extend the wizard view for the creation of the CRM Lead -->
+        <record id="crm_lead_conversion_form_wizard" model="ir.ui.view">
+            <field name="name">crm.lead.conversion.form.wizard</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="attributes">
+                    <attribute name="string">Converted CRM Lead</attribute>
+                    <attribute name="create">0</attribute>
+                </xpath>
+                <xpath expr="//form" position="inside">
+                    <footer>
+                        <button string="Save" name="action_redirect_to_lead" class="btn-primary"
+                            type="object" />
+                        <button string="Discard" class="btn-secondary" special="cancel" />
+                    </footer>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
