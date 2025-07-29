@@ -1,0 +1,1 @@
+GREENSCREENS_FOLDER = 'resources/greenscreens/'
