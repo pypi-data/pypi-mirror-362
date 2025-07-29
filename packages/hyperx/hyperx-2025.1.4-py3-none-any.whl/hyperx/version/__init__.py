@@ -1,0 +1,1 @@
+from .version import major, minor, revision, patch, __version__
