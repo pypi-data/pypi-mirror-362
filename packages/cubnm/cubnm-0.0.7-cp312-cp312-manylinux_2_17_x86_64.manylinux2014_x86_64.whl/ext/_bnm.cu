@@ -1,0 +1,7 @@
+#include "bnm.cu"
+#include "utils.cu"
+#include "fc.cu"
+#include "models/bw.cu"
+#include "models/kuramoto.cu"
+#include "models/rwwex.cu"
+#include "models/rww.cu"
