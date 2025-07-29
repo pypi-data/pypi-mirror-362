@@ -1,0 +1,53 @@
+[project]
+name = "jaxkd"
+dynamic = ["version"]
+authors = [
+    {name="Benjamin Dodge", email="bendodge@stanford.edu"}
+]
+description = "Minimal JAX implementation of k-nearest neighbors using a k-d tree."
+readme = "README.md"
+license = "MIT"
+requires-python = ">= 3.10"
+dependencies = [
+    "jax"
+]
+
+[project.optional-dependencies]
+cuda = [
+    "jax[cuda12]",
+    "jaxkd-cuda"
+]
+dev = [
+    "ipywidgets>=8.1.7",
+    "jax[cuda12]==0.6.0",
+    "jupyterlab>=4.4.3",
+    "matplotlib>=3.10.3",
+    "pytest>=8.3.5",
+    "ruff>=0.11.11",
+    "tqdm>=4.67.1",
+]
+
+[project.urls]
+Source = "https://github.com/dodgebc/jaxkd"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build]
+include = [
+    "jaxkd",
+]
+exclude = [
+    "/external",
+]
+
+[tool.ruff]
+line-length = 100
+exclude = ["*.ipynb"]
+
+[tool.uv.sources]
+jaxkd = { workspace = true }
