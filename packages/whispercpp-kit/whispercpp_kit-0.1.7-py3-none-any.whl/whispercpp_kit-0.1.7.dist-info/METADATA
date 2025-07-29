@@ -1,0 +1,206 @@
+Metadata-Version: 2.4
+Name: whispercpp_kit
+Version: 0.1.7
+Summary: A toolkit for whisper.cpp with audio processing and model management
+Author-email: Simeon Emanuilov <simeon.emanuilov@gmail.com>
+License: MIT License
+        
+        Copyright (c) 2024 Simeon Emanuilov
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        1. The above copyright notice and this permission notice shall be included in all
+           copies or substantial portions of the Software.
+        
+        2. When using or distributing the Software, proper attribution must be given to 
+           the original author by citing the project name "whispercpp_kit" and its source.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+Project-URL: Homepage, https://github.com/s-emanuilov/whispercpp_kit
+Keywords: whisper,speech-to-text,audio,transcription
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: ffmpeg-python
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Dynamic: license-file
+
+# WhisperCPP Kit 🎙️
+
+[![PyPI version](https://badge.fury.io/py/whispercpp-kit.svg)](https://badge.fury.io/py/whispercpp-kit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> 🚀 A Python wrapper around [whisper.cpp](https://github.com/ggerganov/whisper.cpp) with model management and helper features.
+
+## ✨ Features
+
+- 🔄 Automatic building and setup of whisper.cpp
+- 🎯 Simple, intuitive Python API
+- 🔧 Built-in model management
+- 🚦 Clear error messages and dependency checks
+- 🎵 Automatic audio format conversion
+- 🧵 Multi-threading support
+- 🐳 Docker support
+- 🎯 Support for custom and fine-tuned models
+- ⚡ Cached builds for faster subsequent inference
+
+## 📋 System Requirements
+
+Before installing `whispercpp_kit`, ensure you have these system-level dependencies:
+
+### Required dependencies 🛠️
+
+- `git`
+- `cmake`
+- `ffmpeg`
+- `make`
+- `g++`/`gcc` (C++ compiler)
+- Build essentials
+
+### Installation commands 📦
+
+<details>
+<summary>Ubuntu/Debian</summary>
+
+```bash
+sudo apt update
+sudo apt install git cmake ffmpeg build-essential
+```
+</details>
+
+<details>
+<summary>MacOS</summary>
+
+```bash
+brew install git cmake ffmpeg gcc make
+```
+</details>
+
+<details>
+<summary>CentOS/RHEL</summary>
+
+```bash
+sudo yum update
+sudo yum groupinstall "Development Tools"
+sudo yum install git cmake ffmpeg gcc-c++ make
+```
+</details>
+
+> ⚠️ Windows is currently not supported. Please use WSL (Windows Subsystem for Linux) with Ubuntu.
+
+## 🚀 Quick start
+
+### Installation
+
+```bash
+pip install whispercpp_kit
+```
+
+### Basic usage
+
+```python
+from whispercpp_kit import WhisperCPP
+
+# Initialize with default model
+whisper = WhisperCPP(model_name="tiny.en")
+
+# First-time setup (automatically done on first transcribe)
+whisper.setup()
+
+# Transcribe audio
+text = whisper.transcribe("audio.mp3")
+print(text)
+```
+
+### Advanced configuration
+
+```python
+# Using standard models
+whisper = WhisperCPP(
+    model_name="tiny.en",
+    num_threads=8,        # Control threads number
+    verbose=True,         # Enable verbose output
+    cache_dir="./cache"   # Custom cache directory
+)
+
+# Using custom or fine-tuned models
+whisper = WhisperCPP(model_path="/path/to/your/fine-tuned-model.bin")
+
+# The library caches the built whisper.cpp source code
+# This means subsequent runs will be faster as compilation is skipped
+```
+
+## 🐳 Troubleshooting
+
+### Rebuilding whisper.cpp
+
+If you encounter issues with the whisper.cpp binary, you can force a rebuild:
+
+```python
+import shutil
+from whispercpp_kit import WhisperCPP
+
+whisper = WhisperCPP(model_name="tiny.en")
+# Force rebuild of whisper.cpp
+shutil.rmtree(whisper.base_path)
+whisper.setup()
+```
+
+### Common Issues
+
+1. **Binary Deprecation Warning**: If you see a warning about the 'main' binary being deprecated, rebuild whisper.cpp using the steps above. The latest version uses 'whisper-cli' instead.
+
+2. **Transcription Failures**: Ensure you have all required dependencies installed and sufficient permissions to execute the binary.
+
+3. **Audio Format Issues**: The library automatically converts audio files using ffmpeg. Make sure ffmpeg is properly installed if you encounter audio-related errors.
+
+## 🐳 Docker support
+
+<details>
+<summary>Docker Instructions</summary>
+
+```bash
+git clone https://github.com/s-emanuilov/whispercpp_kit
+cd whispercpp_kit/examples/docker
+
+# Build the image
+docker build -t whispercpp_kit .
+
+# Run with default model (base.en)
+docker run -v $(pwd):/app/audio whispercpp_kit your_audio.mp3
+
+# Using specific model
+docker run -v $(pwd):/app/audio whispercpp_kit your_audio.mp3 tiny.en
+```
+
+See [examples/docker/README.md](examples/docker/README.md) for more details.
+</details>
+
+## 📝 License
+
+MIT License - feel free to use in your projects!
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to submit issues and pull requests.
+
+##
