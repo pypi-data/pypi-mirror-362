@@ -1,0 +1,75 @@
+Metadata-Version: 2.4
+Name: query-search
+Version: 0.0.1a1
+Summary: A package to filter pipe outputs or text files like `grep` using sql syntax
+Home-page: 
+Author: Daniel Olson
+Author-email: daniel@orphos.cloud
+Keywords: terminal query search grep sql
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: requires-python
+Dynamic: summary
+
+## Terminal Query Search
+
+This package lets you query files, folders or pipe outputs(like `grep`) using SQL syntax
+
+This uses python's `sqlite3` module for querying
+
+### Table of Contents
+- [Installation](#installation) <!-- - [Quick Start](#quick-start) -->
+- [Learn by Example](#learn-by-example) 
+- [Table Structure](#table-structure)
+- [License](#license)
+
+### Installation
+
+`pip install query-search`
+
+### Learn by Example
+
+```shell
+cat file.txt | qq "where lower(line) like '%daniel%'"
+# or
+echo hello | qq "select line from logs"
+# or
+echo hello | qq path:/path/to/some.sql
+# or
+qq "where line like 'id: %'" /path/to/my.txt
+# or 
+qq "select 'Line: ' || i as line_index, line from logs where line like 'id: %'" /path/to/my.txt
+# or 
+qq path:/path/to/some.sql /path/to/my.txt
+# or
+qq --folder /path/to/folder "where line like '%important%'"
+# or
+qq --folder /path/to/folder path:/path/to/some.sql
+```
+
+### Table Structure
+
+`CREATE TABLE logs (i int, line TEXT);`
+
+`i` Is the line index starting at `1`.
+
+`line` is the read stripped line (`line.strip('\n')`)
+
+### License
+* MIT License
