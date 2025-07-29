@@ -1,0 +1,41 @@
+name: Pre-Release
+
+on:
+  push:
+    tags:
+      - '*rc[1-9]*'
+      - '*beta[1-9]*'
+      - '*a[1-9]*'
+      - '*b[1-9]*'
+
+permissions:
+  contents: read
+
+jobs:
+  prerelease:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: ⚡ Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.20"
+
+      - name: 📦 Build distribution
+        run: uv build
+
+      - name: 🧐 Check distribution with Twine
+        run: uv run twine check dist/*
+
+      - name: 🚀 Upload to TestPyPI
+        env:
+          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: uv run twine upload --repository testpypi -u __token__ -p $TEST_PYPI_TOKEN dist/*
