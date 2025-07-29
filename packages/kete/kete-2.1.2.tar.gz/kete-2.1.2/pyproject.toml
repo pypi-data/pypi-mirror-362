@@ -1,0 +1,103 @@
+[project]
+name = "kete"
+version = "2.1.2"
+description = "Kete Asteroid Survey Tools"
+readme = "README.md"
+authors = [{name = "Dar Dahlen", email = "dardahlen@gmail.com"},
+          ]
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = ["astropy>=5.3.4",
+                "matplotlib",
+                "matplotlib-label-lines<=0.8.0",
+                "numpy>=1.24",
+                "pandas",
+                "requests",
+                "scipy",
+                ]
+
+[project.urls]
+homepage = "https://github.com/dahlend/kete"
+
+[build-system]
+requires = ["maturin>=1.9",
+            "wheel",
+            ]
+build-backend = "maturin"
+
+[tool.maturin]
+python-source = "src"
+module-name = "kete._core"
+manifest-path = "Cargo.toml"
+include = ["LICENSE"]
+
+[project.optional-dependencies]
+dev = ["ruff",
+       "pytest",
+       "pytest-cov",
+       "sphinx",
+       "autodoc",
+       "sphinx-gallery",
+       "mypy",
+       "types-requests",
+       "sphinx_rtd_theme",
+       "click",
+       ]
+docs = ["sphinx",
+        "autodoc",
+        "sphinx-gallery",
+        "sphinx_rtd_theme",
+        "click",
+        "pytz",
+        ]
+
+# Options for pytest
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
+markers = [
+    "horizons: run JPL Horizons tests, requires an internet connection.",
+]
+# filterwarnings = "error"
+
+# Options for the coverage report.
+[tool.coverage.run]
+omit = ["*/kete/mpc.py",
+        "*/kete/tap.py",
+        "*/kete/wise.py",
+        "*/kete/ztf.py",
+        "*/kete/ptf.py",
+        "*/kete/horizons.py",
+        "*/kete/data/*",
+        "*/examples/*",]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+exclude = ["src/examples/*"]
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"
+ignore_missing_imports = true
