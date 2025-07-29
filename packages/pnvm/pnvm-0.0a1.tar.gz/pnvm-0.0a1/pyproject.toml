@@ -1,0 +1,101 @@
+[project]
+name = "pnvm"
+dynamic = ["version"]
+description = "Python-based Node Version Manager"
+authors = [
+    { name = "Axel H. Karlsson", email = "git@axelkarlsson.mozmail.com" },
+]
+maintainers = [
+    { name = "H. Karlsson", email = "programmer@coder-one.se" },
+]
+license = "GPL-3.0"
+license-files = ["LICENSE"]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests>=2.32.4",
+]
+
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://gitlab.com/axelkarlsson/pnvm"
+"Bug Tracker" = "https://gitlab.com/axelkarlsson/pnvm/-/issues"
+
+[project.scripts]
+pnvm = "pnvm.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.16.1",
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+    "ruff>=0.12.1",
+    "twine>=6.1.0",
+]
+
+[tool.hatch.version]
+path = "src/pnvm/__init__.py"
+
+## Should not be needed, according to the doc, but it is now I don't know why currently.
+# See: https://hatch.pypa.io/latest/config/build/#file-selection
+[tool.hatch.build.targets.wheel]
+include = ["src/pnvm"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/pnvm"]
+
+[tool.pytest.ini_options]
+minversion = "8.3"
+addopts = "-ra -q"
+pythonpath = [
+    "src",
+]
+testpaths = [
+    "tests",
+]
+
+markers = [
+    "mock: this is a mock test",
+    "cloud: this is cloud dependent test",
+    "smoke: this is a smoke test",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+preview = true
+select = ["E", "F"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = 80
+
+
+[tool.mypy]
+files = [
+    "src",
+]
+
+[[tool.mypy.overrides]]
+# module = []
+ignore_missing_imports = true

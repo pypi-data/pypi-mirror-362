@@ -1,0 +1,115 @@
+# README
+
+![pipeline](https://gitlab.com/axelkarlsson/pnvm/badges/develop/pipeline.svg?job=pipeline-status)
+[![coverage report](https://gitlab.com/axelkarlsson/pnvm/badges/develop/coverage.svg)](https://gitlab.com/axelkarlsson/pnvm/-/commits/master) 
+
+
+**pnvm** (sometimes **PNVM**), is a small, FOSS utility for managing Node.js versions.  
+It is written in Python, and more specifically Python >= 3.13, and focuses on **security**.
+
+## Important Note
+
+This project is still in alpha and under active development, and as such not ready to be used.
+
+## Installing
+
+You may install this utility via `pip`, kinda like this:
+```bash
+# NOTE: Don't install inside a `venv` unless you know what you are doing.
+$ python3 -m pip install --upgrade pnvm
+
+# If pnvm hasn't been added to $PATH, do the following:
+# NOTE: replace `.bashrc` with whatever equivalent if you're using a shell which isn't bash.
+$ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+# Source the RC file again.
+$ . ~/.bashrc
+```
+
+## License
+
+pnvm is **free software** licensed under the **GNU GPLv3**, or, if available, any later version.
+
+## Examples
+
+Installing Node.js version 18.20.8 via `pnvm`:
+```bash
+# NOTE: You may also write "--install".
+$ pnvm -i v18.20.8
+...
+# Show list of versions:
+$ pnvm -l
+v18.20.8
+# Switch to the newly installed version:
+$ pnvm -c v18.20.8
+
+$ node
+Welcome to Node.js v18.20.8.
+...
+```
+
+## Security
+
+If there are any issues regarding security, please contact me via the email  
+connected to `git`, or, preferrably, open an issue on GitLab.  
+
+It is rather important to do so since this project is decently focused on security.
+
+## Contact
+
+Please open an issue on GitLab before contacting me.  
+If you want to email me, you may do so via the email connected to `git`.
+
+## Extra Notes
+
+I've never ever published a project to PyPI and I'm gonna be honest and admit that I'm a  
+beginner to it. Feel free to help me out if you're more experienced.
+
+## Development
+
+After cloning, run `uv sync` in the project folder.
+
+### Project maintenance with UV
+
+Type checking:
+
+```shell
+uv run mypy
+```
+
+Test/Coverage: 
+
+```shell
+uv run pytest --cov-report term-missing --cov ./src
+```
+
+If you need detailed reports: 
+
+```shell
+uv run pytest --cov-report html:.coverage-html --cov ./src
+```
+
+Linting
+
+```shell
+uv run ruff check  ./src
+```
+
+Checking formatting:
+
+```shell
+uv run ruff format --check ./src
+```
+
+Applying formatting:
+
+```shell
+uv run ruff format ./src
+```
+
+Upgrade packages:
+
+```shell
+uv sync --upgrade
+```
+
+
