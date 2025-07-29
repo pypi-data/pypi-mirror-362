@@ -1,0 +1,180 @@
+# Baseball Crawler Configuration
+# This file externalizes hardcoded settings to make the crawler more configurable
+
+crawler:
+  # Basic crawling parameters
+  max_depth: 1
+  max_pages: 3
+  max_concurrent_crawls: 3
+  
+  # Content filtering - optimized for longer, detailed content
+  content_size_range:
+    min_chars: 300  # Higher minimum for more substantial content
+    max_chars: 15000  # Much higher maximum for full articles
+  
+  # Skip patterns for navigation/unwanted content
+  skip_patterns:
+    - 'skip to'
+    - 'navigation'
+    - 'menu'
+    - 'footer'
+    - 'header'
+    - 'subscribe'
+    - 'sign up'
+    - 'log in'
+    - 'follow us'
+    - 'privacy policy'
+    - 'terms of use'
+    - 'cookie'
+    # ESPN-specific navigation patterns
+    - 'gamecastbox score'
+    - 'american league'
+    - 'national league'
+    - 'afc east'
+    - 'nfc east'
+    - 'atlantic division'
+    - 'eastern conference'
+    - 'homehomescores'
+    - 'scoresscores'
+    - 'scheduleschedule'
+    - 'standingsstandings'
+    - 'statsstatsteams'
+    - 'draftdraft'
+
+llm:
+  # LLM processing parameters - optimized for longer, better content
+  chunk_size: 2  # Fewer blocks per chunk for more focused analysis
+  max_blocks_to_analyze: 40  # More blocks to analyze
+  content_preview_length: 25000  # Much more content to send to LLM
+  
+  # Baseball content extraction prompt template
+  extraction_prompt: |
+    Analyze this content and extract DETAILED baseball-related information. Focus on extracting COMPLETE paragraphs, full articles, and comprehensive content about MLB, players, teams, or games.
+
+    Content:
+    {content}
+
+    IMPORTANT INSTRUCTIONS:
+    - Extract FULL paragraphs and complete sentences, not just headlines
+    - Include detailed game recaps with context, statistics, and analysis
+    - Extract complete player stories with background information
+    - Include comprehensive team analysis and trade discussions
+    - Capture detailed injury reports and roster moves
+    - Extract full article content, not just summaries
+    - Aim for 500+ characters per extracted item when possible
+    - Extract FULL articles and complete multi-paragraph content
+    - Preserve original wording and journalistic style
+
+    Include:
+    - Complete news articles and detailed paragraphs about baseball
+    - Full player profiles, stats, trades, and career updates
+    - Detailed game results with play-by-play, key moments, and analysis
+    - Comprehensive team news, strategy, and management decisions
+    - In-depth injury reports and player health updates
+    - Complete prospect analysis and draft coverage
+    - Full season analysis and playoff implications
+
+    Exclude:
+    - Short headlines without supporting content
+    - Simple scores without detailed context
+    - Navigation menus and advertisements
+    - Social media snippets under 300 characters
+    - Fragments or incomplete sentences
+
+    Return JSON format with DETAILED content: {{"baseball_news": ["detailed_paragraph_1", "detailed_paragraph_2", ...]}}
+    If no substantial baseball content found, return: {{"baseball_news": []}}
+
+  # Summary generation prompt template
+  summary_prompt: |
+    Analyze the following baseball news content and create a comprehensive summary.
+
+    Content ({article_count} articles):
+    {content}
+
+    Please provide:
+    1. A 2-3 paragraph summary of the main baseball news topics
+    2. Key topics/themes mentioned (as a list)
+    3. Any major players, teams, or events discussed
+
+    Format your response as JSON:
+    {{
+        "summary": "2-3 paragraph summary here",
+        "key_topics": ["topic1", "topic2", "topic3"],
+        "major_players": ["player1", "player2"],
+        "major_teams": ["team1", "team2"],
+        "major_events": ["event1", "event2"]
+    }}
+
+scout_bridge:
+  # Baseball link filtering for navigation
+  enabled: true
+  baseball_keywords:
+    - 'baseball'
+    - 'mlb'
+    - 'major league'
+    - 'world series'
+    - 'all-star'
+    - 'playoff'
+    - 'pitcher'
+    - 'batter'
+    - 'home run'
+    - 'rbi'
+    - 'era'
+    - 'innings'
+    - 'roster'
+    - 'trade'
+    - 'draft'
+    - 'spring training'
+    
+  # Navigation link filtering prompt
+  link_filter_prompt: |
+    You are helping to crawl baseball news. Look at this navigation link and determine if it's related to baseball/MLB content.
+    
+    Link: {link_text}
+    URL: {link_url}
+    
+    Return "YES" if this link is likely to contain baseball news, player information, game coverage, or MLB-related content.
+    Return "NO" if this link is for other sports, general navigation, ads, or non-baseball content.
+    
+    Answer with just YES or NO.
+
+output:
+  # Output file configuration
+  json_filename_template: "smart_baseball_news_{timestamp}.json"
+  txt_filename_template: "smart_baseball_news_{timestamp}.txt"
+  timestamp_format: "%Y%m%d_%H%M%S"
+  
+  # Minimum items required for valid output
+  min_items_for_output: 1
+
+logging:
+  # Logging configuration
+  level: "DEBUG"  # DEBUG, INFO, WARNING, ERROR
+  detailed_log_file: "baseball_crawler_detailed.log"
+  error_log_file: "baseball_crawler_errors.log"
+  
+  # Module-specific log levels
+  modules:
+    web_maestro.fetch: "DEBUG"
+    web_maestro.dom_capture: "DEBUG"
+    web_maestro.providers: "DEBUG"
+    web_maestro.crawl: "DEBUG"
+
+timeouts:
+  # Various timeout settings (in milliseconds)
+  page_timeout: 30000
+  dom_timeout: 8000
+  initial_wait: 2000
+  stability_threshold: 4
+
+browser:
+  # Browser configuration
+  headless: true
+  viewport:
+    width: 1920
+    height: 1080
+  args:
+    - '--disable-gpu'
+    - '--disable-dev-shm-usage'
+    - '--disable-setuid-sandbox'
+    - '--no-sandbox'

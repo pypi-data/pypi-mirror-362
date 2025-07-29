@@ -1,0 +1,720 @@
+# 🌐 Web Maestro
+
+[![PyPI version](https://badge.fury.io/py/web-maestro.svg)](https://badge.fury.io/py/web-maestro)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Downloads](https://pepy.tech/badge/web-maestro)](https://pepy.tech/project/web-maestro)
+
+**Production-ready web content extraction with multi-provider LLM support and intelligent browser automation.**
+
+Web Maestro is a Python library that combines advanced web scraping capabilities with AI-powered content analysis. It provides browser automation using Playwright and integrates with multiple LLM providers for intelligent content extraction and analysis.
+
+## 🔥 Real-World Example: Smart Baseball Data Pipeline
+
+Imagine you need to build a comprehensive baseball analytics system that monitors multiple sports websites, extracts game statistics, player performance data, and news updates in real-time. Web Maestro makes this incredibly simple:
+
+```python
+import asyncio
+from web_maestro import WebMaestro, LLMConfig
+
+async def smart_baseball_crawler():
+    # Configure your AI-powered crawler
+    config = LLMConfig(
+        provider="openai",  # or anthropic, portkey, ollama
+        api_key="your-api-key",
+        model="gpt-4o"
+    )
+
+    maestro = WebMaestro(config)
+
+    # Define what you want to extract
+    extraction_prompt = """
+    Extract baseball data and structure it as JSON:
+    - Game scores and schedules
+    - Player statistics (batting avg, ERA, etc.)
+    - Injury reports and roster changes
+    - Latest news headlines
+
+    Focus on actionable data for fantasy baseball decisions.
+    """
+
+    # Crawl multiple sources intelligently
+    sources = [
+        "https://www.espn.com/mlb/",
+        "https://www.mlb.com/",
+        "https://www.baseball-reference.com/"
+    ]
+
+    for url in sources:
+        # AI automatically understands site structure and extracts relevant data
+        result = await maestro.extract_structured_data(
+            url=url,
+            prompt=extraction_prompt,
+            output_format="json"
+        )
+
+        if result.success:
+            print(f"📊 Extracted from {url}:")
+            print(f"⚾ Games: {len(result.data.get('games', []))}")
+            print(f"👤 Players: {len(result.data.get('players', []))}")
+            print(f"📰 News: {len(result.data.get('news', []))}")
+
+            # Data is automatically structured and ready for your database
+            await save_to_database(result.data)
+
+# Run your intelligent baseball pipeline
+asyncio.run(smart_baseball_crawler())
+```
+
+**Why This Example Matters:**
+- 🧠 **AI-Powered**: No manual CSS selectors or HTML parsing - AI understands content contextually
+- 🚀 **Production Ready**: Handles dynamic content, JavaScript-heavy sites, and rate limiting automatically
+- 🔄 **Adaptive**: Works across different sports sites without code changes
+- 📊 **Structured Output**: Returns clean, structured data ready for analysis or storage
+
+## 🌟 Key Features
+
+### 🚀 **Advanced Web Extraction**
+- **Browser Automation**: Powered by Playwright for handling dynamic content and JavaScript-heavy sites
+- **DOM Capture**: Intelligent element interaction including clicks, hovers, and content discovery
+- **Session Management**: Proper context management for complex extraction workflows
+
+### 🤖 **Multi-Provider LLM Support**
+- **Universal Interface**: Works with OpenAI, Anthropic Claude, Portkey, and Ollama
+- **Streaming Support**: Real-time content delivery for better user experience
+- **Intelligent Analysis**: AI-powered content extraction and structuring
+
+### 🔧 **Developer Experience**
+- **Clean API**: Intuitive, well-documented interface
+- **Type Safety**: Full type hints and Pydantic models
+- **Async Support**: Built for modern async/await patterns
+- **Extensible**: Modular architecture for custom providers
+
+## 📦 Installation
+
+### Basic Installation
+```bash
+pip install web-maestro
+```
+
+### Quick Verification
+After installation, verify everything works:
+
+```python
+# Test basic import
+from web_maestro import LLMConfig, SessionContext
+print("✅ Web Maestro installed successfully!")
+
+# Check available providers
+from web_maestro.providers.factory import ProviderRegistry
+print(f"📦 Available providers: {ProviderRegistry.list_providers()}")
+```
+
+### With Specific LLM Provider
+Choose your preferred AI provider:
+
+```bash
+# For OpenAI GPT models
+pip install "web-maestro[openai]"
+
+# For Anthropic Claude models
+pip install "web-maestro[anthropic]"
+
+# For Portkey AI gateway
+pip install "web-maestro[portkey]"
+
+# For local Ollama models
+pip install "web-maestro[ollama]"
+
+# Install all providers
+pip install "web-maestro[all-providers]"
+```
+
+### System Dependencies
+
+Web Maestro requires **Poppler** for PDF processing functionality:
+
+**macOS (Homebrew):**
+```bash
+brew install poppler
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt-get install poppler-utils
+```
+
+**Windows:**
+Download from: https://blog.alivate.com.au/poppler-windows/
+
+### Development Installation
+
+**Quick Setup (Recommended):**
+```bash
+git clone https://github.com/fede-dash/web-maestro.git
+cd web-maestro
+
+# Automated setup - installs system deps, Python deps, and browsers
+hatch run setup-dev
+```
+
+**Manual Setup:**
+```bash
+git clone https://github.com/fede-dash/web-maestro.git
+cd web-maestro
+
+# Install system dependencies
+brew install poppler  # macOS
+# sudo apt-get install poppler-utils  # Linux
+
+# Install Python dependencies
+pip install -e ".[dev,all-features]"
+
+# Install browsers for Playwright
+playwright install
+
+# Setup pre-commit hooks
+pre-commit install
+```
+
+**Available Hatch Scripts:**
+```bash
+# Full system and dev setup
+hatch run setup-dev
+
+# Install just system dependencies
+hatch run setup-system
+
+# Full setup for production use
+hatch run setup-full
+
+# Run tests
+hatch run test
+
+# Run tests with coverage
+hatch run test-cov
+
+# Format and lint code
+hatch run format
+hatch run lint
+```
+
+## 🚀 Quick Start
+
+### Basic Web Content Extraction
+
+```python
+import asyncio
+from web_maestro import fetch_rendered_html, SessionContext
+from web_maestro.providers.portkey import PortkeyProvider
+from web_maestro import LLMConfig
+
+async def extract_content():
+    # Configure your LLM provider
+    config = LLMConfig(
+        provider="portkey",
+        api_key="your-api-key",
+        model="gpt-4",
+        base_url="your-portkey-endpoint",
+        extra_params={"virtual_key": "your-virtual-key"}
+    )
+
+    provider = PortkeyProvider(config)
+
+    # Extract content using browser automation
+    ctx = SessionContext()
+    blocks = await fetch_rendered_html(
+        url="https://example.com",
+        ctx=ctx
+    )
+
+    if blocks:
+        # Combine extracted content
+        content = "\n".join([block.content for block in blocks[:20]])
+
+        # Analyze with AI
+        response = await provider.complete(
+            f"Analyze this content and extract key information:\n{content[:5000]}"
+        )
+
+        if response.success:
+            print("Extracted content:", response.content)
+        else:
+            print("Error:", response.error)
+
+asyncio.run(extract_content())
+```
+
+### Streaming Content Analysis
+
+```python
+import asyncio
+from web_maestro.providers.portkey import PortkeyProvider
+from web_maestro import LLMConfig
+
+async def stream_analysis():
+    config = LLMConfig(
+        provider="portkey",
+        api_key="your-api-key",
+        model="gpt-4",
+        base_url="your-endpoint",
+        extra_params={"virtual_key": "your-virtual-key"}
+    )
+
+    provider = PortkeyProvider(config)
+
+    # Stream response chunks in real-time
+    prompt = "Write a detailed analysis of modern web scraping techniques."
+
+    async for chunk in provider.complete_stream(prompt):
+        print(chunk, end="", flush=True)
+
+asyncio.run(stream_analysis())
+```
+
+### Using Enhanced Fetcher
+
+```python
+import asyncio
+from web_maestro.utils import EnhancedFetcher
+
+async def fetch_with_caching():
+    # Create fetcher with intelligent caching
+    fetcher = EnhancedFetcher(cache_ttl=300)  # 5-minute cache
+
+    # Attempt static fetch first, fallback to browser if needed
+    blocks = await fetcher.try_static_first("https://example.com")
+
+    print(f"Fetched {len(blocks)} content blocks")
+    for block in blocks[:5]:
+        print(f"[{block.content_type}] {block.content[:100]}...")
+
+asyncio.run(fetch_with_caching())
+```
+
+## 🎯 Current Capabilities
+
+### ✅ **What's Working**
+- **Browser Automation**: Full Playwright integration for dynamic content
+- **Multi-Provider LLM**: OpenAI, Anthropic, Portkey, and Ollama support
+- **Streaming**: Real-time response streaming from LLM providers
+- **Content Extraction**: DOM capture with multiple content types
+- **Session Management**: Proper browser context and session handling
+- **Type Safety**: Comprehensive type hints throughout the codebase
+
+### 🚧 **In Development**
+- **WebMaestro Class**: High-level orchestration (basic implementation exists)
+- **Advanced DOM Interaction**: Tab expansion, hover detection (framework exists)
+- **Rate Limiting**: Smart request throttling (utility classes available)
+- **Caching Layer**: Response caching with TTL (basic implementation exists)
+
+### 📋 **Planned Features**
+- Comprehensive test suite
+- Advanced error recovery
+- Performance monitoring
+- Plugin architecture
+- Documentation website
+
+## 🔮 **Future Roadmap: WebActions Framework**
+
+> **🚧 Coming Soon**: Web Maestro is evolving beyond content extraction into intelligent web automation with **WebActions** - a revolutionary framework for automated web interactions.
+
+The next major evolution will introduce **WebActions** - an intelligent automation framework that extends beyond content extraction to include sophisticated web interaction capabilities:
+
+### 🎯 **Planned WebActions Features:**
+- **🤖 Intelligent Form Automation**: AI-driven form completion with context understanding and validation
+- **🔄 Complex Workflow Execution**: Multi-step web processes with decision trees and conditional logic
+- **📱 Interactive Element Management**: Smart handling of dropdowns, modals, and dynamic UI components
+- **🔐 Authentication Workflows**: Automated login sequences with credential management and session persistence
+- **📊 Data Submission Pipelines**: Intelligent data entry with validation and error handling
+- **🎮 Game-like Interactions**: Advanced interaction patterns for complex web applications
+- **🧠 Action Learning**: Machine learning-based action optimization and pattern recognition
+
+### 🌟 **WebActions Vision:**
+WebActions will transform Web Maestro from a content extraction tool into a comprehensive web automation agent capable of performing complex interactions while maintaining the same level of intelligence and adaptability demonstrated in current content analysis features. This evolution will enable use cases such as:
+
+- **Automated Data Entry**: Intelligent form completion across multiple systems
+- **Complex Multi-Step Workflows**: End-to-end process automation with decision making
+- **Intelligent Web Application Testing**: AI-driven testing with adaptive scenarios
+- **Dynamic Content Management**: Automated content publishing and management workflows
+
+**Beta Status**: The current version focuses on content extraction and analysis. WebActions capabilities are in active development and will be released in future versions.
+
+## 🔧 Configuration
+
+### LLM Provider Setup
+
+```python
+from web_maestro import LLMConfig
+
+# OpenAI Configuration
+openai_config = LLMConfig(
+    provider="openai",
+    api_key="sk-...",
+    model="gpt-4",
+    temperature=0.7,
+    max_tokens=2000
+)
+
+# Portkey Configuration (with gateway)
+portkey_config = LLMConfig(
+    provider="portkey",
+    api_key="your-portkey-key",
+    model="gpt-4",
+    base_url="https://your-gateway.com/v1",
+    extra_params={
+        "virtual_key": "your-virtual-key"
+    }
+)
+
+# Anthropic Configuration
+anthropic_config = LLMConfig(
+    provider="anthropic",
+    api_key="sk-ant-...",
+    model="claude-3-sonnet",
+    temperature=0.5
+)
+```
+
+### Browser Configuration
+
+```python
+browser_config = {
+    "headless": True,
+    "timeout_ms": 30000,
+    "viewport": {"width": 1920, "height": 1080},
+    "max_scrolls": 15,
+    "max_elements_to_click": 25,
+    "stability_timeout_ms": 2000
+}
+
+blocks = await fetch_rendered_html(
+    url="https://complex-spa.com",
+    ctx=ctx,
+    config=browser_config
+)
+```
+
+## 📚 API Overview
+
+### Core Functions
+
+```python
+# Browser-based content extraction
+from web_maestro import fetch_rendered_html, SessionContext
+
+ctx = SessionContext()
+blocks = await fetch_rendered_html(url, ctx, config)
+```
+
+### Provider Classes
+
+```python
+# All providers implement the same interface
+from web_maestro.providers.portkey import PortkeyProvider
+
+provider = PortkeyProvider(config)
+response = await provider.complete(prompt)
+stream = provider.complete_stream(prompt)
+```
+
+### Utility Classes
+
+```python
+# Enhanced fetching with caching
+from web_maestro.utils import EnhancedFetcher, RateLimiter
+
+fetcher = EnhancedFetcher(cache_ttl=300)
+rate_limiter = RateLimiter(max_requests=10, time_window=60)
+```
+
+### Data Models
+
+```python
+# Structured data types
+from web_maestro.models.types import CapturedBlock, CaptureType
+from web_maestro.providers.base import LLMResponse, ModelCapability
+```
+
+## 🛡️ Error Handling
+
+```python
+try:
+    response = await provider.complete("Your prompt")
+
+    if response.success:
+        print("Response:", response.content)
+        print(f"Tokens used: {response.total_tokens}")
+    else:
+        print("Error:", response.error)
+
+except Exception as e:
+    print(f"Unexpected error: {e}")
+```
+
+## 🔄 Streaming Support
+
+```python
+# Stream responses for real-time delivery
+async for chunk in provider.complete_stream("Your prompt"):
+    print(chunk, end="", flush=True)
+
+# Chat streaming
+messages = [{"role": "user", "content": "Hello"}]
+async for chunk in provider.complete_chat_stream(messages):
+    print(chunk, end="", flush=True)
+```
+
+## 🧪 Testing Your Setup
+
+```python
+# Test provider connectivity
+import asyncio
+from web_maestro.providers.openai import OpenAIProvider
+from web_maestro import LLMConfig
+
+async def test_setup():
+    config = LLMConfig(
+        provider="openai",
+        api_key="your-openai-api-key",
+        model="gpt-3.5-turbo"
+    )
+
+    provider = OpenAIProvider(config)
+    response = await provider.complete("Hello, world!")
+
+    if response.success:
+        print("✅ Provider working:", response.content)
+    else:
+        print("❌ Provider failed:", response.error)
+
+# Run the test
+asyncio.run(test_setup())
+```
+
+## 🛠️ Troubleshooting
+
+### Common Issues and Solutions
+
+**Import Error: "No module named 'web_maestro'"**
+```bash
+# Make sure you installed the package
+pip install web-maestro
+
+# If using conda
+conda install -c conda-forge web-maestro  # Not yet available
+```
+
+**Browser Dependencies Missing**
+```bash
+# Install Playwright browsers
+playwright install
+
+# On Linux, you might need additional dependencies
+sudo apt-get install libnss3 libxss1 libasound2
+```
+
+**PDF Processing Issues**
+```bash
+# Install Poppler (required for PDF processing)
+# macOS
+brew install poppler
+
+# Ubuntu/Debian
+sudo apt-get install poppler-utils
+
+# Windows: Download from https://blog.alivate.com.au/poppler-windows/
+```
+
+**LLM Provider Authentication**
+```python
+# Verify your API keys are set correctly
+import os
+print("OpenAI API Key:", os.getenv("OPENAI_API_KEY", "Not set"))
+print("Anthropic API Key:", os.getenv("ANTHROPIC_API_KEY", "Not set"))
+```
+
+**Rate Limiting Issues**
+```python
+# Use built-in rate limiting
+from web_maestro.utils import RateLimiter
+
+rate_limiter = RateLimiter(max_requests=10, time_window=60)
+await rate_limiter.acquire()  # Will wait if needed
+```
+
+## 📁 Project Structure
+
+```
+web-maestro/
+├── src/web_maestro/
+│   ├── __init__.py              # Main exports
+│   ├── multi_provider.py        # WebMaestro orchestrator
+│   ├── fetch.py                 # Core fetching logic
+│   ├── context.py               # Session management
+│   ├── providers/               # LLM provider implementations
+│   │   ├── base.py              # Base provider interface
+│   │   ├── portkey.py           # Portkey provider
+│   │   ├── openai.py            # OpenAI provider
+│   │   ├── anthropic.py         # Anthropic provider
+│   │   └── ollama.py            # Ollama provider
+│   ├── utils/                   # Utility classes
+│   │   ├── enhanced_fetch.py    # Smart fetching
+│   │   ├── rate_limiter.py      # Rate limiting
+│   │   ├── text_processor.py    # Text processing
+│   │   └── json_processor.py    # JSON handling
+│   ├── models/                  # Data models
+│   │   └── types.py             # Type definitions
+│   └── dom_capture/             # Browser automation
+│       ├── universal_capture.py # DOM interaction
+│       └── scroll.py            # Scrolling logic
+├── tests/                       # Test files
+├── docs/                        # Documentation
+├── pyproject.toml               # Project configuration
+└── README.md                    # This file
+```
+
+## 📖 Examples
+
+### Real Website Extraction
+
+Test with a real website (example using Chelsea FC):
+
+```python
+import asyncio
+from web_maestro import fetch_rendered_html, SessionContext
+from web_maestro.providers.portkey import PortkeyProvider
+from web_maestro import LLMConfig
+
+async def extract_chelsea_info():
+    # Configure provider
+    config = LLMConfig(
+        provider="portkey",
+        api_key="your-key",
+        model="gpt-4o",
+        base_url="your-endpoint",
+        extra_params={"virtual_key": "your-virtual-key"}
+    )
+
+    provider = PortkeyProvider(config)
+
+    # Extract website content
+    ctx = SessionContext()
+    blocks = await fetch_rendered_html("https://www.chelseafc.com/en", ctx)
+
+    if blocks:
+        # Analyze with AI
+        content = "\n".join([block.content for block in blocks[:50]])
+
+        response = await provider.complete(f"""
+        Extract soccer information from this Chelsea FC website:
+        1. Latest news and match updates
+        2. Upcoming fixtures
+        3. Team news
+
+        Website content:
+        {content[:5000]}
+        """)
+
+        if response.success:
+            print("⚽ Extracted Information:")
+            print(response.content)
+
+asyncio.run(extract_chelsea_info())
+```
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Quick Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/fede-dash/web-maestro.git
+cd web-maestro
+
+# Automated setup (recommended)
+./scripts/setup-dev.sh
+
+# Or manual setup
+pip install hatch
+hatch run install-dev
+hatch run install-hooks
+```
+
+### Development Commands
+
+```bash
+# Code quality (using Hatch - recommended)
+hatch run format      # Format code with Black and Ruff
+hatch run lint        # Run linting checks
+hatch run check       # Run all quality checks
+
+# Testing
+hatch run test        # Run tests
+hatch run test-cov    # Run tests with coverage
+
+# Or use Make commands
+make format           # Format code
+make lint            # Run linting
+make check           # Run all checks
+make test            # Run tests
+make dev-setup       # Full development setup
+```
+
+### Pre-commit Hooks
+
+Pre-commit hooks are **mandatory** and will run automatically:
+
+```bash
+# Install hooks (done automatically by setup script)
+hatch run install-hooks
+
+# Run hooks manually
+pre-commit run --all-files
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📈 Version History
+
+### v1.0.0 (Current)
+- ✅ **Initial Release**: Production-ready web content extraction
+- ✅ **Multi-Provider LLM Support**: OpenAI, Anthropic, Portkey, Ollama
+- ✅ **Browser Automation**: Full Playwright integration
+- ✅ **Streaming Support**: Real-time response streaming
+- ✅ **Type Safety**: Comprehensive type hints throughout
+- ✅ **Session Management**: Proper browser context handling
+
+### 🚀 Coming Soon
+- **v1.1.0**: WebActions framework for intelligent web automation
+- **v1.2.0**: Advanced caching and rate limiting
+- **v1.3.0**: Plugin architecture and custom providers
+
+## 🆘 Support & Contact
+
+- **PyPI Package**: [web-maestro on PyPI](https://pypi.org/project/web-maestro/)
+- **Issues**: [GitHub Issues](https://github.com/fede-dash/web-maestro/issues)
+- **Questions**: Create a discussion or issue
+- **Documentation**: [GitHub Repository](https://github.com/fede-dash/web-maestro)
+- **Email**: For enterprise support inquiries
+
+## 🔗 Related Projects
+
+- **Playwright**: Browser automation framework
+- **Beautiful Soup**: HTML parsing library
+- **aiohttp**: Async HTTP client
+- **Pydantic**: Data validation and settings management
+
+---
+
+<div align="center">
+
+**Web Maestro - Intelligent Web Content Extraction**
+
+[⭐ Star us on GitHub](https://github.com/fede-dash/web-maestro) | [📚 Documentation](docs/) | [🐛 Report Issue](https://github.com/fede-dash/web-maestro/issues)
+
+</div>
