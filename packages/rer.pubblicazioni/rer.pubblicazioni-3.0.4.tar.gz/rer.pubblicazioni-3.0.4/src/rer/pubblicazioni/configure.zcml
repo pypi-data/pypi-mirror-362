@@ -1,0 +1,76 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="rer.pubblicazioni">
+
+  <i18n:registerTranslations directory="locales" />
+
+  <include package=".browser" />
+  <include package=".restapi" />
+  <include package=".upgrades" />
+
+  <genericsetup:registerProfile
+      name="default"
+      title="rer.pubblicazioni"
+      directory="profiles/default"
+      description="Installs the rer.pubblicazioni add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_install"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="rer.pubblicazioni (uninstall)"
+      directory="profiles/uninstall"
+      description="Uninstalls the rer.pubblicazioni add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.uninstall"
+      />
+
+  <utility
+      factory=".setuphandlers.HiddenProfiles"
+      name="rer.pubblicazioni-hiddenprofiles" />
+
+  <!-- VOCABOLARI -->
+  <utility
+    factory=".vocabularies.Lingue"
+    name="rer.pubblicazioni.lingue"
+    />
+
+  <utility
+    factory=".vocabularies.Tipologie"
+    name="rer.pubblicazioni.tipologie"
+    />
+
+  <utility
+    component=".vocabularies.KeywordsVocabularyFactory"
+    provides="zope.schema.interfaces.IVocabularyFactory"
+    name="rer.pubblicazioni.autori"
+    />
+
+  <utility
+    component=".vocabularies.PublicationUsedAuthorsVocabularyFactory"
+    provides="zope.schema.interfaces.IVocabularyFactory"
+    name="rer.pubblicazioni.used_authors"
+    />
+
+  <utility
+    component=".vocabularies.PublicationUsedTypesVocabularyFactory"
+    provides="zope.schema.interfaces.IVocabularyFactory"
+    name="rer.pubblicazioni.used_types"
+    />
+
+  <utility
+    component=".vocabularies.PublicationUsedLanguagesVocabularyFactory"
+    provides="zope.schema.interfaces.IVocabularyFactory"
+    name="rer.pubblicazioni.used_languages"
+    />
+  <!-- INDEXER -->
+  <adapter name="authors" factory=".indexers.author_indexer" />
+  <adapter name="publication_types" factory=".indexers.publication_types_indexer" />
+  <adapter name="publication_language" factory=".indexers.publication_language_indexer" />
+  <adapter name="publication_date" factory=".indexers.publication_date_indexer" />
+  <adapter name="SearchableText" factory=".indexers.publication_searchable_text" />
+
+</configure>

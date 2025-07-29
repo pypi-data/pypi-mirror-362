@@ -1,0 +1,48 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="rer.pubblicazioni">
+
+  <!-- Pannello di controllo -->
+  <browser:page
+      name="rer-pubblicazioni-settings"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".settings.RerPubblicazioniSettingsView"
+      permission="cmf.ManagePortal"
+      />
+
+  <!-- Vista di aiuto/supporto -->
+  <browser:page
+      for="*"
+      name="rer-pubblicazioni-utils-view"
+      class=".utils_view.RerPubblicazioniUtilsView"
+      allowed_interface="rer.pubblicazioni.browser.interfaces.IRerPubblicazioniUtilsView"
+      permission="zope2.View"
+      />
+
+  <!-- vista per il tipo: Pubblicazione -->
+  <browser:page
+      name="view"
+      for="rer.pubblicazioni.interfaces.IPubblicazione"
+      class=".views.PubblicazioneView"
+      template="templates/pubblicazione_view.pt"
+      layer="rer.pubblicazioni.interfaces.IRerPubblicazioniLayer"
+      permission="zope2.View"
+      menu="plone_displayviews"
+      title="Pubblicazione - view"
+      />
+
+  <browser:page
+      name="pubblicazioni_collection_view"
+      for="plone.app.contenttypes.interfaces.ICollection"
+      class=".views.PubblicazioniCollectionView"
+      template="templates/pubblicazioni_collection_view.pt"
+      layer="rer.pubblicazioni.interfaces.IRerPubblicazioniLayer"
+      permission="zope2.View"
+      menu="plone_displayviews"
+      title="Archivio pubblicazioni"
+      />
+
+</configure>
+
