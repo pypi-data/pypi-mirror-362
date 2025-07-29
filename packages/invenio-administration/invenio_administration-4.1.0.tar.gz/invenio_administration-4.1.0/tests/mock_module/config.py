@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2022 CERN.
+#
+# Invenio is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+
+"""Mock service configuration."""
+
+from invenio_records_resources.services import RecordServiceConfig
+
+
+class ServiceConfig(RecordServiceConfig):
+    """Mock service configuration.
+
+    Needs both configs, with File overwritting the record ones.
+    """
+
+    permission_policy_cls = None
+    record_cls = None
+    schema = None
