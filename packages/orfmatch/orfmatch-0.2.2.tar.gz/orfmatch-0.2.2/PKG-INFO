@@ -1,0 +1,47 @@
+Metadata-Version: 2.4
+Name: orfmatch
+Version: 0.2.2
+Summary: Transfer feature annotations from a reference genome to a de novo assembled one.
+Project-URL: Homepage, https://github.com/mcgilmore/orfmatch
+Project-URL: Repository, https://github.com/mcgilmore/orfmatch.git
+Author-email: mcgilmore <michael_gilmore@live.com>
+License-Expression: GPL-3.0-only
+License-File: LICENSE
+Requires-Python: >=3.9
+Requires-Dist: biopython<2,>=1.85
+Requires-Dist: pycirclize<2,>=1.9.1
+Requires-Dist: pygenomeviz<2,>=1.6.1
+Requires-Dist: pyhmmer<0.12,>=0.11.1
+Requires-Dist: pyrodigal<4,>=3.6.3.post1
+Requires-Dist: seaborn<0.14,>=0.13.2
+Requires-Dist: tqdm<5,>=4.67.1
+Description-Content-Type: text/markdown
+
+# orfmatch
+
+Transfer feature annotations from a reference genome to a *de novo* assembled one, where the new genome sequence is from the same or a closely related strain.
+
+## Installation
+
+Install using pip:
+
+`pip install orfmatch`
+
+or from github:
+
+`pip install git+https://github.com/mcgilmore/orfmatch.git`
+
+## Usage
+
+- Input is an assembly in \*.fasta format.
+- Reference genome and output genome are in GenBank format (\*.gbff).
+
+`orfmatch --input <assembly.fasta> --reference <reference.gbff> --output <output.gbff>`
+
+### Optional
+
+- `-e` / `--e-value`: E value cutoff for phmmer protein match search (default: `1e-25`).
+- `-v` / `--variants`: Outputs matched sequences with differences from the reference to `variants.fasta` and alignment to `variants_alignment.txt`.
+- `-c` / `--circle`: Produces a circle plot with features mapped between reference and assembly in SVG format.
+- `-l` / `--line`: Produces a linear plot with features mapped between reference and assembly in SVG format.
+- `-t` / `--threads`: Number of threads used for processing (default: `8`)
