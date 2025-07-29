@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=64.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cressent"
+version = "1.0.0"
+license = { file = "LICENSE" }
+description = "A comprehensive toolkit for ssDNA virus analysis"
+authors = [
+    {name = "Pavan R. & Tisza M.", email = "pavan.4@osu.edu"}
+]
+readme = "README.md"
+requires-python = ">=3.6"
+
+dependencies = [
+    "biopython",
+    "pandas",
+    "click"
+]
+
+[tool.setuptools]
+packages = [
+    "cressent",
+    "cressent.modules",
+    "cressent.modules.openrdp",
+    "cressent.modules.openrdp.scripts",
+    "cressent.modules.openrdp.bin"
+]
+
+# Include non-Python files
+[tool.setuptools.package-data]
+"cressent.modules" = ["*.R"]
+"cressent.modules.openrdp" = ["bin/*", "bin/3Seq/*", "bin/GENECONV/*", "bin/source_code/*"]
+"cressent.modules.openrdp.scripts" = ["*.ini"]
+
+[project.scripts]
+cressent = "cressent.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/ricrocha82/cressent"
+Repository = "https://github.com/ricrocha82/cressent"
