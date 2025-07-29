@@ -1,0 +1,104 @@
+{% extends "slm/base.html" %}
+{% load compress i18n %}
+
+
+{% block page_content %}
+    <div class="row g-0">
+        <div class="col-2">
+        {% block station_list %}
+            {% include 'slm/widgets/stationlist.html' %}
+        {% endblock %}
+        </div>
+
+        <div class="col-10">
+          <div class="container-fluid">
+
+            {% block actions_bar %}
+                <div id="slm-station-nav">
+                    {% if agencies %}
+                    {% block station_agencies %}
+                    <header class="d-flex flex-wrap justify-content-center p-3 slm-agency">
+                    {% for agency in agencies %}
+                        <a href="{% url 'slm:home' %}?agency={{ agency.id }}" class="text-decoration-none">
+                            <span class="fs-3 fw-bold">{{ agency.name }}{% if not forloop.last %},&nbsp;{% endif %}</span>
+                        </a>
+                    {% endfor %}
+                    </header>
+                    {% endblock %}
+                    {% endif %}
+                    {% if station %}
+                    <header class="d-flex flex-wrap justify-content-center py-3 px-3 border-bottom">
+
+                        <!-- Station ID -->
+                        <a href="{% url 'slm:edit' station=station %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                            <h1 class="mono">{% if station %}{{ station }}{% endif %}</h1>
+                        </a>
+
+                        <!-- Links -->
+                        <ul class="nav nav-pills align-items-center">
+                            {% with station_name=site.four_id %}
+                                {% with url_name=request.resolver_match.url_name %}
+                                <li class="nav-item {% if url_name == 'alerts' %}active{% endif %}">
+                                    <a href="{% if station %}{% url 'slm:alerts' station=station %}{% else %}{% url 'slm:alerts' %}{% endif %}" class="nav-link"><i class="bi bi-bell{% if station_alert_level %}-fill {{ station_alert_level.css }}{% endif %} slm-alert-bell"></i> {% trans "Alerts" %}</a>
+                                </li>
+                                <li class="nav-item {% if url_name == 'edit' %}active{% endif %}">
+                                    <a href="{% if station %}{% url 'slm:edit' station=station %}{% else %}{% url 'slm:edit' %}{% endif %}" class="nav-link"><i class="bi bi-pencil-square"></i> {% trans "Edit" %}</a>
+                                </li>
+                                <li class="nav-item {% if url_name == 'upload' %}active{% endif %}">
+                                    <a href="{% if station %}{% url 'slm:upload' station=station %}{% else %}{% url 'slm:upload' %}{% endif %}" class="nav-link"><i class="bi bi-upload"></i> {% trans "Upload" %} <span class="badge rounded-pill slm-files-badge" data-slm-files={{attn_files}} {% if not attn_files %}style="display: none"{% endif %}>{{attn_files}}</span></a>
+                                </li>
+                                <li class="nav-item {% if url_name == 'download' %}active{% endif %}">
+                                    <a href="{% if station %}{% url 'slm:download' station=station %}{% else %}{% url 'slm:download' %}{% endif %}" class="nav-link"><i class="bi bi-download"></i> {% trans "Download" %}</a>
+                                </li>
+                                <li class="nav-item {% if url_name == 'review' %}active{% endif %}">
+                                    <a href="{% if station %}{% url 'slm:review' station=station %}{% else %}{% url 'slm:review' %}{% endif %}" class="nav-link"><i class="bi bi-file-check"></i> {% trans "Review & Submit" %}</a>
+                                </li>
+                                <li class="nav-item {% if url_name == 'log' %}active{% endif %}">
+                                    <a href="{% if station %}{% url 'slm:log' station=station %}{% else %}{% url 'slm:log' %}{% endif %}" class="nav-link"><i class="bi bi-journal-text"></i> {% trans "Activity Log" %}</a>
+                                </li>
+                                {% endwith %}
+                            {% endwith %}
+                        </ul>
+                    </header>
+                    {% endif %}
+                </div>
+
+            {% endblock %}
+
+                {% block action_content %}
+                <div class="container">
+                    <div class="d-flex flex-column justify-content-left align-items-left min-vh-100">
+                    <!-- Alert -->
+
+                    <div class="m-3">
+                        {% include "messages.html" %}
+                    </div>
+
+                    <!-- Feeds -->
+                    <div class="row vh-100">
+                        <!-- All Alerts Feed -->
+                        <div class="my-2 mr-2 p-3 bg-body rounded shadow-sm col-5">
+                            <h2 class="border-bottom pb-2 mb-4">Alerts</h2>
+                            <div class="overflow-auto no-scrollbar" style="max-height: 925px;">
+                                {% include 'slm/widgets/alert_scroll.html' %}
+                            </div>
+                        </div>
+                        <!-- End of All Alerts Feed -->
+
+                        <!-- Activity Log Feed -->
+                        <div class="my-2 p-3 bg-body rounded shadow-sm col-7">
+                            <h2 class="border-bottom pb-2 mb-4">Activity Log</h2>
+                            <div class="overflow-auto no-scrollbar" style="max-height: 925px;">
+                                {% include 'slm/widgets/log_scroll.html' %}
+                            </div>
+                        </div>
+                        <!-- End of Activity Log Feed -->
+                    </div>
+                </div>
+                <!-- End of Feeds -->
+                {% endblock %}
+            </div>
+          </div>
+        </div>
+    </div>
+{% endblock %}
