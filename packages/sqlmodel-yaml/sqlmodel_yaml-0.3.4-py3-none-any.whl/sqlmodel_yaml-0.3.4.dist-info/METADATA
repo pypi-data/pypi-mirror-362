@@ -1,0 +1,61 @@
+Metadata-Version: 2.4
+Name: sqlmodel-yaml
+Version: 0.3.4
+Summary: SQLModel models with dynamically generated PyYAML Constructors and Representors
+Author-email: Cam Ratchford <camratchford@gmail.com>
+Project-URL: Homepage, https://github.com/camratchford/sqlmodel-yaml
+Project-URL: Source, https://github.com/camratchford/sqlmodel-yaml
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Environment :: Console
+Classifier: Environment :: Win32 (MS Windows)
+Classifier: Environment :: MacOS X
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: annotated-types==0.7.0
+Requires-Dist: greenlet==3.2.3
+Requires-Dist: pydantic==2.11.7
+Requires-Dist: pydantic_core==2.33.2
+Requires-Dist: PyYAML==6.0.2
+Requires-Dist: SQLAlchemy==2.0.41
+Requires-Dist: sqlmodel==0.0.24
+Requires-Dist: typing-inspection==0.4.1
+Requires-Dist: typing_extensions==4.14.1
+Provides-Extra: development
+Requires-Dist: setuptools; extra == "development"
+Requires-Dist: wheel; extra == "development"
+Requires-Dist: pre-commit; extra == "development"
+Requires-Dist: pydantic[email]; extra == "development"
+Requires-Dist: mkdocs; extra == "development"
+Requires-Dist: mkdocs-material; extra == "development"
+Requires-Dist: PyGithub; extra == "development"
+Requires-Dist: ruff; extra == "development"
+Requires-Dist: passlib; extra == "development"
+Requires-Dist: pytest; extra == "development"
+Requires-Dist: build; extra == "development"
+Requires-Dist: twine; extra == "development"
+Requires-Dist: fastapi; extra == "development"
+Requires-Dist: uvicorn; extra == "development"
+Requires-Dist: httpx; extra == "development"
+
+
+# SQLModel-YAML
+
+> [SQLModel](https://sqlmodel.tiangolo.com/) models with dynamically generated PyYaml Constructors and Representers
+
+- Declare your `YAMLModel` subclasses in the same way as you would `SQLModel`
+  - Calling `yaml.load` produces initialized instances of your declared models
+    - You only need to commit the changes in a database session.
+    - See `extras/examples/load_example.py`
+  - Calling `yaml.dump` on a model's instance exports the model data into YAML
+    - Assuming your database query contains the generated fields, 
+      the resulting YAML will contain relationships as well.
+    - See `extras/examples/dump_example.py`
+
+
