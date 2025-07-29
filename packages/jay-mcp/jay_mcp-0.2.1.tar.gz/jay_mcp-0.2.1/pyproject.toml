@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jay-mcp"
+version = "0.2.1"
+description = "MCP server for batch GitHub repository information retrieval with parallel processing"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Jay MCP Team", email = "contact@example.com"}
+]
+maintainers = [
+    {name = "Jay MCP Team", email = "contact@example.com"}
+]
+keywords = ["mcp", "model-context-protocol", "github", "repository", "batch", "api", "ai", "tools"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "mcp>=0.1.0",
+    "aiohttp>=3.8.0",
+    "fastapi>=0.100.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "isort>=5.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/jay-mcp"
+Repository = "https://github.com/your-username/jay-mcp"
+Documentation = "https://github.com/your-username/jay-mcp#readme"
+"Bug Tracker" = "https://github.com/your-username/jay-mcp/issues"
+
+[project.scripts]
+jay-mcp = "jay_mcp.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["jay_mcp*"]
+
+[tool.setuptools.package-data]
+jay_mcp = ["py.typed"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
