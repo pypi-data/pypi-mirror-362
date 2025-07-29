@@ -1,0 +1,51 @@
+Metadata-Version: 2.4
+Name: ms-image-gen-mcp
+Version: 1.0.1
+Summary: ModelScope Image Generator
+Requires-Python: >=3.12
+Requires-Dist: build>=1.2.2.post1
+Requires-Dist: mcp[cli]>=1.11.0
+Requires-Dist: requests>=2.32.3
+Requires-Dist: twine>=6.1.0
+Description-Content-Type: text/markdown
+
+# Project description
+## ModelScope Image Generation MCP
+## Project description
+### Feature
+- 📝 Support text to image generation backed by models on ModelScope
+- 📝 Support image to image generation backed by models on ModelScope
+
+### Prerequisites
+    1.Python 3.11+
+    2.ModelScope Token (obtained from Modelscope)
+    3.Node.js (optional, for MCP Inspector)
+    
+### Install
+install ms-image-gen-mcp throuh pip
+
+```
+pip install ms-image-gen-mcp
+```
+### Debug by MCP Inspector
+start the inspector by following command in terminal (replace YOUR_MODELSCOPE_TOKEN with your own token):
+```
+npx @modelcontextprotocol/inspector -e MODELSCOPE_TOKEN=YOUR_MODELSCOPE_TOKEN python -m ms_image_gen_mcp
+```
+### Start the server
+start the server by following command:
+```
+env MODELSCOPE_TOKEN=YOUR_MODELSCOPE_TOKEN python -m ms_image_gen_mcp
+```
+or you can add following json into your config file
+```
+    "modelscope-image-gen-mcp": {
+      "command": "uvx",
+      "args": [
+        "ms_image_gen_mcp"
+      ],
+      "env": {
+        "MODELSCOPE_API_KEY": "Your ModelScope API Key"
+      }
+    }
+```
