@@ -1,0 +1,48 @@
+
+@import "variables";
+@import "functions";
+
+
+.alert {
+  >*:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@mixin alert-variant($background, $color) {
+  .toast-header {
+    background-color: $color;
+    color: white;
+  }
+  .toast-body {
+    background-color: $background;
+    color: $color;
+  }
+}
+
+@each $color, $value in $theme-colors {
+  .toast {
+    &.toast-#{$color} {
+      border: 1px solid theme-color-level($color, $alert-border-level);
+      @include alert-variant(theme-color-level($color, $alert-bg-level),
+                             theme-color-level($color, $alert-color-level));
+    }
+  }
+}
+
+.toast-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 1rem;
+  min-width: 300px;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 9990;
+
+  &:empty {
+    padding: 0;
+  }
+}

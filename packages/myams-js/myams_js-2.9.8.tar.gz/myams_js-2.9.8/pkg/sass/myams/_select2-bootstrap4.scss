@@ -1,0 +1,227 @@
+
+@import "variables";
+
+@import "../../../node_modules/bootstrap/scss/functions";
+@import "../../../node_modules/bootstrap/scss/variables";
+@import "../../../node_modules/bootstrap/scss/mixins";
+
+
+// basic
+.select2-container {
+    display: block;
+
+    *:focus {
+        outline: 0;
+    }
+}
+
+// input-group
+.input-group .select2-container--bootstrap4 {
+    flex-grow: 1;
+}
+// for prepended input
+.input-group-prepend ~ .select2-container--bootstrap4 .select2-selection {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+// for appended input
+.input-group > .select2-container--bootstrap4:not(:last-child) .select2-selection {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.select2-container--bootstrap4 {
+
+    // prepend input group
+    .input-group-prepend > & {
+        border-radius: $input-border-radius 0 0 $input-border-radius;
+    }
+
+    // input box
+    .select2-selection {
+        background-color: $input-bg;
+        border: $input-border-width solid $input-border-color;
+        @include border-radius($input-border-radius);
+        @include box-shadow($input-box-shadow);
+        @include transition($input-transition);
+        width: 100%;
+
+        .bg-secondary & {
+            background-color: $secondary;
+        }
+        .input-group & {
+            height: 100% !important;
+        }
+        .input-group-prepend & {
+            border-radius: $input-border-radius 0 0 $input-border-radius;
+        }
+        .select2-selection__rendered {
+            position: relative;
+            color: $input-color;
+        }
+        .select2-search__field {
+            background-color: $input-bg;
+            color: $input-color;
+
+            fieldset[disabled] & {
+                background-color: $input-disabled-bg;
+            }
+        }
+        &--multiple {
+            .select2-selection__choice {
+                color: $select2-selection-color;
+            }
+        }
+    }
+
+    // opened container
+    &.select2-container--open {
+        .select2-dropdown {
+            border-color: $input-focus-border-color;
+            box-shadow: $input-focus-box-shadow;
+        }
+    }
+
+    // focused input box
+    &.select2-container--focus {
+        .select2-selection {
+            border-color: $input-focus-border-color;
+            box-shadow: $input-focus-box-shadow;
+        }
+
+        // when open, hide bottom border
+        &.select2-container--open .select2-selection {
+            border-bottom: none;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
+
+    // disabled input box
+    &.select2-container--disabled,
+    &.select2-container--disabled.select2-container--focus {
+        .select2-selection {
+            background-color: $input-disabled-bg;
+            cursor: not-allowed;
+            border-color: $input-border-color;
+            box-shadow: none;
+        }
+        .select2-search__field {
+            background-color: transparent;
+        }
+    }
+
+    // readonly select
+    fieldset[disabled] &,
+    .select2[readonly].select2-hidden-accessible + & {
+        .select2-selection {
+            background-color: $input-disabled-bg;
+        }
+    }
+
+    // validated input box
+    select.is-invalid ~ & .select2-selection,
+    form.was-validated select:invalid ~ & .select2-selection {
+        border-color: $danger;
+    }
+    select.is-valid ~ & .select2-selection,
+    form.was-validated select:valid ~ & .select2-selection {
+        border-color: $success;
+    }
+
+    // dropdown
+    .select2-dropdown {
+        background-color: $select2-dropdown-bg;
+        border-color: $input-border-color;
+
+        border-top: 1px solid $input-border-color;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        min-width: 100px;
+
+        // dropdown opened above
+        &.select2-dropdown--above {
+            border-top: 1px solid $input-border-color;
+            border-top-left-radius: $input-border-radius;
+            border-top-right-radius: $input-border-radius;
+        }
+
+        // search input
+        .select2-search {
+            .select2-search__field {
+                background-color: $input-bg;
+                color: $input-color;
+            }
+        }
+
+        .select2-results__options {
+            .select2-results__message {
+                color: $input-placeholder-color;
+            }
+        }
+        // selected item
+        .select2-results__option[aria-selected=true] {
+            background-color: darken($light, 5%);
+            color: $select2-highlight;
+        }
+    }
+
+    // for <optgroup>
+    .select2-results__option[role=option] {
+        padding: 0.2rem 0.75rem;
+    }
+
+    // mouse hovered item
+    .select2-results__option--highlighted,
+    .select2-results__option--highlighted.select2-results__option[aria-selected=true] {
+        background-color: $primary;
+        color: $select2-highlight;
+    }
+
+    // for <optgroup>
+    .select2-results__option[role=group] {
+        padding: 0;
+    }
+
+    // fixes vertical overflow
+    .select2-results > .select2-results__options {
+        max-height: 15em;
+        overflow-y: auto;
+    }
+
+    .select2-results__group {
+        padding: 6px;
+        display: list-item;
+        color: $secondary;
+    }
+
+    // all clear button
+    .select2-selection__clear {
+        position: absolute;
+        right: 4px;
+        width: 1.5em;
+        height: 1.5em;
+        line-height: 1.35em;
+        margin: 0.4em 0.2em;
+        border-radius: 20%;
+        text-align: center;
+
+        font-weight: 900;
+        background-color: lighten($primary, 20%);
+        color: transparent;
+        float: right;
+
+        &:hover {
+            background-color: $primary;
+        }
+        &::before {
+            display: inline-flex;
+            width: 100%;
+            height: 100%;
+            content: "x";
+            color: $light;
+            justify-content: center;
+            align-items: baseline;
+        }
+    }
+}

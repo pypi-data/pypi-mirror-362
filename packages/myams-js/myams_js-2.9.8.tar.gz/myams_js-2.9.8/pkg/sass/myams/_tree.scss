@@ -1,0 +1,92 @@
+
+@import 'variables';
+
+.tree {
+	min-height: 20px;
+
+	li {
+		list-style-type: none;
+		margin: 0;
+		padding: 3px 0 3px 5px;
+		position: relative;
+
+		&:after,
+		&:before {
+			content: '';
+			left: -10px;
+			position: absolute;
+			right: auto;
+		}
+		&:before {
+			border-left: 1px solid #999;
+			bottom: 50px;
+			height: 100%;
+			top: -5px;
+			width: 1px;
+			transition: "border-color 0.1s ease 0.1s";
+		}
+		&:last-child::before {
+			height: 20px;
+		}
+		&:after {
+			border-top: 1px solid #999;
+			height: 20px;
+			top: 14px;
+			width: 15px;
+		}
+		&:hover {
+			background: rgba(0, 0, 0, .15);
+		}
+		>span {
+			color: $body;
+			border: 1px solid #999;
+			border-radius: 5px;
+			display: inline-block;
+			padding: 4px 8px;
+			text-decoration: none;
+			transition: color .2s ease .1s, background-color .2s ease .1s, border-color .3s ease .2s;
+
+			>i {
+				padding-right: 4px;
+			}
+		}
+		&.parent_li >span {
+			padding: 7px;
+		}
+		>span {
+			cursor: pointer;
+
+			&:hover,
+			&:hover + ul li >span {
+				background: #eee;
+				border: 1px solid #94a0b4;
+				color: #000;
+			}
+		}
+	}
+	ul {
+		ul {
+			padding-left: 24px;
+			padding-top: 5px;
+		}
+	}
+	>ul {
+		padding-left: 0;
+
+		>li {
+			&:after,
+			&:before {
+				border: 0;
+			}
+		}
+	}
+}
+
+.tree-node-padding {
+	display: inline-block;
+	width: 2.5em;
+
+	& + .tree-switcher:not(:empty) {
+		margin-left: -14px;
+	}
+}

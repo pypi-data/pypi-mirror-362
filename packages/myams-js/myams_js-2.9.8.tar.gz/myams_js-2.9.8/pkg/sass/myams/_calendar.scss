@@ -1,0 +1,144 @@
+
+.calendar-legend {
+  ul {
+    display: flex;
+    flex-direction: column;
+
+    li {
+      display: flex;
+      flex-direction: row;
+      font-weight: normal;
+
+      &.calendar-marker {
+        &::before {
+          content: " ";
+          display: block;
+          border: 1px solid var(--body);
+          background-color: var(--fc-enabled-bg);
+          width: 1.5em;
+          height: 1.5em;
+          margin-right: 0.25em;
+        }
+        &.session-temporary::before {
+          border-width: 3px;
+          border-style: dashed;
+          background-color: var(--body-bg);
+        }
+        &.session-public::before {
+          background-image: repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(255,255,255,.25) 10px, rgba(255,255,255,.25) 20px);
+        }
+        &.session-not-bookable::before {
+          border-color: var(--fc-nobookable-border);
+          background-color: var(--fc-nobookable-bg);
+        }
+        &.session-internal-bookable::before {
+          border-color: var(--fc-enabled-border);
+          background-color: var(--fc-enabled-bg);
+        }
+        &.session-external-bookable::before {
+          border-width: 3px;
+          background-color: var(--body-bg);
+        }
+        &.session-full::before {
+          background-color: var(--fc-warning-bg);
+          border-color: var(--fc-warning-border);
+        }
+        &.session-confirmed::before {
+          background-color: var(--fc-accepted-bg);
+          border-color: var(--fc-accepted-border);
+        }
+      }
+    }
+  }
+}
+
+.calendar-wrapper {
+  display: flex;
+  flex-direction: row;
+  min-height: calc(100vh - 270px);
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  .calendar-parent {
+    &:not(.col) {
+      > div {
+        display: none;
+      }
+    }
+  }
+  &.transposed {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .calendar-parent {
+      &.border {
+        margin: calc(1rem - 1px) 14px 0 !important;
+        width: calc(100% - 30px) !important;
+      }
+    }
+  }
+  &:not(.transposed) {
+    .calendar-parent {
+      &:not(.col) {
+        width: 40px;
+
+        > h3 {
+          position: absolute;
+          transform: rotate(90deg);
+          top: 0;
+          left: 0.25em;
+          width: 30px;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+.calendar {
+  font-size: 85%;
+
+  >.fc-header-toolbar {
+    flex-wrap: wrap;
+
+    >.fc-toolbar-chunk {
+      white-space: nowrap;
+    }
+    >.fc-toolbar-chunk:first-child {
+      width: 100%;
+      font-size: 70%;
+      margin-bottom: 1em;
+    }
+  }
+
+  .fc-daygrid-event {
+    flex-direction: column;
+    border: 1px solid $fc-daygrid-event-border;
+    padding: 0 0.25em;
+    white-space: normal;
+
+    br {
+      display: none;
+    }
+  }
+
+  .fc-timegrid-event {
+    &.event-bg-gradient {
+      background-image: var(--fc-event-gradient);
+    }
+  }
+  .fc-col-header-cell {
+    white-space: normal;
+  }
+
+  .fc-event {
+    overflow: hidden;
+
+    .action {
+      position: absolute;
+      right: 2px;
+      bottom: 0;
+    }
+  }
+}

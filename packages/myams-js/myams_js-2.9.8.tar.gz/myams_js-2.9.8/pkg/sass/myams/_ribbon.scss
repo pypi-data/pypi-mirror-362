@@ -1,0 +1,103 @@
+@import "variables";
+
+
+#ribbon {
+  position: relative;
+  padding: 0 40px 0 13px;
+  background: $ribbon-bg;
+  height: $ribbon-height;
+
+  @media (max-width: $md-width) {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  @media only screen and (min-width: 0) and (max-width: 679px) {
+    border-top: 1px solid $ribbon-mobile-bottom;
+    border-top: 1px solid $ribbon-mobile-top;
+    background: $ribbon-mobile-bg;
+  }
+
+  .breadcrumb {
+    margin: 0;
+    padding: 10px 34px 9px 0;
+    background: 0 0;
+    vertical-align: top;
+    border-radius: 0;
+    border-bottom: 1px solid $breadcrumb-border-color;
+
+    &,
+    a {
+      color: $ribbon-link !important;
+      text-decoration: none !important;
+
+      @media only screen and (min-width: 0) and (max-width: 679px) {
+        color: $ribbon-mobile-link !important;
+      }
+    }
+
+    li {
+      white-space: nowrap;
+    }
+
+    li:last-child,
+    > .active {
+      color: $ribbon-active-link;
+
+      a {
+        font-weight: bold;
+      }
+
+      @media only screen and (min-width: 0) and (max-width: 679px) {
+        color: $ribbon-mobile-active-link !important;
+      }
+    }
+
+    li.strong {
+      a {
+        line-height: 1em;
+        font-weight: bold;
+        font-size: 120%;
+        color: $ribbon-link-strong !important;
+
+        @media only screen and (min-width: 0) and (max-width: 679px) {
+          color: $ribbon-mobile-link-strong !important;
+        }
+      }
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      @media only screen and (min-width: 0) and (max-width: 679px) {
+        color: $ribbon-mobile-link-strong !important;
+      }
+    }
+  }
+
+  .fixed-ribbon & {
+    position: fixed;
+    right: 0;
+    left: $aside-width;
+    top: 50px;
+    z-index: 5;
+
+    @media (max-width: 979px) {
+      left: 0 !important;
+    }
+  }
+
+  .container.fixed-ribbon & {
+    width: 944px;
+    left: 590px;
+  }
+
+  .minified.fixed-ribbon & {
+    left: 40px;
+  }
+
+  .hidden-menu.fixed-ribbon & {
+    left: 10px;
+
+    @media (max-width: 979px) {
+      left: $aside-width;
+    }
+  }
+}
