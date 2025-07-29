@@ -1,0 +1,81 @@
+# Gufo Thor configuration
+version: "1.0"
+noc:
+  tag: master
+  installation_name: Unconfigured Installation
+  theme: noc
+expose:
+  domain_name: go.getnoc.com
+  web:
+    port: 32777
+  open_browser: true
+pools:
+  vyos:
+    subnet: 10.0.2.0/24
+    address:
+      syslog: 10.0.2.10
+      trap: 10.0.2.11
+services:
+  - web
+  - card
+  - scheduler
+  - chwriter
+  - classifier-vyos
+  - correlator-vyos
+  - discovery-vyos
+  - ping-vyos
+  - syslogcollector-vyos
+  - trapcollector-vyos
+labs:
+  lab1:
+    nodes:
+      r1:
+        type: vyos
+        version: "1.4"
+        router-id: 10.0.0.1
+        pool-gw: true
+        users:
+          - user: vy1
+            password: secret1
+        snmp:
+          - version: v2c
+            community: public1
+      r2:
+        type: vyos
+        version: "1.4"
+        router-id: 10.0.0.2
+        users:
+          - user: vy2
+            password: secret2
+        snmp:
+          - version: v2c
+            community: public2
+      r3:
+        type: vyos
+        version: "1.4"
+        router-id: 10.0.0.3
+        users:
+          - user: vy3
+            password: secret3
+        snmp:
+          - version: v2c
+            community: public3
+    links:
+      - prefix: 10.0.1.0/30
+        node-a: r1
+        node-z: r2
+        protocols:
+          isis:
+            metric: 100
+      - prefix: 10.0.1.4/30
+        node-a: r1
+        node-z: r3
+        protocols:
+          isis:
+            metric: 100
+      - prefix: 10.0.1.8/30
+        node-a: r2
+        node-z: r3
+        protocols:
+          isis:
+            metric: 100
