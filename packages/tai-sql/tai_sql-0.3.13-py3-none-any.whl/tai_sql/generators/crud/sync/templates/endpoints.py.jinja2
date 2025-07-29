@@ -1,0 +1,1738 @@
+# Este archivo ha sido generado automáticamente por tai-sql
+# No modifiques este archivo directamente
+
+{{ imports|join('\n') }}
+
+{% macro pydantic_model_config() -%}
+    class Config:
+        # Performance optimizations
+        arbitrary_types_allowed = False  # Más rápido al validar tipos estrictos
+        use_enum_values = True
+        validate_assignment = True  # Evita validación en cada asignación
+        frozen = False  # Hace el objeto inmutable y más rápido
+        str_strip_whitespace = False  # Evita procesamiento innecesario de strings
+        validate_default = False  # No valida valores por defecto
+        extra = "forbid"  # Más rápido que "allow" o "ignore"
+{%- endmacro %}
+
+# utils
+
+def should_include_relation(relation_name: str, includes: List[str]) -> bool:
+    """
+    Determina si una relación debe ser incluida basándose en la lista de includes.
+    
+    Args:
+        relation_name: Nombre de la relación a verificar
+        includes: Lista de relaciones a incluir
+        
+    Returns:
+        bool: True si la relación debe incluirse
+    """
+    return any(
+        include == relation_name or include.startswith(f"{relation_name}.")
+        for include in includes
+    )
+
+def get_nested_includes(relation_name: str, includes: List[str]) -> List[str]:
+    """
+    Extrae las relaciones anidadas para una relación específica.
+    
+    Args:
+        relation_name: Nombre de la relación padre
+        includes: Lista completa de includes
+        
+    Returns:
+        List[str]: Lista de includes anidados para la relación
+        
+    Example:
+        includes = ['author', 'author.posts', 'author.posts.comments']
+        get_nested_includes('author', includes) -> ['posts', 'posts.comments']
+    """
+    nested = []
+    prefix = f"{relation_name}."
+    
+    for include in includes:
+        if include.startswith(prefix):
+            # Remover el prefijo y añadir a nested
+            nested_path = include[len(prefix):]
+            nested.append(nested_path)
+    
+    return nested
+
+def get_loading_options(model_class, includes: Optional[List[str]] = None) -> List[Any]:
+    """
+    Genera las opciones de carga optimizadas para SQLAlchemy basándose en los includes.
+    
+    Args:
+        model_class: Clase del modelo SQLAlchemy base
+        includes: Lista de relaciones a incluir
+        
+    Returns:
+        List[Any]: Lista de opciones de carga (joinedload/selectinload)
+    """
+    if not includes:
+        return []
+    
+    options = []
+    processed_relations = set()
+    
+    for include_path in includes:
+        
+        # Evitar duplicados
+        if include_path in processed_relations:
+            continue
+
+        # Procesar cada nivel del path (ej: 'author.posts.comments')
+        path_parts = include_path.split('.')
+        current_model = model_class
+        current_option = None
+        
+        for i, part in enumerate(path_parts):
+            # Verificar que la relación existe en el modelo actual
+            if not hasattr(current_model, part):
+                break
+                
+            relation: RelationshipProperty = getattr(current_model, part)
+            
+            if i == 0:
+                # Primera relación desde el modelo principal
+                # Determinar estrategia basándose en el tipo de relación
+                if hasattr(relation, 'direction'):
+                    # Para relaciones 1:N usar selectinload, para N:1 usar joinedload
+                    if relation.direction.name in ['ONETOMANY', 'MANYTOMANY']:
+                        current_option = selectinload(relation)
+                    else:  # MANYTOONE, ONETOONE
+                        current_option = joinedload(relation)
+                else:
+                    # Fallback a selectinload si no se puede determinar
+                    current_option = selectinload(relation)
+                
+                # Actualizar el modelo actual para relaciones anidadas
+                if hasattr(relation, 'mapper'):
+                    current_model = relation.mapper.class_
+            else:
+                # Relaciones anidadas
+                if current_option is not None and hasattr(current_model, part):
+                    nested_relation: RelationshipProperty = getattr(current_model, part)
+                    
+                    # Determinar estrategia para relación anidada
+                    if hasattr(nested_relation, 'direction'):
+                        if nested_relation.direction.name in ['ONETOMANY', 'MANYTOMANY']:
+                            current_option = current_option.selectinload(nested_relation)
+                        else:
+                            current_option = current_option.joinedload(nested_relation)
+                    else:
+                        current_option = current_option.selectinload(nested_relation)
+                    
+                    # Actualizar el modelo actual
+                    if hasattr(nested_relation, 'mapper'):
+                        current_model = nested_relation.mapper.class_
+        
+        # Añadir la opción completa
+        if current_option is not None:
+            options.append(current_option)
+            processed_relations.add(include_path)
+    
+    return options
+
+# General Enum class
+
+class EnumModel:
+
+    def __init__(self, name: str, values: List[str]):
+        self.name = name
+        self.values = values
+    
+    def find_many(self) -> List[str]:
+        """
+        Devuelve una lista de los valores del Enum.
+        
+        Returns:
+            List[str]: Lista de valores del Enum
+        """
+        return self.values
+
+
+{% for model in models %}
+{% set all_pk_autoincrement = true %}
+{% for column in model.columns %}
+    {% if column.args.get('primary_key', False) and not column.args.get('autoincrement', False) %}
+        {% set all_pk_autoincrement = false %}
+    {% endif %}
+{% endfor %}
+class {{ model.name }}Read(BaseModel):
+    """Data Transfer Object de lectura para {{ model.name }}. Devuelve objetos que existen en la base de datos."""
+    {% for column in model.columns %}
+    {% if not column.nullable %}
+    {{ column.name }}: {{ column.type }}
+    {% else %}
+    {{ column.name }}: Optional[{{ column.type }}]
+    {% endif%}
+    {% endfor %}
+
+    {% for relation in model.relations %}
+    {% if relation.direction == 'one-to-many' %}
+    {{ relation.name }}: Optional[List[{{ relation.target }}Read]] = None
+    {% elif relation.direction == 'many-to-one' %}
+    {{ relation.name }}: Optional[{{ relation.target }}Read] = None
+    {% endif %}
+    {% endfor %}
+
+    {{ pydantic_model_config() }}
+    
+    @classmethod
+    def from_instance(
+        cls,
+        instance: {{ model.name }},
+        {% if not model.is_view %}
+        includes: Optional[List[str]] = None,
+        max_depth: int = {{ max_depth }}
+        {% endif %}
+    ) -> {{ model.name }}Read:
+        """
+        Crea un DTO desde una instancia del modelo SQLAlchemy con carga optimizada de relaciones.
+        
+        Args:
+            instance: Instancia del modelo {{ model.name }}
+            includes: Lista de relaciones a incluir (formato: 'relation' o 'relation.nested_relation')
+            max_depth: Profundidad máxima de anidación para evitar recursión infinita
+            
+        Returns:
+            {{ model.name }}Read: Instancia del DTO
+        """
+
+        # Construir DTO base
+        dto_data = {
+            {% for column in model.columns %}
+            '{{ column.name }}': instance.{{ column.name }},
+            {% endfor %}
+        }
+
+        {% if not model.is_view %}
+        # Procesar relaciones con control de profundidad
+        if includes is not None and max_depth > 0:
+            {% for relation in model.relations %}
+            {% if relation.direction == 'one-to-many' %}
+            # Relación 1:N - {{ relation.name }}
+            if should_include_relation('{{ relation.name }}', includes):
+                nested_includes = get_nested_includes('{{ relation.name }}', includes)
+                # Este check debería cumplirse siempre, es por seguridad
+                if hasattr(instance, '{{ relation.name }}') and instance.{{ relation.name }} is not None:
+                    dto_data['{{ relation.name }}'] = [
+                        {{ relation.target }}Read.from_instance(
+                            reg, 
+                            nested_includes, 
+                            max_depth - 1
+                        ) 
+                        for reg in instance.{{ relation.name }}
+                    ]
+
+            {% elif relation.direction == 'many-to-one' %}
+            # Relación N:1 - {{ relation.name }}
+            if should_include_relation('{{ relation.name }}', includes):
+                nested_includes = get_nested_includes('{{ relation.name }}', includes)
+                # Este check debería cumplirse siempre, es por seguridad
+                if hasattr(instance, '{{ relation.name }}') and instance.{{ relation.name }} is not None:
+                    dto_data['{{ relation.name }}'] = {{ relation.target }}Read.from_instance(
+                        instance.{{ relation.name }}, 
+                        nested_includes, 
+                        max_depth - 1
+                    )
+
+            {% endif %}
+            {% endfor %}
+        {% endif %}
+        return cls(**dto_data)
+
+    {% if not model.is_view %}
+    @classmethod
+    def from_created_instance(cls, instance: {{ model.name }}, excluded: str=None) -> {{ model.name }}Read:
+        """
+        Crea un DTO desde una instancia del modelo SQLAlchemy
+        
+        Args:
+            instance: Instancia del modelo {{ model.name }}
+            
+        Returns:
+            {{ model.name }}Read: Instancia del DTO
+        """
+
+        # Construir DTO base
+        dto_data = {
+            {% for column in model.columns %}
+            '{{ column.name }}': instance.{{ column.name }},
+            {% endfor %}
+        }
+
+        {% if model.relations %}
+
+        # Evaluación lazy de relaciones costosas
+        {% for relation in model.relations %}
+        if not '{{ relation.name }}' == excluded and hasattr(instance, '{{ relation.name }}') and getattr(instance, '{{ relation.name }}') is not None:
+        {% if relation.direction == 'one-to-many' %}
+            dto_data['{{ relation.name }}'] = [
+                {{ relation.target }}Read.from_created_instance(reg, '{{ relation.backref }}') 
+                for reg in instance.{{ relation.name }}
+            ]
+        {% elif relation.direction == 'many-to-one' %}
+            dto_data['{{ relation.name }}'] = {{ relation.target }}Read.from_created_instance(
+                instance.{{ relation.name }}, '{{ relation.backref }}'
+            )
+        {% endif %}
+        {% endfor %}
+
+        {% endif %}
+        return cls(**dto_data)
+
+    {% endif %}
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> {{ model.name }}Read:
+        """
+        Crea un DTO desde un diccionario
+        
+        Args:
+            data: Diccionario con los datos del DTO
+            
+        Returns:
+            {{ model.name }}Read: Instancia del DTO
+        """
+        return cls(**data)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return self.model_dump()
+
+
+{% if not model.is_view %}
+class {{ model.name }}Create(BaseModel):
+    """Data Transfer Object de escritura para {{ model.name }}. Define objetos para ser creados en la base de datos."""
+    {% for column in model.columns -%}
+    {% if not column.args.get('autoincrement', False) and column.default is none and not column.nullable and not column.is_foreign_key %}
+    {{ column.name }}: {{ column.type }}
+    {% endif %}
+    {% endfor %}
+    {% for column in model.columns -%}
+    {% if column.is_foreign_key %}
+    {{ column.name }}: Optional[{{ column.type }}] = None
+    {% elif column.default is none and column.nullable %}
+    {{ column.name }}: Optional[{{ column.type }}] = None
+    {% elif column.default is not none %}
+        {% if column.default == "datetime.now" %}
+    {{ column.name }}: {{ column.type }} = Field(default_factory=datetime.now)
+        {% elif column.default == "datetime.today" %}
+    {{ column.name }}: {{ column.type }} = Field(default_factory=datetime.today)
+        {% elif column.default in [True, False, None] %}
+    {{ column.name }}: {{ column.type }} = {{ column.default }}
+        {% elif column.default is string %}
+            {% if column.default.isdigit() %}
+    {{ column.name }}: {{ column.type }} = {{ column.default }}
+            {% elif column.default.replace(" ", "").isalnum() %}
+    {{ column.name }}: {{ column.type }} = "{{ column.default }}"
+            {% else %}
+    {{ column.name }}: {{ column.type }} = "{{ column.default | replace('"', '\\"') }}"
+            {% endif %}
+        {% else %}
+    {{ column.name }}: {{ column.type }} = {{ column.default }}
+        {% endif %}
+    {% endif %}
+    {% endfor %}
+
+    {% for relation in model.relations %}
+    {% if relation.direction == 'one-to-many' %}
+    {{ relation.name }}: Optional[List[{{ relation.target }}Create]] = None
+    {% elif relation.direction == 'many-to-one' %}
+    {{ relation.name }}: Optional[{{ relation.target }}Create] = None
+    {% endif %}
+    {% endfor %}
+
+    {{ pydantic_model_config() }}
+    
+    def to_instance(self) -> {{ model.name }}:
+        """
+        Crea una instancia del modelo SQLAlchemy desde el DTO
+        
+        Returns:
+            {{ model.name }}: Instancia del modelo SQLAlchemy
+        """
+
+        model = {{ model.name }}(
+            {% for column in model.columns %}
+            {% if not column.args.get('autoincrement', False) %}
+            {{ column.name }}=self.{{ column.name }},
+            {% endif %}
+            {% endfor %}
+        )
+        
+        # Evaluación lazy de relaciones costosas
+        {% for relation in model.relations %}
+        if self.{{ relation.name }} is not None:
+            {% if relation.direction == 'one-to-many' %}
+            {{ relation.name }} = [reg.to_instance() for reg in self.{{ relation.name }}]
+            {% elif relation.direction == 'many-to-one' %}
+            {{ relation.name }} = self.{{ relation.name }}.to_instance()
+            {% endif %}
+            model.{{ relation.name }} = {{ relation.name }}
+        {% endfor %}
+
+        return model
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> {{ model.name }}Create:
+        """
+        Crea un DTO desde un diccionario
+        
+        Args:
+            data: Diccionario con los datos del DTO
+            
+        Returns:
+            {{ model.name }}Read: Instancia del DTO
+        """
+        return cls(**data)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return self.model_dump()
+
+
+class {{ model.name }}Filter(BaseModel):
+    """Data Transfer Object de actualización para {{ model.name }}.
+    Define los filtros que sirven para buscar registros en la DB."""
+    {% for column in model.columns -%}
+    {% if not column.args.get('autoincrement', False) %}
+    {{ column.name }}: {{ column.type }} = None
+    {% endif %}
+    {% endfor %}
+
+    {{ pydantic_model_config() }}
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return self.model_dump(exclude_unset=True)
+
+
+class {{ model.name }}UpdateValues(BaseModel):
+    """Data Transfer Object de actualización para {{ model.name }}.
+    Define los valores que se modificarán en los registros correspondientes."""
+    {% for column in model.columns -%}
+    {% if not column.args.get('autoincrement', False) %}
+    {{ column.name }}: {{ column.type }} = None
+    {% endif %}
+    {% endfor %}
+
+    {{ pydantic_model_config() }}
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return self.model_dump(exclude_unset=True)
+
+
+class {{ model.name }}Update(BaseModel):
+    """Data Transfer Object de actualización para {{ model.name }}."""
+    filter: {{ model.name }}Filter
+    values: {{ model.name }}UpdateValues
+
+    {{ pydantic_model_config() }}
+
+
+class {{ model.name }}DataFrameValidator:
+    """ Validador de DataFrame para el modelo {{ model.name }} """
+
+    def validate_dataframe_schema(
+        self, 
+        df: DataFrame, 
+        ignore_extra_columns: bool, 
+        fill_missing_nullable: bool
+    ) -> None:
+        """
+        Valida que el esquema del DataFrame sea compatible con el modelo.
+        
+        Args:
+            df: DataFrame a validar
+            ignore_extra_columns: Si ignorar columnas extra
+            fill_missing_nullable: Si llenar columnas nullable faltantes
+            
+        Raises:
+            ValueError: Si el esquema no es compatible
+        """
+        # Definir columnas del modelo
+        model_columns = {
+            {% for column in model.columns %}
+            '{{ column.name }}': {
+                'type': '{{ column.type }}',
+                'nullable': {{ 'True' if column.nullable else 'False' }},
+                'primary_key': {{ 'True' if column.primary_key else 'False' }},
+                'autoincrement': {{ 'True' if column.autoincrement else 'False' }}
+            }{{ ',' if not loop.last }}
+            {% endfor %}
+        }
+        
+        df_columns = set(df.columns)
+        required_columns = set(model_columns.keys())
+        
+        # Verificar columnas extra
+        extra_columns = df_columns - required_columns
+        if extra_columns and not ignore_extra_columns:
+            raise ValueError(
+                f"DataFrame contiene columnas no definidas en el modelo: {list(extra_columns)}\n"
+                f"Usa ignore_extra_columns=True para ignorarlas o elimínalas del DataFrame"
+            )
+        
+        # Verificar columnas faltantes
+        missing_columns = required_columns - df_columns
+        
+        # Filtrar columnas que pueden faltar
+        critical_missing = []
+        for col in missing_columns:
+            col_info = model_columns[col]
+            # Las columnas críticas son las que no son nullable, no son auto-increment y no son PK auto
+            if (not col_info['nullable'] and 
+                not col_info['autoincrement'] and 
+                not (col_info['primary_key'] and col_info['autoincrement'])):
+                critical_missing.append(col)
+        
+        if critical_missing:
+            raise ValueError(
+                f"DataFrame falta columnas requeridas (NOT NULL): {critical_missing}\n"
+                f"Estas columnas son obligatorias y deben estar presentes en el DataFrame"
+            )
+        
+        # Advertir sobre columnas nullable faltantes
+        nullable_missing = [col for col in missing_columns if col not in critical_missing]
+        if nullable_missing and not fill_missing_nullable:
+            import warnings
+            warnings.warn(
+                f"DataFrame falta columnas nullable: {nullable_missing}\n"
+                f"Usa fill_missing_nullable=True para llenarlas automáticamente con None"
+            )
+    
+    def validate_dataframe_types(self, df: "DataFrame") -> None:
+        """
+        Valida que los tipos de datos del DataFrame sean compatibles.
+        
+        Args:
+            df: DataFrame a validar
+            
+        Raises:
+            TypeError: Si los tipos no son compatibles
+        """
+        
+        # Mapeo de tipos SQLAlchemy a tipos pandas compatibles
+        type_compatibility = {
+            {% for column in model.columns %}
+            '{{ column.name }}': {
+                'sqlalchemy_type': '{{ column.type }}',
+                'compatible_pandas_types': [
+                    {% if 'int' == column.type or 'BigInteger' == column.type %}
+                    'int64', 'Int64', 'int32', 'Int32', 'int16', 'Int16', 'int8', 'Int8', 'object'
+                    {% elif 'float' == column.type or 'Numeric' == column.type %}
+                    'float64', 'float32', 'int64', 'Int64', 'object'
+                    {% elif 'bool' == column.type %}
+                    'bool', 'boolean', 'object'
+                    {% elif 'datetime' == column.type %}
+                    'datetime64[ns]', 'object'
+                    {% elif 'date' == column.type %}
+                    'datetime64[ns]', 'object'
+                    {% elif 'str' == column.type or 'Text' == column.type %}
+                    'object', 'string', 'category'
+                    {% else %}
+                    'object'
+                    {% endif %}
+                ]
+            }{{ ',' if not loop.last }}
+            {% endfor %}
+        }
+        
+        type_errors = []
+        
+        for column in df.columns:
+            if column in type_compatibility:
+                df_dtype = str(df[column].dtype)
+                compatible_types = type_compatibility[column]['compatible_pandas_types']
+                sqlalchemy_type = type_compatibility[column]['sqlalchemy_type']
+                
+                if df_dtype not in compatible_types:
+                    # Verificar si puede ser convertido
+                    if self.can_convert_type(df[column], sqlalchemy_type):
+                        continue
+                    
+                    type_errors.append(
+                        f"Columna '{column}': tipo '{df_dtype}' no compatible con '{sqlalchemy_type}'. "
+                        f"Tipos aceptados: {compatible_types}"
+                    )
+        
+        if type_errors:
+            raise TypeError(
+                "Errores de tipo de datos encontrados:\n" + 
+                "\n".join(f"  - {error}" for error in type_errors) +
+                "\n\nConsidera convertir los tipos antes de la inserción."
+            )
+    
+    def can_convert_type(self, series: "Series", target_sqlalchemy_type: str) -> bool:
+        """
+        Verifica si una serie puede ser convertida al tipo SQLAlchemy objetivo.
+        
+        Args:
+            series: Serie de pandas a verificar
+            target_sqlalchemy_type: Tipo SQLAlchemy objetivo
+            
+        Returns:
+            bool: True si puede ser convertida
+        """
+        try:
+            import pandas as pd
+        except ImportError:
+            raise ImportError(
+                "pandas no está instalado. Para usar from_df(), instala pandas:\n"
+                "pip install pandas\n"
+                "o si usas poetry:\n"
+                "poetry add pandas"
+            )
+        
+        try:
+            # Probar conversión en una muestra pequeña
+            sample = series.dropna().head(10)
+            if sample.empty:
+                return True
+            
+            if 'int' in target_sqlalchemy_type:
+                pd.to_numeric(sample, errors='raise')
+            elif 'float' in target_sqlalchemy_type or 'Numeric' in target_sqlalchemy_type:
+                pd.to_numeric(sample, errors='raise')
+            elif 'bool' in target_sqlalchemy_type:
+                # Verificar valores booleanos válidos
+                valid_bool_values = {True, False, 1, 0, '1', '0', 'true', 'false', 'True', 'False'}
+                if not all(val in valid_bool_values for val in sample.unique()):
+                    return False
+            elif 'datetime' in target_sqlalchemy_type or 'date' in target_sqlalchemy_type:
+                pd.to_datetime(sample, errors='raise')
+            
+            return True
+        except:
+            return False
+    
+    def prepare_dataframe_for_insertion(
+        self, 
+        df: "DataFrame", 
+        ignore_extra_columns: bool, 
+        fill_missing_nullable: bool
+    ) -> "DataFrame":
+        """
+        Prepara el DataFrame para inserción en la base de datos.
+        
+        Args:
+            df: DataFrame original
+            ignore_extra_columns: Si ignorar columnas extra
+            fill_missing_nullable: Si llenar columnas faltantes nullable
+            
+        Returns:
+            DataFrame preparado para inserción
+        """
+        try:
+            import pandas as pd
+            import numpy as np
+        except ImportError:
+            return df
+        
+        # Crear copia para no modificar el original
+        cleaned_df = df.copy()
+        
+        # Definir columnas del modelo
+        model_columns = {
+            {% for column in model.columns %}
+            '{{ column.name }}': {
+                'nullable': {{ 'True' if column.nullable else 'False' }},
+                'autoincrement': {{ 'True' if column.autoincrement else 'False' }}
+            }{{ ',' if not loop.last }}
+            {% endfor %}
+        }
+        
+        # Eliminar columnas extra si se solicita
+        if ignore_extra_columns:
+            extra_columns = set(cleaned_df.columns) - set(model_columns.keys())
+            if extra_columns:
+                cleaned_df = cleaned_df.drop(columns=list(extra_columns))
+        
+        # Agregar columnas nullable faltantes si se solicita
+        if fill_missing_nullable:
+            for col_name, col_info in model_columns.items():
+                if (col_name not in cleaned_df.columns and 
+                    col_info['nullable'] and 
+                    not col_info['autoincrement']):
+                    cleaned_df[col_name] = None
+        
+        # Eliminar columnas autoincrement (la BD las manejará)
+        autoincrement_columns = [
+            col for col, info in model_columns.items() 
+            if info['autoincrement'] and col in cleaned_df.columns
+        ]
+        if autoincrement_columns:
+            cleaned_df = cleaned_df.drop(columns=autoincrement_columns)
+        
+        # Reordenar columnas según el modelo (las que existan)
+        model_column_order = [col for col in model_columns.keys() if col in cleaned_df.columns]
+        cleaned_df = cleaned_df[model_column_order]
+        
+        return cleaned_df
+    
+    def clean_records_data(self, records_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Limpia los datos de registros para inserción en BD.
+        
+        Args:
+            records_data: Lista de diccionarios con datos de registros
+            
+        Returns:
+            Lista de diccionarios limpiados
+        """
+        try:
+            import pandas as pd
+        except ImportError:
+            return records_data
+        
+        cleaned_records = []
+        
+        for record in records_data:
+            cleaned_record = {}
+            for key, value in record.items():
+                # Manejar valores NaN y NaT de pandas
+                if pd.isna(value):
+                    cleaned_record[key] = None
+                # Manejar tipos numpy
+                elif hasattr(value, 'item'):  # numpy scalars
+                    cleaned_record[key] = value.item()
+                else:
+                    cleaned_record[key] = value
+            
+            cleaned_records.append(cleaned_record)
+        
+        return cleaned_records
+
+{% endif %}
+class {{ model.name }}SyncDAO:
+    """
+    Clase DAO síncrona para el modelo {{ model.name }}.
+    
+    Proporciona operaciones completas de Create, Read, Update y Delete
+    para el modelo {{ model.name }} con soporte para gestión automática
+    y manual de sesiones SQLAlchemy.
+    
+    Características principales:
+    - Soporte dual: sesiones automáticas o compartidas
+    - Type hints completos para mejor experiencia de desarrollo
+    - Manejo robusto de errores con rollback automático
+    - Operaciones optimizadas con flush para obtener IDs
+    - Filtros flexibles en todas las operaciones de búsqueda
+    
+    Métodos de lectura:
+        find(**filters, session=None): Busca un único registro
+        find_many(limit, offset, **filters, session=None): Busca múltiples registros
+        find_by_id(id, session=None): Busca por clave primaria
+        count(**filters, session=None): Cuenta registros
+    
+    {% if not model.is_view %}
+    Métodos de escritura:
+        create(**data, session=None): Crea un nuevo registro
+        create_many(records, session=None): Crea múltiples registros
+        update(filters, **data, session=None): Actualiza registros existentes
+        delete(**filters, session=None): Elimina registros
+
+    {% endif %}
+    Parámetros de sesión:
+        Todos los métodos aceptan un parámetro opcional 'session':
+        - Si session=None: Se crea una sesión automática con commit
+        - Si session=Session: Se usa la sesión proporcionada (para transacciones)
+    
+    Ejemplos de uso:
+        ```python
+        # Operaciones simples (sesión automática)
+        crud = {{ model.name }}SyncDAO(session_manager)
+        {% if model.columns %}
+        {% set first_column = model.columns[0] %}
+        {% if not first_column.args.get('autoincrement', False) %}
+        record = crud.create({{ first_column.name }}="valor")
+        {% endif %}
+        {% endif %}
+        found = crud.find_by_id(1)
+        
+        # Operaciones transaccionales (sesión compartida)
+        with session_manager.transaction() as session:
+            record1 = crud.create(data="valor1", session=session)
+            record2 = crud.create(data="valor2", session=session)
+            # Ambos se crean en la misma transacción
+        ```
+    """
+    
+    def __init__(self, session_manager: SyncSessionManager):
+        """
+        Inicializa el SyncDAO con un gestor de sesiones.
+        
+        Args:
+            session_manager: Gestor de sesiones síncronas
+        """
+        self.session_manager = session_manager
+        {% if not model.is_view %}
+        self._df_validator = {{ model.name }}DataFrameValidator()
+        {% endif %}
+
+    {% if not model.is_view %}
+    def find(
+        self,
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) %}
+        {{ column.name }}: {{ column.type }},
+        {% endif %}
+        {% endfor %}
+        includes: Optional[List[str]] = None,
+        session: Optional[Session] = None
+    ) -> Optional[{{ model.name }}Read]:
+        """
+        Busca un único registro por primary key con carga optimizada de relaciones.
+        
+        Args:
+            {% for column in model.columns %}
+            {% if column.args.get('primary_key', False) %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% endif %}
+            {% endfor %}
+            includes: Lista de relaciones a incluir  (formato: 'relation' o 'relation.nested')
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Instancia del modelo o None si no se encuentra
+
+        Examples:
+            Incluir relación simple
+
+            await dao.find(id=1, includes=['author'])
+            
+            Incluir relaciones anidadas
+
+            await dao.find(id=1, includes=['author', 'author.posts'])
+            
+            Múltiples relaciones
+
+            await dao.find(id=1, includes=['author', 'comments', 'tags'])
+        """
+        # Construir query base
+        query = select({{ model.name }})
+        
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) %}
+        query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% endif %}
+        {% endfor %}
+
+        # Aplicar opciones de carga optimizada
+        if includes:
+            loading_options = get_loading_options({{ model.name }}, includes)
+            if loading_options:
+                query = query.options(*loading_options)
+
+        # Ejecutar query
+        def execute_query(session: Session) -> Optional[{{ model.name }}Read]:
+            result = session.execute(query)
+            instance = result.scalars().first()
+            
+            if instance:
+                return {{ model.name }}Read.from_instance(
+                    instance, 
+                    includes=includes, 
+                    max_depth={{ max_depth }}
+                )
+            return None
+
+        if session is not None:
+            return execute_query(session)
+        else:
+            with self.session_manager.get_session() as session:
+                return execute_query(session)
+    {% endif %}
+    
+    def find_many(
+        self,
+        limit: Optional[int] = None, 
+        offset: Optional[int] = None,
+        {% for column in model.columns %}
+        {% if not column.args.get('autoincrement', False) %}
+        {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif  'date' == column.type or 'int' == column.type or 'BigInteger' == column.type %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        min_{{ column.name }}: Optional[{{ column.type }}] = None,
+        max_{{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+        min_{{ column.name }}: Optional[{{ column.type }}] = None,
+        max_{{ column.name }}: Optional[{{ column.type }}] = None,
+        {% else %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        includes: Optional[List[str]] = None,
+        session: Optional[Session] = None
+    ) -> List[{{ model.name }}Read]:
+        """
+        Busca múltiples registros, filtrados, con carga optimizada de relaciones.
+        
+        Args:
+            limit: Límite de registros a retornar
+            offset: Número de registros a saltar
+            {% for column in model.columns %}
+            {% if not column.args.get('autoincrement', False) %}
+            {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% elif  'date' == column.type or 'int' == column.type or 'BigInteger' == column.type %}
+            {{ column.name }}: Filtrar por {{ column.name }},
+            min_{{ column.name }}: Filtrar por fecha mínima (incluída)
+            max_{{ column.name }}: Filtrar por fecha máxima (incluída)
+            {% elif 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+            min_{{ column.name }}: Filtrar por valor mínimo de {{ column.name }} (incluído)
+            max_{{ column.name }}: Filtrar por valor máximo de {{ column.name }} (incluído)
+            {% else %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            includes: Lista de relaciones a incluir (formato: 'relation' o 'relation.nested')
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Lista de instancias del modelo
+
+        Examples:
+            Búsqueda simple con relaciones
+
+            await dao.find_many(limit=10, includes=['author'])
+            
+            Relaciones anidadas con filtros
+
+            await dao.find_many(
+                ..., 
+                includes=['author', 'author.profile', 'comments']
+            )
+        """
+        # Construir query base
+        query = select({{ model.name }})
+        
+        # Aplicar filtros de búsqueda
+        {% for column in model.columns %}
+        {% if not column.args.get('autoincrement', False) %}
+        {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+        if {{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+        if {{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% elif 'date' == column.type or 'int' == column.type or 'BigInteger' == column.type %}
+        if {{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        if min_{{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} >= min_{{ column.name }})
+        if max_{{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} <= max_{{ column.name }})
+        {% elif 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+        if min_{{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} >= min_{{ column.name }})
+        if max_{{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} <= max_{{ column.name }})
+        {% else %}
+        if {{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        
+        # Aplicar opciones de carga optimizada
+        if includes:
+            loading_options = get_loading_options({{ model.name }}, includes)
+            if loading_options:
+                query = query.options(*loading_options)
+        
+        # Aplicar paginación
+        if offset is not None:
+            query = query.offset(offset)
+        if limit is not None:
+            query = query.limit(limit)
+        
+        # Ejecutar query
+        def execute_query(session: Session) -> List[{{ model.name }}Read]:
+            results = session.execute(query)
+            instances = results.scalars().all()
+            
+            return [
+                {{ model.name }}Read.from_instance(
+                    instance, 
+                    includes=includes, 
+                    max_depth={{ max_depth }}
+                ) 
+                for instance in instances
+            ]
+        
+        if session is not None:
+            return execute_query(session)
+        else:
+            with self.session_manager.get_session() as session:
+                return execute_query(session)
+
+    def as_dataframe(
+        self,
+        limit: Optional[int] = None, 
+        offset: Optional[int] = None,
+        {% for column in model.columns %}
+        {% if not column.args.get('autoincrement', False) %}
+        {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif  'date' == column.type or 'int' == column.type or 'BigInteger' == column.type %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        min_{{ column.name }}: Optional[{{ column.type }}] = None,
+        max_{{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+        min_{{ column.name }}: Optional[{{ column.type }}] = None,
+        max_{{ column.name }}: Optional[{{ column.type }}] = None,
+        {% else %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+    ) -> DataFrame:
+        """
+        Busca múltiples registros estableciendo filtros y devuelve el resultado como pandas DataFrame.
+        
+        Args:
+            limit: Límite de registros a retornar
+            offset: Número de registros a saltar
+            {% for column in model.columns %}
+            {% if not column.args.get('autoincrement', False) %}
+            {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% elif  'date' == column.type or 'int' == column.type or 'BigInteger' == column.type %}
+            {{ column.name }}: Filtrar por {{ column.name }},
+            min_{{ column.name }}: Filtrar por fecha mínima (incluída)
+            max_{{ column.name }}: Filtrar por fecha máxima (incluída)
+            {% elif 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+            min_{{ column.name }}: Filtrar por valor mínimo de {{ column.name }} (incluído)
+            max_{{ column.name }}: Filtrar por valor máximo de {{ column.name }} (incluído)
+            {% else %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            
+        Returns:
+            pandas.DataFrame con los registros encontrados
+            
+        Raises:
+            ImportError: Si pandas no está instalado
+            
+        Example:
+            ```python
+            
+            # Obtener todos los registros como DataFrame
+            df = db_api.{{ model.name.lower() }}.as_dataframe()
+            
+            # Con filtros y límites
+            df = db_api.{{ model.name.lower() }}.as_dataframe(
+                limit=100,
+                {% if model.columns %}
+                {{ model.columns[0].name }}="valor_filtro"
+                {% endif %}
+            )
+            
+            # Análisis de datos
+            print(df.describe())
+            print(df.head())
+            
+            # Exportar a CSV
+            df.to_csv('{{ model.name.lower() }}_data.csv', index=False)
+            ```
+        """
+        try:
+            import pandas as pd
+        except ImportError:
+            raise ImportError(
+                "pandas no está instalado. Para usar find_as_dataframe(), instala pandas:\n"
+                "pip install pandas\n"
+                "o si usas poetry:\n"
+                "poetry add pandas"
+            )
+        
+        # Obtener los registros usando find_many
+        records = self.find_many(
+            limit=limit,
+            offset=offset,
+            {% for column in model.columns %}
+            {% if not column.args.get('autoincrement', False) %}
+            {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+            {{ column.name }}={{ column.name }},
+            {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+            {{ column.name }}={{ column.name }},
+            {% elif  'date' == column.type or 'int' == column.type or 'BigInteger' == column.type %}
+            {{ column.name }}={{ column.name }},
+            min_{{ column.name }}=min_{{ column.name }},
+            max_{{ column.name }}=max_{{ column.name }},
+            {% elif 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+            min_{{ column.name }}=min_{{ column.name }},
+            max_{{ column.name }}=max_{{ column.name }},
+            {% else %}
+            {{ column.name }}={{ column.name }},
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+        )
+
+        # Si no hay registros, devolver DataFrame vacío con las columnas del modelo
+        if not records:
+            return pd.DataFrame(columns=[
+                {% for column in model.columns %}
+                '{{ column.name }}'{{ ',' if not loop.last }}
+                {% endfor %}
+            ])
+
+        data = [record.to_dict() for record in records]
+        
+        # Crear DataFrame
+        df = pd.DataFrame(data)
+        
+        # Optimizar tipos de datos si es posible
+        return self._optimize_dataframe_dtypes(df)
+
+    def _optimize_dataframe_dtypes(self, df: DataFrame) -> DataFrame:
+        """
+        Optimiza los tipos de datos del DataFrame basándose en las columnas del modelo.
+        
+        Args:
+            df: DataFrame a optimizar
+            
+        Returns:
+            DataFrame con tipos de datos optimizados
+        """
+        try:
+            import pandas as pd
+        except ImportError:
+            # Si pandas no está disponible, devolver el DataFrame tal como está
+            return df
+        
+        if df.empty:
+            return df
+        
+        # Mapeo de tipos SQLAlchemy a tipos pandas optimizados
+        type_mapping = {
+            {% for column in model.columns %}
+            '{{ column.name }}': {% if 'int' == column.type or 'BigInteger' == column.type %}'int64'{% elif 'float' == column.type or 'Numeric' == column.type %}'float64'{% elif 'bool' == column.type %}'boolean'{% elif 'datetime' == column.type %}'datetime64[ns]'{% elif 'date' == column.type %}'datetime64[ns]'{% elif 'str' == column.type or 'Text' == column.type %}'string'{% else %}'object'{% endif %}{{ ',' if not loop.last }}
+            {% endfor %}
+        }
+        
+        # Aplicar conversiones de tipo de forma segura
+        for column, target_type in type_mapping.items():
+            if column in df.columns:
+                try:
+                    if target_type == 'int64':
+                        # Manejar valores nulos en columnas enteras
+                        df[column] = pd.to_numeric(df[column], errors='coerce').astype('Int64')
+                    elif target_type == 'float64':
+                        df[column] = pd.to_numeric(df[column], errors='coerce')
+                    elif target_type == 'boolean':
+                        df[column] = df[column].astype('boolean')
+                    elif target_type == 'datetime64[ns]':
+                        df[column] = pd.to_datetime(df[column], errors='coerce')
+                    elif target_type == 'string':
+                        df[column] = df[column].astype('string')
+                    # 'object' se deja como está
+                except Exception:
+                    # Si falla la conversión, mantener el tipo original
+                    continue
+        
+        return df
+
+    {% if not model.is_view %}
+    def from_dataframe(
+        self,
+        df: DataFrame,
+        {% if not all_pk_autoincrement %}
+        mode: Literal['create', 'upsert'] = "upsert",
+        {% endif %}
+        validate_types: bool = False,
+        ignore_extra_columns: bool = False,
+        fill_missing_nullable: bool = True
+    ) -> int:
+        """
+        Ingesta un DataFrame de pandas en la tabla correspondiente.
+        
+        Realiza validaciones de esquema y tipos de datos antes de la inserción,
+        y permite diferentes modos de inserción (create o upsert).
+        
+        Args:
+            df: DataFrame de pandas con los datos a insertar
+            {% if not all_pk_autoincrement %}
+            mode ('upsert'): Modo de inserción - 'create' o 'upsert'
+            {% endif %}
+            validate_types (False): Si True, valida tipos de datos del DataFrame
+            ignore_extra_columns (False): Si True, ignora columnas extra del DataFrame
+            fill_missing_nullable (True): Si True, llena con None las columnas nullable faltantes
+            
+        Returns:
+            Número de registros creados o actualizados
+            
+        Raises:
+            ImportError: Si pandas no está instalado
+            ValueError: Si el DataFrame no cumple con el esquema requerido
+            TypeError: Si los tipos de datos no son compatibles
+            
+        Example:
+            ```python
+            import pandas as pd
+            
+            crud = {{ model.name }}SyncDAO(session_manager)
+            
+            # Crear DataFrame
+            df = pd.DataFrame({
+                {% for column in model.columns %}
+                '{{ column.name }}': [{% if 'int' == column.type %}1, 2, 3{% elif 'str' == column.type %}'valor1', 'valor2', 'valor3'{% elif 'bool' == column.type %}True, False, True{% else %}None, None, None{% endif %}]{{ ',' if not loop.last }}
+                {% endfor %}
+            })
+            
+            # Inserción simple
+            records = crud.from_df(df)
+            
+            # Upsert con validaciones relajadas
+            records = crud.from_df(
+                df, 
+                mode='upsert',
+                ignore_extra_columns=True
+            )
+            ```
+        """
+        
+        if df.empty:
+            return []
+
+        {% if not all_pk_autoincrement %}
+        # Validar modo
+        if mode not in ['create', 'upsert']:
+            raise ValueError("mode debe ser 'create' o 'upsert'")
+        {% endif %}
+        
+        # Realizar validaciones del esquema
+        self._df_validator.validate_dataframe_schema(df, ignore_extra_columns, fill_missing_nullable)
+        
+        # Validar tipos de datos si se solicita
+        if validate_types:
+            self._df_validator.validate_dataframe_types(df)
+        
+        # Preparar DataFrame para inserción
+        cleaned_df = self._df_validator.prepare_dataframe_for_insertion(df, ignore_extra_columns, fill_missing_nullable)
+        
+        # Convertir DataFrame a lista de diccionarios
+        records_data = cleaned_df.to_dict('records')
+        
+        # Limpiar valores NaN/None problemáticos
+        records_data = self._df_validator.clean_records_data(records_data)
+        
+        # Ejecutar inserción según el modo
+        {% if not all_pk_autoincrement %}
+        if mode == 'create':
+            return self.create_many([{{ model.name }}Create.from_dict(record) for record in records_data])
+        else:  # upsert
+            return self.upsert_many([{{ model.name }}Create.from_dict(record) for record in records_data])
+        {% else %}
+        return self.create_many([{{ model.name }}Create.from_dict(record) for record in records_data])
+        {% endif %}
+
+    def create(
+        self, 
+        {{ model.tablename }}: {{ model.name }}Create,
+        session: Optional[Session] = None
+    ) -> {{ model.name }}Read:
+        """
+        Crea un nuevo registro.
+        
+        Args:
+            {{ model.tablename }}: Datos del {{ model.tablename }} a crear
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Instancia del modelo creado
+        """
+        
+        {% for relation in model.relations %}
+        {% if relation.direction == 'many-to-one' %}
+        {% set non_nullable_fields = [] %}
+        {% for column in model.columns %}
+        {% if column.name in relation.fields and not column.nullable %}
+        {% set _ = non_nullable_fields.append(column.name) %}
+        {% endif %}
+        {% endfor %}
+        {% if non_nullable_fields %}
+        if {{ model.tablename }}.{{ relation.name }} is None:
+            if any([{% for fk in relation.fields %}{{ model.tablename }}.{{ fk }} is None,{% endfor %}]):
+                raise Exception('Las Foreign Keys no están bien definidas para crear el registro en {{ model.tablename }}')
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        instance = {{ model.tablename }}.to_instance()
+
+        if session is not None:
+            session.add(instance)
+            session.flush()  # Asegura que se genere el ID si es autoincrement
+            data = {{ model.name }}Read.from_created_instance(instance)
+        else:
+            with self.session_manager.get_session() as session:
+                session.add(instance)
+                session.flush()
+                data = {{ model.name }}Read.from_created_instance(instance)
+        
+        return data
+    
+    def create_many(self, records: List[{{ model.name }}Create], session: Optional[Session] = None) -> int:
+        """
+        Crea múltiples registros en la tabla {{ model.tablename }}.
+        
+        Args:
+            records: Lista de {{ model.name }}Create con los datos de los registros
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Número de registros creados
+
+        """
+
+        instances = []
+        for record in records:
+            instances.append(record.to_instance())
+        
+        if session is not None:
+            session.add_all(instances)
+            session.flush()  # Asegura que se generen los IDs si son autoincrement
+        else:
+            with self.session_manager.get_session() as session:
+                session.add_all(instances)
+                session.flush()  # Asegura que se generen los IDs si son autoincrement
+
+        return len(instances)
+    
+    def update(
+        self, 
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) %}
+        {{ column.name }}: {{ column.type }},
+        {% endif -%}
+        {% endfor %}
+        updated_values: {{ model.name }}UpdateValues,
+        session: Optional[Session] = None
+    ) -> int:
+        """
+        Actualiza registros que coincidan con los filtros.
+        
+        Args:
+            {% for column in model.columns %}
+            {% if column.args.get('primary_key', False) %}
+            {{ column.name }}: Identificador del registro
+            {% endif -%}
+            {% endfor %}
+            updated_values: Datos a actualizar
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Número de registros actualizados
+        """
+
+        query = update({{ model.name }})
+
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) %}
+        query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% endif -%}
+        {% endfor %}
+        
+        update_data = updated_values.to_dict()
+
+        if not update_data:  # Solo actualizar si hay datos
+            return 0
+        
+        query = query.values(**update_data)
+        
+        if session is not None:
+            result = session.execute(query)
+        else:
+            with self.session_manager.get_session() as session:
+                result = session.execute(query)
+        
+        return result.rowcount
+    
+    def update_many(
+        self,
+        payload: {{ model.name }}Update, 
+        session: Optional[Session] = None
+    ) -> int:
+        """
+        Actualiza múltiples registros basándose en campos de coincidencia.
+        
+        Args:
+            payload: Datos de actualización y filtros
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Número total de registros actualizados
+        """
+
+        filters = payload.filter.to_dict()
+        values = payload.values.to_dict()
+        
+        if not filters and not values:  # Solo actualizar si hay filtros y valores
+            return 0
+
+        query = update({{ model.name }})
+
+        for key, value in filters.items():
+            query = query.where(getattr({{ model.name }}, key) == value)
+        
+        query = query.values(**values)
+                
+        if session is not None:
+            result = session.execute(query)
+        else:
+            with self.session_manager.get_session() as session:
+                result = session.execute(query)
+        
+        return result.rowcount
+    
+    {% if not all_pk_autoincrement %}
+    def upsert(
+        self,
+        {{ model.tablename }}: {{ model.name }}Create,
+        match_fields: List[str] = [
+            {% for column in model.columns %}
+            {% if column.args.get('primary_key', False) %}
+            '{{ column.name }}'{{ ', ' if not loop.last }}
+            {% endif %}
+            {% endfor %}
+        ],
+        session: Optional[Session] = None
+    ) -> {{ model.name }}DTO:
+        """
+        Inserta o actualiza un registro (upsert).
+        
+        Args:
+            {{ model.tablename }}: Datos del registro a insertar o actualizar
+            match_fields: Campos a usar para verificar si el registro existe. 
+                         Por defecto usa las claves primarias.
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Instancia del modelo (creada o actualizada)
+        """
+        record_dict = {{ model.tablename }}.to_dict()
+
+        # Buscar registro existente usando los campos de coincidencia
+        if not match_fields:
+            raise ValueError("match_fields no puede estar vacío. Debe contener al menos un campo para identificar registros.")
+
+        for field in match_fields:
+            if not field in record_dict:
+                raise ValueError(f"El campo '{field}' debe estar presente en '{{ model.tablename }}' para upsert.")
+            if record_dict[field] is None:
+                raise ValueError(f"El campo '{field}' no puede ser None. Debe tener un valor para upsert.")
+
+        filters = {field: getattr({{ model.tablename }}, field) for field in match_fields}
+
+        def execute_query(session: Session) -> Optional[{{ model.name }}]:
+
+            query = select({{ model.name }})
+        
+            for key, value in filters.items():
+                query = query.where(getattr({{ model.name }}, key) == value)
+
+            result = await session.execute(query)
+            existing = result.scalars().first()
+            
+            if existing:
+                # Actualizar registro existente usando la instancia de SQLAlchemy
+                update_data = {k: v for k, v in record_dict.items() if k not in match_fields}
+
+                if update_data:
+                    # Actualizar atributos directamente en la instancia
+                    for key, value in update_data.items():
+                        if hasattr(existing, key):
+                            setattr(existing, key, value)
+                    
+                    session.flush()  # Aplicar cambios a la base de datos
+                return existing
+
+            else:
+                # Crear nuevo registro
+                instance = {{ model.name }}(**record_dict)
+                session.add(instance)
+                session.flush()
+                return instance
+
+        if session is not None:
+            instance = execute_query(session)
+            return {{ model.name }}Read.from_instance(instance)
+            
+        else:
+            with self.session_manager.get_session() as session:
+                instance = execute_query(session)
+                return {{ model.name }}Read.from_instance(instance)
+    
+    def upsert_many(
+        self,
+        records: List[{{ model.name }}Create],
+        match_fields: List[str] = [
+            {% for column in model.columns %}
+            {% if column.args.get('primary_key', False) %}
+            '{{ column.name }}'{{ ', ' if not loop.last }}
+            {% endif %}
+            {% endfor %}
+        ],
+        session: Optional[Session] = None
+    ) -> int:
+        """
+        Inserta o actualiza múltiples registros.
+        
+        Args:
+            {{ model.tablename }}: Lista de registros a insertar o actualizar
+            match_fields: Campos a usar para verificar si los registros existen
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Número de registros creados o actualizados
+        """
+        results = []
+
+        if session is not None:
+            for record in records:
+                result = self.upsert(record, match_fields, session)
+                results.append(result)
+        else:
+            with self.session_manager.get_session() as session:
+                for record in records:
+                    result = self.upsert(record, match_fields, session)
+                    results.append(result)
+
+        return len(results)
+    
+    {% endif %}
+    def delete(
+        self, 
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) %}
+        {{ column.name }}: {{ column.type }},
+        {% endif %}
+        {% endfor %}
+        session: Optional[Session] = None
+    ) -> int:
+        """
+        Elimina un registro atentiendo a su primary key.
+        
+        Args:
+            {% for column in model.columns %}
+            {% if column.args.get('primary_key', False) %}
+            {{ column.name }}: Filtrar por {{ column.name }} para eliminar
+            {% endif %}
+            {% endfor %}
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Número de registros eliminados
+        """
+
+        query = delete({{ model.name }})
+        
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) %}
+        query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% endif %}
+        {% endfor %}
+
+        if session is not None:
+            result = session.execute(query)
+        else:
+            with self.session_manager.get_session() as session:
+                result = session.execute(query)
+
+        return result.rowcount
+    
+    def delete_many(self, filters_list: List[Dict[str, Any]]) -> int:
+        """
+        Elimina múltiples registros basándose en una lista de filtros.
+        
+        Args:
+            filters_list: Lista de diccionarios con filtros para cada eliminación
+            
+        Returns:
+            Número total de registros eliminados
+        """
+
+        total_deleted = 0
+        def execute_query(session: Session) -> int:
+            for filters in filters_list:
+                query = delete({{ model.name }})
+                
+                for key, value in filters.items():
+                    if hasattr({{ model.name }}, key):
+                        query = query.where(getattr({{ model.name }}, key) == value)
+                
+                result = session.execute(query)
+                total_deleted += result.rowcount
+        
+        if session is not None:
+            execute_query(session)
+        else:
+            with self.session_manager.get_session() as session:
+                execute_query(session)
+        
+        return total_deleted
+    
+    def count(
+        self,
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif  'date' == column.type %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        min_{{ column.name }}: Optional[{{ column.type }}] = None,
+        max_{{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif 'int' == column.type or 'BigInteger' == column.type or 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+        min_{{ column.name }}: Optional[{{ column.type }}] = None,
+        max_{{ column.name }}: Optional[{{ column.type }}] = None,
+        {% else %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% endif %}
+        {% endfor %}
+        session: Optional[Session] = None
+    ) -> int:
+        """
+        Cuenta registros que coincidan con los filtros.
+        
+        Args:
+            {% for column in model.columns %}
+            {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% elif  'date' == column.type %}
+            {{ column.name }}: Filtrar por {{ column.name }},
+            min_{{ column.name }}: Filtrar por fecha mínima (incluída)
+            max_{{ column.name }}: Filtrar por fecha máxima (incluída)
+            {% elif 'int' == column.type or 'BigInteger' == column.type or 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+            min_{{ column.name }}: Filtrar por valor mínimo de {{ column.name }} (incluído)
+            max_{{ column.name }}: Filtrar por valor máximo de {{ column.name }} (incluído)
+            {% else %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% endif %}
+            {% endfor %}
+            session: Sesión existente (opcional)
+            
+        Returns:
+            Número de registros que coinciden con los filtros
+        """
+        
+        query = select(func.count({{ model.name }}))
+        
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+        if {{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+        if {{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% elif 'date' == column.type %}
+        if {{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        if min_{{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} >= min_{{ column.name }})
+        if max_{{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} <= max_{{ column.name }})
+        {% elif 'int' == column.type or 'BigInteger' == column.type or 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+        if min_{{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} >= min_{{ column.name }})
+        if max_{{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} <= max_{{ column.name }})
+        {% else %}
+        if {{ column.name }} is not None:
+            query = query.where({{ model.name }}.{{ column.name }} == {{ column.name }})
+        {% endif %}
+        {% endfor %}
+
+        if session is not None:
+            result = session.execute(query).scalar()
+        else:
+            with self.session_manager.get_session() as session:
+                result = session.execute(query).scalar()
+
+        return result or 0
+    
+    def exists(
+        self,
+        {% for column in model.columns %}
+        {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif  'date' == column.type %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        min_{{ column.name }}: Optional[{{ column.type }}] = None,
+        max_{{ column.name }}: Optional[{{ column.type }}] = None,
+        {% elif 'int' == column.type or 'BigInteger' == column.type or 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+        min_{{ column.name }}: Optional[{{ column.type }}] = None,
+        max_{{ column.name }}: Optional[{{ column.type }}] = None,
+        {% else %}
+        {{ column.name }}: Optional[{{ column.type }}] = None,
+        {% endif %}
+        {% endfor %}
+        session: Optional[Session] = None
+    ) -> bool:
+        """
+        Verifica si existe al menos un registro que coincida con los filtros.
+        
+        Args:
+            {% for column in model.columns %}
+            {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% elif  'date' == column.type %}
+            {{ column.name }}: Filtrar por {{ column.name }},
+            min_{{ column.name }}: Filtrar por fecha mínima (incluída)
+            max_{{ column.name }}: Filtrar por fecha máxima (incluída)
+            {% elif 'int' == column.type or 'BigInteger' == column.type or 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+            min_{{ column.name }}: Filtrar por valor mínimo de {{ column.name }} (incluído)
+            max_{{ column.name }}: Filtrar por valor máximo de {{ column.name }} (incluído)
+            {% else %}
+            {{ column.name }}: Filtrar por {{ column.name }}
+            {% endif %}
+            {% endfor %}
+            session: Sesión existente (opcional)
+            
+        Returns:
+            True si existe al menos un registro, False en caso contrario
+        """
+        return self.count(
+            {% for column in model.columns %}
+            {% if column.args.get('primary_key', False) or column.is_foreign_key %}
+            {{ column.name }}={{ column.name }},
+            {% elif 'str' == column.type or 'Text' == column.type or 'bool' == column.type %}
+            {{ column.name }}={{ column.name }},
+            {% elif  'date' == column.type %}
+            {{ column.name }}={{ column.name }},
+            min_{{ column.name }}=min_{{ column.name }},
+            max_{{ column.name }}=max_{{ column.name }},
+            {% elif 'int' == column.type or 'BigInteger' == column.type or 'float' == column.type or 'Numeric' == column.type or 'datetime' == column.type or 'time' == column.type %}
+            min_{{ column.name }}=min_{{ column.name }},
+            max_{{ column.name }}=max_{{ column.name }},
+            {% else %}
+            {{ column.name }}={{ column.name }},
+            {% endif %}
+            {% endfor %}
+            session=session
+        ) > 0
+
+    {% endif %}
+{% endfor %}
