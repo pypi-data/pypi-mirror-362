@@ -1,0 +1,112 @@
+"""Authentication module for BICAM - uses credential server for S3 access."""
+
+import hashlib
+import json
+from datetime import datetime, timedelta, timezone
+from functools import lru_cache
+from typing import Any, Dict
+
+import boto3
+import requests
+
+# Credential server endpoint - can be overridden via environment variable
+CREDENTIAL_ENDPOINT = "https://xqcl3vbxzi.execute-api.us-east-1.amazonaws.com/prod/get-credentials"
+SECRET_KEY = "bfb6336474da397a353dbdf0d8393ca840c57851cb45d4eef08d1e74fe2cb5a2"
+
+# Global cache for credentials
+_credentials_cache: Dict[str, Any] = {}
+
+
+def get_package_token() -> str:
+    """Generate package token for authentication."""
+    from .__version__ import __version__
+
+    return hashlib.sha256(f"{__version__}-{SECRET_KEY}".encode()).hexdigest()
+
+
+def _is_credentials_valid() -> bool:
+    """Check if cached credentials are still valid (with 5-minute buffer)."""
+    if "expiration" not in _credentials_cache:
+        return False
+
+    try:
+        exp = datetime.fromisoformat(_credentials_cache["expiration"])
+        if exp.tzinfo is None:
+            exp = exp.replace(tzinfo=timezone.utc)
+        now = datetime.now(timezone.utc)
+        return exp > now + timedelta(minutes=5)
+    except (ValueError, TypeError):
+        return False
+
+
+def _create_client_from_cache() -> boto3.client:
+    """Create S3 client from cached credentials."""
+    return boto3.client(
+        "s3",
+        aws_access_key_id=_credentials_cache["access_key"],
+        aws_secret_access_key=_credentials_cache["secret_key"],
+        aws_session_token=_credentials_cache["session_token"],
+        region_name=_credentials_cache.get("region", "us-east-1"),
+    )
+
+
+def _fetch_credentials() -> Dict[str, Any]:
+    """Fetch new credentials from the credential server."""
+    from .__version__ import __version__
+
+    # Get user agent for tracking
+    user_agent = f"bicam/{__version__}"
+
+    try:
+        response = requests.post(
+            CREDENTIAL_ENDPOINT,
+            json={
+                "package_token": get_package_token(),
+                "version": __version__,
+                "user_agent": user_agent,
+            },
+            timeout=10,
+            headers={"User-Agent": user_agent},
+        )
+
+        if response.status_code != 200:
+            error_msg = f"Credential server error: {response.status_code}"
+            try:
+                error_data = response.json()
+                error_msg += f" - {error_data.get('error', 'Unknown error')}"
+            except json.JSONDecodeError:
+                error_msg += f" - {response.text}"
+            raise RuntimeError(error_msg) from None
+
+        data: Dict[str, Any] = response.json()
+        credentials: Dict[str, Any] = data["credentials"]
+        return credentials
+
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Failed to connect to credential server: {str(e)}") from e
+    except (KeyError, json.JSONDecodeError) as e:
+        raise RuntimeError(f"Invalid response from credential server: {str(e)}") from e
+
+
+@lru_cache(maxsize=1)
+def get_s3_client() -> boto3.client:
+    """Get authenticated S3 client with temporary credentials."""
+    global _credentials_cache
+
+    # Check if we have valid cached credentials
+    if _is_credentials_valid():
+        return _create_client_from_cache()
+
+    # Fetch new credentials
+    _credentials_cache = _fetch_credentials()
+
+    return _create_client_from_cache()
+
+
+def get_bucket_name() -> str:
+    """Get the S3 bucket name for BICAM data."""
+    # This could be fetched from the credential server response
+    # For now, return a default or get from environment
+    import os
+
+    return os.environ.get("BICAM_BUCKET_NAME", "bicam-datasets")
