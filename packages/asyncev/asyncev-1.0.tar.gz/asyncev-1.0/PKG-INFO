@@ -1,0 +1,47 @@
+Metadata-Version: 2.4
+Name: asyncev
+Version: 1.0
+Summary: Asynchronous named events with no dependencies
+Project-URL: Homepage, https://github.com/acetylen/asyncev
+Project-URL: Issues, https://github.com/acetylen/asyncev/issues
+Author: Emil Tylén
+License-Expression: MIT
+License-File: LICENSE
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+
+AsyncEv: asynchronous event objects
+===================================
+
+AsyncEv leverages `asyncio` to create events that can be subscribed to and waited for.
+
+## Usage
+
+```python
+import asyncio
+import asyncev
+from dataclasses import dataclass
+
+# Create an event
+@dataclass
+class MyEvent(asyncev.BaseEvent):
+    value: str
+
+# Create a handler
+async def on_myevent(ev: MyEvent):
+    print(f"Got a MyEvent with the value {ev.value}!")
+
+asyncev.bind(MyEvent, on_myevent)
+
+# Emit event (requires a running asyncio event loop)
+async def main():
+    asyncev.emit(MyEvent(value="hello world"))
+    
+asyncio.run(main())
+```
+
+## Testing
+
+```shell
+$ python -m unittest
+```
