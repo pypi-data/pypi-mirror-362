@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: dockwershell
+Version: 0.3.0
+Summary: Asynchronous Docker management for WSL2 using pywershell
+Author: genderlesspit
+License: MIT
+Project-URL: Homepage, https://github.com/genderlesspit/dockwershell
+Description-Content-Type: text/markdown
+Requires-Dist: async_property>=0.2.0
+Requires-Dist: loguru>=0.5.3
+Requires-Dist: pywershell>=0.1.0
+
+<!-- README.md -->
+# DockwerShell
+
+Asynchronous Docker management for Debian-based WSL2 using the [pywershell] engine under the hood.
+
+```python
+import asyncio
+from dockwershell.core import AsyncDocker
+
+async def main():
+    # get singleton instance
+    docker = await AsyncDocker.get()
+
+    # print version (auto-installs if needed)
+    version = await docker.version
+    print("Docker version:", version)
+
+    # list images
+    images = await docker.images
+    print("Available images:", images)
+
+    # run an ad‐hoc command
+    await docker.run("ps -a")
+```
+
+```python
+from pathlib import Path
+from dockwershell.manager import DockerManager
+
+async def build_and_run():
+    mgr = DockerManager()
+    img = await mgr.new(
+        dockerfile=Path("Dockerfile.app"),
+        build_args="ENV=prod",
+        rebuild=False,
+        run_args="-d -p 8000:8000"
+    )
+    result = await img.run()
+    print(result.str)
+
+asyncio.run(build_and_run())
+```
