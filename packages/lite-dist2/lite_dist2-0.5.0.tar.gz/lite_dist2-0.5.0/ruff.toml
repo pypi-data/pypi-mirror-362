@@ -1,0 +1,42 @@
+target-version = "py312"
+line-length = 119
+
+[lint]
+select = ["ALL"]
+ignore = [
+    "D",
+    "FIX002",   # use TODO
+    "TD002",    #
+    "TD003",    #
+    "PLR0913",  # Because of my lazy
+    "ERA001",   # Ocurring False Positive
+    "FBT001",   # flag parameter
+    "FBT002",   # flag parameter
+]
+
+[lint.per-file-ignores]
+"__init__.py" = [
+    "F401"      # The imported class is rarely used within __init__.py
+]
+"tests/**.py" = [
+    "S101",     # pytest use assert
+    "SLF001",   # test private method
+    "ARG001",   # Fixture
+]
+"example/**.py" = [
+    "INP001",   # Example is not package
+]
+
+[lint.flake8-type-checking]
+exempt-modules = [
+    "lite_dist2.table_node_api.table_param"
+]
+runtime-evaluated-base-classes = [
+    "pydantic.BaseModel",
+    "lite_dist2.study.StudyModel",  # uses at test
+]
+
+[format]
+indent-style = "space"
+quote-style = "double"
+skip-magic-trailing-comma = false
