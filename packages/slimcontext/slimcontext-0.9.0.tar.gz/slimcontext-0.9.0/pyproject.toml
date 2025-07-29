@@ -1,0 +1,124 @@
+[project]
+requires-python = ">=3.10"
+name = "slimcontext"
+
+[tool.poetry]
+name = "slimcontext"
+version = "0.9.0"
+description = "A tool to turn a git repository into context for LLMs."
+authors = ["Neil Schneider <schneider.neil@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://gitlab.com/notorious-community/slimcontext"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Version Control",
+]
+keywords = ["LLM", "Git", "Context", "Tool", "ChatBot"]
+
+[tool.poetry.scripts]
+slimcontext = "slimcontext.main:main"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+tiktoken = ">=0.8.0, <1.0.0"
+click = "^8.1.7"
+beautifulsoup4 = "^4.12.3"
+nbformat = "^5.10.4"
+
+[tool.poetry.group.build.dependencies]
+nox = ">=2024.10.0"
+build = "^1.2.2.post1"
+
+[tool.poetry.group.tests.dependencies]
+coverage = "^7.6.8"
+pytest = "^8.3.3"
+pytest-cov = "^6.0.0"
+ruff = "^0.8.2"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[tool.poetry.group.deploy.dependencies]
+twine = "^6.0.1"
+id = "^1.5.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+exclude = [
+    "samples/*",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+preview = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+preview = true
+ignore = [
+  "Q000", # double quotes
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "SLF001", "PLC2701"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+pythonpath = ["slimcontext"]
+addopts = "--cov=slimcontext --cov-report=html"
+testpaths = [
+  "tests",
+]
+filterwarnings = [
+  "error",  # Treat warnings as errors
+  "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+branch = true
+omit = [
+  "tests/*"
+]
+parallel = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+precision = 2
+omit = [
+  "tests/*",
+]
+exclude_also = [
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+    ]
+
+[tool.coverage.html]
+directory = ".htmlcov"
+
+[tool.coverage.annotate]
+directory = ".cov"
