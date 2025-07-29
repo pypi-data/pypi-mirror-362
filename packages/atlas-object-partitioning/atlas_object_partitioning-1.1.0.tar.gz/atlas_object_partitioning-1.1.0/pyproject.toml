@@ -1,0 +1,28 @@
+[project]
+name = "atlas-object-partitioning"
+version = "1.1.0"
+description = "Object partitioning package."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [ "typer", "func_adl_servicex_xaodr25", "servicex_analysis_utils", "jinja2", "pyarrow",]
+[[project.authors]]
+name = "Gordon Watts"
+email = "gwatts@uw.edu"
+
+[project.optional-dependencies]
+test = [ "pytest", "pytest-cov", "flake8", "black", "coverage",]
+
+[project.scripts]
+atlas-object-partitioning = "atlas_object_partitioning.partition:app"
+
+[tool.hatch.envs.default]
+dependencies = []
+
+[tool.hatch.envs.dev]
+dependencies = [ "pytest", "pytest-cov", "flake8", "black", "coverage",]
+
+[tool.hatch.build.targets.sdist]
+include = [ "src/atlas_object_partitioning/**", "tests/**",]
+
+[tool.hatch.build.targets.wheel]
+include = [ "src/atlas_object_partitioning/**",]
