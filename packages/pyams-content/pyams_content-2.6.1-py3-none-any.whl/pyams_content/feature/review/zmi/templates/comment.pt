@@ -1,0 +1,33 @@
+<li class="d-flex flex-row m-0 px-3 py-2" i18n:domain="pyams_content">
+	<tal:var define="avatar profile.get_avatar()">
+		<tal:if condition="avatar">
+			<img class="avatar mt-2" alt=""
+				 src="${tales:absolute_url(avatar, '++thumb++square:32x32.png')}"/>
+		</tal:if>
+		<tal:if condition="not:avatar">
+			<i class="fa fa-lg fa-user avatar text-center mt-2"></i>
+		</tal:if>
+		<div class="mx-3">
+			<div>
+				<tal:if condition="comment.comment_type=='request'">
+					<span i18n:translate="">Review query from</span>
+				</tal:if>
+				<strong class="text-info">${request.principal.title}</strong>
+				<tal:if condition="comment.is_reviewer_comment">
+					&nbsp;
+					<span i18n:translate="">(as reviewer)</span>
+				</tal:if>
+				<time class="hint align-base"
+					  data-ams-hint-gravity="w" data-ams-hint-offset="5"
+					  title="${comment_date}">
+					${comment_age.lower()}
+				</time>
+			</div>
+			<div tal:condition="comment.comment_type=='request'">
+				<span i18n:translate="">Selected reviewers:</span>&nbsp;
+				${comment.reviewers}
+			</div>
+			${structure:tales:html(comment.comment)}
+		</div>
+	</tal:var>
+</li>

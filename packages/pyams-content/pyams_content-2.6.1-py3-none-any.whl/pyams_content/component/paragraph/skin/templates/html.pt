@@ -1,0 +1,21 @@
+<div class="row"
+	 tal:define="settings view.settings;
+				 has_padding settings.has_padding();
+				 renderer view.illustration_renderer;
+				 position getattr(renderer, 'position', None) if renderer is not None else None;"
+	 tal:omit-tag="not:has_padding">
+	<div class="${settings.get_padding()}"
+		 tal:omit-tag="not:has_padding"
+		 tal:switch="position">
+		<tal:var case="'before-title'">${structure:renderer.render()}</tal:var>
+		<h2 tal:define="title i18n:context.title"
+			tal:condition="title and (position != 'before-title')">${title}</h2>
+		<tal:var case="'before-body'">${structure:renderer.render()}</tal:var>
+		<div tal:define="body i18n:context.body">
+			${structure:tales:html(body, 'oid_to_href;glossary')}
+		</div>
+		<tal:var case="'after-body'">${structure:renderer.render()}</tal:var>
+		<div class="clearfix"></div>
+		${structure:provider:pyams_content.associations}
+	</div>
+</div>

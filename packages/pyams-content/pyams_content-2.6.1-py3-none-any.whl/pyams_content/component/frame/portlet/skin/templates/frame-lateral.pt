@@ -1,0 +1,24 @@
+<blockquote tal:define="settings view.settings;
+						renderer_settings view.renderer_settings;
+						renderer view.illustration_renderer;
+						position getattr(renderer, 'position', None) if renderer is not None else None;
+						pictogram renderer_settings.pictogram;"
+			tal:switch="position"
+			class="blockquote alert alert-${renderer_settings.status} float-${renderer_settings.position} ${renderer_settings.get_css_class()} mx-3">
+	<tal:var case="'before-title'">${structure:renderer.render()}</tal:var>
+	<tal:if condition="pictogram">
+		<div class="float-left my-2 mx-3 pictogram hidden-sm hidden-xs"
+			 tal:define="image i18n:pictogram.image">
+			${structure:tales:thumbnail(image, width=64, height=64)}
+		</div>
+	</tal:if>
+	<h3 class="alert-heading"
+		tal:define="title i18n:settings.title"
+		tal:condition="title and (position != 'before-title')">${title}</h3>
+	<tal:var case="'before-body'">${structure:renderer.render()}</tal:var>
+	<div tal:define="body i18n:settings.body">
+		${structure:tales:html(body, 'oid_to_href;glossary')}
+	</div>
+	<tal:var case="'after-body'">${structure:renderer.render()}</tal:var>
+	<div class="clearfix"></div>
+</blockquote>

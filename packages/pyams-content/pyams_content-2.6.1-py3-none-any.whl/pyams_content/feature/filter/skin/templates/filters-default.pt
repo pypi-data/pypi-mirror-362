@@ -1,0 +1,106 @@
+<div class="search-filters"
+     tal:condition="view.filters"
+     i18n:domain="pyams_content">
+	<form id="search-filters" class="ams-form">
+		<tal:loop repeat="filter view.filters">
+			<div class="filter border-top border-bottom"
+				 tal:condition="filter and filter.initial_options">
+				<fieldset>
+					<legend class="d-flex justify-content-start justify-content-md-end">
+						<a role="button"
+						   class="btn text-primary text-truncate mt-2"
+						   data-toggle="collapse"
+						   aria-expanded="true" aria-controls="filter_${filter.filter_type}${repeat.filter.index}"
+						   href="#filter_${filter.filter_type}${repeat.filter.index}">
+							<strong>${i18n:filter.filter.label}</strong>
+							<i class="fa fas fa-fw fa-caret-${'up' if (filter.filter.open_state or filter.is_active) else 'down'}"></i>
+						</a>
+					</legend>
+					<div id="filter_${filter.filter_type}${repeat.filter.index}"
+					     class="collapse ${'show' if (filter.filter.open_state or filter.is_active) else ''} mb-3"
+					     data-ams-events-handlers='{
+					        "show.bs.collapse": "PyAMS_search.switchFilter",
+					        "hide.bs.collapse": "PyAMS_search.switchFilter"
+					     }'
+						 tal:switch="filter.filter.display_mode">
+						<tal:if case="'select'">
+							<select id="filter_${i18n:filter.filter.label}"
+							        name="filter"
+							        class="filters__select select2"
+							        data-filter-type="${filter.filter_type}"
+							        data-ams-change-handler="PyAMS_search.updateSearchFilters">
+								<option value="">${filter.select_placeholder}</option>
+								<tal:loop repeat="filter_option filter.all_options">
+									<option value="${filter_option.key}"
+									        selected="${filter_option.key in filter.current_filters and 'selected' or None}">
+										${filter_option.label}
+									</option>
+								</tal:loop>
+							</select>
+						</tal:if>
+						<tal:if case="'list'">
+							<div class="options">
+								<div tal:repeat="filter_option filter.initial_options"
+									 class="custom-control custom-checkbox text-left text-md-${filter.filter.labels_alignment} ${'text-truncate' if filter.filter.truncate_labels else ''}">
+									<input id="filter_${filter_option.key}_${repeat.filter_option.index}"
+									       name="filter"
+									       type="checkbox"
+									       class="custom-control-input"
+									       value="${filter_option.key}"
+									       checked="${filter_option.key in filter.current_filters and 'checked' or None}"
+									       data-filter-type="${filter.filter_type}"
+									       data-ams-change-handler="PyAMS_search.updateSearchFilters" />
+									<label for="filter_${filter_option.key}_${repeat.filter_option.index}"
+									       class="custom-control-label">
+										${filter_option.label}
+										<tal:if condition="filter.filter.display_count">(${filter_option.doc_count})</tal:if>
+									</label>
+								</div>
+								<tal:if condition="filter.show_more">
+									<div id="moreFilters_${repeat.filter.index}"
+									     class="collapse ${'show' if filter.is_expanded else ''}"
+									     data-ams-events-handlers='{
+									        "shown.bs.collapse": "PyAMS_search.switchMoreFilters",
+									        "hidden.bs.collapse": "PyAMS_search.switchMoreFilters"
+									     }'>
+										<div tal:repeat="extra_option filter.additional_options"
+											 class="custom-control custom-checkbox text-left text-md-${filter.filter.labels_alignment} ${'text-truncate' if filter.filter.truncate_labels else ''}">
+											<input id="extraFilter_${extra_option.key}_${repeat.extra_option.index}"
+											       name="filter"
+											       type="checkbox"
+											       class="custom-control-input"
+											       value="${extra_option.key}"
+											       checked="${extra_option.key in filter.current_filters and 'checked' or None}"
+											       data-filter-type="${filter.filter_type}"
+											       data-ams-change-handler="PyAMS_search.updateSearchFilters"/>
+											<label for="extraFilter_${extra_option.key}_${repeat.extra_option.index}"
+											       class="custom-control-label">
+												${extra_option.label}
+												<tal:if condition="filter.filter.display_count">(${extra_option.doc_count})</tal:if>
+											</label>
+										</div>
+									</div>
+									<button type="button"
+									        class="btn btn-sm"
+									        data-toggle="collapse"
+									        data-target="#moreFilters_${repeat.filter.index}"
+									        class="collapsed"
+									        data-ams-more-label="${filter.show_more_text}"
+									        data-ams-less-label="${filter.show_less_text}">
+										${filter.show_less_text if filter.is_expanded else filter.show_more_text}
+									</button>
+								</tal:if>
+							</div>
+						</tal:if>
+					</div>
+				</fieldset>
+			</div>
+		</tal:loop>
+		<button type="button"
+		        class="btn btn-sm my-3"
+		        data-ams-click-handler="PyAMS_search.resetFilters">
+			<i18n:var translate="">Reset all filters</i18n:var>
+			<i class="fa fas fa-arrow-rotate-left"></i>
+		</button>
+	</form>
+</div>

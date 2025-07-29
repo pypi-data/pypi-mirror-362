@@ -1,0 +1,16 @@
+<tal:var define="settings view.settings" i18n:domain="pyams_content">
+	${structure:view.get_setting(settings, 'title')}
+	${structure:view.get_setting(settings, 'header')}
+	<small><strong i18n:translate="">Key-numbers list:</strong></small>
+	<ul class="mb-0">
+		<li class="text-truncated"
+			tal:repeat="number settings.values()">
+			<i class="fa-fw ${'far fa-eye' if number.visible else 'far fa-eye-slash text-danger'} hint"></i>
+			<i tal:omit-tag="">
+				<i tal:omit-tag="">${i18n:number.label}</i>
+				<i tal:omit-tag="">${number.number or '--'}</i>
+				<i tal:omit-tag="">${i18n:number.unit}</i>
+			</i>
+		</li>
+	</ul>
+</tal:var>

@@ -1,0 +1,75 @@
+<div class="contact frame my-3 pt-3 px-3 border by-1 bx-5 border-secondary rounded"
+	 i18n:domain="pyams_content"
+	 tal:define="settings view.settings">
+	<h2 tal:define="title i18n:context.title"
+		tal:condition="title">${title}</h2>
+	<div tal:condition="settings.can_display_photo"
+		 class="thumbnail photo float-${settings.photo_position} mx-3 mb-2">
+		${structure:tales:picture(context.photo,
+								  xl_thumb='portrait', xl_width=2,
+								  lg_thumb='portrait', lg_width=2,
+								  md_thumb='portrait', md_width=2,
+								  sm_thumb='portrait', sm_width=3,
+								  xs_thumb='portrait', xs_width=4)}
+	</div>
+	<div tal:condition="settings.can_display_map"
+		 class="osmmap-wrapper float-${settings.map_position} d-flex flex-column col-lg-6 my-2 m${settings.map_position[0]}-lg-n3 px-0 px-lg-3 h-3 h-lg-4">
+		<div id="osmmap_${tales:cache_key(context)}"
+			 class="osmmap-map w-100 h-100"
+			 data-map-configuration='${settings.get_map_configuration(context)}'></div>
+		<tal:if condition="settings.display_coordinates">
+			<tal:var define="position context.position"
+					 condition="position">
+				<div class="opsmap-location"
+					 tal:define="gps_position position.wgs_coordinates">
+					<div class="small mt-1">
+						<span i18n:translate="">GPS position:</span>
+						<a class="d-inline d-md-none"
+						   href="geo:${'{1:.8f},{0:.8f}'.format(gps_position.longitude, gps_position.latitude)}">
+								${'{1:.8f}, {0:.8f}'.format(gps_position.longitude, gps_position.latitude)}
+						</a>
+						<a class="d-none d-md-inline"
+						   href="https://www.google.com/maps/?q=${'{1:.8f}, {0:.8f}'.format(gps_position.longitude, gps_position.latitude)}"
+						   target="_blank">
+								${'{1:.8f}, {0:.8f}'.format(gps_position.longitude, gps_position.latitude)}
+						</a>
+					</div>
+				</div>
+			</tal:var>
+		</tal:if>
+	</div>
+	<address>
+		<strong class="contact-name">${context.name}</strong><br />
+		<tal:if define="charge i18n:context.charge"
+				condition="charge">
+			${charge}<br />
+		</tal:if>
+		<tal:if condition="context.company">
+			<strong>${context.company}</strong><br />
+		</tal:if>
+		<div class="address"
+			 tal:condition="context.address">
+			${structure:tales:html(context.address)}
+		</div>
+		<tal:if condition="context.phone_number">
+			<span i18n:translate="">Phone number:</span>
+			<a href="tel:${context.phone_number}">
+				${context.phone_number}
+			</a><br />
+		</tal:if>
+		<tal:if condition="context.contact_email">
+			<span i18n:translate="">Email contact:</span>
+			<a href="${settings.email_url}">
+				${context.contact_email}
+			</a><br />
+		</tal:if>
+		<tal:if define="target settings.contact_form_target"
+		        condition="target is not None">
+			<a class="btn btn-light my-2"
+			   href="${tales:canonical_url(target)}">
+				${settings.contact_link_label}
+			</a>
+		</tal:if>
+	</address>
+	<div class="clearfix"></div>
+</div>

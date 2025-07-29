@@ -1,0 +1,15 @@
+<div class="alert alert-info m-0 p-2" i18n:domain="pyams_content">
+	<strong i18n:translate="">FOR YOUR INFORMATION</strong><br />
+	<tal:if define="next_step view.next_step"
+			condition="next_step">
+		<u i18n:translate="">Next step</u> : ${next_step}<br />
+	</tal:if>
+	<u i18n:translate="">Previous step</u> : ${view.previous_step}
+	<tal:var define="message view.previous_message">
+		<tal:if	condition="message"><br />
+			<span class="small" i18n:translate="">With this comment:</span>
+			<p class="small px-4 py-2">${structure:message}</p>
+		</tal:if>
+		<br tal:condition="not:message" />
+	</tal:var>
+</div>

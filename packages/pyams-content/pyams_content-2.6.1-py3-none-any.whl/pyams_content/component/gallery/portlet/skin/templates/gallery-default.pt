@@ -1,0 +1,80 @@
+<div tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 gallery_id tales:cache_key(settings);
+				 items view.get_visible_medias();
+				 (has_medias, medias) tales:boolean_iter(items);"
+	 tal:condition="has_medias"
+	 class="gallery" i18n:domain="pyams_content">
+	<h2 tal:define="title i18n:settings.title"
+		tal:condition="title">
+		${title}
+	</h2>
+	<div tal:define="selections renderer_settings.thumb_selection"
+		 id="gallery_${gallery_id}"
+		 class="d-flex flex-row flex-wrap">
+		<tal:loop repeat="media medias">
+			<div class="media p-3 col ${renderer_settings.get_css_cols()}"
+				 tal:define="data i18n:media.data;
+							 thumbnails tales:thumbnails(data);
+							 target thumbnails.get_thumbnail('1200x800');
+							 title i18n:media.title;
+							 alt_title i18n:media.alt_title;
+							 alt alt_title or title;
+							 description i18n:media.description;"
+				 tal:condition="data">
+				<a class="card d-block"
+				   tal:define="data i18n:media.data"
+				   href="${tales:absolute_url(target)}"
+				   data-toggle="modal"
+				   data-target="#gallery_${gallery_id}_modal"
+				   data-title="${title}"
+				   data-alt-title="${alt_title}"
+				   data-author="@ ${media.author}"
+				   data-description="${tales:html(description)}">
+					${structure:tales:picture(data,
+											  selections=selections,
+											  alt=alt)}
+				</a>
+			</div>
+		</tal:loop>
+	</div>
+	<div class="modal modal-gallery modal-auto fade" aria-hidden="true"
+		 id="gallery_${gallery_id}_modal"
+		 data-ams-resize-target="#gallery_${gallery_id}_image">
+		<div class="modal-dialog modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header py-2">
+					<h6 class="modal-title">
+						${i18n:context.title}
+					</h6>
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body p-0">
+					<div class="position-relative">
+						<div class="position-relative">
+							<img class="gallery-img w-100" src="" alt=""
+								 id="gallery_${gallery_id}_image"/>
+							<a class="carousel-control-prev" role="button" data-slide="prev">
+								<span class="carousel-control-prev-icon"
+									  aria-hidden="true"></span>
+								<span class="sr-only" i18n:translate="">Previous image</span>
+							</a>
+							<a class="carousel-control-next" role="button" data-slide="next">
+							<span class="carousel-control-next-icon"
+								  aria-hidden="true"></span>
+								<span class="sr-only" i18n:translate="">Next image</span>
+							</a>
+						</div>
+						<ul class="d-flex flex-nowrap m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50">
+							<li class="title" data-separator="/"></li>
+							<li class="author" data-separator="/"></li>
+						</ul>
+					</div>
+				</div>
+				<p class="description my-1 px-2 text-secondary small"></p>
+			</div>
+		</div>
+	</div>
+</div>

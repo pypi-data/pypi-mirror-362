@@ -1,0 +1,20 @@
+<section class="wrapper-form" i18n:domain="pyams_content">
+	<div class="row">
+		<form class="search-form w-100"
+			  action="${tales:absolute_url(context)}">
+			<div class="form-group d-flex flex-row mx-3">
+				<input type="text" class="form-control" name="user_search"
+					   placeholder="Your search" title="Search" i18n:attributes="placeholder; title"
+					   value="${request.params.get('user_search')}"
+					   data-ams-change-handler="PyAMS_search.updateSearch" />
+				${structure:tales:search_form_params(ignored='user_search')}
+				<input type="hidden" name="order_by" value="${request.params.get('order_by') or context.order_by}" />
+				<input type="hidden" name="start" value="${request.params.get('start', 0)}" />
+				<input type="hidden" name="length" value="${request.params.get('length', 10)}" />
+				<button type="submit" class="btn btn-secondary ml-2" role="button">
+					<span class="visually-hidden text-nowrap" i18n:translate="">Refine search</span>
+				</button>
+			</div>
+		</form>
+	</div>
+</section>

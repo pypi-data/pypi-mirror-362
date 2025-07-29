@@ -1,0 +1,12 @@
+<tal:var define="settings view.settings" i18n:domain="pyams_content">
+	${structure:view.get_setting(settings, 'title')}
+	<small><strong i18n:translate="">Medias list:</strong></small>
+	<ul class="mb-0">
+		<li>${structure:view.get_setting(settings, 'use_context_gallery')}</li>
+		<li class="text-truncate"
+			tal:repeat="media settings.values()">
+			${structure:view.get_setting(media, 'title', visible=media.visible,
+										 icon='far fa-image' if media.visible else None)}
+		</li>
+	</ul>
+</tal:var>

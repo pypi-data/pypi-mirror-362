@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" i18n:domain="pyams_content">
+<head>
+	<title i18n:translate="">
+		[<tal:var i18n:name="service_name" tal:content="settings.service_name">Service name</tal:var>]
+		You are requested for a content review
+	</title>
+	<meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8" />
+	<meta charset="utf-8" />
+	<style>
+		html,
+		body,
+		p,
+		pre {
+			font-family: Ubuntu, Verdana, Arial, Helvetica, sans-serif;
+			font-size: 13px;
+			color: #333;
+		}
+		pre {
+			border-left: 2px solid #346597;
+			padding-left: 10px;
+		}
+		pre.noborder {
+			border-left: none;
+			padding-left: 0;
+		}
+	</style>
+</head>
+<body>
+	<p i18n:translate="">Hello,</p>
+	<p i18n:translate="">
+		You have been requested by <span i18n:name="sender" tal:content="sender">sender</span>, contributor
+		of « <span i18n:name="service_name" tal:content="settings.service_name">Service name</span> »
+		website, to make a review of a content.
+	</p>
+	<p i18n:translate="">
+		<span i18n:name="sender" tal:content="sender">sender</span> added the following message to his
+		request:
+	</p>
+	<pre style="padding: 5px 20px;" tal:content="comment">comment</pre>
+	<p i18n:translate="">To review and comment this publication, please use the following link:
+		<a i18n:name="target"
+		   href="${tales:absolute_url(context, 'admin')}">${i18n:context.title}</a>.</p>
+	<p i18n:translate="">After reading this content, please use the « Comments » menu entry.</p>
+	<p i18n:translate="">If you don't want to reply to this request, please contact
+		<span i18n:name="sender" tal:content="sender">sender</span> directly by replying to this mail.</p>
+	<p i18n:translate="">Thank you.</p>
+	<br />
+	<pre class="noborder" tal:content="settings.signature">signature</pre>
+</body>
+</html>

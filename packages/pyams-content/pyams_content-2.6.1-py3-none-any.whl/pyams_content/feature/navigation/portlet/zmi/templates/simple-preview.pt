@@ -1,0 +1,15 @@
+<tal:var define="settings view.settings" i18n:domain="pyams_content">
+	${structure:view.get_setting(settings, 'title')}
+	<small><strong i18n:translate="">Navigation links:</strong></small>
+	<ul class="mb-0">
+		<li class="text-truncate"
+			tal:repeat="link settings.links.values()">
+			<i class="fa-fw ${link.icon_class if link.visible else 'far fa-eye-slash text-danger'} hint"
+			   title="${link.icon_hint}"></i>
+			<i tal:omit-tag=""
+			   tal:define="link_info view.get_link_info(link)">
+				${link_info.user_title}
+			</i>
+		</li>
+	</ul>
+</tal:var>

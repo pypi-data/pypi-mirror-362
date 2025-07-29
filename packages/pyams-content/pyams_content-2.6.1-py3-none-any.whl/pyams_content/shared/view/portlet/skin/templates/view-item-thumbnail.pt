@@ -1,0 +1,17 @@
+<div class="p-1"
+	 tal:define="settings view.view.settings;
+				 renderer_settings view.view.renderer_settings;
+				 illustration tales:pyams_illustration(context);"
+	 tal:condition="illustration">
+	<a href="${view.url}">
+		<tal:if define="image i18n:illustration.data;
+                        alt_title i18n:illustration.alt_title;
+                        selections renderer_settings.thumb_selection;"
+                condition="image">
+			${structure:tales:picture(image,
+									  selections=selections,
+									  alt=alt_title,
+									  css_class='w-100')}
+		</tal:if>
+	</a>
+</div>

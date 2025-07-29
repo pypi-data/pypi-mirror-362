@@ -1,0 +1,96 @@
+<div i18n:domain="pyams_content"
+	 tal:define="settings view.settings;
+				 items settings.get_visible_items();
+				 (has_items, verbatims) tales:boolean_iter(items);"
+	 tal:condition="has_items">
+	<h3 tal:define="title i18n:settings.title"
+		tal:condition="title"
+		class="position-relative border-bottom pb-2 mt-4">
+		${title}
+		<span class="position-absolute underline"></span>
+	</h3>
+	<p class="mb-2"
+	   tal:define="lead i18n:settings.lead"
+	   tal:condition="lead">
+		${structure:tales:html(lead)}
+	</p>
+	<tal:loop repeat="verbatim verbatims">
+		<div tal:define="illustration tales:pyams_illustration(verbatim)"
+			 class="lead frame my-3 px-3 border by-1 bx-5 border-secondary rounded text-secondary">
+			<div class="d-flex flex-row py-3">
+				<tal:if condition="illustration">
+					<div tal:define="image i18n:illustration.data"
+						 class="illustration col-md-2 col-sm-3 px-0 hidden-xs">
+						<a tal:define="thumbnails tales:thumbnails(image);
+									   target thumbnails.get_thumbnail('800x600');
+									   alt_title i18n:illustration.alt_title;"
+						   href="${tales:absolute_url(target)}"
+						   data-toggle="modal"
+						   data-target="#illustration_${tales:cache_key(illustration)}">
+							${structure:tales:picture(image,
+													  xl_thumb='portrait', xl_width=2,
+													  lg_thumb='portrait', lg_width=2,
+													  md_thumb='portrait', md_width=2,
+													  sm_thumb='portrait', sm_width=3,
+													  xs_thumb='portrait', xs_width=12,
+													  alt=alt_title, css_class='w-100')}
+							<ul class="d-flex m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+								tal:define="title i18n:illustration.title;
+											author illustration.author;"
+								tal:condition="title or author">
+								<li tal:condition="title" data-separator="/">${title}</li>
+								<li tal:condition="author" data-separator="/">© ${author}</li>
+							</ul>
+						</a>
+						<div class="modal fade" aria-hidden="true"
+							 id="illustration_${tales:cache_key(illustration)}">
+							<div class="modal-dialog modal-dialog-scrollable modal-lg">
+								<div class="modal-content">
+									<div class="modal-header py-2">
+										<h6 class="modal-title">
+											${i18n:illustration.title}
+										</h6>
+										<button type="button" class="close" data-dismiss="modal">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body p-0">
+										<div class="position-relative">
+											${structure:tales:picture(image, alt='')}
+											<ul class="d-flex flex-nowrap m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+												tal:define="title i18n:illustration.title;
+															author illustration.author;"
+												tal:condition="title or author">
+												<li tal:condition="title" data-separator="/">${title}</li>
+												<li tal:condition="author" data-separator="/">© ${author}</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</tal:if>
+				<div class="d-flex flex-column"
+					 tal:define="quote i18n:verbatim.quote"
+					 tal:condition="quote">
+					<h4 class="pl-4 text-body"
+						tal:define="title i18n:verbatim.title"
+						tal:condition="title">
+						${title}
+					</h4>
+					<div class="wrapper-quote">
+						<div class="quote">
+							${structure:tales:html(quote, 'oid_to_href;glossary')}
+						</div>
+						<div class="author text-reset mt-2 small">
+							<strong>${verbatim.author}</strong><tal:if
+								condition="verbatim.author and verbatim.charge">, </tal:if>
+							${i18n:verbatim.charge}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</tal:loop>
+</div>

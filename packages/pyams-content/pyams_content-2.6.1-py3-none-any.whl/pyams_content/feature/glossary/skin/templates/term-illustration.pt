@@ -1,0 +1,16 @@
+<div class="illustration float-right col-6 col-lg-5 m-2 px-0 position-relative"
+	 tal:define="illustration view.illustration;
+				 image i18n:illustration.data;
+				 alt_title i18n:illustration.alt_title;
+				 author i18n:illustration.title;"
+	 tal:condition="image">
+	${structure:tales:picture(image, lg_width=5, md_width=6, sm_width=6, alt=alt_title)}
+	<ul class="legend m-0 py-1 px-2 list-inline list-separated position-absolute position-bottom small text-white-50"
+		tal:define="title i18n:illustration.title;
+					author i18n:illustration.author;">
+		<li class="title d-inline text-wrap" data-separator="/"
+			tal:condition="title">${title}</li>
+		<li class="author d-inline text-wrap" data-separator="/"
+			tal:condition="author">© ${author}</li>
+	</ul>
+</div>
