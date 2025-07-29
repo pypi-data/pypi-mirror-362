@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        This view makes the stage_id field explicitly invisible in the form view.
+        While the field is set to readonly=True in the Python model and buttons are dynamically added,
+        this ensures that the default rendering of the field is hidden, relying solely on buttons for stage changes.
+    -->
+    <record id="helpdesk_ticket_view_form_inherit_transition" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.inherit.transition</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.ticket_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="attributes">
+                <attribute name="invisible">False</attribute>
+                <attribute name="readonly">True</attribute> <!-- Redundant due to Python but for emphasis -->
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+        The kanban view modification to disable drag-and-drop (group_draggable='false')
+        is handled dynamically in the get_view() method of the helpdesk.ticket model.
+        This XML record is mostly for completeness or if other static modifications
+        to the Kanban view related to transitions were needed in the future.
+        If get_view() handles it, this specific kanban inheritance might be redundant for group_draggable.
+    -->
+    <record id="helpdesk_ticket_view_kanban_inherit_transition" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.kanban.inherit.transition</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.view_helpdesk_ticket_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="group_draggable">false</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

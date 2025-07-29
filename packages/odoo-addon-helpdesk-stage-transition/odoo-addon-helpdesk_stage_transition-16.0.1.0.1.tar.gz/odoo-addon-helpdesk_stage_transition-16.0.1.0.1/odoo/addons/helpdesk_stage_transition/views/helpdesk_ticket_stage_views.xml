@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="helpdesk_ticket_stage_view_form_inherit_transition" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.stage.form.inherit.transition</field>
+        <field name="model">helpdesk.ticket.stage</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.view_helpdesk_ticket_stage_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group[1]" position="after">
+                <group string="Stage Transitions">
+                    <field name="next_stage_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                </group>
+            </xpath>
+            <!--
+                The field previous_stage_ids is intentionally not added to the view
+                as it's a readonly field computed as the inverse of next_stage_ids.
+                Displaying it might confuse users, as it's not meant to be edited directly.
+            -->
+        </field>
+    </record>
+
+    <record id="helpdesk_ticket_stage_view_tree_inherit_transition" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.stage.tree.inherit.transition</field>
+        <field name="model">helpdesk.ticket.stage</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.view_helpdesk_ticket_stage_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="next_stage_ids" widget="many2many_tags" optional="show" options="{'no_create_edit': True}" domain="[('id', '!=', id)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
