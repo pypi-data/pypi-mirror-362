@@ -1,0 +1,206 @@
+Resources:
+
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: FrontendApi
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: frontend
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      ResourceId: !Ref ApiGatewayResource
+      RestApiId: !Ref ApiGatewayRestApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: 
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FrontendLambdaFunction.Arn}/invocations
+
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ApiGatewayMethodGet
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      StageName: prod
+
+  FrontendLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref FrontendLambdaFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*/*/frontend"
+
+  LogIngestionLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: lambda_handler.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: !Ref BucketName
+        S3Key: !Ref S3KeyLambda
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref LogsTableName
+          TABLE_REGION: !Ref Region
+          SERVICES: !Ref Services
+
+  SummaryLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: lambda_handler.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: !Ref BucketName
+        S3Key: !Ref S3KeySummary
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref SummaryTableName
+          TABLE_REGION: !Ref Region
+
+  FrontendLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: lambda_handler.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: !Ref BucketName
+        S3Key: !Ref S3KeyFrontend
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref FrontendTableName
+          TABLE_REGION: !Ref Region
+
+  LogIngestionSchedule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: rate(1 day)  # << updated from 1 hour to 1 day
+      Targets:
+        - Arn: !GetAtt LogIngestionLambda.Arn
+          Id: LogIngestionTarget
+
+  LogIngestionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LogIngestionLambda
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt LogIngestionSchedule.Arn
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                  - logs:DescribeLogGroups
+                Resource: "*"
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:GetItem
+                  - dynamodb:Scan
+                  - dynamodb:Query
+                  - dynamodb:DescribeStream
+                  - dynamodb:GetRecords
+                  - dynamodb:GetShardIterator
+                  - dynamodb:ListStreams
+                Resource: "*"
+
+  LogsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref LogsTableName
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Id
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  SummaryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref SummaryTableName
+      AttributeDefinitions:
+        - AttributeName: eventID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: eventID
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  DynamoDBStreamToLambda:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      EventSourceArn: !GetAtt LogsTable.StreamArn
+      FunctionName: !Ref SummaryLambdaFunction
+      StartingPosition: LATEST
+
+Parameters:
+  BucketName:
+    Type: String
+  S3KeyLambda:
+    Type: String
+  S3KeySummary:
+    Type: String
+  LogsTableName:
+    Type: String
+  SummaryTableName:
+    Type: String
+  FrontendTableName:
+    Type: String
+  S3KeyFrontend:
+    Type: String
+  Region:
+    Type: String
+  Services:
+    Type: String
