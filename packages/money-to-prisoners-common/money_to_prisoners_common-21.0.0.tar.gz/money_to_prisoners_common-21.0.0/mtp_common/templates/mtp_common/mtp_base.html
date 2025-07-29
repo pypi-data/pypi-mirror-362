@@ -1,0 +1,98 @@
+{% extends 'govuk-frontend/template.html' %}
+{% load i18n %}
+{% load static %}
+{% load mtp_common %}
+
+{% block page_title %}{% trans 'Send money to someone in prison' %}{% endblock %}
+
+{% block head %}
+  {{ block.super }}
+
+  <link href="{% static 'app.css' %}?{{ APP_GIT_COMMIT_SHORT }}" rel="stylesheet" type="text/css" />
+  <style media="print">
+    a[href^="/"]:after {
+      content: " ({{ request.scheme }}://{{ request.get_host }}" attr(href) ")";
+    }
+  </style>
+
+  {% if analytics_policy.ga4_enabled %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics_policy.ga4_measurement_id }}"></script>
+    <script {% if csp_nonce %}nonce="{{ csp_nonce }}"{% endif %}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      {% comment "NOTE" %}
+        This overrides the default page location/title sent to GA4.
+        Some views send redacted/simplified page information.
+      {% endcomment %}
+      {% with default_ga_data=default_google_analytics_pageview %}
+      {% with ga_data=google_analytics_pageview|default:default_ga_data %}
+        gtag('config', '{{ analytics_policy.ga4_measurement_id }}', {
+          'page_location': '{{ ga_data.location }}',
+          {% if ga_data.title %}
+            'page_title': '{{ ga_data.title }}',
+          {% endif %}
+        });
+      {% endwith %}
+      {% endwith %}
+
+      {% block ga4_end %}{% endblock %}
+    </script>
+  {% endif %}
+{% endblock %}
+
+{% block body_classes %}{{ block.super }} {% if moj_internal_site %}mtp-internal-site{% endif %}{% endblock %}
+
+{% block body_start %}
+  {% block cookie_message %}
+    <div class="govuk-cookie-banner mtp-cookie-banner" data-nosnippet role="region" aria-label="{% trans 'Cookie banner' %}">
+      <div class="govuk-cookie-banner__message govuk-width-container">
+
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-cookie-banner__content">
+              <p>
+                {% trans 'GOV.UK uses cookies to make the site simpler.' %}
+                <a href="https://www.gov.uk/help/cookies">
+                  {% trans 'Find out more about cookies' %}
+                </a>
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  {% endblock %}
+{% endblock %}
+
+{% block before_content %}
+  {% block phase_banner %}
+    {% if ENVIRONMENT != 'prod' %}
+      <div class="govuk-phase-banner">
+        <p class="govuk-phase-banner__content">
+          <strong class="govuk-tag mtp-tag--error govuk-phase-banner__content__tag">
+            {% trans 'Warning' %}
+          </strong>
+          <span class="govuk-phase-banner__text">
+            {% trans 'This website is only for testing!' %}
+          </span>
+        </p>
+      </div>
+    {% endif %}
+  {% endblock %}
+
+  {% block breadcrumb_bar %}
+    {% breadcrumb_bar %}
+  {% endblock %}
+{% endblock %}
+
+{% block body_end %}
+  <span class="mtp-ga-data" data-page="{% if google_analytics_pageview %}{{ google_analytics_pageview.page }}{% elif default_google_analytics_pageview %}{{ default_google_analytics_pageview.page }}{% endif %}" data-location="{% if google_analytics_pageview %}{{ google_analytics_pageview.location }}{% elif default_google_analytics_pageview %}{{ default_google_analytics_pageview.location }}{% endif %}" data-title="{% if google_analytics_pageview %}{{ google_analytics_pageview.title }}{% endif %}"></span>
+  <script src="{% static 'app.js' %}?{{ APP_GIT_COMMIT_SHORT }}"></script>
+  <!--
+  {{ APP }}-{{ ENVIRONMENT }} / {{ APP_GIT_COMMIT_SHORT }} at {{ APP_BUILD_DATE }}
+  -->
+{% endblock %}
