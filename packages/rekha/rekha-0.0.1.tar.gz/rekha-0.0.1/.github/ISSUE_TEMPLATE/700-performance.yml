@@ -1,0 +1,153 @@
+name: ⚡ Performance issue
+description: Report performance problems or suggest optimizations
+title: "[Performance]: "
+labels: ["performance"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        #### Before submitting an issue, please make sure the issue hasn't been already addressed by searching through [the existing and past issues](https://github.com/project-vajra/rekha/issues?q=is%3Aissue+sort%3Acreated-desc+).
+
+  - type: textarea
+    attributes:
+      label: Your environment
+      description: |
+        Please provide your environment information:
+      value: |
+        <details>
+        <summary>Environment Information</summary>
+
+        ```text
+        Rekha version: [e.g., 0.1.0]
+        Python version: [e.g., 3.9.7]
+        Operating System: [e.g., macOS 14.0, Ubuntu 22.04, Windows 11]
+        Hardware: [e.g., M1 Mac, Intel i7, GPU info if relevant]
+        Memory: [e.g., 16GB RAM]
+        ```
+
+        </details>
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Performance issue type
+      description: What type of performance issue are you experiencing?
+      options:
+        - Slow plot generation
+        - High memory usage
+        - Memory leaks
+        - Slow data processing
+        - Slow export/save operations
+        - UI/display performance
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: ⚡ Performance problem description
+      description: |
+        Please describe the performance issue in detail:
+
+        1. What operation is slow/using too much memory?
+        2. How much data are you working with?
+        3. What's the current performance vs what you'd expect?
+        4. When did you first notice this issue?
+
+        Include timing information if possible.
+      placeholder: |
+        **Problem:** Creating a scatter plot with [X] data points takes [Y] seconds.
+
+        **Data size:** [number of rows/columns, data types, file size]
+
+        **Expected performance:** Should take [expected time] based on [comparison/expectation]
+
+        **Timing info:**
+        ```python
+        import time
+        start = time.time()
+        # Your slow code here
+        end = time.time()
+        print(f"Took {end - start:.2f} seconds")
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Minimal reproduction example
+      description: |
+        Please provide a minimal code example that demonstrates the performance issue.
+        Include data generation if needed to make it reproducible.
+      placeholder: |
+        ```python
+        import rekha as rk
+        import pandas as pd
+        import numpy as np
+        import time
+
+        # Generate test data
+        n = 100000  # Adjust size to reproduce issue
+        df = pd.DataFrame({
+            'x': np.random.randn(n),
+            'y': np.random.randn(n),
+            'category': np.random.choice(['A', 'B', 'C'], n)
+        })
+
+        # Code that demonstrates the performance issue
+        start = time.time()
+        fig = rk.scatter(df, x='x', y='y', color='category')
+        fig.show()
+        end = time.time()
+        print(f"Took {end - start:.2f} seconds")
+        ```
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Plot type affected
+      description: Which plot type is affected by this performance issue?
+      options:
+        - Line plot
+        - Scatter plot
+        - Bar chart
+        - Histogram
+        - Box plot
+        - Heatmap
+        - CDF plot
+        - Multiple plot types
+        - Core functionality (not plot-specific)
+
+  - type: textarea
+    attributes:
+      label: Profiling information
+      description: |
+        If you've done any profiling or have additional performance metrics, please share them here.
+        This could include:
+        - Python profiler output
+        - Memory usage graphs
+        - Comparison with other libraries
+        - Performance before/after specific versions
+      placeholder: |
+        **Memory usage:** [peak memory usage, if known]
+
+        **Comparison:**
+        - Matplotlib directly: [timing]
+        - Plotly: [timing]
+        - Seaborn: [timing]
+
+        **Profiler output:** [if available]
+
+  - type: textarea
+    attributes:
+      label: Suggested optimization
+      description: |
+        Do you have any ideas for how this could be optimized?
+        Any specific bottlenecks you've identified?
+
+  - type: markdown
+    attributes:
+      value: >
+        Thanks for contributing 🎉!

@@ -1,0 +1,125 @@
+name: 🐛 Bug report
+description: Report a bug in Rekha
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        #### Before submitting an issue, please make sure the issue hasn't been already addressed by searching through [the existing and past issues](https://github.com/project-vajra/rekha/issues?q=is%3Aissue+sort%3Acreated-desc+).
+
+  - type: textarea
+    attributes:
+      label: Your environment
+      description: |
+        Please provide your environment information:
+      value: |
+        <details>
+        <summary>Environment Information</summary>
+
+        ```text
+        Rekha version: [e.g., 0.1.0] (run: python -c "import rekha; print(rekha.__version__)")
+        Python version: [e.g., 3.9.7]
+        Operating System: [e.g., macOS 14.0, Ubuntu 22.04, Windows 11]
+        Matplotlib version: [e.g., 3.8.0]
+        Pandas version: [e.g., 2.1.0]
+        NumPy version: [e.g., 1.24.0]
+        ```
+
+        </details>
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 🐛 Bug description
+      description: |
+        Please provide a clear and concise description of what the bug is.
+
+        **Minimal reproduction example:** Please provide a minimal code example that reproduces the issue. This helps us fix the bug quickly. The example should be:
+        - As short as possible while still reproducing the issue
+        - Self-contained (include all necessary imports and data)
+        - Runnable (we should be able to copy-paste and run it)
+
+        **Expected vs Actual behavior:** Please describe what you expected to happen vs what actually happened.
+
+        **Error messages:** If you see any error messages, please include the full traceback.
+      placeholder: |
+        **Bug description:**
+        A clear and concise description of what the bug is.
+
+        **Minimal reproduction example:**
+        ```python
+        import rekha as rk
+        import pandas as pd
+        import numpy as np
+
+        # Create minimal data
+        df = pd.DataFrame({
+            'x': [1, 2, 3, 4],
+            'y': [1, 4, 2, 3]
+        })
+
+        # Code that reproduces the bug
+        fig = rk.scatter(df, x='x', y='y')
+        fig.show()
+        ```
+
+        **Expected behavior:**
+        Should show a scatter plot.
+
+        **Actual behavior:**
+        Gets an error: [paste error message]
+
+        **Error traceback:**
+        ```
+        Paste the full error traceback here if applicable
+        ```
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Plot type affected
+      description: Which plot type is affected by this bug?
+      options:
+        - Line plot
+        - Scatter plot
+        - Bar chart
+        - Histogram
+        - Box plot
+        - Heatmap
+        - CDF plot
+        - Multiple plot types
+        - Core functionality (not plot-specific)
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: Bug category
+      description: What category does this bug fall into? (Select all that apply)
+      options:
+        - label: Plotting/Visualization (incorrect plot output)
+        - label: API/Interface (function parameters, return values)
+        - label: Performance (slow execution, memory issues)
+        - label: Export/Save functionality
+        - label: Theming/Styling (colors, fonts, layout)
+        - label: Data handling (pandas DataFrame processing)
+        - label: Documentation mismatch (code doesn't match docs)
+        - label: Matplotlib integration issues
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: |
+        Add any other context about the bug here:
+        - Does this happen with specific data types/sizes?
+        - Did this work in a previous version?
+        - Any workarounds you've found?
+        - Screenshots of incorrect plots (if applicable)
+
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing 🎉!
