@@ -1,0 +1,357 @@
+# bge_utils
+
+A comprehensive collection of utility functions for Python projects, designed to speed up prototyping and common development tasks.
+
+## 📦 Installation
+
+```bash
+pip install bge_utils
+```
+
+## 🚀 Quick Start
+
+```python
+import bge_utils as bu
+
+# Convert an image
+bu.convert_img('image.jpg', 'output/', 'png')
+
+# Get time since timestamp
+past_time = time.time() - 3600
+print(bu.time_since(past_time))  # "1 hours ago"
+
+# Generate random string
+random_str = bu.generate_random_string(10)
+print(random_str)  # "aBc123XyZ9"
+```
+
+## 📚 Function Reference
+
+### 🔄 Conversion Utils
+
+#### `convert_img(img_path, output_path, output_format="png")`
+
+Converts images to different formats.
+
+**Supported formats:** PNG, JPG, WEBP, ICO
+
+-   **img_path** (str or list): Path to image file(s)
+-   **output_path** (str): Output directory
+-   **output_format** (str): Target format (default: "png")
+
+```python
+# Convert single image
+convert_img('photo.jpg', 'output/', 'png')
+
+# Convert multiple images
+convert_img(['img1.jpg', 'img2.png'], 'output/', 'webp')
+```
+
+#### `convert_units(num, unit)`
+
+Converts numbers between different units.
+
+**Supported conversions:**
+
+-   **Angle**: DEG, RAD, MRAD
+-   **Temperature**: C, F, K
+-   **Length**: M, CM, MM, KM
+
+-   **num** (float): Number to convert
+-   **unit** (str): Source unit
+-   **Returns**: Dictionary with all unit conversions
+
+```python
+# Temperature conversion
+temps = convert_units(25, 'C')
+print(temps)  # {'C': 25.0, 'F': 77.0, 'K': 298.15}
+
+# Length conversion
+lengths = convert_units(100, 'CM')
+print(lengths)  # {'M': 1.0, 'CM': 100.0, 'MM': 1000.0, 'KM': 0.001}
+```
+
+---
+
+### 📅 DateTime Utils
+
+#### `time_since(past_timestamp)`
+
+Calculates human-readable time elapsed since a timestamp.
+
+-   **past_timestamp** (float): Unix timestamp
+-   **Returns**: Formatted time string
+
+```python
+import time
+past = time.time() - 7200  # 2 hours ago
+print(time_since(past))  # "2 hours ago"
+```
+
+#### `find_timezone_difference(timezone2)`
+
+Calculates time difference between Amsterdam and another timezone.
+
+-   **timezone2** (str): Target timezone (e.g., 'America/New_York')
+-   **Returns**: Human-readable time difference
+
+```python
+diff = find_timezone_difference('America/New_York')
+print(diff)  # "The given timezone is 6 hours behind Amsterdam."
+```
+
+---
+
+### 📊 Excel Utils
+
+#### `make_excel_img(file, output_folder, sheetname, range, extension="png")`
+
+Generates images from Excel sheet ranges.
+
+-   **file** (str): Excel file path
+-   **output_folder** (str): Output directory
+-   **sheetname** (str): Sheet name
+-   **range** (str): Cell range (e.g., 'A1:D10')
+-   **extension** (str): Image format ("png", "gif", "bmp")
+
+```python
+make_excel_img('data.xlsx', 'output/', 'Sheet1', 'A1:D10', 'png')
+```
+
+> **Note**: Requires `excel2img` package: `pip install excel2img`
+
+---
+
+### 📁 File Utils
+
+#### `find_files(folder, extension="")`
+
+Searches for files with specific extensions in a directory tree.
+
+-   **folder** (str): Root directory
+-   **extension** (str): File extension filter (optional)
+-   **Returns**: List of matching file paths
+
+```python
+# Find all .py files
+py_files = find_files('/project', '.py')
+
+# Find all files
+all_files = find_files('/project')
+```
+
+#### `select_files(max_files=None, single_file_mode=False)`
+
+Opens file dialog for user file selection.
+
+-   **max_files** (int): Maximum files to select
+-   **single_file_mode** (bool): Single file selection only
+-   **Returns**: List of selected file paths
+
+```python
+# Select up to 3 files
+files = select_files(max_files=3)
+
+# Select single file
+file = select_files(single_file_mode=True)
+```
+
+#### `remove_files(folder, extension="")`
+
+Removes files with specific extensions from a folder.
+
+-   **folder** (str): Target directory
+-   **extension** (str): File extension filter
+
+```python
+remove_files('/temp', '.tmp')  # Remove all .tmp files
+```
+
+#### `get_txt_lines(txt_file)`
+
+Reads text file and returns lines as a list.
+
+-   **txt_file** (str): Text file path
+-   **Returns**: List of stripped lines
+
+```python
+lines = get_txt_lines('data.txt')
+print(lines)  # ['Line 1', 'Line 2', 'Line 3']
+```
+
+#### `copy_file(item, output_folder)`
+
+Copies a file to specified output folder.
+
+-   **item** (str): Source file path
+-   **output_folder** (str): Destination folder
+
+#### `zip_files(directory)`
+
+Compresses files in directory to gzip format.
+
+-   **directory** (str): Directory to compress
+
+#### `move_files(source_folder, destination_folder, extension="")`
+
+Moves files between folders with optional extension filtering.
+
+-   **source_folder** (str): Source directory
+-   **destination_folder** (str): Destination directory
+-   **extension** (str): File extension filter
+
+#### `merge_text_files(file_list, output_file)`
+
+Merges multiple text files into one.
+
+-   **file_list** (list): List of file paths to merge
+-   **output_file** (str): Output file path
+
+#### `write_list_to_file(list_of_lines, file_path)`
+
+Writes list of lines to a file.
+
+-   **list_of_lines** (list): Lines to write
+-   **file_path** (str): Output file path
+
+#### `remove_duplicate_lines(file_path, output_file)`
+
+Removes duplicate lines from a file.
+
+-   **file_path** (str): Input file path
+-   **output_file** (str): Output file path
+
+#### `select_directory(title="Select Directory")`
+
+Opens directory selection dialog.
+
+-   **title** (str): Dialog title
+-   **Returns**: Selected directory path
+
+#### `find_all_directory_files(extension="")`
+
+Prompts for directory selection and finds matching files.
+
+-   **extension** (str): File extension filter
+-   **Returns**: List of matching files
+
+---
+
+### 🔢 Math Utils
+
+#### `mean_and_stddev(numbers)`
+
+Calculates mean and standard deviation of numbers.
+
+-   **numbers** (list): List of numbers
+-   **Returns**: Tuple (mean, standard_deviation)
+
+```python
+result = mean_and_stddev([1, 2, 3, 4, 5])
+print(result)  # (3.0, 1.4142135623730951)
+print(f"Mean: {result[0]}, StdDev: {result[1]}")
+```
+
+---
+
+### 🐍 Python Utils
+
+#### `list_functions(module, verbose=False)`
+
+Lists all callable functions in a module.
+
+-   **module**: Module object to inspect
+-   **verbose** (bool): Include docstrings if True
+
+```python
+import math
+list_functions(math)  # Lists all math functions
+list_functions(math, verbose=True)  # With docstrings
+```
+
+#### `flatten_list(nested_list)`
+
+Flattens nested lists into a single list.
+
+-   **nested_list** (list): Nested list structure
+-   **Returns**: Flattened list
+
+```python
+nested = [1, [2, [3, 4], 5], 6]
+flat = flatten_list(nested)
+print(flat)  # [1, 2, 3, 4, 5, 6]
+```
+
+#### `generate_random_string(length=8)`
+
+Generates random alphanumeric string.
+
+-   **length** (int): String length (default: 8)
+-   **Returns**: Random string
+
+```python
+random_str = generate_random_string(12)
+print(random_str)  # "aBc123XyZ9eF"
+```
+
+#### `send_ntfy(message, topic)`
+
+Sends notifications via ntfy.sh service.
+
+-   **message** (str): Notification message
+-   **topic** (str): Notification topic
+
+```python
+send_ntfy("Task completed!", "my_alerts")
+```
+
+#### `setup_logger(name, log_file, level=logging.INFO)`
+
+Creates configured logger instance.
+
+-   **name** (str): Logger name
+-   **log_file** (str): Log file path
+-   **level**: Logging level
+-   **Returns**: Logger instance
+
+```python
+import logging
+logger = setup_logger("app", "app.log", logging.DEBUG)
+logger.info("Application started")
+```
+
+#### `retry(max_attempts=3, delay=1, exceptions=(Exception,))`
+
+Decorator for retrying failed function calls.
+
+-   **max_attempts** (int): Maximum retry attempts
+-   **delay** (int): Delay between attempts (seconds)
+-   **exceptions** (tuple): Exception types to catch
+
+```python
+@retry(max_attempts=5, delay=2)
+def unstable_operation():
+    # Your code here
+    pass
+```
+
+---
+
+## 🛠️ Requirements
+
+-   **Python**: >= 3.8
+-   **Core dependencies**: requests, pillow, pytz
+-   **Optional dependencies**:
+    -   excel2img (for Excel image generation)
+
+## 📄 License
+
+MIT License
+
+## 🤝 Contributing
+
+Contributions are welcome! This package is constantly being expanded with new utility functions.
+
+## 📞 Support
+
+For issues and questions, please visit the [GitHub repository](https://github.com/Bge929/Python-my_utils).
