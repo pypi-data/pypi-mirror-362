@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pydal-psycopg3"
+dynamic = ["version"]
+
+description = "Experimental psycopg3 driver for pydal"
+readme = "README.md"
+authors = [
+    { name = "Robin van der Noord", email = "robinvandernoord@gmail.com" }
+]
+requires-python = ">=3.10"
+
+dependencies = [
+    "psycopg >3, <4",
+    "pydal>=20250629.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "testcontainers",
+]
+
+[tool.hatch.version]
+path = "src/pydal_psycopg3/__about__.py"
+
+[tool.semantic_release]
+branch = "master"
+version_variable = "src/pydal_psycopg3/__about__.py:__version__"
+change_log = "CHANGELOG.md"
+upload_to_repository = false
+upload_to_release = false
+build_command = "hatch build"
