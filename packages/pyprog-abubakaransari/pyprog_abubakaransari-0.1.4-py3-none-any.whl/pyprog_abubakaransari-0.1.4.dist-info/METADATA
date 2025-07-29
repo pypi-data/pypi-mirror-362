@@ -1,0 +1,478 @@
+Metadata-Version: 2.4
+Name: pyprog-abubakaransari
+Version: 0.1.4
+Summary: Progress bars and spinners for terminal and notebooks
+Author-email: Muhammad Abubakar Siddique Ansari <ansaricodes@gmail.com>
+License: Apache-2.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: IPython==8.12.3
+Requires-Dist: colorama==0.4.6
+Dynamic: license-file
+
+# PyProg - Progress Bars for Python
+
+> 🎯 *Create elegant and customizable progress bars with ease!*
+> **PyProg** is a lightweight library for beautiful, flexible progress bars.
+
+---
+
+## 🔧 Features
+
+* Highly **customizable**
+* Supports **nested** and **parallel** progress bars
+* Supports **Spinners**
+* **CSS** enabled customization in notebooks
+* **Plug-and-play** or deeply **configurable**
+---
+
+## 📦 Installation
+
+Install from **PyPI**:
+
+```bash
+pip install pyprog-abubakaransari
+```
+
+---
+
+## ✨ What Can You Do With It?
+
+**PyProg** provides utilities for both terminal and notebook progress visuals. It contains these modules:
+
+1. **PyProg.progress_bar**: The module for creating terminal progress bars.
+2. **PyProg.spinners**: The module for creating terminal spinners.
+3. **PyProg.ntbk_progbars**: The module for creating progressbars in notebooks.
+4. **PyProg.ntbk_spinner**: The moduel for creating spinners in notebook environement.
+5. **PyProg.utils**: The module providing different utilites.
+6. **PyProg.manager**: The theme and style manager.
+
+---
+
+#### 1. `PyProg.progress_bar` Module
+
+This module includes powerful classes and utilities to handle different styles of terminal progress bars:
+
+
+### 🧱 1. `ProgressBar` (Class)
+
+A flexible class for custom and advanced progress bar handling.
+
+```python
+from PyProg.progress_bar import ProgressBar, time
+
+pb = ProgressBar(txt_lf='Progress {percent:.0f}%: ')
+total = 100
+
+for i in range(total + 1):
+    pb.update(i / total, i, total)
+    time.sleep(0.1)  # Simulate work
+print()  # Ensure a newline after completion
+```
+
+### 🔁 2. `simple()` (Function)
+
+A lightweight wrapper generator — just like `tqdm`.
+
+```python
+from PyProg.progress_bar import simple, time
+from PyProg.utils import gradient_colors
+
+iterable = range(101)
+for i in simple(iterable, txt_lf='Progress {percent:.0f}%: ',
+                colors = gradient_colors('#00ff00', '#0000ff', 20),
+            paint = 'bar-by-bar'):
+    time.sleep(0.1)  # Simulate work
+```
+
+* Automatically detects iterable length
+* Supports optional `args` dictionary or keyword arguments
+
+
+### 🧩 3. `nested_bar()` (Function)
+
+Enables **parent-child** progress bar setups — helpful for managing **parallel or dependent tasks**.
+
+```python
+from PyProg.progress_bar import ProgressBar, nested_bar, time
+
+def task1(bar):
+    for i in range(100):
+        time.sleep(0.01)
+        bar.update(i / 99, i + 1, 100)
+
+def task2(bar):
+    for i in range(50):
+        time.sleep(0.01)
+        bar.update(i / 49, i + 1, 50)
+
+main = ProgressBar({'line': 2})
+childs = {
+    "Task1": [task1, {"txt_lf": "Task1 {percent:.0f}%"}],
+    "Task2": [task2, {"txt_lf": "Task2 {percent:.0f}%"}]
+}
+
+nested_bar(main, childs, auto_arrangement=True)
+```
+
+#### ⚠️ Important Notes on `nested_bar`
+
+* If `auto_arrangement=False`, you **must** explicitly set the `line` for **all bars**.
+* Never assign the **same `line` number** to multiple bars unless intentionally overlapping.
+* To reserve vertical space:
+
+  * Set **child bars** to `line = n`
+  * Set **parent bar** to `line = n + 1`
+
+---
+
+#### 2. `PyProg.spinner` Module
+
+This module provides **dynamic, colored, and customizable terminal spinners**.
+
+### 1. `Spinner` (Class)
+
+Create and manage animated terminal spinners.
+
+```python
+from PyProg.spinner import Spinner
+import time
+
+spn = Spinner({"text": "Loading", "interval": 0.1})
+spn.start()
+
+time.sleep(3)  # Simulate work
+
+spn.stop()
+```
+
+**Colors can cycle dynamically** by using lists like `['red', 'blue', 'green']`.
+You can use the spinner in a `with` block:
+
+```python
+from PyProg.spinner import Spinner
+import time
+
+with Spinner({"text": "Please wait..."}) as spn:
+    time.sleep(3)
+```
+
+### 2. `spinning_work()` (Function)
+
+Runs a spinner during execution of a custom task.
+
+```python
+from PyProg.spinner import spinning_work
+import time
+
+def task(spn):
+    time.sleep(3)
+    return "Done!"
+
+spinner, result = spinning_work({"text": "Working..."}, work=task)
+```
+
+### 3. `run_spinner_with_bar()` (Function)
+
+🌀 Combines a **spinner** with a **progress bar**, updating the spinner text live with bar content.
+
+#### 🔧 Example:
+
+```python
+from PyProg.spinner import run_spinner_with_bar
+import time
+
+def work(pb, spn):
+    for i in range(101):
+        pb.update(i/100, i, 100)
+        spn.text = "Working: " + pb.bar_str.replace('\r', '')
+        time.sleep(0.05)
+
+run_spinner_with_bar({}, {}, work)
+```
+
+### 🔁 Spinner Control Methods
+
+| Method     | Description                         |
+| ---------- | ----------------------------------- |
+| `start()`  | Begin spinner animation             |
+| `stop()`   | Stop spinner and show final message |
+| `pause()`  | Pause spinner (non-terminating)     |
+| `resume()` | Resume paused spinner               |
+| `hide()`   | Temporarily hide spinner output     |
+| `show()`   | Re-show spinner if hidden           |
+
+---
+
+
+Awesome! Here's the **continued documentation** for the `PyProg.ntbk_progbar` module, picking up from your fun and expressive intro 😄:
+
+---
+
+### 3. `PyProg.ntbk_progbar` Module
+
+Most powerful module in notebook environments! Hack-to-the-core system here! 💥
+
+But it is so powerful because it allows you to **customize progress bars via CSS** — fully HTML-rendered, styleable, and beautiful 🤩.
+
+If we were to calculate a score for customization, it would be literally `∞`...
+(unless someone doesn’t know even the "C" of CSS 😜 — but hey, that’s not *our* fault 😎).
+
+It provides these utilities:
+
+
+## 🧱 1. `NotebookProgressBar` (Class)
+
+HTML/CSS-based progress bar made for Jupyter/Colab environments. Custom colors, gradients, labels, tokens, animations — you name it!
+
+### 🔧 Example Usage:
+
+```python
+from PyProg.ntbk_progbar import NotebookProgressBar
+from PyProg.utils import gradient_colors
+import time
+
+pb = NotebookProgressBar({
+    'txt_lf': "Neon Progress {iters} | {percent:.0f}%",
+    'txt_rt': "| ETA {eta} | Elapsed {elapsed}",
+    'colors': gradient_colors('#00ff00', '#0000ff', 10) + gradient_colors('#0000ff', '#00ff00', 10),
+    'paint': 'bar-by-bar',
+    'length': 30,
+    'text_color': ['#efa', '#afe']
+})
+
+total = 100
+for i in range(total + 1):
+    pb.update(i / total, current_iter=i, total_iter=total)
+    time.sleep(0.03)
+
+print("Progress Complete!")
+```
+
+
+### 🛠️ Customization (Arguments)
+
+| Key                 | Type                                        | Description                                                    |
+| ------------------- | ------------------------------------------- | -------------------------------------------------------------- |
+| `txt_lf`            | `str`                                       | Text on the left (supports tokens like `{percent}`, `{iters}`) |
+| `txt_rt`            | `str`                                       | Text on the right (ETA, speed etc)                             |
+| `bar`               | `str` or `list`                             | Character(s) to build the bar                                  |
+| `space`             | `str`                                       | Character for unfilled part                                    |
+| `paint`             | `"bar"` / `"bar-by-bar"` / `"progress-bar"` | Paint strategy                                                 |
+| `colors`            | `list[str]`                                 | List of CSS colors (or hex codes)                              |
+| `bar_style`         | `str`                                       | Inline CSS for each bar block                                  |
+| `space_style`       | `str`                                       | CSS for empty segments                                         |
+| `progressbar_style` | `str`                                       | Style for wrapper container                                    |
+| `add_css`           | `str`                                       | Inject your own custom CSS rules                               |
+| `text_color`        | `str` or `list`                             | Colors for text (left and right)                               |
+| `tokens`            | `dict`                                      | Custom tokens like `{spinner}`, `{file}` etc                   |
+| `freq`              | `float`                                     | Min time between updates (smoothing)                           |
+
+🎯 You can use it in **context managers**, attach **HTML inline outputs**, or integrate into live dashboards.
+
+
+## 🔁 2. `simple()` (Function)
+
+A quick plug-and-play generator for notebooks!
+
+```python
+from PyProg.ntbk_progbar import simple
+import time
+
+for i in simple(range(100), txt_lf="Doing... {percent:.0f}%"):
+    time.sleep(0.05)
+```
+
+It auto-detects `len()` of the iterable or uses `total` from arguments. Internally uses `NotebookProgressBar`.
+
+
+## 🌲 3. `nested_bar()` (Function)
+
+Manage **multiple subtasks with individual progress bars** — all under one master bar.
+
+```python
+from PyProg.ntbk_progbar import NotebookProgressBar, nested_bar
+import time
+
+def task1(pb):
+    for i in range(100):
+        pb.update(i / 99, i+1, 100)
+        time.sleep(0.01)
+
+def task2(pb):
+    for i in range(50):
+        pb.update(i / 49, i+1, 50)
+        time.sleep(0.01)
+
+main = NotebookProgressBar({'txt_lf': "Overall Progress {percent:.0f}%"})
+tasks = {
+    "Task 1": [task1, {"txt_lf": "Task 1: {percent:.0f}%"}],
+    "Task 2": [task2, {"txt_lf": "Task 2: {percent:.0f}%"}],
+}
+
+nested_bar(main, tasks)
+```
+
+### 🧪 Notes:
+
+* Parent bar = outer progress
+* Child bars = separate for each task
+* You can customize each bar individually!
+
+
+## ✨ Advanced Tricks
+
+🎨 **Animated Gradients**:
+
+```python
+from PyProg.utils import gradient_colors
+colors = gradient_colors("#ff0000", "#0000ff", 15)
+```
+
+🔌 **Add Custom Tokens**:
+
+```python
+NotebookProgressBar({
+    'txt_lf': "📁 File: {filename} - {percent:.0f}%",
+    'tokens': {
+        'filename': lambda self: 'data.csv'
+    }
+})
+```
+
+🧩 **Inline HTML**:
+
+```python
+bar = NotebookProgressBar({...})
+some_html = f"<div>{bar.get_inline_html()}</div>"
+```
+
+---
+
+### 4. `PyProg.ntbk_spinner` Module
+
+⚙️ **Spinner-as-a-Show** — not just a spinning icon, but a complete animated display component with CSS + live-updated bar inside!
+
+In notebooks, visual feedback during longer tasks really helps. This module takes it further by allowing:
+
+* 🌀 Animated spinners (CSS or SVG)
+* 🎨 Dynamic color cycles (background + foreground)
+* 📊 Embedding progress bars directly into spinner text
+* 🤝️ Full integration with `NotebookProgressBar`
+
+---
+
+## 🌀 1. `NotebookDivSpinner` (Class)
+
+Create a stylish spinner that can also **display dynamic text** or even embed **inline progress bars** 😎.
+
+### ✅ Example:
+
+```python
+from PyProg.ntbk_spinner import NotebookDivSpinner
+import time
+
+spn = NotebookDivSpinner({
+    "text": "Processing",
+    "fg_text": ["#00ff00", "#00ccff"],
+    "bg_text": ["transparent", "#222"],
+    "clr_interval": [0.5, 0.5]
+})
+
+spn.start()
+time.sleep(3)
+spn.stop()
+```
+
+---
+
+### 🔧 Arguments (Init Options)
+
+| Key            | Type          | Description                           |
+| -------------- | ------------- | ------------------------------------- |
+| `text`         | `str`         | Initial text to show                  |
+| `final_text`   | `str`         | Text shown after `stop()`             |
+| `fg_text`      | `str or list` | Foreground (text) color(s)            |
+| `bg_text`      | `str or list` | Background color(s)                   |
+| `clr_interval` | `list[float]` | Time (s) between color changes        |
+| `refresh`      | `float`       | Delay between animation frame updates |
+| `speed`        | `float`       | Speed of rotation (larger = slower)   |
+| `spin_side`    | `str`         | `"left"` or `"right"` of text         |
+| `spinner`      | `dict`        | Spinner customization (see below)     |
+| `add_css`      | `str`         | Inject raw CSS for style animation    |
+| `id`           | `str`         | Optional unique ID (auto generated)   |
+
+---
+
+### 🎨 `spinner` → Sub-dict for spinner customization
+
+| Key             | Type          | Description                                        |
+| --------------- | ------------- | -------------------------------------------------- |
+| `spinner_html`  | `str`         | Custom HTML (like SVG or emoji) inside the spinner |
+| `spinner_css`   | `dict or str` | Style for spinner block                            |
+| `container_css` | `dict or str` | Style for spinner + text container                 |
+| `text_css`      | `dict or str` | Style for the changing text                        |
+| `final_css`     | `str`         | Final message style                                |
+| `animation`     | `dict`        | `{animation_name: css_keyframes}`                  |
+
+---
+
+### 🔄 Methods
+
+| Method                   | Description                          |
+| ------------------------ | ------------------------------------ |
+| `.start()`               | Begin animation and rendering        |
+| `.stop()`                | End spinner and show final message   |
+| `.hide()` / `.show()`    | Hide or reveal the spinner           |
+| `.pause()` / `.resume()` | Stop animation loop or resume it     |
+| `.set_text("New...")`    | Live update the text next to spinner |
+
+---
+
+## 🔗 2. `run_spin_with_bar()` (Function)
+
+Attach a spinner ☸ and embed a progress bar 📈 directly into it as live updating text!
+
+```python
+from PyProg.ntbk_spinner import run_spin_with_bar
+import time
+
+def work(pb, spn):
+    for i in range(101):
+        pb.update(i/100, i, 100)
+        spn.set_text(pb.get_inline_html())  # Embed bar into spinner text
+        time.sleep(0.025)
+
+run_spin_with_bar({}, {}, work)
+```
+
+### 🔄 Parameters
+
+| Param          | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| `spinner_args` | Dict for spinner customization                                |
+| `bar_args`     | Dict for progress bar styling                                 |
+| `work`         | A function of `(pb, spn)` where progress and text are updated |
+
+### 🔁 Returns
+
+```python
+(pb, spn)  # ProgressBar instance, Spinner instance
+```
+
+You can use them later if needed!
+
+---
+
+### 🧪 Pro Tip:
+
+You can embed **inline progress bar segments** inside the spinner like this:
+
+```python
+spn.set_text(pb.get_inline_html())
+```
+
+Or display **custom values or tokenized stats** if you set `bar_args['txt_lf']`.
