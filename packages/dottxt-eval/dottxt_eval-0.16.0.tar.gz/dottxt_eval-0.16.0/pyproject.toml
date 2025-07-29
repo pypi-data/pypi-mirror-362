@@ -1,0 +1,100 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dottxt-eval"
+authors= [{name = ".txt"}]
+description = "Simple and robust LLM evaluations"
+requires-python = ">=3.10"
+dynamic = ["version"]
+dependencies = [
+    "click",
+    "pytest",
+    "rich",
+    "jsonschema",
+    "datasets",
+    "Pillow",
+    "tenacity",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest-asyncio",
+    "pre-commit",
+    "pytest-cov",
+    "coverage[toml]>=5.1",
+    "diff-cover",
+]
+docs = [
+    "mkdocs",
+    "mkdocstrings[python]",
+    "mkdocs-material",
+    "mkdocs-section-index",
+    "mkdocs-git-committers-plugin-2",
+    "mkdocs-git-revision-date-localized-plugin",
+]
+
+[project.urls]
+repository = "https://github.com/dottxt-ai/doteval"
+
+[project.readme]
+file="README.md"
+content-type = "text/markdown"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["doteval"]
+
+[tool.setuptools_scm]
+write_to = "src/doteval/_version.py"
+
+[project.scripts]
+doteval = "doteval.cli:cli"
+
+[project.entry-points.pytest11]
+doteval = "doteval.plugin"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[[tool.mypy.overrides]]
+module = [
+    "numpy.*",
+    "pydantic",
+    "pytest",
+    "torch",
+    "transformers.*",
+    "modal.*",
+    "huggingface_hub.*",
+    "outlines.*",
+    "yaml.*",
+    "jsonschema.*"
+]
+ignore_missing_imports = true
+
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+
+[tool.coverage.run]
+omit = [
+    "src/doteval/_version.py",
+    "src/doteval/datasets.py",
+    "tests/*",
+]
+branch = true
+
+[tool.coverage.report]
+omit = [
+    "src/doteval/_version.py",
+    "src/doteval/datasets.py",
+    "tests/*",
+]
+exclude_lines = [
+    "pragma: no cover"
+]
+show_missing = true
+
+[tool.diff_cover]
+compare_branch = "origin/main"
+diff_range_notation = ".."
