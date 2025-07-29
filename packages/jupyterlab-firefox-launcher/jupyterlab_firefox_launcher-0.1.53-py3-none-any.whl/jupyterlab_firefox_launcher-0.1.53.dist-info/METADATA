@@ -1,0 +1,331 @@
+Metadata-Version: 2.4
+Name: jupyterlab-firefox-launcher
+Version: 0.1.53
+Summary: JupyterLab extension to launch Firefox in a tab
+Project-URL: Homepage, https://github.com/vantagecompute/jupyterlab-firefox-launcher
+Project-URL: Documentation, https://github.com/vantagecompute/jupyterlab-firefox-launcher
+Project-URL: Repository, https://github.com/vantagecompute/jupyterlab-firefox-launcher.git
+Project-URL: Changelog, https://github.com/vantagecompute/jupyterlab-firefox-launcher/blob/main/CHANGELOG.md
+Project-URL: Issues, https://github.com/vantagecompute/jupyterlab-firefox-launcher/issues
+Author-email: Your Name <your.email@example.com>
+License: BSD 3-Clause License
+        
+        Copyright (c) 2025, Your Name
+        All rights reserved.
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+        1. Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+        
+        2. Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+        
+        3. Neither the name of the copyright holder nor the names of its
+           contributors may be used to endorse or promote products derived from
+           this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+        AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+        IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+        FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+        DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+        SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+        CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+        OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+License-File: LICENSE
+Keywords: Browser,Extension,Firefox,Jupyter,JupyterLab,JupyterLab3,JupyterLab4
+Classifier: Framework :: Jupyter
+Classifier: Framework :: Jupyter :: JupyterLab
+Classifier: Framework :: Jupyter :: JupyterLab :: 4
+Classifier: Framework :: Jupyter :: JupyterLab :: Extensions
+Classifier: Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Requires-Dist: jupyter-server<3,>=2.0.1
+Requires-Dist: jupyterlab<5,>=4.0.0
+Requires-Dist: tornado>=6.1.0
+Provides-Extra: dev
+Requires-Dist: build; extra == 'dev'
+Requires-Dist: hatch; extra == 'dev'
+Requires-Dist: jupyterlab<5,>=4.0.0; extra == 'dev'
+Provides-Extra: test
+Requires-Dist: coverage; extra == 'test'
+Requires-Dist: pytest; extra == 'test'
+Requires-Dist: pytest-asyncio; extra == 'test'
+Requires-Dist: pytest-cov; extra == 'test'
+Requires-Dist: pytest-jupyter[server]>=0.4; extra == 'test'
+Description-Content-Type: text/markdown
+
+# JupyterLab Firefox Launcher
+
+[![PyPI version](https://img.shields.io/pypi/v/jupyterlab-firefox-launcher.svg)](https://pypi.org/project/jupyterlab-firefox-launcher/)
+[![License](https://img.shields.io/pypi/l/jupyterlab-firefox-launcher.svg)](https://github.com/vantagecompute/jupyterlab-firefox-launcher/blob/main/LICENSE)
+[![Python Version](https://img.shields.io/pypi/pyversions/jupyterlab-firefox-launcher.svg)](https://pypi.org/project/jupyterlab-firefox-launcher/)
+[![JupyterLab Version](https://img.shields.io/badge/JupyterLab-4.0%2B-orange.svg)](https://jupyterlab.readthedocs.io/)
+
+A powerful JupyterLab extension that seamlessly integrates Firefox browser functionality directly into your JupyterLab workspace, enabling web browsing, debugging, and development workflow enhancement without leaving your coding environment.
+
+## ✨ Features
+
+- **🚀 One-Click Firefox Launch**: Launch Firefox directly from the JupyterLab launcher with a single click
+- **🔧 Integrated Workflow**: Browse documentation, test web applications, and debug without context switching
+- **⚡ Modern Architecture**: Built with JupyterLab 4+ using modern TypeScript and Python backend
+- **🎯 Seamless Integration**: Appears natively in JupyterLab's launcher interface alongside notebooks and terminals
+- **🔒 Secure**: Server-side controlled browser launching with proper security considerations
+- **🌐 Development-Friendly**: Perfect for web development, data visualization, and research workflows
+
+## 🛠️ Architecture
+
+This extension consists of two main components:
+
+### Frontend Extension (TypeScript)
+- Modern ES2018+ TypeScript implementation
+- Webpack module federation for optimal loading
+- Integrated with JupyterLab's launcher system
+- Responsive UI components using Lumino widgets
+
+### Server Extension (Python)
+- Tornado-based web handlers for browser control
+- Secure server-side process management
+- RESTful API for frontend communication
+- Cross-platform Firefox detection and launching
+
+## 📦 Installation
+
+### From PyPI (Recommended)
+
+```bash
+pip install jupyterlab-firefox-launcher
+```
+
+### From Source
+
+```bash
+git clone https://github.com/vantagecompute/jupyterlab-firefox-launcher.git
+cd jupyterlab-firefox-launcher
+pip install -e .
+```
+
+## 🔧 System Dependencies
+
+This extension requires additional system packages to work properly on Linux:
+
+### Ubuntu/Debian
+```bash
+sudo apt update
+sudo apt install firefox xvfb x11vnc websockify novnc
+```
+
+### RHEL/CentOS/Fedora
+```bash
+# RHEL/CentOS
+sudo yum install firefox xorg-x11-server-Xvfb x11vnc python3-websockify
+
+# Fedora
+sudo dnf install firefox xorg-x11-server-Xvfb x11vnc python3-websockify
+
+# Install noVNC manually
+sudo mkdir -p /usr/share/novnc
+sudo git clone https://github.com/novnc/noVNC.git /usr/share/novnc
+```
+
+### Arch Linux
+```bash
+sudo pacman -S firefox xorg-server-xvfb x11vnc python-websockify
+# Install noVNC from AUR or manually
+```
+
+**Required packages:**
+- `firefox` - The Firefox web browser
+- `xvfb` - Virtual X11 display server
+- `x11vnc` - VNC server for X11
+- `websockify` - WebSocket to TCP proxy for noVNC
+- `novnc` - Web-based VNC client
+
+## 🚀 Usage
+
+1. **Install the extension** using pip as shown above
+2. **Restart JupyterLab** to load the new extension
+3. **Open JupyterLab** in your browser
+4. **Look for the Firefox icon** in the JupyterLab launcher
+5. **Click the Firefox launcher** to open Firefox in a new window/tab
+
+### Verification
+
+To verify the extension is properly installed:
+
+```bash
+# Check server extension
+jupyter server extension list
+
+# Check frontend extension  
+jupyter labextension list
+```
+
+You should see `jupyterlab_firefox_launcher` listed as enabled in both outputs.
+
+## 🔧 Development
+
+### Prerequisites
+
+- **Python 3.8+** with pip
+- **Node.js 16+** with npm/yarn
+- **JupyterLab 4.0+**
+- **Firefox browser** installed on your system
+
+### Development Setup
+
+1. **Clone and navigate to the repository:**
+   ```bash
+   git clone https://github.com/vantagecompute/jupyterlab-firefox-launcher.git
+   cd jupyterlab-firefox-launcher
+   ```
+
+2. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install Python dependencies:**
+   ```bash
+   pip install -e ".[dev]"
+   ```
+
+4. **Install JavaScript dependencies:**
+   ```bash
+   jlpm install
+   ```
+
+5. **Build the extension:**
+   ```bash
+   jlpm build
+   ```
+
+6. **Enable the extension for development:**
+   ```bash
+   jupyter server extension enable jupyterlab_firefox_launcher
+   ```
+
+### Development Workflow
+
+#### Frontend Development
+```bash
+# Watch mode for frontend changes
+jlpm watch
+
+# In another terminal, start JupyterLab
+jupyter lab --watch
+```
+
+#### Building for Distribution
+```bash
+# Clean previous builds
+jlpm clean
+
+# Build production version
+jlpm build:prod
+
+# Build Python wheel
+python -m build
+```
+
+#### Running Tests
+```bash
+# Python tests
+pytest
+
+# JavaScript tests (if available)
+jlpm test
+```
+
+### Project Structure
+
+```
+jupyterlab-firefox-launcher/
+├── README.md                          # This file
+├── LICENSE                           # BSD-3-Clause license
+├── pyproject.toml                    # Python project configuration
+├── tsconfig.json                     # TypeScript configuration
+├── package.json                      # Node.js package configuration
+├── webpack.config.js                 # Webpack build configuration
+├── install.json                      # JupyterLab extension metadata
+├── src/                             # TypeScript source code
+│   ├── index.ts                     # Main extension entry point
+│   └── handler.ts                   # Frontend request handlers
+├── jupyterlab_firefox_launcher/     # Python package
+│   ├── __init__.py                  # Package initialization
+│   ├── server.py                    # Tornado server extension
+│   └── labextension/               # Built frontend assets
+└── dist/                           # Distribution packages
+```
+
+## 🔧 Technical Details
+
+### Build System
+- **Python**: Hatchling with hatch-jupyter-builder integration
+- **Frontend**: Webpack 5 with module federation
+- **TypeScript**: ES2018 target with modern module resolution
+- **Package Management**: pip for Python, jlpm (yarn) for JavaScript
+
+### Dependencies
+- **Python**: jupyter-server ≥2.0.1, jupyterlab ≥4.0.0, tornado ≥6.1.0
+- **JavaScript**: @jupyterlab/application, @jupyterlab/launcher, @lumino/widgets
+
+### Browser Support
+- **Firefox**: All modern versions
+- **Platform**: Cross-platform (Windows, macOS, Linux)
+- **Security**: Server-controlled launching for enhanced security
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [contributing guidelines](CONTRIBUTING.md) for details.
+
+### Development Guidelines
+1. **Fork the repository** and create a feature branch
+2. **Follow code style** conventions (Black for Python, Prettier for TypeScript)
+3. **Add tests** for new functionality
+4. **Update documentation** as needed
+5. **Submit a pull request** with a clear description
+
+### Reporting Issues
+- Use the [GitHub issue tracker](https://github.com/vantagecompute/jupyterlab-firefox-launcher/issues)
+- Include JupyterLab version, Python version, and browser details
+- Provide steps to reproduce the issue
+
+## 📄 License
+
+This project is licensed under the [BSD-3-Clause License](LICENSE).
+
+```
+Copyright (c) 2025, Vantage Compute
+All rights reserved.
+```
+
+## 🙏 Acknowledgments
+
+- **JupyterLab Team** for the excellent extension framework
+- **Project Jupyter** for the amazing ecosystem
+- **Contributors** who help improve this extension
+
+## 📚 Related Resources
+
+- [JupyterLab Documentation](https://jupyterlab.readthedocs.io/)
+- [JupyterLab Extension Developer Guide](https://jupyterlab.readthedocs.io/en/stable/extension/extension_dev.html)
+- [Project Jupyter](https://jupyter.org/)
+
+---
+
+**Made with ❤️ for the Jupyter community**
