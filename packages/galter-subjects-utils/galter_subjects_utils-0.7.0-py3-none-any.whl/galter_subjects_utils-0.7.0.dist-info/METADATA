@@ -1,0 +1,142 @@
+Metadata-Version: 2.4
+Name: galter-subjects-utils
+Version: 0.7.0
+Summary: Subject terms tooling for InvenioRDM
+Author-email: Northwestern University <DL_FSM_GDS@e.northwestern.edu>
+License: MIT License
+        
+        Copyright (C) 2021-2023 Northwestern University.
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy of
+        this software and associated documentation files (the "Software"), to deal in
+        the Software without restriction, including without limitation the rights to
+        use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+        of the Software, and to permit persons to whom the Software is furnished to do
+        so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Repository, https://github.com/galterlibrary/galter-subjects-utils
+Keywords: invenio,inveniordm,subjects
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: invenio-app-rdm<14.0.0,>=12.0.0
+Requires-Dist: click
+Requires-Dist: flask
+Requires-Dist: invenio_access
+Requires-Dist: invenio_db
+Requires-Dist: invenio_pidstore
+Requires-Dist: invenio_rdm_records
+Requires-Dist: invenio_records_resources
+Requires-Dist: invenio_vocabularies
+Requires-Dist: requests
+Requires-Dist: sqlalchemy
+Provides-Extra: dev
+Requires-Dist: check-manifest>=0.49; extra == "dev"
+Requires-Dist: invenio-search[opensearch2]<3.0.0,>=2.1.0; extra == "dev"
+Requires-Dist: invoke<3.0,>=2.2; extra == "dev"
+Requires-Dist: pytest-invenio<3.0.0,>=2.1.1; extra == "dev"
+Provides-Extra: dev-pre
+Requires-Dist: check-manifest>=0.49; extra == "dev-pre"
+Requires-Dist: invenio-search[opensearch2]<4.0.0,>=3.0.0; extra == "dev-pre"
+Requires-Dist: invoke<3.0,>=2.2; extra == "dev-pre"
+Requires-Dist: pytest-invenio<4.0.0,>=3.3.0; extra == "dev-pre"
+Dynamic: license-file
+
+# galter-subjects-utils
+
+*Subjects tooling for InvenioRDM.*
+
+<a href="https://pypi.org/project/galter-subjects-utils/">
+  <img src="https://img.shields.io/pypi/v/galter-subjects-utils.svg">
+</a>
+
+This distribution package provides an invenio subcommand group to manage controlled vocabulary subjects.
+
+In particular, it provides functionality to
+
+- generate and update the initial list of subject terms for a vocabulary distribution package.
+- update a running instance's subjects by analyzing the delta between the instance and the updated target list of terms.
+
+Although it contributes MeSH and LCSH terms functionality (those may be extracted out in the future), the goal is for this package to provide a framing for any subjects operations/CLI tooling. See https://github.com/galterlibrary/invenio-subjects-mesh for an example
+of how it fits in the ecosystem.
+
+## Installation
+
+```bash
+pip install galter-subjects-utils
+```
+
+### Versions
+
+This repository follows [semantic versioning](https://semver.org/) indexed on invenio-app-rdm compatibility according to the table below:
+
+| galter-subjects-utils | invenio-app-rdm version |
+| --------------------- | ----------------------- |
+| 0.7.X                 | 13.X                    |
+| 0.5.X, 0.6.x          | 12.X                    |
+
+This just means for example that version 0.7 guarantees generation of subjects files and subject manipulation compatible with invenio-app-rdm v13. When there is a break in subjects format, this tool will bump its major version.
+
+## Usage
+
+In virtualenv (`(venv)` denotes that going forward):
+
+```bash
+(venv) invenio galter-subjects --help
+```
+
+## Development
+
+Install the project in editable mode with `dev` dependencies in an isolated virtualenv:
+
+```bash
+(venv) pip install -e .[dev]
+```
+
+Run tests:
+
+```bash
+(venv) invoke test
+# or shorter
+(venv) inv test
+```
+
+Check manifest:
+
+```bash
+(venv) inv check-manifest
+```
+
+To check compatibility with the pre-release version of InvenioRDM (invenio-app-rdm):
+
+```bash
+# Step 1 - install the pre-release dependencies
+(venv) pip install --pre -e .[dev_pre]
+# Step 2 - Run the pre-release tests
+(venv) inv test
+# if using uv run:
+uv run --extra dev_pre --prerelease=allow inv test
+```
