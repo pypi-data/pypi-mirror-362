@@ -1,0 +1,46 @@
+[project]
+dynamic = []
+name = "pydantic-api-models-notion"
+version = "0.0.22"
+
+[tool.poetry]
+description = "A Pydantic-based library for Notion API data models"
+packages = [{ include = "pydantic_api" }]
+authors = ["stevieflyer"]
+readme = "README.md"
+repository = "https://github.com/stevieflyer/pydantic-api-models-notion"
+homepage = "https://github.com/stevieflyer/pydantic-api-models-notion"
+keywords = ["notion", "pydantic", "api", "data-models"]
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+]
+
+[tool.poetry-dynamic-versioning]
+enable = false
+vcs = "git"
+style = "semver"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+emoji = "^2.14.0"
+pydantic-api-models = "^0.0.2"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.15.0"
+pytest = "^8.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.5.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[[tool.mypy.overrides]]
+module = ["pydantic_api.base.*"]
+follow_untyped_imports = true
