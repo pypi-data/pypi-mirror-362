@@ -1,0 +1,75 @@
+Metadata-Version: 2.1
+Name: uiflow2
+Version: 0.0.5.a4
+Summary: M5stack uiflow2 Python3 library.
+Home-page: https://www.m5stack.com
+Author: dianjixz
+Author-email: dianjixz@m5stack.com
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: paho-mqtt
+Requires-Dist: requests
+Requires-Dist: pyserial
+Requires-Dist: smbus2
+Requires-Dist: evdev
+Requires-Dist: pyaudio
+Requires-Dist: network
+Requires-Dist: typing-extensions
+
+# coremp135_uiflow
+## 1. Install debian12
+
+https://docs.m5stack.com/zh_CN/guide/linux/coremp135/image
+
+choose M5_CoreMP135_debian12_20240919 download and install. you also need resize the partition to full size of the SD card.
+## 2. Install System Dependencies
+
+```bash
+apt install libportaudio2
+```
+## 3. Install UiFlow2 library
+pip install uiflow2 --break-system-packages
+
+## 4. Start UiFlow2 server
+
+```bash
+# bind device mac
+uiflow2 register
+Please input your email: XXXXXXXXX@XXXX.com
+Please input your password: XXXXXXXXX
+
+# start server
+uiflow2
+
+# stop server
+uiflow2 stop
+
+# clean download program and start uiflow2 server
+uiflow2 ui
+
+# enable uiflow2 systemd service
+uiflow2 enable
+
+# restart uiflow2 systemd service
+systemctl restart uiflow2.service
+
+# check uiflow2 systemd service status
+systemctl status uiflow2.service
+
+# stop uiflow2 systemd service
+systemctl stop uiflow2.service
+
+# disable uiflow2 systemd service
+uiflow2 disable
+```
+
+## more details
+
+https://docs.m5stack.com/en/guide/linux/coremp135/uiflow2
+
+
