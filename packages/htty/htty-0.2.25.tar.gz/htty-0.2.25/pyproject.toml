@@ -1,0 +1,79 @@
+[project]
+name = "htty"
+# [[[cog
+# import os
+# cog.out(f'version = "{os.environ["HTTY_VERSION"]}"')
+# ]]]
+version = "0.2.25"
+# [[[end]]]
+description = "Headless Terminal - Python library for terminal automation"
+readme = "README.md"
+authors = [
+    { name = "Matt Rixman", email = "MatrixManAtYrService@users.noreply.github.com" },
+]
+license = { text = "MIT" }
+requires-python = ">=3.8"
+keywords = ["terminal", "automation", "pty", "headless", "subprocess", "python"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System :: Shells",
+    "Topic :: Terminals",
+]
+dependencies = [
+    # [[[cog
+    # import os
+    # version = os.environ["HTTY_VERSION"]
+    # 
+    # # Use local dependency for development/version-bump, PyPI for releases
+    # use_local = os.environ.get("HTTY_USE_LOCAL_CORE", "false").lower() == "true"
+    # 
+    # if use_local:
+    #     cog.out(f'"htty_core @ {{root:uri}}/../htty-core",')
+    # else:
+    #     cog.out(f'"htty-core=={version}",')
+    # ]]]
+    "htty-core==0.2.25",
+    # [[[end]]]
+    "ansi2html",
+]
+
+[project.urls]
+Homepage = "https://github.com/MatrixManAtYrService/ht"
+Documentation = "https://github.com/MatrixManAtYrService/ht"
+Repository = "https://github.com/MatrixManAtYrService/ht"
+Issues = "https://github.com/MatrixManAtYrService/ht/issues"
+
+[project.scripts]
+htty = "htty.cli:htty_sync"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/htty"]
+
+[dependency-groups]
+analysis = [
+    "fawltydeps",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pdoc]
+sort_identifiers = false
