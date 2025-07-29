@@ -1,0 +1,23 @@
+FROM python:3.10-bullseye
+
+# Install build dependencies
+RUN pip install --upgrade pip
+RUN pip install pyinstaller
+
+WORKDIR /app
+COPY . .
+
+RUN pip install .
+
+RUN pyinstaller --onefile \
+    --paths=src \
+    --copy-metadata pygount \
+    --copy-metadata semgrep \
+    --add-data "$(python3 -c 'import semgrep.semgrep_interfaces, os; print(os.path.join(os.path.dirname(semgrep.semgrep_interfaces.__file__), "lang.json"))'):semgrep/semgrep_interfaces" \
+    --add-data "$(python3 -c 'import cachehash.sql, os; print(os.path.join(os.path.dirname(cachehash.__file__), "sql/make_table.sql"))'):cachehash/sql" \
+    --add-data "$(python3 -c 'import cachehash.sql, os; print(os.path.join(os.path.dirname(cachehash.__file__), "sql/get_record_hash_key.sql"))'):cachehash/sql" \
+    --add-data "$(python3 -c 'import cachehash.sql, os; print(os.path.join(os.path.dirname(cachehash.__file__), "sql/delete_record.sql"))'):cachehash/sql" \
+    --add-data "$(python3 -c 'import cachehash.sql, os; print(os.path.join(os.path.dirname(cachehash.__file__), "sql/get_record.sql"))'):cachehash/sql" \
+    --add-data "$(python3 -c 'import cachehash.sql, os; print(os.path.join(os.path.dirname(cachehash.__file__), "sql/insert_record.sql"))'):cachehash/sql" \
+    --add-data "$(python3 -c 'import cachehash.sql, os; print(os.path.join(os.path.dirname(cachehash.__file__), "sql/update_record.sql"))'):cachehash/sql" \
+    src/techlens_agent/agent.py
