@@ -1,0 +1,326 @@
+Metadata-Version: 2.2
+Name: nacos-tools
+Version: 0.1.10
+Summary: A Python library for Nacos integration with virtual database (async/sync), cache, and storage systems
+Home-page: https://github.com/oscarou1992/nacos_tools
+Author: Oscar Ou
+Author-email: oscar.ou@tamaredge.ai
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: sqlalchemy>=1.4.0
+Requires-Dist: pymysql>=1.1.1
+Requires-Dist: psycopg2-binary>=2.9.5
+Requires-Dist: aiomysql>=0.2.0
+Requires-Dist: asyncpg>=0.27.0
+Requires-Dist: redis>=4.0.0
+Requires-Dist: nacos-sdk-python>=0.1.9
+Requires-Dist: oss2>=2.17.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+[English](https://github.com/oscarou1992/nacos_tools/tree/master/docs) | [简体中文](https://github.com/oscarou1992/nacos_tools/blob/master/docs/README_zh.md)
+
+# Nacos Tools
+
+A Python microservice infrastructure library that integrates Alibaba Nacos for dynamic configuration management, service discovery, and unified tool management (databases, caches, storage) with support for both synchronous and asynchronous frameworks.
+
+## What is Nacos Tools?
+
+Nacos Tools is a **microservice infrastructure adaptation layer** that acts as a bridge between Python applications and Nacos configuration center. It provides:
+
+- **Centralized Configuration Management**: No more hardcoded configurations in each service
+- **Unified Tool Interfaces**: Consistent APIs for accessing various infrastructure services
+- **Dynamic Hot Reload**: Real-time configuration updates without service restart
+- **Decoupled Architecture**: Business logic independent of infrastructure implementations
+
+## Core Features
+
+### 🔧 Dynamic Configuration Management
+- Real-time configuration loading from Nacos
+- Automatic configuration change detection and hot reload
+- Zero-downtime configuration updates
+- Environment-based configuration management
+
+### 🔍 Service Discovery & Registration
+- Automatic service registration to Nacos
+- Multiple load balancing strategies (Random, Round Robin)
+- Health check and heartbeat mechanism
+- Automatic failover on instance failure
+
+### 🛠 Unified Tool Management
+- **Databases (VDB)**: MySQL and PostgreSQL with SQLAlchemy ORM
+- **Caches**: Redis (extensible to Memcached, etc.)
+- **Storage**: Aliyun OSS (extensible to AWS S3, etc.)
+- Thread-safe proxy pattern for seamless updates
+
+### ⚡ Async/Sync Dual Mode
+- **Sync Mode**: Flask support with pymysql, psycopg2, redis
+- **Async Mode**: Sanic/FastAPI support with aiomysql, asyncpg, aioredis
+- Unified API interface for both paradigms
+
+## Installation
+
+```bash
+pip install nacos-tools
+```
+
+### Requirements
+- Python >= 3.6
+- Core Dependencies:
+  - `nacos-sdk-python>=0.1.5`
+  - `sqlalchemy>=1.3.13`
+  - `redis>=3.5.3`
+  - `oss2>=2.9.0`
+
+## Quick Start
+
+### Flask (Synchronous)
+
+```python
+from flask import Flask
+from nacos_tools import NacosTools
+
+app = Flask(__name__)
+
+# Initialize NacosTools
+nacos_tools = NacosTools(
+    server_addr="http://localhost:8848",
+    namespace="public",
+    data_id="app-config",
+    group="DEFAULT_GROUP",
+    app=app
+)
+
+@app.route("/query")
+def query_users():
+    # Use VDB with SQLAlchemy ORM
+    with nacos_tools.vdb.session() as session:
+        users = session.query(User).filter_by(active=True).all()
+        return {"users": [u.to_dict() for u in users]}
+
+@app.route("/cache")
+def cache_demo():
+    # Use Redis cache
+    user_data = nacos_tools.cache.get("user:123")
+    if not user_data:
+        user_data = fetch_from_db()
+        nacos_tools.cache.set("user:123", user_data, ttl=3600)
+    return {"user": user_data}
+
+if __name__ == "__main__":
+    app.run()
+```
+
+### FastAPI (Asynchronous)
+
+```python
+from fastapi import FastAPI
+from nacos_tools import NacosTools
+
+app = FastAPI()
+
+# Initialize NacosTools with async mode
+nacos_tools = NacosTools(
+    server_addr="http://localhost:8848",
+    namespace="public",
+    data_id="app-config",
+    group="DEFAULT_GROUP",
+    app=app,
+    async_mode=True
+)
+
+@app.get("/query")
+async def query_users():
+    # Use async VDB
+    result = await nacos_tools.vdb.query(
+        "SELECT * FROM users WHERE active = ?", [True]
+    )
+    return {"users": result}
+
+@app.get("/cache")
+async def cache_demo():
+    # Use async Redis
+    user_data = await nacos_tools.cache.get("user:123")
+    if not user_data:
+        user_data = await fetch_from_db()
+        await nacos_tools.cache.set("user:123", user_data, ttl=3600)
+    return {"user": user_data}
+```
+
+## Configuration Format
+
+Configure your tools in Nacos using KEY=VALUE format:
+
+```properties
+# Database Configuration
+VDB_TYPE=mysql
+VDB_HOST=localhost
+VDB_PORT=3306
+VDB_USER=root
+VDB_PASSWORD=secret
+VDB_DATABASE=myapp
+
+# Cache Configuration
+CACHE_TYPE=redis
+CACHE_HOST=localhost
+CACHE_PORT=6379
+CACHE_DB=0
+CACHE_PASSWORD=secret
+
+# Storage Configuration
+STORAGE_TYPE=aliyun-oss
+STORAGE_ENDPOINT=oss-cn-hangzhou.aliyuncs.com
+STORAGE_ACCESS_KEY_ID=your_key
+STORAGE_ACCESS_KEY_SECRET=your_secret
+STORAGE_BUCKET=my-bucket
+```
+
+## Advanced Features
+
+### Multi-Database Support
+
+```python
+# Configure multiple databases in Nacos
+# VDB_BINDS=db1,db2
+# DB1_HOST=server1.com
+# DB1_DATABASE=app_db
+# DB2_HOST=server2.com
+# DB2_DATABASE=analytics_db
+
+# Use different databases with bind_key
+class User(nacos_tools.vdb.Model):
+    __bind_key__ = 'db1'
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+
+class Analytics(nacos_tools.vdb.Model):
+    __bind_key__ = 'db2'
+    __tablename__ = 'events'
+    id = Column(Integer, primary_key=True)
+```
+
+### Service Discovery
+
+```python
+# Get service instances with load balancing
+instance = nacos_tools.discovery.get_instance(
+    service_name="payment-service",
+    strategy="round_robin"  # or "random"
+)
+
+# Make request to selected instance
+response = requests.post(f"http://{instance}/process", data=payload)
+```
+
+### Dynamic Configuration Updates
+
+When configurations change in Nacos:
+1. NacosTools detects changes via polling (every 5 seconds)
+2. New tool instances are created with updated configs
+3. Proxy objects transparently switch to new instances
+4. Old instances are properly closed
+5. **Zero downtime, no code changes needed!**
+
+## Architecture Highlights
+
+### 🏗 Proxy Pattern for Hot Updates
+- Tool instances wrapped in proxy objects
+- Configuration changes update internal instances only
+- Global references remain valid throughout updates
+- Thread-safe implementation
+
+### 🔌 Plugin Architecture
+- Base classes define tool interfaces
+- Implementations register via decorators
+- Easy to add new tool types
+- Configuration-driven tool selection
+
+### 💪 Resilience Patterns
+- Exponential backoff retry mechanism
+- Connection pool management
+- Automatic reconnection
+- Graceful degradation
+
+## Use Cases
+
+### 1. Microservice Configuration Management
+- Centralize credentials and endpoints
+- Environment-specific configurations
+- Feature flags and A/B testing
+- Real-time configuration updates
+
+### 2. Multi-Tenant SaaS
+- Per-tenant database routing
+- Isolated cache namespaces
+- Dynamic resource allocation
+- Tenant-specific configurations
+
+### 3. Blue-Green Deployments
+- Gradual traffic shifting
+- Database migration coordination
+- Zero-downtime updates
+- Rollback capabilities
+
+### 4. Development Efficiency
+- Easy local/cloud switching
+- Reduced boilerplate code
+- Consistent interfaces
+- Rapid prototyping
+
+## Extending Nacos Tools
+
+Add new tool types easily:
+
+```python
+# 1. Create implementation
+from nacos_tools.tools.cache.base import CacheBase, register_cache
+
+@register_cache("memcached")
+class MemcachedCache(CacheBase):
+    def __init__(self, **kwargs):
+        self.client = MemcachedClient(kwargs['host'], kwargs['port'])
+    
+    async def get(self, key):
+        return await self.client.get(key)
+    
+    async def set(self, key, value, ttl=None):
+        return await self.client.set(key, value, exptime=ttl)
+
+# 2. Configure in Nacos
+# CACHE_TYPE=memcached
+# MEMCACHED_HOST=localhost
+# MEMCACHED_PORT=11211
+```
+
+## Best Practices
+
+1. **Always use tool proxies** - Never access tool instances directly
+2. **Handle connection failures** - Implement retry logic in critical paths
+3. **Monitor configuration changes** - Log config updates for debugging
+4. **Resource cleanup** - Always close connections on shutdown
+5. **Test configuration changes** - Verify hot reload works in staging
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details
+
+## Links
+
+- [Documentation](https://github.com/oscarou1992/nacos_tools/tree/master/docs)
+- [PyPI Package](https://pypi.org/project/nacos-tools/)
+- [Issue Tracker](https://github.com/oscarou1992/nacos_tools/issues)
+- [Nacos Official Site](https://nacos.io/)
