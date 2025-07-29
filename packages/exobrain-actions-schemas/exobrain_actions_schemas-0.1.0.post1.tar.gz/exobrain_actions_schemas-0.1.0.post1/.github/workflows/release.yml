@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🚨 Check that this is not a pre-release tag
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ (rc|alpha|beta|a|b)[0-9]*$ ]]; then
+            echo "Pre-release tag detected: ${GITHUB_REF_NAME}. Canceling the workflow."
+            exit 1
+          fi
+
+      - name: 🐍 Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: ⚡ Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.20"
+
+      - name: 📦 Build distribution
+        run: uv build
+
+      - name: 🧐 Check distribution with Twine
+        run: uv run twine check dist/*
+
+      - name: 🚀 Upload to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: uv run twine upload --repository pypi -u __token__ -p $PYPI_TOKEN dist/*
