@@ -1,0 +1,93 @@
+[project]
+name = "namecheap-python"
+version = "1.0.3"
+description = "A friendly Python SDK for Namecheap API"
+authors = [{name = "Adrian Galilea Delgado", email = "adriangalilea@gmail.com"}]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+keywords = ["namecheap", "domains", "dns", "api", "sdk"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: Name Service (DNS)",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+# Core dependencies only
+dependencies = [
+    "httpx>=0.27.0",
+    "pydantic>=2.5.0",
+    "python-dotenv>=1.0.0",
+    "xmltodict>=0.13.0",
+    "tldextract>=5.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/adriangalilea/namecheap-python"
+Repository = "https://github.com/adriangalilea/namecheap-python"
+Issues = "https://github.com/adriangalilea/namecheap-python/issues"
+
+[project.optional-dependencies]
+cli = [
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "PyYAML>=6.0.0",
+    "platformdirs>=4.0.0",
+]
+tui = [
+    "textual>=0.47.0",
+]
+all = [
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "PyYAML>=6.0.0",
+    "platformdirs>=4.0.0",
+    "textual>=0.47.0",
+]
+dev = [
+    "ruff>=0.7.0",
+]
+
+[project.scripts]
+namecheap-cli = "namecheap_cli:main"
+namecheap-dns-tui = "namecheap_dns_tui:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/namecheap", "src/namecheap_cli", "src/namecheap_dns_tui"]
+
+[tool.ruff]
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "F",     # pyflakes
+    "I",     # isort
+    "B",     # flake8-bugbear
+    "UP",    # pyupgrade
+    "N",     # pep8-naming
+    "S",     # flake8-bandit
+    "C4",    # flake8-comprehensions
+    "RET",   # flake8-return
+    "SIM",   # flake8-simplify
+]
+# Ignore line length
+extend-ignore = ["E501"]
+ignore = [
+    "S101",    # Use of assert detected - reasonable for tests and validation
+    "SIM110",  # Use any() - no current violations, keeping for edge cases
+    "SIM118",  # Use `key in dict` instead of `key in dict.keys()` - no current violations
+]
+
+
+
