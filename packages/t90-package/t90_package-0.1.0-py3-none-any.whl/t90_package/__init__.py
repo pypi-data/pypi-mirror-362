@@ -1,0 +1,1 @@
+from .main_code import guess_the_number
