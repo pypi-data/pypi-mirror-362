@@ -1,0 +1,115 @@
+site_name: Eunomia
+
+repo_name: whataboutyou-ai/eunomia
+repo_url: https://github.com/whataboutyou-ai/eunomia
+
+copyright: Copyright &copy; 2025 - Eunomia authors
+
+theme:
+  name: material
+  logo: assets/logo-owl.png
+  favicon: assets/logo-owl.png
+  palette:
+    primary: white
+  font:
+    text: Inter
+    code: Source Code Pro
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.expand
+    - navigation.sections
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.top
+    - content.code.copy
+    - content.tabs.link
+    - announce.dismiss
+  custom_dir: docs/overrides
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      noclasses: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/whataboutyou-ai/eunomia
+      name: eunomia on GitHub
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/TyhGZtzg3G
+      name: community on Discord
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/eunomia-ai/
+      name: eunomia on PyPi
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_root_heading: true
+            heading_level: 3
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Welcome to Eunomia: get_started/index.md
+      - Installation: get_started/installation.md
+      - Quickstart: get_started/quickstart.md
+      - User Guide:
+          - How Eunomia works: get_started/user_guide/index.md
+          - Run the Eunomia Server: get_started/user_guide/run_server.md
+          - Create a Policy: get_started/user_guide/create_policies.md
+          - Register an Entity: get_started/user_guide/register_entities.md
+          - Update and Delete an Entity: get_started/user_guide/upd_del_entities.md
+          - Check Permissions at Runtime: get_started/user_guide/check_permissions.md
+  - Docs:
+      - Documentation: api/index.md
+      - Eunomia:
+          - Eunomia Docs: api/main/index.md
+          - API: api/main/api.md
+      - Eunomia Core:
+          - Eunomia Core Docs: api/core/index.md
+          - Schemas: api/core/schemas.md
+      - SDKs:
+          - Eunomia SDKs: api/sdks/index.md
+          - Python SDK: api/sdks/python.md
+          - TypeScript SDK: api/sdks/typescript.md
+      - Extensions:
+          - Eunomia Extensions: api/extensions/index.md
+          - MCP Authz Middleware: api/extensions/mcp.md
+          - LangChain: api/extensions/langchain.md
+  - Community:
+      - Join the Community: community/index.md
+      - How to Contribute: community/contribute.md
+      - License: community/license.md
