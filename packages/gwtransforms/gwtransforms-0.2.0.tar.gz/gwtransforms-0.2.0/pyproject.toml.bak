@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gwtransforms"
+authors = [
+  { name = "Bernardo Veronese", email = "bernardopveronese@gmail.com" },
+]
+description = "Coordinate and parameter transformations for gravitational-wave related calculations."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.11"
+keywords = []
+license = { file = "LICENSE" }
+classifiers = ["Programming Language :: Python :: 3"]
+#dynamic = ["dependencies", "version"]
+dynamic = ["version"]
+dependencies = ["numpy", "astropy"]
+
+[project.urls]
+Homepage = "https://github.com/binado/gwtransforms"
+
+[project.optional-dependencies]
+jax = ['jax']
+autograd = ['autograd']
+symbolic = ['sympy']
+ci = ['pytest']
+dev = ['pytest', 'ruff', 'pre-commit', 'nb-clean', 'gwtransforms[symbolic]']
+
+[tool.setuptools.packages.find]
+include = ['gwtransforms*']
+
+# [tool.setuptools.dynamic]
+# dependencies = { file = ["requirements.txt"] }
+
+# pyproject.toml
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["test"]
+
+[tool.ruff.lint]
+select = ["TID252"]
+fixable = ["ALL"]

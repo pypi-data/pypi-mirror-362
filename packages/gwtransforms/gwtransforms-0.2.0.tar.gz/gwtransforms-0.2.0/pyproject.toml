@@ -1,0 +1,59 @@
+[project]
+name = "gwtransforms"
+authors = [
+  { name = "Bernardo Veronese", email = "bernardopveronese@gmail.com" },
+]
+version = "0.2.0"
+description = "Coordinate and parameter transformations for gravitational-wave related calculations."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "astropy[recommended]>=7.1.0",
+    "numpy>=2.3.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.urls]
+Homepage = "https://github.com/binado/gwtransforms"
+
+[project.optional-dependencies]
+symbolic = [
+    "sympy>=1.14.0",
+]
+dataframe = [
+    "pandas>=2.3.0",
+    "pandas-stubs>=2.2.3.250527",
+]
+dataarray = [
+    "xarray>=2025.6.1",
+]
+
+[tool.ruff.lint]
+select = ["TID252"]
+fixable = ["ALL"]
+
+[tool.uv.sources]
+gwtransforms = { workspace = true }
+
+[dependency-groups]
+symbolic = [
+    "gwtransforms[symbolic]"
+]
+dev = [
+    "pytest>=8.4.1",
+    "nb-clean>=4.0.1",
+    "pre-commit>=4.2.0",
+    "ruff>=0.12.0",
+    "mypy>=1.16.1",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --doctest-modules"
+testpaths = ["test", "gwtransforms"]
+
+[tool.uv]
+default-groups = ["dev", "symbolic"]

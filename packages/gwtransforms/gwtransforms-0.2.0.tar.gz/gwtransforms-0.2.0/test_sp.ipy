@@ -1,0 +1,53 @@
+# coding: utf-8
+import sympy as sp
+import numpy as np
+x = sp.symbols("x")
+exp = sp.Matrix([1, x])
+exp_fn = sp.lambdify([x], exp, modules="numpy")
+exp_fn_vec = np.vectorize(exp_fn)
+x = np.ones((100,))
+exp_fn_vec(x)
+%save -r test_sp 1-11
+import sympy as sp
+import numpy as np
+x = sp.symbols("x")
+exp = sp.Matrix([1, x])
+exp_fn = sp.lambdify([x], exp, modules="numpy")
+exp_fn_vec = np.vectorize(exp_fn)
+x = np.ones((100,))
+exp_fn_vec(x)
+exp.tolist()
+exp_fn = sp.lambdify([x], exp, modules=None)
+x = sp.symbols("x")
+exp_fn = sp.lambdify([x], exp, modules=None)
+x_arr = np.ones((100,))
+exp_fn_arr = np.vectorize(exp_fn)(x_arr)
+exp_fn(1)
+exp_fn(3)
+type(exp_fn(3))
+exp_fn = sp.lambdify([x], exp.tolist(), modules=["math", "cmath", "mpmath"])
+exp_fn(3)
+exp
+exp_fn = sp.lambdify([x], exp.tolist())
+exp_fn(3)
+type(exp_fn(3))
+exp_fn = sp.lambdify([x], exp.tolist()), modules="numpy")
+exp_fn = sp.lambdify([x], exp.tolist(), modules="numpy")
+type(exp_fn(3))
+type(exp_fn(3))
+exp_fn(np.ones((3,)))
+from sympy.utilities.iterables import flatten
+help(flatten)
+ans = exp_fn(np.ones((3,)))
+ans
+flatten(ans)
+help(flatten)
+flatten(ans, cls=list)
+np.broadcast_arrays(flatten(ans, cls=list))
+np.broadcast_arrays(*flatten(ans, cls=list))
+np.stack(*flatten(ans, cls=list))
+np.stack(flatten(ans, cls=list), axis=-1)
+np.stack(np.broadcast_arrays(flatten(ans, cls=list)), axis=-1)
+np.stack(np.broadcast_arrays(*flatten(ans, cls=list)), axis=-1)
+!ls
+%save -r -a test_sp 1-36
