@@ -1,0 +1,192 @@
+Metadata-Version: 2.4
+Name: ansys-dyna-core
+Version: 0.9.0
+Summary: Python interface to LS-DYNA Service
+Keywords: Ansys,LS-DYNA,gRPC
+Author-email: "ANSYS, Inc." <pyansys.core@ansys.com>
+Maintainer-email: "ANSYS, Inc." <pyansys.core@ansys.com>
+Requires-Python: >=3.10,<4
+Description-Content-Type: text/x-rst
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+License-File: LICENSE
+Requires-Dist: ansys-dpf-core>=0.7.2
+Requires-Dist: ansys-api-dyna==0.4.2
+Requires-Dist: ansys-tools-path>=0.6.0
+Requires-Dist: hollerith>=0.6.0
+Requires-Dist: numpy>=1
+Requires-Dist: pandas>=2.0
+Requires-Dist: appdirs>=1.4.4
+Requires-Dist: transformations==2025.1.1
+Requires-Dist: chardet==5.2.0
+Requires-Dist: requests==2.32.4
+Requires-Dist: ansys-platform-instancemanagement~=1.0 ; extra == "all"
+Requires-Dist: pyvista>=0.43.4 ; extra == "all"
+Requires-Dist: Jinja2 ; extra == "all"
+Requires-Dist: Jinja2 ; extra == "codegen"
+Requires-Dist: recommonmark==0.7.1 ; extra == "doc"
+Requires-Dist: matplotlib==3.10.3 ; extra == "doc"
+Requires-Dist: imageio==2.37.0 ; extra == "doc"
+Requires-Dist: imageio-ffmpeg==0.6.0 ; extra == "doc"
+Requires-Dist: numpydoc==1.9.0 ; extra == "doc"
+Requires-Dist: Sphinx==8.2.1 ; extra == "doc"
+Requires-Dist: sphinx-autobuild==2024.10.3 ; extra == "doc"
+Requires-Dist: sphinx-design==0.6.1 ; extra == "doc"
+Requires-Dist: sphinxcontrib-websupport==2.0.0 ; extra == "doc"
+Requires-Dist: pytest-sphinx==0.6.3 ; extra == "doc"
+Requires-Dist: sphinx-notfound-page==1.1.0 ; extra == "doc"
+Requires-Dist: sphinx-copybutton==0.5.2 ; extra == "doc"
+Requires-Dist: sphinx-gallery==0.19.0 ; extra == "doc"
+Requires-Dist: sphinx-autodoc-typehints==3.1.0 ; extra == "doc"
+Requires-Dist: ansys-sphinx-theme==1.5.3 ; extra == "doc"
+Requires-Dist: pypandoc==1.15 ; extra == "doc"
+Requires-Dist: nbsphinx==0.9.6 ; extra == "doc"
+Requires-Dist: ipywidgets==8.1.7 ; extra == "doc"
+Requires-Dist: joblib==1.5.1 ; extra == "doc"
+Requires-Dist: scikit-learn==1.7.0 ; extra == "doc"
+Requires-Dist: ipython==8.37.0 ; extra == "doc"
+Requires-Dist: jupyterlab==4.4.4 ; extra == "doc"
+Requires-Dist: sphinx-jinja==2.0.2 ; extra == "doc"
+Requires-Dist: sphinx-autoapi==3.6.0 ; extra == "doc"
+Requires-Dist: pyvista==0.45.2 ; extra == "doc"
+Requires-Dist: pyvista>=0.43.4 ; extra == "graphics"
+Requires-Dist: ansys-platform-instancemanagement~=1.0 ; extra == "pim"
+Requires-Dist: matplotlib==3.10.3 ; extra == "tests"
+Requires-Dist: numpy==2.2.6 ; extra == "tests"
+Requires-Dist: pytest==8.4.1 ; extra == "tests"
+Requires-Dist: pytest-cov==6.2.1 ; extra == "tests"
+Requires-Dist: joblib==1.5.1 ; extra == "tests"
+Requires-Dist: pandas==2.3.0 ; extra == "tests"
+Requires-Dist: openpyxl==3.1.5 ; extra == "tests"
+Requires-Dist: scikit-learn==1.7.0 ; extra == "tests"
+Requires-Dist: pytest-xdist==3.8.0 ; extra == "tests"
+Requires-Dist: ipython==8.37.0 ; extra == "tests"
+Requires-Dist: pyvista==0.45.2 ; extra == "tests"
+Project-URL: Documentation, https://dyna.docs.pyansys.com
+Project-URL: Homepage, https://dyna.docs.pyansys.com
+Project-URL: Source, https://github.com/ansys/pydyna
+Project-URL: Tracker, https://github.com/ansys/pydyna/issues
+Provides-Extra: all
+Provides-Extra: codegen
+Provides-Extra: doc
+Provides-Extra: graphics
+Provides-Extra: pim
+Provides-Extra: tests
+
+PyDYNA
+======
+
+.. readme_start
+
+|pyansys| |python| |pypi| |GH-CI| |codecov| |MIT| |black| |Ask DeepWiki|
+
+.. |pyansys| image:: https://img.shields.io/badge/Py-Ansys-ffc107.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAABDklEQVQ4jWNgoDfg5mD8vE7q/3bpVyskbW0sMRUwofHD7Dh5OBkZGBgW7/3W2tZpa2tLQEOyOzeEsfumlK2tbVpaGj4N6jIs1lpsDAwMJ278sveMY2BgCA0NFRISwqkhyQ1q/Nyd3zg4OBgYGNjZ2ePi4rB5loGBhZnhxTLJ/9ulv26Q4uVk1NXV/f///////69du4Zdg78lx//t0v+3S88rFISInD59GqIH2esIJ8G9O2/XVwhjzpw5EAam1xkkBJn/bJX+v1365hxxuCAfH9+3b9/+////48cPuNehNsS7cDEzMTAwMMzb+Q2u4dOnT2vWrMHu9ZtzxP9vl/69RVpCkBlZ3N7enoDXBwEAAA+YYitOilMVAAAAAElFTkSuQmCC
+   :target: https://docs.pyansys.com/
+   :alt: PyAnsys
+
+.. |python| image:: https://img.shields.io/pypi/pyversions/ansys-dyna-core?logo=pypi
+   :target: https://pypi.org/project/ansys-dyna-core/
+   :alt: Python
+
+.. |pypi| image:: https://img.shields.io/pypi/v/ansys-dyna-core.svg?logo=python&logoColor=white
+   :target: https://pypi.org/project/ansys-dyna-core
+   :alt: PyPI
+
+.. |codecov| image:: https://codecov.io/gh/ansys/ansys-dyna-core/branch/main/graph/badge.svg
+   :target: https://codecov.io/gh/ansys/pydyna
+   :alt: Codecov
+
+.. |GH-CI| image:: https://github.com/ansys/pydyna/actions/workflows/ci_cd_pr.yml/badge.svg
+   :target: https://github.com/ansys/pydyna/actions/workflows/ci_cd_pr.yml
+   :alt: GH-CI
+
+.. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
+   :target: https://opensource.org/licenses/MIT
+   :alt: MIT
+
+.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg?style=flat
+   :target: https://github.com/psf/black
+   :alt: Black
+
+.. |Ask DeepWiki| image:: https://deepwiki.com/badge.svg
+   :target: https://deepwiki.com/ansys/pydyna
+   :alt: Ask DeepWiki
+
+Overview
+========
+PyDYNA is a Pythonic package for providing a more convenient and complete way to
+build an Ansys DYNA input deck, submit it to the Ansys LS-DYNA solver, and
+finally postprocess the results.
+
+PyDYNA contains three submodules, ``ansys.dyna.core.pre``, ``ansys.dyna.core.solver``, and ``ansys.dyna.core.run``.
+
+- ``pre``: This module provides highly abstracted APIs for creating and
+  setting up DYNA input decks. There are many classes supported, namely,
+  DynaMech, DynaIGA, DynaICFD, DynaSALE, DynaEM,DynaNVH, DynaMaterial,
+  DynaISPH, DynaICFD and DynaAirbag. Each of these classes can be used to generate
+  LS-DYNA keywords. Since these classes have high-level abstraction, each function call
+  generates groups of keywords needed to define an input in LS-DYNA.
+- ``solver``: This API provides features to interact directly with the Ansys LS-DYNA solver.
+  LS-DYNA is primarily a batch solver with very limited interactive capabilities, the
+  ``solver`` service provides a way to push input files to the LS-DYNA solver, monitor the state
+  of the running job, change the value of a load curve and finally retrieve result files back from
+  the server
+- ``run``: This module provides the ability to start the LS-DYNA solver. This does not require any
+  client-server library or Docker container.
+
+Once you have results, you can use the Ansys Data Processing Framework (DPF),
+which is designed to provide numerical simulation users and engineers
+with a toolbox for accessing and transforming simulation data. DPF
+can access data from Ansys solver files and from several files with neutral formats,
+including CSV, HDF5, and VTK. Using DPF's various operators,
+you can manipulate and transform this data.
+
+The `ansys-dpf-post package <https://github.com/ansys/pydpf-post>`_ provides
+a simplified Python interface to DPF, thus enabling rapid postprocessing
+without ever leaving a Python environment. For more information on DPF-Post,
+see the `DPF-Post documentation <https://post.docs.pyansys.com>`_.
+
+Documentation and issues
+========================
+Documentation for the latest stable release of PyDyna is hosted at `PyDYNA documentation
+<https://dyna.docs.pyansys.com/version/stable//>`_.
+
+For examples on how to use PyDYNA, see `Examples <https://dyna.docs.pyansys.com/version/stable/examples/index.html>`_
+in the PyDYNA documentation.
+
+In the upper right corner of the documentation's title bar, there is an option for switching from
+viewing the documentation for the latest stable release to viewing the documentation for the
+development version or previously released versions.
+
+On the `PyDYNA Issues <https://github.com/ansys/pydyna/issues>`_ page, you can create issues to
+report bugs and request new features. On the `PyDYNA Discussions <https://github.com/ansys/pydyna/discussions>`_
+page or the `Discussions <https://discuss.ansys.com/>`_ page on the Ansys Developer portal,
+you can post questions, share ideas, and get community feedback.
+
+To reach the project support team, email `pyansys.core@ansys.com <pyansys.core@ansys.com>`_.
+
+License
+=======
+PyDYNA is licensed under the MIT license.
+
+PyDYNA makes no commercial claim over Ansys whatsoever. This library extends the functionality of
+Ansys LS-DYNA by adding a Python interface to LS-DYNA without changing the core behavior or
+license of the original software. The use of the interactive control of PyDYNA requires a legally
+licensed local copy of LS-DYNA.
+
+For more information on LS-DYNA, see the
+`Ansys LS-DYNA <https://www.ansys.com/products/structures/ansys-ls-dyna>`_
+page on the Ansys website.
+
+.. LINKS AND REFERENCES
+.. _pip: https://pypi.org/project/pip/
+.. _PyAnsys Developer's Guide: https://dev.docs.pyansys.com/
+
