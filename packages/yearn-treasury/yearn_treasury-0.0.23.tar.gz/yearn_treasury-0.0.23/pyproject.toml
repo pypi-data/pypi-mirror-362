@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "yearn-treasury"
+version = "0.0.23"
+description = "This WIP library runs the eth-portfolio and dao-treasury exporters for the Yearn Finance treasury."
+authors = ["Bob The Buidler <you@example.com>"]
+packages = [{ include = "yearn_treasury/*" }]
+
+[build-system]
+requires = ["setuptools", "wheel", "mypy[mypyc]==1.17.0", "tomli>=2.0.0; python_version < '3.11'", "types-requests"]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry.scripts]
+yearn-treasury = "yearn_treasury.main:main"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+dao-treasury = ">=0.0.40,<0.1"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "*"
+types-requests = "*"
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "*"
+sphinx-rtd-theme = "*"
+myst-parser = "*"
+
+[tool.mypy]
+exclude = ["build/","cache/","env/", "tests/", "setup.py"]
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hypothesis
+  | \.mypy_cache
+  | \.pytest_cache
+  | \.venv
+  | cache
+  | dist
+  | env
+)/
+'''
