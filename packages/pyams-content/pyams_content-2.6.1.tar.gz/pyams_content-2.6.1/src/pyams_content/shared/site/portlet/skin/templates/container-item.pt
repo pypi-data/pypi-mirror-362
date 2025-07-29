@@ -1,0 +1,37 @@
+<tal:var define="target view.url;
+				 renderer_settings view.view.renderer_settings;"
+		 i18n:domain="pyams_content">
+	<div class="my-3 d-flex flex-column flex-md-row position-relative mb-4">
+		<tal:if define="illustration view.illustration"
+				condition="renderer_settings.display_illustrations and illustration">
+			<a class="mr-md-3 px-0"
+			   href="${target}">
+				<tal:if define="image i18n:illustration.data;
+								alt_title i18n:illustration.alt_title;
+								selections view.view.renderer_settings.thumb_selection;"
+						condition="image">
+					${structure:tales:picture(image,
+											  selections=selections,
+											  alt=alt_title, css_class='result_media w-100')}
+				</tal:if>
+			</a>
+		</tal:if>
+		<div class="w-100">
+			<a class="stretched-link"
+			   href="${target}">
+				<h4>${view.title}</h4>
+			</a>
+			<div class="breadcrumbs position-relative">
+				${structure:tales:breadcrumbs(context)}
+			</div>
+			<div class="header"
+				 tal:define="header view.header"
+				 tal:condition="header">
+				${structure:header}
+			</div>
+			<div class="tags position-relative">
+				${structure:tales:tags(context)}
+			</div>
+		</div>
+	</div>
+</tal:var>

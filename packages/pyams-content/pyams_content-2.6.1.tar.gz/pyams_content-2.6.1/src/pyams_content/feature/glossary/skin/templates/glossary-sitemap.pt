@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+		tal:define="url tales:absolute_url(request.root)">
+	<tal:loop repeat="term context.terms.values()">
+		<url tal:condition="term.status == 'published'">
+			<loc>${url}/get-glossary-term-page.html?term=${term.label}</loc>
+			<lastmod>${tales:timestamp(term, 'iso')}</lastmod>
+		</url>
+	</tal:loop>
+</urlset>

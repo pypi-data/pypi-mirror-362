@@ -1,0 +1,19 @@
+<tal:var define="settings view.settings" i18n:domain="pyams_content">
+	${structure:view.get_setting(settings, 'title')}
+	${structure:view.get_setting(settings, 'allow_empty_query')}
+	${structure:view.get_setting(settings, 'force_canonical_url')}
+	<small><strong i18n:translate="">First search results sample:</strong> </small>
+	<ul class="mb-0"
+		tal:define="global count 0;
+					(count, aggregations, items) settings.get_items(request, limit=10, ignore_cache=True);">
+		<li class="text-truncated"
+		    tal:repeat="item items">
+			<span>${i18n:item.title}</span>
+			<span>(${tales:oid(item)})</span>
+		</li>
+		<li tal:condition="not:count"
+			i18n:translate="">
+			No result found.
+		</li>
+	</ul>
+</tal:var>

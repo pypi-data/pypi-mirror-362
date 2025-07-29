@@ -1,0 +1,34 @@
+<h2 tal:define="title i18n:context.title"
+	tal:condition="title">
+	${title}
+</h2>
+<div class="row">
+	<div class="col-2">
+		<ul class="nav nav-tabs flex-column"
+		     id="nav-${tales:cache_key(context)}"
+		     role="tablist">
+			<li tal:repeat="paragraph view.get_paragraphs()"
+				role="presentation">
+				<button id="nav-tab-${tales:cache_key(paragraph)}"
+						class="nav-link ${'active' if repeat['paragraph'].start() else ''} w-100"
+						data-toggle="tab"
+						data-target="#nav-panel-${tales:cache_key(paragraph)}"
+						aria-controls="nav-panel-${tales:cache_key(paragraph)}"
+						aria-selected="${'true' if repeat['paragraph'].start() else 'false'}">
+					${i18n:paragraph.title}
+				</button>
+			</li>
+		</ul>
+	</div>
+	<div class="col-10">
+		<div class="tab-content">
+			<div tal:repeat="renderer view.renderers"
+				 role="tabpanel"
+				 class="tab-pane fade ${'show active' if repeat['renderer'].start() else ''} p-2"
+				 id="nav-panel-${tales:cache_key(renderer.context)}"
+				 aria-labelledby="nav-tab-${tales:cache_key(renderer.context)}">
+				${structure:renderer.render(template_name='group:tab')}
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,21 @@
+<section class="ams-form"
+         i18n:domain="pyams_content">
+    <h2 class="bg-secondary-modal d-flex flex-wrap pl-3 py-2-modal"
+        tal:define="title view.title"
+        tal:condition="title">
+        <a tal:define="back_url view.back_url | nothing"
+           tal:condition="back_url"
+           class="mr-1"
+           href="${back_url}" data-ams-target="${getattr(view, 'back_url_target', '#content')}">
+            <i class="fas fa-fw fa-backward hint"
+               data-original-title="Back to previous page"
+               i18n:attributes="data-original-title"></i>
+        </a>
+        <span tal:condition="title.startswith('<')"
+              class="flex-grow-1">${structure:title}</span>
+        <span tal:condition="not:title.startswith('<')"
+              class="flex-grow-1" i18n:translate="">${title}</span>
+        <i tal:omit-tag="">${structure:provider:pyams.toolbar}</i>
+    </h2>
+    ${structure:view.medias_view.render()}
+</section>

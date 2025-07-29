@@ -1,0 +1,58 @@
+<div class="d-flex flex-column frame my-3 pt-3 border by-1 bx-3 border-secondary rounded"
+	tal:define="items view.attachments;
+				(has_attachments, attachments) tales:boolean_iter(items);
+				items view.links;
+				(has_links, links) tales:boolean_iter(items);
+				renderer_style view.description_format + chr(59) + 'glossary';"
+	tal:condition="has_attachments or has_links">
+	<div tal:condition="has_attachments"
+		 class="d-flex flex-row">
+		<div class="svg-container icon">
+			<img class="mt-n3 px-3"
+				 src="/--static--/pyams/css/img/download.svg"
+				 alt="" />
+		</div>
+		<div class="d-flex flex-column">
+			<div tal:repeat="item attachments">
+				<tal:var define="item_info view.get_link_info(item);
+								 description i18n:item.description;
+								 data i18n:item.data;">
+					<p class="d-flex flex-column">
+						<tal:if condition="description">
+							${structure:tales:html(description, renderer_style)}
+							<br tal:condition="view.description_format == 'text'" />
+						</tal:if>
+						<a tal:define="href_data tales:absolute_url(data);"
+						   href="${href_data}" target="_blank">
+							${item_info.user_title}
+						</a>
+					</p>
+				</tal:var>
+			</div>
+		</div>
+	</div>
+	<div tal:condition="has_links"
+		 class="d-flex flex-row">
+		<div class="svg-container icon">
+			<img class="mt-n3 p-3"
+				 src="/--static--/pyams/css/img/link.svg"
+				 alt="" />
+		</div>
+		<div class="d-flex flex-column links">
+			<div tal:repeat="link links">
+				<div tal:define="link_info view.get_link_info(link);
+								 description i18n:link.description;
+								 pictogram link.pictogram;">
+					<tal:if condition="description">
+						${structure:tales:html(description, renderer_style)}
+						<br tal:condition="view.description_format == 'text'" />
+					</tal:if>
+					<a class="d-block"
+					   tal:define="href link.get_url(request);
+								   target None if (href.startswith('mailto:') or href.startswith(request.application_url)) else '_blank'"
+					   href="${href}" target="${target}">${link_info.user_title}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

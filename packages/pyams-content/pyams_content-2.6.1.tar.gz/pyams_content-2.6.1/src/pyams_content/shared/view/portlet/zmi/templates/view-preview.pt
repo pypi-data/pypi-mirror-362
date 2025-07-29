@@ -1,0 +1,23 @@
+<tal:var define="settings view.settings"
+         i18n:domain="pyams_content">
+    ${structure:view.get_setting(settings, 'title')}
+    <small><strong i18n:translate="">Views list:</strong></small>
+    <ul class="mb-0"
+        tal:define="global count 0">
+        <li class="text-truncated"
+            tal:repeat="settings_view settings.get_views()">
+            ${structure:view.get_setting(settings_view, 'title', converter='text_with_oid')}
+            <tal:var define="global count count+1" />
+        </li>
+        <li class="text-truncate"
+            tal:condition="not:count"
+            i18n:translate="">(no selected view)</li>
+    </ul>
+    ${structure:view.get_setting(settings, 'views_context')}
+    ${structure:view.get_setting(settings, 'views_merge_mode')}
+    ${structure:view.get_setting(settings, 'limit')}
+    ${structure:view.get_setting(settings, 'start')}
+    ${structure:view.get_setting(settings, 'force_canonical_url')}
+    ${structure:view.get_setting(settings, 'exclude_from_search')}
+    ${structure:view.get_setting(settings, 'first_page_only')}
+</tal:var>

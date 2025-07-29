@@ -1,0 +1,66 @@
+<fieldset class="border mx-1 mx-sm-2 mx-md-3"
+		  i18n:domain="pyams_content">
+	<legend i18n:translate="">Available QRCodes</legend>
+	<div class="form-group widget-group row">
+		<label for="form-widgets-content-url"
+		       class="col-form-label text-sm-right col-sm-3 col-md-4 ">
+			<span i18n:translate="">Content public URL</span>
+		</label>
+		<div class="col-sm-9 col-md-8">
+			<div class="form-widget">
+				<div class="input-group"
+				     data-ams-modules="clipboard"
+				     data-target-input="nearest">
+					<input id="form-widgets-content-url"
+					       type="text"
+						   class="form-control text-widget textline-field"
+						   disabled
+						   value="${view.content_url}"/>
+					<div class="input-group-append">
+						<div class="input-group-text hint"
+							 data-original-title="Copy value to clipboard"
+							 data-ams-click-handler="MyAMS.clipboard.copyText"
+							 data-ams-clipboard-target="#form-widgets-content-url"
+							 i18n:attributes="data-original-title">
+							<i class="far fa-clipboard"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="alert alert-info margin-10 padding-10">
+		<p><i18n:var translate="">QR codes are available in PNG and SVG formats.</i18n:var><br />
+			<i18n:var translate="">SVG format is to be preferred for high size printings.</i18n:var></p>
+	</div>
+	<div class="form-group d-flex flex-column flex-md-row mx-0 justify-content-center">
+		<fieldset class="col col-md-6 border mt-0 mr-md-1 pb-2">
+			<legend i18n:translate="">PNG format</legend>
+			<img class="w-100"
+				 alt="QR code in PNG format"
+				 title="QR code in PNG format"
+				 src="${tales:absolute_url(context)}/qrcode.png"
+				 i18n:attributes="alt; title;" />
+			<div class="text-center">
+				<a class="btn btn-sm btn-primary"
+				   target="download_window"
+				   href="${tales:absolute_url(context)}/qrcode.png?download=1"
+				   i18n:translate="">Download...</a>
+			</div>
+		</fieldset>
+		<fieldset class="col col-md-6 border mt-md-0 ml-md-1 pb-2">
+			<legend i18n:translate="">SVG format</legend>
+			<img class="w-100"
+				 alt="QR code in SVG format"
+				 title="QR code in SVG format"
+				 src="${tales:absolute_url(context)}/qrcode.svg"
+				 i18n:attributes="alt; title;" />
+			<div class="text-center">
+				<a class="btn btn-sm btn-primary"
+				   target="download_window"
+				   href="${tales:absolute_url(context)}/qrcode.svg?download=1"
+						 i18n:translate="">Download...</a>
+			</div>
+		</fieldset>
+	</div>
+</fieldset>

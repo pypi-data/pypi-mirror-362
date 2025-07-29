@@ -1,0 +1,31 @@
+<div class="logos"
+	 tal:define="items context.get_logos();
+				 (has_items, logos) tales:boolean_iter(items);"
+	 tal:condition="has_items">
+	<h2 tal:define="title i18n:context.title"
+		tal:condition="title">
+		${title}
+	</h2>
+	<div class="d-flex justify-content-around">
+		<tal:loop repeat="logo logos">
+			<div class="col-3 col-sm-2 d-flex flex-column text-center"
+				 tal:condition="logo is not None">
+				<a tal:define="image i18n:logo.image;
+							   url view.get_url(logo);"
+				   tal:omit-tag="not:url"
+				   href="${url}" title="${logo.get_title(request)}">
+					${structure:tales:picture(image,
+											  xl_thumb='square', xl_width=2,
+											  lg_thumb='square', lg_width=2,
+											  md_thumb='square', md_width=2,
+											  sm_thumb='square', sm_width=2,
+											  xs_thumb='square', xs_width=3)}
+				</a>
+				<small class="text-dark pt-2">
+					${logo.get_title(request)}
+				</small>
+			</div>
+		</tal:loop>
+	</div>
+	<div class="clearfix"></div>
+</div>

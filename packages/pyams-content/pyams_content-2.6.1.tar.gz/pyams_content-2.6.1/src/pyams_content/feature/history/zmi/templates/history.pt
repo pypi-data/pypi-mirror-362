@@ -1,0 +1,9 @@
+<div class="p-2">
+	<tal:loop repeat="comment view.history.values()">
+		<tal:if condition="comment.comment">
+			<strong>${view.get_principal(comment)}</strong> - ${view.get_timestamp(comment)}<br />
+			<p class="mb-1">${structure:tales:html(comment.comment)}</p>
+			<hr class="my-1" tal:condition="not:repeat.comment.end()" />
+		</tal:if>
+	</tal:loop>
+</div>

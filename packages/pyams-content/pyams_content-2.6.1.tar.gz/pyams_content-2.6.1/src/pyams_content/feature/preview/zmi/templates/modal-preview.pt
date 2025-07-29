@@ -1,0 +1,20 @@
+<div class="modal-dialog ${view.modal_class | ''}">
+	<div class="modal-content ${view.modal_content_class | ''}">
+		<div class="modal-header">
+			<div tal:define="header provider:pyams.header"
+				 tal:condition="header">
+				<i tal:omit-tag="">${structure:provider:pyams.header}</i>
+			</div>
+			<button type="button" class="close"
+					data-dismiss="modal" aria-label="Close">
+				<i class="far fa-times-circle" aria-hidden="true"></i>
+			</button>
+		</div>
+		<div class="modal-body p-0">
+			<iframe src="${tales:absolute_url(context, 'preview.html')}"
+					frameborder="0" style="width: 100%;"
+					onload="this.style.height = (MyAMS.$(parent.window).height() - 50) + 'px'"></iframe>
+			<i tal:omit-tag="">${structure:provider:pyams.footer}</i>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,36 @@
+<tal:var define="settings view.settings" i18n:domain="pyams_content">
+	${structure:view.get_setting(settings, 'title')}
+	<small><strong i18n:translate="">Navigation menus:</strong></small>
+	<ul class="mb-0">
+		<li class="text-truncate"
+			tal:repeat="menu settings.menus.values()">
+			<i class="fa-fw ${menu.icon_class if menu.visible else 'far fa-eye-slash text-danger'} hint"
+			   title="${menu.icon_hint}"></i>
+			${i18n:menu.title}
+			<tal:if condition="menu.reference">
+				(<i class="fa fas fa-right-long"></i>
+				 <i tal:define="link_info view.get_link_info(menu)"
+					tal:omit-tag="">
+					${link_info.user_title}
+					<i tal:condition="menu.dynamic_menu"
+					   class="fa fab fa-elementor hint"
+					   title="Dynamic menu" i18n:attributes="title"></i>
+				</i>)
+			</tal:if>
+			<ul class="mb-0"
+				tal:define="values menu.links.values();
+							(has_links, links) tales:boolean_iter(values);"
+				tal:condition="has_links">
+				<li class="text-truncate"
+					tal:repeat="link links">
+					<i class="fa-fw ${link.icon_class if link.visible else 'far fa-eye-slash text-danger'} hint"
+					   title="${link.icon_hint}"></i>
+					<i tal:omit-tag=""
+					   tal:define="link_info view.get_link_info(link)">
+						${link_info.user_title}
+					</i>
+				</li>
+			</ul>
+		</li>
+	</ul>
+</tal:var>

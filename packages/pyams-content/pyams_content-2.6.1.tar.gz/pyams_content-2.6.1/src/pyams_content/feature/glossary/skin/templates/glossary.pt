@@ -1,0 +1,35 @@
+<div class="modal-content my-3" i18n:domain="pyams_content">
+	<div class="modal-header">
+		<h3 class="modal-title">
+			${view.title}
+		</h3>
+	</div>
+	<div class="modal-body no-padding">
+		<div class="modal-viewport">
+			<div class="col-md-12"
+				 tal:define="description view.glossary.description"
+				 tal:condition="description">
+				${structure:tales:html(description, 'markdown')}
+			</div>
+			<div class="columns-1 columns-sm-2 columns-lg-3 columns-xl-4"
+				 tal:define="global previous None">
+				<tal:loop repeat="term view.glossary.terms.values()">
+					<tal:var define="label term.alt or term.label;
+									 first label[0].upper();"
+							 condition="term.status == 'published'">
+						<h4 class="mt-3 mb-1 px-3"
+							tal:condition="first != previous">
+							${first}
+						</h4>
+						<span data-term="${term.label}"
+							  class="mw-100 d-block thesaurus-term text-nowrap text-truncate">
+							${term.alt or term.label}
+						</span>
+						<tal:var define="global previous label[0].upper()" />
+					</tal:var>
+				</tal:loop>
+				<div class="clearfix spacer"></div>
+			</div>
+		</div>
+	</div>
+</div>

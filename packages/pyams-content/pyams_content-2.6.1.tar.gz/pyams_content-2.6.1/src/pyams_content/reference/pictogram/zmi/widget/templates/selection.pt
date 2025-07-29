@@ -1,0 +1,74 @@
+<div class="row pictograms-manager px-3" i18n:domain="pyams_content"
+	 tal:define="js tales:resource_path('pyams_content.zmi:content_js')"
+	 data-ams-modules='{"content": "${js}"}'>
+	<fieldset class="border col-md-5">
+		<legend class="inner" i18n:translate="">Available pictograms</legend>
+		<div class="height-300px pictograms available-pictograms vp-y mouse-pointer">
+			<div class="pictogram border-bottom p-2 clearfix"
+				 data-ams-events-handlers='{
+					"dblclick": "MyAMS.content.pictograms.switchPictogram"
+				 }'
+				 tal:repeat="pictogram view.available_pictograms">
+				<input type="hidden" data-ams-pictogram-name="${view.name}"
+					   value="${pictogram.__name__}" />
+				<div class="float-right mr-1">
+					<a class="mouse-pointer"
+					   data-toggle="modal"
+					   data-ams-url="${tales:absolute_url(pictogram, 'properties.html')}">
+						<i class="fa fa-fw fa-search hint opaque baseline"
+						   data-ams-hint-gravity="se" data-ams-hint-offset="3"
+						   title="Display pictogram properties" i18n:attributes="title"></i>
+					</a>
+					<a class="action mouse-pointer"
+					   data-ams-click-handler="MyAMS.content.pictograms.switchPictogram">
+						<i class="fa fa-fw fa-arrow-right hint opaque baseline"
+						   data-ams-hint-gravity="se" data-ams-hint-offset="3"
+						   title="Switch pictogram selection" i18n:attributes="title"></i>
+					</a>
+				</div>
+				<div class="w-50px text-center float-left mr-2">
+					<tal:var define="img i18n:pictogram.image"
+							 condition="img">
+						${structure:tales:thumbnail(img, 48, 48)}
+					</tal:var>
+				</div>
+				<span>${i18n:pictogram.title}</span>
+			</div>
+		</div>
+	</fieldset>
+	<fieldset class="border col-md-6 ml-3 mt-0">
+		<legend class="inner" i18n:translate="">Selected pictograms</legend>
+		<div class="sortable visible-placeholder visible-helper height-300px pictograms selected-pictograms vp-y mouse-pointer">
+			<div class="pictogram border-bottom p-2 clearfix"
+				 data-ams-events-handlers='{
+				 	"dblclick": "MyAMS.content.pictograms.switchPictogram"
+				 }'
+				 tal:repeat="pictogram view.selected_pictograms">
+				<input type="hidden" name="${view.name}"
+					   value="${pictogram.__name__}" />
+				<div class="float-right mr-1">
+					<a class="mouse-pointer"
+					   data-toggle="modal"
+					   data-ams-url="${tales:absolute_url(pictogram, 'properties.html')}">
+						<i class="fa fa-fw fa-search hint opaque baseline"
+						   data-ams-hint-gravity="se" data-ams-hint-offset="3"
+						   title="Display pictogram properties" i18n:attributes="title"></i>
+					</a>
+					<a class="action mouse-pointer"
+					   data-ams-click-handler="MyAMS.content.pictograms.switchPictogram">
+						<i class="fa fa-fw fa-arrow-left hint opaque baseline"
+						   data-ams-hint-gravity="se" data-ams-hint-offset="3"
+						   title="Switch pictogram selection" i18n:attributes="title"></i>
+					</a>
+				</div>
+				<div class="w-50px text-center float-left mr-2">
+					<tal:var define="img i18n:pictogram.image"
+							 condition="img">
+						${structure:tales:thumbnail(img, 48, 48)}
+					</tal:var>
+				</div>
+				<span>${i18n:pictogram.title}</span>
+			</div>
+		</div>
+	</fieldset>
+</div>

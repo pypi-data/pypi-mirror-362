@@ -1,0 +1,16 @@
+<tal:var define="settings view.settings" i18n:domain="pyams_content">
+	${structure:view.get_setting(settings, 'title')}
+	${structure:view.get_setting(settings, 'lead')}
+	<small><strong i18n:translate="">Verbatim list:</strong></small>
+	<ul class="mb-0">
+		<li tal:repeat="verbatim settings.values()">
+			<div class="text-truncate">
+				<i tal:condition="not:verbatim.visible"
+				   class="far fa-eye-slash text-danger hint"
+				   title="Hidden element" i18n:attributes="title"></i>
+				<tal:if define="title i18n:verbatim.title"
+						condition="title">${title}: </tal:if><i tal:define="quote i18n:verbatim.quote">${view.html_to_text(quote) or '--'}</i>
+			</div>
+		</li>
+	</ul>
+</tal:var>

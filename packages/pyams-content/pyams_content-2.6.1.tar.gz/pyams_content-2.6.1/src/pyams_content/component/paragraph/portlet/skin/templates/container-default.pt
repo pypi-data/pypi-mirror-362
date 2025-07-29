@@ -1,0 +1,51 @@
+<div class="edito"
+	 tal:condition="view.renderers">
+	<tal:var define="settings view.settings">
+		<h2 tal:define="title i18n:settings.title"
+			tal:condition="title">
+			${title}
+		</h2>
+		<tal:loop repeat="renderer view.renderers">
+			<tal:if condition="renderer is not None">
+				<a id="part_${tales:cache_key(renderer.context)}"></a>
+				${structure:renderer.render(view.template_name)}
+			</tal:if>
+		</tal:loop>
+		<tal:if condition="settings.reference">
+			<div tal:define="label i18n:settings.button_label"
+				 tal:condition="label"
+				 class="col-md-12 text-center">
+				<a href="${tales:relative_url(settings.target)}">
+					<div class="btn btn-default">
+						${label}
+					</div>
+				</a>
+			</div>
+		</tal:if>
+		<tal:if condition="settings.display_navigation_links">
+			<tal:var define="(previous, next) view.get_navigation_links()"
+					 condition="(previous is not None) or (next is not None)">
+				<nav aria-label="Previous and next topics" i18n:attributes="aria-label">
+					<ul class="pagination justify-content-between">
+						<li class="page-item">
+							<a class="page-link"
+							   href="${tales:relative_url(previous.context)}"
+							   tal:condition="previous is not None">
+								<span aria-hidden="true">&larr;</span>
+								${i18n:previous.title}
+							</a>
+						</li>
+						<li class="page-item">
+							<a class="page-link"
+							   href="${tales:relative_url(next.context)}"
+							   tal:condition="next is not None">
+								${i18n:next.title}
+								<span aria-hidden="true">&rarr;</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</tal:var>
+		</tal:if>
+	</tal:var>
+</div>

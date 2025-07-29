@@ -1,0 +1,64 @@
+<div i18n:domain="pyams_content"
+	 tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 start int(request.params.get('start', 0));
+				 limit (start + renderer_settings.page_size) if renderer_settings.paginate else settings.limit;
+				 items settings.get_items(request, start, renderer_settings.page_size, limit);
+				 total_count next(items);
+				 aggregations next(items);
+				 (has_items, results) tales:boolean_iter(items);"
+	 tal:condition="has_items">
+	<h3 tal:define="title i18n:settings.title"
+		tal:condition="title"
+		class="position-relative border-bottom pb-2 mt-4">
+		${title}
+		<span class="position-absolute underline"></span>
+	</h3>
+	<tal:var define="visible_filters renderer_settings.get_visible_filters();
+					 (has_filters, filters) tales:boolean_iter(visible_filters);
+					 global count 0;">
+		<div tal:condition="has_filters"
+			 class="${renderer_settings.filters_css_class}">
+			${structure:provider:filters_default(renderer_settings=renderer_settings, aggregations=aggregations)}
+		</div>
+		<div tal:omit-tag="not:has_filters"
+			 class="${renderer_settings.results_css_class}">
+			<div class="summary summary-masonry ${renderer_settings.get_css_class()}">
+				<tal:loop repeat="item results">
+					<tal:var define="global count count+1">
+						${structure:view.render_item(item, 'masonry')}
+					</tal:var>
+				</tal:loop>
+			</div>
+		</div>
+	</tal:var>
+	<nav aria-label="Pagination" i18n:attributes="aria-label"
+		 tal:condition="renderer_settings.paginate">
+		<ul class="pagination justify-content-between">
+			<ul class="pagination w-100 justify-content-between">
+				<li class="page-item">
+					<a tal:condition="start > 0"
+					   class="page-link"
+					   data-ams-search-params='{
+							"start": ${start - renderer_settings.page_size}
+					   }'
+					   href="PyAMS_search.changePage">
+						<span aria-hidden="true">&larr;</span>
+						<i18n:var translate="">Previous page</i18n:var>
+					</a>
+				</li>
+				<li class="page-item">
+					<a tal:condition="start + count < total_count"
+					   class="page-link"
+					   data-ams-search-params='{
+							"start": ${start + count}"
+					   }'
+					   href="PyAMS_search.changePage">
+						<i18n:var translate="">Next page</i18n:var>
+						<span aria-hidden="true">&rarr;</span>
+					</a>
+				</li>
+			</ul>
+		</ul>
+	</nav>
+</div>

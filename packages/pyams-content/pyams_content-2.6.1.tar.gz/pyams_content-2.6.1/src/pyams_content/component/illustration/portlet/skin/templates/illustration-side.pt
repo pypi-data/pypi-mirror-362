@@ -1,0 +1,61 @@
+<div class="illustration px-0"
+	 tal:define="renderer_settings view.renderer_settings;
+				 illustration view.illustration;"
+	 tal:condition="illustration and illustration.has_data()"
+	 i18n:domain="pyams_content">
+	<div class="position-relative"
+		 tal:define="image i18n:illustration.data">
+		<a tal:define="thumbnails tales:thumbnails(image);
+					   target thumbnails.get_thumbnail('800x600');
+					   alt_title i18n:illustration.alt_title;
+					   selections renderer_settings.thumb_selection;"
+		   tal:omit-tag="not:renderer_settings.zoom_on_click"
+		   href="${tales:absolute_url(target)}"
+		   data-toggle="${'modal' if renderer_settings.zoom_on_click else None}"
+		   data-target="#illustration_${tales:cache_key(illustration)}">
+			${structure:tales:picture(image,
+									  selections=selections,
+									  alt=alt_title)}
+			<ul class="d-flex m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+				tal:define="title i18n:illustration.title;
+							author illustration.author;"
+				tal:condition="title or author">
+				<li tal:condition="title" data-separator="/">${title}</li>
+				<li tal:condition="author" data-separator="/">© ${author}</li>
+			</ul>
+		</a>
+		<div class="modal fade" aria-hidden="true"
+			 id="illustration_${tales:cache_key(illustration)}"
+			 tal:condition="renderer_settings.zoom_on_click">
+			<div class="modal-dialog modal-dialog-scrollable modal-lg">
+				<div class="modal-content">
+					<div class="modal-header py-2">
+						<h6 class="modal-title">
+							${i18n:illustration.title}
+						</h6>
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body p-0">
+						<div class="position-relative">
+							${structure:tales:picture(image, alt=alt_title)}
+							<ul class="d-flex flex-nowrap m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+								tal:define="title i18n:illustration.title;
+											author illustration.author;"
+								tal:condition="title or author">
+								<li tal:condition="title" data-separator="/">${title}</li>
+								<li tal:condition="author" data-separator="/">© ${author}</li>
+							</ul>
+						</div>
+					</div>
+					<p class="description my-1 px-2 text-secondary small"
+					   tal:define="description i18n:illustration.description"
+					   tal:condition="description">
+						${structure:tales:html(description)}
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

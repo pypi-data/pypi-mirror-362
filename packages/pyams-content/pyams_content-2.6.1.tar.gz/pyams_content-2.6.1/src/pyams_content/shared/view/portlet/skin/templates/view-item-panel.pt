@@ -1,0 +1,39 @@
+<tal:var define="target view.url;
+				 renderer_settings view.view.renderer_settings;"
+		 i18n:domain="pyams_content">
+	<div class="col my-3 d-flex flex-column">
+		<div class="d-none d-sm-block"
+			 tal:define="illustration tales:pyams_illustration(context)"
+			 tal:condition="renderer_settings.display_illustrations and illustration">
+			<a href="${target}">
+				<tal:if define="image i18n:illustration.data;
+								alt_title i18n:illustration.alt_title;
+								selections view.view.renderer_settings.thumb_selection;"
+						condition="image">
+					${structure:tales:picture(image,
+											  selections=selections,
+											  alt=alt_title,
+											  css_class='result_media')}
+				</tal:if>
+			</a>
+		</div>
+		<div tal:define="button_title i18n:renderer_settings.button_title">
+			<a href="${target}">
+				<h4 class="mt-2">${view.title}</h4>
+			</a>
+			<a href="${target}"
+			   tal:define="header view.header"
+			   tal:condition="header">
+				<div class="header text-body">
+					${structure:header}
+				</div>
+			</a>
+			<div tal:condition="button_title">
+				<a class="btn btn-light border see-all mt-2"
+				   href="${target}">
+					${button_title}
+				</a>
+			</div>
+		</div>
+	</div>
+</tal:var>
