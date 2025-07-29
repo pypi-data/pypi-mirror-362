@@ -1,0 +1,80 @@
+<section class="rounded-lg ${getattr(view, 'section_class', '')}"
+		 tal:omit-tag="getattr(view, 'hide_section', False)"
+		 data-ams-modules="form menu plugins"
+		 i18n:domain="pyams_app_msc">
+	<h2 class="bg-secondary-modal d-flex flex-wrap pl-3 py-2-modal"
+		tal:define="title view.title"
+		tal:condition="title">
+		<a tal:define="back_url view.back_url | nothing"
+		   tal:condition="back_url"
+		   class="mr-1"
+		   href="${back_url}" data-ams-target="${getattr(view, 'back_url_target', '#content')}">
+			<i class="fas fa-fw fa-backward hint"
+			   data-original-title="Back to previous page"
+			   i18n:attributes="data-original-title"></i>
+		</a>
+		<span tal:condition="title.startswith('<')"
+			  class="flex-grow-1">${structure:title}</span>
+		<span tal:condition="not:title.startswith('<')"
+			  class="flex-grow-1" i18n:translate="">${title}</span>
+		<i tal:omit-tag="">${structure:provider:pyams.toolbar}</i>
+	</h2>
+	<div class="d-flex flex-wrap calendar-wrapper pb-3"
+		 tal:define="js tales:resource_path('pyams_app_msc.zmi:msc')"
+		 data-ams-modules='{
+			"msc": {
+				"src": "${js}"
+			}
+		 }'
+		 data-ams-callback="MyAMS.msc.calendar.afterInit">
+		<tal:loop repeat="room view.rooms">
+			<div tal:define="can_view view.can_view_bookings;
+							 can_edit view.can_edit_planning;"
+				 class="col d-flex flex-column mt-3 mh-400px w-100 calendar-parent position-relative">
+				<h3>
+					<span class="btn px-1 py-0 mouse-pointer"
+						  data-ams-click-handler="MyAMS.msc.calendar.switchDisplay">
+						<i class="fas fa-fw fa-angle-right"></i>
+					</span>
+					${room.name}
+					<span class="small" i18n:translate="">
+						(<i18n:var name="capacity">${room.capacity}</i18n:var> seats)
+					</span>
+				</h3>
+				<div tal:condition="can_view or can_edit"
+					 id="eventMenu"
+					 class="dropdown-menu"
+					 role="menu">
+					<a tal:condition="can_view"
+					   class="dropdown-item small" tabindex="-1"
+					   href="MyAMS.msc.calendar.manageEventBookings">
+						<i class="fas fa-fw fa-ticket-alt"></i>
+						<i18n:var translate="">Manage event booking...</i18n:var>
+					</a>
+					<div tal:condition="can_view and can_edit"
+						 class="dropdown-divider"></div>
+					<a tal:condition="can_edit"
+					   class="dropdown-item small" tabindex="-1"
+					   href="MyAMS.msc.calendar.changeEventActivity">
+						<i class="fab fa-fw fa-dropbox"></i>
+						<i18n:var translate="">Assign to catalog activity...</i18n:var>
+					</a>
+					<a tal:condition="can_edit"
+					   class="dropdown-item small" tabindex="-1"
+					   href="MyAMS.msc.calendar.cloneEvent">
+						<i class="fas fa-fw fa-copy"></i>
+						<i18n:var translate="">Clone event...</i18n:var>
+					</a>
+				</div>
+				<div class="calendar"
+					 data-options="${view.get_calendar_options(room)}"
+					 data-msc-room="${room.__name__}"
+					 data-msc-editable="${can_edit}"
+					 data-ams-events-handlers='{
+						"before-init.ams.calendar": "MyAMS.msc.calendar.initCalendar",
+						"after-init.ams.calendar": "MyAMS.msc.calendar.afterInitCalendar"
+					 }'></div>
+			</div>
+		</tal:loop>
+	</div>
+</section>

@@ -1,0 +1,57 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+enum BookingStatus {
+   request
+
+}
+
+class MovieTheater {
+   str name
+   [Principal] managers
+}
+
+class CinemaRoom {
+   str name
+   int capacity
+}
+
+class WfSharedContent {
+}
+
+class Activity {
+}
+
+class Session {
+   CinemaRoom room
+}
+
+class Booking {
+   BookingStatus status
+   Principal principal
+}
+
+class Principal {
+   id str
+   title str
+}
+
+class CustomerInfo {
+}
+
+
+Persistent <|-- MovieTheater
+Contained <|-- MovieTheater
+UserSkinnableContentMixin <|-- MovieTheater
+
+MovieTheater *-- CinemaRoom
+
+Principal *-- CustomerInfo
+
+WfSharedContent <|-- Activity
+Activity *-- Session
+
+Session *-- Booking
+
+
+@enduml
