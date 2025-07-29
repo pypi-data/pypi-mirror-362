@@ -1,0 +1,384 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+]
+
+[project]
+name = "acb"
+version = "0.19.1"
+description = "ACB: Asynchronous Component Base"
+readme = "README.md"
+license.text = "BSD-3-CLAUSE"
+authors = [
+    { name = "lesleslie", email = "les@wedgwoodwebworks.com" },
+]
+requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: AsyncIO",
+    "Framework :: Pydantic",
+    "Framework :: Pydantic :: 2",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "acb[cache,dns,ftpd,monitoring,nosql,requests,secret,smtp,storage]",
+    "aioconsole>=0.8.1",
+    "anyio>=4.9",
+    "arrow>=1.3",
+    "attrs>=25.3",
+    "bevy>=2.0.2",
+    "blake3>=1.0.5",
+    "brotli>=1.1",
+    "devtools>=0.12.2",
+    "dill>=0.4",
+    "google-api-python-client>=2.176",
+    "google-crc32c>=1.7.1",
+    "icecream>=2.1.5",
+    "inflection>=0.5.1",
+    "loguru>=0.7.3",
+    "msgspec[toml,yaml]",
+    "nest-asyncio>=1.6",
+    "pydantic[email]>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "pyfiglet>=1.0.3",
+    "pyyaml>=6.0.2",
+    "redis-om>=0.3.5",
+    "sqlalchemy>=2.0.41",
+    "sqlalchemy-utils>=0.41.2",
+    "sqlmodel>=0.0.24",
+    "toml>=0.10.2",
+    "tomli-w>=1.2",
+    "uuid-utils>=0.11",
+]
+
+optional-dependencies.all = [
+    "acb[cache,dns,ftpd,models,monitoring,nosql,requests,secret,smtp,sql,storage]",
+]
+optional-dependencies.api = [
+    "acb[cache,nosql,requests,monitoring,secret]",
+]
+optional-dependencies.cache = [
+    "aiocache[redis]>=0.12.3",
+    "coredis>=4.24",
+    "logfire[redis]>=3.24",
+]
+optional-dependencies.cloud-native = [
+    "acb[cache,sql,storage,secret,monitoring,dns]",
+]
+optional-dependencies.dataplatform = [
+    "acb[sql,nosql,storage,monitoring]",
+]
+optional-dependencies.demo = [
+    "faker>=37.4",
+]
+optional-dependencies.dns = [
+    "google-cloud-dns>=0.35.1",
+    "python-cloudflare>=1.0.1",
+    "validators>=0.35",
+]
+optional-dependencies.ftpd = [
+    "aioftp>=0.26.2",
+    "asyncssh>=2.21",
+]
+optional-dependencies.gcp = [
+    "acb[dns,secret,nosql,storage]",
+]
+optional-dependencies.microservice = [
+    "acb[cache,requests,monitoring,secret]",
+]
+optional-dependencies.minimal = [
+    "acb[cache,requests]",
+]
+optional-dependencies.models = [
+    "attrs>=25.3",
+    "msgspec>=0.19",
+    "redis-om>=0.3.5",
+    "sqlalchemy>=2.0.41",
+    "sqlmodel>=0.0.24",
+]
+optional-dependencies.monitoring = [
+    "logfire[system-metrics]>=3.24",
+    "sentry-sdk[loguru]>=2.32",
+]
+optional-dependencies.nosql = [
+    "beanie>=1.30",
+    "google-cloud-firestore>=2.21",
+    "motor>=3.7.1",
+    "redis-om>=0.3.5",
+]
+optional-dependencies.requests = [
+    "hishel>=0.1.3",
+    "httpx[http2]>=0.28.1",
+    "logfire[httpx]>=3.24",
+    "niquests>=3.14.1",
+    "sentry-sdk[httpx]>=2.32",
+]
+optional-dependencies.secret = [
+    "google-cloud-secret-manager>=2.24",
+    "infisicalsdk>=1.0.9",
+]
+optional-dependencies.smtp = [
+    "mailgun>=1.1",
+]
+optional-dependencies.sql = [
+    "aiomysql>=0.2",
+    "aiosqlite>=0.21",
+    "babel>=2.17",
+    "greenlet>=3.2.3",
+    "logfire[sqlalchemy]>=3.24",
+    "pymysql>=1.1.1",
+    "sentry-sdk[sqlalchemy]>=2.32",
+    "sqlalchemy>=2.0.41",
+    "sqlalchemy-libsql>=0.2",
+    "sqlalchemy-utils>=0.41.2",
+    "sqlmodel>=0.0.24",
+]
+optional-dependencies.storage = [
+    "adlfs>=2024.12",
+    "fsspec>=2025.1",
+    "gcsfs>=2025.5.1",
+    "s3fs>=2025.5.1",
+]
+optional-dependencies.webapp = [
+    "acb[cache,sql,storage,requests,monitoring]",
+]
+urls.Documentation = "https://github.com/lesleslie/acb"
+urls.Homepage = "https://github.com/lesleslie/acb"
+urls.Repository = "https://github.com/lesleslie/acb"
+
+[dependency-groups]
+dev = [
+    "complexipy>=3.2",
+    "crackerjack>=0.22.8",
+    "pre-commit>=4.2",
+    "pyright>=1.1.403",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1",
+    "pytest-benchmark>=5.1",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+    "pytest-timeout>=2.4",
+    "pyyaml>=6.0.2",
+    "refurb>=2.1",
+    "ruff>=0.12.3",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+fix = true
+unsafe-fixes = true
+show-fixes = true
+output-format = "full"
+
+format.docstring-code-format = true
+lint.extend-select = [
+    "C901",
+    "D",
+    "F",
+    "I",
+    "UP",
+]
+lint.ignore = [
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+    "E402",
+    "F821",
+    "UP040",
+]
+lint.fixable = [
+    "ALL",
+]
+lint.unfixable = [  ]
+lint.isort.no-lines-before = [
+    "first-party",
+]
+lint.mccabe.max-complexity = 13
+lint.pydocstyle.convention = "google"
+
+[tool.codespell]
+skip = "*/data/*"
+quiet-level = 3
+ignore-words-list = "crate,uptodate,nd,nin"
+
+[tool.pyproject-fmt]
+column_width = 120
+indent = 4
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+testpaths = [
+    "tests",
+    "acb",
+]
+python_classes = [
+    "Test*",
+]
+python_functions = [
+    "test_*",
+]
+markers = [
+    "unit: marks test as a unit test",
+    "benchmark: mark test as a benchmark (disables parallel execution)",
+    "integration: marks test as an integration test",
+]
+timeout = 300
+timeout_method = "thread"
+addopts = "--cov=acb --cov-report=term --cov-fail-under=42"
+filterwarnings = [
+    "ignore::pytest_benchmark.logger.PytestBenchmarkWarning",
+]
+
+[tool.pytest.benchmark]
+disable_gc = true
+warmup = false
+warmup_iterations = 0
+min_rounds = 1
+max_time = 5.0
+
+[tool.coverage.run]
+branch = false
+source = [
+    "acb",
+]
+data_file = ".coverage"
+parallel = false
+omit = [
+    "*/tests/*",
+    "*/site-packages/*",
+    "*/__pycache__/*",
+    "*/__init__.py",
+    "*/_version.py",
+    "*/conftest.py",
+    "*/test_*.py",
+    "*/_test.py",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+    "except ImportError",
+    "def __str__",
+    "@abstractmethod",
+]
+ignore_errors = false
+
+[tool.pyright]
+verboseOutput = true
+include = [
+    "acb",
+]
+exclude = [
+    "acb/actions/handle/__init__.py",
+    "scratch",
+]
+extraPaths = [
+    ".venv/lib/python3.13/site-packages/",
+]
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+reportOptionalMemberAccess = false
+reportOptionalCall = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportInvalidTypeForm = false
+reportUnknownLambdaType = false
+reportUnknownParameterType = "warning"
+reportMissingParameterType = "warning"
+reportAttributeAccessIssue = "warning"
+reportUnusedFunction = "warning"
+reportUndefinedVariable = "warning"
+reportMissingTypeArgument = "warning"
+reportPrivateUsage = false
+pythonVersion = "3.13"
+
+[tool.creosote]
+paths = [
+    "acb",
+]
+deps-file = "pyproject.toml"
+exclude-deps = [
+    "pydantic-settings",
+    "google-api-python-client",
+    "uv",
+    "autotyping",
+    "google-crc32c",
+    "inflection",
+    "uuid-utils",
+    "attrs",
+    "pytest-timeout",
+    "tomli-w",
+    "hatchling",
+    "keyring",
+    "pytest-cov",
+    "pyfiglet",
+    "pytest-asyncio",
+    "pytest-benchmark",
+    "pytest-xdist",
+    "pyyaml",
+    "pytest",
+    "pytest-mock",
+    "nest-asyncio",
+    "pre-commit",
+]
+
+[tool.refurb]
+enable_all = true
+quiet = true
+
+[tool.bandit]
+target = [
+    "acb",
+]
+skips = [
+    "B607",
+    "B301",
+    "B602",
+    "B311",
+    "B403",
+    "B704",
+    "B603",
+    "B105",
+    "B101",
+    "B106",
+    "B404",
+]
+
+[tool.vulture]
+min_confidence = 86
+paths = [
+    "acb",
+]
+ignore_names = [
+    "cls",
+]
+
+[tool.uv]
+keyring-provider = "subprocess"
+index-url = "https://pypi.org/simple/"
+publish-url = "https://upload.pypi.org/legacy/"
+check-url = "https://pypi.org/simple/"
