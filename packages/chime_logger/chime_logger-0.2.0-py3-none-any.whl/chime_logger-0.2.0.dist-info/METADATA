@@ -1,0 +1,120 @@
+Metadata-Version: 2.3
+Name: chime_logger
+Version: 0.2.0
+Summary: A python logger for CHIME/FRB with Loki support.
+License: MIT
+Author: Tarik Zegmott
+Author-email: tarik.zegmott@mcgill.ca
+Requires-Python: >=3.6,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: requests (>=2.27.1)
+Requires-Dist: rfc3339 (>=6.1)
+Requires-Dist: urllib3 (>=1.26.14,<2.0)
+Description-Content-Type: text/markdown
+
+<div align="center">
+    <img src="./static/CHIME_Logger_Logo.png" width="220", height="110">
+</div>
+
+<h1 align="center">CHIME Logger</h1>
+
+Chime Logger is a Python logging extension that provides emitters for sending logs to [Grafana Loki](https://grafana.com/oss/loki/) and a file, and custom logging filters for pipeline and event tagging. It is designed for easy integration with Python applications and supports advanced log shipping and tagging use cases. It runs asynchronously, making it suitable for high-performance applications.
+
+## Features
+
+- **Loki Emitters**: Send logs to Loki using different API versions (v0, v1, v2), with support for custom tags and HTTP headers.
+- **File Emitter**: Write logs to a local file for debugging and redundancy purposes.
+- **Custom Filters**: Automatically add default `pipeline` and `event` attributes to log records for consistent tagging.
+
+## Installation
+
+Install the package using pip:
+
+```bash
+pip install chime_logger
+```
+
+## Usage
+
+Once you have installed the package, you can use it in your Python application as follows:
+
+```python
+import chime_logger
+import logging
+
+chime_logger.setup_logging()
+
+chime_log = logging.getLogger("CHIME")
+
+chime_log.setLevel(logging.DEBUG)
+
+chime_log.debug("This is a debug message", extra={"pipeline": "example_pipeline", "event": "example_event"})
+chime_log.info("This is an info message", extra={"pipeline": "example_pipeline", "event": "example_event"})
+chime_log.error("This is an error message", extra={"pipeline": "example_pipeline", "event": "example_event"})
+chime_log.warning("This is a warning message", extra={"pipeline": "example_pipeline", "event": "example_event"})
+```
+
+To avoid having to set the `pipeline` in each log call, see [Configuration] section below for how to set a default pipeline name using environment variables.
+
+Additionally, you can use the `LoggerAdapter` to add context to your log messages. This allows you to dynamically change the context for different parts of your application without modifying the logger configuration. An example of using `LoggerAdapter` is shown below:
+
+```python
+import chime_logger
+import logging
+
+chime_logger.setup_logging()
+
+logger = logging.getLogger("CHIME")
+
+context = {'event': '1'}
+
+logger = logging.LoggerAdapter(logger, context)
+
+logger.info("This message should appear")
+# OUTPUT: 2025-07-09 15:38:18 [ pipeline=Testing event=1 ] This message should appear
+
+context['event'] = 300
+
+logger.info("This message should appear")
+# OUTPUT: 2025-07-09 15:38:38 [ pipeline=Testing event=300 ] This message should appear
+```
+
+### Configuration
+
+If you want to send logs to a custom Loki instance or modify the default parameters, configure the logger using these environment variables:
+
+- `CHIME_LOGGER_PIPELINE_NAME`: Name of the pipeline to attach to log records, by default it is set to "unknown_pipeline".
+  ```bash
+  export CHIME_LOGGER_PIPELINE_NAME="your-pipeline-name"
+  ```
+- `CHIME_LOGGER_LOKI_URL`: URL of your Loki instance
+  ```bash
+  export CHIME_LOGGER_LOKI_URL="http://your-loki-instance:3100"
+  ```
+- `CHIME_LOGGER_LOKI_TENANT`: (Optional) Tenant ID for multi-tenancy
+  ```bash
+  export CHIME_LOGGER_LOKI_TENANT="your-tenant-id"
+  ```
+- `CHIME_LOGGER_LOKI_USER` and `CHIME_LOGGER_LOKI_PASSWORD`: (Optional) Credentials for authentication
+  ```bash
+  export CHIME_LOGGER_LOKI_USER="your-username"
+  export CHIME_LOGGER_LOKI_PASSWORD="your-password"
+  ```
+- `CHIME_LOGGER_FILE_LOG_PATH`: (Optional) Path to a file where logs will be written. This is useful for local debugging.
+  ```bash
+  export CHIME_LOGGER_FILE_LOG_PATH="/path/to/your/logfile.log"
+  ```
+
+## License
+
+See [LICENSE](LICENSE) for details.
+
