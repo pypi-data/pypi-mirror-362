@@ -1,0 +1,31 @@
+{% if not append | deep_get(role, "internal.append") %}
+{% set meta = role.meta | default({}) %}
+# {{ meta.name.value | safe_join(" ") }}
+{% endif %}
+{% if description | deep_get(meta, "description.value") %}
+{% set description = [meta.description.value] if meta.description.value is string else meta.description.value %}
+
+{{ description | map("replace", "\n\n", "\n") | safe_join("\n") }}
+{% endif %}
+
+{#      TOC      #}
+{% include '_toc.j2' +%}
+
+{#      Requirements      #}
+{% include '_requirements.j2' %}
+
+{#      Vars      #}
+{% if options.tabulate_vars -%}
+{% include '_vars_tabulated.j2' %}
+{%- else -%}
+{% include '_vars.j2' %}
+{% endif -%}
+
+{#      Tag      #}
+{% include '_tag.j2' -%}
+
+{#      Todo      #}
+{% include '_todo.j2' -%}
+
+{#      Meta      #}
+{% include '_meta.j2' -%}
