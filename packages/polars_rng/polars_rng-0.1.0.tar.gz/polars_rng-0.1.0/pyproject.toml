@@ -1,0 +1,28 @@
+[project]
+name = "polars_rng"
+version = "0.1.0"
+description = "Random number generation as polars expressions"
+readme = "README.md"
+authors = [
+    { name = "Alistair Pattison", email = "alistairpattison@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "polars>=1.27.0",
+]
+
+[tool.maturin]
+module-name = "polars_rng._core"
+python-packages = ["polars_rng"]
+python-source = "python"
+# profile = "dev" # faster builds, turn off for release
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[dependency-groups]
+dev = [
+    "ipython>=8.18.1",
+    "pytest>=8.3.5",
+]
