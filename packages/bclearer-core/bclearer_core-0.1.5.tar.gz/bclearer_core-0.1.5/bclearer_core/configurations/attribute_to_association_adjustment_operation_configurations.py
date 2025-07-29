@@ -1,0 +1,51 @@
+from bclearer_core.common_knowledge.adjustment_operation_types import (
+    AdjustmentOperationTypes,
+)
+from bclearer_core.common_knowledge.attribute_to_associations_operation_subtypes import (
+    AttributeToAssociationOperationSubtypes,
+)
+from bclearer_core.configurations.adjustment_operation_configurations import (
+    AdjustmentOperationConfigurations,
+)
+from bclearer_core.configurations.load_hdf5_model_configurations import (
+    LoadHdf5ModelConfigurations,
+)
+from bclearer_interop_services.ea_interop_service.nf_ea_common.common_knowledge.ea_association_direction_types import (
+    EaAssociationDirectionTypes,
+)
+
+
+class AttributeToAssociationAdjustmentOperationConfigurations(
+    AdjustmentOperationConfigurations,
+):
+    def __init__(
+        self,
+        adjustment_operation_type: AdjustmentOperationTypes,
+        adjustment_universe_load_hdf5_model_configuration: LoadHdf5ModelConfigurations,
+        output_universe_short_name: str,
+        direction: EaAssociationDirectionTypes,
+        package_name: str,
+        # attribute_to_association_operation_subtype: AttributeToAssociationOperationSubtypes,
+    ):
+        super().__init__(
+            adjustment_operation_type=adjustment_operation_type,
+            adjustment_universe_load_hdf5_model_configuration=adjustment_universe_load_hdf5_model_configuration,
+            output_universe_short_name=output_universe_short_name,
+        )
+
+        self.direction = direction
+
+        self.package_name = package_name
+
+    #        self.attribute_to_association_operation_subtype = attribute_to_association_operation_subtype
+
+    def __enter__(self):
+        return self
+
+    def __exit__(
+        self,
+        exception_type,
+        exception_value,
+        traceback,
+    ):
+        pass

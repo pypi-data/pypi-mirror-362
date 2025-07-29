@@ -1,0 +1,13 @@
+UUIDS_COLUMN_NAME = "uuids"
+
+TUPLE_TYPE_IDS_COLUMN_NAME = (
+    "TupleTypeIds"
+)
+
+PLACED1_OBJECT_UUIDS_COLUMN_NAME = (
+    "Place1Uuids"
+)
+
+PLACED2_OBJECT_UUIDS_COLUMN_NAME = (
+    "Place2Uuids"
+)
