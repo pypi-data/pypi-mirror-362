@@ -1,0 +1,151 @@
+Metadata-Version: 2.4
+Name: teamcenter-mcp-server
+Version: 0.2.0
+Summary: MCP server for Teamcenter Knowledge Base with Azure AD and cookie authentication
+Author: Siemens Digital Industries Software
+License: MIT
+Project-URL: Homepage, https://github.com/siemens/teamcenter-mcp-server
+Project-URL: Bug Reports, https://github.com/siemens/teamcenter-mcp-server/issues
+Project-URL: Documentation, https://github.com/siemens/teamcenter-mcp-server#readme
+Keywords: mcp,teamcenter,siemens,ai,llm
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.104.1
+Requires-Dist: uvicorn>=0.24.0
+Requires-Dist: fastmcp>=0.1.0
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: requests>=2.28.0
+Requires-Dist: msal>=1.20.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+
+# CodeSentinel MCP Server
+
+A Model Context Protocol (MCP) server that connects AI coding assistants to Siemens Teamcenter Knowledge Base.
+
+## Quick Start
+
+### 1. Install Dependencies
+
+```bash
+# Using UV (recommended)
+uv sync
+
+# Or using pip
+pip install -r requirements.txt
+```
+
+### 2. Get Authentication
+
+Choose one method:
+
+#### Option A: Web Cookie (Easiest)
+1. Go to https://codesentinel.azurewebsites.net
+2. Login with your Siemens credentials
+3. Open DevTools (F12) → Application → Cookies
+4. Copy the `codesess` cookie value
+
+#### Option B: Azure AD Token
+```bash
+# Set your Azure AD config (get from admin)
+export AZURE_CLIENT_ID="your-client-id"
+export AZURE_TENANT_ID="your-tenant-id"
+
+# Get token
+uv run python auth_helper.py
+```
+
+### 3. Test the Connection
+
+```bash
+# Test with cookie
+export CODESESS_COOKIE="your-cookie-value"
+uv run pytest tests/test_mcp_integration.py -v -k "test_with_codesess_cookie"
+
+# Test with Azure token
+export AZURE_BEARER_TOKEN="your-token"
+uv run pytest tests/test_mcp_integration.py -v -k "test_real_api"
+```
+
+### 4. Configure VS Code / Continue.dev
+
+Add to `~/.continue/config.json`:
+
+```json
+{
+  "tools": [
+    {
+      "type": "mcp",
+      "title": "Teamcenter KB",
+      "transport": {
+        "type": "stdio",
+        "command": "uv",
+        "args": ["run", "python", "/path/to/auth_mcp_stdio_v2.py"],
+        "env": {
+          "TEAMCENTER_API_HOST": "https://codesentinel.azurewebsites.net",
+          "AZURE_CLIENT_ID": "your-client-id",
+          "AZURE_TENANT_ID": "your-tenant-id"
+        }
+      }
+    }
+  ]
+}
+```
+
+## Testing
+
+### Run All Tests
+```bash
+# Test against mock API (no auth needed)
+uv run pytest tests/
+
+# Test against real API (requires auth)
+export CODESESS_COOKIE="your-cookie"
+uv run pytest tests/test_mcp_integration.py
+```
+
+### Example Query
+```bash
+# Direct test of a specific query
+export CODESESS_COOKIE="your-cookie"
+uv run python -c "
+import asyncio
+from auth_mcp_stdio_v2 import search
+asyncio.run(search.fn('What file processes JSON requests?', 5))
+"
+```
+
+## Architecture
+
+- **auth_mcp_stdio_v2.py** - Main MCP server with Azure AD support
+- **main.py** - Mock API server for local testing
+- **tests/** - Comprehensive test suite
+
+## Security
+
+- NO credentials in code
+- All secrets via environment variables
+- Secure cookie/token handling
+- See SETUP_SECURE.md for details
+
+## Troubleshooting
+
+### "Connection refused"
+- For mock: Run `uv run uvicorn main:app`
+- For real API: Check your network/proxy
+
+### "Authentication failed"
+- Cookie expired: Get a fresh one from the web app
+- Token expired: Run `auth_helper.py` again
+
+### "Import too slow"
+- Normal on WSL2 with Windows mounts (13s vs 4s native)
+- VS Code timeout is 10s but usually works anyway
