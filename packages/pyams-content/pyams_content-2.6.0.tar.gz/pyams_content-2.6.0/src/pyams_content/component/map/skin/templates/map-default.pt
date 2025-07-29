@@ -1,0 +1,33 @@
+<div class="osmmap-container my-3"
+	 i18n:domain="pyams_content"
+	 tal:define="settings view.settings;
+				 configuration settings.configuration;">
+	<h2 tal:define="title i18n:context.title"
+		tal:condition="title">${title}</h2>
+	<div class="osmmap-wrapper"
+		 style="height: ${settings.map_height}px;">
+		<div id="osmmap_${tales:cache_key(context)}"
+			 class="osmmap-map w-100 h-100"
+			 data-map-configuration='${settings.get_map_configuration(context)}'></div>
+	</div>
+	<tal:if condition="settings.display_coordinates">
+		<tal:var define="position context.position"
+				 condition="position">
+			<div class="opsmap-location"
+				 tal:define="gps_position position.wgs_coordinates">
+				<div class="small mt-1">
+					<span i18n:translate="">GPS position:</span>
+					<a class="d-inline d-md-none"
+					   href="geo:${'{1:.8f},{0:.8f}'.format(gps_position.longitude, gps_position.latitude)}">
+						${'{1:.8f}, {0:.8f}'.format(gps_position.longitude, gps_position.latitude)}
+					</a>
+					<a class="d-none d-md-inline"
+					   href="https://www.google.com/maps/?q=${'{1:.8f}, {0:.8f}'.format(gps_position.longitude, gps_position.latitude)}"
+					   target="_blank">
+						${'{1:.8f}, {0:.8f}'.format(gps_position.longitude, gps_position.latitude)}
+					</a>
+				</div>
+			</div>
+		</tal:var>
+	</tal:if>
+</div>

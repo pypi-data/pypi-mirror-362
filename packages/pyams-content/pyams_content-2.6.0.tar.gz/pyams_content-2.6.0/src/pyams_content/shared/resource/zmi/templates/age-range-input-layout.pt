@@ -1,0 +1,17 @@
+<div class="form-group widget-group row">
+	<label for="${view.id}"
+	       class="col-form-label text-sm-right ${view.label_css_class | view.form.label_css_class | 'col-sm-3 col-md-4'} ${'required' if view.required and view.label else ''}">
+		${view.label}
+		<i tal:define="description view.field.description"
+		   tal:condition="description"
+		   class="fa fa-question-circle hint"
+		   data-original-title="${description}"></i>
+	</label>
+	<div class="${view.input_css_class | view.form.input_css_class | 'col-sm-9 col-md-8'}">
+		<i tal:omit-tag="">${structure:view.prefix.render() | ''}</i>
+		<div class="form-widget ${view.widget_css_class | view.form.widget_css_class | nothing}">
+			${structure:view.render()}
+		</div>
+		<i tal:omit-tag="">${structure:view.suffix.render() | ''}</i>
+	</div>
+</div>

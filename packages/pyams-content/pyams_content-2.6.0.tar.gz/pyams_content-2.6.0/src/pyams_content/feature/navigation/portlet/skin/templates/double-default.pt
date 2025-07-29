@@ -1,0 +1,58 @@
+<div class="tab-menus mb-3" i18n:domain="pyams_content"
+	 tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 menus list(settings.menus.get_visible_items(request));"
+	 tal:condition="menus">
+	<h3 tal:define="title i18n:settings.title"
+		tal:condition="title"
+		class="position-relative border-bottom pb-2 mt-4">
+		${title}
+		<span class="position-absolute underline"></span>
+	</h3>
+	<ul class="nav nav-tabs" role="tablist">
+		<li tal:repeat="menu menus"
+			class="nav-item" role="presentation">
+			<button tal:define="menu_key tales:cache_key(menu)"
+					type="button" role="tab"
+					id="tab_${menu_key}"
+					class="nav-link ${'active' if repeat.menu.start() else ''}"
+					data-toggle="tab" data-target="#panel_${menu_key}"
+					aria-selected="${'true' if repeat.menu.start() else 'false'}"
+					aria-controls="panel_${menu_key}">
+				${i18n:menu.title}
+			</button>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<tal:loop repeat="menu menus">
+			<div tal:define="menu_key tales:cache_key(menu)"
+				 class="tab-pane fade ${'show active' if repeat.menu.start() else ''} row row-cols-1 row-cols-sm-2 row-cols-md-3"
+				 id="panel_${menu_key}"
+				 role="tabpanel" aria-labelledby="tab_${menu_key}">
+				<div tal:define="selections renderer_settings.thumb_selection"
+					 tal:repeat="link menu.get_visible_items(request)"
+					 class="col my-3 d-flex flex-column">
+					<tal:var define="illustration tales:pyams_illustration(link);
+									 link_info view.get_link_info(link);">
+						<tal:if condition="illustration">
+							<a tal:define="img_data i18n:illustration.data;
+										   alt i18n:illustration.alt_title;"
+							   href="${link.get_url(request)}">
+								${structure:tales:picture(img_data,
+														  selections=selections,
+														  alt=alt)}
+							</a>
+						</tal:if>
+						<a class="caption"
+						   href="${link.get_url(request)}">
+							<h4 class="mt-2">${link_info.user_title}</h4>
+						</a>
+						<tal:var define="description i18n:link.description">
+							${structure:tales:html(description)}
+						</tal:var>
+					</tal:var>
+				</div>
+			</div>
+		</tal:loop>
+	</div>
+</div>

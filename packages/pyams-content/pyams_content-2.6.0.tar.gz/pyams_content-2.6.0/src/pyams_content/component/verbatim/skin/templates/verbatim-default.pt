@@ -1,0 +1,77 @@
+<div i18n:domain="pyams_content"
+	 tal:define="settings view.settings">
+	<h3 tal:define="title i18n:context.title"
+		tal:condition="title"
+		class="position-relative border-bottom pb-2 mt-4">
+		${title}
+		<span class="position-absolute underline"></span>
+	</h3>
+	<div tal:define="illustration tales:pyams_illustration(context)"
+		 class="lead frame my-3 px-3 border by-1 bx-5 border-secondary rounded text-secondary">
+		<div class="d-flex flex-row py-3">
+			<tal:if condition="illustration">
+				<div tal:define="image i18n:illustration.data"
+					 class="illustration col-md-2 col-sm-3 px-0 hidden-xs">
+					<a tal:define="thumbnails tales:thumbnails(image);
+								   target thumbnails.get_thumbnail('800x600');
+								   alt_title i18n:illustration.alt_title;
+								   selections view.illustration_selections;"
+					   href="${tales:absolute_url(target)}"
+					   data-toggle="modal"
+					   data-target="#illustration_${tales:cache_key(illustration)}">
+						${structure:tales:picture(image, selections=selections,
+												  alt=alt_title, css_class='w-100')}
+						<ul class="d-flex m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+							tal:define="title i18n:illustration.title;
+										author illustration.author;"
+							tal:condition="title or author">
+							<li tal:condition="title" data-separator="/">${title}</li>
+							<li tal:condition="author" data-separator="/">© ${author}</li>
+						</ul>
+					</a>
+					<div class="modal fade" aria-hidden="true"
+						 id="illustration_${tales:cache_key(illustration)}">
+						<div class="modal-dialog modal-dialog-scrollable modal-lg">
+							<div class="modal-content">
+								<div class="modal-header py-2">
+									<h6 class="modal-title">
+										${i18n:illustration.title}
+									</h6>
+									<button type="button" class="close" data-dismiss="modal">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body p-0">
+									<div class="position-relative">
+										${structure:tales:picture(image, alt='')}
+										<ul class="d-flex flex-nowrap m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+											tal:define="title i18n:illustration.title;
+														author illustration.author;"
+											tal:condition="title or author">
+											<li tal:condition="title" data-separator="/">${title}</li>
+											<li tal:condition="author" data-separator="/">© ${author}</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</tal:if>
+			<div class="d-flex flex-column"
+				 tal:define="quote i18n:context.quote"
+				 tal:condition="quote">
+				<div class="wrapper-quote">
+					<div class="quote">
+						${structure:tales:html(quote, 'oid_to_href;glossary')}
+					</div>
+					<div class="author text-reset mt-2 small">
+						<strong>${context.author}</strong><tal:if
+							condition="context.author and context.charge">, </tal:if>
+						${i18n:context.charge}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

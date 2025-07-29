@@ -1,0 +1,139 @@
+<div tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 start int(request.params.get('start', 0));
+				 length view.current_page_length;"
+	 tal:condition="settings.allow_empty_query or settings.has_user_query(request)"
+	 i18n:domain="pyams_content">
+	<h3 class="position-relative border-bottom pb-2 mt-4">
+		${i18n:settings.title}
+		<span class="position-absolute underline"></span>
+	</h3>
+	<form action="${tales:absolute_url(context)}"
+		  id="search-results">
+		${structure:tales:search_form_params}
+		<input type="hidden" name="order_by"
+			   value="${request.params.get('order_by') or getattr(context, 'order_by', '')}" />
+		<input type="hidden" name="start"
+			   value="${start}" />
+		<input type="hidden" name="length"
+			   value="${length}" />
+	</form>
+	<div class="search-results"
+		 tal:define="(count, aggregations, items) settings.get_items(request, start, length)"
+		 tal:condition="count or (renderer_settings.display_if_empty and not request.annotations.get('pyams_content.portlet.search.has_results'))">
+		<header class="d-flex flex-row flex-wrap justify-content-between align-items-baseline mx-3">
+			<div tal:condition="renderer_settings.display_results_count">
+				<tal:if condition="count">
+					<span class="text-nowrap" i18n:translate="">
+						<i18n:var name="count">${count}</i18n:var> result(s) found
+					</span>
+				</tal:if>
+				<tal:if condition="not:count">
+					<span class="text-nowrap" i18n:translate="">No result found!</span>
+				</tal:if>
+			</div>
+			<div tal:condition="count and renderer_settings.allow_sorting">
+				<select class="form-control"
+						data-ams-change-handler="PyAMS_search.updateSort"
+						tal:define="order_by request.params.get('order_by') or context.order_by">
+					<option value="relevance"
+							selected="${'selected' if order_by == 'relevance' else None}"
+							i18n:translate="">Sort by relevance</option>
+					<option value="visible_publication_date"
+							selected="${'selected' if order_by == 'visible_publication_date' else None}"
+							i18n:translate="">Sort by publication date</option>
+					<option value="modified_date"
+							selected="${'selected' if order_by == 'modified_date' else None}"
+							i18n:translate="">Sort by last modification date</option>
+				</select>
+			</div>
+			<div class="d-inline-flex flex-nowrap align-items-baseline"
+				 tal:condition="count and renderer_settings.allow_pagination">
+				<span class="text-nowrap"
+					  i18n:translate="">Page length:</span>&nbsp;
+				<select class="form-control"
+						data-ams-change-handler="PyAMS_search.updatePageLength">
+					<option tal:repeat="value ('10', '20', '50')"
+							value="${value}"
+							selected="${'selected' if value == length else None}"
+							i18n:translate="">${value}</option>
+				</select>
+			</div>
+		</header>
+		<hr tal:condition="renderer_settings.display_results_count or renderer_settings.allow_sorting or renderer_settings.allow_pagination" />
+		<tal:var define="visible_filters renderer_settings.get_visible_filters();
+						 (has_filters, filters) tales:boolean_iter(visible_filters);">
+			<div tal:condition="has_filters"
+				 class="${renderer_settings.filters_css_class}">
+				<i tal:omit-tag="">
+					${structure:provider:filters_default(renderer_settings=renderer_settings, aggregations=aggregations)}
+				</i>
+			</div>
+			<div tal:omit-tag="not:has_filters"
+				 class="${renderer_settings.results_css_class}">
+				<div class="summary summary-masonry ${renderer_settings.get_css_class()}">
+					<tal:loop repeat="item items">
+						${structure:view.render_item(item, 'masonry')}
+					</tal:loop>
+				</div>
+			</div>
+		</tal:var>
+		<div class="clearfix"></div>
+		<div class="col-md-12 text-center">
+			<nav role="navigation"
+				 class="pagination mt-4 justify-content-center small"
+				 aria-label="Pagination" i18n:attributes="aria-label">
+				<ul class="pagination"
+					tal:define="(current, total) settings.get_pages(start, length, count)"
+					data-ams-current-page="${current}">
+					<tal:if condition="renderer_settings.allow_pagination and (total > 1)">
+						<li class="page-item prev"
+							tal:condition="current > 1">
+							<a class="page-link"
+							   href="#" i18n:translate=""
+							   data-ams-click-handler="PyAMS_search.previousPage">Previous page</a>
+						</li>
+						<li class="page-item">
+							<span class="page-link bg-light"
+								  tal:condition="current == 1">1</span>
+							<a tal:condition="current > 1"
+							   class="page-link"
+							   href="#"
+							   data-ams-click-handler="PyAMS_search.gotoPage">1</a>
+						</li>
+						<li class="page-item"
+							tal:condition="current > 5">
+							<a class="page-link disabled">…</a>
+						</li>
+						<tal:loop repeat="page range(max(1, current-4), min(current+3, total))">
+							<li class="page-item">
+								<a tal:condition="current != page+1"
+								   class="page-link"
+								   href="#"
+								   data-ams-click-handler="PyAMS_search.gotoPage">${page+1}</a>
+								<a tal:condition="current == page+1"
+								   class="page-link bg-light">${page+1}</a>
+							</li>
+						</tal:loop>
+						<li class="page-item"
+							tal:condition="current < total-4">
+							<span class="page-link disabled">…</span>
+						</li>
+						<li class="page-item"
+							tal:condition="current < total-3">
+							<a class="page-link"
+							   href="#"
+							   data-ams-click-handler="PyAMS_search.gotoPage">${total}</a>
+						</li>
+						<li class="page-item next"
+							tal:condition="current < total">
+							<a class="page-link"
+							   href="#" i18n:translate=""
+							   data-ams-click-handler="PyAMS_search.nextPage">Next page</a>
+						</li>
+					</tal:if>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>

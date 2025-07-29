@@ -1,0 +1,54 @@
+<div class="head"
+     tal:define="settings view.settings"
+     i18n:domain="pyams_content">
+    <tal:if condition="settings.display_illustration">
+        <tal:var define="illustration tales:pyams_banner_illustration(context)"
+                 condition="illustration">
+            <div class="position-relative"
+                 tal:define="data i18n:illustration.data;
+                             alt_title i18n:illustration.alt_title;"
+                 tal:condition="data">
+                ${structure:tales:picture(data,
+                                          xl_thumb='banner', lg_thumb='banner', md_thumb='banner',
+                                          sm_thumb='banner', xs_thumb='banner', alt=alt_title,
+                                          css_class='w-100')}
+                <ul class="d-flex m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+                    tal:define="title i18n:illustration.title;
+                                author illustration.author;"
+                    tal:condition="title or author">
+                    <li tal:condition="title" data-separator="/">${title}</li>
+                    <li tal:condition="author" data-separator="/">© ${author}</li>
+                </ul>
+            </div>
+        </tal:var>
+    </tal:if>
+    <div class="mt-4"></div>
+    <div class="breadcrumbs position-relative"
+         tal:condition="settings.display_breadcrumbs">
+        ${structure:provider:pyams.breadcrumbs}
+    </div>
+    <h1 class="d-flex justify-content-between align-items-baseline"
+        tal:condition="settings.display_title">
+        ${structure:provider:pyams_content.title}
+        <tal:if condition="settings.display_tags">
+            ${structure:provider:pyams_content.tags}
+        </tal:if>
+    </h1>
+    <div class="small pubdate text-secondary"
+         tal:condition="settings.display_publication_date">
+        <span class="prefix">${i18n:settings.publication_date_prefix}</span>
+        ${structure:provider:pyams_content.publication_date}
+    </div>
+    <div class="lead my-3 px-3 border-left b-3 border-secondary rounded-left text-secondary"
+         tal:condition="settings.display_header">
+        <tal:var define="header tales:i18n(context, 'header', '')">
+            ${structure:tales:html(header)}
+        </tal:var>
+    </div>
+    <tal:if condition="settings.display_alerts">
+        ${structure:provider:pyams_content.context_alerts}
+    </tal:if>
+    <tal:if condition="settings.display_specificities">
+        ${structure:provider:pyams_content.specificities(name='header')}
+    </tal:if>
+</div>

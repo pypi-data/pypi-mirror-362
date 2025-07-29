@@ -1,0 +1,56 @@
+<div tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 carousel_id tales:cache_key(settings);
+				 medias list(view.get_visible_medias());"
+	 tal:condition="medias"
+	 id="carousel_${carousel_id}"
+	 class="carousel carousel-fade slide"
+	 data-ride="carousel"
+	 i18n:domain="pyams_content">
+	<h2 tal:define="title i18n:settings.title"
+		tal:condition="title">
+		${title}
+	</h2>
+	<div class="carousel-inner">
+		<ol class="carousel-indicators">
+			<li tal:repeat="image medias"
+				data-target="#carousel_${carousel_id}"
+				data-slide-to="${repeat['image'].index()}"
+				class="${'active' if repeat['image'].start() else None}"></li>
+		</ol>
+		<div tal:repeat="image medias"
+			 class="carousel-item${' active' if repeat['image'].start() else ''}"
+			 data-interval="5000">
+			<div class="position-relative"
+				 tal:define="alt_title i18n:image.alt_title"
+				 tal:condition="image.data">
+				${structure:tales:picture(image.data,
+										  selections=renderer_settings.thumb_selection,
+										  css_class='d-block w-100',
+										  alt=alt_title)}
+				<div class="carousel-caption d-none d-md-block py-1"
+					 tal:define="description i18n:image.description"
+					 tal:condition="description">
+					<p>${structure:tales:html(description)}</p>
+				</div>
+				<ul class="d-flex m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+					tal:define="title i18n:image.title;
+								author image.author;"
+					tal:condition="author">
+					<li tal:condition="title" data-separator="/">${title}</li>
+					<li tal:condition="author" data-separator="/">© ${author}</li>
+				</ul>
+			</div>
+		</div>
+		<a class="carousel-control-prev" role="button"
+		   data-slide="prev" href="#carousel_${carousel_id}">
+			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+			<span class="sr-only" i18n:translate="">Previous image</span>
+		</a>
+		<a class="carousel-control-next" role="button"
+		   data-slide="next" href="#carousel_${carousel_id}">
+			<span class="carousel-control-next-icon" aria-hidden="true"></span>
+			<span class="sr-only" i18n:translate="">Next image</span>
+		</a>
+	</div>
+</div>

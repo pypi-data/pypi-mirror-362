@@ -1,0 +1,35 @@
+<div tal:define="settings view.settings;
+				 renderer_settings view.renderer_settings;
+				 carousel_id tales:cache_key(settings);
+				 media view.get_media();"
+	 tal:condition="media"
+	 id="carousel_${carousel_id}"
+	 class="carousel carousel-fade"
+	 i18n:domain="pyams_content">
+	<h2 tal:define="title i18n:context.title"
+		tal:condition="title">
+		${title}
+	</h2>
+	<div class="carousel-inner">
+		<div class="position-relative"
+			 tal:define="alt_title i18n:media.alt_title"
+			 tal:condition="media.data">
+			${structure:tales:picture(media.data,
+									  selections=renderer_settings.thumb_selection,
+									  css_class='d-block w-100',
+									  alt=alt_title)}
+			<div class="carousel-caption d-none d-md-block py-1"
+				 tal:define="description i18n:media.description"
+				 tal:condition="description">
+				<p>${structure:tales:html(description)}</p>
+			</div>
+			<ul class="d-flex m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+				tal:define="title i18n:media.title;
+							author media.author;"
+				tal:condition="author">
+				<li tal:condition="title" data-separator="/">${title}</li>
+				<li tal:condition="author" data-separator="/">© ${author}</li>
+			</ul>
+		</div>
+	</div>
+</div>

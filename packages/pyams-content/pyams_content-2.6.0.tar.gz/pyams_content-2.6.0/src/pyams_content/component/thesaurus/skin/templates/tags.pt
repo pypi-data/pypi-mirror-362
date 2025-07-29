@@ -1,0 +1,12 @@
+<div class="tags" i18n:domain="pyams_content"
+	 tal:define="target view.search_target">
+	<tal:loop repeat="tag view.tags">
+		<a tal:omit-tag="target is None"
+		   tal:define="href tales:absolute_url(target)"
+		   href="${href}?tag=${tag.label}">
+			<span class="badge badge-secondary font-weight-normal">
+				#${tag.alt or tag.label}
+			</span>
+		</a>
+	</tal:loop>
+</div>

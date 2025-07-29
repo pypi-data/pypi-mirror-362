@@ -1,0 +1,40 @@
+<tal:var define="term view.context"
+		 i18n:domain="pyams_content">
+	<div tal:condition="term.generic">
+		<strong i18n:translate="">Term family:</strong>
+		<span class="thesaurus-term"
+			  data-term="${term.generic.label}"
+			  tal:omit-tag="term.status == 'archived'">${term.generic.alt or term.generic.label}</span>
+	</div>
+	<div tal:condition="term.specifics">
+		<strong i18n:translate="">Specific terms:</strong>
+		<tal:loop repeat="specific term.specifics">
+			<span class="thesaurus-term"
+				  data-term="${specific.label}"
+				  tal:omit-tag="specific.status == 'archived'">${specific.alt or specific.label}</span><tal:if condition="not:repeat.specific.end()">,</tal:if>
+		</tal:loop>
+	</div>
+	<div tal:condition="term.associations">
+		<strong i18n:translate="">Associated terms:</strong>
+		<tal:loop repeat="association term.associations">
+			<span class="thesaurus-term"
+				  data-term="${association.label}"
+				  tal:omit-tag="association.status == 'archived'">${association.alt or association.label}</span><tal:if condition="not:repeat.association.end()">,</tal:if>
+		</tal:loop>
+	</div>
+	<div tal:condition="term.used_for">
+		<strong i18n:translate="">Synonyms:</strong>
+		<tal:loop repeat="synonym term.used_for">
+			<span class="thesaurus-term"
+				  data-term="${synonym.label}"
+				  tal:omit-tag="synonym.status == 'archived'">${synonym.alt or synonym.label}</span><tal:if condition="not:repeat.synonym.end()">,</tal:if>
+		</tal:loop>
+	</div>
+	<div tal:condition="term.usage">
+		<strong i18n:translate="">See:</strong>
+		<span class="thesaurus-term"
+			  data-term="${term.usage.label}"
+			  tal:omit-tag="term.usage.status == 'archived'">${term.usage.alt or term.usage.label}</span>
+	</div>
+	<br />
+</tal:var>

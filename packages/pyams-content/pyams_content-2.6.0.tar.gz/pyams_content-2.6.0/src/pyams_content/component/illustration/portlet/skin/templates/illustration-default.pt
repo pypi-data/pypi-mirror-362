@@ -1,0 +1,30 @@
+<div class="illustration"
+	 tal:define="renderer_settings view.renderer_settings;
+				 illustration view.illustration;"
+	 tal:condition="illustration and illustration.has_data()">
+	<div class="position-relative"
+		 tal:define="image i18n:illustration.data;
+					 alt_title i18n:illustration.alt_title;
+					 selections renderer_settings.thumb_selection;">
+		${structure:tales:picture(image,
+								  selections=selections,
+								  alt=alt_title,
+								  css_class='d-block w-100')}
+		<tal:if condition="renderer_settings.display_title or renderer_settings.display_author">
+			<ul class="d-flex m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+				tal:define="title i18n:illustration.title;
+							author illustration.author;"
+				tal:condition="(renderer_settings.display_title and title) or (renderer_settings.display_author and author)">
+				<li tal:condition="renderer_settings.display_title and title" data-separator="/">${title}</li>
+				<li tal:condition="renderer_settings.display_author and author" data-separator="/">© ${author}</li>
+			</ul>
+		</tal:if>
+	</div>
+	<tal:if condition="renderer_settings.display_description">
+		<p class="description mt-1 px-2 text-secondary small"
+		   tal:define="description i18n:illustration.description"
+		   tal:condition="description">
+			${structure:tales:html(description)}
+		</p>
+	</tal:if>
+</div>

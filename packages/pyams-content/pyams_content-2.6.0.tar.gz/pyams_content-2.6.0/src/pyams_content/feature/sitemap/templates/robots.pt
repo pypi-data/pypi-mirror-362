@@ -1,0 +1,11 @@
+Sitemap: ${tales:absolute_url(request.root)}/sitemap.xml
+
+User-agent: *
+Disallow: /--static--/
+Disallow: /api/<tal:loop repeat="site disallowed_sites">
+Disallow: /${site.__name__}/</tal:loop><tal:loop repeat="site allowed_inner_sites">
+Allow: /${site.__name__}/*</tal:loop><tal:loop repeat="path disallowed_tools">
+Disallow: ${path}/</tal:loop><tal:loop repeat="(interface, name) tools_configuration.tables_names.items()">
+Disallow: /${tools_configuration.tables_manager_name}/${name}/</tal:loop><tal:loop repeat="extension extensions"><tal:loop repeat="disallowed extension.disallowed">
+Disallow: ${disallowed}</tal:loop><tal:loop repeat="allowed extension.allowed">
+Allow: ${allowed}</tal:loop></tal:loop>

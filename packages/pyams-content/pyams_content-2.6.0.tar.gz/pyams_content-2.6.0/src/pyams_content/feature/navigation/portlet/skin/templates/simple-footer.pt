@@ -1,0 +1,21 @@
+<div i18n:domain="pyams_content"
+	 tal:define="settings view.settings;
+				 items settings.links.get_visible_items(request);
+				 (has_items, links) tales:boolean_iter(items);"
+	 tal:condition="has_items">
+	<h3 tal:define="title i18n:settings.title"
+		tal:condition="title"
+		class="position-relative border-bottom pb-2 mt-4">
+		${title}
+		<span class="position-absolute underline"></span>
+	</h3>
+	<div class="d-flex justify-content-around flex-wrap">
+		<div tal:repeat="link links"
+			 class="my-3">
+			<a tal:define="link_info view.get_link_info(link)"
+			   href="${link.get_url(request)}">
+				${link_info.user_title}
+			</a>
+		</div>
+	</div>
+</div>

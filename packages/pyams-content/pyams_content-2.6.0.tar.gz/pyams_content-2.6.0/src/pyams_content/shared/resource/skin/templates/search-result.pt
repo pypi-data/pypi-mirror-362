@@ -1,0 +1,49 @@
+<tal:var define="target view.url;
+				 renderer_settings view.view.renderer_settings;"
+		 i18n:domain="pyams_content">
+	<div class="my-3 d-flex flex-column flex-md-row position-relative mb-4">
+		<tal:if define="illustration tales:pyams_illustration(context)"
+				condition="renderer_settings.display_illustrations and illustration">
+			<a class="mr-md-3 px-0"
+			   href="${target}">
+				<tal:if define="image i18n:illustration.data;
+								alt_title i18n:illustration.alt_title;"
+						condition="image">
+					${structure:tales:picture(image,
+											  xs_thumb='portrait', xs_width=12,
+											  sm_thumb='portrait', sm_width=3,
+											  md_thumb='portrait', md_width=2,
+											  lg_thumb='portrait', lg_width=2,
+											  xl_thumb='portrait', xl_width=2,
+											  alt=alt_title,
+											  css_class='result_media')}
+				</tal:if>
+			</a>
+		</tal:if>
+		<div class="w-100"
+			 tal:define="publication_date view.publication_date if renderer_settings.display_publication_date else None">
+			<a class="stretched-link"
+			   href="${target}">
+				<h4 class="${'mb-0' if publication_date else None}">
+					${view.title}
+				</h4>
+			</a>
+			<div tal:condition="publication_date"
+				 class="mb-2">
+				<i class="small">${publication_date}</i>
+			</div>
+			<div class="breadcrumbs position-relative">
+				${structure:tales:breadcrumbs(context)}
+			</div>
+			<div class="header"
+				 tal:define="header view.header"
+				 tal:condition="header">
+				${structure:header}
+			</div>
+			<div tal:condition="renderer_settings.display_tags"
+				 class="tags position-relative">
+				${structure:tales:tags(context)}
+			</div>
+		</div>
+	</div>
+</tal:var>

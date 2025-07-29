@@ -1,0 +1,19 @@
+<div id="page-navigation"
+	 class="bg-light border-left bl-3 lh-12 small d-print-none"
+	 tal:define="settings view.settings;
+				 (has_items, items) tales:boolean_iter(view.paragraphs);"
+	 tal:condition="has_items">
+	<ul class="nav nav-pills flex-column">
+		<tal:loop repeat="item items">
+			<li class="nav-item"
+				role="presentation"
+				tal:define="title i18n:item.title"
+				tal:condition="title">
+				<a class="nav-link"
+				   href="#part_${tales:cache_key(item)}">
+					${title}
+				</a>
+			</li>
+		</tal:loop>
+	</ul>
+</div>

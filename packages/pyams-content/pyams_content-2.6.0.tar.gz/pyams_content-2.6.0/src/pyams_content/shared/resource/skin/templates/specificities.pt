@@ -1,0 +1,226 @@
+<div class="mt-3"
+	 i18n:domain="pyams_content"
+	 tal:define="field_names context.field_names;
+				 resource_info view.resource_info;
+				 country resource_info.original_country;
+				 title resource_info.original_title;
+				 author resource_info.author;
+				 translator resource_info.translator;
+				 illustrator resource_info.illustrator;
+				 drawer resource_info.drawer;
+				 colourist resource_info.colourist;
+				 lettering resource_info.lettering;
+				 producer resource_info.producer;
+				 director resource_info.director;
+				 actors resource_info.actors;
+				 editor resource_info.editor;
+				 collection resource_info.collection;
+				 series resource_info.series;
+				 volume resource_info.volume;
+				 format resource_info.format;
+				 release_year resource_info.release_year;
+				 awards i18n:resource_info.awards;
+				 nb_pages resource_info.nb_pages;
+				 duration resource_info.duration;
+				 age_range resource_info.age_range;
+				 editor_reference resource_info.editor_reference;
+				 isbn_number resource_info.isbn_number;
+				 source_url resource_info.source_url;
+				 price resource_info.price;
+				 summary i18n:resource_info.summary;
+				 synopsis i18n:resource_info.synopsis;
+				 publisher_words i18n:resource_info.publisher_words;">
+	<tal:if define="illustration tales:pyams_illustration(context)"
+			condition="illustration">
+		<div class="float-right col-5 col-md-4 mb-3"
+			 tal:define="data i18n:illustration.data;
+						 alt i18n:illustration.alt_title;"
+			 tal:condition="data">
+			<a tal:define="thumbnails tales:thumbnails(data);
+						   target thumbnails.get_thumbnail('800x600');"
+			   href="${tales:absolute_url(data)}"
+			   data-toggle="modal"
+			   data-target="#illustration_${tales:cache_key(context)}">
+				${structure:tales:picture(data,
+										  xs_width=5, sm_width=4, md_width=3, lg_width=3, xl_width=2,
+										  css_class='img_responsive', alt=alt)}
+			</a>
+			<div class="modal fade" aria-hidden="true"
+				 id="illustration_${tales:cache_key(context)}">
+				<div class="modal-dialog modal-dialog-scrollable modal-lg">
+					<div class="modal-content w-auto">
+						<div class="modal-header py-2">
+							<h6 class="modal-title">
+								${i18n:context.title}
+							</h6>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body p-0">
+							<div class="position-relative">
+								${structure:tales:picture(data, alt=illustration.alt_title)}
+								<ul class="d-flex flex-nowrap m-0 py-1 px-2 legend list-inline list-separated position-absolute small text-white-50"
+									tal:define="title i18n:illustration.title;
+												author illustration.author;"
+									tal:condition="title or author">
+									<li tal:condition="title" data-separator="/">${title}</li>
+									<li tal:condition="author" data-separator="/">© ${author}</li>
+								</ul>
+							</div>
+						</div>
+						<p class="description my-1 px-2 text-secondary small"
+						   tal:define="description i18n:illustration.description"
+						   tal:condition="description">
+							${structure:tales:html(description)}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</tal:if>
+	<dl class="row dl-horizontal col-7 col-md-8 lh-11">
+		<tal:var define="collections list(view.collections);
+						 target view.search_target;"
+				 condition="collections">
+			<tal:case switch="len(collections)">
+				<dt class="col-md-4 pl-0 text-md-right"
+					tal:case="1" i18n:translate="">Collection:</dt>
+				<dt class="col-md-4 pl-0 text-md-right"
+					tal:case="default" i18n:translate="">Collections:</dt>
+			</tal:case>
+			<dd class="col-md-8 pl-0">
+				<tal:loop repeat="collection collections"><a
+						tal:omit-tag="target is None"
+						tal:define="href tales:absolute_url(target)"
+						href="${href}?collections=${collection.label}">
+					${collection.alt or collection.label}</a><tal:if
+						condition="not repeat['collection'].end()">, </tal:if></tal:loop>
+			</dd>
+		</tal:var>
+		<tal:loop repeat="field field_names">
+			<tal:case switch="field">
+				<tal:if case="'original_country'" condition="country">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Original country:</dt>
+					<dd class="col-md-8 pl-0">${country}</dd>
+				</tal:if>
+				<tal:if case="'original_title'" condition="title">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Original title:</dt>
+					<dd class="col-md-8 pl-0">${title}</dd>
+				</tal:if>
+				<tal:if case="'author'" condition="author">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Author:</dt>
+					<dd class="col-md-8 pl-0">${author}</dd>
+				</tal:if>
+				<tal:if case="'translator'" condition="translator">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Translator:</dt>
+					<dd class="col-md-8 pl-0">${translator}</dd>
+				</tal:if>
+				<tal:if case="'illustrator'" condition="illustrator">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Illustrator:</dt>
+					<dd class="col-md-8 pl-0">${illustrator}</dd>
+				</tal:if>
+				<tal:if case="'drawer'" condition="drawer">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Drawer:</dt>
+					<dd class="col-md-8 pl-0">${drawer}</dd>
+				</tal:if>
+				<tal:if case="'colourist'" condition="colourist">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Colourist:</dt>
+					<dd class="col-md-8 pl-0">${colourist}</dd>
+				</tal:if>
+				<tal:if case="'lettering'" condition="lettering">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Lettering:</dt>
+					<dd class="col-md-8 pl-0">${lettering}</dd>
+				</tal:if>
+				<tal:if case="'producer'" condition="producer">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Producer:</dt>
+					<dd class="col-md-8 pl-0">${producer}</dd>
+				</tal:if>
+				<tal:if case="'director'" condition="director">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Director:</dt>
+					<dd class="col-md-8 pl-0">${director}</dd>
+				</tal:if>
+				<tal:if case="'actors'" condition="actors">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Actors:</dt>
+					<dd class="col-md-8 pl-0">${actors}</dd>
+				</tal:if>
+				<tal:if case="'editor'" condition="editor">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Editor:</dt>
+					<dd class="col-md-8 pl-0">${editor}</dd>
+				</tal:if>
+				<tal:if case="'collection'" condition="collection">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Collection:</dt>
+					<dd class="col-md-8 pl-0">${collection}</dd>
+				</tal:if>
+				<tal:if case="'series'" condition="series">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Series:</dt>
+					<dd class="col-md-8 pl-0">${series}</dd>
+				</tal:if>
+				<tal:if case="'volume'" condition="volume">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Volume:</dt>
+					<dd class="col-md-8 pl-0">${volume}</dd>
+				</tal:if>
+				<tal:if case="'format'" condition="format">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Format:</dt>
+					<dd class="col-md-8 pl-0">${format}</dd>
+				</tal:if>
+				<tal:if case="'nb_pages'" condition="nb_pages">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Number of pages:</dt>
+					<dd class="col-md-8 pl-0">${nb_pages}</dd>
+				</tal:if>
+				<tal:if case="'duration'" condition="duration">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Duration:</dt>
+					<dd class="col-md-8 pl-0">${duration}</dd>
+				</tal:if>
+				<tal:if case="'age_range'" condition="age_range">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Age range:</dt>
+					<dd class="col-md-8 pl-0">${view.get_age_range(age_range)}</dd>
+				</tal:if>
+				<tal:if case="'release_year'" condition="release_year">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Release year:</dt>
+					<dd class="col-md-8 pl-0">${release_year}</dd>
+				</tal:if>
+				<tal:if case="'awards'" condition="awards">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Awards:</dt>
+					<dd class="col-md-8 pl-0">
+						<ul>
+							<li tal:repeat="line awards.split('\n')">${line}</li>
+						</ul>
+					</dd>
+				</tal:if>
+				<tal:if case="'editor_reference'" condition="editor_reference">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Editor reference:</dt>
+					<dd class="col-md-8 pl-0">${editor_reference}</dd>
+				</tal:if>
+				<tal:if case="'isbn_number'" condition="isbn_number">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">ISBN number:</dt>
+					<dd class="col-md-8 pl-0">${isbn_number}</dd>
+				</tal:if>
+				<tal:if case="'price'" condition="price">
+					<dt class="col-md-4 pl-0 text-md-right" i18n:translate="">Price:</dt>
+					<dd class="col-md-8 pl-0"  i18n:translate="">€ <i18n:var name="price">${'{0:.2f}'.format(price)}</i18n:var></dd>
+				</tal:if>
+			</tal:case>
+		</tal:loop>
+	</dl>
+	<blockquote class="edito border bl-4 px-3 py-2 rounded"
+				tal:condition="('summary'in field_names) and summary">
+		<h4 i18n:translate="">Summary</h4>
+		<div>${structure:tales:html(summary, 'oid_to_href;glossary')}</div>
+	</blockquote>
+	<blockquote class="edito border bl-4 px-3 py-2 rounded"
+				tal:condition="('synopsis'in field_names) and synopsis">
+		<h4 i18n:translate="">Synopsis</h4>
+		<div>${structure:tales:html(synopsis, 'oid_to_href;glossary')}</div>
+	</blockquote>
+	<blockquote class="edito border bl-4 px-3 py-2 rounded"
+				tal:condition="('publisher_words'in field_names) and publisher_words">
+		<h4 i18n:translate="">Publisher's words</h4>
+		<div>${structure:tales:html(publisher_words, 'oid_to_href;glossary')}</div>
+	</blockquote>
+	<dl class="dl-horizontal row"
+		tal:condition="('source_url' in field_names) and source_url">
+		<dt class="col-md-3 text-md-right text-nowrap" i18n:translate="">More resource info:</dt>
+		<dd class="col-md-9 pl-md-0"><a href="${source_url}" target="_blank">${source_url}</a></dd>
+	</dl>
+</div>
