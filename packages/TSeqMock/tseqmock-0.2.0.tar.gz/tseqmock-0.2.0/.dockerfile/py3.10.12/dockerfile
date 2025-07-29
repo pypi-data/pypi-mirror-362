@@ -1,0 +1,26 @@
+# ------------------------------------------------------------------------------
+# Dockerfile for TSeqMock test environment
+#
+# Base image : python:3.10.12
+# Purpose    : Provide a consistent and reproducible environment for running
+#              tests on the TSeqMock package, avoiding CI inconsistencies.
+# Includes   : numpy, pandas, pydantic, pytest, scipy, syrupy, and other deps.
+#
+# Build with :
+#   docker build -t tseqmock-env-test:py3.10.12 .
+#
+# Run tests with :
+#   docker run -v $(pwd):/tseqmock --rm tseqmock-env-test:py3.10.12 ./tseqmock/scripts/test.sh
+# ------------------------------------------------------------------------------
+    
+FROM python:3.10.12
+
+RUN pip install --no-cache-dir \
+    numpy==2.2.5 \
+    pandas==2.2.3 \
+    pydantic==2.11.4 \
+    pydantic-core==2.33.2 \
+    PypAssist==0.2.0 \
+    pytest==8.3.5 \
+    scipy==1.15.2 \
+    syrupy==4.9.1
