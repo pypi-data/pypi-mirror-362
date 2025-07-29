@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "{{ cookiecutter.project_slug }}"
+description = "{{ cookiecutter.project_description }}"
+authors = [
+  { name = "{{ cookiecutter.full_name }}", email = "{{ cookiecutter.email }}" },
+]
+readme = "README.rst"
+requires-python = ">=3.12"
+dependencies = ["cookiecutter>=2.6.0", "dynaconf>=3.2.11", "fire>=0.7.0"]
+
+[dependency-groups]
+dev = [
+  "coverage>=7.9.1",
+  "mypy>=1.16.1",
+  "pre-commit>=4.2.0",
+  "pytest>=8.4.0",
+  "pytest-cov>=6.2.1",
+  "ruff>=0.11.13",
+  "tox>=4.27.0",
+]
+
+[project.scripts]
+fusepyfoundry = "src.temperature._cli:main"
+
+[project.urls]
+Repository = "https://github.com/{{ cookiecutter.github_username }}/{{ cookiecutter.project_slug | replace('_', '-') }}"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+addopts = "--cov --cov-report=term-missing"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+  # Have to re-enable the standard pragma
+  "pragma: no cover",
+
+  # Don't complain about missing debug-only code:
+  "def __repr__",
+  "if self.debug",
+
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+
+  # Don't complain if non-runnable code isn't run:
+  "if 0:",
+  "if __name__ == .__main__.:",
+
+  # Don't complain about fire commands
+  "fire.Fire",
+]
+fail_under = 90
+ignore_errors = true
