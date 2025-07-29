@@ -1,0 +1,351 @@
+# SecureSpeak AI Python SDK
+
+The official Python SDK for SecureSpeak AI — Professional deepfake detection.
+
+## Installation
+
+```bash
+pip install securespeakai-sdk
+```
+
+## Quick Start
+
+```python
+from securespeak import SecureSpeakClient
+
+# Initialize client with your API key
+client = SecureSpeakClient("your-api-key-here")
+
+# Analyze a local audio file
+result = client.analyze_file("suspicious_audio.wav")
+
+# Check if it's a deepfake
+if result['label'] == 'AI':
+    print(f"DEEPFAKE DETECTED! Confidence: {result['confidence']:.2f}")
+else:
+    print(f"Authentic audio. Confidence: {result['confidence']:.2f}")
+```
+
+## Authentication
+
+The SDK supports two types of authentication:
+
+### 1. API Key Authentication (Required)
+```python
+from securespeak import SecureSpeakClient
+
+client = SecureSpeakClient("your-api-key-here")
+```
+
+### 2. Firebase Authentication (Optional - for billing endpoints)
+```python
+from securespeak import SecureSpeakClient
+
+client = SecureSpeakClient(
+    api_key="your-api-key-here",
+    firebase_token="your-firebase-id-token"
+)
+```
+
+## Core Analysis Methods
+
+### File Analysis
+```python
+# Analyze local audio files
+result = client.analyze_file("audio.wav")
+print(f"Result: {result['label']}, Confidence: {result['confidence']:.2f}")
+```
+
+### URL Analysis
+```python
+# Analyze audio from URLs (YouTube, social media, etc.)
+result = client.analyze_url("https://youtube.com/watch?v=example")
+print(f"Result: {result['label']}, Confidence: {result['confidence']:.2f}")
+```
+
+### Live Analysis
+
+**Note:** Live analysis requires `pyaudio` for microphone capture. Install with: `pip install pyaudio`
+
+```python
+# Real-time analysis with microphone capture
+import pyaudio
+import wave
+import io
+
+def capture_and_analyze_live():
+    # Configure audio settings
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 44100
+    CHUNK = 1024
+    RECORD_SECONDS = 3  # Analyze every 3 seconds
+    
+    audio = pyaudio.PyAudio()
+    
+    # Start recording from microphone
+    stream = audio.open(format=FORMAT,
+                       channels=CHANNELS,
+                       rate=RATE,
+                       input=True,
+                       frames_per_buffer=CHUNK)
+    
+    print("Listening for audio...")
+    
+    while True:
+        frames = []
+        
+        # Record for specified duration
+        for _ in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+            data = stream.read(CHUNK)
+            frames.append(data)
+        
+        # Convert to audio file format
+        audio_data = io.BytesIO()
+        wf = wave.open(audio_data, 'wb')
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(audio.get_sample_size(FORMAT))
+        wf.setframerate(RATE)
+        wf.writeframes(b''.join(frames))
+        wf.close()
+        
+        # Analyze the captured audio
+        try:
+            result = client.analyze_live_audio(audio_data.getvalue())
+            print(f"Live result: {result['label']}, Confidence: {result['confidence']:.2f}")
+        except Exception as e:
+            print(f"Analysis error: {e}")
+    
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
+
+# Run live analysis
+capture_and_analyze_live()
+```
+
+## Billing & Account Management
+
+### Get Account Balance
+```python
+try:
+    balance_info = client.get_balance()
+    print(f"Current balance: ${balance_info['balance']:.2f}")
+    print(f"Usage: {balance_info['usage']}")
+except Exception as e:
+    print(f"Error: {e}")
+```
+
+### Get Billing Configuration
+```python
+config = client.get_billing_config()
+print(f"Pricing: {config['pricing']}")
+```
+
+### Create Payment Intent
+```python
+try:
+    payment_intent = client.create_payment_intent(amount=50.0)
+    print(f"Payment intent created: {payment_intent['client_secret']}")
+except Exception as e:
+    print(f"Error: {e}")
+```
+
+## API Key Management
+
+### Get All User Keys
+```python
+keys = client.get_user_keys()
+for key in keys:
+    print(f"Key: {key['name']}, Usage: {key['usage_count']}")
+```
+
+### Get Key Statistics
+```python
+stats = client.get_key_stats("your-key-id")
+print(f"Total usage: {stats['usage']['total']}")
+print(f"AI detected: {stats['usage']['ai_detected']}")
+```
+
+### Get Analysis History
+```python
+history = client.get_analysis_history("your-key-id", limit=10)
+for analysis in history['history']:
+    print(f"Time: {analysis['timestamp']}, Result: {analysis['label']}")
+```
+
+## WebSocket Real-time Analysis
+
+For continuous real-time analysis:
+
+```python
+from securespeak import SecureSpeakClient
+
+def on_prediction(result):
+    print(f"Real-time result: {result['label']}, Confidence: {result['confidence']:.2f}")
+
+client = SecureSpeakClient("your-api-key-here")
+ws_client = client.create_websocket_connection(on_prediction)
+
+try:
+    ws_client.connect()
+    
+    # Send audio frames
+    with open("audio_frame.wav", "rb") as f:
+        audio_data = f.read()
+        ws_client.send_audio_frame(audio_data)
+    
+    # Keep connection alive
+    import time
+    time.sleep(10)
+    
+finally:
+    ws_client.close()
+```
+
+## Debug & Monitoring
+
+### System Health Check
+```python
+status = client.keep_alive()
+print(f"API Status: {status['status']}")
+```
+
+### Model Information
+```python
+model_info = client.get_model_info()
+print(f"Model status: {model_info['status']}")
+```
+
+### Environment Information
+```python
+env_info = client.get_environment_info()
+print(f"Python version: {env_info['python_version']}")
+print(f"TensorFlow version: {env_info['tensorflow_version']}")
+```
+
+## Response Format
+
+All analysis methods return a comprehensive JSON response:
+
+```json
+{
+  "label": "AI",
+  "confidence": 0.95,
+  "analysis_time_ms": 1200,
+  "file_info": {
+    "filename": "audio.wav",
+    "format": "wav",
+    "source_type": "uploaded_file",
+    "size_bytes": 1024000
+  },
+  "audio_metadata": {
+    "duration_sec": 30.5,
+    "sample_rate": 44100,
+    "channels": 1
+  },
+  "endpoint": "/analyze_file",
+  "timestamp": "2024-01-01T12:00:00Z"
+}
+```
+
+## Error Handling
+
+The SDK includes comprehensive error handling:
+
+```python
+from securespeak import SecureSpeakClient, SecureSpeakAPIError
+
+client = SecureSpeakClient("your-api-key-here")
+
+try:
+    result = client.analyze_file("audio.wav")
+except SecureSpeakAPIError as e:
+    print(f"API Error ({e.status_code}): {e.message}")
+    if e.details:
+        print(f"Details: {e.details}")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+```
+
+## Pricing
+
+- **File Analysis**: $0.018 per file
+- **URL Analysis**: $0.025 per URL
+- **Live Analysis**: $0.032 per second
+
+*Enterprise customers may have custom pricing. Check your billing configuration.*
+
+## Requirements
+
+- Python 3.7 or higher
+- Valid SecureSpeak AI API key
+- Optional: Firebase authentication for billing endpoints
+
+## Dependencies
+
+- `requests>=2.25.0`
+- `websocket-client>=1.2.0`
+- `typing-extensions>=4.0.0`
+
+## Advanced Usage
+
+### Batch Processing
+```python
+import os
+from securespeak import SecureSpeakClient
+
+client = SecureSpeakClient("your-api-key-here")
+
+# Process multiple files
+audio_files = ["file1.wav", "file2.wav", "file3.wav"]
+results = []
+
+for file_path in audio_files:
+    try:
+        result = client.analyze_file(file_path)
+        results.append({
+            'file': file_path,
+            'label': result['label'],
+            'confidence': result['confidence']
+        })
+    except Exception as e:
+        print(f"Error processing {file_path}: {e}")
+
+# Print results
+for result in results:
+    print(f"{result['file']}: {result['label']} ({result['confidence']:.2f})")
+```
+
+### Custom Error Handling
+```python
+from securespeak import SecureSpeakClient, SecureSpeakAPIError
+
+client = SecureSpeakClient("your-api-key-here")
+
+try:
+    result = client.analyze_file("audio.wav")
+except SecureSpeakAPIError as e:
+    if e.status_code == 402:  # Payment Required
+        print("Insufficient balance!")
+        print(f"Required: ${e.details.get('required_amount', 0):.3f}")
+        print(f"Available: ${e.details.get('current_balance', 0):.3f}")
+    elif e.status_code == 403:
+        print("Invalid API key!")
+    else:
+        print(f"API Error: {e.message}")
+```
+
+## Documentation
+
+For complete documentation, examples, pricing, and API reference, visit: https://securespeakai.com/docs
+
+## Support
+
+- Website: https://securespeakai.com
+- Dashboard: https://securespeakai.com/dashboard
+- Support: https://securespeakai.com/support
+
+## License
+
+MIT License
