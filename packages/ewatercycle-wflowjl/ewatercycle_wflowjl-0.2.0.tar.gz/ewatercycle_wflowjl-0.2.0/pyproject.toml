@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling>=1.8.0", "hatch-vcs", "hatch-fancy-pypi-readme"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/ewatercycle_wflowjl/__init__.py"
+
+[project]
+name = "ewatercycle-wflowjl"
+description = "Wflow.jl eWaterCycle plugin"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+  { name = "Bart Schilperoort, Peter Kalverla, Stefan Verhoeven", email = "b.schilperoort@esciencecenter.nl" },
+]
+keywords = ["ewatercycle", "hydrology"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+]
+dynamic = ["version"]
+
+# Include here only the dependencies for the eWaterCycle wrapped model
+dependencies = [
+  "ewatercycle>=2.4.0",
+  "remotebmi",
+  "toml",
+]
+
+[project.optional-dependencies]
+dev = [
+  "hatch",
+  "ruff",
+]
+
+# This registers the plugin such that it is discoverable by eWaterCycle
+[project.entry-points."ewatercycle.models"]
+WflowJl = "ewatercycle_wflowjl.model:WflowJl"
+
+[project.entry-points."ewatercycle.forcings"]
+WflowJlForcing = "ewatercycle_wflowjl.forcing.forcing:WflowJlForcing"
+
+[tool.ruff]
+target-version = "py310"
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "D", "C90", "I", "N", "UP", "PLE", "PLR", "PLW"]
+extend-select = ["D401", "D400", "D404", "TID252"]
+ignore = [
+  "PLR2004",
+  "PLR0913",
+  "N813",
+]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["ewatercycle_wflowjl"]
+force-single-line = true
+lines-after-imports = 2
