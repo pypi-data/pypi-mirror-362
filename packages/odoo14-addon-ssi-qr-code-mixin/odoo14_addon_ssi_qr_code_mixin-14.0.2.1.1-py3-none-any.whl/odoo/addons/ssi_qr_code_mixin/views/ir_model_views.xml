@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+<odoo>
+
+<record id="ir_model_form" model="ir.ui.view">
+    <field name="model">ir.model</field>
+    <field name="inherit_id" ref="base.view_model_form" />
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//notebook" position="inside">
+                <page name="page_qr_content" string="QR Content">
+                    <group name="grp_content" colspan="4">
+                        <field name="qr_use_standard_content" widget="boolean_toggle" />
+                        <field
+                                name="qr_python_code"
+                                colspan="2"
+                                widget="ace"
+                                attrs="{'invisible': [('qr_use_standard_content', '=', True)]}"
+                            />
+                    </group>
+                </page>
+            </xpath>
+        </data>
+    </field>
+</record>
+
+</odoo>
