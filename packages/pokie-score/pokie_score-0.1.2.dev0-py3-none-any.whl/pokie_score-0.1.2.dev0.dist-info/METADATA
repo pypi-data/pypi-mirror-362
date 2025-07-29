@@ -1,0 +1,110 @@
+Metadata-Version: 2.4
+Name: pokie_score
+Version: 0.1.2.dev0
+Summary: Implemenation of the Pokie from Sharief et al. 2025
+Project-URL: Homepage, https://github.com/SammyS15/Pokie
+Project-URL: Documentation, https://github.com/SammyS15/Pokie
+Project-URL: Repository, https://github.com/SammyS15/Pokie
+Project-URL: Issues, https://github.com/SammyS15/Pokie/issues
+Author: Justine Zeghal
+Author-email: Sammy Sharief <sammybassoon1516@hotmail.com>
+License: MIT License
+        
+        Copyright (c) [2025] [pokie authors]
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Keywords: machine learning,pytorch,statistics
+Classifier: Development Status :: 1 - Planning
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.9
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: torch
+Requires-Dist: tqdm
+Provides-Extra: dev
+Requires-Dist: pytest-cov<5,>=4.1; extra == 'dev'
+Requires-Dist: pytest-mock<4,>=3.12; extra == 'dev'
+Requires-Dist: pytest<9,>=8.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Pokie: Posterior over k Inference Estimation
+
+Pokie is a Python package for evaluating the calibration and accuracy of posterior distributions through a sample-based, likelihood-free method. It enables Bayesian model comparison in simulation-based settings where the true posterior is unknown and standard metrics fail.
+
+## How Pokie Works
+
+1.	Select a Ground Truth
+- Pick a truth sample $y^\*_{j} \sim p(y | x^\*, \mathcal{M}^\*)$
+2.	Draw Posterior Samples
+- Draw N samples $\{ y_{i,j} \}_{i=1}^N \sim p(y | x^*, \mathcal{M})$
+3.	Repeat for Lr Random Regions:
+- Sample a random center $c_{j,\ell} \in \mathbb{R}^q$
+- Select a random posterior sample to define a radius:
+$r_{j,\ell} = \| c_{j,\ell} - y_{i,j} \|$
+- Define a region $\mathcal{R}{j,\ell}$ as the hypersphere around $c_{j,\ell}$ with radius $r_{j,\ell}$
+4.	Count Points
+- Count how many posterior samples fall into the region: $n = \sum_i \mathbf{1}[y_{i,j} \in \mathcal{R}_{j,\ell}]$
+- Check if the ground-truth sample falls inside: $k = \mathbf{1}[y^*j \in \mathcal{R}_{j,\ell}]$
+5.	Update Score
+```
+if k == 1:
+    score += (n + 1) / (N + 2)
+else:
+    score += (N - n + 1) / (N + 2)
+```
+6.	Final Pokie Score:
+$P_{\text{Pokie}}(\mathcal{M}) = \frac{\texttt{score}}{L \cdot L_r}$
+
+
+## Interpretation
+- Well-calibrated posterior → Pokie score → ≈ 2/3
+- Misaligned posterior → Pokie score → ≈ 1/2
+
+## Example Usage
+```
+import torch
+from pokie import pokie
+
+# Ground truth parameters (T samples in q-dim)
+truth = torch.randn(T, q)
+
+# Posterior samples from M models (M, T, S, q)
+posterior = torch.randn(M, T, S, q)
+
+# Run Pokie
+score = pokie(truth, posterior, num_runs=100)
+print(score)  # Pokie scores for each model
+```
+
+## Developing
+
+If you're a developer then:
+
+```python
+git clone git@github.com:SammyS15/Pokie.git
+cd Pokie
+git checkout -b my-new-branch
+pip install -e .
+```
+
+But make an issue first so we can discuss implementation ideas.
