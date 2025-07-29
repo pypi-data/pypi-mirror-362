@@ -1,0 +1,37 @@
+[project]
+name = "agador"
+version = "0.4.5"
+description = "UMnet network data gatherer"
+authors = [
+    {name = "Amy Liebowitz",email = "amylieb@umich.edu"}
+]
+license="MIT"
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "umnet-napalm (>=1.1.12)",
+    "umnet-db (>=0.4.4)",
+    "nornir-netbox (>=0.3.0,<0.4.0)",
+    "python-decouple (>=3.8,<4.0)",
+    "gitpython (>=3.1.44,<4.0.0)",
+    "pyyaml (>=6.0.2,<7.0.0)",
+    "python-slugify (>=8.0.4,<9.0.0)",
+    "cron-converter (>=1.2.1,<2.0.0)",
+    "nornir (>=3.5.0)",
+    "pynetbox (>=7.5.0,<8.0.0)"
+]
+
+[tool.poetry.dev-dependencies]
+black = "^24.10.0"
+pytest = "^8.3.4"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.12"
+
+[project.scripts]
+agador-run-with-schedule='agador.run_with_schedule:main'
+agador-run='agador.run:main'
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
