@@ -1,0 +1,210 @@
+import logging.config
+import logging.handlers
+import sys
+from logging import Logger
+from pathlib import Path
+
+from lynceus.core.config import CONFIG_GENERAL_KEY
+from lynceus.core.config.lynceus_config import LynceusConfig
+from lynceus.lynceus_exceptions import LynceusConfigError
+from lynceus.utils import format_exception_human_readable, lookup_root_path
+
+
+class LynceusSession:
+    DEFAULT_SALT: str = 'lynceus'
+
+    # Additional even more verbose than DEBUG log level.
+    TRACE = 5
+
+    __internal_key_preventing_external_usage_of_init = object()
+
+    __REGISTERED_SESSIONS: dict = {}
+
+    def __init__(self, *, salt: str = DEFAULT_SALT, root_logger_name: str = 'Ubeeko', load_core_default_config: bool = True,
+                 _creation_key=None):
+        # Safe-guard: prevents direct call to this method.
+        if _creation_key != LynceusSession.__internal_key_preventing_external_usage_of_init:
+            raise RuntimeError(f'You should always use LynceusSession.get_session() method when requesting a LynceusSession ({salt=}).')
+
+        # Initializes internal Lynceus config.
+        self.__config = LynceusConfig()
+        self.__root_logger_name = root_logger_name
+
+        # Loads configuration file(s):
+        #  - first the default config according to load_core_default_config toggle
+        #  - then the default and user config corresponding to specify salt, if not the default one
+        loaded_config_files = self.__load_configuration(salt, load_core_default_config=load_core_default_config)
+
+        # Additional even more verbose than DEBUG log level.
+        logging.TRACE = LynceusSession.TRACE
+        logging.addLevelName(LynceusSession.TRACE, 'TRACE')
+
+        # Gets default/root Lynceus logger.
+        self.__logger = self.get_logger()
+        root_level: int = logging.getLevelName(self.get_config(CONFIG_GENERAL_KEY, 'logger.root.level', default='INFO'))
+        self.__logger.setLevel(root_level)
+
+        # Configures main root logger.
+        self.__configure_logger(self.__logger)
+
+        # Disables default root logger, removing all default handlers on it.
+        # This instruction is not enough, because it automatically created another handler: logging.basicConfig(force=True)
+        logging.root.propagate = False
+        for default_root_handler in logging.root.handlers:
+            logging.root.removeHandler(default_root_handler)
+
+        # Informs now that Logger is initialized.
+        self.__logger.info(f'This is the loading information of looked up configuration files (Format=<Path: isLoaded?>) "{loaded_config_files}".')
+
+    @staticmethod
+    # pylint: disable=protected-access
+    def get_session(*, salt: str = DEFAULT_SALT, registration_key: dict[str, str] | None = None,
+                    root_logger_name: str = 'Lynceus', load_core_default_config: bool = True):
+        # Safe-guard: a registration key is highly recommended if not an internal session (which would be the case with salt == DEFAULT_SALT).
+        if registration_key is None:
+            if salt != LynceusSession.DEFAULT_SALT:
+                raise LynceusConfigError('It is mandatory to provide your own registration_key when getting a session.' +
+                                         f' System will automatically consider it as {registration_key}, but you may not be able to retrieve your session.' +
+                                         ' And it may lead to memory leak.')
+            registration_key = {'default': salt}
+
+        # Turns the registration_key to an hashable version.
+        if registration_key is not None:
+            registration_key = frozenset(registration_key.items())
+
+        # Creates and registers the session if needed.
+        if registration_key in LynceusSession.__REGISTERED_SESSIONS:
+            session: LynceusSession = LynceusSession.__REGISTERED_SESSIONS[registration_key]
+            session.__logger.debug(f'Successfully retrieved cached Session for registration key "{registration_key}": {session}.')
+        else:
+            session: LynceusSession = LynceusSession(salt=salt, root_logger_name=root_logger_name,
+                                                     load_core_default_config=load_core_default_config,
+                                                     _creation_key=LynceusSession.__internal_key_preventing_external_usage_of_init)
+
+            LynceusSession.__REGISTERED_SESSIONS[registration_key] = session
+            session.__logger.debug(f'Successfully registered new Session (new total count={len(LynceusSession.__REGISTERED_SESSIONS)})'
+                                   f' for registration key "{registration_key}": {session}.'
+                                   f' This is its loaded configuration (salt={salt}):\n' +
+                                   f'{LynceusConfig.format_dict_to_string(LynceusConfig.format_config(session.__config), indentation_level=1)}')
+
+        # TODO: implement another method allowing to free a specific registered session
+        # TODO: turn LynceusSession as a Context, allowing usage with the 'with' keyword to automatic free the session once used
+
+        # Returns the Lynceus session.
+        return session
+
+    def __load_configuration(self, salt: str, load_core_default_config: bool) -> dict[Path, bool]:
+        # Defines the potential configuration file to load.
+        config_file_meta_list = []
+        if load_core_default_config:
+            # Adds the Lynceus default configuration file as requested.
+            config_file_meta_list.append({'config_path': f'misc/{self.DEFAULT_SALT}.default.conf', 'root_path': Path(__file__).parent})
+
+        # Adds default configuration file corresponding to specified salt, if not the default one.
+        if salt != self.DEFAULT_SALT:
+            config_file_meta_list.append({'config_path': f'misc/{salt}.default.conf'})
+
+        # Adds user configuration file corresponding to specified salt.
+        config_file_meta_list.append({'config_path': f'{salt}.conf'})
+
+        # Looks up for configuration file(s), starting with a "default" one, and then optional user one.
+        loaded_config_files: dict[Path, bool] = {}
+        for config_file_meta in config_file_meta_list:
+            conf_file_name = config_file_meta['config_path']
+            conf_file_root_path = config_file_meta.get('root_path', Path().resolve())
+
+            loaded: bool = False
+            relative_file: Path = Path(conf_file_name)
+            try:
+                full_path: Path = lookup_root_path(relative_file, root_path=conf_file_root_path) / relative_file
+
+                # Merges it in internal Lynceus config.
+                self.__config.update_from_configuration_file(full_path)
+
+                loaded = True
+            except FileNotFoundError as exc:
+                # Since recent version, there is no more mandatory configuration file to have, and several files can be loaded.
+                # N.B.: it is valid, there is no logger yet here, so using print ...
+                self.get_logger('internal').warning(f'WARNING: Unable to load "{conf_file_name}" configuration file,'
+                                                    f' from "{conf_file_root_path}"'
+                                                    f' (not existing configuration file is valid) =>'
+                                                    f' {format_exception_human_readable(exc, quote_message=True)}')
+
+            # Registers configuration file loading information.
+            loaded_config_files[relative_file] = loaded
+
+        # Returns configuration file loading mapping, for information.
+        return loaded_config_files
+
+    def has_config_section(self, section: str):
+        return self.__config.has_section(section)
+
+    def get_config(self, section: str, key: str, *, default: object = LynceusConfig.UNDEFINED_VALUE):
+        return self.__config.get_config(section, key, default=default)
+
+    def is_bool_config_enabled(self, section: str, key: str):
+        return self.__config.is_bool_config_enabled(section=section, key=key)
+
+    def get_config_section(self, section: str):
+        return self.__config[section]
+
+    def get_lynceus_config_copy(self) -> LynceusConfig:
+        """
+        Returns a copy of the internal Lynceus config, can be very interesting to get default config.
+        :return: a copy of the internal Lynceus config, can be very interesting to get default config.
+        """
+        return self.__config.copy()
+
+    @staticmethod
+    def __create_stream_handler(stream, formatter, level, message_filter=None):
+        handler = logging.StreamHandler(stream=stream)
+        handler.setLevel(level)
+        handler.setFormatter(formatter)
+        if message_filter:
+            handler.addFilter(message_filter)
+        return handler
+
+    def __configure_logger(self, logger: Logger):
+        if not logger.handlers:
+            if self.is_bool_config_enabled(CONFIG_GENERAL_KEY, 'logger.console.enable'):
+                message_format: str = self.get_config(CONFIG_GENERAL_KEY, 'logger.console.format',
+                                                      default='{asctime:20} {name:16} {levelname:8} {message}')
+                date_format: str = self.get_config(CONFIG_GENERAL_KEY, 'logger.console.date_format', default='%Y/%m/%d %H:%M:%S')
+                level: int = logging.getLevelName(self.get_config(CONFIG_GENERAL_KEY, 'logger.console.level', default='INFO'))
+                formatter = logging.Formatter(message_format, date_format, '{')
+
+                # Configures error output (from Warning levels).
+                error_output_handler = LynceusSession.__create_stream_handler(sys.stderr, formatter,
+                                                                              max(level, logging.WARNING))
+                logger.addHandler(error_output_handler)
+
+                # Configures standard output (from configured Level, if lower than Warning,
+                #  and excluding everything from Warning and higher).
+                if level < logging.WARNING:
+                    # pylint: disable=unnecessary-lambda-assignment
+                    standard_output_filter = lambda record: record.levelno < logging.WARNING
+                    standard_output_handler = LynceusSession.__create_stream_handler(sys.stdout, formatter, level,
+                                                                                     standard_output_filter)
+                    logger.addHandler(standard_output_handler)
+
+            if self.is_bool_config_enabled(CONFIG_GENERAL_KEY, 'logger.file.enable'):
+                message_format: str = self.get_config(CONFIG_GENERAL_KEY, 'logger.file.format',
+                                                      default='{asctime:20} {name:16} {levelname:8} {message}')
+                date_format: str = self.get_config(CONFIG_GENERAL_KEY, 'logger.file.date_format', default='%Y/%m/%d %H:%M:%S')
+                level: int = logging.getLevelName(self.get_config(CONFIG_GENERAL_KEY, 'logger.file.level', default='INFO'))
+                output_file: str = self.get_config(CONFIG_GENERAL_KEY, 'logger.file.path', default=None)
+
+                if output_file is None:
+                    raise LynceusConfigError('You must at least specify "logger.file.path" if you enable "logger.file.enable".')
+
+                # Manages file open mode (append by default, override if configured).
+                open_mode: str = 'w' if self.is_bool_config_enabled(CONFIG_GENERAL_KEY, 'logger.file.override') else 'a'
+                handler = logging.FileHandler(output_file, mode=open_mode)
+                formatter = logging.Formatter(message_format, date_format, '{')
+                handler.setLevel(level)
+                handler.setFormatter(formatter)
+                logger.addHandler(handler)
+
+    def get_logger(self, name: str = None) -> Logger:
+        complete_name: str = f'{self.__root_logger_name}.{name}' if name else self.__root_logger_name
+        return logging.getLogger(complete_name)
