@@ -1,0 +1,50 @@
+---
+name: PyPi Release
+
+# https://help.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  release:
+    types:
+      - created
+
+# based on https://github.com/pypa/gh-action-pypi-publish
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checking out code from GitHub
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+      - name: generate version file
+        run: |
+          echo "$RELEASE_TAG" > python_rako/__version__.py
+          cat python_rako/__version__.py
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --user --upgrade pip setuptools wheel build
+      - name: Build
+        run: >-
+          python -m build
+
+      # TEST
+      - name: Publish to Test PyPI
+        if: startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      # PROD
+      - name: Publish distribution 📦 to PyPI
+        if: startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
