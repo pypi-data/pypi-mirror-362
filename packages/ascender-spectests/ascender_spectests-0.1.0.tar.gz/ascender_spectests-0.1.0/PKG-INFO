@@ -1,0 +1,88 @@
+Metadata-Version: 2.3
+Name: ascender-spectests
+Version: 0.1.0
+Summary: ascender-spectests
+Author: Zahcoder34
+Author-email: Zakhriw@gmail.com
+Requires-Python: >=3.11,<3.14
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: ascender-framework (>=2.0rc6,<3.0)
+Description-Content-Type: text/markdown
+
+## Ascender Specification Tests
+
+This library provides a set of utilities and tools for testing your ascender framework project and performing unit tests on your code.
+
+It supports Ascender Framework's DI (Dependency Injection) and provides a way to mock dependencies for testing purposes.
+
+### Features
+- Mocking of dependencies
+- Unit testing utilities
+- Integration with Ascender Framework's DI system
+- Easy setup for testing Ascender projects
+- HTTP client utilities (although you could use ascender.common.HTTPClient)
+
+### Installation
+To install the Ascender Specification Tests library, you can use the following command:
+```bash
+poetry add ascender-spectests
+```
+
+### Usage
+To use the Ascender Specification Tests library in your project, you can import the necessary modules and define test cases using the provided utilities. Here's a simple example:
+
+```python
+from spectests import TestingCase, AscSpecificationInterface
+from unittest import AsyncTestCase
+
+
+@TestingCase(
+   imports=[
+      # define your dependency injection imports here.
+   ],
+   providers=[
+      # define your service providers here.
+   ],
+)
+class MyTestCase(AsyncTestCase, AscSpecificationInterface):
+   async def setUp(self):
+      # Setup code here, e.g., initializing services or mocking dependencies
+      print(self.injector) # Access to the DI injector of the current TestingCase scope (including imports and providers)
+
+    async def test_example(self):
+        # Assert
+        result = "expected_value"
+        self.assertEqual(result, 'expected_value')
+```
+
+
+Now to use it you have to provide the spectests in bootstrap.py file of your ascender project:
+
+```python
+from ascender.core import IBootstrap
+from ascender.core.cli import provideCLI
+from spectests import provideSpecTests
+
+appBootstrap: IBootstrap = {
+    "providers": [
+         provideRouter(routes),
+         provideSpecTests(
+            {
+               "type": "specsuite",
+               "spec": MyTestCase,  # Your test case class
+               "methods": ["test_example"],  # List of methods to run as tests (not allowed to provide if type is "autospec")
+            }
+         ),  # Add this line to include the spec tests
+         provideCLI(SpecTestsCLI)
+    ]
+}
+```
+
+## Running Tests
+To run the tests defined in your Ascender Specification Tests, you can use the following command:
+```bash
+ascender run tests start
+```
