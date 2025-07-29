@@ -1,0 +1,50 @@
+Python 2 to 3 issues to check for:
+==================================
+
+time.clock() is replaced by time.perf_counter()
+Integer division can now return a float
+file() was removed; use open() instead
+Remove unnecessary calls to unicode() and str()
+sort() lost cmp argument; use key instead
+
+
+MGET issues to check for:
+=========================
+
+Remove unnecessary absolute imports of GeoEco.Whatever
+Replace PythonAggregatedModuleDependency with PythonModuleDependency
+Search for aggregated and make sure it is ok
+Remove ArcGISProductDependency and use ArcGISDependency instead
+Remove GetResultCacheKey
+Remove ImportGDALModule
+Change 0x%(id)08X to 0x%(id)016X
+Do not call Destroy on GDAL objects anymore
+os.path.splitunc was subsumed into os.path.splitdrive
+Look for '\\' and check it
+Where possible, switch to using "with" rather than try/finally: dataset.Close()
+Remove unnecessary calls to _Str()
+Comparison of NoDataValue and UnscaledNoDataValue must account for nan: Grid.numpy_equal_nan(a, b)
+DerivedGrid now takes a function rather than an expression
+When importing rasters to a geodatabase from data products tools, need to pass suppressRenameWarning=True
+Remove calls to ArcGISWorkspace.ToRasterCatalog and all uses of raster catalogs (they were removed in ArcGIS Pro)
+
+
+ArcPro vs. Desktop issues to check for:
+=======================================
+
+Remove RefreshCatalog
+ArcGIS environment variables moved to the case-sensitive arcpy.env workspace:
+    gp.Extent --> arcpy.env.extent
+    gp.OutputCoordinateSystem --> gp.env.outputCoordinateSystem
+    gp.SnapRaster --> arcpy.env.snapRaster
+    gp.Workspace --> arcpy.env.workspace
+gp.List* functions now return lists rather than ArcGIS enumerator object
+gp.Describe().Extent now returns an object with properties rather than a string
+gp.CreatePersonalGDB_management no longer exists
+Look for code that involves .mdb
+These functions now return a Result object, so we have to do .getOutput(0):
+    gp.CreateSpatialReference_management
+    gp.GetCount_management
+Replace initializeToArcGISGeoprocessorVariable=u'OverwriteOutput' with initializeToArcGISGeoprocessorVariable='env.overwriteOutput'
+Spatial analyist no longer has tools like ExtractByMask_sa. Need to call gp.sa.ExtractByMask and then save() the output.
+gp.CreateFeatureClass_management must have a lowercase "class": gp.CreateFeatureclass_management

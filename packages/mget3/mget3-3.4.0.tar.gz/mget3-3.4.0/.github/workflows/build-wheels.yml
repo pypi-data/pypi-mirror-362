@@ -1,0 +1,318 @@
+name: Build and test wheels
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - '.github/**'
+      - 'badges/**'
+      - 'doc/**'
+      - 'README.md'
+      - 'RELEASE_NOTES.md'
+      - '.readthedocs.yaml'
+
+  workflow_dispatch:  # Allows manual trigger
+
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        # Python versions are specified in pyproject.toml
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+    
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.21.1
+
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_ARCHS: "auto64"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build sdist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  test_wheels_linux:
+    name: Test wheel on ${{ matrix.os }} Python ${{ matrix.python-version }}
+    needs: build_wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    environment:
+      name: "Test data products"
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display system information
+        run: |
+          echo "uname -a:"
+          uname -a
+          echo ""
+          echo "hostnamectl:"
+          hostnamectl
+          echo ""
+          echo "python3 --version:"
+          python3 --version
+
+      - name: Display GDAL versions available for installation
+        run: |
+          apt-cache policy gdal-bin gdal-data gdal-plugins libgdal-dev 
+
+      # Now we need to install GDAL. Unfortunately, we cannot use
+      # awalsh128/cache-apt-pkgs-action for this, at least on ubuntu-24.04,
+      # because it appears that GDAL has a post-install script that sets
+      # LD_LIBRARY_PATH, and that script does not appear to run even if
+      # execute_install_scripts is true for cache-apt-pkgs-action. At least, I
+      # THINK that is the problem. In any case, if we use
+      # cache-apt-pkgs-action, we get the following error when we try to run
+      # gdalinfo later below:
+      #
+      #     gdalinfo: error while loading shared libraries: libblas.so.3: cannot open shared object file: No such file or directory
+      #
+      # So call apt-get ourselves. The line with curl installs apt-fast.
+
+      - name: Install apt-fast
+        run: |
+          sudo /bin/bash -c "$(curl -sL https://git.io/vokNn)"
+          sudo apt-get update -y
+
+      - name: Install GDAL on ubuntu-22.04
+        if: ${{ matrix.os == 'ubuntu-22.04' }}
+        run: |
+          sudo apt-fast install -y gdal-bin gdal-data libgdal-dev libgdal30
+
+      - name: Install GDAL on ubuntu-24.04
+        if: ${{ matrix.os == 'ubuntu-24.04' }}
+        run: |
+          sudo apt-fast install -y gdal-bin gdal-data gdal-plugins libgdal-dev libgdal34t64
+
+      - name: Install Python packages needed to install GDAL's Python bindings
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy<2" setuptools wheel
+
+      - name: Install GDAL's Python package
+        run: |
+          GDAL_VERSION_NEEDED=$(gdalinfo --version | awk '{print $2}' | sed 's/,//')
+          python -m pip install gdal==$GDAL_VERSION_NEEDED
+          echo ""
+          echo "Testing GDAL's python bindings"
+          python -c "from osgeo import _gdal_array"
+
+      - name: Download built wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: cibw-wheels-ubuntu-latest
+          path: ./wheels
+
+      - name: Install wheel
+        run: |
+          GEOECO_VERSION=$(ls ./wheels | grep -m 1 mget3 | sed 's/.*mget3-\(.*\)-cp.*-cp.*.whl/\1/')
+          python -m pip install mget3==$GEOECO_VERSION --find-links=./wheels
+
+      - name: Install Python packages needed to run tests
+        run: |
+          python -m pip install pytest python-dotenv
+
+      - name: Cache MATLAB Runtime
+        id: cache-matlab-runtime-linux
+        uses: actions/cache@v4
+        with:
+          path: ~/MATLAB_Runtime
+          key: cache-matlab-runtime-r2024b-linux
+
+      - name: Download MATLAB Runtime
+        if: ${{ steps.cache-matlab-runtime-linux.outputs.cache-hit != 'true' }}
+        run: |
+          curl -L -o MATLAB_Runtime.zip https://ssd.mathworks.com/supportfiles/downloads/R2024b/Release/0/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2024b_glnxa64.zip
+          mkdir ~/MATLAB_Runtime
+          unzip MATLAB_Runtime.zip -d ~/MATLAB_Runtime
+
+      - name: Install MATLAB runtime
+        run: |
+          sudo ~/MATLAB_Runtime/install -agreeToLicense yes
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install libsodium-dev (needed by R plumber package)
+        run: |
+          sudo apt-get update && sudo apt-get install -y libsodium-dev          
+
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Display R version
+        run: |
+          Rscript -e 'print(version)'
+
+      - name: Run tests
+        env:
+          CMEMS_USERNAME: ${{ secrets.CMEMS_USERNAME }}
+          CMEMS_PASSWORD: ${{ secrets.CMEMS_PASSWORD }}
+          NASA_EARTHDATA_USERNAME: ${{ secrets.NASA_EARTHDATA_USERNAME }}
+          NASA_EARTHDATA_PASSWORD: ${{ secrets.NASA_EARTHDATA_PASSWORD }}
+        run: |
+          python -m pytest -rs ./test/GeoEco/
+
+  test_wheels_windows:
+    name: Test wheel on ${{ matrix.os }} Python ${{ matrix.python-version }}
+    needs: build_wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # As of this writing (September 2024), the available Windows runners were
+        # windows-2022, windows-2019, and windows-latest, which was equivalent to
+        # windows-2022. No desktop images (e.g. Windows 10 or 11) were available.
+        # Because Windows 2019 and 2022 are both based on Windows 10, there's not
+        # much of an advantage to testing on both 2019 and 2022. Therefore, we are
+        # just running this job on windows-latest.
+        os: [windows-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    environment:
+      name: "Test data products"
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Note: this checkout apparently needs to happen before the
+      # actions/cache below or the actions/cache won't work. so I'm moving it
+      # up, even though it is not actually needed until just before the "Run
+      # tests" step.
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache GDAL wheels from cgohlke/geospatial-wheels
+        id: cache-GDAL-wheels
+        uses: actions/cache@v4
+        with:
+          path: GDAL_wheels
+          key: cache-GDAL-3.10.1-win_amd64-wheels
+
+      - name: Download GDAL wheels from cgohlke/geospatial-wheels
+        # Note: we still support Python 3.9, but the last release of
+        # cgohlke/geospatial-wheels that supported 3.9 was v2024.9.22.
+        # Continue to use that for Python 3.9, and use later versions for
+        # Python 3.10 and later.
+        if: ${{ steps.cache-GDAL-wheels.outputs.cache-hit != 'true' }}
+        run: |
+          mkdir GDAL_wheels
+          curl -L -o GDAL_wheels\\GDAL-3.9.2-cp39-cp39-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2024.9.22/GDAL-3.9.2-cp39-cp39-win_amd64.whl
+          curl -L -o GDAL_wheels\\GDAL-3.10.1-cp310-cp310-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2025.1.20/GDAL-3.10.1-cp310-cp310-win_amd64.whl
+          curl -L -o GDAL_wheels\\GDAL-3.10.1-cp311-cp311-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2025.1.20/GDAL-3.10.1-cp311-cp311-win_amd64.whl
+          curl -L -o GDAL_wheels\\GDAL-3.10.1-cp312-cp312-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2025.1.20/GDAL-3.10.1-cp312-cp312-win_amd64.whl
+          curl -L -o GDAL_wheels\\GDAL-3.10.1-cp313-cp313-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2025.1.20/GDAL-3.10.1-cp313-cp313-win_amd64.whl
+
+      - name: Install GDAL wheel
+        shell: bash   # Yes, bash on Windows
+        run: |
+          python -m pip install -U pip
+          python -m pip install -U setuptools wheel
+          if [ "${{ matrix.python-version }}" = "3.9" ]; then
+            python -m pip install GDAL==3.9.2 --find-links=GDAL_wheels
+          else
+            python -m pip install GDAL==3.10.1 --find-links=GDAL_wheels
+          fi        
+
+      - name: Download built wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: cibw-wheels-windows-latest
+          path: wheels
+
+      - name: Install wheel
+        shell: pwsh
+        run: |
+          $env:MGET_VERSION = python -c "import glob; import os; files = glob.glob(os.path.join('wheels', 'mget3-*.whl')); print(os.path.basename(files[0]).split('-')[1])"
+          python -m pip install mget3==$env:MGET_VERSION --find-links=wheels
+
+      - name: Install Python packages needed to run tests
+        run: |
+          python -m pip install pytest python-dotenv
+
+      - name: Cache MATLAB Runtime
+        id: cache-matlab-runtime-windows
+        uses: actions/cache@v4
+        with:
+          path: MATLAB_Runtime
+          key: cache-matlab-runtime-r2024b-windows
+
+      - name: Download MATLAB Runtime
+        if: ${{ steps.cache-matlab-runtime-windows.outputs.cache-hit != 'true' }}
+        shell: pwsh
+        run: |
+          curl -L -o MATLAB_Runtime.zip https://ssd.mathworks.com/supportfiles/downloads/R2024b/Release/0/deployment_files/installer/complete/win64/MATLAB_Runtime_R2024b_win64.zip
+          echo "Decompressing downloaded zip"
+          Expand-Archive -Path "MATLAB_Runtime.zip" -DestinationPath "MATLAB_Runtime"
+          echo "Checking that it exists"
+          dir MATLAB_Runtime
+
+      - name: Install MATLAB runtime
+        shell: cmd
+        run: |
+          MATLAB_Runtime\setup -agreeToLicense yes
+
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Display R version
+        shell: cmd
+        run: |
+          Rscript -e "print(version)"
+
+      - name: Run tests
+        env:
+          CMEMS_USERNAME: ${{ secrets.CMEMS_USERNAME }}
+          CMEMS_PASSWORD: ${{ secrets.CMEMS_PASSWORD }}
+          NASA_EARTHDATA_USERNAME: ${{ secrets.NASA_EARTHDATA_USERNAME }}
+          NASA_EARTHDATA_PASSWORD: ${{ secrets.NASA_EARTHDATA_PASSWORD }}
+        run: |
+          python -m pytest -rs test\\GeoEco
