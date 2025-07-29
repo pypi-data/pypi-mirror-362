@@ -1,0 +1,72 @@
+Metadata-Version: 2.1
+Name: kingdee.cdp.webapi.sdk
+Version: 8.2.0
+Summary: python sdk for k3cloud web api v3.0
+Home-page: https://open.kingdee.com
+Author: g_wang
+Author-email: 1249350176@qq.com
+License: MIT License
+Keywords: k3cloud webapi sdk
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3 :: Only
+Requires-Dist: requests
+Requires-Dist: urllib3
+
+K3Cloud Web Api SDK v1.0
+##########################
+
+介绍
+_______
+
+金蝶云星空WebAPI的Python SDK, 目前可以支持Python3。
+
+安装指南
+__________
+
+使用pip在线安装 ::
+
+    pip install k3cloud_webapi_sdk
+
+使用pip离线安装 ::
+
+    pip install 本地whl包文件的完整目录
+
+手动安装::
+
+    python setup.py install
+
+使用方法
+__________
+
+使用python sdk，参照sample.py
+
+.. code:: python
+
+    #!/usr/bin/python
+    # -*- coding: utf-8 -*-
+    from k3cloud_webapi_sdk.main import K3CloudApiSdk
+
+    # 首先构造一个SDK实例
+    api_sdk = K3CloudApiSdk()
+
+    # 然后初始化SDK，需指定如下配置文件相关参数，否则会导致SDK初始化失败而无法使用：
+    # config_path:配置文件的相对或绝对路径，建议使用绝对路径
+    # config_node:配置文件中的节点名称
+    api_sdk.Init(config_path='conf.ini', config_node='config')
+
+    # 构造保存接口的部分字段数据，使用时请参考WebAPI具体接口的实际参数列表
+    save_data = {"Model": {
+        "FCreateOrgId": {"FNumber": 100},
+        "FUserOrgId": {"FNumber": 100},
+        "FNumber": "***********",
+        "FName": "***********"
+    }}
+
+    # 调用sdk中的保存接口
+    api_sdk.Save("BD_Material", save_data)
+
+
