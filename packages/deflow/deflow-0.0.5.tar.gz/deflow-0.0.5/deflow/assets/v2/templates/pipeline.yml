@@ -1,0 +1,67 @@
+pipeline-workflow:
+  type: Workflow
+
+  desc: |
+    Pipeline workflow for run all node that config in this pipeline name.
+
+  params:
+    name:
+      desc: "A pipeline name for passing to run this pipeline workflow."
+      type: str
+    start-date:
+      desc: "A start datetime"
+      type: datetime
+    run-mode:
+      desc: |
+        Running mode of this workflow. This workflow allow mode to run be:
+          - N (Normal): Run with normal mode.
+          - R (Rerun): Run with rerun mode, that get only failed node to run.
+          - F (Force): Run with force mode, that run all nodes from the begin.
+          - T (Test): Run with test mode.
+      type: choice
+      options: [ "N", "R", "F", "T" ]
+
+  jobs:
+    start-pipeline:
+      desc: "A start pipeline job for get a pipeline information"
+      stages:
+        - name: "Get and Start Pipeline Information"
+          id: get-start-pipeline
+          uses: tasks/get-start-pipeline-info@v2
+          with:
+            name: ${{ params.name }}
+
+        - name: "For-each Node Priorities"
+          id: node-priorities
+          foreach: ${{ stages.get-start-pipeline.outputs.node-priorities-key }}
+          stages:
+
+            - name: "Get Nodes"
+              id: get-nodes
+              vars:
+                node_priorities: ${{ stages.get-start-pipeline.outputs.node-priorities }}
+              run: |
+                nodes: list[str] = node_priorities.get(${{ item }})
+
+            - name: "For-each Node"
+              id: node
+              foreach: ${{ stages.get-nodes.outputs.nodes }}
+              concurrent: 5
+              stages:
+
+                - name: "Trigger Node Workflow"
+                  trigger: node-workflow
+                  params:
+                    name: ${{ item }}
+                    audit-date: ${{ stages.get-start-pipeline.outputs.audit-date }}
+                    run-mode: ${{ params.run-mode }}
+
+            - name: "End Trigger Node"
+              id: end-trigger-node
+              echo: "End trigger Node: ${{ item }}"
+
+        - name: "Clear Log"
+          echo: Clear logging and close pipeline
+
+        - name: "Notification"
+          echo: Notify with mail or notify-services

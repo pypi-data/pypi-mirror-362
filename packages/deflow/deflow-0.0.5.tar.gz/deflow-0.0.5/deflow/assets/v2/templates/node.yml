@@ -1,0 +1,48 @@
+node-workflow:
+  type: Workflow
+  desc: |
+    Node workflow for run the minimum data process like ETL/ELT/EL or hook external
+    service action.
+
+  params:
+    name:
+      desc: "A node name."
+      type: str
+    audit-date:
+      desc: "An audit datetime of this running workflow."
+      type: datetime
+    run-mode:
+      desc: |
+        Running mode of this workflow. This workflow allow mode to run be:
+          - N (Normal): Run with normal mode.
+          - R (Rerun): Run with rerun mode, that get only failed node to run.
+          - F (Force): Run with force mode, that run all nodes from the begin.
+          - T (Test): Run with test mode.
+      type: choice
+      options: [ "N", "R", "F", "T" ]
+
+  jobs:
+    start-node:
+      desc: "A start node job"
+      stages:
+        - name: "Get and Start Node Information"
+          id: start-node
+          uses: tasks/start-node@v2
+          with:
+            name: ${{ params.name }}
+
+        - name: "Call Node Operator and Task"
+          uses: tasks/${{ stages.start-node.outputs.operator }}@${{ stages.start-node.outputs.task }}
+          with:
+            node: ${{ stages.start-node.outputs.node }}
+            audit_date: ${{ params.audit-date }}
+
+        - name: "Making Data Quality"
+          echo: Start run data quality
+
+        - name: "Clear Log"
+          echo: Clear logging and close node
+
+        - name: "End Node Workflow"
+          echo: |
+            End run node: ${{ params.name }}
