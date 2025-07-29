@@ -1,0 +1,17 @@
+<odoo>
+    <data>
+        <record id="helpdesk_ticket_stage_automove_inherited" model="ir.ui.view">
+            <field name="name">helpdesk.ticket.stage.automove.inherited</field>
+            <field name="model">helpdesk.ticket.stage</field>
+            <field name="inherit_id" ref="helpdesk_mgmt.view_helpdesk_ticket_stage_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='main']/group[@name='main_right']" position="inside">
+                    <field name="has_automove"/>
+                    <field name="timeout" attrs="{'invisible': [('has_automove', '=', False)]}"/>
+                    <field name="to_stage_id" attrs="{'invisible': [('has_automove', '=', False)], 'required': [('has_automove','=',True)]}"/>
+                    <!-- Dos tipos de herencia, añadir o complementar  -->
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
