@@ -1,0 +1,1 @@
+"""pyportal is a python library for submitting new jobs & downloading results of the processed jobs from FACEWARE PORTAL."""
