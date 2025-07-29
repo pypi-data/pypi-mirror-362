@@ -1,0 +1,71 @@
+[project]
+name = "antimeridian"
+version = "0.4.2"
+authors = [{ name = "Pete Gadomski", email = "pete.gadomski@gmail.com" }]
+description = "Correct GeoJSON geometries that cross the 180th meridian"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["geojson", "antimeridian", "shapely"]
+license = { text = "Apache-2.0" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Development Status :: 4 - Beta",
+]
+dependencies = ["numpy>=1.22.4", "shapely>=2.0"]
+
+[project.urls]
+Documentation = "https://www.gadom.ski/antimeridian"
+Github = "https://github.com/gadomski/antimeridian"
+Issues = "https://github.com/gadomski/antimeridian/issues"
+Changelog = "https://github.com/gadomski/antimeridian/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+cli = ["click>=8.1.6"]
+
+[project.scripts]
+antimeridian = "antimeridian._cli:cli"
+
+[dependency-groups]
+dev = [
+    "cartopy>=0.24.1",
+    "matplotlib>=3.9.2",
+    "mike>=2.1.3",
+    "mkdocs-click>=0.8.1",
+    "mkdocs-jupyter>=0.25.1",
+    "mkdocs-material[imaging]>=9.5.47",
+    "mkdocstrings[python]>=0.27.0",
+    "mypy>=1.2",
+    "packaging>=24.0",
+    "pre-commit>=4.0",
+    "pytest-console-scripts>=1.4",
+    "pytest>=8.0",
+    "ruff>=0.6.1",
+    "scipy>=1.14.1",
+    "shapely>=2.0.6",
+]
+
+[tool.mypy]
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "shapely",
+    "shapely.geometry",
+    "shapely.affinity",
+    "shapely.validation",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+filterwarnings = ["error"]
+
+[tool.ruff]
+lint.select = ["F", "E", "W", "I", "ERA", "RUF"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
