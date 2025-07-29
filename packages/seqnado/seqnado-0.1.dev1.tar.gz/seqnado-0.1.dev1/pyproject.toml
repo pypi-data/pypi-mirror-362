@@ -1,0 +1,50 @@
+[build-system]
+requires = [
+    "setuptools >= 61.0",
+    "wheel",
+    "setuptools_scm[toml]>=6.2",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seqnado"
+authors = [
+    {name = "Alastair Smith", email = "alastair.smith@ndcls.ox.ac.uk"},
+    {name = "Catherine Chahrour", email = "catherine.chahrour@msdtc.ox.ac.uk"}]
+description = "Pipelines for genomics analysis"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "GNU GENERAL PUBLIC LICENSE Version 3"}
+dynamic = ["version"]
+dependencies = [
+    "click",
+    "cookiecutter",
+    "pandas",
+    "pandera",
+    "pulp<=3.2.1",
+    "pydantic",
+    "pyyaml",
+    "seaborn",
+    "setuptools_scm",
+    "snakemake-wrapper-utils",
+    "snakemake>8,<9",
+    "snakemake-executor-plugin-slurm",
+    "tracknado",
+    "wget",
+]
+
+[project.scripts]
+seqnado = "seqnado.cli:cli_pipeline"
+seqnado-design = "seqnado.cli:cli_design"
+seqnado-config = "seqnado.cli:cli_config"
+seqnado-init = "seqnado.cli:cli_init"
+
+[tool.setuptools_scm]
+write_to = "seqnado/_version.py"
+local_scheme = "no-local-version"
+
+[tool.setuptools]
+packages = ["seqnado"]
+
+[project.urls]
+Homepage = "https://github.com/alsmith151/seqnado"
