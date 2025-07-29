@@ -1,0 +1,145 @@
+name: Build and Publish Python Package
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/cryptoservice/**'
+      - 'setup.py'
+      - 'pyproject.toml'
+  workflow_dispatch:
+  release:
+    types: [published]
+
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]"
+
+      - name: Run tests with pytest
+        run: |
+          pytest tests/ -v --cov=cryptoservice --cov-report=xml
+
+  release:
+    needs: test
+    runs-on: ubuntu-22.04
+    concurrency: release
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Python Semantic Release
+        id: release
+        uses: python-semantic-release/python-semantic-release@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git_committer_name: "github-actions"
+          git_committer_email: "actions@users.noreply.github.com"
+
+      - name: Check if release was created
+        if: steps.release.outputs.released == 'true'
+        run: |
+          echo "Version: ${{ steps.release.outputs.version }}"
+          echo "Release created successfully"
+
+      - name: Set up Python
+        if: steps.release.outputs.released == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build package
+        run: python -m build
+
+      - name: Check package
+        run: twine check dist/*
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist/*
+
+      - name: Get Changelog
+        id: changelog
+        if: steps.release.outputs.released == 'true'
+        run: |
+          # 使用 semantic release 生成的 changelog
+          if [ -f "CHANGELOG.md" ]; then
+            # 提取当前版本的 changelog 内容
+            CHANGELOG=$(awk "/## v${{ steps.release.outputs.version }}/{flag=1; next} /## v/{flag=0} flag" CHANGELOG.md)
+            if [ -z "$CHANGELOG" ]; then
+              # 如果没有找到版本特定的内容，尝试提取第一个版本块
+              CHANGELOG=$(awk '/## v/{if(first){exit} first=1; next} first' CHANGELOG.md)
+            fi
+          else
+            CHANGELOG="No changelog available"
+          fi
+
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Webhook Notification
+        if: success()
+        uses: distributhor/workflow-webhook@v3
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          data: |
+            {
+              "package": "cryptoservice",
+              "version": "${{ steps.release.outputs.version }}",
+              "commit": "${{ github.sha }}",
+              "author": "${{ github.actor }}",
+              "message": "Package published successfully to PyPI",
+              "changelog": ${{ steps.changelog.outputs.changelog != '' && toJSON(steps.changelog.outputs.changelog) || '"No changelog"' }},
+              "features": {
+                "new": ${{ contains(steps.changelog.outputs.changelog, '### Feature') }},
+                "fixes": ${{ contains(steps.changelog.outputs.changelog, '### Fix') }},
+                "breaking": ${{ contains(steps.changelog.outputs.changelog, 'BREAKING CHANGE') }}
+              },
+              "repository": "${{ github.repository }}",
+              "release_url": "https://github.com/${{ github.repository }}/releases/tag/v${{ steps.release.outputs.version }}"
+            }
+
+      - name: Create PR to develop
+        if: steps.release.outputs.released == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base develop \
+            --head main \
+            --title "chore(release): sync v${{ steps.release.outputs.version }} from main to develop" \
+            --body "This PR syncs the latest release from the main branch back to develop."
