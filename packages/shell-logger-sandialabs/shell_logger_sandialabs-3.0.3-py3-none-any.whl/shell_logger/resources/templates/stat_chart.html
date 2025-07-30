@@ -1,0 +1,38 @@
+<div class="card stat-chart">
+    <span class="card-title">{title}</span>
+    <div class="wrapper">
+        <canvas id="{id}"></canvas>
+    </div>
+</div>
+<script>
+var chart = new Chart("{id}", {{
+    type: "line",
+    data: {{
+        labels: {labels},
+        datasets: [{{
+            showLine: true,
+            lineTension: 0,
+            pointRadius: 0,
+            data: {data}
+        }}]
+    }},
+    options: {{
+        legend: false,
+        tooltips: {{
+            enabled: false
+        }},
+        scales: {{
+            yAxes: [{{
+                ticks: {{
+                    beginAtZero: true,
+                    max: 100,
+                    stepSize: 50
+                }}
+            }}],
+            xAxes: [{{
+                display: false
+            }}]
+        }}
+    }}
+}});
+</script>
