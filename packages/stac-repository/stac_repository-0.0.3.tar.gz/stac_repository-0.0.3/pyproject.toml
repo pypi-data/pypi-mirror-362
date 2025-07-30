@@ -1,0 +1,73 @@
+[project]
+dynamic = ["version"]
+
+name = "stac-repository"
+description = "A (git-)versionned STAC catalog storage and management system"
+keywords = [
+    "pystac",
+    "stac",
+    "database",
+    "git",
+    "repository",
+    "storage",
+    "store",
+]
+readme = "README.md"
+
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 4 - Beta",
+]
+
+authors = [{ name = "Pierre Fontbonne", email = "pierre.fontbonne@uca.fr" }]
+maintainers = [
+    { name = "Pierre Fontbonne", email = "pierre.fontbonne@uca.fr" },
+    { name = "Yannick Guéhenneux", email = "yannick.guehenneux@uca.fr" },
+]
+
+license = "etalab-2.0"
+license-files = ["LICENCE.txt"]
+
+requires-python = ">=3.12"
+
+dependencies = [
+    "pydantic ~= 2.10.3",
+    "stac-pydantic~=3.2.0",
+    "orjson ~= 3.10",
+    "shapely ~= 2.0.0",
+    "typer ~= 0.15.1",
+]
+
+[dependency-groups]
+
+dev = ["pytest ~= 8.3.0"]
+
+[project.scripts]
+stac-repository = "stac_repository_cli.app:app"
+stac-processor = "stac_processor_cli.app:app"
+
+[project.urls]
+Homepage = "https://github.com/fntb/stac-repository"
+Documentation = "https://github.com/fntb/stac-repository"
+Repository = "https://github.com/fntb/stac-repository"
+Issues = "https://github.com/fntb/stac-repository"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+    "stac_repository",
+    "stac_repository.file",
+    "stac_repository.git",
+    "stac_repository.stac",
+    "stac_repository_cli",
+    "stac_processor_cli",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "stac_repository.__about__.__version__" }
