@@ -1,0 +1,33 @@
+language: python
+sudo: false
+python:
+  - "2.7"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
+  - "pypy"
+  - "pypy3"
+matrix:
+  include:
+  - name: "postgres gtfs load test"
+    services:
+      - postgresql
+    install:
+      - pip install six sqlalchemy pytz docopt psycopg2-binary
+    script:
+      - python -m pygtfs.gtfs2db append pygtfs/test/data/sample_feed/ postgresql://postgres@localhost:5432
+    python: 3.9
+  - name: "postgres + bart gtfs load test"
+    services:
+      - postgresql
+    install:
+      - pip install six sqlalchemy pytz docopt psycopg2-binary
+      - curl -o bart_gtfs.zip https://www.bart.gov/sites/default/files/docs/google_transit_20211001_20220213_v1.zip
+    script:
+      - python -m pygtfs.gtfs2db append bart_gtfs.zip postgresql://postgres@localhost:5432
+    python: 3.9
+install:
+  - pip install six sqlalchemy pytz docopt
+script:
+  - python setup.py test
