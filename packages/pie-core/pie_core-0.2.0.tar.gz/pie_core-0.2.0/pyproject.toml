@@ -1,0 +1,80 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "pie-core"
+version = "0.2.0"
+description = "Core modules of PyTorch-IE"
+authors = ["Arne Binder <arne.binder@dfki.de>"]
+readme = "README.md"
+homepage = "https://github.com/arnebinder/pie-core"
+repository = "https://github.com/arnebinder/pie-core"
+license = "MIT"
+packages = [
+    { include = "pie_core", from = "src" },
+]
+include = [
+  { path = "LICENSES/**", format = "sdist" }
+]
+classifiers = [
+    "Framework :: Pytest",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+]
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/arnebinder/pie-core/issues"
+"Changelog" = "https://github.com/arnebinder/pie-core/releases"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+huggingface_hub = ">=0.23.4,<0.26.0"
+# required for (Iterable)TaskEncodingDataset
+torch = {version = "^2.1.0", source = "pytorch-cpu"}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
+pre-commit = "^3.4.0"
+
+[tool.poetry.group.dev]
+optional = true
+
+[[tool.poetry.source]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
+[[tool.poetry.source]]
+name = "pre-release"
+url = "https://test.pypi.org/simple/"
+priority = "explicit"
+
+
+[tool.pytest.ini_options]
+addopts = [
+  "--color=yes",
+  "--durations=0",
+  "--strict-markers",
+  "--doctest-modules",
+  "-m not test_hf_access",
+]
+filterwarnings = [
+  "ignore::DeprecationWarning",
+  "ignore::UserWarning",
+]
+log_cli = "True"
+markers = [
+  "slow: slow tests",
+  "test_hf_access: enable test failing if hf write access not provided",
+]
+minversion = "6.0"
+testpaths = "tests/"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: nocover",
+    "raise NotImplementedError",
+    "raise NotImplementedError()",
+    "if __name__ == .__main__.:",
+]
