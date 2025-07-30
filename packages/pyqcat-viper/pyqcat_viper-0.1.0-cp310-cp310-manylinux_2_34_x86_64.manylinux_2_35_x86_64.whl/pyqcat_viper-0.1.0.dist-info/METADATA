@@ -1,0 +1,67 @@
+Metadata-Version: 2.2
+Name: pyqcat-viper
+Version: 0.1.0
+Summary: The C++ accelerator library for Snake like optimizer.
+Author: HanQing Shi
+Author-email: shq@originqc.com
+Project-URL: Source Code, https://gitlab.qpanda.cn/spirit/pyqcat-viper
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: C++
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: project-url
+Dynamic: requires-python
+Dynamic: summary
+
+# pyqcat-viper
+---------------
+
+Copyright (c) Origin Quantum Computing 2025.
+
+We implemented the work point allocation algorithm by borrowing Google's Snake optimizer and combining it with test data from ours quantum chips. This algorithm was utilized to implement the work point allocation on the WuKong chip that was gone live in 2023, but now with the increasing size of the chip, the existing program is facing performance problems, so we have to find ways to improve the performance of the system. And Viper is using C++ to rewrite the error calculation part of the logic in the optimizer to improve the overall performance.
+
+## Principles
+------------
+Using viztracer, it was located that the algorithm speed is mainly limited by the computation of the error function, which will be called ~10000 times per DE algorithm executability, and under the current python framework, the single error function has been optimized to the extreme, but still cannot meet the demand. Therefore, the following two optimization directions are considered, using parallel computing and rewriting the error function using C++.
+Since we want to integrate it into a **Python** project, we use *Pybind11* to package Viper into a dynamic library and eventually provide it to Python.
+
+Requirement: https://document.qpanda.cn/docs/e1Az4bl4V7UVBaqW
+
+## Roadmap
+----------
+- [x] Use viztracer to generate and view call stacks and analyze call elapsed time.
+- [x] Study the Python code to make sense of the logic associated with the error calculation.
+- [x] Rewrite the entire error calculation flow of the chip using C++.
+- [x] Compare the results of the Python version of each step of the error calculation with the C++ version of the calculation.
+- [x] Wrapping C++ code into Python and testing it.
+- [x] Performance Tuning for Viper.EvaluationModel.
+- [x] Replacing the original error calculation model in Python with a new error calculation model and performing stability testing.
+- [x] Write a VipOptimizer that completely replaces the previous FreqAllocator.
+
+## Core developers
+------------------
+This project, pyqcat-viper, is conducted by Origin Quantum - Center of Measurement and Control - Software R&D Department - Group of **Spirit**.
+
+| Developer | Duty | Email | Title |
+| :----: | :---- | :---- |:---- |
+| Shi, Hanqing |Author of pyqcat-viper, as well as development of the initial version. |shq@originqc.com| Senior Software Engineer at OriginQ |
+| Dr. Peng Wang |Researcher of the Google snake like optimizer and wrote the Python version of the workpoint allocation code |pengwang@mail.ustc.edu.cn| PhD Candidate at USTC |
