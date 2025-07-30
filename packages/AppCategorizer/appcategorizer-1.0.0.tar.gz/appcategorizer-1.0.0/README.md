@@ -1,0 +1,179 @@
+<!-- # AppCategorizer
+
+A powerful **Python library** designed to **categorize software applications automatically** using Artificial Intelligence.
+
+## Table of Contents
+- [About](#about)
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+  - [Command Line Interface (CLI)](#command-line-interface-cli)
+- [How it Works](#how-it-works)
+- [Contributing](#contributing)
+- [Contact](#contact)
+
+## About
+
+`AppCategorizer` is a **Python package** that takes an application name as input and provides its most suitable category. It achieves this by **fetching application data from multiple sources** including Snapcraft, Flathub, Apple Store, GOG, Itch.io, and MyAbandonware. This comprehensive data collection is then processed using **Artificial Intelligence (AI)** and **Natural Language Processing (NLP)** techniques to accurately determine and assign the most suitable category to the application.
+
+The project is entirely written in Python.
+
+## Features
+
+`AppCategorizer` offers a robust set of features to streamline the application categorization process:
+
+*   **Multi-source Data Fetching**: Gathers comprehensive application information from **over 5 different sources**, ensuring a broad and rich dataset for categorization.
+*   **Intelligent Tag Normalization**: Cleans and standardizes diverse tags obtained from various data sources, ensuring consistent and high-quality input for the categorization process.
+*   **AI-Powered Categorization**: Utilizes **Natural Language Processing (NLP) techniques** to intelligently analyze application data and assign the most appropriate category.
+*   **Command Line Interface (CLI)**: Provides a **simple and intuitive CLI** for quick, on-the-fly application categorization, making it easy to use directly from the terminal.
+*   **Python API**: Offers **programmatic access**, allowing seamless integration into other Python projects, scripts, and automated workflows.
+
+## Installation
+
+You can install `AppCategorizer` directly using pip:
+
+```bash
+pip install AppCategorizer
+```
+
+
+## Quick Start
+
+### Command Line Interface (CLI)
+
+Use the `AppCategorizer` command directly in your terminal for quick categorization:
+
+```bash
+# For single-word application names:
+AppCategorizer Facebook
+# Expected Output: Social Networking
+
+# For multi-word application names (enclose in quotes):
+AppCategorizer 'Google Chrome'
+# Expected Output: Web Browser
+```
+
+
+## How it Works
+
+`AppCategorizer` operates by first **fetching relevant application data** from a diverse set of online repositories, which includes Snapcraft, Flathub, Apple Store, GOG, Itch.io, and MyAbandonware. Once this raw data is collected, it undergoes an **intelligent tag normalization process** designed to clean and standardize various tags, ensuring uniformity and reliability. Finally, the normalized data is fed into an **Artificial Intelligence model** that employs **Natural Language Processing (NLP) techniques** to accurately analyze the information and assign the most suitable category to the software application.
+
+## Contributing
+
+We welcome contributions to `AppCategorizer`! If you have suggestions for improvements, new features, or bug fixes, please feel free to:
+*   Open an issue to discuss your ideas or report bugs.
+*   Fork the repository and submit a pull request with your changes.
+
+## Contact
+
+For any questions or inquiries, please open an issue on the GitHub repository or contact [Zain Ramzan](https://www.linkedin.com/in/zainramzan). -->
+
+
+
+# AppCategorizer
+
+A powerful **Python library** designed to **categorize software applications automatically** using Artificial Intelligence.
+
+## Table of Contents
+
+* [About](#about)
+* [Features](#features)
+* [Installation](#installation)
+* [Quick Start](#quick-start)
+  * [Command Line Interface (CLI)](#command-line-interface-cli)
+  * [Batch Mode](#batch-mode)
+  * [Using the Library in Python Code](#using-the-library-in-python-code)
+* [How it Works](#how-it-works)
+* [API Documentation](#api-documentation)
+* [Contributing](#contributing)
+
+## About
+
+`AppCategorizer` is a **Python package** that takes an application name as input and provides its most suitable category. It achieves this by **fetching application data from multiple sources** including Snapcraft, Flathub, Apple Store, GOG, Itch.io, and MyAbandonware. This comprehensive data collection is then processed using **Artificial Intelligence (AI)** and **Natural Language Processing (NLP)** techniques to accurately determine and assign the most suitable category to the application.
+
+The project is entirely written in Python.
+
+## Features
+
+`AppCategorizer` offers a robust set of features to streamline the application categorization process:
+
+* **Multi-source Data Fetching**: Gathers comprehensive application information from **over 5 different sources**, ensuring a broad and rich dataset for categorization.
+* **Intelligent Tag Normalization**: Cleans and standardizes diverse tags obtained from various data sources, ensuring consistent and high-quality input for the categorization process.
+* **AI-Powered Categorization**: Utilizes **Natural Language Processing (NLP) techniques** to intelligently analyze application data and assign the most appropriate category.
+* **Command Line Interface (CLI)**: Provides a **simple and intuitive CLI** for quick, on-the-fly application categorization, making it easy to use directly from the terminal.
+* **Python API**: Offers **programmatic access**, allowing seamless integration into other Python projects, scripts, and automated workflows.
+
+## Installation
+
+You can install `AppCategorizer` directly using pip:
+
+```bash
+pip install AppCategorizer
+```
+
+## Quick Start
+
+### Command Line Interface (CLI)
+
+Use the `AppCategorizer` command directly in your terminal for quick categorization:
+
+```bash
+# For single-word application names:
+AppCategorizer facebook
+# Expected Output: social media
+
+# For multi-word application names (enclose in quotes):
+AppCategorizer "Google Chrome"
+# Expected Output: Web browser
+```
+
+### Batch Mode
+
+You can also use the batch mode to categorize multiple applications at once:
+
+```bash
+AppCategorizer batch input.txt output.csv
+```
+
+### Using the Library in Python Code
+
+You can use the AppCategorizer library in your Python code as follows:
+
+```python
+from AppCategorizer import process_app, batch_process, load_model
+
+# Single application categorization
+classifier = load_model()
+app_name = "Firefox"
+app_name, main_cat, ai_cat, sub_cats = process_app(app_name, classifier)
+print(f"Application: {app_name}")
+print(f"Rule-Based Category: {main_cat}")
+print(f"AI Category: {ai_cat}")
+print(f"Sub-Categories: {', '.join(sub_cats)}")
+
+# Batch categorization
+batch_process("input.txt", "output.csv")
+```
+
+## How it Works
+
+AppCategorizer operates by first fetching relevant application data from a diverse set of online repositories, which includes Snapcraft, Flathub, Apple Store, GOG, Itch.io, and MyAbandonware. Once this raw data is collected, it undergoes an intelligent tag normalization process designed to clean and standardize various tags, ensuring uniformity and reliability. Finally, the normalized data is fed into an Artificial Intelligence model that employs Natural Language Processing (NLP) techniques to accurately analyze the information and assign the most suitable category to the software application.
+
+## API Documentation
+
+### `process_app(app_name, classifier)`
+Categorizes a single application using the provided classifier.  
+**Parameters**:  
+- `app_name`: The name of the application to categorize  
+- `classifier`: The classifier to use for categorization  
+**Returns**: Tuple containing the application name, rule-based category, AI category, and sub-categories
+
+### `batch_process(input_file, output_file)`
+Categorizes a batch of applications from the input file and writes the results to the output file.  
+**Parameters**:  
+- `input_file`: File containing list of application names  
+- `output_file`: Desired output file name  
+
+## Contributing
+
+We welcome contributions to AppCategorizer! If you have suggestions for improvements, new features, or bug fixes, please feel free to contact <a href="https://www.linkedin.com/in/zainramzan" target="_blank">Zain Ramzan</a>
