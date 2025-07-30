@@ -1,0 +1,84 @@
+#!python
+# -*- coding: utf-8 -*-
+
+"""package ad9xdds
+author    Benoit Dubois
+copyright FEMTO ENGINEERING, 2022
+license   GPL v3.0+
+brief     Basic script to control AD9915 DDS development board through FTDI
+          USB to SPI adapter.
+details   AD9915 development board is configurable by USB through
+          FTDI 232H device, an USB to SPI transceiver.
+"""
+
+import argparse
+import pyftdi.spi as spi
+import ad9xdds.ad9915dev_umr232hm as ad9915
+
+
+def parse():
+    """Specific parsing procedure.
+    :returns: populated namespace (parser)
+    """
+    parser = argparse.ArgumentParser(
+        description='Set output frequency of AD9915 development board')
+    parser.add_argument('-if', action='store', dest='ifreq', type=str,
+                        help='Input frequency in MHz.')
+    parser.add_argument('-of', action='store', dest='ofreq', type=str,
+                        help='Output frequency (MHz).')
+    parser.add_argument('-a', action='store', dest='amp', type=int,
+                        help='Amplitude of output signal (u.a. 0 to {})'.\
+                        format(ad9915.AMAX))
+    parser.add_argument('-p', action='store', dest='phi', type=float,
+                        help='Phase of output signal')
+    parser.add_argument('-u', '--url', action='store',
+                        help='URL of FTDI UMR232HM (in the form \'ftdi:///\')')
+    parser.add_argument('--fine', action='store_true',
+                        help='Use fine tuning of output frequency')
+    parser.add_argument('-l', '--list', action='store_true',
+                        help='List FTDI device')
+    args = parser.parse_args()
+    return args
+
+
+"""Main part of script.
+"""
+args = parse()
+
+if args.list: # List FTDI URL and exit imediately after:
+    print(spi.SpiController().configure('ftdi:///?'))
+    exit(0)
+
+dds = ad9915.Ad9915Dev()
+dds.connect(url=args.url)
+
+if args.ifreq:
+    if not 0 < float(args.ifreq) < ad9915.IFMAX:
+        print("Input frequency out of range")
+    else:
+        dds.set_ifreq(float(args.ifreq))
+
+if args.phi:
+    if not 0 <= float(args.phi) < 360:
+        print("Phase out of range")
+    else:
+        dds.set_phy(args.phi)
+
+if args.amp:
+    if not 0 <= float(args.amp) <= ad9915.AMAX:
+        print("Amplitude out of range")
+    else:
+        dds.set_amp(args.amp)
+
+if args.ofreq:
+    if args.ifreq and not 0 < float(args.ofreq) <= (float(args.ifreq)*0.8):
+        print("Output frequency out of range")
+    elif not 0 < float(args.ofreq) <= (ad9915.IFMAX*0.8):
+        print("Output frequency out of range")
+    else:
+        if args.fine is True:
+            dds.set_operation_mode(ad9915.OPMODE['modulus'])
+            dds.set_ofreq_fine(args.ifreq, args.ofreq)
+        else:
+            dds.set_operation_mode(ad9915.OPMODE['profile'])
+            dds.set_ofreq(float(args.ofreq))
