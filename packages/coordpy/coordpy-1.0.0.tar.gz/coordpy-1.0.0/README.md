@@ -1,0 +1,1 @@
+Provides a class for geographic coordinate
