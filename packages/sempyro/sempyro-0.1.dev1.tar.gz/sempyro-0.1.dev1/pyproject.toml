@@ -1,0 +1,160 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sempyro"
+dynamic = ["version"]
+description = "SeMPyRO (for Semantic Models Python Pydantic RDF Ontology) is a Pydantic models representing classes of DCAT-AP v3 data model."
+keywords = ["rdf", "pydantic", "DCAT", "DCAT-AP", "data model"]
+requires-python = ">= 3.8.1"
+authors = [
+  { name = "Anastasia Nayden", email = "anastasia.nayden@health-ri.nl" },
+  { name = "Mark Janse", email = "mark.janse@health-ri.nl" },
+]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+dependencies = [
+  "rdflib >= 7.0.0",
+  "pydantic ~= 2.10.6",
+  "ruamel.yaml ~= 0.18.5",
+  "email-validator == 2.2.0",
+  "python-dateutil ~= 2.8",
+]
+
+readme = "README.md"
+license = { file = "LICENSE" }
+
+[project.optional-dependencies]
+notebook_docs = [
+  "notebook >= 7.0.6",
+  "pandas >=1.5.3",
+  "tabulate >= 0.9.0",
+  "fairclient >= 1.0.0",
+]
+
+[project.urls]
+Documentation = "https://github.com/Health-RI/SeMPyRO/tree/main/docs"
+Repository = "https://github.com/Health-RI/SeMPyRO.git"
+Issues = "https://github.com/Health-RI/SeMPyRO/issues"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
+
+[tool.hatch.envs.docs]
+features = ["notebook-docs"]
+
+[tool.hatch.envs.test]
+dependencies = ["pytest", "pytest-cov"]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12", "pypy3.9", "pypy3.10"]
+
+[tool.hatch.envs.test.scripts]
+test = "pytest {args:__tests__}"
+test-cov = "coverage run -m pytest {args:__tests__}"
+cov-report = ["- coverage combine", "coverage report", "coverage xml"]
+cov = ["test-cov", "cov-report"]
+
+[tool.hatch.envs.lint]
+detached = true
+dependencies = ["black>=23.1.0", "mypy>=1.0.0", "ruff>=0.0.243"]
+
+[tool.hatch.envs.lint.scripts]
+typing = "mypy --install-types --non-interactive {args:sempyro __tests__}"
+style = ["ruff {args:.}", "black --check --diff {args:.}"]
+fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
+all = ["style", "typing"]
+
+[tool.black]
+target-version = ["py38"]
+line-length = 120
+skip-string-normalization = true
+
+[tool.ruff]
+target-version = "py38"
+line-length = 120
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C",
+  "DTZ",
+  "E",
+  "EM",
+  "F",
+  "FBT",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "Q",
+  "RUF",
+  "S",
+  "T",
+  "TID",
+  "UP",
+  "W",
+  "YTT",
+]
+ignore = [
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "FBT003",
+  # Ignore checks for possible passwords
+  "S105",
+  "S106",
+  "S107",
+  # Ignore complexity
+  "C901",
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+]
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+]
+
+[tool.ruff.isort]
+known-first-party = ["sempyro"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.per-file-ignores]
+"__tests__/**/*" = ["PLR2004", "S101", "TID252"]
+"sempyro/dcat/__init__.py" = ["I001"]
+"sempyro/hri_dcat/__init__.py" = ["I001"]
+
+[tool.coverage.run]
+source_pkgs = ["sempyro", "__tests__"]
+branch = true
+parallel = true
+
+[tool.coverage.paths]
+sempyro = ["sempyro"]
+tests = ["__tests__"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
