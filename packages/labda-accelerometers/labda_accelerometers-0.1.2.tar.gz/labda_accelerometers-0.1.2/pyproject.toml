@@ -1,0 +1,79 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "labda-accelerometers"
+description = "A package designed to process data from movement sensors – accelerometers."
+readme = "README.md"
+authors = [
+    { name = "Josef Heidler", email = "jheidler@health.sdu.dk" }
+]
+version = "0.1.2"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+keywords = ["accelerometers", "sensors", "movement-behavior", "physical-activity"]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    'Operating System :: OS Independent',
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "agcounts>=0.2.6",
+    "numba>=0.61.2",
+    "pandas>=2.2.3",
+    "resampy>=0.4.3",
+    "scikit-digital-health>=0.17.9",
+]
+
+[project.urls]
+Homepage = 'https://github.com/josefheidler/labda-accelerometers'
+Documentation = 'https://labda.josefheidler.cz/accelerometers'
+Source = 'https://github.com/josefheidler/labda-accelerometers'
+Changelog = 'https://labda.josefheidler.cz/accelerometers/changelog'
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "labda-parsers",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "scipy>=1.15.3",
+    "pyarrow>=20.0.0",
+]
+
+[tool.ruff.lint]
+pydocstyle = { convention = 'google' }
+
+[tool.ruff]
+line-length = 120
+target-version = 'py311'
+
+[tool.ruff.format]
+quote-style = 'single'
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+[tool.uv.sources]
+labda-parsers = { path = "../labda-parsers", editable = true }
