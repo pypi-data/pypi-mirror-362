@@ -1,0 +1,296 @@
+# Shippo MCP Server
+
+A Model Context Protocol (MCP) server that integrates with the [Shippo shipping API](https://goshippo.com/) to provide shipping functionality through an AI assistant. This server enables you to validate addresses, get shipping rates, create shipments, generate shipping labels, track packages, manage carrier accounts, and handle refunds.
+
+## Features
+
+- **Address Validation**: Validate shipping addresses using Shippo's address validation service
+- **Shipping Rates**: Get real-time shipping rates from multiple carriers
+- **Shipment Management**: Create, list, and retrieve detailed shipment information
+- **Label Creation**: Generate shipping labels for packages
+- **Transaction Management**: List and manage shipping label transactions
+- **Refund Processing**: Create and track refunds for shipping labels
+- **Package Tracking**: Track packages using tracking numbers
+- **Carrier Management**: List and manage configured carrier accounts
+
+## Prerequisites
+
+1. **Homebrew** (macOS/Linux): Install from [brew.sh](https://brew.sh/)
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. **uv** (Python package manager): Install via Homebrew
+   ```bash
+   brew install uv
+   ```
+
+3. **Python 3.13+**: This project requires Python 3.13 or higher (uv will handle this)
+
+4. **Shippo Account**: Sign up for a free [Shippo account](https://apps.goshippo.com/join)
+
+5. **API Key**: Generate an [API Token](https://docs.goshippo.com/docs/guides_general/authentication/) from your Shippo dashboard
+
+## Installation
+
+1. Clone or download this repository
+2. Install dependencies using uv:
+   ```bash
+   uv install
+   ```
+
+## Configuration
+
+The server gets the Shippo API key from environment variables. You can set it either:
+
+1. **Via MCP client configuration** (recommended for production)
+2. **Via command line** for testing:
+   ```bash
+   export SHIPPO_API_KEY=shippo_test_your_api_key_here
+   ```
+
+> **Note**: Use a test API key (starts with `shippo_test_`) for development and testing. Only use live API keys for production.
+
+## Usage
+
+### Starting the Server
+
+#### For stdio transport (MCP client integration)
+```bash
+export SHIPPO_API_KEY=shippo_test_your_api_key_here && uv run --with shippo-mcp shippo-mcp stdio
+```
+
+#### For HTTP transport (Inspector compatible)
+```bash
+export SHIPPO_API_KEY=shippo_test_your_api_key_here && uv run --with shippo-mcp shippo-mcp server
+```
+The server will be available at: http://127.0.0.1:8000/mcp
+
+### Getting Help
+```bash
+uv run --with shippo-mcp shippo-mcp --help
+```
+
+### MCP Client Configuration
+
+#### Claude Desktop Configuration
+
+Add this configuration to your Claude Desktop config file (usually located at `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "shippo": {
+      "command": "/opt/homebrew/bin/uv",
+      "args": [
+        "run",
+        "--with",
+        "shippo-mcp",
+        "shippo-mcp",
+        "stdio"
+      ],
+      "env": {
+        "SHIPPO_API_KEY": "shippo_test_your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+### Available Tools
+
+#### Address & Validation
+
+##### 1. `validate_address`
+Validate a shipping address to ensure it's deliverable.
+
+**Parameters:**
+- `name` (required): Recipient name
+- `street1` (required): Primary street address
+- `city` (required): City name
+- `state` (required): State/province code
+- `zip_code` (required): ZIP/postal code
+- `country` (optional): Country code (default: "US")
+- `street2` (optional): Secondary address line
+- `company` (optional): Company name
+- `phone` (optional): Phone number
+- `email` (optional): Email address
+
+#### Rates & Shipping
+
+##### 2. `get_shipping_rates`
+Get shipping rates for a package between two addresses.
+
+**Parameters:**
+- `from_name` through `from_zip`: Sender address details
+- `to_name` through `to_zip`: Recipient address details
+- `length`, `width`, `height`: Package dimensions
+- `weight`: Package weight
+- `from_country`, `to_country` (optional): Country codes (default: "US")
+- `distance_unit` (optional): "in" or "cm" (default: "in")
+- `mass_unit` (optional): "lb" or "kg" (default: "lb")
+
+##### 3. `create_shipment`
+Create a shipment and get basic information about available rates.
+
+**Parameters:** Same as `get_shipping_rates`
+
+##### 4. `list_shipments`
+List all shipments for the account with summary information.
+
+**Parameters:** None
+
+##### 5. `get_shipment`
+Get detailed information about a specific shipment, including all available rates.
+
+**Parameters:**
+- `shipment_id` (required): The ID of the shipment to retrieve
+
+#### Labels & Transactions
+
+##### 6. `create_shipping_label`
+Create a shipping label from a rate ID.
+
+**Parameters:**
+- `rate_id` (required): The ID of the rate to purchase (obtained from `get_shipping_rates` or `get_shipment`)
+
+##### 7. `list_transactions`
+List all shipping label transactions to find transaction IDs for refunds.
+
+**Parameters:** None
+
+#### Refunds
+
+##### 8. `create_refund`
+Create a refund for a shipping label transaction.
+
+**Parameters:**
+- `transaction_id` (required): The ID of the transaction to refund (obtained from `list_transactions`)
+
+##### 9. `list_refunds`
+List all refunds for the account with detailed status information and visual indicators.
+
+**Parameters:** None
+
+##### 10. `get_refund`
+Get comprehensive details of a specific refund including status, dates, and transaction info.
+
+**Parameters:**
+- `refund_id` (required): The ID of the refund to retrieve
+
+#### Tracking & Management
+
+##### 11. `track_package`
+Track a package using its tracking number.
+
+**Parameters:**
+- `tracking_number` (required): The tracking number
+- `carrier` (required): Carrier name (e.g., "usps", "ups", "fedex")
+
+##### 12. `list_carrier_accounts`
+List all configured carrier accounts in your Shippo account.
+
+**Parameters:** None
+
+## Example Workflows
+
+### 1. Getting Shipping Quotes
+```
+1. Use `validate_address` for both sender and recipient addresses
+2. Confirm package dimensions and weight with user
+3. Use `get_shipping_rates` to get all available options
+4. Present rates clearly to user for selection
+```
+
+### 2. Complete Shipping Process
+```
+1. Validate sender and recipient addresses
+2. Confirm package dimensions and weight
+3. Use `get_shipping_rates` to get available options
+4. Present rates and ask user to select preferred option
+5. Use `create_shipping_label` with chosen rate_id
+6. Provide label URL and tracking information to user
+```
+
+### 3. Managing Existing Shipments
+```
+1. Use `list_shipments` to see all shipments and their IDs
+2. Use `get_shipment` with specific shipment ID for detailed info
+3. Use rate IDs from `get_shipment` to create labels with `create_shipping_label`
+```
+
+### 4. Refund Management
+```
+1. Use `list_transactions` to find the transaction ID for a purchased label
+2. Use `create_refund` with the transaction ID to request a refund
+3. Use `list_refunds` to see all refunds with status indicators
+4. Use `get_refund` for detailed status and explanations
+```
+
+### 5. Package Tracking
+```
+1. Get tracking number from shipping label creation
+2. Use `track_package` with tracking number and carrier
+3. Monitor delivery status and history
+```
+
+## Supported Carriers
+
+Shippo supports many carriers including:
+- USPS
+- UPS
+- FedEx
+- DHL
+- Canada Post
+- Australia Post
+- And many more regional carriers
+
+The available carriers depend on your Shippo account configuration and carrier accounts you've set up.
+
+## Development
+
+### Project Structure
+```
+shippo-mcp/
+├── server.py          # Main MCP server implementation
+├── pyproject.toml     # Python dependencies and project config
+└── readme.md          # This file
+```
+
+### Testing
+
+To test individual tools:
+
+1. Start the server
+2. Use an MCP client or test the functions directly
+3. Use Shippo's test API keys to avoid charges
+
+### Error Handling
+
+The server includes comprehensive error handling for:
+- Missing API keys
+- Invalid addresses
+- Network issues
+- Shippo API errors
+- Invalid parameters
+
+## Security Notes
+
+- Never commit your actual API keys to version control
+- Use test API keys for development
+- Live API keys will charge real money for label purchases
+- Store API keys securely in production environments
+
+## API Rate Limits
+
+Shippo has rate limits on their API. The server handles basic error cases, but for high-volume usage, consider implementing additional rate limiting or retry logic.
+
+## Support
+
+- [Shippo Documentation](https://docs.goshippo.com/)
+- [Shippo API Reference](https://docs.goshippo.com/docs/reference)
+- [MCP Protocol Documentation](https://modelcontextprotocol.io/)
+
+## License
+
+This project is open source. See the license terms in your repository for details.
