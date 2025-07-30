@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kailash-nexus"
+version = "1.0.0"
+description = "Zero-configuration multi-channel workflow orchestration platform"
+authors = [{name = "Kailash Team"}]
+dependencies = [
+    "kailash>=0.6.6",
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pytest-cov>=4.0",
+    "requests>=2.28",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "unit: Unit tests (fast, isolated)",
+    "integration: Integration tests (real services)",
+    "e2e: End-to-end tests (complete flows)",
+]
