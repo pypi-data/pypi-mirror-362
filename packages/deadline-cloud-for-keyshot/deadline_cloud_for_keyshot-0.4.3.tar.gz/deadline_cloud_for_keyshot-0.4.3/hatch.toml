@@ -1,0 +1,65 @@
+[envs.default]
+pre-install-commands = [
+  "pip install -r requirements-testing.txt"
+]
+
+[envs.default.scripts]
+sync = "pip install -r requirements-testing.txt"
+test = "pytest {args:test/unit}"
+test-installer = "pytest --no-cov {args:test/installer} -vvv --numprocesses=1"
+typing = "mypy {args:src test}"
+style = [
+  "ruff check {args:.}",
+  "black --check --diff {args:.}",
+]
+fmt = [
+  "black {args:.}",
+  "style",
+]
+lint = [
+  "style",
+  "typing",
+]
+
+[[envs.all.matrix]]
+python = ["3.9", "3.10", "3.11"]
+
+[envs.default.env-vars]
+SKIP_BOOTSTRAP_TEST_RESOURCES="True"
+
+[envs.codebuild.scripts]
+build = "hatch build"
+
+[envs.codebuild.env-vars]
+SKIP_BOOTSTRAP_TEST_RESOURCES="True"
+
+[envs.integ]
+pre-install-commands = [
+  "pip install -r requirements-integ-testing.txt",
+  "pip install -r requirements-testing.txt"
+]
+
+[envs.integ.scripts]
+test = "pytest --no-cov {args:test/integ} -vvv --numprocesses=1"
+
+[envs.release]
+detached = true
+
+[envs.release.scripts]
+deps = "pip install -r requirements-release.txt"
+bump = "semantic-release -v --strict version --no-push --no-commit --no-tag --skip-build {args}"
+version = "semantic-release -v --strict version --print {args}"
+
+[envs.installer.scripts]
+build-installer = "python {root}/scripts/build_installer_cli.py --installer-source-path {root}/installer/DeadlineCloudForKeyShotSubmitter.xml {args:}"
+
+[envs.docs]
+dependencies = [
+  "mkdocs>=1.5.0",
+  "mkdocs-material>=9.4.0",
+]
+
+[envs.docs.scripts]
+build = "mkdocs build"
+serve = "mkdocs serve"
+deploy = "mkdocs gh-deploy --force"
