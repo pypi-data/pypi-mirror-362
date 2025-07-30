@@ -1,0 +1,121 @@
+# Copyright 2025 The MelowRAG Author @erfanzar (Erfan Zare Chavoshi).
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+
+try:
+    from libcloud.storage.providers import DRIVERS, get_driver  # type:ignore
+    from libcloud.storage.types import ContainerDoesNotExistError, ObjectDoesNotExistError  # type:ignore
+
+    LIBCLOUD = True
+except ImportError:
+    LIBCLOUD, DRIVERS = False, None
+
+
+from .base import Cloud
+
+
+class ObjectStorage(Cloud):
+    """
+    Object storage cloud provider backed by Apache libcloud.
+    """
+
+    @staticmethod
+    def isprovider(provider):
+        """
+        Checks if this provider is an object storage provider.
+
+        Args:
+            provider: provider name
+
+        Returns:
+            True if this is an object storage provider
+        """
+
+        return LIBCLOUD and provider and provider.lower() in [x.lower() for x in DRIVERS]
+
+    def __init__(self, config):
+        super().__init__(config)
+
+        if not LIBCLOUD:
+            raise ImportError('Cloud object storage is not available - install "cloud" extra to enable')
+
+        driver = get_driver(config["provider"])
+
+        self.client = driver(
+            config.get("key", os.environ.get("ACCESS_KEY")),
+            config.get("secret", os.environ.get("ACCESS_SECRET")),
+            **{field: config.get(field) for field in ["host", "port", "region", "token"] if config.get(field)},
+        )
+
+    def metadata(self, path=None):
+        try:
+            if self.isarchive(path):
+                return self.client.get_object(self.config["container"], self.objectname(path))
+
+            return self.client.get_container(self.config["container"])
+        except (ContainerDoesNotExistError, ObjectDoesNotExistError):
+            return None
+
+    def load(self, path=None):
+        if self.isarchive(path):
+            obj = self.client.get_object(self.config["container"], self.objectname(path))
+
+            directory = os.path.dirname(path)
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+
+            obj.download(path, overwrite_existing=True)
+
+        else:
+            container = self.client.get_container(self.config["container"])
+            for obj in container.list_objects(prefix=self.config.get("prefix")):
+                localpath = os.path.join(path, obj.name)
+                directory = os.path.dirname(localpath)
+
+                os.makedirs(directory, exist_ok=True)
+
+                obj.download(localpath, overwrite_existing=True)
+
+        return path
+
+    def save(self, path):
+        try:
+            container = self.client.get_container(self.config["container"])
+        except ContainerDoesNotExistError:
+            container = self.client.create_container(self.config["container"])
+
+        for f in self.listfiles(path):
+            with open(f, "rb") as iterator:
+                self.client.upload_object_via_stream(
+                    iterator=iterator, container=container, object_name=self.objectname(f)
+                )
+
+    def objectname(self, name):
+        """
+        Derives an object name. This method checks if a prefix configuration parameter is present and combines
+        it with the input name parameter.
+
+        Args:
+            name: input name
+
+        Returns:
+            object name
+        """
+
+        name = os.path.basename(name)
+
+        prefix = self.config.get("prefix")
+
+        return f"{prefix}/{name}" if prefix else name
