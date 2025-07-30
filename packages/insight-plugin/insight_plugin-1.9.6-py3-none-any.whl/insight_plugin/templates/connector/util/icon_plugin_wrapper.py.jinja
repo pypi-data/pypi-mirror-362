@@ -1,0 +1,168 @@
+import base64
+import hashlib
+import json
+import logging
+import os
+import sys
+import tempfile
+import time
+import threading
+import uuid
+
+from cryptography.fernet import Fernet
+from typing import Union
+
+MORE_DATA_THRESHOLD = 32 * 1024  # 32k
+CACHED_FILE_EXPIRY_HOURS = 4
+
+# ICON plugins run in a multi-threaded runtime
+# so we need to have a mutex in certain sections
+lock = threading.RLock()
+
+reaper = None
+secret: Union[None, str] = None
+
+logger = logging.getLogger(__name__)
+
+
+def get_encryption_key():
+    global secret
+    global reaper
+
+    # Since we are running in a multi-threaded runtime,
+    # acquire a lock since we can mutate a global variable
+    with lock:
+        if secret is None:
+            password = str(uuid.uuid4()).encode()
+            # Even though md5 gets flagged by bandit, we're just using
+            # it to generate a encryption key and Fernet
+            # library requires it to be 32 bytes in size
+            key = hashlib.md5(password).hexdigest()  # nosec
+            secret = base64.urlsafe_b64encode(key.encode("utf-8"))
+
+        # Also, start up the reaper thread which will
+        # delete old (presumably orphaned) *.cached files
+        if reaper is None:
+            logger.info("Starting .cached file reaper thread")
+            reaper = threading.Thread(target=cached_files_reaper)
+            reaper.start()
+
+        return secret
+
+
+def encrypt(data, filename, key):
+    # write the encrypted file
+    with open(filename, "wb") as file:
+        file.write(Fernet(key).encrypt(json.dumps(data).encode("utf-8")))
+
+
+def decrypt(filename, key):
+    with open(filename, "rb") as file:
+        # read the encrypted data
+        return json.loads(Fernet(key).decrypt(file.read()).decode("utf-8"))
+
+
+# taken from https://stackoverflow.com/questions/45393694/size-of-a-dictionary-in-bytes
+def get_size(obj, seen=None):
+    """Recursively finds size of objects"""
+    size = sys.getsizeof(obj)
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    # Important mark as seen *before* entering recursion to gracefully handle
+    # self-referential objects
+    seen.add(obj_id)
+    if isinstance(obj, dict):
+        size += sum([get_size(v, seen) for v in obj.values()])
+        size += sum([get_size(k, seen) for k in obj.keys()])
+    elif hasattr(obj, '__dict__'):
+        size += get_size(obj.__dict__, seen)
+    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+        size += sum([get_size(i, seen) for i in obj])
+    return size
+
+
+#
+# Helper function that wraps a SurfaceCommand function and does a few things
+# specific to this integration:
+#
+# 1) If the size of 'more_data' is greater than a certain threshold, write the dictionary to
+#    disk (after encryption) and format a new 'more_data' which contains a reference
+#    to the cached data on disk.
+#
+# 2) Strip away None/null fields in the return result payload. We've seen problems
+#    where a None/null field causes the plugin output validation step to fail,
+#    e.g. 'None is not type dict'. Ideally, we'd change the insight plugin library
+#    to be more flexible with nullable fields, but for the time being, we should
+#    just remove them.
+#
+def call_connector_function(func, user_log, params: dict,
+                            max_bytes: int = MORE_DATA_THRESHOLD):
+    to_delete = None
+
+    try:
+        # if input parameter has a "more_data" and the more_data
+        # references some cached data stored on localdisk, go fetch and decypt it now
+        if "more_data" in params and isinstance(params["more_data"], dict) and "__localcache__" in params["more_data"]:
+            filename = params["more_data"]["__localcache__"]
+            more_data = decrypt(filename, get_encryption_key())
+            params["more_data"] = more_data
+            to_delete = filename
+
+        # call connector function
+        result = func(user_log, **params)
+
+        if "more_data" in result and isinstance(result["more_data"], dict):
+            # if the "more_data" that we want to return to the
+            # caller exceed a threshold, just store it locally
+            # on disk and format a reference to it, so we can pick
+            # it back up later
+            more_data_size = get_size(result["more_data"])
+
+            if more_data_size > max_bytes:
+                offload_filename = f"{tempfile.gettempdir()}/{str(uuid.uuid4()).replace('-', '')}.cached"
+                encrypt(result["more_data"], offload_filename, get_encryption_key())
+                result["more_data"] = {
+                    "__localcache__": offload_filename
+                }
+
+        # also, remove all null/None output fields which can cause
+        # problems with plugin return validation, e.g. None is not an instance of dict
+        return {
+            k: v for k, v in result.items() if v is not None
+        }
+
+    finally:
+        if to_delete is not None:
+            try:
+                os.remove(to_delete)
+            except Exception as ex:
+                logger.error(f"Could not delete {to_delete}", exc_info=ex)
+
+
+def clean_old_cached_files(hours_old):
+    logger.info("Purging old .cached files...")
+    now = time.time()
+    directory = tempfile.gettempdir()
+    for filename in os.listdir(directory):
+        try:
+            if filename.endswith(".cached"):
+                filepath = os.path.join(directory, filename)
+                if os.path.isfile(filepath):
+                    file_age = now - os.path.getmtime(filepath)
+                    if file_age > hours_old * 3600:
+                        try:
+                            os.remove(filepath)
+                            logger.info(f"Deleted {filepath}")
+                        except OSError as e:
+                            logger.error(f"Reaper: Could not delete {filepath}: {e}")
+        except Exception as ex:
+            logger.error(f"Reaper: Could not inspect {filename}: {ex}")
+
+
+def cached_files_reaper():
+    while True:
+        clean_old_cached_files(CACHED_FILE_EXPIRY_HOURS)
+        time.sleep(5.0 * 60.0)
