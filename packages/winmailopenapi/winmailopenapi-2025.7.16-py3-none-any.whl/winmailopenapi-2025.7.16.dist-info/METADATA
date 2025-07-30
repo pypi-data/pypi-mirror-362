@@ -1,0 +1,225 @@
+Metadata-Version: 2.1
+Name: winmailopenapi
+Version: 2025.7.16
+Summary: Winmail OpenApi
+Home-page: http://winmail.cn
+Author: Sway
+Author-email: sway_wang@foxmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.6.0
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: pydantic
+
+# Winmail-openapi
+
+## 介绍
+
+[Winmail](http://winmail.cn) OpenAPI 接口
+
+## 安装
+
+```bash
+pip install winmailopenapi
+```
+
+## 更新历史
+
+2025.07.16
+
+- 首次更新
+
+  
+
+## 使用说明
+
+可以使用HTTP、HTTPS请求，不检查证书。具体OpenApi的接口完整手册请查看Winmail官方文档。按官方OpenApi1.2版本完成，提供基础的参数提示。方法名使用Winmail接口中的方法名命名。
+并且加入了域别名、用户别名、系统通信组、公共地址簿接口。
+
+```python
+from winmailopenapi import OpenApi
+
+api = OpenApi('mail.test.com', 6080, 'bt6aWe181d5b', 'bt1t387e78f6871aea2016aR3916eb65e299b7affHb')
+
+print(api.updatesession())
+
+try:
+    print("用户登陆：")
+    print(api.login("username", "userpassword", tid=6))
+    
+    print("列邮件夹：")
+    print(api.folders())
+    print("新增邮件夹：")
+    print(api.folders.newfolder(newfolder="api-folder"))
+    print("重命名邮件夹：")
+    print(api.folders.renamefolder(folder="api-folder", newfolder="api-folder-rename"))
+    
+    print("列个人地址簿：")
+    print(api.addressbook())
+    
+    print("列用户邮件：")
+    print(api.msglist(folder='INBOX'))
+    print("移动用户邮件：")
+    print(api.msglist.move(folder='INBOX', msgid=2607, tofolder='newfolder'))
+    print("删除用户邮件：")
+    print(api.msglist.delete(folder='INBOX', msgid=2606))
+    
+    print("取新邮件数：")
+    print(api.msgnum())
+    
+    print("列系统通信组：")
+    print(api.systemgroup())
+    print("列公共地址簿：")
+    print(api.netaddressbook())
+    print("读取用户邮件内容：")
+    print(api.readmsg('INOBX', 2605))
+
+    print("写邮件内容：")
+    print(api.newmsg.reset())
+    print("上传附件：")
+    print(api.upload.upload(['C:\\login.txt']))
+    print("写邮件内容：")
+    print(api.newmsg.send(to='a@test.com', subject='主题', msgbody='邮件内容<font color=red>aaa</font>', ishtml=1))
+   
+except Exception as e:
+    print(e)
+
+    
+try:
+    print("管理员登陆：")
+    print(api.login("adminuser", "adminpassword", manage_path='admin'))
+    print("列用户：")
+    print(api.user(domain='test.com'))
+    print("列用户别名：")
+    print(api.useralias(domain='test.com'))
+    print("列组：")
+    print(api.group(domain='test.com'))
+    print("列域名：")
+    print(api.domain())
+    print("列域别名：")
+    print(api.domainalias())
+
+except Exception as e:
+    print(e)
+
+result = api.user.edited(name='usera', password='newpassword',  domain='test.com', changedpwd=1, authtype=0, status=0)
+print(result)  
+
+```
+
+
+
+**扩展说明**
+
+接口中未包含的可以参考以下调用OpenApi类直接操作提交。
+
+可以使用 get_api/post_api 提交，建议使用post_api，get请求长度有限，参数内容多的应当使用post_api。
+
+```python
+
+from winmailopenapi import OpenApi as WinmailApi
+
+server = 'mail.test.com'
+port = 6080
+apikey = 'bt6aWe18d35b'
+apisecret = 'btt387e78f64871aea2016aR3916eb65e299b7affHb'
+
+# 管理员接口示例
+manage_path = 'admin'
+user = 'admin'
+pwd = 'adminpassword'    
+api = WinmailApi(server, port, apikey, apisecret, use_ssl=False)
+
+login_result = api.login(user, pwd, manage_path)
+
+if login_result['result'] == 'ok':
+    # 更新session id防止会话过期，默认为30分钟过期。
+    if api.updatesession():
+        print('update ok')
+    else:
+        print('update failed')
+
+    # 取域名列表，按API接口说明的参数字典
+    method_params = {
+        "method": "domain"
+    }
+
+    method_result = api.post_api(**method_params)
+    
+    if method_result['result'] == 'ok':
+        print(method_result)
+    else:
+        print(method_result)
+
+else:
+    print(login_result)
+
+
+# 邮箱用户接口示例
+user = 'usera'
+pwd = 'mypassword'
+# 邮件用户的参考：sessid包含的webmail风格。如果是手机可以使用6，普通PC用0
+tid = 6
+api = WinmailApi(server, port, apikey, apisecret, use_ssl=False)
+
+login_result = api.login(user, pwd, tid=tid)
+if login_result['result'] == 'ok':
+    # print(api.url)
+    # print(api.sessid)
+
+    if api.updatesession():
+        print('update ok')
+    else:
+        print('update failed')
+
+    # 写邮件操作示例
+    # 上传附件操作，如果有多个附件可以一次请求也可以多次请求。每次请求的附件都会保留在邮件上除非使用reset清除。建议上传前清一下附件缓存
+    method_params = {
+        "method": "newmsg.reset",
+    }
+    method_result = api.get_api(**method_params)
+    if method_result['result'] != 'ok':
+        print(method_result)
+
+    # 第一次上传多个附件
+    method_params = {
+        "method": "upload.upload",
+        "attachfile": ['E://logs//webmail.log',
+                'E://logs//system.log']
+    }
+    method_result = api.post_api(**method_params)
+    if method_result['result'] != 'ok':
+        print(method_result)
+    # 第二次上传单个附件
+    method_params = {
+        "method": "upload.upload",
+        "attachfile": 'E://logs//admin.log'
+    }
+    method_result = api.post_api(**method_params)
+    if method_result['result'] != 'ok':
+        print(method_result)
+
+    # 写邮件信体
+    method_params = {
+        "method": "newmsg.send",
+        "from": "AA<a@test.com>",
+        "to": "B用户<b@test.com>",
+        "subject": 'OpenApi写信测试',
+        "msgbody": "<font color=red>RED content</font>",
+        "ishtml": '1',
+        "savetosent": '1'
+    }
+    method_result = api.post_api(**method_params)
+
+    if method_result['result'] == 'ok':
+        print(method_result)
+    else:
+        print(method_result)
+
+else:
+    print(login_result)
+```
+
+
+
