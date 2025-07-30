@@ -1,0 +1,325 @@
+{
+    "rules": [
+        {
+            "id": "access:open/publication",
+            "title": "Open Access Publication",
+            "message": "Publication articles must be Open Access",
+            "description": "The EU curation policy requires publication articles must be Open Access",
+            "level": "error",
+            "condition": {
+                "type": "comparison",
+                "left": {
+                    "type": "field",
+                    "path": "metadata.resource_type.id"
+                },
+                "operator": "==",
+                "right": "publication-article"
+            },
+            "checks": [
+                {
+                    "type": "comparison",
+                    "left": {
+                        "type": "field",
+                        "path": "access.files"
+                    },
+                    "operator": "==",
+                    "right": "public"
+                }
+            ]
+        },
+        {
+            "id": "journal:title/publication",
+            "title": "Journal Information",
+            "message": "Publication articles must state the journal it was published in",
+            "description": "The EU curation policy requires publication articles must state the journal it was published in",
+            "level": "error",
+            "condition": {
+                "type": "comparison",
+                "left": {
+                    "type": "field",
+                    "path": "metadata.resource_type.id"
+                },
+                "operator": "==",
+                "right": "publication-article"
+            },
+            "checks": [
+                {
+                    "type": "comparison",
+                    "left": {
+                        "type": "field",
+                        "path": "custom_fields.journal:journal.title"
+                    },
+                    "operator": "!=",
+                    "right": ""
+                }
+            ]
+        },
+        {
+            "id": "license:exists",
+            "title": "Record license",
+            "message": "All records must have a license",
+            "description": "The EU curation policy requires all records to have a license",
+            "level": "error",
+            "checks": [
+                {
+                    "type": "list",
+                    "operator": "exists",
+                    "path": "metadata.rights",
+                    "predicate": {}
+                }
+            ]
+        },
+        {
+            "id": "license:cc-by/publication",
+            "title": "Journal Article License",
+            "message": "Journal article should have a CC-BY license",
+            "description": "The EU curation policy recommends journal articles to have a CC-BY license",
+            "level": "info",
+            "condition": {
+                "type": "logical",
+                "operator": "and",
+                "expressions": [
+                    {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "metadata.resource_type.id"
+                        },
+                        "operator": "==",
+                        "right": "publication-article"
+                    },
+                    {
+                        "type": "list",
+                        "operator": "exists",
+                        "path": "metadata.rights",
+                        "predicate": {}
+                    }
+                ]
+            },
+            "checks": [
+                {
+                    "type": "list",
+                    "operator": "any",
+                    "path": "metadata.rights",
+                    "predicate": {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "id"
+                        },
+                        "operator": "in",
+                        "right": [
+                            "cc-by-1.0",
+                            "cc-by-2.0",
+                            "cc-by-2.5",
+                            "cc-by-3.0",
+                            "cc-by-3.0-at",
+                            "cc-by-3.0-us",
+                            "cc-by-4.0"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "license:cc-by-nc-nd/book",
+            "title": "Book License",
+            "message": "Book  should have a CC BY, NC or SA license",
+            "description": "The EU curation policy recommends books to have a CC BY, NC or SA license",
+            "level": "info",
+            "condition": {
+                "type": "logical",
+                "operator": "and",
+                "expressions": [
+                    {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "metadata.resource_type.id"
+                        },
+                        "operator": "in",
+                        "right": [
+                            "publication-book",
+                            "publication-section"
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "operator": "exists",
+                        "path": "metadata.rights",
+                        "predicate": {}
+                    }
+                ]
+            },
+            "checks": [
+                {
+                    "type": "list",
+                    "operator": "any",
+                    "path": "metadata.rights",
+                    "predicate": {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "id"
+                        },
+                        "operator": "in",
+                        "right": [
+                            "cc-by-1.0",
+                            "cc-by-2.0",
+                            "cc-by-2.5",
+                            "cc-by-3.0",
+                            "cc-by-3.0-at",
+                            "cc-by-3.0-us",
+                            "cc-by-4.0",
+                            "cc-by-nc-1.0",
+                            "cc-by-nc-2.0",
+                            "cc-by-nc-2.5",
+                            "cc-by-nc-3.0",
+                            "cc-by-nc-4.0",
+                            "cc-by-nc-nd-1.0",
+                            "cc-by-nc-nd-2.0",
+                            "cc-by-nc-nd-2.5",
+                            "cc-by-nc-nd-3.0",
+                            "cc-by-nc-nd-3.0-igo",
+                            "cc-by-nc-nd-4.0",
+                            "cc-by-nd-1.0",
+                            "cc-by-nd-2.0",
+                            "cc-by-nd-2.5",
+                            "cc-by-nd-3.0",
+                            "cc-by-nd-4.0"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "license:osi/software",
+            "title": "Software License",
+            "message": "Software must have an appropriate license",
+            "description": "The EU curation policy requires software to have an appropriate license",
+            "level": "info",
+            "condition": {
+                "type": "logical",
+                "operator": "and",
+                "expressions": [
+                    {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "metadata.resource_type.id"
+                        },
+                        "operator": "==",
+                        "right": "software"
+                    },
+                    {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "access.files"
+                        },
+                        "operator": "==",
+                        "right": "public"
+                    },
+                    {
+                        "type": "list",
+                        "operator": "exists",
+                        "path": "metadata.rights",
+                        "predicate": {}
+                    }
+                ]
+            },
+            "checks": [
+                {
+                    "type": "comparison",
+                    "left": {
+                        "type": "field",
+                        "path": "metadata.license.type"
+                    },
+                    "operator": "==",
+                    "right": "software-related-license"
+                }
+            ]
+        },
+        {
+            "id": "license:cc-by-0/other",
+            "title": "Records should be CC-BY or CC-0 License",
+            "message": "Unless the record is a article, book, section or software, it should be CC BY or CC 0",
+            "description": "The EU curation policy suggests records should have a CC BY or CC 0 license",
+            "level": "info",
+            "condition": {
+                "type": "logical",
+                "operator": "and",
+                "expressions": [
+                    {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "metadata.resource_type.id"
+                        },
+                        "operator": "not in",
+                        "right": [
+                            "publication-article",
+                            "publication-book",
+                            "publication-section",
+                            "software"
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "operator": "exists",
+                        "path": "metadata.rights",
+                        "predicate": {}
+                    }
+                ]
+            },
+            "checks": [
+                {
+                    "type": "list",
+                    "operator": "any",
+                    "path": "metadata.rights",
+                    "predicate": {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "id"
+                        },
+                        "operator": "in",
+                        "right": [
+                            "cc0-1.0",
+                            "cc-by-1.0",
+                            "cc-by-2.0",
+                            "cc-by-2.5",
+                            "cc-by-3.0",
+                            "cc-by-3.0-at",
+                            "cc-by-3.0-us",
+                            "cc-by-4.0"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "funding:eu",
+            "title": "EU Funding",
+            "message": "Records must have at least one EU-funded project",
+            "description": "The EU curation policy requires author to have persistent identifiers",
+            "level": "error",
+            "checks": [
+                {
+                    "type": "list",
+                    "operator": "any",
+                    "path": "metadata.funding",
+                    "predicate": {
+                        "type": "comparison",
+                        "left": {
+                            "type": "field",
+                            "path": "funder.id"
+                        },
+                        "operator": "==",
+                        "right": "00k4n6c32"
+                    }
+                }
+            ]
+        }
+    ]
+}
