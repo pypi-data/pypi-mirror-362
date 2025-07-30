@@ -1,0 +1,247 @@
+/* Date Range Picker Styles - Compact Version Only */
+
+/* Base structure - minimal styling since we only use compact */
+.date-range-picker {
+    /* No styling needed here - compact version overrides everything */
+}
+
+/* Compact version styling */
+.date-range-picker-compact .date-range-picker {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Stacked layout for when space is constrained */
+.date-range-picker-stacked {
+    flex-direction: column !important;
+    align-items: stretch !important;
+}
+
+.date-range-picker-stacked .date-range-controls {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.date-range-picker-stacked .date-range-info {
+    margin-left: 0 !important;
+    margin-top: 0.5rem !important;
+    width: 100%;
+    text-align: left;
+}
+
+.date-range-picker-compact .date-range-controls {
+    flex: 0 1 auto;  /* Don't grow to fill space, only shrink if needed */
+    display: flex;
+    align-items: center;
+}
+
+.date-range-picker-compact .date-range-info {
+    margin-left: 1rem;  /* Fixed spacing instead of auto */
+    margin-top: 0;
+    line-height: 1;
+    flex-shrink: 0;  /* Prevent info from shrinking */
+    white-space: nowrap;  /* Keep text on one line */
+}
+
+/* Shared controls styling */
+.date-range-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.date-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Compact version for charts */
+.chart-container .date-range-picker,
+.date-range-picker-compact {
+    padding: 0.2rem;
+    margin-bottom: 0.2rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+}
+
+.chart-container .date-range-controls,
+.date-range-picker-compact .date-range-controls {
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    flex-shrink: 1;  /* Allow controls to shrink if needed */
+}
+
+.chart-container .date-input-group,
+.date-range-picker-compact .date-input-group {
+    gap: 0.25rem;
+}
+
+.chart-container .date-input-group label,
+.date-range-picker-compact .date-input-group label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.chart-container .date-input-group input[type="date"],
+.date-range-picker-compact .date-input-group input[type="date"] {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.8rem;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    color: #333;
+    font-family: inherit;
+}
+
+/* Focus state for date inputs */
+.chart-container .date-input-group input[type="date"]:focus,
+.date-range-picker-compact .date-input-group input[type="date"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* Make unfocused date inputs darker for better readability */
+.chart-container .date-input-group input[type="date"]:not(:focus),
+.date-range-picker-compact .date-input-group input[type="date"]:not(:focus) {
+    opacity: 0.85;
+    background: #ffffff;
+}
+
+.chart-container .date-range-apply,
+.chart-container .date-range-preset,
+.date-range-picker-compact .date-range-apply,
+.date-range-picker-compact .date-range-preset {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Subtle buttons for compact version */
+.chart-container .date-range-apply,
+.date-range-picker-compact .date-range-apply {
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chart-container .date-range-apply:hover,
+.date-range-picker-compact .date-range-apply:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    transform: none;
+    box-shadow: none;
+}
+
+.chart-container .date-range-preset,
+.date-range-picker-compact .date-range-preset {
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chart-container .date-range-preset:hover,
+.date-range-picker-compact .date-range-preset:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.chart-container .date-range-info,
+.date-range-picker-compact .date-range-info {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: #333;
+}
+
+/* Make it even more compact on smaller screens */
+@media (max-width: 768px) {
+    .date-range-picker-compact .date-range-controls {
+        font-size: 0.75rem;
+    }
+    
+    .date-range-picker-compact .date-input-group input[type="date"] {
+        width: 110px;
+    }
+}
+
+/* Ensure stacked layout works in chart containers too */
+.chart-container .date-range-picker-stacked,
+.date-range-picker-compact .date-range-picker-stacked {
+    padding: 0.4rem;
+}
+
+.chart-container .date-range-picker-stacked .date-range-info,
+.date-range-picker-compact .date-range-picker-stacked .date-range-info {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+    .chart-container .date-range-picker,
+    .date-range-picker-compact {
+        background: rgba(217, 220, 224, 0.3);
+        border-color: rgba(217, 220, 224, 0.3);
+    }
+    
+    /* Labels in dark theme */
+    .chart-container .date-input-group label,
+    .date-range-picker-compact .date-input-group label {
+        color: #cbd5e0;
+    }
+    
+    /* Keep white-ish background for compact date inputs */
+    .chart-container .date-input-group input[type="date"],
+    .date-range-picker-compact .date-input-group input[type="date"] {
+        background: rgba(255, 255, 255, 0.1);
+        color: #e2e8f0;
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Buttons in dark theme */
+    .chart-container .date-range-apply,
+    .date-range-picker-compact .date-range-apply {
+        background: transparent;
+        color: #9ca3af;
+        border-color: #4b5563;
+    }
+    
+    .chart-container .date-range-apply:hover,
+    .date-range-picker-compact .date-range-apply:hover {
+        background: #374151;
+        border-color: #6b7280;
+    }
+    
+    .chart-container .date-range-preset,
+    .date-range-picker-compact .date-range-preset {
+        background: transparent;
+        color: #9ca3af;
+        border-color: #4b5563;
+    }
+    
+    .chart-container .date-range-preset:hover,
+    .date-range-picker-compact .date-range-preset:hover {
+        background: #374151;
+        border-color: #6b7280;
+    }
+    
+    /* Info text in dark theme */
+    .chart-container .date-range-info,
+    .date-range-picker-compact .date-range-info {
+        color: #9ca3af;
+    }
+}
