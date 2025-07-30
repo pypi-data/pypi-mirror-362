@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContextForge 🚀</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-title">ContextForge 🚀</h1>
+                <div class="folder-indicator">
+                    <span id="current-folder-display" class="folder-display">No folder selected</span>
+                    <button id="browse-dialog-btn" class="btn btn-small">📁 Browse</button>
+                    <button id="settings-btn" class="btn btn-small">⚙️ Settings</button>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle dark/light theme">
+                    <span class="theme-icon sun-icon">☀️</span>
+                    <span class="theme-icon moon-icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - File Tree -->
+            <div class="left-panel">
+                <div class="panel-header">
+                    <h3>Project Files</h3>
+                    <div class="tree-controls">
+                        <button id="select-all-btn" class="btn btn-small">Select All</button>
+                        <button id="select-none-btn" class="btn btn-small">Select None</button>
+                    </div>
+                </div>
+                <div class="file-tree-container">
+                    <div id="file-tree" class="file-tree">
+                        <!-- Recent folders will be rendered here by JavaScript -->
+                    </div>
+                </div>
+                <div class="selection-summary">
+                    <div class="summary-item">
+                        <span>Selected: <span id="selected-count">0</span> files</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Est. tokens: <span id="token-estimate">0</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Instructions -->
+            <div class="right-panel">
+                <div class="panel-header">
+                    <h3>Instructions</h3>
+                    <div class="copy-controls">
+                        <button id="copy-btn" class="btn btn-primary" disabled>Copy</button>
+                        <button id="xml-copy-btn" class="btn btn-primary" disabled>XML Copy</button>
+                    </div>
+                </div>
+                
+                <!-- Instructions Section -->
+                <div class="instructions-section">
+                    <textarea id="instructions" placeholder="Enter your instructions for the AI here...
+e.g., 'Please review this code and suggest improvements' or 'Help me understand how this codebase works'"></textarea>
+                </div>
+                
+                <!-- XML Input Section -->
+                <div class="xml-input-section">
+                    <div class="section-header">
+                        <label>Apply XML Changes</label>
+                        <button id="preview-changes-btn" class="btn btn-primary">Preview Changes</button>
+                    </div>
+                    <textarea id="xml-input" placeholder="Paste XML changes here to apply them to your files..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Folder Browser Modal -->
+        <div id="folder-browser-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-header-left">
+                        <h2>Select Folder</h2>
+                        <div class="path-input-container">
+                            <input type="text" id="browser-path-input" placeholder="Enter path (e.g., ~/Documents or /Users/username)" />
+                        </div>
+                    </div>
+                    <button class="modal-close" id="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-sidebar">
+                        <div class="sidebar-section">
+                            <div class="sidebar-section-title">Favorites</div>
+                            <button class="sidebar-item quick-link" data-path="~">
+                                <span class="sidebar-item-icon">🏠</span>
+                                <span>Home</span>
+                            </button>
+                            <button class="sidebar-item quick-link" data-path="~/Desktop">
+                                <span class="sidebar-item-icon">🖥️</span>
+                                <span>Desktop</span>
+                            </button>
+                            <button class="sidebar-item quick-link" data-path="~/Documents">
+                                <span class="sidebar-item-icon">📄</span>
+                                <span>Documents</span>
+                            </button>
+                            <button class="sidebar-item quick-link" data-path="~/Downloads">
+                                <span class="sidebar-item-icon">⬇️</span>
+                                <span>Downloads</span>
+                            </button>
+                        </div>
+                        <div class="sidebar-section" id="recent-section">
+                            <div class="sidebar-section-title">Recent</div>
+                            <div id="recent-folders">
+                                <!-- Recent folders will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-main">
+                        <div class="columns-browser-container">
+                            <div id="columns-browser" class="columns-browser">
+                                <!-- Column views will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Toast -->
+        <div id="error-toast" class="error-toast hidden">
+            <span id="error-message"></span>
+            <button id="error-close">×</button>
+        </div>
+
+        <!-- Success Toast -->
+        <div id="success-toast" class="success-toast hidden">
+            <span id="success-message"></span>
+            <button id="success-close">×</button>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>File Ignore Settings</h2>
+                    <button class="modal-close" id="settings-modal-close">&times;</button>
+                </div>
+                <div class="modal-body settings-modal-body">
+                    <div class="settings-section">
+                        <h3>Gitignore Settings</h3>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="use-gitignore" checked>
+                            <span>Use .gitignore file if present</span>
+                        </label>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Custom Ignore Patterns</h3>
+                        <p class="settings-help">Add patterns to ignore files (e.g., *.log, temp/*, secret.txt)</p>
+                        <div class="pattern-list" id="ignore-patterns-list">
+                            <!-- Patterns will be populated here -->
+                        </div>
+                        <div class="pattern-input-group">
+                            <input type="text" id="new-ignore-pattern" placeholder="Enter pattern..." />
+                            <button id="add-ignore-pattern" class="btn btn-small">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Whitelist Patterns</h3>
+                        <p class="settings-help">Whitelist patterns override all ignore rules (e.g., important.log)</p>
+                        <div class="pattern-list" id="whitelist-patterns-list">
+                            <!-- Patterns will be populated here -->
+                        </div>
+                        <div class="pattern-input-group">
+                            <input type="text" id="new-whitelist-pattern" placeholder="Enter pattern..." />
+                            <button id="add-whitelist-pattern" class="btn btn-small">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Default Ignored Patterns</h3>
+                        <p class="settings-help">These patterns are always ignored by default:</p>
+                        <div class="default-patterns" id="default-patterns-list">
+                            <!-- Default patterns will be shown here -->
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="show-ignored-files">
+                            <span>Show ignored files in tree (grayed out)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="stats-display">
+                        <span id="ignore-stats"></span>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="settings-cancel" class="btn btn-secondary">Cancel</button>
+                        <button id="settings-save" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diff Processor Modal -->
+        <div id="diff-modal" class="modal hidden">
+            <div class="modal-content diff-modal-content-large">
+                <div class="modal-header">
+                    <h2>Preview XML Changes</h2>
+                    <button class="modal-close" id="diff-modal-close">&times;</button>
+                </div>
+                <div class="modal-body diff-modal-body">
+                    <div id="diff-preview-section" class="diff-preview-section">
+                        <div class="diff-sidebar">
+                            <h3>Files to Modify</h3>
+                            <div id="file-groups-list"></div>
+                        </div>
+                        <div class="diff-viewer-container">
+                            <div class="file-tabs-container">
+                                <div class="file-tabs" id="file-tabs"></div>
+                            </div>
+                            <div class="code-viewer-wrapper">
+                                <h3 id="code-viewer-title">Select a file to preview</h3>
+                                <div id="code-viewer" class="code-viewer-unified"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="diff-summary">
+                        <span id="diff-summary-text">No changes parsed</span>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="diff-cancel-btn" class="btn btn-secondary">Cancel</button>
+                        <button id="diff-apply-selected-btn" class="btn btn-primary" style="display: none;" disabled>Apply Selected</button>
+                        <button id="diff-apply-all-btn" class="btn btn-primary" style="display: none;" disabled>Apply All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
