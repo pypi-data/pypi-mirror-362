@@ -1,0 +1,134 @@
+.\" SPDX-FileCopyrightText: © 2025 Corn
+.\"
+.\" SPDX-License-Identifier: GFDL-1.3-or-later
+
+.TH PYROM "1" "July 2025" "pyrom 1.0" "User Commands"
+.SH NAME
+pyrom \- utility for checking integrity of ROM files
+.SH SYNOPSIS
+.SY pyrom
+.RB [ \-f ]
+.RB [ \-S ]
+.RB [ \-s ]
+.RB [ \-m ]
+.RB [ \-j
+.IR THREADS ]
+.RB [ \-l
+.IR HASHERS ]
+.RB [ \-\-strict ]
+.RB [ \-u ]
+.RB [ \-d
+.IR DIR ]
+.RB [ \-r ]
+.RB [ \-C
+.IR CHECKS ]
+.RB [ \-o
+.IR OUTPUT ]
+.RB [ \-q ]
+.B files
+.RI [ files ...]
+.YS
+.SY pyrom
+.RB [ \-h | \-\-help ]
+.YS
+.SY pyrom
+.RB [ \-v | \-\-version ]
+.YS
+.SS "positional arguments:"
+.TP
+.B files
+DATfiles to get checksums from
+.SS "options:"
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+show a help message and exit
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+show program's version number and exit
+.TP
+\fB\-f\fR, \fB\-\-show\-failed\fR
+Show a list of corrupted ROMs after checks are finished
+.TP
+\fB\-S\fR, \fB\-\-show\-summary\fR
+After checks are finished, display how many files are ok/missing/corrupt etc.
+.TP
+\fB\-s\fR, \fB\-\-show\-skipped\fR
+Show a list of duplicate titles skipped
+.TP
+\fB\-m\fR, \fB\-\-show\-missing\fR
+Show a list of missing titles after checks are finished
+.TP
+\fB\-j\fR THREADS, \fB\-\-threads\fR THREADS
+How many threads to use for reading files from disk (default = nproc/4)
+.TP
+\fB\-l\fR HASHERS, \fB\-\-hashers\fR HASHERS
+How many hash checks to run in parallel (default = nproc/4)
+.TP
+\fB\-\-strict\fR
+Match ROMs only if the directory they are in matches the console name
+.TP
+\fB\-u\fR, \fB\-\-print\-unresolved\fR
+Print all files that could not be matched to a game.
+Note that unresolved files are not considered the
+result and will always be printed to stdout. May
+increase the runtime since ALL files in the target
+directory will be checked.
+.TP
+\fB\-d\fR DIR, \fB\-\-dir\fR DIR
+Root directory in which ROMs are stored (default is the current directory).
+.TP
+\fB\-r\fR, \fB\-\-machine\-readable\fR
+Display results in a machine\-readable format
+.TP
+\fB\-C\fR CHECKS, \fB\-\-disable\-checks\fR CHECKS
+Comma\-separated list of checks to disable ('size', 'crc', 'md5', 'sha1', 'sha256', 'xxh3', 'b3')
+.TP
+\fB\-o\fR OUTPUT, \fB\-\-output\-file\fR OUTPUT
+Name of a file file to write results to. Without this option results are written to stdout.
+(You will likely want to use this with the \fB\-\-machine\fR option)
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Silence progress bars
+.SH DESCRIPTION
+When invoked, pyrom will first parse the provided files. These can either be normal DAT files or pyrom's custom format. Mixing them is permitted.
+Then, it will walk the given directory (or the current one), assigning each file it finds that matches a known ROM, until it has walked all files or
+assigned all ROMs. Any ROMs that did not have matching files will be marked as missing.
+
+Note that pyrom searches for files according to their names - requiring strict naming (if you do not know the correct name of the file, use 
+.MR pyrom\-morph 1
+to retrieve it). It is not required to follow the naming convention for directories, though you can speed up resolving which files belong to which ROM
+when there are duplicate names by using the 
+.B \-\-strict
+option.
+
+On the topic of conflicts, if a file can belong to multiple ROMs (and therefore, logically, to multiple games), it will first be resolved according to the directory it is in -
+either matching the game name or the console name. If that fails, it will be matched according to the size and if even that fails, crc will be attempted.
+The game name, size and crc checks are skipped when 
+.B \-\-strict 
+is given. If it so happens that the ROMs are identical - all except one will be skipped, since the file is identical for all of them, there is no need
+to check it multiple times.
+
+Then, it will hash the file with each algorithm which was specified in the DAT files - if a single check fails, subsequent ones are cancelled
+and the whole ROM as well as the Game it belongs to are marked as failed.
+Lastly, it will print the statistics according to the options given. By default, this is like specifying '-Sf', i.e. summary + print failed games.
+.SH OPTIONS
+Some options have more nuance to them and are described at more length here.
+.TP 
+.B \-j|\-\-threads/\-l|\-\-hashers
+The total number of OS threads that will be spawned in total is 
+.IB threads * hashers + threads .
+This is because each thread that loads a file starts its own ThreadPool for hashing.
+You should also take into consideration the storage medium in which your files are stored -
+if you have many extra threads, but are hosting your files on an HDD,
+adding more threads will likely overwhelm your disk instead of providing any speedups.
+.TP
+.B \-o|\-\-output
+Note that using 
+.B \-\-output
+is not exactly equivalent to just piping the output to a file. By using a shell pipe, a newline will typically be prepended to the file (a quirk of the 
+.I rich
+library) and a progress bar will not be displayed even if the
+.B \-\-quiet
+option was not given.
+.TP
+
