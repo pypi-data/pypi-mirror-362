@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/cloudinary-video-player@latest/dist/cld-video-player.min.css">
+</head>
+
+<body>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/cloudinary-video-player@latest/dist/cld-video-player.light.min.js"></script>
+    
+    <video
+        style="min-width:100vw;min-height:100vh;max-width:100vw;max-height:100vh"
+        id="demo-player"
+        controls
+        class="cld-video-player"
+    >
+    </video>
+    <script>
+        var cld = cloudinary.Cloudinary.new({cloud_name: "demo", secure: true});
+        var player = cld.videoPlayer('demo-player', {
+            posterOptions: {
+                transformation: {
+                    start_offset: 0,
+                }
+            }
+        })
+        var info = {
+            title: "dog",
+            subtitle: "woof"
+        }
+
+        player.source({
+            publicId: "dog",
+            info: info
+        })
+        document.body.style='margin:0px;'
+    </script>
+</body>
