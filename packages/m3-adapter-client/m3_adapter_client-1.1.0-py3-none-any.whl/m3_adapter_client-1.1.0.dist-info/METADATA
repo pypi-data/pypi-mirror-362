@@ -1,0 +1,78 @@
+Metadata-Version: 2.4
+Name: m3-adapter-client
+Version: 1.1.0
+Summary: M3 UI клиента для взаимодействия со СМЭВ3 посредством Адаптера
+Author: BARS Group
+Author-email: education_dev@bars-open.ru
+License: MIT
+Classifier: Intended Audience :: Developers
+Classifier: Environment :: Web Environment
+Classifier: Natural Language :: Russian
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: Django :: 2.2
+Classifier: Framework :: Django :: 3.0
+Classifier: Framework :: Django :: 3.1
+Classifier: Framework :: Django :: 3.2
+Classifier: Framework :: Django :: 4.0
+Description-Content-Type: text/markdown
+Requires-Dist: m3-core<3
+Requires-Dist: m3-ui<3
+Requires-Dist: m3-objectpack<3
+Requires-Dist: adapter-client<4
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: summary
+
+# M3 UI клиента для взаимодействия со СМЭВ3 посредством Адаптера
+
+## Подключение
+settings:
+
+    INSTALLED_APPS = [
+        'adapter_client',
+        'm3_adapter_client'
+    ]
+
+
+apps:
+
+    from django.apps.config import AppConfig as AppConfigBase
+
+    class AppConfig(AppConfigBase):
+
+        name = __package__
+
+        def ready(self):
+            self._init_adapter_client()
+
+        def _init_adapter_client(self):
+            from adapter_client.config import ProductConfig, set_config
+
+            set_config(ProductConfig())
+
+app_meta:
+
+    from django.conf.urls import url
+    from m3_adapter_client import actions
+    from .controllers import controller
+
+    def register_actions():
+        controller.extend_packs((
+            actions.Pack(),
+            actions.JournalPack(),
+        ))
+
+## Запуск тестов
+    $ tox
