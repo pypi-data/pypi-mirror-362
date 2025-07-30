@@ -1,0 +1,149 @@
+Metadata-Version: 2.4
+Name: babbl
+Version: 0.2.8
+Summary: Turn markdown into beautiful research blog posts
+Author-email: Michael Lutz <michael@example.com>
+License: MIT
+Keywords: markdown,blog,research,static-site
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: markdown>=3.4.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jinja2>=3.1.0
+Requires-Dist: click>=8.1.0
+Requires-Dist: pathspec>=0.11.0
+Requires-Dist: watchdog>=3.0.0
+Requires-Dist: pygments>=2.15.0
+Requires-Dist: marko>=2.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Dynamic: license-file
+
+# Babbl
+
+A modern markdown-to-HTML converter designed for research blog posts with support for tables, code references, and beautiful styling.
+
+## Features
+
+- **Clean HTML Output**: Semantic HTML with responsive CSS styling
+- **Table Support**: Full markdown table rendering with clean styling
+- **Code References**: Include code snippets from files using simple syntax
+- **Syntax Highlighting**: Pygments integration for code blocks
+- **Table of Contents**: Auto-generated TOC for document navigation
+- **Frontmatter Support**: YAML metadata in markdown files
+- **Extensible**: Built with Marko parser for easy customization
+
+## Installation
+
+```bash
+pip install babbl
+```
+
+## Quick Start
+
+### Render a single file
+```bash
+babbl render document.md
+```
+
+### Build multiple files
+```bash
+babbl build ./docs --output-dir ./public
+```
+
+### With custom styling
+```bash
+babbl render document.md --css custom.css --toc
+```
+
+## Usage
+
+### Python API
+
+```python
+from babbl import BabblParser, HTMLRenderer
+
+parser = BabblParser()
+renderer = HTMLRenderer()
+
+with open("document.md", "r") as f:
+    content = f.read()
+
+document = parser.parse(content)
+html = renderer.html(document, metadata={})
+```
+
+### Code References
+
+Reference code from files using simple syntax:
+
+```markdown
+#function_name
+[Description](path/to/file.py#function_name)
+[Line 15](path/to/file.py#L15)
+[Lines 10-20](path/to/file.py#L10-L20)
+```
+
+### Tables
+
+Standard markdown table syntax:
+
+```markdown
+| Header 1 | Header 2 | Header 3 |
+|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 3   |
+| Cell 4   | Cell 5   | Cell 6   |
+```
+
+### Frontmatter
+
+YAML metadata at the beginning of files:
+
+```markdown
+---
+title: "My Document"
+author: "Author Name"
+date: "2024-01-01"
+---
+
+# Content starts here
+```
+
+## CLI Commands
+
+### `babbl render`
+Render a single markdown file to HTML.
+
+**Options:**
+- `--output, -o`: Output file path
+- `--css`: Custom CSS file
+- `--toc`: Generate table of contents
+- `--base-path`: Base path for code references
+
+### `babbl build`
+Build multiple markdown files in a directory.
+
+**Options:**
+- `--output-dir, -o`: Output directory
+- `--pattern`: File pattern (default: `*.md`)
+- `--recursive, -r`: Process subdirectories
+- `--css`: Custom CSS file
+- `--toc`: Generate table of contents
+- `--base-path`: Base path for code references
+
+## License
+
+MIT License

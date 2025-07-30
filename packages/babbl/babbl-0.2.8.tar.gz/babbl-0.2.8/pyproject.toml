@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "babbl"
+version = "0.2.8"
+description = "Turn markdown into beautiful research blog posts"
+requires-python = ">=3.8"
+readme = "README.md"
+authors = [
+    {name = "Michael Lutz", email = "michael@example.com"}
+]
+license = {text = "MIT"}
+keywords = ["markdown", "blog", "research", "static-site"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "markdown>=3.4.0",
+    "pyyaml>=6.0",
+    "jinja2>=3.1.0",
+    "click>=8.1.0",
+    "pathspec>=0.11.0",
+    "watchdog>=3.0.0",
+    "pygments>=2.15.0",
+    "marko>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+]
+
+[project.scripts]
+babbl = "babbl.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["babbl*"]
+
+
