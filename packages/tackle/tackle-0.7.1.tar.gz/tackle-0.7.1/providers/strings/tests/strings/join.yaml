@@ -1,0 +1,28 @@
+a_list:
+  ->: split
+  separator: .
+  input: "{{item}}"
+  for:
+    - stuff.thing
+    - things.stuffs
+
+a_str:
+  ->: split
+  separator: .
+  input: things.stuffs
+
+join_a_str:
+  ->: join
+  separator: .
+  input: "{{ a_str }}"
+
+foo:
+  stuff:
+    - things
+    - more_things
+    - even_more_things
+
+inventory->: "{{ join(foo.stuff, ',') }}"
+
+type: stuff
+apath->: "{{join([type,'.txt'])}}"

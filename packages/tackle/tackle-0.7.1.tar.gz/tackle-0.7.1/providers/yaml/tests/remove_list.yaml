@@ -1,0 +1,18 @@
+stuff: things
+
+things:
+  - stuff
+  - things
+  - _stuff
+  - _thing
+  - _foo
+  - bar_
+
+out:
+  ->: yaml_in_place
+  contents: "{{ things }}"
+  path: output.yaml
+  remove:
+   - ^_
+   - _$
+

@@ -1,0 +1,17 @@
+stuff: things
+
+remove_str:
+  things:
+    - stuff
+    - things
+    - _stuff
+    - _thing
+    - _foo
+    - _bar
+
+out:
+  ->: yaml_in_place
+  contents: "{{ remove_str.things }}"
+  path: output.yaml
+  remove: "^_"
+

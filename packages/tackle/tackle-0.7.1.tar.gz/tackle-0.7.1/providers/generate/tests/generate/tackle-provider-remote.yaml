@@ -1,0 +1,16 @@
+stuff: things
+
+target: output
+input: plain_src
+
+init->: isdir {{target}}
+
+compact:
+  ->: tackle robcxyz/tackle-provider
+  checkout: main
+  override:
+    project_slug: output
+
+after->: isdir output/.github
+
+cleanup->: remove output

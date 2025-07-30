@@ -1,0 +1,101 @@
+name: File Provider
+
+description: Hooks that operate on the files.
+
+examples:
+  - name: "[copy](copy.md)"
+    description: Copy a file or directory single file
+    content: |
+      compact->: copy path/to/file output/path
+      expanded:
+        ->: jinja
+        template: path/to/file
+        output: output/path
+
+  - name: "[chmod](chmod.md)"
+    description: Change directory permissions
+    content->: file tests/file/chmod.yaml
+
+hook_examples:
+  copy:
+    - name: Basic
+      description: The most minimal implementation.
+      content: |
+        compact->: copy path/to/src output/path
+        expanded:
+          ->: copy
+          src: path/to/src
+          dst: output/path
+
+  move:
+    - name: Basic
+      description: The most minimal implementation.
+      content: |
+        compact->: move path/to/src output/path
+        expanded:
+          ->: move
+          src: path/to/src
+          dst: output/path
+
+  remove:
+    - name: Basic
+      description: Remove a file or directory
+      content: |
+        compact->: remove path/to/file
+        expanded:
+          ->: remove
+          path: path/to/dir
+        expanded_list:
+          ->: remove
+          path:
+            - path/to/src1
+            - path/to/src2
+
+  shred:
+    - name: Basic
+      description: The most minimal implementation.
+      content: |
+        compact->: shred path/to/file
+        expanded:
+          ->: shred
+          src: path/to/src
+          passes: 10  # Default
+        expanded_list:
+          ->: shred
+          src:
+            - path/to/src1
+            - path/to/src2
+
+  create_file:
+    - name: Basic
+      description: Create an empty file.
+      content: |
+        compact->: create_file path/to/file/to/create
+        expanded:
+          ->: create_file
+          path: path/to/file/to/read
+
+  file:
+    - name: Read a file
+      description: Read a file into a variable as a string.
+      content: |
+        compact->: file path/to/file/to/read
+        expanded:
+          ->: file
+          path: path/to/file/to/read
+
+    - name: Write to a file
+      description: Write to a file with contents.
+      content: |
+        stuff: |
+          and things...
+        compact->: file path/to/file/to/write {{stuff}}
+        expanded:
+          ->: file
+          path: path/to/file/to/read
+          contents: {{stuff}}
+
+  chmod:
+    - name: Basic
+      description: The most minimal implementation.
+      content->: file tests/file/chmod.yaml

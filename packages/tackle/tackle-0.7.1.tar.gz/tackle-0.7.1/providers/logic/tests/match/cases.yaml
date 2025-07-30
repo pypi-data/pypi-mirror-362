@@ -1,0 +1,21 @@
+a_dict: nothing
+
+fallback_dict:
+  ->: match a_dict
+  case:
+    hook-expanded:
+      ->: print expanded
+    hook-compact->: print compact
+    '^foo.*': this
+    '.*': foo
+
+b_dict: foobar
+
+matched_dict:
+  ->: match b_dict
+  case:
+    hook-expanded:
+      ->: print expanded
+    hook-compact->: print compact
+    '^foo.*': this
+    '.*': foo

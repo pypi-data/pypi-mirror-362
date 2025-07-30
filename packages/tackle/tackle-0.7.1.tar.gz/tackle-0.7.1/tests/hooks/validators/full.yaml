@@ -1,0 +1,15 @@
+
+MyHook<-:
+  foo:
+    type: str
+    validator:
+      field_names:
+        value: val
+        info: values
+      mode: after
+      body:
+        return->: val --if val=='bar'
+        raise->: Not bar
+
+call->: MyHook --foo bar
+error->: MyHook --foo baz --try --except 1
