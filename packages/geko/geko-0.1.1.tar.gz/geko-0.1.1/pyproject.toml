@@ -1,0 +1,64 @@
+[project]
+name = "geko"
+version = "0.1.1"
+description = "(Point-like) Photon Evolution Kernel Object"
+authors = [
+    {name = "Felix Hekhorn",email = "felix.a.hekhorn@jyu.fi"}
+]
+license = {text = "GPL-3"}
+readme = "README.md"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "eko[box] (==0.14.6)",
+    "numpy (<2.0.0)",
+    "scipy (<2.0.0)"
+]
+
+[tool.poetry]
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pdbpp = "^0.11.6"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.1.3"
+pytest-env = "^0.6.2"
+
+[tool.poetry.group.benchmark]
+optional = true
+
+[tool.poetry.group.benchmark.dependencies]
+pandas = "^2.1.4"
+matplotlib = "^3.5.1"
+meson = "^1.8"
+ninja = "^1.8"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+Sphinx = "^7.0.0"
+sphinx-rtd-theme = "^3.0.0"
+sphinxcontrib-bibtex = "^2.4.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+test = "pytest tests"
+docs = { "shell" = "cd docs; make html" }
+docs-view = { "shell" = "cd docs; make view" }
+docs-server = { "shell" = "cd docs; make server" }
+docs-clean = { "shell" = "cd docs; make clean" }
+
+[tool.pytest.ini_options]
+env = ["D:NUMBA_DISABLE_JIT=1"]
+
+[tool.ruff.format]
+docstring-code-format = true
