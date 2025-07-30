@@ -1,0 +1,107 @@
+![pygame](https://raw.githubusercontent.com/pygame/pygame/main/docs/reST/_static/pygame_logo.svg)
+
+This project is a branch of <a target="_blank" rel="noopener" href="https://pypi.org/project/pygame/">pygame</a> on <a href="https://www.qpython.org">QPython</a>.
+
+
+**[Pygame](https://www.pygame.org/)** is a free and open-source cross-platform library for the development of multimedia applications like video games using Python.
+It uses the [Simple DirectMedia Layer library](https://www.libsdl.org/) and several other popular libraries to abstract the most common functions, making writing these programs a more intuitive task.
+
+👉 **[We need your help](https://www.pygame.org/contribute.html)** to make pygame the best it can be! New contributors are welcome.
+
+---
+
+## Installation
+
+Before installing pygame, you must check that Python is installed on your machine.
+
+To find out, open a command prompt (Windows) or a terminal (MacOS/Linux) and type:
+
+```bash
+python --version
+```
+
+If a message such as `Python 3.8.10` appears, Python is correctly installed.
+Otherwise, go to the [official Python website](https://www.python.org/downloads/) to install it.
+
+Next, check if `pip` is installed:
+
+```bash
+pip --version
+```
+
+If you see something like `pip 20.0.2 from /usr/lib/...`, you're ready to install pygame:
+
+```bash
+pip install pygame
+```
+
+Once installed, test pygame by running:
+
+```bash
+python3 -m pygame.examples.aliens
+```
+
+If this doesn’t work, check the [Getting Started](https://www.pygame.org/wiki/GettingStarted/) guide for platform-specific setup help.
+
+---
+
+## Help
+
+If you're new to pygame, you should be able to get started fairly quickly.
+Pygame comes with many tutorials and introductions. There's also full reference documentation.
+
+You can browse documentation on the [docs page](https://www.pygame.org/docs/), or locally via:
+
+```bash
+python -m pygame.docs
+```
+
+If local docs aren't found, it will open the online documentation.
+
+To upgrade pygame to the latest version:
+
+```bash
+pip install pygame --upgrade
+```
+
+Best of all, the `examples/` directory includes many playable programs to get you started.
+
+---
+
+## Features
+
+**Pygame** is a powerful library for game development, offering a wide range of features:
+
+### 🎨 Graphics
+
+* Easy tools for 2D graphics and animation
+* Support for images, rectangles, and polygon shapes
+
+### 🔊 Sound
+
+* Play and manipulate sound and music
+* Supports WAV, MP3, and OGG formats
+
+### 🎮 Input
+
+* Handle keyboard, mouse, and joystick input easily
+
+### 🕹️ Game Development Tools
+
+* Collision detection
+* Sprite management
+* Game loop support
+
+Whether you're building a platformer, puzzle game, or something new — Pygame has you covered.
+
+---
+
+## Building From Source
+
+To use in-development features or contribute to Pygame, build it from source instead of installing via `pip`.
+
+Installing from source is mostly automated. The most work is compiling dependencies. Once done, run:
+
+```bash
+python setup.py install
+```
