@@ -1,0 +1,108 @@
+[tool.poetry]
+name = "oscapify"
+version = "0.1.0"
+description = "A robust tool for converting scientific literature CSV files to OSCAP-compatible format"
+authors = [
+    "Jordan R. Willis <jwillis0720@gmail.com>",
+    "Troy Sincomb <troysincomb@gmail.com>",
+    "Caleb Kibet <ckibet@iavi.org>",
+]
+license = "MIT"
+readme = "README.md"
+keywords = ["oscap", "scientific-literature", "csv", "converter"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+packages = [{include = "oscapify"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^8.0"
+pandas = ">=1.5.0"
+requests = "^2.25.0"
+platformdirs = "^2.0.0"
+pydantic = "^2.0.0"
+
+[tool.poetry.urls]
+Homepage = "https://github.com/yourusername/oscapify"
+Repository = "https://github.com/yourusername/oscapify"
+Documentation = "https://github.com/yourusername/oscapify"
+Issues = "https://github.com/yourusername/oscapify/issues"
+
+[tool.poetry.scripts]
+oscapify = "oscapify.cli:main"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0"
+pytest-cov = "^4.0"
+black = "^22.0"
+pre-commit = "^3.0"
+# ruff = "^0.1.0"
+# mypy = "^1.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--cov=oscapify",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+[tool.coverage.run]
+source = ["oscapify"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if False:",
+]
+
+# [tool.ruff]
+# line-length = 100
+# target-version = "py38"
+#
+# [tool.ruff.lint]
+# select = ["E", "F", "W", "I", "N", "UP", "ANN", "S", "B", "A", "COM", "C4", "DTZ", "DJ", "EM", "EXE", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SIM", "TID", "TCH", "ARG", "PTH", "ERA", "PL", "TRY", "RUF"]
+# ignore = ["ANN101", "ANN102", "COM812", "ISC001"]
+#
+# [tool.mypy]
+# python_version = "3.8"
+# warn_return_any = true
+# warn_unused_configs = true
+# disallow_untyped_defs = true
+# disallow_incomplete_defs = true
+# check_untyped_defs = true
+# disallow_untyped_decorators = true
+# no_implicit_optional = true
+# warn_redundant_casts = true
+# warn_unused_ignores = true
+# warn_no_return = true
+# warn_unreachable = true
+# strict_equality = true
