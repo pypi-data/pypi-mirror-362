@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ramanbiolib_ui"
+authors = [
+    {name = "Marcelo Teran Miranda"},
+]
+description = "UI for ramanbiolib. Biomolecules identification search using Raman spectra."
+readme = "README.md"
+requires-python = ">=3.7,<3.8"
+keywords = ["raman", "spectroscopy", "biomolecules"]
+license = {text = "GNU GPLv3"}
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+]
+dynamic = ["version"]
+
+dependencies = [
+  "cefpython3==66.0",          
+  "numpy>=1.21.6,<1.22.0",       
+  "pandas>=1.1.5,<2.0",        
+  "scipy>=1.7.3,<1.8",         
+  "plotly>=5.0,<6.0",
+  "ramanbiolib"       
+]
+
+[project.urls]
+Homepage = "https://github.com/mteranm/ramanbiolib-ui"
+Repository = "https://github.com/mteranm/ramanbiolib-ui"
+
+[tool.setuptools.packages.find]
+include = ["ramanbiolibui*"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+ramanbiolibui = ["static/**/*", "templates/**/*", "img/**/*"]
+
+[project.scripts]
+ramanbiolib_ui = "ramanbiolibui.app:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "ramanbiolibui.__version__"}
