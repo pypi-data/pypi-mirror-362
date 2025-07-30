@@ -1,0 +1,73 @@
+name: Build and Publish to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      test_pypi:
+        description: 'Publish to Test PyPI instead of PyPI'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Required for trusted publishing
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: Set up Python
+      run: uv python install 3.11
+      
+    - name: Extract version from tag
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "release" ]; then
+          VERSION=${{ github.event.release.tag_name }}
+        else
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.1.0")
+        fi
+        # Remove 'v' prefix if present
+        VERSION=${VERSION#v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Extracted version: $VERSION"
+        
+    - name: Update version in pyproject.toml
+      run: |
+        sed -i 's/version = ".*"/version = "${{ steps.version.outputs.version }}"/' pyproject.toml
+        echo "Updated pyproject.toml version to ${{ steps.version.outputs.version }}"
+        
+    - name: Build package
+      run: uv build
+      
+    - name: Check package
+      run: |
+        uv tool run twine check dist/*
+        
+    - name: Publish to Test PyPI
+      if: ${{ inputs.test_pypi }}
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        
+    - name: Publish to PyPI
+      if: ${{ !inputs.test_pypi }}
+      uses: pypa/gh-action-pypi-publish@release/v1
+      
+    - name: Create build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+        retention-days: 30
