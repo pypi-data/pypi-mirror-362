@@ -1,0 +1,125 @@
+Metadata-Version: 2.4
+Name: VCNet
+Version: 0.2.0
+Summary: Counterfactual generation
+Author-email: Thomas Guyet <thomas.guyet@inria.fr>, Victor Guyomard <victor.guyomard@inria.fr>
+Maintainer-email: Thomas Guyet <thomas.guyet@inria.fr>
+License-Expression: LGPL-3.0-only
+Project-URL: Homepage, https://gitlab.inria.fr/tguyet/vcnet/
+Project-URL: Repository, https://gitlab.inria.fr/tguyet/vcnet.git
+Project-URL: Issues, https://gitlab.inria.fr/tguyet/vcnet/-/issues
+Project-URL: Documentation, https://tguyet.gitlabpages.inria.fr/vcnet
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: numpy
+Requires-Dist: torch
+Requires-Dist: matplotlib
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: scipy
+Requires-Dist: lightning
+Requires-Dist: xgboost
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Dynamic: license-file
+
+---
+title: README
+author: Thomas Guyet
+---
+
+![PyPI version](https://badge.fury.io/py/VCNet.svg)
+![Downloads](https://static.pepy.tech/badge/VCNet)
+![GitHub license](https://img.shields.io/static/v1?label=Licence&message=LGPL-3&color=green)
+![Lightning](https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=lightning&logoColor=white)
+![Torch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
+
+
+# VCNet: Variational Counter Net
+
+This repository contains an enriched implementation of `VCNet`, a _counterfactual generator_ for tabular datasets.
+Counterfactual generation is an explainable artificial intelligence technique that helps users understand the decisions of predictive models.
+
+`VCNet` handles both categorical and numerical variables and can also manage immutable variables (i.e., variables that cannot be changed while generating counterfactuals). Currently, it is implemented for binary classification only. `VCNet` is based on conditional variational encoders which increases the realism of the generated counterfactuals. Compared to its competitors (see for instance [jax-relax](https://github.com/BirkhoffG/jax-relax)), `VCNet` offers an easy and fast training architecture that generates realistic counterfactuals (i.e., counterfactuals that likely exist in the data distribution).
+
+This library provides two versions of `VCNet`:
+* **Joint-learning architecture:** This version includes both the classification model and the counterfactual generator.
+* **Post-hoc architecture:** This version includes only the counterfactual generator, which can be fitted on any probabilistic prediction model (`torch` modules, `sklearn` classifiers or `XGBoost` classifiers).
+
+
+This library is enhanced by several practical features:
+* it is fully compatible with Pandas: the examples and the counterfactuals can be pandas dataframes, making it easy to integrate into a standard data analysis pipeline
+* handling categorical and immutable variables: 
+* adding automatic rounding of numerical feature to augment the realism 
+
+Once the `VCNet` model is fitted, it can be used to generate efficiently valid counterfactuals of examples.
+
+<br/>
+
+For more details about the features of the library, we invite you to take a look at the [documentation](https://tguyet.gitlabpages.inria.fr/vcnet) and its [examples](https://tguyet.gitlabpages.inria.fr/vcnet/vcnet_example.html).
+
+## Authors
+
+This implementation is derived from the original work by V. Guyomard ([CARLA CROCO VCNet](https://github.com/Orange-OpenSource/carla_croco_vcnet)). It is implemented as a PyTorch Lightning module for easy integration into your own architecture.
+
+* Thomas Guyet, Inria, [AIstroSight](https://team.inria.fr/aistrosight/)
+* Victor Guyomard, Orange Labs
+
+
+## How to install
+
+### Installation with `pip`
+
+`VCNet` is available on `PyPi`, the installation of the package and its dependencies is possible in a single line:
+```bash
+pip install VCNet
+```
+
+### Installation from sources
+
+The `pyproject.toml` is the project configuration file which enables to create and set up a virtual environment suitable to run `VCNet`.
+
+1. Download the code from gitlab
+```bash
+git clone https://gitlab.inria.fr/tguyet/vcnet.git
+cd vcnet
+```
+
+2. Install the dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+or, to install the package:
+```bash
+pip install -e .
+```
+
+3. Test VCNet on Adult dataset
+
+```bash
+python tests/test_data.py
+```
+
+
+For more details, look at the [documentation pages](https://tguyet.gitlabpages.inria.fr/vcnet).
+
+
+## How to cite
+
+```bibtex
+@inproceedings{guyomard2022vcnet,
+  title={VCNet: A self-explaining model for realistic counterfactual generation},
+  author={Guyomard, Victor and Fessant, Fran{\c{c}}oise and Guyet, Thomas and Bouadi, Tassadit and Termier, Alexandre},
+  booktitle={Joint European Conference on Machine Learning and Knowledge Discovery in Databases},
+  pages={437--453},
+  year={2022},
+  organization={Springer}
+}
+```
