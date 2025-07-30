@@ -1,0 +1,204 @@
+Metadata-Version: 2.4
+Name: arato-proxy
+Version: 0.3.0
+Summary: LiteLLM proxy for Arato logs
+Project-URL: Homepage, https://github.com/AratoAi/litellm-proxy
+Project-URL: Documentation, https://github.com/AratoAi/litellm-proxy#readme
+Project-URL: Repository, https://github.com/AratoAi/litellm-proxy
+Project-URL: Issues, https://github.com/AratoAi/litellm-proxy/issues
+Author-email: Arato <dev@arato.com>
+License: MIT
+License-File: LICENSE
+Keywords: arato,litellm,llm,logging,openai,proxy
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Internet :: WWW/HTTP :: HTTP Servers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Requires-Dist: fastapi
+Requires-Dist: litellm[proxy]
+Requires-Dist: python-dotenv
+Requires-Dist: requests
+Requires-Dist: uvicorn
+Description-Content-Type: text/markdown
+
+# LiteLLM based proxy for Arato Logs
+
+Use this [LiteLLM](https://www.litellm.ai/) proxy to send logs data to an Arato monitoring endpoint.
+All LLM calls going through the proxy will be logged in Arato.
+
+## Quick Start
+
+### Using uvx (Recommended)
+
+Since this package is not yet published to PyPI, you can use uvx with the local wheel:
+
+```bash
+# First, build the package
+uv build
+
+# Run directly without installation using the local wheel
+uvx --from ./dist/arato_proxy-*.whl arato-proxy
+
+# Or with custom configuration
+uvx --from ./dist/arato_proxy-*.whl arato-proxy --config custom.yaml --port 8080
+```
+
+### Using uv/pip (Development Install)
+
+```bash
+# Install from source in development mode
+uv pip install -e .
+
+# Or install from the built wheel
+uv pip install ./dist/arato_proxy-*.whl
+
+# Then run
+arato-proxy
+```
+
+### Publishing to PyPI (For Maintainers)
+
+To publish a new version to PyPI, you have two options:
+
+#### Option 1: GitHub Release (Recommended)
+
+1. Create a GitHub release with a tag like `v0.3.0`
+2. This automatically triggers the release workflow
+
+#### Option 2: Manual Workflow Dispatch
+
+1. Go to Actions → "Build and Publish to PyPI" → "Run workflow"
+2. Choose version bump type:
+   - `patch`: 0.2.0 → 0.2.1
+   - `minor`: 0.2.0 → 0.3.0
+   - `major`: 0.2.0 → 1.0.0
+   - Or specify exact version like `0.5.0`
+
+The GitHub Actions workflow will:
+
+1. Extract/calculate the version from the git tag or bump type
+2. Update the version in `pyproject.toml`
+3. Create a new tag (for manual dispatch)
+4. Build the package
+5. Publish to PyPI using trusted publishing
+
+Once published to PyPI, users will be able to run:
+
+```bash
+# After publishing to PyPI
+uvx arato-proxy
+pip install arato-proxy
+```
+
+### GitHub Actions
+
+This repository includes automated workflows:
+
+- **Test**: Runs tests on Python 3.8-3.12 for all PRs and pushes
+- **Release**: Automatically publishes to PyPI when a GitHub release is created or manually triggered
+  - Version is automatically extracted from the git tag
+  - Supports automatic version bumping
+  - No manual version management needed
+
+## Setup
+
+### Environment Variables
+
+You need to setup environment variables with the following keys:
+
+```bash
+OPENAI_API_KEY="sk-..."
+ARATO_API_URL="https://api.arato.ai/..."
+ARATO_API_KEY="ar-..."
+```
+
+You can create a `.env` file or set them in your environment:
+
+```bash
+# Generate template .env file
+arato-proxy --init-env
+```
+
+### Configuration
+
+The proxy uses a YAML configuration file (`config.yaml`). You can generate a template:
+
+```bash
+# Generate template config.yaml
+arato-proxy --init-config
+```
+
+## CLI Usage
+
+The `arato-proxy` command provides several options:
+
+```bash
+# Show help
+arato-proxy --help
+
+# Start with default settings
+arato-proxy
+
+# Start with custom configuration
+arato-proxy --config custom.yaml --port 8080
+
+# Generate template files
+arato-proxy --init-config    # Creates config.yaml
+arato-proxy --init-env       # Creates .env
+```
+
+### Known Issue: Callback Loading
+
+Currently, the Arato callback functionality has a compatibility issue when running via uvx. The proxy will start and work with basic LiteLLM functionality, but the Arato-specific logging callbacks may not load properly in packaged environments. This is being investigated.
+
+For now, you can use the proxy for basic LiteLLM functionality, and the callback issue will be resolved in a future update.
+
+### Required Environment Variables
+
+- `ARATO_API_URL` - URL of the Arato API endpoint
+- `ARATO_API_KEY` - API key for authentication  
+- `OPENAI_API_KEY` - OpenAI API key for the proxy
+
+## Development
+
+### From Source
+
+```bash
+git clone https://github.com/AratoAi/litellm-proxy
+cd litellm
+python3 -m venv .venv
+source .venv/bin/activate
+uv pip install -e .
+```
+
+### Running Tests
+
+```bash
+python -m pytest test_custom_callbacks.py -v
+```
+
+### Building the Package
+
+```bash
+uv build
+```
+
+### Installing in Development Mode
+
+```bash
+uv pip install -e .
+```
+
+## Example usage with n8n
+
+In n8n, create a new OpenAI integration and set the base URL to point to your LiteLLM endpoint
+
+![n8n](n8n.png)
