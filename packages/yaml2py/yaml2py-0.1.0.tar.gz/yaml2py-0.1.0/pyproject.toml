@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yaml2py"
+version = "0.1.0"
+authors = [
+  { name="JonesHong", email="latte831104@example.com" },
+]
+description = "A CLI tool to generate type-hinted Python config classes from YAML files with nested structure support."
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "click>=8.0", 
+    "watchdog>=2.1.6",  # 用於監控 YAML 檔案變化
+    "pyyaml>=6.0",      # YAML 解析器
+]
+
+[project.urls]
+"Homepage" = "https://github.com/joneshong/yaml2py"
+"Bug Tracker" = "https://github.com/joneshong/yaml2py/issues"
+
+# 【關鍵】這一段定義了 CLI 命令
+[project.scripts]
+yaml2py = "yaml2py.cli:main"  
+yml2py = "yaml2py.cli:main"

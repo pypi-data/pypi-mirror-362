@@ -1,0 +1,96 @@
+app:
+  name: AdvancedExample
+  version: 2.0.0
+  environment: production
+  features:
+    authentication:
+      enabled: true
+      providers:
+        - name: oauth2
+          client_id: client_123
+          client_secret: secret_xyz
+        - name: jwt
+          secret_key: jwt_secret_key
+          expiry: 3600
+    caching:
+      enabled: true
+      backend: redis
+      ttl: 300
+
+services:
+  api:
+    base_url: https://api.example.com
+    version: v2
+    endpoints:
+      - path: /users
+        method: GET
+        rate_limit: 1000
+        auth_required: true
+      - path: /posts
+        method: POST
+        rate_limit: 100
+        auth_required: true
+      - path: /public
+        method: GET
+        rate_limit: 5000
+        auth_required: false
+  
+  database:
+    primary:
+      engine: postgresql
+      host: db-primary.example.com
+      port: 5432
+      name: prod_db
+      user: db_admin
+      password: primary_secret
+      options:
+        pool_size: 50
+        max_overflow: 10
+        pool_timeout: 30
+    
+    replica:
+      engine: postgresql
+      host: db-replica.example.com
+      port: 5432
+      name: prod_db
+      user: db_reader
+      password: replica_secret
+      options:
+        pool_size: 20
+        max_overflow: 5
+        pool_timeout: 15
+
+monitoring:
+  metrics:
+    enabled: true
+    interval: 60
+    exporters:
+      - type: prometheus
+        port: 9090
+      - type: datadog
+        api_key: dd_api_key
+        app_key: dd_app_key
+  
+  logging:
+    level: INFO
+    handlers:
+      - type: file
+        path: /var/log/app.log
+        max_bytes: 10485760
+        backup_count: 5
+      - type: syslog
+        host: syslog.example.com
+        port: 514
+        facility: local0
+
+deployment:
+  regions:
+    - name: us-east-1
+      primary: true
+      replicas: 3
+    - name: eu-west-1
+      primary: false
+      replicas: 2
+    - name: ap-southeast-1
+      primary: false
+      replicas: 1
