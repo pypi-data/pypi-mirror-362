@@ -1,0 +1,82 @@
+{% set printf_formats = {
+    "double": "%lf",
+    "float": "%f",
+    "int8_t": "%hhd",
+    "int16_t": "%hd",
+    "int32_t": "%d",
+    "int64_t": "%lld",
+    "uint8_t": "%hhu",
+    "uint16_t": "%hu",
+    "uint32_t": "%u",
+    "uint64_t": "%llu"
+} %}
+#include <cstdio>      // printf
+#include <cmath>       // std::abs
+#include "forward.hpp" // Exported forward
+
+// Inputs
+{% for name in inputs_name %}
+#include "data/{{ name }}.h"
+{% endfor %}
+
+// Outputs
+{% for name in outputs_name %}
+#include "data/{{ name }}_expected.h"
+{% endfor %}
+
+int main()
+{
+    // Initialize the output arrays
+    {%- for o in range(outputs_name | length) %}
+    {{ outputs_dtype[o] }}* {{ outputs_name[o] }} = nullptr;
+    {% endfor %}
+
+    const float abs_err = 0.001f;
+    const float rel_err = 0.0001f;
+
+    // Call the forward function
+    {{ func_name }}({{ inputs_name|join(", ") }}{% if inputs_name %}, {% endif %}&{{ outputs_name|join(", &") }});
+
+
+    int nb_identical;
+    int nb_out;
+    int return_code = 0;
+
+    // Print the results of each output
+    {%- for o in range(outputs_name | length) %}
+    nb_identical = 0;
+    nb_out = 0;
+    printf("{{ outputs_name[o] }}:\n");
+    printf("---------------------------------------------------------------------------------\n"
+           "|\tIdx\t|\tExpected\t|\tPredicted\t|\tERROR ?\t|\n"
+           "|-------------------------------------------------------------------------------|\n");
+
+    for (int o = 0; o < {{ outputs_size[o] }}; ++o) {
+        printf("|\t%5d\t|\t%8f\t|\t %8f\t|", o, {{ outputs_name[o] }}_expected[o], {{ outputs_name[o] }}[o]);
+        if ((std::isnan({{ outputs_name[o] }}_expected[o]) && std::isnan({{ outputs_name[o] }}[o]))
+            || (std::isinf({{ outputs_name[o] }}_expected[o]) && std::isinf({{ outputs_name[o] }}[o]) && {{ outputs_name[o] }}_expected[o] == {{ outputs_name[o] }}[o])
+            || std::abs({{ outputs_name[o] }}_expected[o] - {{ outputs_name[o] }}[o]) <= abs_err + rel_err * std::abs({{ outputs_name[o] }}_expected[o]))
+        {
+            nb_identical++;
+            printf("\t\t|\n");
+        } else {
+            printf("\tX\t|\n");
+        }
+        nb_out++;
+    }
+    if (nb_out - nb_identical != 0 )
+    {
+        return_code = 1;
+    }
+
+    printf("\n\n");
+    printf("---------------------------------\n");
+    printf("|\t\t|\tTOTAL\t|\n");
+    printf("|-------------------------------|\n");
+    printf("|\tCORRECT\t|\t%5d\t|\n",nb_identical);
+    printf("|\tERROR\t|\t%5d\t|\n", nb_out - nb_identical);
+    printf("---------------------------------\n");
+    {% endfor %}
+
+    return return_code;
+}

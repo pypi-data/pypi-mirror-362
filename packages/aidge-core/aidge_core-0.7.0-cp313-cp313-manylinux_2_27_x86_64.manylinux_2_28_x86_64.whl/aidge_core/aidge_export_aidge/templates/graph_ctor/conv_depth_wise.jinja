@@ -1,0 +1,25 @@
+{% filter indent(width=4, first=False) %}
+/*** {{name|upper}} ***/
+std::shared_ptr<Aidge::Node> {{name}} =
+        Aidge::ConvDepthWise(
+            _{{name|upper}}_CHANNELS,
+            {
+            {%- for i in range(kernel_dims|length) -%}
+                _{{name|upper}}_KERNEL_{{i}}{%- if not loop.last %}, {% endif -%}
+            {%- endfor -%}
+            },
+            "{{name}}",
+            {
+            {%- for i in range(stride_dims|length) -%}
+                _{{name|upper}}_STRIDE_{{i}} {%- if not loop.last %}, {% endif -%}
+            {%- endfor -%}
+            },
+            {
+            {%- for i in range(dilation_dims|length) -%}
+                _{{name|upper}}_DILATION_{{i}} {%- if not loop.last %}, {% endif -%}
+            {%- endfor -%}
+            }
+        );
+{% include "./_set_input.jinja" %}
+graph->add({{name}});
+{% endfilter %}

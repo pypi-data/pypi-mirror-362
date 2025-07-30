@@ -1,0 +1,13 @@
+#ifndef EXPORT_ATTRIBUTES_{{name|upper}}_H
+#define EXPORT_ATTRIBUTES_{{name|upper}}_H
+
+{% for i in range(kernel_dims|length) %}
+#define _{{name|upper}}_KERNEL_{{i}} {{kernel_dims[i]}}
+{%- endfor %}
+{% for i in range(stride_dims|length) %}
+#define _{{name|upper}}_STRIDE_{{i}} {{stride_dims[i]}}
+{%- endfor %}
+
+#define _{{name|upper}}_CEIL_MODE {{ceil_mode|int}}
+
+#endif /* EXPORT_ATTRIBUTES_{{name|upper}}_H */

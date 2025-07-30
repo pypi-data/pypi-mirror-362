@@ -1,0 +1,70 @@
+{
+	"operator": "BatchNormalization",
+	"opset_version": 21,
+	"initializer_rank": 5,
+    "test_meta_data": {
+        "multiple_batchs": false
+    },
+	"base_configuration": {
+		"input_properties": [
+			{"name": "input_0", "dims": [1, 10, 200, 200]},
+			{"name": "scale_1", "dims": [10]},
+			{"name": "bias_2", "dims": [10]},
+            {"name": "mean_3", "dims": [10]},
+            {"name": "var_4", "dims": [10]}
+		],
+		"attributes": {
+			"epsilon": 1e-05,
+			"momentum": 0.9,
+			"training_mode": 0
+		}
+	},
+	"test_configurations": {
+        "feature_map_size": {
+            "10": {
+                "attributes": {},
+                "input_properties": [
+                    {"name": "input_0", "dims": [1, 10, 10, 10]}
+                ]
+            },
+            "100": {
+                "attributes": {},
+                "input_properties": [
+                    {"name": "input_0", "dims": [1, 10, 100, 100]}
+                ]
+            },
+            "500": {
+                "attributes": {},
+                "input_properties": [
+                    {"name": "input_0", "dims": [1, 10, 500, 500]}
+                ]
+            }
+        },
+        "channel_size": {
+            "1": {
+                "attributes": {},
+                "input_properties": [
+                    {"name": "input_0", "dims": [1, 1, 200, 200]},
+                    {"name": "scale_1", "dims": [1]},
+                    {"name": "bias_2", "dims": [1]},
+                    {"name": "mean_3", "dims": [1]},
+                    {"name": "var_4", "dims": [1]}
+                ]
+            },
+            "10": {
+                "attributes": {},
+                "input_properties": []
+            },
+            "100": {
+                "attributes": {},
+                "input_properties": [
+                    {"name": "input_0", "dims": [1, 100, 200, 200]},
+                    {"name": "scale_1", "dims": [100]},
+                    {"name": "bias_2", "dims": [100]},
+                    {"name": "mean_3", "dims": [100]},
+                    {"name": "var_4", "dims": [100]}
+                ]
+            }
+        }
+	}
+}
