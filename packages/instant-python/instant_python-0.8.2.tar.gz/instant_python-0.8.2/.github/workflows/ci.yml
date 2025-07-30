@@ -1,0 +1,303 @@
+name: CI - Testing and Code analysis
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  check_user:
+    name: check-user
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ github.actor == 'dimanu-py' }}
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 👍 Check triggering user
+        run: echo "Workflow triggered by ${{ github.actor }}"
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    needs: check_user
+    if: ${{ needs.check_user.outputs.should_run == 'true' }}
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 📥 Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🛠️ Setup environment
+        uses: ./.github/actions/python_setup
+
+      - name: 🧐 Check linting
+        id: check_lint
+        run: |
+          git pull --rebase origin main
+          uvx ruff check --exclude "instant_python/templates,test/**/resources/**" instant_python test
+        continue-on-error: true
+
+      - name: 🚨 Auto fix lint errors
+        id: fix_lint
+        if: ${{ steps.check_lint.outcome == 'failure' }}
+        run: |
+          git pull --rebase origin main
+          uvx ruff check --fix --exclude "instant_python/templates,test/**/resources/**" instant_python test
+
+      - name: ✏️ Commit lint fixes
+        if: ${{ steps.fix_lint.outcome == 'success' }}
+        run: |
+          git config user.name ${{ vars.GIT_COMMITTER_NAME }}
+          git config user.email ${{ vars.GIT_COMMITTER_EMAIL }}
+
+          if git diff --quiet; then
+            echo "No changes to commit."
+          else
+            git add .
+            git commit -m "🚨 chore: fix linting issues via GitHub Actions"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧐 Check linting again
+        run: uvx ruff check --exclude "instant_python/templates,test/**/resources/**" instant_python test
+
+  format:
+    name: format
+    runs-on: ubuntu-latest
+    needs: check_user
+    if: ${{ needs.check_user.outputs.should_run == 'true' }}
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 📥 Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🛠️ Setup environment
+        uses: ./.github/actions/python_setup
+
+      - name: 🧐 Check code format
+        id: check_format
+        run: |
+          git pull --rebase origin main
+          uvx ruff format --check --exclude "instant_python/templates,test/**/resources/**" instant_python test
+        continue-on-error: true
+
+      - name: 🎨 Auto format code
+        id: format_code
+        if: ${{ steps.check_format.outcome == 'failure' }}
+        run: |
+          git pull --rebase origin main
+          uvx ruff format --exclude "instant_python/templates,test/**/resources/**" instant_python test
+
+      - name: ✏️ Commit formatted code
+        if: ${{ steps.format_code.outcome == 'success' }}
+        run: |
+          git config user.name ${{ vars.GIT_COMMITTER_NAME }}
+          git config user.email ${{ vars.GIT_COMMITTER_EMAIL }}
+
+          if git diff --quiet; then
+            echo "No changes to commit."
+          else
+            git add .
+            git commit -m "🎨 style: format code via GitHub Actions"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧐 Check code format again
+        run: uvx ruff format --check --exclude "instant_python/templates,test/**/resources/**" instant_python test
+
+  analyze-code-quality:
+    name: analyze-code-quality
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 📥 Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: ▶️ CodeQL Initialization
+        uses: github/codeql-action/init@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+        with:
+          languages: python
+          build-mode: none
+          queries: +security-extended,security-and-quality
+          config-file: ./codeql-config.yml
+
+      - name: 🧐 CodeQL Analysis
+        uses: github/codeql-action/analyze@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+        with:
+          category: '/language:python'
+
+
+  secrets:
+    name: secrets-scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      pull-requests: write
+
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 📥 Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🛠️ Setup environment
+        uses: ./.github/actions/python_setup
+
+      - name: 🏃 Run secrets scanner
+        run: make secrets
+
+  audit:
+    name: audit-dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 📥 Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🛠️ Setup environment
+        uses: ./.github/actions/python_setup
+
+      - name: 🏃 Run audit
+        run: make audit
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 📥 Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🛠️ Setup environment
+        uses: ./.github/actions/python_setup
+
+      - name: 📦 Install test dependencies
+        run: uv pip install pytest pytest-cov
+
+      - name: 🏃 Run tests
+        run: uv run pytest --cov --cov-report=xml --cov-branch test -ra -s
+
+      - name: 📥 Upload coverage report to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          flags: unittests
+          name: codecov-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: dimanu-py/instant-python
+
+  rollback:
+    name: rollback
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    if: ${{ always() && needs.test.result == 'failure' }}
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 📥 Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: ⏪️ Reset to previous commit
+        run: |
+          git config user.name ${{ vars.GIT_COMMITTER_NAME }}
+          git config user.email ${{ vars.GIT_COMMITTER_EMAIL }}
+          git reset --hard ${{ github.event.before }}
+          git push --force-with-lease origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  tox-test:
+    name: tox
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
+    steps:
+      - name: 🛡️ Harden runner
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        with:
+          egress-policy: audit
+
+      - name: 📥 Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🛠️ Setup environment
+        uses: ./.github/actions/python_setup
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+
+      - name: 🏃 Run tox
+        run: make tox
