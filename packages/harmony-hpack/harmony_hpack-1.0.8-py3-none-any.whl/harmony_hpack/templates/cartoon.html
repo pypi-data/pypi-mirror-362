@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>$title</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Comic Sans MS', 'Marker Felt', 'Arial Rounded MT Bold', sans-serif;
+                background-color: #fff5f7;
+                color: #333;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                position: relative;
+                overflow-x: hidden;
+                background-image: radial-gradient(circle at 20% 30%, #ffd6e7 0%, transparent 25%), radial-gradient(circle at 80% 70%, #d6f4ff 0%, transparent 25%);
+            }
+
+            .card {
+                background-color: white;
+                border-radius: 30px;
+                box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
+                width: 90%;
+                max-width: 400px;
+                padding: 20px;
+                position: relative;
+                z-index: 1;
+                margin-bottom: 30px;
+                text-align: center;
+                border: 4px solid #ff85c0;
+                transform-style: preserve-3d;
+            }
+
+            .card::before {
+                content: '';
+                position: absolute;
+                top: -8px;
+                left: -8px;
+                right: -8px;
+                bottom: -8px;
+                border-radius: 35px;
+                background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee);
+                z-index: -1;
+                opacity: 0.4;
+                transform: translateZ(-10px);
+            }
+
+            .app-icon {
+                width: 64px;
+                height: 64px;
+                margin: 0 auto 15px;
+                border-radius: 15px;
+                border: 4px solid white;
+                box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
+                transition: all 0.3s ease;
+                background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 32px;
+                font-weight: bold;
+                transform: rotate(-5deg);
+            }
+
+            .app-icon:hover {
+                transform: scale(1.1) rotate(5deg);
+            }
+
+            .app-title {
+                font-size: 26px;
+                font-weight: 800;
+                color: #ff6b9d;
+                margin-bottom: 5px;
+                letter-spacing: 1px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .version-badge {
+                background-color: #ff85c0;
+                color: white;
+                font-size: 12px;
+                padding: 4px 10px;
+                border-radius: 15px;
+                margin-left: 10px;
+            }
+
+            .app-version {
+                color: #888;
+                font-size: 13px;
+                margin-bottom: 20px;
+                font-weight: 500;
+            }
+
+            .info-card {
+                background-color: #fff9fc;
+                border-radius: 20px;
+                padding: 10px;
+                margin: 15x 0;
+                text-align: left;
+                border: 2px dashed #ffb6c1;
+                position: relative;
+            }
+
+            .info-card::before {
+                content: '✨';
+                position: absolute;
+                top: -15px;
+                left: 20px;
+                font-size: 24px;
+            }
+
+            .info-item {
+                display: flex;
+                margin-bottom: 10px;
+                font-size: 13px;
+                color: #666;
+                align-items: center;
+            }
+
+            .info-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .info-icon {
+                width: 24px;
+                height: 24px;
+                margin-right: 12px;
+                color: #ff6b9d;
+                flex-shrink: 0;
+                font-size: 20px;
+                flex-shrink: 0;
+            }
+
+            .qr-container {
+                margin: 20px 0;
+                position: relative;
+            }
+
+            .qr-container::after {
+                content: '';
+                position: absolute;
+                bottom: -15px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80%;
+                height: 10px;
+                background: radial-gradient(ellipse at center, rgba(255, 105, 180, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+                z-index: -1;
+            }
+
+            .qr-label {
+                font-size: 12px;
+                color: #ff6b9d;
+                margin-bottom: 12px;
+                font-weight: bold;
+            }
+
+            .qr-code {
+                width: 140px;
+                height: 140px;
+                margin: 0 auto;
+                background-color: white;
+                border-radius: 15px;
+                box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+                transition: all 0.3s ease;
+                border: 3px solid #ffb6c1;
+                background-image: radial-gradient(circle at center, #ffecf5 0%, white 70%);
+            }
+
+            .qr-code:hover {
+                transform: scale(1.05) rotate(2deg);
+            }
+
+            .download-btn {
+                background: linear-gradient(135deg, #ff6b9d 0%, #ff85c0 100%);
+                color: white;
+                border: none;
+                border-radius: 50px;
+                padding: 14px 30px;
+                font-size: 15px;
+                font-weight: bold;
+                width: 100%;
+                max-width: 240px;
+                margin: 20px auto 10px;
+                cursor: pointer;
+                box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .download-btn::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 100px;
+                height: 100px;
+                background: radial-gradient(circle, rgba(255, 105, 180, 0.5) 0%, rgba(255, 105, 180, 0) 70%);
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+
+            .download-btn:hover {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 12px 25px rgba(255, 105, 180, 0.5);
+            }
+
+            .download-btn:active {
+                transform: translateY(0) scale(0.98);
+            }
+
+            .download-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+                transition: all 0.5s ease;
+            }
+
+            .download-btn:hover::before {
+                left: 100%;
+            }
+
+            .btn-icon {
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+            }
+
+            .harmony-badge {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+            .hpack-power {
+                font-size: 12px;
+                color: #ff85c0;
+                display: inline-block;
+                font-weight: bold;
+            }
+
+            .hpack-link {
+                color: #ff6b9d;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            @keyframes float {
+                0% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+                100% {
+                    transform: translateY(0px);
+                }
+            }
+
+            .pulse {
+                animation: pulse 1.5s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.4);
+                }
+                70% {
+                    box-shadow: 0 0 0 15px rgba(255, 105, 180, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(255, 105, 180, 0);
+                }
+            }
+
+            .float {
+                animation: float 3s ease-in-out infinite;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <img src="$app_icon" class="app-icon float" alt="App Icon" />
+
+            <div class="app-title">
+                $title
+                <span class="version-badge">$badge</span>
+            </div>
+
+            <div class="app-version">(v$version_name $version_code) • $size</div>
+
+            <div class="info-card">
+                <div class="info-item">
+                    <svg class="info-icon" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M19,19H5V8H19M16,1V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3H18V1M17,12H12V17H17V12Z" />
+                    </svg>
+                    <span>更新时间: $date</span>
+                </div>
+                <div class="info-item">
+                    <svg class="info-icon" viewBox="0 0 24 24">
+                        <path
+                            fill="currentColor"
+                            d="M11 9h2V7h-2m1 13c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-18A10 10 0 002 12a10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2m-1 15h2v-6h-2v6z"
+                        />
+                    </svg>
+                    <span>更新说明: $desc</span>
+                </div>
+            </div>
+
+            <div class="qr-container">
+                <div class="qr-label">扫描二维码安装</div>
+                <img class="qr-code" src="$qrcode" alt="QR Code" />
+            </div>
+
+            <button class="download-btn pulse" onclick="window.location.href='store://enterprise/manifest?url=$manifest_url'">
+                <svg class="btn-icon" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                </svg>
+                立即安装
+            </button>
+
+            <div class="harmony-badge">
+                <p class="hpack-power">powered by <a href="https://github.com/iHongRen/hpack" class="hpack-link" target="_blank">hpack</a></p>
+            </div>
+        </div>
+    </body>
+</html>
