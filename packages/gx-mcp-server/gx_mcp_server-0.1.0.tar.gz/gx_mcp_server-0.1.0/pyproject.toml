@@ -1,0 +1,93 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gx-mcp-server"
+version = "0.1.0"
+description = "Expose Great Expectations data-quality checks via MCP"
+readme = "README.md"
+long_description_content_type = "text/markdown"
+license = { file = "LICENSE" }
+authors = [
+    { name = "David Front", email = "dfront@gmail.com" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.11"
+keywords = ["data validation", "great-expectations", "mcp"]
+dependencies = [
+    "fastmcp>=2.8",
+    "pandas>=1.5",
+    "great-expectations>=0.17",
+    "pydantic>=1",
+    "requests>=2.28",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio", 
+    "pre-commit",
+    "ruff",
+    "mypy",
+    "types-requests",
+    "pandas-stubs",
+    "openai",
+    "python-dotenv",
+]
+
+[project.scripts]
+gx-mcp-server = "gx_mcp_server.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/dfront/gx-mcp-server"
+Repository = "https://github.com/dfront/gx-mcp-server"
+Issues = "https://github.com/dfront/gx-mcp-server/issues"
+Documentation = "https://github.com/dfront/gx-mcp-server#readme"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gx_mcp_server"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_configs = true
+# Relax type checking for development flexibility
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+# Exclude examples from type checking entirely
+exclude = [
+    "examples/.*"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+asyncio_mode = "auto"
+filterwarnings = [
+    # Suppress harmless warnings from Great Expectations
+    "ignore::marshmallow.warnings.ChangedInMarshmallow4Warning",
+    "ignore:.*Number.*field should not be instantiated.*",
+]
+
+[tool.ruff]
+# Complain about TODOs
+extend-select = ["FIX002"]
