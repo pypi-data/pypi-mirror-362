@@ -1,0 +1,50 @@
+[project]
+name = "affinity-model"
+description = "A data model for the Affinity CRM API"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Planet A GmbH", email = "dev@planet-a.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+dynamic = ["version"]
+license = "MIT"
+
+# Main dependencies
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "datamodel-code-generator>=0.28.1",
+    "freezegun>=1.5.1",
+    "pydantic>=2.10.6",
+    "pytest-watcher>=0.4.3",
+    "pytest>=8.3.4",
+    "syrupy>=4.8.2",
+]
+
+[tool.black]
+include = '.*py$'
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = [
+  "affinity_model"
+]
+exclude = ["affinity_model.tests"]
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+style = "semver"
+strict = true
+bump = true
+latest-tag = true
