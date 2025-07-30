@@ -1,0 +1,39 @@
+syntax = "proto2";
+import "CoreMessages.proto";
+import "ProtoR1_LSTCam.proto";
+import "ProtoR1_NectarCam.proto";
+import "ProtoR1_DigiCam.proto";
+
+package ProtoR1;
+
+//Changed from "runHeader" to "configuration" because of the most likely lack of run for CTA
+message CameraConfiguration
+{
+	optional fixed32          		  telescope_id       = 1; //changed to fixed32: faster encoding
+	optional string           		  cs_serial          = 2; //WARNING: strings are currently ignored. Will add them, but will take some days
+	optional fixed64          		  configuration_id             = 3; //changed from "run" to "configuration" to associate events to a configuration
+	optional fixed64          		  date               = 4; //question: should we also add a date in string format ? Can always be added later I guess
+	optional uint32           		  num_pixels         = 5;
+	optional uint32           		  num_samples        = 6;
+	optional AnyArray 				  expected_pixels_id = 7;
+	optional string                   data_model_version = 8;
+	optional ProtoR1.NectarCamConfig  nectarcam          = 9;
+	optional ProtoR1.LstCamConfig     lstcam             = 10;
+	optional ProtoR1.DigiCamConfig    digicam            = 11;
+}
+
+message CameraEvent
+{
+	optional fixed64        		configuration_id = 1;
+	optional fixed64        		event_id         = 2;
+	optional fixed64        		tel_event_id     = 3;
+	optional fixed32        		trigger_time_s   = 4;
+	optional fixed32        		trigger_time_qns = 5;
+	optional fixed32        		trigger_type     = 6;
+	optional AnyArray       		waveform         = 7;
+	optional AnyArray       	    pixel_status     = 8;
+	optional fixed64        	    ped_id           = 9;
+	optional ProtoR1.NectarCamEvent nectarcam        = 10;
+	optional ProtoR1.LstCamEvent    lstcam           = 11;
+	optional ProtoR1.DigiCamEvent   digicam          = 12;
+}

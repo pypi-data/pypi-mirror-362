@@ -1,0 +1,40 @@
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//                  CTA_DL0 protocol buffer data model                       //
+//                Based on DL0 Data Model Specification                      //
+//                CTA-SPE-COM-000000-0004 | Issue 1 | d                      //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+syntax = "proto2";
+
+import "CoreMessages.proto";
+
+package DL0v1.Trigger;
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//          TELESCOPE TRIGGER MESSAGES ie. all registered triggers           //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+message DataStream
+{
+    optional AnyArray tel_ids       = 1; // uint16 [1..n] in DM
+    optional fixed64  sb_id         = 2; // uint64 in DM
+    optional fixed64  obs_id        = 3; // uint64 in DM
+    optional fixed32  producer_id   = 4; // uint64 in DM
+    optional fixed32  sb_creator_id = 5; // uint8 in DM
+}
+
+message Trigger
+{
+    optional fixed32 tel_id                         = 1; // uint16 in DM
+    optional fixed64 trigger_id                     = 2; // uint64 in DM
+    optional fixed32 trigger_type                   = 3; // uint8 in DM
+    optional fixed32 trigger_time_s                 = 4; // HighResTimestamp in DM
+    optional fixed32 trigger_time_qns               = 5; // HighResTimestamp in DM
+    optional bool    readout_requested              = 6; // bool in DM
+    optional bool    data_available                 = 7; // bool in DM
+    optional fixed32 hardware_stereo_trigger_mask   = 8; // uint16 [0..1] in DM
+}

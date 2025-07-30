@@ -1,0 +1,30 @@
+syntax = "proto2";
+import "CoreMessages.proto";
+
+//package R1v1;
+package R1v1_debug;
+
+//changed all uint32 to fixed32
+message DebugCameraConfiguration
+{
+	optional string		cs_serial			= 1;
+	optional string   	evb_version		= 2;
+	optional string   	cdhs_version		= 3; //changed camtoactl to "cdhs" aka central data handling system
+	optional AnyArray 	tdp_type		= 4;
+	optional AnyArray 	tdp_action		= 5;
+	optional AnyArray 	ttype_pattern		= 6;
+}
+
+message DebugEvent
+{
+	optional AnyArray module_status       = 1;
+	optional fixed32  extdevices_presence = 2;
+	optional AnyArray tib_data            = 3;
+	optional AnyArray cdts_data           = 4;
+	optional AnyArray swat_data           = 5;
+	optional AnyArray counters            = 6;
+	optional AnyArray chips_flags         = 7;
+	optional AnyArray      charges_gain1         = 8;  // HG
+	optional AnyArray      charges_gain2         = 9;  // LG
+	optional fixed32 tdp_action = 10;
+}

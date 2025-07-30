@@ -1,0 +1,75 @@
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//                  CTA_DL0 protocol buffer data model                       //
+//                Based on DL0 Data Model Specification                      //
+//             CTA-SPE-COM-000000-0004 | Issue 1 | a.draft06                 //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+syntax = "proto2";
+
+import "CoreMessages.proto";
+import "R1v1_debug.proto";
+import "SAG_data_v1.proto";
+
+package DL0v1.Telescope;
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //   
+//                  TELESCOPE MESSAGES ie. readout data                      //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+message DataStream
+{
+    optional fixed32 tel_id          = 1; // uint16 in DM
+    optional fixed64 sb_id           = 2; // uint64 in DM
+    optional fixed64 obs_id          = 3; // uint64 in DM
+    optional float   waveform_scale  = 4; // float32 in DM
+    optional float   waveform_offset = 5; // float32 in DM
+    optional fixed32 sb_creator_id   = 6; // uint8 in DM
+}
+
+message CameraConfiguration
+{
+    optional fixed32  tel_id                   =  1; // uint16 in DM
+    optional fixed64  local_run_id             =  2; // uint64 in DM
+    optional double   config_time_s            =  3; // LowResTimestamp in DM
+    optional fixed64  camera_config_id         =  4; // uint64 in DM
+    optional AnyArray pixel_id_map             =  5; // uint16[num_pixels]  in DM
+    optional AnyArray module_id_map            =  6; // uint16[num_modules] in DM
+    optional fixed32  num_pixels               =  7; // uint16 in DM
+    optional fixed32  num_channels             =  8; // uint8  in DM
+    optional fixed32  num_samples_nominal      =  9; // uint16 in DM
+    optional fixed32  num_samples_long         = 10; // uint16 in DM
+    optional fixed32  num_modules              = 11; // uint16 in DM
+    optional fixed32  sampling_frequency       = 12; // uint16 in DM
+    optional fixed32  calibration_algorithm_id = 13; // uint16 in DM
+    optional fixed64  calibration_service_id   = 14; // uint64 in DM
+    optional string   data_model_version       = 15; // string in DM
+}
+
+message Event
+{
+    optional fixed64  event_id                         =  1; // uint64 in DM
+    optional fixed32  tel_id                           =  2; // uint16 in DM
+    optional fixed32  event_type                       =  3; // uint8  in DM
+    optional fixed32  event_time_s                     =  4; // HighResTimestamp in DM
+    optional fixed32  event_time_qns                   =  5; // HighResTimestamp in DM
+    optional AnyArray pixel_status                     =  6; // uint8[num_pixels] in DM
+    optional AnyArray first_cell_id                    =  7; // uint16[N] with N=1 for SST, 2120 for LST, not present otherwise
+    optional fixed32  num_channels                     =  8; // uint8 in DM
+    optional fixed32  num_samples                      =  9; // uint16 in DM
+    optional fixed32  num_pixels_survived              = 10; // uint16 in DM
+    optional fixed64  calibration_monitoring_id        = 11; // uint64 in DM
+    // removed from protobuf, was added by mistake.
+    // When dropping support for old protobuf that comes with CentOS 7,
+    // we can properly reserve to prevent re-use, which is problematic in protobufs.
+    // reserved 12;
+    // reserved "pixel_id";
+    optional AnyArray waveform                         = 13; // uint16[num_channels*num_pixels*num_samples] in DM
+    optional AnyArray pedestal_intensity               = 14; // float32[num_pixels] in DM
+    optional R1v1_debug.DebugEvent debug               = 15;
+    optional fixed32  num_modules                      = 16;
+    optional SAG_data_v1.SAGData sag_data              = 17;
+}

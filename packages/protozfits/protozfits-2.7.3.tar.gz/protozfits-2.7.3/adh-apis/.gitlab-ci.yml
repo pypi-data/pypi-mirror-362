@@ -1,0 +1,104 @@
+variables:
+  # make sure the CI system checks out the submodules
+  GIT_SUBMODULE_STRATEGY: recursive
+
+
+alma9:
+  image: harbor.cta-observatory.org/proxy_cache/almalinux:9
+
+  before_script:
+    # install build dependencies
+    - dnf install -y 'dnf-command(config-manager)'
+    - dnf config-manager -y --set-enabled crb
+    - dnf install -y epel-release 
+    - dnf install -y cmake make gcc gcc-c++ protobuf-devel protobuf-compiler zeromq-devel libzstd-devel
+
+  script:
+    # build
+    - cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/.local/adh-apis -DCMAKE_CXX_STANDARD=17
+    - cmake --build build -- -j 2
+    - cmake --install build
+
+    # run tests
+    - ctest --output-on-failure --test-dir build
+
+    # test building the downstream project (testing the cmake exports)
+    - cd examples
+    - CMAKE_PREFIX_PATH=$HOME/.local/adh-apis cmake -S . -B build
+    - cmake --build build
+    - ./build/main
+
+
+alma9-rpm:
+  image: harbor.cta-observatory.org/proxy_cache/almalinux:9
+
+  before_script:
+    # install build dependencies
+    - dnf install -y 'dnf-command(config-manager)'
+    - dnf config-manager -y --set-enabled crb
+    - dnf install -y epel-release
+    - dnf install -y cmake make gcc gcc-c++ protobuf-devel protobuf-compiler zeromq-devel libzstd-devel rpm-build
+
+  script:
+    # build rpm
+    - |
+      cmake -S . -B build \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/opt/ctao \
+        -DCPACK_PACKAGING_INSTALL_PREFIX=/opt/ctao/ \
+        -DCPACK_GENERATOR=RPM
+    - cmake --build build --target package -- -j 2
+
+    - rpm -qlp build/*.rpm
+    - rpm -i build/*.rpm
+
+    # test building the downstream project
+    # this tests both the cmake exports and the rpm building
+    - cd examples
+    - CMAKE_PREFIX_PATH="/opt/ctao/" cmake -S . -B build
+    - cmake --build build
+    - ./build/main
+
+ubuntu24:
+  image: harbor.cta-observatory.org/proxy_cache/ubuntu:24.04
+
+  variables:
+    # needed to avoid interactive prompts during installation
+    DEBIAN_FRONTEND: "noninteractive"
+
+  before_script:
+    # install build dependencies
+    - apt update && apt install -y cmake build-essential libzmq3-dev libzstd-dev libprotobuf-dev protobuf-compiler
+
+  script:
+    - cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/.local/adh-apis
+    - cmake --build build -- -j 2
+    - cmake --install build
+
+    # run tests
+    - ctest --output-on-failure --test-dir build
+
+    # test building the downstream project (testing the cmake exports)
+    - cd examples
+    - CMAKE_PREFIX_PATH=$HOME/.local/adh-apis cmake -S . -B build
+    - cmake --build build
+    - ./build/main
+
+
+conda:
+  image: harbor.cta-observatory.org/proxy_cache/condaforge/miniforge3
+  variables:
+    CMAKE_GENERATOR: Ninja
+
+  before_script:
+    - mamba install -y compilers cmake libprotobuf zstd zeromq zlib ninja
+
+  script:
+    # build
+    - cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/.local/adh-apis -DCMAKE_CXX_STANDARD=17
+    - cmake --build build --parallel 4
+    - cmake --install build
+
+    # run tests
+    - ctest --output-on-failure --test-dir build

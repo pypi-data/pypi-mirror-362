@@ -1,0 +1,29 @@
+syntax = "proto2";
+import "CoreMessages.proto";
+
+package ProtoR1;
+
+//replaced all uint32 to fixed32
+message NectarCamConfig
+{
+	optional string   idaq_version        = 1;
+	optional string   cdhs_version        = 2;
+	optional fixed32  acquisition_mode    = 3;
+	optional fixed32  num_modules         = 4;
+	optional AnyArray expected_modules_id = 5;
+	optional fixed32  algorithms          = 6;
+	optional fixed64   run_id = 7;	
+}
+
+message NectarCamEvent
+{
+	optional AnyArray module_status       = 1;
+	optional fixed32  extdevices_presence = 2;
+	optional AnyArray tib_data            = 3;
+	optional AnyArray cdts_data           = 4;
+	optional AnyArray swat_data           = 5;
+	optional AnyArray counters            = 6;
+	optional fixed64  run_id 			  = 7;
+	optional AnyArray charges_gain1       = 8;  // HG
+	optional AnyArray charges_gain2       = 9;  // LG
+}

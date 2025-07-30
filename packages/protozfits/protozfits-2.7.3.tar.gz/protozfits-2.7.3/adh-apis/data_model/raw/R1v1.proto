@@ -1,0 +1,129 @@
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//                  CTA_R1 protocol buffer data model V0.1                   //
+//                Based on R1/Event Data Model Specification                 //
+//             CTA-SPE-COM-000000-0002 | Issue 1 | Rev. d                    //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+syntax = "proto2";
+
+import "CoreMessages.proto";
+import "R1v1_debug.proto";
+
+package R1v1;
+
+// Disclaimer 1: all fields are made optional to allow for more robustness at 
+//     runtime. in case  a field is  really missing the last thing we want is
+//     that it triggers a runtime error on the camera side
+
+// Disclaimer 2: all atomic fields  are  defined  as fixed-length for  faster 
+//     encoding. The length is always 32 or 64 bits, while fields  with  less
+//     bits will be reduced by lossless compression before writing to storage
+
+// Disclaimer 3: AnyArrays are  arrays of  any type,  with fast encoding.  See 
+//     their definition in CoreMessages.proto. They are needed because default
+//     protobufs arrays are slow to encode
+
+// Disclaimer 4: The HiResTimestamp  type is not  used but  rather  its fields 
+//     (s + qns) are  already exploded  in  the  relevant  messages. This will 
+//     substantially simplify the usage of the data format  
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //   
+//                  TELESCOPE MESSAGES ie. readout data                      //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+message TelescopeDataStream
+{
+    optional fixed32 tel_id          = 1; // uint16 in DM
+    optional fixed64 sb_id           = 2; // uint64 in DM
+    optional fixed64 obs_id          = 3; // uint64 in DM
+    optional float   waveform_scale  = 4; // float32 in DM
+    optional float   waveform_offset = 5; // float32 in DM
+}
+
+message CameraConfiguration
+{
+    optional fixed32  tel_id                   =  1; // uint16 in DM
+    optional fixed64  local_run_id             =  2; // uint64 in DM
+    optional double   config_time_s            =  3; // LowResTimestamp in DM
+    optional fixed64  camera_config_id         =  4; // uint64 in DM
+    optional AnyArray pixel_id_map             =  5; // uint16[num_pixels]  in DM
+    optional AnyArray module_id_map            =  6; // uint16[num_modules] in DM
+    optional fixed32  num_modules              =  7; // uint16 in DM
+    optional fixed32  num_pixels               =  8; // uint16 in DM
+    optional fixed32  num_channels             =  9; // uint8  in DM
+    optional string   data_model_version       = 10; // string in DM
+    optional fixed64  calibration_service_id   = 11; // uint64 in DM
+    optional fixed32  calibration_algorithm_id = 12; // uint16 in DM
+    optional fixed32  num_samples_nominal      = 13; // uint16 in DM
+    optional fixed32  num_samples_long         = 14; // uint16 in DM
+    optional R1v1_debug.DebugCameraConfiguration debug = 15;
+}
+
+enum NumCameraModules
+{
+    LST = 265;
+}
+
+message Event
+{
+    optional fixed64  event_id                         =  1; // uint64 in DM
+    optional fixed32  tel_id                           =  2; // uint16 in DM
+    optional fixed64  local_run_id                     =  3; // uint64 in DM
+    optional fixed32  event_type                       =  4; // uint8  in DM
+    optional fixed32  event_time_s                     =  5; // HighResTimestamp in DM
+    optional fixed32  event_time_qns                   =  6; // HighResTimestamp in DM
+    optional fixed32  num_channels                     =  7; // uint8 in DM
+    optional fixed32  num_samples                      =  8; // uint16 in DM
+    optional fixed32  num_pixels                       =  9; // uint16 in DM
+    optional fixed32  num_modules                      = 10; // missing in DM ? 
+    optional AnyArray waveform                         = 11; // uint16[num_channels*num_pixels*num_samples] in DM
+    optional AnyArray pixel_status                     = 12; // uint8[num_pixels] in DM
+    optional AnyArray first_cell_id                    = 13; // uint16[N] with N=1 for SST, 2120 for LST, not present otherwise
+    optional AnyArray module_hires_local_clock_counter = 14; // uint64[num_modules] in DM. 
+    optional AnyArray pedestal_intensity               = 15; // float32[num_pixels] in DM
+    optional fixed64  calibration_monitoring_id        = 16; // uint64 in DM
+    optional R1v1_debug.DebugEvent debug = 17;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//      CALIBRATION MESSAGES ie. monitoring of applied pre-calibration       //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+message CalibrationCoefficientSet
+{
+    optional fixed64 calibration_monitoring_id    = 1; // uint64 in DM
+    optional fixed64 local_run_id                 = 2; // uint64 in DM
+    optional fixed32 tel_id                       = 3; // uint16 in DM
+    optional fixed64 sky_pedestal_coefficient_id  = 4; // uint64 in DM
+    optional fixed64 flat_fielding_coefficient_id = 5; // uint64 in DM
+    optional fixed64 absolute_gain_coefficient_id = 6; // uint64 in DM
+}
+
+enum CalibType
+{
+    NO_TYPE       = 0;
+    SKY_PEDESTAL  = 1;
+    FLAT_FIELDING = 2;
+    ABSOLUTE_GAIN = 3;
+}
+
+message CalibrationCoefficientUpdate
+{
+    optional CalibType type                       =  1 [default = NO_TYPE]; // is a derived type in DM
+    optional fixed64   calibration_coefficient_id =  2; // uint64 in DM
+    optional fixed32   tel_id                     =  3; // uint16 in DM
+    optional fixed32   coefficient_type           =  4; // uint8  in DM
+    optional fixed32   measurement_start_time_s   =  5; // HiResTimestamp in DM
+    optional fixed32   measurement_start_time_qns =  6; // HiResTimestamp in DM
+    optional fixed32   measurement_stop_time_s    =  7; // HiResTimestamp in DM
+    optional fixed32   measurement_stop_time_qns  =  8; // HiResTimestamp in DM
+    optional AnyArray  coeff_mean                 =  9; // float64[Nchan*Npix] in DM
+    optional AnyArray  coeff_stddev               = 10; // float16[Nchan*Npix] in DM
+    optional AnyArray  coeff_count                = 11; // uint64[Nchan*Npix]  in DM  
+}

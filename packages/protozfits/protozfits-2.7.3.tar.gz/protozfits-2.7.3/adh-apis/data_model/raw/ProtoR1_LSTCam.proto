@@ -1,0 +1,32 @@
+syntax = "proto2";
+import "CoreMessages.proto";
+
+package ProtoR1;
+
+//changed all uint32 to fixed32
+message LstCamConfig
+{
+	optional string   idaq_version        = 1;
+	optional string   cdhs_version        = 2; //changed camtoactl to "cdhs" aka central data handling system
+	optional fixed32  num_modules         = 3;
+	optional AnyArray expected_modules_id = 4;
+	optional fixed32  algorithms          = 5;
+	optional fixed32  pre_proc_algorithms = 6;
+	optional fixed64   run_id = 7;
+
+}
+
+message LstCamEvent
+{
+	optional AnyArray module_status       = 1;
+	optional fixed32  extdevices_presence = 2;
+	optional AnyArray tib_data            = 3;
+	optional AnyArray cdts_data           = 4;
+	optional AnyArray swat_data           = 5;
+	optional AnyArray counters            = 6;
+	optional AnyArray chips_flags         = 7;
+	optional AnyArray first_capacitor_id  = 8;
+	optional AnyArray drs_tag_status      = 9;
+	optional AnyArray drs_tag             = 10;
+	optional fixed64   run_id = 11;
+}

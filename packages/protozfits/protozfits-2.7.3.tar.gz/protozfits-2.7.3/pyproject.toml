@@ -1,0 +1,166 @@
+[build-system]
+requires = ["scikit-build-core[pyproject]", "pybind11", "setuptools_scm[toml]"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "protozfits"
+description = "Python bindings for the protobuf zfits library"
+readme = "README.md"
+requires-python = ">= 3.9"
+license = {text = "BSD-3-Clause"}
+maintainers = [
+    {name = "Maximilian Linhoff", email = "maximilian.linhoff@tu-dortmund.de"},
+]
+
+
+dependencies = [
+    "numpy",
+    "protobuf",
+    "astropy",
+    "tqdm",
+    "pyyaml",
+]
+
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: BSD License',
+    'Operating System :: MacOS',
+    'Operating System :: POSIX :: Linux',
+    'Programming Language :: Python :: 3 :: Only',
+]
+dynamic = ['version']
+
+
+[project.urls]
+repository = "https://gitlab.cta-observatory.org/cta-computing/common/protozfits-python/"
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "pytest-cov",
+]
+doc = [
+    "sphinx",
+    "numpydoc",
+    "ctao-sphinx-theme",
+    "sphinx-changelog",
+    "sphinx-automodapi",
+]
+dev = [
+    "sphinx-autobuild",
+    "towncrier",
+]
+all = ["protozfits[tests,doc,dev]"]
+
+[tool.scikit-build]
+sdist.cmake = true
+wheel.packages = ["src/protozfits"]
+install.components = ["Python", "Runtime"]
+build.targets = ["pyrawzfits"]
+cmake.args = [
+    "-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON",
+    "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON",
+]
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["src/protozfits/_version.py"]
+sdist.exclude = ["src/protozfits/_dev_version/*"]
+
+[[tool.scikit-build.overrides]]
+if.state = "editable"
+build-dir = "build"
+editable.rebuild = true
+
+[tool.setuptools_scm]
+write_to = "src/protozfits/_version.py"
+
+[tool.pytest.ini_options]
+minversion = "7"
+testpaths = ["src"]
+log_cli_level = "INFO"
+xfail_strict = true
+# print summary of failed tests, force errors if settings are misspelled
+addopts = ["-ra", "--strict-config", "--strict-markers"]
+filterwarnings = [
+    "error",
+    # deprecation warning from protobuf with python 3.12
+    "ignore:Type .* uses PyType_Spec with a metaclass that has custom tp_new:DeprecationWarning",
+    "ignore:datetime.datetime.utcfromtimestamp\\(\\):DeprecationWarning",
+]
+
+[tool.coverage.run]
+relative_files = true
+source = ["src"]
+omit = [
+    "src/protozfits/_version.py",
+    "src/protozfits/_dev_version/*"
+]
+
+[tool.ruff]
+src = ["src"]
+line-length = 88
+target-version = "py310"
+
+
+[tool.ruff.lint]
+extend-select = [
+    "I", # isort
+    "N", # pep8 naming
+    "NPY", # numpy
+    "PT", # pytest
+    "UP", # pyupgrade
+    "COM", # flake8-commas
+    "ISC", # implicit string concat rules
+    "ICN", # import name conventions
+    "G", # logging
+]
+ignore = [
+    "COM812", # incompatible with ruff format
+    "ISC001", # incompatible with ruff format
+]
+
+[tool.codespell]
+skip = "*.fits,*.fits.gz,*.fits.fz"
+
+[tool.repo-review]
+select = ["PY", "PP", "PC"]
+ignore = [
+    "PY007", # we do not use tox for now
+    "PC140", # mypy is not used
+    "PC170", # pygrep is not used
+    "PC180", # prettier is not used
+    "PC111", # blacken-docs is not used
+    "PC901", # no CI setup currently for updating pre-commit hooks
+    "PY004", # we don't have a documentation yet...
+]
+
+[tool.towncrier]
+package = "protozfits"
+directory = "docs/changes"
+filename = "CHANGES.rst"
+template = "docs/changes/template.rst"
+underlines = ["-", "~", "^"]
+# Let towncrier create proper links to the merged MR.
+# By default, towncrier connects everything to issues.
+# We rather want to connect it to merge request
+issue_format = "`!{issue} <https://gitlab.cta-observatory.org/cta-computing/common/protozfits-python/-/merge_requests/{issue}>`__"
+
+[tool.towncrier.fragment.feature]
+    name = "New Features"
+    showcontent = true
+
+[tool.towncrier.fragment.bugfix]
+    name = "Bug Fixes"
+    showcontent = true
+
+[tool.towncrier.fragment.api]
+    name = "API Changes"
+    showcontent = true
+
+[tool.towncrier.fragment.optimization]
+    name = "Refactoring and Optimization"
+    showcontent = true
+
+[tool.towncrier.fragment.maintenance]
+    name = "Maintenance"
+    showcontent = true

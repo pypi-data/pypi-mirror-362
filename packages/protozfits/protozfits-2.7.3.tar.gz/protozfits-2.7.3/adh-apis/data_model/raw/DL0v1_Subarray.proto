@@ -1,0 +1,41 @@
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//                  CTA_DL0 protocol buffer data model                       //
+//                Based on DL0 Data Model Specification                      //
+//                 CTA-SPE-COM-000000-0004 | Issue 1 | a                     //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+syntax = "proto2";
+
+import "CoreMessages.proto";
+
+package DL0v1.Subarray;
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+//               SUBARRAY MESSAGES ie. subarray trigger data                 //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+message DataStream
+{
+    optional fixed32 subarray_id    = 1; // uint16 in DM
+    optional fixed64 sb_id          = 2; // uint64 in DM
+    optional fixed64 obs_id         = 3; // uint64 in DM
+    optional fixed64 producer_id    = 4; // uint64 in DM
+    optional fixed32 sb_creator_id  = 5; // uint8 in DM
+}
+
+message Event
+{
+    optional fixed64  event_id              = 1; // uint64 in DM
+    optional fixed32  trigger_type          = 2; // uint8 in DM
+    optional fixed64  sb_id                 = 3; // uint64 in DM
+    optional fixed64  obs_id                = 4; // uint64 in DM
+    optional fixed32  event_time_s          = 5; // HighResTimestamp in DM
+    optional fixed32  event_time_qns        = 6; // HighResTimestamp in DM
+    optional AnyArray trigger_ids           = 7; // uint64[trigger_count] in DM
+    optional AnyArray tel_ids_with_trigger  = 8; // uint16[trigger_count] in DM
+    optional AnyArray tel_ids_with_data     = 9; // uint16[trigger_with_data_count] in DM
+}

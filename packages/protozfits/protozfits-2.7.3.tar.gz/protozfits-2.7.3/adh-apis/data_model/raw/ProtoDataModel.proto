@@ -1,0 +1,566 @@
+syntax = "proto2";
+import "CoreMessages.proto";
+
+package ProtoDataModel;
+
+/*********************
+ * Waveform data for a given channel, for the entire camera
+ *********************/
+message WaveFormData
+{
+	optional AnyArray samples       = 1; //actual waveforms
+	optional AnyArray pixelsIndices = 2; //indices of pixels that are present
+	optional AnyArray firstSplIdx   = 3; //first recorded sample from the readout window. for timing purposes
+	optional fixed32  num_samples   = 4 [default=0];//number of waveform sample for each pixel
+		//Baseline used as of now
+	optional AnyArray baselines     = 5;
+
+	//for DL0 data challenge
+	optional AnyArray peak_time_pos       = 50;
+	optional AnyArray time_over_threshold = 51;
+}
+
+/*********************
+ * Integral data for a given channel, for the entire camera
+ *********************/
+message IntegralData
+{
+	optional AnyArray gains          = 1; //integrated gain
+	optional AnyArray maximumTimes   = 2; //sample index of the maximum
+	optional AnyArray tailTimes      = 3; //number of samples of the tail
+	optional AnyArray raiseTimes     = 4; //number of samples while the signal is rising
+	optional AnyArray pixelsIndices  = 5; //indices of pixels that are present
+	optional AnyArray firstSplIdx    = 6; //first recorded sample from the readout window. for timing purposes
+}
+
+/*********************
+ * The grouping of waveform and integrals for a given channel
+ *********************/
+message PixelsChannel
+{
+	optional WaveFormData waveforms = 1;
+	optional IntegralData integrals = 2;
+}
+
+message InterferometryChannel
+{
+	optional fixed32  channelId	= 1;			// Inteferometry channel ID
+	optional fixed32  pixelId 	= 2;			// index of SII pixel
+	optional fixed32  num_samples   = 3 [default=0];	// number of SII single pixel samples
+	optional AnyArray samples 	= 4;
+}
+
+// add counters for nectarcam tests
+message CameraCounters
+{
+	optional AnyArray counters = 1;
+}
+
+message ModuleStatus
+{
+	optional AnyArray status = 1;
+}
+
+message PixelPresence
+{
+	optional AnyArray presence = 1;
+}
+
+message UCTSdata
+{
+	optional AnyArray data = 1;
+}
+
+message TIBdata
+{
+	optional AnyArray data = 1;
+}
+
+message SWATdata
+{
+	optional AnyArray data = 1;
+}
+
+message ChipsFlags
+{
+	optional AnyArray data = 1;
+}
+
+message FirstCapacitorIds
+{
+	optional AnyArray data = 1;
+}
+
+message DrsTags
+{
+	optional AnyArray data = 1;
+	optional fixed32  num_samples   = 2 [default=0];
+}
+
+
+/*********************
+ * Trigger from one camera
+ *********************/
+message CameraTrigger
+{
+	optional sfixed32 telescopeID = 1 [default=0]; //ID of the telescope that triggered
+	optional sfixed64 timeSec     = 2 [default=0]; //time of the trigger
+	optional sfixed64 timeNanoSec = 3 [default=0]; //time of the trigger
+	optional fixed32  eventNumber = 4 [default=0]; //internal camera's event counter
+}
+
+/*********************
+ * Trigger for a subarray - just a bunch of camera triggers
+ *********************/
+message ArrayTrigger
+{
+	optional fixed32        arrayEvtNum = 1 [default=0];  //global counter of array triggers for this subarray
+	optional fixed32        num_cameras = 2;
+	repeated CameraTrigger  cameras     = 3;
+}
+
+/*********************
+ * Configuration data sent before every run. I am not sure that this should be coming from the camera itself, but rather
+ * the cameras should receive it from the master, along with the relevant DAQ and RTA components
+ *********************/
+enum ImgReducMode
+{
+	NO_IMG_REDUC 		 = 0;
+	ZERO_SUPPR 			 = 1;
+	INTEGRATION 		 = 2;
+	INTEG_AND_ZERO_SUPPR = 3;
+}
+
+enum EvtsReducMode
+{
+	NO_EVT_REDUC 	 = 0;
+	TIME_COINCIDENCE = 1;
+	IMAGE_PARAMS     = 2;
+	HIGH_LEVEL_ANA   = 3;
+}
+
+// R1_TEL_HEAD V1.0 begin
+
+message nectarcam_specific_head
+{
+	optional string idaq_version = 1;
+	optional string camtoactl_version = 2;
+	optional uint32 acquisition_mode = 3;
+	optional uint32 num_modules = 4;
+	optional AnyArray expected_modules_id = 5;
+	optional uint32 algorithms = 6;
+}
+
+message lstcam_specific_head
+{
+	optional string idaq_version = 1;
+	optional string camtoactl_version = 2;
+	optional uint32 num_modules = 3;
+	optional AnyArray expected_modules_id = 4;
+	optional uint32 algorithms = 5;
+	optional uint32 pre_proc_algorithms = 6;
+}
+// R1_TEL_HEAD V1.0 end
+
+
+
+message CameraRunHeader
+{
+	optional sfixed32      telescopeID       = 1 [default=-1]; //which telescope is this ?
+	optional fixed32       runNumber         = 2 [default=0];  //new run number
+	optional fixed32       dateMJD           = 3 [default=0];  //date when the new run was received
+	optional fixed64       timeNanoSec       = 4 [default=0];  //precise date of start for the new run (for sorting events)
+	optional ImgReducMode  imgReducMode      = 5 [default=NO_IMG_REDUC]; //data reduction mode for this current telescope
+	optional EvtsReducMode evtsReducMode     = 6 [default=NO_EVT_REDUC];
+	optional sfixed32      numTraces         = 7 [default=-1]; //number of traces recorded per waveform
+	optional sfixed32      numGainChannels   = 8 [default=-1]; //number of gains outputted by this camera
+	optional sfixed32      integWindowSize   = 9 [default=-1]; //how many samples are integrated (only if data reduction is enabled)
+	optional sfixed32      integThreshold    = 10 [default=-1]; //what is the minimum level before integrating the pixels
+	optional sfixed32      zeroSuppThreshold = 11 [default=-1]; //what is the minimum level before removing the pixel's data
+
+	//FlashCam-specific header items
+ 	optional sfixed32	adcs         = 20 [default = -1]; 	//number of ADC channels
+	optional sfixed32	triggers     = 21 [default = -1]; 	//number of trigger channels
+	optional sfixed32	adcbits      = 22 [default = -1];	//number of FADC samples per trace
+	optional sfixed32	sumlength    = 23 [default = -1];	//number of bits per FADC sample
+	optional sfixed32   blprecision  = 24 [default = -1];	//number of samples of FPGA integrator
+	optional sfixed32 	mastercards  = 25 [default = -1];	//precision of the FPGA baseline algorithm (1/LSB)
+	optional sfixed32   triggercards = 26 [default = -1];	//number of master cards
+	optional sfixed32   adccards     = 27 [default = -1];	//number of trigger cards
+	optional sfixed32   gpss         = 28 [default = -1];	//number of FADC cards
+
+// R1_TEL_HEAD V1.0 begin
+	optional uint32 telescope_id = 512;
+	optional string cs_serial = 513;
+	optional fixed64 run_id = 514;
+	optional fixed64 date = 515;
+	optional uint32 num_pixels = 516;
+	optional uint32 num_samples = 517;
+	optional AnyArray expected_pixels_id = 518;
+	optional string data_model_version = 519;
+	optional nectarcam_specific_head nectarcam = 520;
+	optional lstcam_specific_head lstcam = 521;
+// R1_TEL_HEAD V1.0 end
+
+
+
+}
+
+/*********************
+ * One full camera event. This is the structure that would be given to the FITS writer.
+ * New fields would be automatically be taken into account thanks to the C++ reflexion features of the protobufs
+ *********************/
+
+  // change in interfaceOut.h file if modification
+
+enum EventType
+{
+	NONE         = 0;
+	PHYSICAL     = 1;
+	PEDESTAL     = 2;
+	LIGHT_PULSER = 3;
+}
+
+enum AcquisitionMode
+{
+	UNKNOWN = 0x00000000;
+	DAQCHARGE = 0x0000EEE0;
+	DAQCHARGE_T = 0x0000EEE1;
+	DAQSAMPLE = 0x0000EEE3;
+	DAQSAMPLE_C = 0x0000EEE4;
+	DAQSAMPLE_D = 0x0000EEE5;
+	DAQCHARGESAMPLE = 0x0000EEE6;
+}
+
+message CircleParams
+{
+	optional double x = 1;		// muon's fitted circle center X-coord [mm]
+	optional double y = 2;		// muon's fitted circle center Y-coord [mm]
+	optional double r = 3;		// muon's fitted circle radius [mm]
+	optional double s = 4;		// muon's RMS of fitted circle
+	optional int32 niter = 5;	// number of iterations during fit
+	optional int32 npts = 6;	// number of pixels considered
+	optional bool muon_flag = 7;	// muon detection flag set by camera server - DEPRECATED, MOVED to event_type
+	optional double muon_totalpe = 8; // muon total signal (in PE)
+}
+
+message HillasParams
+{	// parameters as per: http://adsabs.harvard.edu/abs/1993ApJ...404..206R
+	optional double x = 1;		//
+	optional double y = 2;		//
+	optional double r = 3;		// dist
+	optional double phi = 4;	//
+	optional double intensity = 5;	//
+	optional double length = 6;	//
+	optional double width = 7;	//
+	optional double psi = 8;	//
+	optional double skewness = 9;	//
+	optional double kurtosis = 10;	//
+	optional double miss = 11;	//
+	optional int32 npts = 12;	// number of pixels considered
+}
+
+message CameraLocation
+{
+	optional double x   = 1; //position of the telescope
+	optional double y   = 2;
+	optional double z   = 3;
+	optional double az  = 4;
+	optional double alt = 5;
+}
+
+message CameraGeometry
+{
+	optional int32          num_pixels      = 1;
+	optional AnyArray       pixels_x        = 2;
+	optional AnyArray       pixels_y        = 3;
+	optional AnyArray       pixels_r        = 4;
+	optional double         rotation        = 5;
+	optional double         foc_length      = 6;
+	optional int32		num_mirrors     = 7;
+	optional double		mirror_area     = 8;
+	optional CameraLocation pointing        = 9;
+	optional double		sample_duration = 10;
+}
+
+
+	// R1_TEL_EVT  V1.0 begin
+
+message lstcam_specific_evt
+{
+	optional AnyArray module_status = 1;
+	optional uint32 extdevices_presence = 2;
+	optional AnyArray tib_data = 3;
+	optional AnyArray cdts_data = 4;
+	optional AnyArray swat_data = 5;
+	optional AnyArray counters = 6;
+	optional AnyArray chips_flags = 7;
+	optional AnyArray first_capacitor_id = 8;
+	optional AnyArray drs_tag_status = 9;
+	optional AnyArray drs_tag = 10;
+}
+
+message nectarcam_specific_evt
+{
+	optional AnyArray module_status = 1;
+	optional uint32 extdevices_presence = 2;
+	optional AnyArray tib_data = 3;
+	optional AnyArray cdts_data = 4;
+	optional AnyArray swat_data = 5;
+	optional AnyArray counters = 6;
+}
+	// R1_TEL_EVT  V1.0 end
+
+// 2018.06.14: new fields as per Krzysiek Zietara implementation of fw/hw/gw version markers
+enum DigicamCardType
+{
+	TRIGGER         = 0;
+	FADC_ANALOG     = 1;
+	FADC_INTERSIL   = 2;
+}
+
+message DigicamConfig
+{
+	optional AnyArray  protocol_vers         = 1;  // protocol version
+	optional AnyArray  sn                    = 2;  // serial number
+	optional AnyArray  hv                    = 3;  // hardware version
+	optional AnyArray  gateware_rev          = 4;  // gateware revision
+	optional AnyArray  gateware_vers         = 5;  // gateware version
+	optional AnyArray  gateware_code         = 6;  // gateware code
+	optional AnyArray  gateware_card_type    = 7;  // gateware card type (enum DigicamCardType: 0=TRIGGER, 1=FADC_ANALOG, 2=FADC_INTERSIL)
+	optional AnyArray  firmware_rev          = 8;  // firmware revision
+	optional AnyArray  firmware_vers         = 9;  // firmware version
+	optional AnyArray  firmware_code         = 10; // firmware code
+	optional AnyArray  firmware_card_type    = 11; // firmware card type (enum DigicamCardType: 0=TRIGGER, 1=FADC_ANALOG, 2=FADC_INTERSIL)
+	optional uint32    operation_id          = 12; // NEW: 20180910 (reserved)
+	optional uint32    operation_data        = 13; // NEW: 20180910 (reserved)
+	optional fixed32   digicam_time_nanosec  = 14; // digicam internal clock nanoseconds
+	optional fixed32   digicam_time_sec      = 15; // digicam internal clock seconds
+}
+
+message DigicamSiiConfig
+{
+	optional fixed32   protocol_vers         = 1;  // protocol version
+	optional fixed32   sn                    = 2;  // serial number
+	optional fixed32   hv                    = 3;  // hardware version
+	optional fixed32   gateware_rev          = 4;  // gateware revision
+	optional fixed32   gateware_vers         = 5;  // gateware version
+	optional fixed32   gateware_code         = 6;  // gateware code
+	optional fixed32   gateware_card_type    = 7;  // gateware card type (enum DigicamCardType: 0=TRIGGER, 1=FADC_ANALOG, 2=FADC_INTERSIL)
+	optional fixed32   firmware_rev          = 8;  // firmware revision
+	optional fixed32   firmware_vers         = 9;  // firmware version
+	optional fixed32   firmware_code         = 10; // firmware code
+	optional fixed32   firmware_card_type    = 11; // firmware card type (enum DigicamCardType: 0=TRIGGER, 1=FADC_ANALOG, 2=FADC_INTERSIL)
+	optional uint32    operation_id          = 12; // NEW: 20180910 (reserved)
+	optional uint32    operation_data        = 13; // NEW: 20180910 (reserved)
+	optional fixed32   digicam_time_nanosec  = 14; // digicam internal clock nanoseconds
+	optional fixed32   digicam_time_sec      = 15; // digicam internal clock seconds
+}
+
+
+message CameraEvent
+{
+	optional sfixed32        telescopeID = 1 [default=-1]; //ID of this telescope
+	optional double          dateMJD     = 2 [default=0];  //camera server date when the event was generated
+    // there are two attributes "eventType / event_type", one is the enum, one is a plain number
+    // these map to the same name in the json serialization, since that is normalized to snake_case
+    // Recent versions of protobuf warn about "duplicated json name" and it results in errors
+    // in the python bindings. Specify an explicit json name here to fix.
+	optional EventType       eventType   = 3 [default=NONE,  json_name="event_type_enum"];  //type of event, i.e. physical, pedestal...
+	optional fixed32         eventNumber = 4 [default=0];  //internal camera's event counter
+	optional fixed32         arrayEvtNum = 5 [default=0];  //corresponding array event number
+	optional PixelsChannel   hiGain      = 6;
+	optional PixelsChannel   loGain      = 7;
+	optional CameraTrigger   trig        = 8;
+	optional CameraRunHeader head        = 9; //could be added at some point (not written to disk) to simplify the processing
+	optional CircleParams	 muon        = 10;
+	optional CameraGeometry  geometry    = 11;
+	optional sfixed32        hilo_offset = 12;
+	optional sfixed32        hilo_scale  = 13;
+
+	// add counters for nectarcam tests
+	optional CameraCounters cameraCounters  = 14;
+	optional ModuleStatus      moduleStatus    = 15;
+	optional PixelPresence     pixelPresence   = 16;
+
+	// NectarCam specific		   
+	optional AcquisitionMode   acquisitionMode = 17;
+
+	// Ext devices
+	optional bool              uctsDataPresence = 18;
+	optional UCTSdata          uctsData = 19;
+	optional bool              tibDataPresence = 20;
+	optional TIBdata           tibData      = 21;
+	optional bool              swatDataPresence = 22;
+	optional SWATdata          swatData     = 23;
+
+	// LstCam specific
+	optional ChipsFlags chipsFlags = 25;
+	optional FirstCapacitorIds firstCapacitorIds = 26;
+	optional DrsTags drsTagsHiGain = 27;
+	optional DrsTags drsTagsLoGain = 28;
+
+
+	//add Digicam-specific fields
+	optional fixed64  local_time_nanosec     = 30;	// local camera nanoseconds
+	optional fixed64  local_time_sec         = 31;  // local camera seconds
+	optional AnyArray pixels_flags           = 32;	// one byte of flags per pixel
+	//Field below actually never used AFAIK
+	optional AnyArray trigger_map            = 33;	// DEPRECATED: use trigger_output_patch7 or trigger_output_patch19 instead
+	optional fixed32  event_type             = 34;
+	optional AnyArray trigger_input_traces   = 35;
+	optional AnyArray trigger_output_patch7  = 36;  // TRG0 ALG
+	optional AnyArray trigger_output_patch19 = 37;  // TRG1 ALG
+	optional AnyArray trigger_output_muon    = 38;  // TRG2 ALG
+	// 2018.06.14: new fields as per Krzysiek Zietara implementation of fw/hw/gw version markers
+	optional DigicamConfig digicam_config	 = 39;
+	// 2018.09.10: JB/CAMK: SST1M camera can compute hillas parameters on-the-fly
+	optional HillasParams	 hillas          = 40;
+	// 2019.05.15: JB/CAMK: SST1M support for stellar intensity interferometry
+	optional InterferometryChannel sii	 = 41;	// Stellar Interferometry Data
+	optional DigicamSiiConfig sii_config	 = 42;	// SII configuration (cannot use std, as it is too slow to serialize ...)
+
+
+	//add ASTRI-specific fields
+	//first event header
+	optional bool     gps_status = 51;	// false = no gps available, true = gps available
+	optional AnyArray time_utc   = 52;      // tightly packed utc-style time
+	optional fixed32  time_ns    = 53;      // nanosecond part event time
+	optional fixed32  time_s     = 54;	// integral part of precise timestamp
+	optional fixed32  flags      = 55;	// packed flags: telescope ID +  packet type (+subtype)
+	optional fixed32  ssc        = 56;	// source sequence counter, to figure out missing packets
+	optional fixed32  pkt_len    = 57;	// number of bytes contained inside this packet
+
+	//then science event
+	optional bool     muon_tag   = 58;	// whether this is a muon or not
+	optional AnyArray trpdm		 = 59;	// boolean list of triggered pdms
+
+	//then science with housekeeping
+	optional AnyArray pdmdt		 = 60;	//hi-gain uint16 channel
+	optional AnyArray pdmt       = 61;	//lo-gain uint16 channel
+	//calibration header
+	optional AnyArray daqtime    = 62;	//relative trigger time per-pdm
+	optional AnyArray ptm		 = 63;	//pixels trigger mode
+	optional AnyArray trpxlid    = 64;	//pdms temperatures
+	//calibration trailer
+	optional AnyArray pdmdac     = 65;	//gain of pixels
+	//calirbation c11 c12
+	optional AnyArray pdmpc		 = 66;	//pixels count rate
+
+	//calibration c13 c14. todo to be merged with pixels channels, and add specific event type
+	optional AnyArray pdmhi		 = 67;	//calibration event, i.e. dark count, fibers runs
+	optional AnyArray pdmlo		 = 68;	//same for lo-gain channel
+
+	//variance. to be merged with event type ?
+	optional AnyArray daqmode	 = 69;	//acquisition mode i.e. peak detector or sampling & hold
+	optional AnyArray varsamp	 = 70;	//log2 value of #samples used to calculate sum and sumsqr
+	optional AnyArray pdmsum	 = 71;	//value of the sum of the samples
+	optional AnyArray pdmsumsq   = 72;	//squared value of the sum of the samples
+	//housekeeping ignored for now
+
+	//FlashCam-specific fields
+	optional float pulser = 80;
+	optional AnyArray ftimeoffset = 81;
+	optional AnyArray ftimestamp = 82;
+
+
+	// R1_TEL_EVT  V1.0 begin
+	optional fixed64 run_id = 512;
+	optional fixed64 event_id = 513;
+	optional fixed64 tel_event_id = 514;
+	optional fixed32 trigger_time_s = 515;
+	optional fixed32 trigger_time_qns = 516;
+	optional uint32 trigger_type = 517;
+	optional AnyArray waveform = 518;
+	optional AnyArray pixel_status = 519;
+	optional fixed64 ped_sub_id = 520;
+	optional nectarcam_specific_evt nectarcam = 521;
+	optional lstcam_specific_evt lstcam = 522;
+	// R1_TEL_EVT  V1.0 end
+
+
+	//DL0 Data challenge stuff
+	optional fixed32  num_gains  = 1024;
+}
+
+
+
+
+message PacketLibData
+{
+	optional bytes data = 1;
+}
+
+message ShowerParams
+{
+	optional float azimuth    = 1;
+	optional float altitude   = 2;
+	optional float start_alt  = 3;
+	optional float max_alt    = 4;
+	optional float ch_max_alt = 5;
+}
+
+message MCCalibrationChannel
+{
+	optional AnyArray gain          = 1;
+	optional AnyArray pedestal      = 2;
+	optional AnyArray pulse_shape   = 3;
+}
+
+message MCCalibration
+{
+	optional fixed32              telescope_id  = 1;
+	optional MCCalibrationChannel hi_gain       = 2;
+	optional MCCalibrationChannel lo_gain       = 3;
+	optional AnyArray             broken_pixels = 4;
+	optional double       		 ref_pulse_step = 5;
+}
+
+/*********************
+ * One full array event. Just a bunch of camera events from different telescopes
+ *********************/
+message ArrayEvent
+{
+	optional ArrayTrigger triggerData = 1;
+	repeated CameraEvent  cameraData  = 2;
+	optional ShowerParams shower_params = 3;
+}
+
+
+/*********************
+ * data model V1.0 
+ * (defined for NectarCam and LstCam)
+ *********************/
+ 
+// see in CameraRunHeader
+//message R1_TEL_HEAD
+//{
+//	optional uint32 telescope_id = 1;
+//	optional string cs_serial = 2;
+//	optional fixed64 run_id = 3;
+//	optional fixed64 date = 4;
+//	optional uint32 num_pixels = 5;
+//	optional uint32 num_samples = 6;
+//	optional AnyArray expected_pixels_id = 7;
+//	optional string data_model_version = 8;
+//	optional nectarcam_specific_head nectarcam = 9;
+//	optional lstcam_specific_head lstcam = 10;
+//}
+
+
+
+// see in CameraEvent
+//message R1_TEL_EVT
+//{
+//	optional fixed64 run_id = 1;
+//	optional fixed64 event_id = 2;
+//	optional fixed64 tel_event_id = 3;
+//	optional fixed32 trigger_time_s = 4;
+//	optional fixed32 trigger_time_qns = 5;
+//	optional uint32 trigger_type = 6;
+//	optional AnyArray waveform = 7;
+//	optional AnyArray pixel_status = 8;
+//	optional fixed64 ped_sub_id = 9;
+//	optional nectarcam_specific_evt nectarcam = 10;
+//	optional lstcam_specific_evt lstcam = 11;
+//}

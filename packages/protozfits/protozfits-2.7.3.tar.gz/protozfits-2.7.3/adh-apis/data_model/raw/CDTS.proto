@@ -1,0 +1,42 @@
+syntax = "proto2";
+
+package CTA.ADH.CDTS;
+
+enum TriggerType
+{
+    CameraTrigger   = 1;
+    SoftTrigger     = 2;
+    ExternalTrigger = 3;
+}
+
+enum WhiteRabbitStatus
+{
+    Uninitialized    = 1;
+    SyncNsec         = 2;
+    SyncSec          = 3;
+    SyncPhase        = 4;
+    TrackPhase       = 5;
+    WaitOffsetStable = 6;
+}
+
+message TimeStamp
+{
+    required fixed64 seconds     = 1;
+    required fixed64 picoSeconds = 2;
+}
+
+message TriggerMessage
+{
+    required fixed32           telescope = 1;
+    required fixed64           event     = 2;
+    required TimeStamp         time      = 3;
+    optional TriggerType       type      = 4 [default = CameraTrigger];
+    optional WhiteRabbitStatus status    = 5 [default = TrackPhase];
+}
+
+message TriggerBunch
+{
+    repeated TriggerMessage triggers = 1;
+}
+
+
