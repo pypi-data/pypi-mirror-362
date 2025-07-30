@@ -1,0 +1,169 @@
+[project]
+name = "cogniweave"
+version = "0.1.8"
+description = "Experimental agent framework built on top of LangChain"
+authors = [
+    { name = "Kotodama", email = "2682064633@qq.com" },
+]
+license = { text = "Apache License 2.0" }
+readme = "README.md"
+keywords = ["agent"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+requires-python = ">=3.11,<4"
+dependencies = [
+    "aiohttp==3.12.14",
+    "aiosqlite==0.21.0",
+    "anyio==4.9.0",
+    "exceptiongroup==1.2.2",
+    "httpx[socks]",
+    "langchain==0.3.26",
+    "langchain-community==0.3.25",
+    "langchain-core==0.3.68",
+    "langchain-openai==0.3.27",
+    "pyahocorasick==2.1.0",
+    "pydantic==2.11.7",
+    "pygtrie==2.5.0",
+    "pypinyin==0.54.0",
+    "python-dotenv",
+    "PyYAML==6.0.2",
+    "sqlalchemy==2.0.41",
+    "rich==14.0.0",
+    "typing_extensions==4.14.1",
+    "sortedcontainers==2.4.0",
+    "faiss-cpu==1.11.0"
+]
+
+[project.urls]
+Repository = "https://github.com/Inexplicable-YL/CogniWeaveAgent"
+
+[tool.uv]
+dev-dependencies = [
+    # dev
+    "exceptiongroup>=1",
+    "setuptools>=74",
+    "tomli>=2",
+    "trio>=0.26",
+    # lint
+    "mypy>=1",
+    "pylint-pydantic>=0.3",
+    "pylint>=3",
+    "ruff>=0.6",
+    # docs
+    "sophia-doc>=0.1",
+    "tomlkit>=0.13",
+    # test
+    "pytest>=8",
+    "pytest-asyncio",
+    "pytest-cov>=5",
+    "pytest-mock>=3",
+    "pytest-xdist>=3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["ALL"]
+exclude = ["typeshed-fallback", "*/typeshed/*"]
+ignore = [
+    "C90",      # mccabe
+    "FBT",      # flake8-boolean-trap
+    "EM",       # flake8-errmsg
+    "INP",      # flake8-no-pep420
+    "E501",     # Line too long, handled by formatter
+    "D415",     # First line should end with a period, question mark, or exclamation point
+    "ANN401",   # Dynamically typed expressions (typing.Any) are disallowed
+    "ASYNC109", # Async function definition with a timeout parameter
+    "S101",     # Use of assert detected
+    "COM812",   # Trailing comma missing
+    "TD003",    # Missing issue link on the line following this TODO
+    "FIX002",   # Line contains TODO
+    "PGH003",   # Use specific rule codes when ignoring type issues
+    "PLR0912",  # Too many branches
+    "PLR0913",  # Too many arguments to function call
+    "TRY003",   # Avoid specifying long messages outside the exception class
+    "PERF203",  # try-except within a loop incurs performance overhead
+    "D107",
+    "BLE001",
+    "PLW2901",
+    "TRY301",
+    "N802",
+    "SLF001",
+    "A001",
+    "A002",
+    "D",
+    "DTZ005",
+    "DTZ006",
+]
+allowed-confusables = ["，", "：", "！", "（", "）"]
+
+[tool.ruff.lint.flake8-builtins]
+builtins-ignorelist = ["id", "type"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["pydantic", "aiohttp", "structlog"]
+extra-standard-library = ["typing_extensions"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["D", "PLR2004", "T201"]
+
+[tool.pyright]
+ignore = ["example/nodes"]
+exclude = ["**/.conda", "**/.venv", "**/__pycache__"]
+pythonVersion = "3.11"
+pythonPlatform = "All"
+#typeCheckingMode = "strict"
+python.linting.enabled = false
+python.linting.mypyEnabled = false
+python.linting.pylintEnabled = false
+reportUnnecessaryIsInstance = false
+reportCallInDefaultInitializer = true
+reportImplicitOverride = true
+reportPropertyTypeMismatch = true
+reportInvalidTypeVarUse = false
+reportShadowedImports = true
+reportUninitializedInstanceVariable = false
+reportPrivateUsage = false
+
+
+#[tool.mypy]
+#python_version = "3.11"
+#strict = true
+#disable_error_code = [
+#    "valid-type",
+#    "unused-ignore",
+#    "index",
+#    "misc",
+#]
+#warn_return_any = false
+
+#[[tool.mypy.overrides]]
+#module = "apscheduler.*"
+#ignore_missing_imports = true
+
+[tool.hatch.build]
+packages = ["src/cogniweave"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/README.md", "/src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
