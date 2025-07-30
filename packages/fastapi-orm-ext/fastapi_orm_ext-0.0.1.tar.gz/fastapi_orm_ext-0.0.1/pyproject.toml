@@ -1,0 +1,108 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fastapi-orm-ext"
+dynamic = ["version"]
+description = "FastAPI ORM Extensions"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "MIT"
+keywords = ["fastapi", "orm", "extensions"]
+authors = [
+  { name = "Pavel Kozhemjachenko", email = "pkozhem@gmail.com" },
+]
+classifiers = [
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "fastapi>=0.116.1",
+    "sqlalchemy>=2.0.41",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "ipython",
+]
+
+[project.urls]
+Documentation = "https://github.com/pkozhem/fastapi-orm-ext#readme"
+Issues = "https://github.com/pkozhem/fastapi-orm-ext/issues"
+Source = "https://github.com/pkozhem/fastapi-orm-ext"
+Repository = "https://github.com/pkozhem/fastapi-orm-ext"
+
+[tool.hatch.version]
+path = "src/fastapi_orm_ext/__about__.py"
+
+[tool.hatch.envs.lint]
+extra-dependencies = [
+  "ruff",
+]
+[tool.hatch.envs.lint.scripts]
+check = "ruff check {args:src/fastapi_orm_ext tests}"
+format = "ruff format {args:src/fastapi_orm_ext tests}"
+
+[tool.coverage.run]
+source_pkgs = ["fastapi_orm_ext", "tests"]
+branch = true
+parallel = true
+omit = ["src/fastapi_orm_ext/__about__.py"]
+
+[tool.coverage.paths]
+fastapi_orm_ext = ["src/fastapi_orm_ext", "*/fastapi-orm-ext/src/fastapi_orm_ext"]
+tests = ["tests", "*/fastapi-orm-ext/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+target-version = "py313"
+fix = true
+src = ["app"]
+line-length = 120
+indent-width = 4
+include = [
+    "app/**/*.py",
+    "*.py",
+]
+exclude = [
+    "**/.venv",
+    "test*",
+]
+
+[tool.ruff.lint]
+select = [
+    "ALL"
+]
+ignore = [
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed in `*args`
+    "B008",    # do not perform function calls in argument defaults
+    "B024",    # abstract base class, but it has no abstract methods or properties
+    "COM812",  # Ruff formatter recommeds to desable this rule
+    "D",       # pydocstyle
+    "E501",    # line too long, handled by ruff
+    "FA102",   # Missing `from __future__ import annotations`
+    "FIX002",  # Line contains TODO, consider resolving the issue
+    "RET504",  # Unnecessary assignment before return
+    "RUF100",  # Unused noqa directive
+    "RUF102",  # Invalid rule code in # noqa: {}
+    "TC002",   # Move third-party import into a type-checking block
+    "TD002",   # Missing author in TODO
+]
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
