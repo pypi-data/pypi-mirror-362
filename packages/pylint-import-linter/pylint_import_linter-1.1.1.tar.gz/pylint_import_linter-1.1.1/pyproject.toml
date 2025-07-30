@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pylint-import-linter"
+version = "1.1.1"
+license = "BSD-2-Clause"
+description = "Enforces rules for the imports within and between Python packages."
+authors = [
+    {name = "David Seddon", email = "david@seddonym.me"},
+    {name = "Siarhei Skuratovich", email = "sOraCool@gmail.com"},
+]
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0,<8.2.0; python_version < '3.10'",
+    "click>=8.2.1; python_version >= '3.10'",
+    "grimp>=3.9",
+    "tomli>=2.2.1; python_version < '3.11'",
+    "typing-extensions>=4.14.1",
+    "pylint>=3.0.0",
+    "types-pyyaml>=6.0.12.20250516",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: Unix",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Utilities",
+]
+dynamic = ["readme"]
+
+[project.urls]
+Documentation = "https://import-linter.readthedocs.io/"
+Source-code = "https://github.com/seddonym/import-linter/"
+
+[project.scripts]
+lint-imports = "importlinter.cli:lint_imports_command"
+
+[project.entry-points.pylint]
+import-linter = "importlinter.pylint_plugin"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.dynamic]
+readme = {file = "README.rst"}
+
+[tool.setuptools.package-data]
+importlinter = ["py.typed"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.black]
+line-length = 99
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = "True"
+force_grid_wrap = 0
+use_parentheses = "True"
+line_length = 99
+
+[tool.mypy]
+exclude = [
+    '^tests/assets/',
+]
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = "astroid.*"
+ignore_missing_imports = true
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "mypy>=1.0.0",
+    "pyyaml>=6.0.2",
+    "build>=1.2.2.post1",
+]
