@@ -1,0 +1,296 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+  schedule:
+    - cron: $cron-daily
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python', 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+
+  dependency-check:
+    name: Dependency Vulnerability Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install safety bandit semgrep
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f pyproject.toml ]; then pip install .; fi
+
+    - name: Run Safety check for Python
+      run: |
+        safety check --json --output safety-report.json || true
+        echo "Python dependency check completed"
+
+    - name: Run Bandit security check for Python
+      run: |
+        bandit -r . -f json -o bandit-report.json || true
+        echo "Python security check completed"
+
+    - name: Set up Node.js for dependency check
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Node.js dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm ci || npm install
+        fi
+
+    - name: Run npm audit for Node.js
+      run: |
+        if [ -f package.json ]; then
+          npm audit --json > npm-audit-report.json || true
+          echo "Node.js dependency check completed"
+        fi
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+          npm-audit-report.json
+        retention-days: 30
+      if: always()
+
+  license-check:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install license checking tools
+      run: |
+        python -m pip install pip-licenses licensecheck
+
+    - name: Check Python package licenses
+      run: |
+        if [ -f requirements.txt ] || [ -f pyproject.toml ]; then
+          pip-licenses --format=json --output-file=python-licenses.json || true
+          echo "Python license check completed"
+        fi
+
+    - name: Set up Node.js for license check
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Check Node.js package licenses
+      run: |
+        if [ -f package.json ]; then
+          npm install -g license-checker
+          license-checker --json --out nodejs-licenses.json || true
+          echo "Node.js license check completed"
+        fi
+
+    - name: Upload license reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: license-reports
+        path: |
+          python-licenses.json
+          nodejs-licenses.json
+        retention-days: 30
+      if: always()
+
+  code-metrics:
+    name: Code Quality Metrics
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install code quality tools
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install radon xenon mccabe complexity
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f pyproject.toml ]; then pip install .; fi
+
+    - name: Run code complexity analysis
+      run: |
+        echo "Running code complexity analysis..."
+        radon cc . --json > complexity-report.json || true
+        radon mi . --json > maintainability-report.json || true
+        radon hal . --json > halstead-report.json || true
+
+    - name: Set up Node.js for metrics
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Node.js code quality tools
+      run: |
+        if [ -f package.json ]; then
+          npm install -g jscpd plato eslint
+        fi
+
+    - name: Run JavaScript code analysis
+      run: |
+        if [ -f package.json ]; then
+          echo "Running JavaScript code analysis..."
+          jscpd --reporters json --output ./jscpd-report.json . || true
+        fi
+
+    - name: Upload metrics reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-metrics
+        path: |
+          complexity-report.json
+          maintainability-report.json
+          halstead-report.json
+          jscpd-report.json
+        retention-days: 30
+      if: always()
+
+  pre-commit-hooks:
+    name: Pre-commit Hooks
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install pre-commit
+      run: |
+        python -m pip install pre-commit
+
+    - name: Cache pre-commit hooks
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+    - name: Run pre-commit hooks
+      run: |
+        if [ -f .pre-commit-config.yaml ]; then
+          pre-commit run --all-files
+        else
+          echo "No pre-commit configuration found"
+        fi
+
+  documentation-check:
+    name: Documentation Quality
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check README exists
+      run: |
+        if [ ! -f README.md ]; then
+          echo "::warning::README.md not found"
+        else
+          echo "README.md found"
+        fi
+
+    - name: Check CHANGELOG exists
+      run: |
+        if [ ! -f CHANGELOG.md ]; then
+          echo "::warning::CHANGELOG.md not found"
+        else
+          echo "CHANGELOG.md found"
+        fi
+
+    - name: Check LICENSE exists
+      run: |
+        if [ ! -f LICENSE ] && [ ! -f LICENSE.txt ] && [ ! -f LICENSE.md ]; then
+          echo "::warning::LICENSE file not found"
+        else
+          echo "LICENSE file found"
+        fi
+
+    - name: Check documentation links
+      run: |
+        if [ -f README.md ]; then
+          echo "Checking README.md for broken links..."
+          # Basic link validation - could be enhanced with markdown-link-check
+          grep -o 'http[s]*://[^)]*' README.md || echo "No external links found"
+        fi

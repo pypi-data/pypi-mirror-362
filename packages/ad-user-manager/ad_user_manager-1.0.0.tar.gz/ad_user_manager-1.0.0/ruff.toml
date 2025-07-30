@@ -1,0 +1,43 @@
+# Ruff configuration for AD User Manager
+target-version = "py312"
+line-length = 88
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "S",   # bandit security
+    "B",   # flake8-bugbear
+    "A",   # flake8-builtins
+    "C4",  # flake8-comprehensions
+    "ICN", # flake8-import-conventions
+    "PIE", # flake8-pie
+    "PT",  # flake8-pytest-style
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "ARG", # flake8-unused-arguments
+    "PLE", # pylint errors
+    "PLR", # pylint refactor
+    "PLW", # pylint warnings
+]
+ignore = [
+    "S101",  # use of assert
+    "S311",  # random generator for non-cryptographic use
+    "PLR0913", # too many arguments
+    "PLR2004", # magic value used in comparison
+    "ARG002", # unused method argument
+    "ARG001", # unused function argument
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["S101", "PLR2004", "ARG001", "ARG002"]
+
+[lint.mccabe]
+max-complexity = 10
+
+[lint.isort]
+known-first-party = ["ad_user_manager"]

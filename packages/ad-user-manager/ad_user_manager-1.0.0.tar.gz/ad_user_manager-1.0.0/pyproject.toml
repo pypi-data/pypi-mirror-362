@@ -1,0 +1,90 @@
+[project]
+name = "ad-user-manager"
+version = "1.0.0"
+description = "Modern Active Directory user management tool with conflict resolution"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.2.1",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "rich>=14.0.0",
+    "structlog>=25.4.0",
+    "ldap3>=2.9.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "black>=24.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.8.0",
+]
+
+[project.scripts]
+ad-user-manager = "ad_user_manager.cli:main"
+
+[build-system]
+requires = [
+    "hatchling",
+]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "N",
+    "UP",
+    "S",
+    "B",
+    "A",
+    "C4",
+    "ICN",
+    "PIE",
+    "PT",
+    "RET",
+    "SIM",
+    "ARG",
+    "PLE",
+    "PLR",
+    "PLW",
+]
+ignore = [
+    "S101",
+    "S311",
+]
+
+[tool.black]
+line-length = 88
+target-version = [
+    "py312",
+]
+include = "\\.pyi?$"
+exclude = "/(\n  \\.git\n | \\.venv\n | build\n | dist\n)/\n"
+skip-string-normalization = true
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+python_files = [
+    "test_*.py",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:pyasn1.*",
+    "ignore:tagMap is deprecated.*:DeprecationWarning",
+    "ignore:typeMap is deprecated.*:DeprecationWarning",
+]
