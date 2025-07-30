@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sqlitekit"
+version = "3"
+description = "cli tool for a sqlite database of items and item details (scaffold layer 1)"
+authors = [
+    { name = "Silcrow" }
+]
+dependencies = [
+    "click",
+    "alembic",
+    "pendulum",
+    "sqlalchemy"
+]
+
+[project.scripts]
+sqlitekit = "cli.app:cli"
+
+[tool.setuptools.packages.find]
+include = ["cli", "dao", "crud", "database", "dashboard", "shared", "etl", "alembic", "data"]
