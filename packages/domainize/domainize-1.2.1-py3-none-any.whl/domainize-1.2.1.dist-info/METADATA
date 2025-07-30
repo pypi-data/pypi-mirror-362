@@ -1,0 +1,46 @@
+Metadata-Version: 2.3
+Name: domainize
+Version: 1.2.1
+Summary: Library for extracting domains.
+License: MIT
+Author: Data
+Author-email: data@camber.io
+Requires-Python: >=3.8,<4.0
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Typing :: Typed
+Project-URL: Documentation, https://gitlab.com/rocket-boosters/pipper/domainize
+Project-URL: Homepage, https://gitlab.com/rocket-boosters/pipper/domainize
+Project-URL: Repository, https://gitlab.com/rocket-boosters/pipper/domainize
+Description-Content-Type: text/markdown
+
+# Domainize
+
+Library for extracting domains.
+
+## Usage
+
+Domainize does its best to find what we'd typically consider the real domain
+of a website. This includes removing subdomains while preserving pseudo-TLD
+such as `co.uk`.
+
+```python
+import domainize
+
+domainize.get_domain("https://github.com/camber-ops/pipper-domainize")
+# github.com
+
+domainize.get_domain("blog.camber.io/foobar")
+# camber.io
+
+domainize.get_domain("google.co.uk")
+# google.co.uk
+```
+
