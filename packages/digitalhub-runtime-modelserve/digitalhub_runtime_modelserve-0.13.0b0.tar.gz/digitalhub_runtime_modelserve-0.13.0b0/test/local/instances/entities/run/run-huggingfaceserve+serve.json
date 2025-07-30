@@ -1,0 +1,1413 @@
+{
+    "id": "f01f768d-5996-454c-b204-af3bc65b05ab",
+    "key": "store://demo-etl/run/huggingfaceserve+run/f01f768d-5996-454c-b204-af3bc65b05ab",
+    "kind": "huggingfaceserve+run",
+    "metadata": {
+      "name": "f01f768d-5996-454c-b204-af3bc65b05ab",
+      "updated_by": "digitalhubdev",
+      "project": "demo-etl",
+      "updated": "2024-11-20T12:21:38.853Z",
+      "created_by": "digitalhubdev",
+      "created": "2024-11-20T11:12:44.323Z"
+    },
+    "name": "f01f768d-5996-454c-b204-af3bc65b05ab",
+    "project": "demo-etl",
+    "spec": {
+      "tensor_input_names": [
+        "name1"
+      ],
+      "tokenizer_revision": "1.0",
+      "max_log_len": 20,
+      "replicas": 3,
+      "profile": "1xa10",
+      "huggingface_task": "sequence_classification",
+      "dtype": "FLOAT32",
+      "disable_lower_case": true,
+      "local_execution": false,
+      "path": "huggingface://model1/model",
+      "trust_remote_code": true,
+      "service_type": "NodePort",
+      "task": "huggingfaceserve+serve://demo-etl/4d62fa65-7387-4804-b5d8-e72641fdb0e1",
+      "model_name": "model1",
+      "function": "huggingfaceserve://demo-etl/func5:4d62fa65-7387-4804-b5d8-e72641fdb0e1",
+      "disable_special_tokens": true,
+      "backend": "HUGGINGFACE",
+      "return_probabilities": true,
+      "max_length": 100,
+      "resources": {
+        "cpu": {
+          "requests": "0100m",
+          "limits": "0200m"
+        },
+        "mem": {
+          "requests": "0100Ki",
+          "limits": "0200Ki"
+        },
+        "gpu": {
+          "limits": "01"
+        }
+      },
+      "envs": [
+        {
+          "name": "USER",
+          "value": "test"
+        }
+      ],
+      "secrets": [
+        "secret-key"
+      ],
+      "volumes": [
+        {
+          "name": "volume1",
+          "volume_type": "empty_dir",
+          "mount_path": "/volume1"
+        },
+        {
+          "name": "volume2",
+          "volume_type": "persistent_volume_claim",
+          "mount_path": "/volume2"
+        }
+      ],
+      "node_selector": [
+        {
+          "key": "node1",
+          "value": "value1"
+        }
+      ]
+    },
+    "status": {
+      "state": "ERROR",
+      "transitions": [
+        {
+          "status": "ERROR",
+          "message": "k8s:  {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"deployments.apps \\\"d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab\\\" not found\",\"reason\":\"NotFound\",\"details\":{\"name\":\"d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab\",\"group\":\"apps\",\"kind\":\"deployments\"},\"code\":404}\n ",
+          "time": "2024-11-20T12:21:38.562436038Z"
+        },
+        {
+          "status": "RUNNING",
+          "message": "deployment d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab created, service s-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab created",
+          "time": "2024-11-20T11:12:44.437579733Z"
+        },
+        {
+          "status": "READY",
+          "time": "2024-11-20T11:12:44.342235121Z"
+        },
+        {
+          "status": "BUILT",
+          "time": "2024-11-20T11:12:44.32895907Z"
+        }
+      ],
+      "message": "k8s:  {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"deployments.apps \\\"d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab\\\" not found\",\"reason\":\"NotFound\",\"details\":{\"name\":\"d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab\",\"group\":\"apps\",\"kind\":\"deployments\"},\"code\":404}\n ",
+      "service": {
+        "name": "s-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab",
+        "namespace": "digitalhub-tenant1",
+        "type": "NodePort",
+        "clusterIP": "10.97.29.131",
+        "ports": [
+          {
+            "name": "port8080",
+            "nodePort": 30702,
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          },
+          {
+            "name": "port8081",
+            "nodePort": 30390,
+            "port": 8081,
+            "protocol": "TCP",
+            "targetPort": 8081
+          }
+        ],
+        "url": "s-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab.digitalhub-tenant1:8080",
+        "urls": [
+          "s-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab.digitalhub-tenant1:8080",
+          "s-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab.digitalhub-tenant1:8081"
+        ]
+      },
+      "k8s": {
+        "pods": [
+          {
+            "metadata": {
+              "creationTimestamp": 1732101164,
+              "generateName": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab-7987445848-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+                "dhcore/framework": "k8sserve",
+                "dhcore/function": "func5",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "huggingfaceserve",
+                "dhcore/template": "1xa10",
+                "pod-template-hash": "7987445848"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101164
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-scheduler",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732101164
+                }
+              ],
+              "name": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05824dh",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "apps/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "ReplicaSet",
+                  "name": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab-7987445848",
+                  "uid": "70786f91-dcdb-488a-b5fd-32b9137fe4db"
+                }
+              ],
+              "resourceVersion": "130650",
+              "uid": "9613f669-1d6f-4c80-ae34-d15eac29bac5"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "-m",
+                    "huggingfaceserver",
+                    "--model_name",
+                    "model1",
+                    "--protocol",
+                    "v2",
+                    "--enable_docs_url",
+                    "true",
+                    "--model_id",
+                    "model1/model",
+                    "--tokenizer_revision",
+                    "1.0",
+                    "--max_length",
+                    "100",
+                    "--disable_lower_case",
+                    "true",
+                    "--disable_special_tokens",
+                    "true",
+                    "--trust_remote_code",
+                    "true",
+                    "--tensor_input_names",
+                    "name1",
+                    "--task",
+                    "sequence-classification",
+                    "--backend",
+                    "huggingface",
+                    "--return_probabilities",
+                    "true",
+                    "--max_log_len",
+                    "20",
+                    "--dtype",
+                    "float32"
+                  ],
+                  "command": [
+                    "python"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "f01f768d-5996-454c-b204-af3bc65b05ab"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "kserve/huggingfaceserver:latest",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 30,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 30,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-tgfnj",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Always",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoSchedule",
+                  "key": "nvidia.com/gpu",
+                  "operator": "Equal",
+                  "value": "a10"
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "name": "kube-api-access-tgfnj",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101164,
+                  "message": "0/7 nodes are available: 1 node(s) had untolerated taint {nvidia.com/gpu: a100}, 3 Insufficient cpu, 3 Insufficient nvidia.com/gpu, 3 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }. preemption: 0/7 nodes are available: 3 No preemption victims found for incoming pod, 4 Preemption is not helpful for scheduling.",
+                  "reason": "Unschedulable",
+                  "status": "False",
+                  "type": "PodScheduled"
+                }
+              ],
+              "phase": "Pending",
+              "qosClass": "Burstable"
+            }
+          },
+          {
+            "metadata": {
+              "creationTimestamp": 1732101164,
+              "generateName": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab-7987445848-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+                "dhcore/framework": "k8sserve",
+                "dhcore/function": "func5",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "huggingfaceserve",
+                "dhcore/template": "1xa10",
+                "pod-template-hash": "7987445848"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101164
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-scheduler",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732101164
+                }
+              ],
+              "name": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b058vx85",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "apps/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "ReplicaSet",
+                  "name": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab-7987445848",
+                  "uid": "70786f91-dcdb-488a-b5fd-32b9137fe4db"
+                }
+              ],
+              "resourceVersion": "130644",
+              "uid": "a6cb9e2e-519d-4338-b9fc-8fbed8957c9d"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "-m",
+                    "huggingfaceserver",
+                    "--model_name",
+                    "model1",
+                    "--protocol",
+                    "v2",
+                    "--enable_docs_url",
+                    "true",
+                    "--model_id",
+                    "model1/model",
+                    "--tokenizer_revision",
+                    "1.0",
+                    "--max_length",
+                    "100",
+                    "--disable_lower_case",
+                    "true",
+                    "--disable_special_tokens",
+                    "true",
+                    "--trust_remote_code",
+                    "true",
+                    "--tensor_input_names",
+                    "name1",
+                    "--task",
+                    "sequence-classification",
+                    "--backend",
+                    "huggingface",
+                    "--return_probabilities",
+                    "true",
+                    "--max_log_len",
+                    "20",
+                    "--dtype",
+                    "float32"
+                  ],
+                  "command": [
+                    "python"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "f01f768d-5996-454c-b204-af3bc65b05ab"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "kserve/huggingfaceserver:latest",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 30,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 30,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-jz4nv",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Always",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoSchedule",
+                  "key": "nvidia.com/gpu",
+                  "operator": "Equal",
+                  "value": "a10"
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "name": "kube-api-access-jz4nv",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101164,
+                  "message": "0/7 nodes are available: 1 node(s) had untolerated taint {nvidia.com/gpu: a100}, 3 Insufficient cpu, 3 Insufficient nvidia.com/gpu, 3 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }. preemption: 0/7 nodes are available: 3 No preemption victims found for incoming pod, 4 Preemption is not helpful for scheduling.",
+                  "reason": "Unschedulable",
+                  "status": "False",
+                  "type": "PodScheduled"
+                }
+              ],
+              "phase": "Pending",
+              "qosClass": "Burstable"
+            }
+          },
+          {
+            "metadata": {
+              "creationTimestamp": 1732101164,
+              "generateName": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab-7987445848-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+                "dhcore/framework": "k8sserve",
+                "dhcore/function": "func5",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "huggingfaceserve",
+                "dhcore/template": "1xa10",
+                "pod-template-hash": "7987445848"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101164
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-scheduler",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732101164
+                }
+              ],
+              "name": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b059tblp",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "apps/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "ReplicaSet",
+                  "name": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab-7987445848",
+                  "uid": "70786f91-dcdb-488a-b5fd-32b9137fe4db"
+                }
+              ],
+              "resourceVersion": "130638",
+              "uid": "9d6092f4-0aa3-4073-9033-2bfaaee8b034"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "-m",
+                    "huggingfaceserver",
+                    "--model_name",
+                    "model1",
+                    "--protocol",
+                    "v2",
+                    "--enable_docs_url",
+                    "true",
+                    "--model_id",
+                    "model1/model",
+                    "--tokenizer_revision",
+                    "1.0",
+                    "--max_length",
+                    "100",
+                    "--disable_lower_case",
+                    "true",
+                    "--disable_special_tokens",
+                    "true",
+                    "--trust_remote_code",
+                    "true",
+                    "--tensor_input_names",
+                    "name1",
+                    "--task",
+                    "sequence-classification",
+                    "--backend",
+                    "huggingface",
+                    "--return_probabilities",
+                    "true",
+                    "--max_log_len",
+                    "20",
+                    "--dtype",
+                    "float32"
+                  ],
+                  "command": [
+                    "python"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "f01f768d-5996-454c-b204-af3bc65b05ab"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "kserve/huggingfaceserver:latest",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 30,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 30,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-qv6qr",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Always",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoSchedule",
+                  "key": "nvidia.com/gpu",
+                  "operator": "Equal",
+                  "value": "a10"
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "name": "kube-api-access-qv6qr",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101164,
+                  "message": "0/7 nodes are available: 1 node(s) had untolerated taint {nvidia.com/gpu: a100}, 3 Insufficient cpu, 3 Insufficient nvidia.com/gpu, 3 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }. preemption: 0/7 nodes are available: 3 No preemption victims found for incoming pod, 4 Preemption is not helpful for scheduling.",
+                  "reason": "Unschedulable",
+                  "status": "False",
+                  "type": "PodScheduled"
+                }
+              ],
+              "phase": "Pending",
+              "qosClass": "Burstable"
+            }
+          }
+        ],
+        "secret": {
+          "secret": {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+              "labels": {
+                "dhcore/framework": "k8sserve",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "dhcore/function": "func5",
+                "dhcore/template": "1xa10",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "huggingfaceserve",
+                "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+                "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab"
+              },
+              "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab",
+              "namespace": "digitalhub-tenant1"
+            }
+          }
+        },
+        "service": {
+          "metadata": {
+            "creationTimestamp": 1732101164,
+            "labels": {
+              "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+              "dhcore/framework": "k8sserve",
+              "dhcore/function": "func5",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "huggingfaceserve",
+              "dhcore/template": "1xa10"
+            },
+            "managedFields": [
+              {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "manager": "Kubernetes Java Client",
+                "operation": "Update",
+                "time": 1732101164
+              }
+            ],
+            "name": "s-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab",
+            "namespace": "digitalhub-tenant1",
+            "resourceVersion": "130647",
+            "uid": "90f26339-0e66-4830-a54b-09f4e7e33256"
+          },
+          "apiVersion": "v1",
+          "kind": "Service",
+          "spec": {
+            "clusterIP": "10.97.29.131",
+            "clusterIPs": [
+              "10.97.29.131"
+            ],
+            "externalTrafficPolicy": "Cluster",
+            "internalTrafficPolicy": "Cluster",
+            "ipFamilies": [
+              "IPv4"
+            ],
+            "ipFamilyPolicy": "SingleStack",
+            "ports": [
+              {
+                "name": "port8080",
+                "nodePort": 30702,
+                "port": 8080,
+                "protocol": "TCP",
+                "targetPort": 8080
+              },
+              {
+                "name": "port8081",
+                "nodePort": 30390,
+                "port": 8081,
+                "protocol": "TCP",
+                "targetPort": 8081
+              }
+            ],
+            "selector": {
+              "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+              "dhcore/framework": "k8sserve",
+              "dhcore/function": "func5",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "huggingfaceserve",
+              "dhcore/template": "1xa10"
+            },
+            "sessionAffinity": "None",
+            "type": "NodePort"
+          }
+        },
+        "deployment": {
+          "metadata": {
+            "annotations": {
+              "deployment.kubernetes.io/revision": "1"
+            },
+            "creationTimestamp": 1732101164,
+            "generation": 1,
+            "labels": {
+              "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+              "dhcore/framework": "k8sserve",
+              "dhcore/function": "func5",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "huggingfaceserve",
+              "dhcore/template": "1xa10"
+            },
+            "managedFields": [
+              {
+                "apiVersion": "apps/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "Kubernetes Java Client",
+                "operation": "Update",
+                "time": 1732101164
+              },
+              {
+                "apiVersion": "apps/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "subresource": "status",
+                "time": 1732101765
+              }
+            ],
+            "name": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab",
+            "namespace": "digitalhub-tenant1",
+            "resourceVersion": "139983",
+            "uid": "39e5b83f-8e6b-4374-9c84-9bd5a02a3499"
+          },
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "spec": {
+            "progressDeadlineSeconds": 600,
+            "replicas": 3,
+            "revisionHistoryLimit": 10,
+            "selector": {
+              "matchLabels": {
+                "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+                "dhcore/framework": "k8sserve",
+                "dhcore/function": "func5",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "huggingfaceserve",
+                "dhcore/template": "1xa10"
+              }
+            },
+            "strategy": {
+              "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+              },
+              "type": "RollingUpdate"
+            },
+            "template": {
+              "metadata": {
+                "labels": {
+                  "app.kubernetes.io/instance": "dhcore-f01f768d-5996-454c-b204-af3bc65b05ab",
+                  "app.kubernetes.io/managed-by": "dhcore",
+                  "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                  "app.kubernetes.io/version": "f01f768d-5996-454c-b204-af3bc65b05ab",
+                  "dhcore/framework": "k8sserve",
+                  "dhcore/function": "func5",
+                  "dhcore/project": "demo-etl",
+                  "dhcore/runtime": "huggingfaceserve",
+                  "dhcore/template": "1xa10"
+                },
+                "name": "d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "args": [
+                      "-m",
+                      "huggingfaceserver",
+                      "--model_name",
+                      "model1",
+                      "--protocol",
+                      "v2",
+                      "--enable_docs_url",
+                      "true",
+                      "--model_id",
+                      "model1/model",
+                      "--tokenizer_revision",
+                      "1.0",
+                      "--max_length",
+                      "100",
+                      "--disable_lower_case",
+                      "true",
+                      "--disable_special_tokens",
+                      "true",
+                      "--trust_remote_code",
+                      "true",
+                      "--tensor_input_names",
+                      "name1",
+                      "--task",
+                      "sequence-classification",
+                      "--backend",
+                      "huggingface",
+                      "--return_probabilities",
+                      "true",
+                      "--max_log_len",
+                      "20",
+                      "--dtype",
+                      "float32"
+                    ],
+                    "command": [
+                      "python"
+                    ],
+                    "env": [
+                      {
+                        "name": "DH_RUN_SECRET_NAME",
+                        "value": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                      },
+                      {
+                        "name": "DHCORE_ACCESS_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ACCESS_TOKEN",
+                            "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_REFRESH_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_REFRESH_TOKEN",
+                            "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_CLIENT_ID",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_CLIENT_ID",
+                            "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_TOKEN_TYPE",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_TOKEN_TYPE",
+                            "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_ISSUER",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ISSUER",
+                            "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                          }
+                        }
+                      },
+                      {
+                        "name": "PROJECT_NAME",
+                        "value": "demo-etl"
+                      },
+                      {
+                        "name": "DHCORE_EXPIRES_IN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_EXPIRES_IN",
+                            "name": "sec-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab"
+                          }
+                        }
+                      },
+                      {
+                        "name": "RUN_ID",
+                        "value": "f01f768d-5996-454c-b204-af3bc65b05ab"
+                      }
+                    ],
+                    "envFrom": [
+                      {
+                        "configMapRef": {
+                          "name": "digitalhub-common-env"
+                        }
+                      },
+                      {
+                        "secretRef": {
+                          "name": "digitalhub-common-creds"
+                        }
+                      }
+                    ],
+                    "image": "kserve/huggingfaceserver:latest",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "c-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab",
+                    "resources": {
+                      "limits": {
+                        "cpu": {
+                          "number": 30,
+                          "format": "DECIMAL_SI"
+                        },
+                        "nvidia.com/gpu": {
+                          "number": 1,
+                          "format": "DECIMAL_SI"
+                        }
+                      },
+                      "requests": {
+                        "cpu": {
+                          "number": 30,
+                          "format": "DECIMAL_SI"
+                        },
+                        "nvidia.com/gpu": {
+                          "number": 1,
+                          "format": "DECIMAL_SI"
+                        }
+                      }
+                    },
+                    "securityContext": {
+                      "allowPrivilegeEscalation": false,
+                      "privileged": false,
+                      "runAsNonRoot": true
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File"
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "imagePullSecrets": [
+                  {
+                    "name": "registry-credentials"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                  "runAsNonRoot": true
+                },
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                  {
+                    "effect": "NoSchedule",
+                    "key": "nvidia.com/gpu",
+                    "operator": "Equal",
+                    "value": "a10"
+                  }
+                ]
+              }
+            }
+          },
+          "status": {
+            "conditions": [
+              {
+                "lastTransitionTime": 1732101164,
+                "lastUpdateTime": 1732101164,
+                "message": "Deployment does not have minimum availability.",
+                "reason": "MinimumReplicasUnavailable",
+                "status": "False",
+                "type": "Available"
+              },
+              {
+                "lastTransitionTime": 1732101765,
+                "lastUpdateTime": 1732101765,
+                "message": "ReplicaSet \"d-huggingfaceserveserve-f01f768d-5996-454c-b204-af3bc65b05ab-7987445848\" has timed out progressing.",
+                "reason": "ProgressDeadlineExceeded",
+                "status": "False",
+                "type": "Progressing"
+              }
+            ],
+            "observedGeneration": 1,
+            "replicas": 3,
+            "unavailableReplicas": 3,
+            "updatedReplicas": 3
+          }
+        }
+      }
+    },
+    "user": "digitalhubdev"
+  }
