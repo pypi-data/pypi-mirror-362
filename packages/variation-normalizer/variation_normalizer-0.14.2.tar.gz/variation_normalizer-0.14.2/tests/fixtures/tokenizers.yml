@@ -1,0 +1,363 @@
+gene:
+  should_match:
+    - token: flt3
+    - token: abl
+    - token: abl1
+    - token: HGNC:1097
+    - token: ncbigene:673
+    - token: ensembl:ENSG00000157764
+  should_not_match:
+    - token: not-a-gene
+
+protein_substitution:
+  should_match:
+    - token: V600E
+    - token: Arg54Ser
+    - token: p.Met918Thr
+    - token: p.Asp842Val
+    - token: p.(Arg54Ser)
+    - token: p.Arg54Ser
+    - token: p.Val600Glu
+    - token: p.Trp24Cys
+    - token: p.(Trp24Cys)
+    - token: p.Ala146Val
+    - token: V0E
+    - token: (p.TrpVal24CysArg)
+  should_not_match:
+    - token: foo
+    - token: p.(Arg54Ser
+    - token: p.(Z600B)
+    - token: p.(Gly56Ala^Ser^Cys)
+    - token: NP_004324.2:c.Val600Glu
+    - token: NM_004985.4:c.437C>T
+    - token: BRAF V600E foo
+    - token: NP_004324.2:p.Val600Glu
+    - token: NP_006197.1:p.Asp842Val
+    - token: NP_
+    - token: NP_:p.
+    - token: c.Met918Thr
+
+protein_stop_gain:
+  should_match:
+    - token: Tyr365Ter
+    - token: (p.Tyr365*)
+    - token: (Tyr365Ter)
+    - token: p.Tyr365Ter
+    - token: p.(Tyr365Ter)
+    - token: Tyr0Ter
+  should_not_match:
+    - token: BRAF V600E
+    - token: p.Tyr365Terr
+    - token: NP_060842.3:p.Tyr365Terr
+    - token: NP_060842.3:p.Tyr365Ter (p.Tyr365Tyr)
+    - token: (p.Tyr365Tyr)
+
+protein_reference_agree:
+  should_match:
+    - token: p.Cys188=
+    - token: Cys188=
+    - token: p.Glu55=
+    - token: p.(G55=)
+    - token: Glu55=
+    - token: Glu0=
+  should_not_match:
+    - token: c.Cys188=
+    - token: p.Leu862==
+    - token: p.Xyz223=
+
+cdna_reference_agree:
+  should_match:
+    - token: c.123=
+    - token: (c.123=)
+  should_not_match:
+    - token: c.292T>C
+    - token: g.292T>C
+    - token: g.123
+    - token: (c.123=
+    - token: c.123=)
+    - token: c.123
+    - token: c.123==
+
+genomic_reference_agree:
+  should_match:
+    - token: g.123=
+    - token: (g.123=)
+  should_not_match:
+    - token: c.292T>C
+    - token: c.292T>C
+    - token: c.123
+    - token: (g.123=
+    - token: g.123=)
+    - token: g.123
+    - token: g.123==
+
+hgvs:
+  should_match:
+    - token: NC_000007.13:g.36561662C>T
+    - token: NM_01234.5:c.22+1A>T
+    - token: NP_000918.2:p.Ile1145=
+  should_not_match:
+    - token: NP004324.2
+    - token: LRGp1
+    - token: ERBB2:c.2326_2327delinsCT
+    - token: LRG_199t1:c.54G>H
+
+cdna_substitution:
+  should_match:
+    - token: (c.292T>C)
+    - token: c.292T>C
+    - token: (c.233A>G)
+    - token: c.509T>A
+    - token: c.54G>N
+  should_not_match:
+    - token: (c.292T>C
+    - token: g.292T>C
+    - token: c.292T<C
+    - token: c.292Z>C
+    - token: c.j324T<C
+    - token: 292T<C
+    - token: c.509T>
+    - token: c.509>A
+    - token: c.T>A
+    - token: c.54G>H
+
+genomic_substitution:
+  should_match:
+    - token: (g.292T>C)
+    - token: g.292T>C
+    - token: (g.233A>G)
+    - token: g.509T>A
+    - token: g.54G>N
+  should_not_match:
+    - token: (g.292T>C
+    - token: c.292T>C
+    - token: g.292T<C
+    - token: g.292Z>C
+    - token: g.j324T<C
+    - token: 292T<C
+    - token: g.509T>
+    - token: g.509>A
+    - token: g.T>A
+    - token: g.54G>H
+
+protein_delins:
+  should_match:
+    - token: p.Cys28delinsTrpVal
+    - token: Cys28delinsTrpVal
+    - token: p.Cys28_Lys29delinsTrp
+    - token: p.(Pro578_Lys579delinsLeuTer)
+    - token: p.Leu747_Thr751delinsPro
+    - token: p.Glu746_Thr751delinsValAla
+    - token: G776delinsVC
+  should_not_match:
+    - token: p.Cys28delinsTrpVals
+    - token: p.Cys28delinsTrpValSup
+    - token: p.Cys28Lys29delinsTrp
+    - token: p._Lys29delinsTrp
+    - token: p.Cys28_delinsTrp
+    - token: p.Cys28_Lys29delinsTrpPrt
+    - token: p.12314delinsArg
+    - token: 32386323delinsGA
+    - token: Cys28delins
+    - token: delinsTrpVals
+    - token: Glu776delinsVC
+
+cdna_delins:
+  should_match:
+    - token: c.32386323delinsGA
+    - token: c.6775_6777delinsC
+    - token: c.145_147delinsTGG
+    - token: c.9002_9009delinsTTT
+    - token: c.850_901delinsTTCCTCGATGCCTG
+    #    - token: c.42522624_42522669delins42536337_42536382
+    #    - token: c.812_829delins908_925
+    - token: (c.301_302delinsGG)
+    - token: c.615delinsAA
+  should_not_match:
+    - token: 32386323delinsGA
+    - token: c.145_147delinsTGGS
+    - token: c.145_147delTGG
+    - token: g.32386323delinsGA
+    - token: NM_000797.3:c.812_829delins908_
+    - token: c.42522624_42522669delins_42536382
+    - token: c.delinsGA
+    - token: c.32386323delins
+    - token: (c.301_302delinsGG
+    - token: c.delins
+    - token: delins
+    - token: c._147delinsTGG
+    - token: c.145_delinsTGG
+    - token: c.delinsTGG
+    - token: c.d_delinsTG
+
+genomic_delins:
+  should_match:
+    - token: g.32386323delinsGA
+    - token: g.6775_6777delinsC
+    - token: g.145_147delinsTGG
+    - token: g.9002_9009delinsTTT
+    - token: g.850_901delinsTTCCTCGATGCCTG
+    - token: (g.301_302delinsGG)
+    - token: g.10149938delinsAA
+    - token: g.10149938delinsAAN
+  should_not_match:
+    - token: 32386323delinsGA
+    - token: g.145_147delinsTGGS
+    - token: g.145_147delTGG
+    - token: c.32386323delinsGA
+    - token: NM_000797.3:g.812_829delins908_
+    - token: g.42522624_42522669delins_42536382
+    - token: g.delinsGA
+    - token: g.32386323delins
+    - token: (g.301_302delinsGG
+    - token: g.delins
+    - token: delins
+    - token: g._147delinsTGG
+    - token: g.145_delinsTGG
+    - token: g.delinsTGG
+    - token: g.d_delinsTG
+
+protein_deletion:
+  should_match:
+    - token: p.Val7del
+    - token: Val7del
+    - token: p.(Val7del)
+    - token: (Val7del)
+    - token: p.V7del
+    - token: V7del
+    - token: p.(V7del)
+    - token: (V7del)
+    - token: Lys23_Val25del
+    - token: p.Lys23_Val25del
+    - token: p.(Lys23_Val25del)
+    - token: (Lys23_Val25del)
+    - token: p.Phe76del
+    - token: L747_T751delLREAT
+    - token: p.L747_T751delLREAT
+  should_not_match:
+    - token: Val7deletion
+    - token: (Val7deletion)
+    - token: p.Val7deletion
+    - token: c.Val7del
+    - token: ValSup7del
+    - token: delVal7
+    - token: 7Valdel
+    - token: Val7_Glydel
+    - token: Val_Gly7del
+    - token: p.(V7del
+    - token: p.V7del)
+
+cdna_deletion:
+  should_match:
+    - token: c.2263_2277del
+    - token: c.1608del
+    - token: c.2263_2277delTTGAGGGAAAACACA
+    - token: c.163delG
+    - token: c.435_436delGC
+  should_not_match:
+    - token: g.2263_2277del
+    - token: g.1608del
+    - token: c.del
+    - token: 2263_2277del
+    - token: c._2277del
+    - token: c.2263_del
+    - token: c.2263
+
+genomic_deletion:
+  should_match:
+    - token: g.37880219_37880233del
+    - token: g.139390650del
+    - token: g.55593610_55593615delTTGTTG
+    - token: g.10191495delT
+  should_not_match:
+    - token: c.37880219_37880233del
+    - token: c.139390650del
+    - token: g.del
+    - token: 37880219_37880233del
+    - token: g._37880233del
+    - token: g._37880233del
+    - token: g.37880219
+
+protein_insertion:
+  should_match:
+    - token: p.(Lys23_Leu24insArgSerGln)
+    - token: p.His4_Gln5insAla
+    - token: p.Lys2_Gly3insGlnSerLys
+    - token: p.(Met3_His4insGlyTer)
+    - token: T599_V600insV
+    - token: A763_Y764insFQEA
+  should_not_match:
+    - token: p.Lys23insAsp
+    - token: Lys23insAsp
+    - token: p.His4_Gln5insAlaG
+
+cdna_insertion:
+  should_match:
+    - token: c.169_170insA
+    - token: c.240_241insAGG
+  should_not_match:
+    - token: c.849_850ins858_895
+    - token: p.His4_Gln5insAla
+    - token: c.His4_Gln5insAla
+    - token: 849_850ins858_895
+    - token: p.849_850ins858_
+    - token: p.849_850ins_895
+    - token: p.169_insA
+    - token: p._170insA
+    - token: p.849_850ins858_895
+
+genomic_insertion:
+  should_match:
+    - token: g.123_124insAGC
+    - token: g.32867861_32867862insT
+    - token: g.37881011_37881012insGGCTCCCCA
+    - token: g.7572948_7572949insN
+  should_not_match:
+    - token: g.123_124insAGCX
+    - token: c.169_170insAla
+    - token: g.32867861_32867862delinsT
+    - token: 123_124insAGCX
+
+genomic_duplication:
+  should_match:
+    - token: g.2087938_2087948dup
+    - token: g.49531262dup
+  should_not_match:
+    - token: 49531262dup
+    - token: dupdup
+    - token: g.(?_30417576)_(31394018_?)dup
+    - token: g.(31060227_31100351)_(33274278_33417151)dup
+    - token: g.(?_154021812)_154092209dup
+
+genomic_duplication_ambiguous:
+  should_match:
+    - token: g.(?_30417576)_(31394018_?)dup
+    - token: g.(31060227_31100351)_(33274278_33417151)dup
+    - token: g.(?_154021812)_154092209dup
+  should_not_match:
+    - token: g.2087938_2087948dup
+    - token: g.49531262dup
+    - token: g.(?_31394018)_(_30417576_?)dup
+
+genomic_deletion_ambiguous:
+  should_match:
+    - token: g.(?_31120496)_(33339477_?)del
+    - token: g.(?_155980375)_(156013167_?)del
+    - token: g.(?_18575354)_18653629del
+    - token: g.133462764_(133464858_?)del
+    - token: g.(31060227_31100351)_(33274278_33417151)del
+    - token: g.(31120496_?)_(?_33339477)del
+  should_not_match:
+    - token: c.(?_169)_(170_?)del
+    - token: g.(?_31120496)_(33339477_?)delins
+    - token: (?_31120496)_(33339477_?)del
+    - token: g.(x_31100351)_(33274278_33417151)del
+
+amplification:
+  should_match:
+    - token: Amplification
+    - token: amplification
+    - token: AMPLIFICATION
+  should_not_match:
+    - token: amplificatoin
+    - token: amp
