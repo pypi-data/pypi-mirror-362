@@ -1,0 +1,119 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "napari-SAM4IS"
+version = "0.0.9"
+description = "Create annotations for instance segmentation using Segment Anything models"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    {name = "Hiroki Kawai", email = "h.kawai888@gmail.com"},
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Framework :: napari",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.20.0",
+    "magicgui>=0.7.0",
+    "qtpy>=2.0.0",
+    "torch>=1.12.0",
+    "torchvision>=0.13.0",
+    "scikit-image>=0.19.0",
+    "napari[all]>=0.4.17",
+    "requests>=2.25.0",
+    "urllib3>=1.26.0",
+    "Pillow>=8.0.0",
+]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/hiroalchem/napari-SAM4IS/issues"
+"Documentation" = "https://github.com/hiroalchem/napari-SAM4IS#README.md"
+"Source Code" = "https://github.com/hiroalchem/napari-SAM4IS"
+"User Support" = "https://github.com/hiroalchem/napari-SAM4IS/issues"
+
+[project.optional-dependencies]
+testing = [
+    "tox",
+    "pytest>=6.0",
+    "pytest-cov",
+    "pytest-qt",
+    "pyqt5",
+]
+dev = [
+    "black>=22.0",
+    "ruff>=0.1.0",
+    "pre-commit",
+]
+
+[project.entry-points."napari.manifest"]
+napari-SAM4IS = "napari_sam4is:napari.yaml"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml"]
+
+[tool.black]
+line-length = 79
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.ruff]
+line-length = 79
+select = [
+    "E", "F", "W", #flake8
+    "UP", # pyupgrade
+    "I", # isort
+    "BLE", # flake8-blind-exception
+    "B", # flake8-bugbear
+    "A", # flake8-builtins
+    "C4", # flake8-comprehensions
+    "ISC", # flake8-implicit-str-concat
+    "G", # flake8-logging-format
+    "PIE", # flake8-pie
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501", # line too long. let black handle this
+    "UP006", "UP007", # type annotation. As using magicgui require runtime type annotation then we disable this.
+    "SIM117", # flake8-simplify - some of merged with statements are not looking great with black, reanble after drop python 3.9
+]
+
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".mypy_cache",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "*vendored*",
+    "*_vendor*",
+]
+
+target-version = "py38"
+fix = true
