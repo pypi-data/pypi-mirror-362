@@ -1,0 +1,224 @@
+[tool.poetry]
+name          = "ocebuild"
+version       = "0.1.1-dev"
+description   = "Portable OpenCore EFI dependency & build manager."
+authors       = [ "Cory Bennett <csquaredbennett@gmail.com>" ]
+readme        = "README.md"
+license       = "BSD-3-Clause"
+homepage      = "https://github.com/Qonfused/OCE-Build"
+repository    = "https://github.com/Qonfused/OCE-Build"
+documentation = "https://ocebuild.readthedocs.io/"
+keywords      = [ "cli", "tui", "packaging", "dependency", "opencore" ]
+classifiers   = [
+  "Development Status :: 2 - Pre-Alpha",
+  'Environment :: Console',
+  "Intended Audience :: Developers",
+  'License :: OSI Approved :: BSD License',
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: C++",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Build Tools",
+  "Operating System :: OS Independent",
+]
+
+################################################################################
+#                              Build Configuration                             #
+################################################################################
+
+# Continuing the [tool.poetry] section, this configures the build output of
+# `poetry-core` when using any PEP-517 build frontend.
+packages      = [
+  # Include required modules for the source distribution:
+  { include = "ocebuild",         from = ".",   format = "sdist" },
+  { include = "ocebuild_cli",     from = ".",   format = "sdist" },
+  { include = "third_party",      from = ".",   format = "sdist" },
+  # Redirect poetry to staging area for wheel distribution:
+  { include = "ocebuild",  from = "ci/tools/poetry/staging",  format = "wheel" }
+]
+include       = [
+  # Include required CI paths for PEP-517 builds:
+  { path = "ci/*.py",                                 format = "sdist" },
+  { path = "ci/tools/poetry",                         format = "sdist" },
+  # Ensure all top-level files are included for wheel distribution:
+  { path = "ci/tools/poetry/staging/ocebuild/*.py",   format = "wheel" }
+]
+
+# Poetry hooks are only used when building using the full project locally. These
+# ensure that the build directory is cleaned before and after each local build.
+[tool.poe.poetry_hooks]
+pre_build     = "_pre_build"
+post_build    = "_post_build"
+
+[tool.poe.tasks]
+_pre_build    = [ "clean" ]
+_post_build   = [ "clean -s post_build", "pyinstaller" ]
+
+# Below are used when building the project using any PEP-517 build frontend.
+[tool.poetry.build]
+generate-setup-file = false
+script        = "ci/tools/poetry/hooks/build.py"
+
+[build-system]
+requires      = ["poetry-core>=1.2.0b1", "toml"]
+build-backend = "poetry.core.masonry.api"
+
+################################################################################
+#                              Project Dependencies                            #
+################################################################################
+
+[tool.poetry.dependencies]
+python            = ">=3.8"
+packaging         = "^23.0"
+typing_extensions = { version = "^4.2.0", python = "<3.10" }
+graphlib_backport = { version = "^1.0.0", python = "<3.9" }
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.cli.dependencies]
+click = "^8.0.1"
+rich = "^13.4.2"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.3.3"
+pylint = "^2.17.4"
+pyinstaller = { version = "^5.13.0", python = ">=3.7,<3.13" }
+pypiserver = "^1.5.2"
+toml = "^0.10.2"
+
+[tool.poetry.group.test.dependencies]
+pytest      = "^7.0.1"
+pytest-cov  = ">=3,<5"
+
+[tool.poetry.group.docs]
+optional = true
+[tool.poetry.group.docs.dependencies]
+sphinx = "^7.1.1"
+sphinx-autoapi = "^2.1.1"
+furo = "^2023.7.26"
+myst-parser = "^2.0.0"
+
+################################################################################
+#                                Project Scripts                               #
+################################################################################
+
+[tool.poetry.scripts]
+# Run with `poetry run ocebuild <args>`
+ocebuild = "ocebuild.cli.__main__:_main"
+
+# Run tasks via `poetry <task>` with the poethepoet plugin.
+[tool.poe]
+include = [ "ci/tools/poetry/tasks.toml" ]
+poetry_command = ""
+
+  # Run with `poetry test <args>`
+  [tool.poe.tasks.test]
+  cmd     = "pytest --cov=ocebuild"
+  help    = "Runs project tests with a short coverage report."
+
+  # Run with `poetry lint <args>`
+  [tool.poe.tasks.lint]
+  cmd     = "pylint --rcfile ci/tools/pylint/.pylintrc ocebuild"
+  help    = "Runs project linter with a short report."
+
+  # Run with `poetry lint-diff <args>`
+  [tool.poe.tasks.lint-diff]
+  shell   = "git diff --name-only | sed '/.*\\.py/!d' | xargs poetry lint"
+  interpreter = ["posix", "bash"]
+  help    = "Runs the lint command only on changed files."
+
+  # Run with `poetry clean <args>`
+  [tool.poe.tasks.clean]
+  script = "ci.tools.poetry.hooks.build:clean"
+  help   = "Cleans the build directory."
+
+    [[tool.poe.tasks.clean.args]]
+    name = "stage"
+    options = ["-s", "--stage"]
+    type = "string"
+    help = "The build stage to clean. (Optional)"
+
+  # Run with `poetry pyinstaller <args>`
+  [tool.poe.tasks.pyinstaller]
+  cmd  = """
+  pyinstaller ci/tools/poetry/build/ocebuild/cli/__main__.py
+    --name ocebuild
+    --clean
+    --noconfirm
+    --log-level=ERROR
+    --onefile
+    --workpath ci/tools/pyinstaller/build
+    --specpath ci/tools/pyinstaller
+  """
+  help = "Builds the project CLI using PyInstaller."
+
+  # Run with `poetry sphinx-build <args>`
+  [tool.poe.tasks.sphinx-build]
+  cmd     = "sphinx-build -b html ci/tools/sphinx docs/build"
+  help    = "Builds the project documentation."
+
+################################################################################
+#                           PyPI Distribution Testing                          #
+################################################################################
+
+[[tool.poetry.source]]
+name = "local"
+url = "http://localhost:8080/"
+priority = 'explicit'
+
+# Run with `poetry pypi-local`
+[tool.poe.tasks.pypi-local]
+shell        = """
+({ lsof -t -i:8080 | xargs -r kill & } 2>/dev/null &&
+  pypi-server run -p 8080 -P. -a. --hash-algo=sha256 --overwrite) &
+poetry publish -r local && bash ci/scripts/lib/print.sh \
+  \"\\\\nRunning 'local' pypi server on https://localhost:8080/.\" &
+wait $(jobs -p)
+"""
+interpreter  = ["posix", "bash"]
+help         = "Publishes the project to a local PyPI server."
+
+################################################################################
+#                               Test Configuration                             #
+################################################################################
+
+[tool.pytest.ini_options]
+addopts           = "-rfEX --strict-markers"
+# addopts           = "-rfEX --strict-markers --doctest-modules"
+# doctest_optionflags = "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL"
+filterwarnings = [ "ignore:invalid escape sequence:DeprecationWarning" ]
+norecursedirs     = [ "ci", "dist", "docs" ]
+python_files      = [ "*_test.py" ]
+python_functions  = [ "test_*" ]
+
+[tool.coverage.run]
+relative_files  = true
+source          = [ "ocebuild/*" ]
+omit            = [ "__*.py", "*_test.py", "**/errors/*" ]
+
+[tool.coverage.report]
+exclude_also  = [
+  # Don't complain about missing debug-only code:
+  "def __repr__",
+  "if self\\.debug",
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "raise ValidatonError",
+  "raise PathValidationError",
+  # Don't complain if non-runnable code isn't run:
+  "if 0:",
+  "if __name__ == .__main__.:",
+  # Don't complain about abstract methods, they aren't run:
+  "@(abc\\.)?abstractmethod"
+]
+show_missing  = true
+skip_covered  = true
+skip_empty    = true
+sort          = "-Miss"
