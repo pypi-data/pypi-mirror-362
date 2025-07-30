@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "remap_badblocks"
+version = "0.7"
+requires-python = ">= 3.10"
+description = "CLI tool for remapping bad sectors on Linux disks using device-mapper"
+readme = "README.md"
+license = "GPL-3.0-only"
+authors = [
+    { name = "Luigi Privitera", email = "priviteraluigi98@gmail.com" }
+]
+
+[project.urls]
+Repository = "https://gitlab.com/Luigi-98/remap_badblocks.git"
+Issues = "https://gitlab.com/Luigi-98/remap_badblocks/-/issues"
+
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "flake8",
+    "ruff",
+    "pytest>=7.0",
+    "pre-commit",
+    "black",
+    "isort",
+]
+
+[project.scripts]
+remap-badblocks = "remap_badblocks.cli.__main__:main"
+
+[tool.setuptools]
+package-dir = {"remap_badblocks" = "src/remap_badblocks"}
+
+[tool.mypy]
+mypy_path = "src"
