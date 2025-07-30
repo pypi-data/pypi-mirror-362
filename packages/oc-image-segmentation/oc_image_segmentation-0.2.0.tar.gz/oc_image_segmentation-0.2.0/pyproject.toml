@@ -1,0 +1,66 @@
+[project]
+name = "oc-image-segmentation"
+description = "A Python library for image segmentation using OpenCV and deep learning models."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+dynamic = ["version"]
+authors = [
+    {name = "Florent Pigout", email = "florent@toopy.org"}
+]
+
+dependencies = [
+    "albumentations",
+    "cityscapesscripts",
+    "dynaconf",
+    "keras==3.8.0",
+    "numpy",
+    "pillow",
+    "pyyaml",
+    "scikit-learn",
+    "tensorflow==2.18.0",
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+
+[project.scripts]
+oc-segment = "oc_image_segmentation.cli:main"
+
+[project.optional-dependencies]
+extra = [
+    "matplotlib",
+    "pandas",
+]
+lint = [
+    "pre-commit",
+    "yamllint",
+]
+test = [
+    "pytest-cov",
+    "pytest",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = {find = {where = ["."], exclude = ["var*", "tests*", "docs*", "examples*", "scripts*", "*.egg-info*"]}}
+
+[tool.setuptools.package-data]
+"oc_image_segmentation" = ["*.yaml", "*.yml"]
+
+[tool.setuptools.package-dir]
+"" = "."
+
+[tool.setuptools.dynamic]
+version = {attr = "oc_image_segmentation.__version__"}
