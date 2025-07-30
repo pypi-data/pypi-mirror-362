@@ -1,0 +1,95 @@
+[tool.poetry]
+name = "redopt"
+version = "0.1.0"
+description = "AI tool to connect Redis OSS source code, benchmarks, and profiling data. Includes GitHub PR performance analyzer, function analysis service, and profiling analysis system."
+authors = [
+    "Filipe Oliveira <filipe@redis.com>",
+    "Paulo Sousa <paulo.sousa@redis.com>",
+]
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/redis/redopt"
+repository = "https://github.com/redis/redopt"
+documentation = "https://github.com/redis/redopt#readme"
+keywords = ["redis", "performance", "profiling", "ai", "analysis", "benchmarks"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Benchmark",
+    "Topic :: Software Development :: Quality Assurance",
+]
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^2.11.7"
+# GitHub PR Summarizer dependencies
+openai = "^1.3.0"
+PyGithub = "^1.59.1"
+python-dotenv = "^1.0.0"
+pydantic-settings = "^2.10.1"
+openai-agents = "^0.1.0"
+config = "^0.5.1"
+fastapi = "^0.116.1"
+uvicorn = "^0.35.0"
+redis = {extras = ["hiredis"], version = "^6.2.0"}
+networkx = "<3.5"
+scikit-learn = "<1.5"
+numpy = "<2.0"
+clang = "^20.1.5"
+libclang = "^18.1.1"
+tqdm = "^4.67.1"
+pyyaml = "^6.0.1"
+mcp = {extras = ["cli"], version = "^1.11.0"}
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+isort = "^6.0.1"
+
+[tool.poetry.scripts]
+redopt = "src.main:main"
+function-analysis-api = "src.function_analysis.run_api:main"
+function-analysis-chat = "src.function_analysis.interfaces.chat:main"
+function-analysis-index = "src.function_analysis.cli.indexer:main"
+redopt-mcp = "src.mcp_server:main"
+
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+src_paths = ["src"]
+known_first_party = ["src"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+skip_glob = ["*/__pycache__/*", "*/build/*", "*/dist/*"]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
