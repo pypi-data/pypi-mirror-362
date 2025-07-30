@@ -1,0 +1,408 @@
+# MCP Development Toolkit
+
+[![PyPI version](https://badge.fury.io/py/mcp-dev-toolkit.svg)](https://badge.fury.io/py/mcp-dev-toolkit)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A comprehensive development toolkit for building Model Context Protocol (MCP) tools and servers with built-in middleware, validation, schema extraction, and code generation.
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Basic installation
+pip install mcp-dev-toolkit
+
+# Full installation with all features
+pip install mcp-dev-toolkit[full]
+
+# Development installation
+pip install mcp-dev-toolkit[dev]
+```
+
+### Create Your First Tool
+
+```python
+from mcp_dev_toolkit import create_sdk, ToolType
+
+# Create SDK instance
+sdk = create_sdk("my-awesome-tools", "1.0.0")
+
+@sdk.tool(
+    name="url_shortener",
+    description="Shorten URLs using various services",
+    tool_type=ToolType.INTEGRATION,
+    tags=["url", "utility"],
+    examples=[{
+        "input": {"url": "https://example.com/very/long/url", "service": "bitly"},
+        "output": {"short_url": "https://bit.ly/abc123"}
+    }]
+)
+async def url_shortener(url: str, service: str = "bitly") -> dict:
+    """Shorten a URL using the specified service"""
+    # Your implementation here
+    return {
+        "original_url": url,
+        "short_url": f"https://short.ly/{hash(url) % 1000000}",
+        "service": service,
+        "created_at": datetime.now().isoformat()
+    }
+
+# Generate MCP server
+server_path = sdk.generate_mcp_server("./my_server")
+print(f"Server generated at: {server_path}")
+
+# Run the server
+if __name__ == "__main__":
+    app = sdk.create_mcp_app()
+    asyncio.run(sdk.run_server(app))
+```
+
+## 📋 Features
+
+### 🎯 Core Features
+- **Decorator-based tool registration** - Simple `@sdk.tool()` decorator
+- **Automatic schema extraction** - Generate JSON schemas from Python type hints
+- **Built-in middleware system** - Validation, logging, performance monitoring
+- **Code generation** - Generate complete MCP servers and OpenAPI specs
+- **Integration support** - Built-in support for external API integrations
+- **Comprehensive error handling** - Graceful error handling and validation
+
+### 🔧 Middleware System
+- **ValidationMiddleware** - Automatic input validation and type conversion
+- **LoggingMiddleware** - Comprehensive logging of tool execution
+- **PerformanceMiddleware** - Performance monitoring and timing
+- **CachingMiddleware** - Simple in-memory caching
+- **RateLimitingMiddleware** - Rate limiting protection
+- **SecurityMiddleware** - Input sanitization and security checks
+
+### 📊 Code Generation
+- **MCP Server Generation** - Complete, runnable MCP servers
+- **OpenAPI Specification** - Generate REST API specs from tools
+- **Client SDK Generation** - Python client libraries
+- **Documentation Generation** - Auto-generated documentation
+
+## 🛠️ Usage Examples
+
+### Tool Types
+
+```python
+from mcp_dev_toolkit import create_sdk, ToolType
+
+sdk = create_sdk("example-tools")
+
+# Simple utility tool
+@sdk.tool(tool_type=ToolType.SIMPLE)
+async def calculate_hash(text: str, algorithm: str = "md5") -> dict:
+    import hashlib
+    hash_obj = getattr(hashlib, algorithm)()
+    hash_obj.update(text.encode())
+    return {"hash": hash_obj.hexdigest(), "algorithm": algorithm}
+
+# AI/Agentic tool
+@sdk.tool(tool_type=ToolType.AGENTIC)
+async def analyze_sentiment(text: str) -> dict:
+    # Integration with AI services
+    return {"sentiment": "positive", "confidence": 0.95}
+
+# Workflow orchestration tool
+@sdk.tool(tool_type=ToolType.WORKFLOW)
+async def process_document(file_path: str, operations: list) -> dict:
+    # Multi-step document processing
+    return {"processed": True, "operations_completed": len(operations)}
+
+# External integration tool
+@sdk.tool(tool_type=ToolType.INTEGRATION)
+async def fetch_weather(city: str, api_key: str) -> dict:
+    # Weather API integration
+    return {"city": city, "temperature": 22, "condition": "sunny"}
+```
+
+### Custom Middleware
+
+```python
+from mcp_dev_toolkit import Middleware
+
+class CustomAuthMiddleware(Middleware):
+    def __init__(self, required_token: str):
+        super().__init__(priority=1)  # High priority
+        self.required_token = required_token
+    
+    async def process_pre(self, tool_schema, args, kwargs):
+        token = kwargs.get('auth_token')
+        if token != self.required_token:
+            raise ValueError("Invalid authentication token")
+        # Remove token from kwargs before tool execution
+        kwargs.pop('auth_token', None)
+        return None
+
+# Add to SDK
+sdk.add_middleware(CustomAuthMiddleware("secret-token"))
+```
+
+### Advanced Schema Definition
+
+```python
+from typing import Literal, List
+from enum import Enum
+
+class Priority(Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+@sdk.tool()
+async def create_task(
+    title: str,
+    description: str = "",
+    priority: Priority = Priority.MEDIUM,
+    tags: List[str] = None,
+    due_date: str = None,
+    assignee: str = None
+) -> dict:
+    """Create a new task with specified parameters"""
+    return {
+        "task_id": f"task_{hash(title) % 10000}",
+        "title": title,
+        "description": description,
+        "priority": priority.value,
+        "tags": tags or [],
+        "due_date": due_date,
+        "assignee": assignee,
+        "status": "created"
+    }
+```
+
+## 🖥️ Command Line Interface
+
+The toolkit includes a powerful CLI for project management:
+
+```bash
+# Create new project
+mcp-toolkit create my-project --type server --output ./projects
+
+# Generate code from existing tools
+mcp-toolkit generate my_tools.py --server --openapi --client
+
+# Validate tools
+mcp-toolkit validate my_tools.py
+
+# Run server
+mcp-toolkit run my_server.py --debug
+```
+
+### CLI Commands
+
+- **create** - Create new MCP projects with templates
+- **generate** - Generate servers, APIs, and clients from existing tools
+- **validate** - Validate tool definitions and schemas
+- **run** - Run MCP servers with debugging support
+
+## 📁 Project Structure
+
+When you generate a project, you get a complete, production-ready structure:
+
+```
+my_project_server/
+├── my_project_server.py    # Main server file
+├── config.yml              # Configuration
+├── requirements.txt        # Dependencies
+├── README.md               # Documentation
+└── tests/                  # Test files (when generated)
+    ├── test_tools.py
+    └── conftest.py
+```
+
+## 🔗 Integration Support
+
+### API Gateway Integration
+
+```python
+# Set up gateway for external API calls
+sdk.set_gateway(api_gateway_client)
+
+@sdk.integration(service="weather_api", endpoint="/current")
+async def get_weather(city: str, gateway=None) -> dict:
+    """Get current weather using gateway"""
+    response = await gateway.get(f"/weather?city={city}")
+    return response.json()
+```
+
+### Database Integration
+
+```python
+@sdk.tool()
+async def query_database(sql: str, gateway=None) -> dict:
+    """Execute database query safely"""
+    # Use gateway for database connections
+    result = await gateway.execute_query(sql)
+    return {"rows": result, "count": len(result)}
+```
+
+## 🧪 Testing
+
+The toolkit includes comprehensive testing utilities:
+
+```python
+import pytest
+from mcp_dev_toolkit.testing import MCPTestClient
+
+@pytest.mark.asyncio
+async def test_url_shortener():
+    client = MCPTestClient(sdk)
+    
+    result = await client.call_tool("url_shortener", {
+        "url": "https://example.com",
+        "service": "bitly"
+    })
+    
+    assert result["service"] == "bitly"
+    assert "short_url" in result
+```
+
+## 📊 Monitoring and Analytics
+
+Built-in performance monitoring and analytics:
+
+```python
+# Performance metrics are automatically collected
+from mcp_dev_toolkit import PerformanceMiddleware
+
+# Custom metrics middleware
+class MetricsMiddleware(Middleware):
+    async def process_post(self, tool_schema, result):
+        # Send metrics to your monitoring system
+        await send_metric(f"tool.{tool_schema.metadata.name}.success", 1)
+        return None
+
+sdk.add_middleware(MetricsMiddleware())
+```
+
+## 🔧 Configuration
+
+### Environment-based Configuration
+
+```python
+import os
+from mcp_dev_toolkit import create_sdk
+
+sdk = create_sdk(
+    name=os.getenv("MCP_SERVER_NAME", "default-server"),
+    version=os.getenv("MCP_SERVER_VERSION", "1.0.0")
+)
+
+# Configure middleware based on environment
+if os.getenv("ENVIRONMENT") == "production":
+    sdk.add_middleware(SecurityMiddleware())
+    sdk.add_middleware(RateLimitingMiddleware(max_calls=1000))
+```
+
+### YAML Configuration
+
+```yaml
+# config.yml
+server:
+  name: "my-mcp-server"
+  version: "1.0.0"
+  debug: false
+
+middleware:
+  - type: "validation"
+    enabled: true
+  - type: "logging" 
+    enabled: true
+    level: "INFO"
+  - type: "performance"
+    enabled: true
+
+tools:
+  rate_limit: 100
+  timeout: 30
+```
+
+## 🚀 Deployment
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 8000
+
+CMD ["python", "my_server.py"]
+```
+
+### Serverless Deployment
+
+```python
+# For AWS Lambda, Azure Functions, etc.
+from mcp_dev_toolkit import create_lambda_handler
+
+handler = create_lambda_handler(sdk)
+
+def lambda_handler(event, context):
+    return handler(event, context)
+```
+
+## 📚 API Reference
+
+### Core Classes
+
+- **MCPDevelopmentSDK** - Main SDK class
+- **ToolType** - Enum for tool types
+- **ToolMetadata** - Tool metadata container
+- **ToolSchema** - Complete tool schema
+- **Middleware** - Base middleware class
+
+### Decorators
+
+- **@sdk.tool()** - Register MCP tools
+- **@sdk.integration()** - Register API integrations
+
+### Utilities
+
+- **SchemaExtractor** - Extract schemas from functions
+- **MCPServerGenerator** - Generate complete servers
+- **OpenAPIGenerator** - Generate API specifications
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+```bash
+git clone https://github.com/yourusername/mcp-dev-toolkit.git
+cd mcp-dev-toolkit
+pip install -e ".[dev]"
+pre-commit install
+```
+
+### Running Tests
+
+```bash
+pytest tests/
+pytest --cov=mcp_dev_toolkit tests/
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built on the Model Context Protocol (MCP) specification
+- Inspired by modern API development frameworks
+- Thanks to all contributors and the MCP community
+
+---
+
+**Made with ❤️ for the MCP community**
+
+For more examples, documentation, and community support, visit our [GitHub repository](https://github.com/yourusername/mcp-dev-toolkit).
