@@ -1,0 +1,49 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "*" # Triggers on tags like v1.0.0, v1.2.3, etc.
+
+permissions:
+  id-token: write # IMPORTANT: mandatory for trusted publishing
+
+jobs:
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/laygo
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Extracted version: ${VERSION}"
+
+      - name: Update version in __init__.py
+        run: |
+          sed -i 's|VERSION_NUMBER|${{ steps.version.outputs.VERSION }}|g' laygo/__init__.py
+          echo "Updated version to ${{ steps.version.outputs.VERSION }}"
+          cat laygo/__init__.py
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
