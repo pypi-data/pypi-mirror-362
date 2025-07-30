@@ -1,0 +1,644 @@
+openapi: "3.0.0"
+
+info:
+    title: UPW sensor API
+    version: "1.0"
+    description: >
+        RESTful API for the ultra-pure water (UPW) sensor by Ilka Schulz Labortechnik<br>
+        <br>
+        [Product GitLab page](https://gitlab.com/islabtech/upw-sensor)<br>
+        [API GitLab page](https://gitlab.com/islabtech/upw-sensor/api)<br>
+    termsOfService: TODO
+    contact:
+        name: costumer support
+        email: support@islabtech.com
+        url: https://gitlab.com/islabtech/upw-sensor/api
+    license:
+        name: Apache 2.0
+        url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+tags:
+    - name: system
+      description: general system status and control
+    - name: measure
+      description: take conductivity and temperature measurements
+    - name: settings
+      description: system and network settings
+    - name: calibrate temperature
+      description: calibrate the device's integrated water temperature sensor
+    - name: calibrate conductivity
+      description: calibrate the conductivity sensor
+
+servers:
+    - url: http://localhost:{port}/api/v1
+      description: mock API server (run mock_api.py on local machine)
+      variables:
+          port:
+              description: tcp port of the mock API server
+              default: "5000"
+    - url: http://{ip}:80/api/v1
+      description: remote sensor
+      variables:
+          ip:
+              description: IP address of the remote sensor
+              default: 192.168.0.100
+
+components:
+    schemas:
+        epoch_timestamp:
+            type: integer
+            description: seconds since January 1st 1970 (integer value)
+        epoch_microseconds:
+            type: integer
+            description: microseconds that form the fractional part of the timestamp
+        temperature_value:
+            type: number
+            description: temperature in the given temperature unit (floating point value)
+            example: 25.2
+        optional_temperature_value:
+            type: number
+            nullable: true
+            description: >
+                temperature in the given temperature unit (floating point value)
+                This can be null if the last measurement was a failure.
+            example: 0.055
+        optional_conductivity_value:
+            type: number
+            nullable: true
+            description: >
+                conductivity in the given conductivity unit (floating point value)
+                This can be null if the last measurement was a failure.
+            example: 0.055
+        conductivity_value:
+            type: number
+            nullable: true
+            description: conductivity in the given conductivity unit (floating point value)
+            example: 0.055
+        measurement:
+            type: object
+            nullable: true
+            description: >
+                last conductivity and temperature measurement
+                This can be null if there is no measurement available yet.
+            properties:
+                epoch_timestamp:
+                    $ref: "#/components/schemas/epoch_timestamp"
+                epoch_microseconds:
+                    $ref: "#components/schemas/epoch_microseconds"
+                temperature:
+                    $ref: "#components/schemas/optional_temperature_value"
+                conductivity:
+                    $ref: "#components/schemas/optional_conductivity_value"
+        successful_measurement:
+            type: object
+            properties:
+                epoch_timestamp:
+                    $ref: "#/components/schemas/epoch_timestamp"
+                epoch_microseconds:
+                    $ref: "#components/schemas/epoch_microseconds"
+                temperature:
+                    $ref: "#components/schemas/temperature_value"
+                conductivity:
+                    $ref: "#components/schemas/conductivity_value"
+        wifi_settings:
+            type: object
+            properties:
+                connect_to_ap:
+                    type: boolean
+                    nullable: false
+                    description: whether the device shall try to connect to WiFi
+                ssid:
+                    type: string
+                    nullable: true
+                    description: name / SSID of the WiFi to connect to
+                # bssid:
+                #     type: string
+                #     nullable: true
+                #     description: address / BSSID of the WiFi to connect to
+                user:
+                    type: string
+                    nullable: true
+                    description: username to authenticate with the WiFi
+                password:
+                    type: string
+                    nullable: true
+                    description: WiFi password
+        ethernet_settings:
+            type: object
+            properties:
+                use_dhcp:
+                    type: boolean
+                    nullable: false
+                    description: >
+                        whether the sensor shall be assigned a dynamic IP address by a DHCP server
+                ipv4_address:
+                    type: string
+                    nullable: true
+                    description: static IPv4 addres – only used if use_dhcp is false
+                    example: "192.168.0.100"
+                ipv4_netmask:
+                    type: string
+                    nullable: true
+                    description: IPv4 netmask – only used if use_dhcp is false
+                    example: "255.255.255.0"
+                ipv4_gateway_address:
+                    type: string
+                    nullable: true
+                    description: IPv4 adress of the gateway – only used if use)dhcp is false
+                    example: "192.168.0.1"
+                dns_server_address_1:
+                    type: string
+                    nullable: true
+                    description: IPv4 address of the primary DNS server to use if DHCP is disabled
+                    example: "192.168.0.32"
+                dns_server_address_2:
+                    type: string
+                    nullable: true
+                    description: IPv4 address of the secondary DNS server to use if DHCP is disabled
+                    example: "8.8.8.8"
+        ntp_settings:
+            type: object
+            description: >
+                The sensor needs to connect to an NTP server to receive the system time from it. if
+                you do not want to connect the sensor to the internet, consider allowing one of
+                these measures:<br>
+                    a) allow outgoing connections only to a specific NTP server<br>
+                    b) host your own NTP server<br>
+                    c) do not use an NTP server – the sensor has a real time clock (RTC) which will
+                       keep track of time mor or less accurately
+            properties:
+                ntp_server_name_1:
+                    type: string
+                    description: primary server name or IP address to receive system time from
+                    example: "pool.ntp.org"
+                ntp_server_name_2:
+                    type: string
+                    description: secondary server name or IP address to receive system time from
+                    example: "time.fu-berlin.de"
+                ntp_server_name_3:
+                    type: string
+                    description: tertiary server name or IP address to receive system time from
+                    example: ""
+        temperature_calibration:
+            type: object
+            properties:
+                resistance_at_0_C:
+                    type: number
+                    description: PT1000 resistance at 0 °C in Ohm
+                    example: 998.2
+                resistance_coefficient:
+                    type: number
+                    description: PT1000 temperature resistance coefficient in Ohm/K
+                    example: 3.851
+        conductivity_calibration:
+            type: object
+            properties:
+                cell_constant:
+                    type: number
+                    description: cell constant in m^-1
+                    example: 1.23
+
+    responses:
+        bad_settings_patch:
+            description: >
+                bad request body<br>
+                Possible causes:<br>
+                <li> invalid key
+                <li> parameter value has wrong type
+            content:
+                text/plain:
+                    schema:
+                        type: string
+                        example: "invalid key: foo"
+
+paths:
+    /system/update:
+        post:
+            tags:
+                - system
+            summary: update sensor firmware
+            description: >
+                The device will check for firmware updates. You must configure your firewall so that
+                the sensor can access:<br>
+                <li> a DNS server<br>
+                <li> firmware.islabtech.com on port 443<br>
+
+                If a new firmware is available, the sensor will install it and reboot afterwards.
+                This requires approx. 20 seconds. See /api/v1/reboot for more information on reboots.
+                If the firmware is already up to date, the sensor continues normal operation.
+            responses:
+                "200":
+                    description: The firmware is already up to date or it was updated successfully.
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: "already up to date\n"
+                "500":
+                    description: >
+                        The sensor was not able to update the firmware. Reasons may be:<br>
+                        <li> no connection to DNS server<br>
+                        <li> no connection to firmware.islabtech.com<br>
+                        <li> The firmware has not been updated for several years and thus does not
+                             now modern TLS root certificates.<br>
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: "an error occured during update\n"
+    /system/version:
+        get:
+            tags:
+                - system
+            summary: get firmware and hardware version info
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    firmware:
+                                        type: object
+                                        properties:
+                                            version:
+                                                type: string
+                                                example: "0.1.2"
+                                            author_name:
+                                                type: string
+                                                example: "Ilka Schulz"
+                                            author_email:
+                                                type: string
+                                                example: "ilka@islabtech.com"
+                                    hardware:
+                                        type: object
+                                        properties:
+                                            version:
+                                                type: string
+                                                example: "0.4.5"
+                                            serial_number:
+                                                type: string
+                                                example: "0123-4567-89AB-CDEF"
+    # TODO: /system/status
+    /system/reboot:
+        post:
+            tags:
+                - system
+            summary: reboot the sensor
+            description: >
+                The sensor will reboot and drop all state (e.g. measurement logs will be
+                lost) except settings (configuration and calibration are kept in non-volatile memory).
+                The device will be offline during the boot process which will last approx. 10 seconds.
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: "Device will reboot now...\n"
+    /system/logs/full:
+        get:
+            tags:
+                - system
+            summary: get full system logs since the last reboot
+            description: >
+                The sensor creates some log file and stores it in memory. The logs will end as soon
+                as memory is full and the first log lines will not be overwritten (no ring buffer).
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: "TODO: serve some example logs here..."
+
+    /measurements/latest:
+        get:
+            tags:
+                - measure
+            summary: get the latest measurement
+            description: >
+                Read the latest measurement (temperature and conductivity) from the sensor. The
+                measurement may have been a failure. If you want to read the last successful measurement,
+                access "/api/v1/measurements/latest_successful".
+                This endpoint will not trigger a new measurement – the device will just continue to
+                measure continuously.
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/measurement"
+    /measurements/latest_successful:
+        get:
+            tags:
+                - measure
+            summary: get the last successful measurement
+            description: >
+                Read the last successful measurement (temperature and conductivity) from the sensor.
+                This endpoint will not trigger a new measurement – the device will just continue to
+                measure continuously.
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/successful_measurement"
+    /measurements/history:
+        get:
+            tags:
+                - measure
+            summary: get all measurements
+            description: >
+                Read all measurements (temperature and conductivity, successful and failed) from the
+                sensor since it was last turned on. The number of readings may be capped (e.g. at
+                1000) due to memory limitations but will be overwritten in a ring buffer. The
+                returned array will contain all successful and failed measurements.
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    values:
+                                        type: array
+                                        nullable: false
+                                        items:
+                                            $ref: "#/components/schemas/measurement"
+
+    # settings
+    /settings/network/wifi:
+        get:
+            tags:
+                - settings
+            summary: get WiFi configuration
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/wifi_settings"
+        patch:
+            tags:
+                - settings
+            summary: change WiFi configuration
+            requestBody:
+                description: >
+                    settings object<br>
+                    The submitted object does not need to be complete. Add only those fields to the
+                    submitted object which you want to change.
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/wifi_settings"
+            responses:
+                "200":
+                    description: successfully updated settings
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/wifi_settings"
+                "400":
+                    $ref: "#/components/responses/bad_settings_patch"
+    /settings/network/ethernet:
+        get:
+            tags:
+                - settings
+            summary: get ethernet configuration
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ethernet_settings"
+        patch:
+            tags:
+                - settings
+            summary: change ethernet configuration
+            requestBody:
+                description: >
+                    settings object<br>
+                    The submitted object does not need to be complete. Add only those fields to the
+                    submitted object which you want to change.
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ethernet_settings"
+            responses:
+                "200":
+                    description: successfully updated settings
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ethernet_settings"
+                "400":
+                    $ref: "#/components/responses/bad_settings_patch"
+    # /system/wifi/scan:
+    #     get:
+    #         tags:
+    #             - system
+    #         summary: scan for available WiFi access points
+    #         responses:
+    #             "200":
+    #                 description: OK
+    #                 content:
+    #                     application/json:
+    #                         schema:
+    #                             type: object
+    #                             properties:
+    #                                 wifi_networks:
+    #                                     type: array
+    #                                     items:
+    #                                         type: object
+    #                                         properties:
+    #                                             ssid:
+    #                                                 type: string
+    #                                                 description: name / SSID of the WiFi
+    #                                                 example: "some wifi"
+    #                                             bssid:
+    #                                                 type: string
+    #                                                 description: address / BSSID of the WiFi
+    #                                                 example: "00:11:22:33:44:55"
+    #                                             channel:
+    #                                                 type: number
+    #                                                 description: channel used by the WiFi access point (integer)
+    #                                                 example: 5
+    #                                             rssi:
+    #                                                 type: number
+    #                                                 description: received signal strength indication in dBm (integer)
+    #                                                 example: -80
+    #                                             security:
+    #                                                 type: string
+    #                                                 description: security level of the discovered WiFi access point
+    #                                                 example: "WPA2"
+    /settings/network/ntp:
+        get:
+            tags:
+                - settings
+            summary: get network time configuration
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ntp_settings"
+        patch:
+            tags:
+                - settings
+            summary: change network time configuration
+            requestBody:
+                description: >
+                    settings object<br>
+                    The submitted object does not need to be complete. Add only those fields to the
+                    submitted object which you want to change.
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ntp_settings"
+            responses:
+                "200":
+                    description: successfully updated settings
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ntp_settings"
+                "400":
+                    $ref: "#/components/responses/bad_settings_patch"
+
+    /settings/calibration/temperature:
+        get:
+            tags:
+                - calibrate temperature
+            summary: get current temperature sensor calibration
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/temperature_calibration"
+        patch:
+            tags:
+                - calibrate temperature
+            summary: change temperature calibration
+            requestBody:
+                description: >
+                    settings object<br>
+                    The submitted object does not need to be complete. Add only those fields to the
+                    submitted object which you want to change.
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/temperature_calibration"
+            responses:
+                "200":
+                    description: successfully updated settings
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/temperature_calibration"
+                "400":
+                    $ref: "#/components/responses/bad_settings_patch"
+    /settings/calibration/temperature/calibrate:
+        post:
+            tags:
+                - calibrate temperature
+            summary: calibrate the temperature sensor now
+            requestBody:
+                description: the correct temperature which the sensor currently experiences
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                correct_temperature:
+                                    type: number
+                                    example: 0.0
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        text/plain:
+                            example: "successfully updated temperature calibration\n"
+                "400":
+                    description: bad correct temperature value
+                    content:
+                        text/plain:
+                            example: "user error: please specify the `correct_temperature` parameter\n"
+    /settings/calibration/conductivity:
+        get:
+            tags:
+                - calibrate conductivity
+            summary: get current conductivity sensor calibration
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/conductivity_calibration"
+        patch:
+            tags:
+                - calibrate conductivity
+            summary: change conductivity calibration
+            requestBody:
+                description: >
+                    settings object<br>
+                    The submitted object does not need to be complete. Add only those fields to the
+                    submitted object which you want to change.
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/conductivity_calibration"
+            responses:
+                "200":
+                    description: successfully updated settings
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/conductivity_calibration"
+                "400":
+                    $ref: "#/components/responses/bad_settings_patch"
+    /settings/calibration/conductivity/calibrate:
+        post:
+            tags:
+                - calibrate conductivity
+            summary: calibrate the conductivity sensor now
+            requestBody:
+                description: the correct conductivity which the sensor currently experiences in µS/cm
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                correct_conductivity:
+                                    type: number
+                                    example: 1413
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        text/plain:
+                            example: "successfully updated conductivity calibration\n"
+                "400":
+                    description: bad correct conductivity value
+                    content:
+                        text/plain:
+                            example: "user error: please specify the `correct_conductivity` parameter\n"

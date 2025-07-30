@@ -1,0 +1,148 @@
+%! Tex = lualatex
+\documentclass[twocolumn,11pt,a4paper]{extarticle}
+\usepackage[left=20mm,right=20mm,top=10mm,bottom=20mm]{geometry}
+% \usepackage{fontspec}
+\usepackage{biblatex}
+\addbibresource{modbus-doc.bib}
+\usepackage[hidelinks,breaklinks]{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+%\usepackage{makecell}
+\usepackage{multirow}
+%\usepackage{filecontents}
+
+\begin{document}
+\title{UPW Sensor v1 Modbus Documentation}
+\author{Ilka Schulz Labortechnik}
+\date{\today}
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+This document specifies the Modbus/TCP interface~\cite{Modbus} of the
+ISLabTech~\cite{ISLabTech} UPW Sensor v1.~\cite{sensor}
+
+\textbf{Note:}
+The Modbus interface is provided for compatibility with old PLC controllers only.
+It is highly recommended to use the more modern REST API instead.~\cite{api}
+There are also ready-to-use client libraries in Python~\cite{pythonlib} and Rust.~\cite{rustlib}
+
+% TODO: add example code in Python
+
+\section{Transport Layer}
+The device listens on TCP/IP port 502 and accepts  TCP connections without authentication.
+Be aware that the maximum number of concurrent TCP connections is limited to 11
+and that other clients,
+e.g. using the REST API or the web app,
+will also occupy TCP connections.
+
+If you want to limit client access to the Modbus/TCP interface,
+the only currently available option is to set up your organization's firewall to block such connections on port 502.
+
+
+\section{Registers}
+The Modbus interface provides the following Discrete Inputs (DI), Coils (C), Input Registers (IR) and Holding Registers (HR). All addresses are written in decimal. Boolean values are interpreted as 0=false, 1=true.
+
+\subsection{Measurements}
+\begin{tabularx}{\columnwidth}{l l X}
+	\toprule
+	\textbf{Address} & \textbf{Type} & \textbf{Description}\\
+	\midrule
+	\multicolumn{3}{l}{\textbf{Conductivity}}\\
+	\midrule
+	10 & DI & conductivity < \SI{1.1}{\micro{}S/cm}\\
+	10 & IR & conductivity (nS/cm)\\
+	10 & HR & calibrate conductivity  (nS/cm)\\
+%	11 & DI, IR & like addr. 10 but blocking until next measurement is done\\
+	\midrule
+	\multicolumn{3}{l}{\textbf{Temperature}}\\
+	\midrule
+	20 & DI & temperature < \SI{25}{\degreeCelsius}\\
+	20 & IR & temperature (1/100th °C)\\
+	20 & HR & calibrate temperature (1/100th °C)\\
+%	21 & DI, IR & like addr. 20 but blocking until next measurement is done\\
+	30 & IR & temperature (1/10th K)\\
+%	31 & DI, IR & like addr. 30 but blocking until next measurement is done\\
+	\bottomrule
+\end{tabularx}
+%\vfill
+
+\subsection{Network}
+\begin{tabularx}{\columnwidth}{l l X}
+	\toprule
+	\textbf{Address} & \textbf{Type} & \textbf{Description}\\
+	\midrule
+	\multicolumn{3}{l}{\textbf{WiFi}}\\
+	\midrule
+	100 & C & connect to WiFi\\
+	\midrule
+	\multicolumn{3}{l}{\textbf{Ethernet}}\\
+	\midrule
+%	200 & C & connect to ethernet\\
+	201 & C & use DHCP on ethernet\\
+	\midrule
+	\multicolumn{3}{l}{\textbf{Static IPv4 On Ethernet}}\\
+	\multicolumn{3}{l}{only effective if "use DHCP on ethernet" is false}\\
+	\midrule
+	210 & HR & address first byte\\
+	211 & HR & address second byte\\
+	212 & HR & address third byte\\
+	213 & HR & address fourth byte\\
+%	\midrule
+%	220 & HR & netmask (0..32)\\
+	\midrule
+	230 & HR & gateway first byte\\
+	231 & HR & gateway second byte\\
+	232 & HR & gateway third byte\\
+	233 & HR & gateway fouth byte\\
+	\midrule
+	240 & HR & DNS server first byte\\
+	241 & HR & DNS server second byte\\
+	242 & HR & DNS server third byte\\
+	243 & HR & DNS server fourth byte\\
+	\midrule
+	250 & HR & alt. DNS server first byte\\
+	251 & HR & alt. DNS server second byte\\
+	252 & HR & alt. DNS server third byte\\
+	253 & HR & alt. DNS server fourth byte\\
+	\bottomrule
+\end{tabularx}
+\vfill
+
+\subsection{System Status}
+\begin{tabularx}{\columnwidth}{l l X}
+	\toprule
+	\textbf{Address} & \textbf{Type} & \textbf{Description}\\
+	\midrule
+	300 & C & enable automatic firmware updates\\
+	\midrule
+	\multicolumn{3}{l}{\textbf{Device Version}}\\
+	\midrule
+	310 & IR & firmware major version\\
+	311 & IR & firmware minor version\\
+	312 & IR & firmware patch version\\
+	\midrule
+	320 & IR & hardware major version\\
+	321 & IR & hardware minor version\\
+	322 & IR & hardware patch version\\
+	\midrule
+	\multicolumn{3}{l}{\textbf{Device Serial Number}}\\
+	\midrule
+	330 & IR & first two bytes\\
+	331 & IR & second two bytes\\
+	332 & IR & third two bytes\\
+	333 & IR & fourth two bytes\\
+	\bottomrule
+\end{tabularx}
+%\vfill
+
+
+\printbibliography[heading=bibnumbered]
+%\addcontentsline{toc}{section}{References}
+%\bibliographystyle{plain}
+%\bibliography{\jobname}
+\vfill
+
+\end{document}
