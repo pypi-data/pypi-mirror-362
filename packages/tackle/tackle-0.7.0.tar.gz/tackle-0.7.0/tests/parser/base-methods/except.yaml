@@ -1,0 +1,60 @@
+
+stuff: things
+
+compact->: tackle foobar.yaml --try --except foo
+
+str:
+  ->: tackle foobar.yaml
+  try: true
+  except: foo
+
+dic:
+  ->: tackle foobar.yaml
+  try: true
+  except:
+    stuff: "{{stuff}}"
+
+hook:
+  ->: tackle foobar.yaml
+  try: true
+  except:
+    stuff->: "{{stuff}}"
+
+dict_render_block->:
+  if: false
+  do: this
+  else:
+    stuff: "{{stuff}}"
+
+hook_call->:
+  do->: ferk
+  try: true
+  except:
+    stuff->: "{{stuff}}"
+
+embedded:
+  hook_call->:
+    do->: ferk
+    try: true
+    except:
+      stuff->: "{{stuff}}"
+
+listed:
+  hook_call:
+    ->: print {{item}}
+    for:
+      - stuff
+      - things
+    if: false
+    else:
+      stuff->: "{{item}}"
+
+block_listed:
+  block_call->:
+    for:
+      - stuff
+      - things
+    if: false
+    do: this
+    else:
+      stuff->: "{{item}}"

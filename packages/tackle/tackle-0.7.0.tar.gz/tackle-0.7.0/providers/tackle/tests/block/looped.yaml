@@ -1,0 +1,30 @@
+alist:
+  - stuff
+  - things
+
+blocker->:
+  for: alist
+  priv_compact_>: "{{item}}"
+  var1: foo
+  use_var1->: "{{var1}}"
+  compact->: "{{item}}"
+  var2: bar
+  expanded:
+    ->: "{{item}}"
+  priv_expanded:
+    _>: "{{item}}"
+
+#blocker->:
+#  for: alist
+#  first:
+#    ->: tackle
+#    chdir: fake-tackle
+#
+#  print->: print "{{ first }}"
+#
+#blocker2->:
+#  for: alist
+#  thing: false
+#  print->: print this --if "{{ thing }}"
+#
+#output->: print "{{ this }}"

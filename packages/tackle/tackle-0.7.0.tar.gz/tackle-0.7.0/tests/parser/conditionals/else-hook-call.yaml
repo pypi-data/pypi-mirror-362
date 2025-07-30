@@ -1,0 +1,43 @@
+
+stuff: things
+
+hook_call->:
+  if: false
+  do: this
+  else:
+    stuff->: "{{stuff}}"
+
+
+embedded:
+  hook_call->:
+    if: false
+    do: this
+    else:
+      stuff->: "{{stuff}}"
+
+
+listed:
+  hook_call:
+    ->: print {{item}}
+    for:
+      - stuff
+      - things
+    if: false
+    else:
+      stuff->: "{{item}}"
+
+block_listed:
+  block_call->:
+    for:
+      - stuff
+      - things
+    if: false
+    do: this
+    else:
+      stuff->: "{{item}}"
+
+
+#hook_call_compact->:
+#  if: false
+#  do: this
+#  else->: var "{{stuff}}"

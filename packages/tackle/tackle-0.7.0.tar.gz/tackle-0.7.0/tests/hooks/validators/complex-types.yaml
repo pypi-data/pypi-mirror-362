@@ -1,0 +1,10 @@
+
+MyHook<-:
+  foo:
+    type: IPv4Address
+    validator:
+      returns->: 1.1.1.1 --if v=='bar'
+      raise->: Not bar
+
+call->: MyHook --foo bar
+error->: MyHook --foo baz --try --except 1
