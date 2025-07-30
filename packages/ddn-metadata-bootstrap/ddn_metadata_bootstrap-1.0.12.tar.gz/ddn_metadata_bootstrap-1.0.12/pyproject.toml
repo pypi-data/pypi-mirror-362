@@ -1,0 +1,128 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddn-metadata-bootstrap"
+version = "1.0.12"
+description = "AI-powered metadata enhancement for Hasura DDN schema files"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Kenneth Stott", email = "kenneth@hasura.io"},
+]
+maintainers = [
+    {name = "Kenneth Stott", email = "kenneth@hasura.io"},
+]
+keywords = ["hasura", "ddn", "graphql", "schema", "metadata", "ai", "anthropic", "descriptions", "relationships"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Database",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Code Generators",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "anthropic>=0.3.0",
+    "PyYAML>=6.0",
+    "python-dotenv>=0.19.0",
+    "inflection>=0.5.1",
+    "nltk>=3.9.1"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+    "mypy>=1.0.0",
+    "twine>=4.0.0",
+    "build>=0.10.0",
+    "bump2version>=1.0.0",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/hasura/ddn-metadata-bootstrap"
+Documentation = "https://github.com/hasura/ddn-metadata-bootstrap#readme"
+Repository = "https://github.com/hasura/ddn-metadata-bootstrap.git"
+"Bug Reports" = "https://github.com/hasura/ddn-metadata-bootstrap/issues"
+Changelog = "https://github.com/hasura/ddn-metadata-bootstrap/blob/main/CHANGELOG.md"
+
+[project.scripts]
+ddn-metadata-bootstrap = "ddn_metadata_bootstrap.main:main"
+ddn-bootstrap = "ddn_metadata_bootstrap.main:main"
+
+[tool.setuptools]
+packages = ["ddn_metadata_bootstrap"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ddn_metadata_bootstrap.__version__"}
+
+[tool.setuptools.package-data]
+ddn_metadata_bootstrap = ["*.py", "**/*.py"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
+testpaths = [
+    "tests",
+]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "anthropic.*",
+    "yaml.*",
+    "dotenv.*",
+]
+ignore_missing_imports = true
