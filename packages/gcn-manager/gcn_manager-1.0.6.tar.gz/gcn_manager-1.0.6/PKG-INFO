@@ -1,0 +1,193 @@
+Metadata-Version: 2.4
+Name: gcn-manager
+Version: 1.0.6
+Summary: Management application for mqtt-based gpio-change-notifier clients
+Author-email: nipil <nipil@users.noreply.github.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/nipil/gcn-manager-py
+Project-URL: Issues, https://github.com/nipil/gcn-manager-py/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: backoff==2.2.1
+Requires-Dist: dotenv==0.9.9
+Requires-Dist: email_validator==2.2.0
+Requires-Dist: ovh==1.2.0
+Requires-Dist: paho-mqtt==2.1.0
+Requires-Dist: phonenumbers==9.0.8
+Requires-Dist: pydantic==2.11.7
+Requires-Dist: tweepy==4.16.0
+Requires-Dist: aiohappyeyeballs==2.6.1
+Requires-Dist: aiohttp==3.12.13
+Requires-Dist: aiosignal==1.4.0
+Requires-Dist: annotated-types==0.7.0
+Requires-Dist: async-lru==2.0.5
+Requires-Dist: attrs==25.3.0
+Requires-Dist: certifi==2025.6.15
+Requires-Dist: charset-normalizer==3.4.2
+Requires-Dist: dnspython==2.7.0
+Requires-Dist: frozenlist==1.7.0
+Requires-Dist: idna==3.10
+Requires-Dist: multidict==6.6.3
+Requires-Dist: oauthlib==3.3.1
+Requires-Dist: propcache==0.3.2
+Requires-Dist: pydantic_core==2.33.2
+Requires-Dist: python-dotenv==1.1.1
+Requires-Dist: requests==2.32.4
+Requires-Dist: requests-oauthlib==2.0.0
+Requires-Dist: typing-inspection==0.4.1
+Requires-Dist: typing_extensions==4.14.1
+Requires-Dist: urllib3==2.5.0
+Requires-Dist: yarl==1.20.1
+Dynamic: license-file
+
+# Manager (in Python) for "Gpio Change Notifier (GCN)" clients
+
+Usage:
+
+    python3 -m gcn_manager --help
+    options:
+      -h, --help            show this help message and exit
+      --trace
+      --log-level LVL
+      --print-env-then-exit
+      --mqtt-host HOST
+      --mqtt-port PORT
+      --mqtt-user-name STR
+      --mqtt-user-password STR
+      --mqtt-keep-alive SEC
+      --mqtt-connect-timeout SEC
+      --mqtt-reconnect
+      --mqtt-still-connecting-alert SEC
+      --mqtt-transport STR
+      --mqtt-client-id-random-bytes N
+      --mqtt-tls-min-version VER
+      --mqtt-tls-max-version VER
+      --mqtt-tls-ciphers STR
+      --mqtt-socket-send-buffer-size N
+      --idle-loop-sleep SEC
+      --client-heartbeat-max-skew SEC
+      --client-heartbeat-watchdog SEC
+      --enable-email-notifications
+      --enable-sms-notifications
+      --enable-twitter-notifications
+      --notify-manager-starting-recipients A,B,C
+      --notify-manager-still-connecting-recipients A,B,C
+      --notify-manager-connected-recipients A,B,C
+      --notify-manager-disconnected-recipients A,B,C
+      --notify-manager-exiting-recipients A,B,C
+      --notify-client-skewed-heartbeat-recipients A,B,C
+      --notify-client-missed-heartbeat-recipients A,B,C
+      --notify-client-dropped-items-recipients A,B,C
+      --notify-client-status-change-online-recipients A,B,C
+      --notify-client-status-change-offline-recipients A,B,C
+      --notify-client-gpio-change-up-recipients A,B,C
+      --notify-client-gpio-change-down-recipients A,B,C
+      --email-from FROM
+      --email-smtp-host HOST
+      --email-smtp-port PORT
+      --email-username NAME
+      --email-password PASS
+      --email-smtp-starttls
+      --email-smtp-debug
+      --sms-allow-country CODE
+      --sms-ovh-sender-name NAME
+      --sms-ovh-service-name NAME
+      --sms-ovh-user-name USERNAME
+      --sms-ovh-endpoint URL
+      --sms-ovh-app-key SECRET
+      --sms-ovh-app-secret SECRET
+      --sms-ovh-consumer-key SECRET
+      --sms-ovh-api-timeout SEC
+      --twitter-app-consumer-key SECRET
+      --twitter-app-consumer-secret SECRET
+      --twitter-user-access-token SECRET
+      --twitter-user-access-token-secret SECRET
+
+Or use environment variables, see `constants.py`
+
+## Features
+
+- ENV
+  - recipients
+    - email -> DONE
+    - sms -> DONE
+    - twitter -> DONE
+
+- MQTT
+  - tls
+    - mandatory -> DONE
+    - mandatory verification -> DONE
+  - auth
+    - login/password -> DONE
+  - errors
+    - retryable
+      - dns resolution -> DONE
+      - host unreachable -> DONE
+      - port unreachable -> DONE
+    - fatal
+      - auth failed -> DONE
+      - tls failed -> DONE
+
+- notifications
+  - manager
+    - starting -> DONE
+    - exiting -> DONE
+  - mqtt connection
+    - failing -> DONE
+    - established -> DONE
+  - client
+    - status
+      - offline -> DONE
+      - online -> DONE
+    - heartbeat
+      - skewed -> DONE
+      - missed -> DONE
+    - dropped item -> DONE
+  - gpio
+    - raising -> DONE
+    - falling -> DONE
+
+- brain
+  - monitored gpio -> DONE
+  - gpio initial -> DONE
+  - gpio changed -> DONE
+  - untracked -> DONE
+
+## TODO
+
+- implement a safeguard regarding notifications : max N/day
+
+- external monitor for the manager, to ensure it is running
+
+## development
+
+python asyncio debug
+
+    export PYTHONASYNCIODEBUG=1
+
+install make on windows (for docker images) then restart powershell
+
+    winget install --id ezwinports.make
+
+## twitter-credentials
+
+developer portal <https://developer.x.com/en>
+
+project / app / keys and token
+
+- Consumer Keys / API Key and Secret : `regenerate`
+- Authentication Tokens
+  - Bearer Token : __not needed__
+  - Access Token and Secret : `regenerate`
+- OAuth 2.0 Client ID and Client Secret : `regenerate`
+
+project / app / settings
+
+- oauth 1.0 : `Read and write and Direct message`
+- type of app : `native app`
+- oauth 2.0 / callback uri : `https://localhost` + mandatory website
+
+_**IMPORTANT**: regenerate `Access Token and Secret` each time you modify oauth 1.0 permissions !_
