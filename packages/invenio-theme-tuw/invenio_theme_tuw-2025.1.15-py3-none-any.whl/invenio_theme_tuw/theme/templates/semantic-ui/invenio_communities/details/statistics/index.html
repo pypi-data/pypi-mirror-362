@@ -1,0 +1,67 @@
+{# -*- coding: utf-8 -*-
+
+  This file is part of Invenio.
+  Copyright (C) 2023 CERN.
+  Copyright (C) 2025 TU Wien.
+
+  Invenio is free software; you can redistribute it and/or modify it
+  under the terms of the MIT License; see LICENSE file for more details.
+#}
+
+{%- extends "invenio_communities/details/base.html" %}
+{%- set active_community_header_menu_item= 'statistics' %}
+
+{%- block header %}
+  {{ super() }}
+  <!-- Folium start -->
+  {{ map_header|safe }}
+  <!-- Folium end -->
+{%- endblock header %}
+
+{%- block page_body %}
+  {{ super() }}
+  <div class="ui container rel-m-2 rel-pt-1">
+    <h1>Usage statistics for "{{ record.metadata.title }}"</h1>
+    <form id="input-form">
+      <ul>
+        <li>
+          <label for="recid">Record</label>
+          <select name="recid" id="recid" onchange="document.getElementById('input-form').submit();">
+            {%- for rec in records -%}
+              {%- set selected = "selected" if rec.id == record.id else "" -%}
+              <option value="{{ rec.id }}" {{ selected }}>{{ rec.metadata.title }}</option>
+            {%- endfor %}
+          </select>
+        </li>
+
+        <li>
+          {#- there is also type="month" but that has limited availability for now... -#}
+          <label for="month"><abbr title="Only the month of the selected date will be used">Month</abbr></label>
+          <input name="month" id="month" type="date" value="{{ month }}-01" onchange="document.getElementById('input-form').submit();" />
+        </li>
+
+        <li>
+          <label for="type">Views or downloads</label>
+          <select name="type" id="type" onchange="document.getElementById('input-form').submit();">
+            <option value="view">Views</option>
+            <option value="download">Downloads</option>
+            <option value="both">Both</option>
+          </select>
+        </li>
+
+        <noscript>
+          <li>
+            <input type="submit" value="Go!" />
+          </li>
+        </noscript>
+      </ul>
+    </form>
+    {{ map_html|safe }}
+    {#- the script is inline, which means we can't use defer #}
+    <script nonce="{{ csp_nonce() }}">
+      {{ map_script|safe }}
+    </script>
+    <!-- Not centered yet... -->
+    {{ table_html|safe }}
+  </div>
+{%- endblock page_body -%}

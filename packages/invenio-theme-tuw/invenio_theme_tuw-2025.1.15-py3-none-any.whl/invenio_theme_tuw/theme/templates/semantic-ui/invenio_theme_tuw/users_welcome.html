@@ -1,0 +1,79 @@
+{# -*- coding: utf-8 -*-
+
+  Copyright (C) 2024 TU Wien.
+
+  Invenio Theme TUW is free software; you can redistribute it and/or modify it
+  under the terms of the MIT License; see LICENSE file for more details.
+#}
+
+{%- extends config.BASE_TEMPLATE %}
+
+{%- block page_body %}
+  {%- set user_name = user.user_profile.given_name or user.user_profile.full_name %}
+  <article id="welcome-text-container" class="ui container rel-mt-3">
+    <section class="mb-20">
+      <h1>User information</h1>
+      <p id="tiss-profile">
+        {%- if user.user_profile.tiss_id %}
+          <i class="info circle icon"></i>
+          <a href="https://tiss.tuwien.ac.at/person/{{ user.user_profile.tiss_id }}.html">TISS profile</a> for {{ user.user_profile.full_name }}.
+        {%- else %}
+          <i class="exclamation triangle icon"></i>
+          No TISS profile found for <em>{{ user.user_profile.full_name }}</em>! Potentially this is an external account.
+        {%- endif %}
+      </p>
+    </section>
+    <hr>
+
+    <section class="mt-20">
+      <h1>Email template</h1>
+      <pre class="response text">
+Dear {{ user_name }},
+
+
+Thanks for your request, I've just granted you permission to create new record drafts and upload files!
+Here are a few things you should know:
+
+*) For long-term file accessibility and preservation, we strongly recommend that you consult our file format guide:
+   {{ config.THEME_TUW_FILE_FORMATS_URL }}
+
+*) If you include code in your uploaded record, please make sure that it is easily reusable.
+   It is good practice to provide a list of the required dependencies with their exact versions, e.g. in a language-specific project file or a README text file.
+   Also, we recommend separating code from data via different directories, and using relative paths in code over absolute ones.
+
+*) In addition to technical reusability, you should make sure that it is legally reusable by assigning appropriate licenses.
+   For data, we generally recommend the CC-BY (4.0) license, while for code we recommend the MIT license.
+
+*) Once a record is published, the set of uploaded files is fixed and cannot be changed anymore.
+   However, you'll still be able to update the record's metadata after publication, e.g. to modify the description, or add new known citations to the record.
+
+*) If you find that some files do need to be updated after publication (e.g. due to errata, or new/updated data), you can create a *new version* of the record.
+   This will give you the opportunity to replace individual files from an already published record.
+   The resulting new version will be a new record with its own DOI, which is strongly linked to the old version in the system however.
+
+*) Access to the system is strongly linked to active university accounts.
+   We recognise that every journey, including university affiliations, will eventually end.
+   Therefore, it is a good idea to think of eventual succession plans for record maintenance, and nominate a future caretaker of the datasets.
+
+We are happy to assist you with any questions on your data upload.
+Some more information can be found in our upload guide: {{ config.THEME_TUW_UPLOAD_GUIDE_URL }}
+
+{%+ if config.THEME_TUW_TEST_INSTANCE_URL +%}
+As a final note, if you just want to play around and familiarize yourself with the system or just need to deposit data as part of an exercise, we also offer a test system: {{ config.THEME_TUW_TEST_INSTANCE_URL }}
+This test system does not mint any live DOIs, and we reserve the right to arbitrarily clear its contents.
+Otherwise, the functionality is pretty much identical, so it's an ideal playground.
+{# note: the shape of this construct, including the {%+ ... +%} and this comment are relevant for the formatting #}
+{%+ endif +%}
+Best regards,
+{{ current_user.user_profile.given_name }}
+      </pre>
+    </section>
+    <hr>
+    <a class="ui button mt-20" href="{{ url_for('.list_user_info') }}">Back</a>
+  </article>
+{%- endblock page_body %}
+
+{%- block css %}
+  {{ super() }}
+  {{ webpack['invenio-theme-tuw-users-welcome.css'] }}
+{%- endblock css %}
