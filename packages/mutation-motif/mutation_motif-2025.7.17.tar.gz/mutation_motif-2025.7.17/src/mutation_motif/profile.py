@@ -1,0 +1,155 @@
+from random import choice
+from random import seed as set_seed
+
+from cogent3 import DNA
+from numpy import array, logical_and, zeros
+
+
+def MakeCircleRange(circle_size, slice_side):
+    """factory function that pre computes all circular slices
+    slices are assumed to be 2*slice_side+1 in length
+    """
+    assert (circle_size - 1) % 2 == 0
+
+    slice_collection = {}
+    full_indices = list(range(circle_size))
+    for centre_index in range(circle_size):
+        left = centre_index - slice_side
+        right = centre_index + slice_side + 1
+
+        if left < 0:
+            indices = full_indices[left:] + full_indices[:right]
+        elif right > circle_size:
+            indices = full_indices[left:] + full_indices[: right - circle_size]
+        else:
+            indices = full_indices[left:right]
+        slice_collection[centre_index] = indices
+
+    def call(centre_index):
+        return slice_collection[centre_index]
+
+    return call
+
+
+def chosen_base_indices(data, chosen_base, step):
+    """returns a list of arrays containing positions with
+    chosen base (starting base)"""
+    assert (data.shape[1] - 1) % 2 == 0, "seqs not 2n + 1 long"
+    if type(chosen_base) == str:
+        assert len(chosen_base) == 1, "single base only"
+
+        chosen_base = DNA.alphabet.to_indices(chosen_base)[0]
+
+    indices = zeros(data.shape, dtype=bool)
+
+    # define in-frame columns
+    for column in range(data.shape[1] // 2 % step, data.shape[1], step):
+        if column == data.shape[1] // 2:
+            continue
+        indices[:, column] = True
+
+    indices = logical_and(data == chosen_base, indices)
+    indices_by_row = []
+    for i in range(data.shape[0]):
+        (row_indices,) = indices[i, :].nonzero()
+        indices_by_row.append(row_indices)
+
+    # exclude seqs with minimum number
+    return indices_by_row
+
+
+def filter_seqs_by_chosen_base(data, chosen_base_indices, min_chosen_bases):
+    """returns sequences and end base indices for seqs with sufficient
+    end bases"""
+    keep = []
+    new_indices = []
+    for i in range(data.shape[0]):
+        if len(chosen_base_indices[i]) >= min_chosen_bases:
+            keep.append(i)
+            new_indices.append(chosen_base_indices[i])
+
+    data = data.take(keep, axis=0)
+    return data, new_indices
+
+
+def get_random_indices(chosen_base_indices, circle_range):
+    sampled = []
+    for v in chosen_base_indices:
+        r = choice(v)
+        sampled.append(circle_range(r))
+
+    return sampled
+
+
+def MakeControl(data, chosen_base, step, flank_size):
+    """factory function for generating control profiles"""
+    sample_indices = chosen_base_indices(data, chosen_base, step)
+    data, sample_indices = filter_seqs_by_chosen_base(data, sample_indices, 1)
+    circle_range = MakeCircleRange(data.shape[1], flank_size)
+
+    def call():
+        return get_control(
+            data,
+            chosen_base,
+            step,
+            flank_size,
+            sample_indices=sample_indices,
+            circle_range=circle_range,
+        )
+
+    return call
+
+
+def get_control(
+    seq_array,
+    chosen_base,
+    step,
+    flank_size,
+    sample_indices=None,
+    circle_range=None,
+    seed=None,
+):
+    """returns control profile"""
+    assert seed is not None, "Must provide a random number seed"
+    set_seed(seed)
+    if sample_indices is None:
+        sample_indices = chosen_base_indices(seq_array, chosen_base, step)
+        seq_array, sample_indices = filter_seqs_by_chosen_base(
+            seq_array,
+            sample_indices,
+            1,
+        )
+
+    if circle_range is None:
+        circle_range = MakeCircleRange(seq_array.shape[1], flank_size)
+
+    sampled_indices = get_random_indices(sample_indices, circle_range)
+    rows = []
+    for i in range(len(seq_array)):
+        row = seq_array[i].take(sampled_indices[i])
+        rows.append(row)
+    return array(rows)
+
+
+def get_observed(data, flank_size):
+    """returns observed profile"""
+    length = data.shape[1]
+    mid_pt = (length - 1) // 2
+    assert 2 * mid_pt + 1 == length, "Funny length"
+
+    start = mid_pt - flank_size
+    return data[:, start : start + (flank_size * 2 + 1)]
+
+
+def get_profiles(data, chosen_base, step, flank_size, circle_range=None, seed=None):
+    """returns matched observed and control profiles"""
+    ctl = get_control(
+        data,
+        chosen_base,
+        step,
+        flank_size,
+        circle_range=circle_range,
+        seed=seed,
+    )
+    obs = get_observed(data, flank_size)
+    return obs, ctl
