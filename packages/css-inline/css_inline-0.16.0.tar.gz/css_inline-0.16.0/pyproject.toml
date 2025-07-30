@@ -1,0 +1,54 @@
+[project]
+name = "css-inline"
+dynamic = ["version"]
+description = "High-performance library for inlining CSS into HTML 'style' attributes"
+keywords = ["css", "html", "email", "stylesheet", "inlining"]
+authors = [
+    { name = "Dmitry Dygalo", email = "dmitry@dygalo.dev" }
+]
+license = { file = "LICENSE" }
+classifiers=[
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Rust",
+]
+dependencies = []
+requires-python = ">=3.9"
+
+[project.urls]
+homepage = "https://github.com/Stranger6667/css-inline/tree/master/bindings/python"
+repository = "https://github.com/Stranger6667/css-inline"
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint.isort]
+known-first-party = ["css_inline"]
+known-third-party = ["hypothesis", "pytest"]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+
+[build-system]
+requires = ["maturin>=1.1"]
+build-backend = "maturin"
+
+[tool.maturin]
+strip = true
+manifest-path = "bindings/python/Cargo.toml"
+
+[tool.pyodide.build]
+default_cross_build_env_url = "https://github.com/pyodide/pyodide/releases/download/0.28.0a3/xbuildenv-0.28.0a3.tar.bz2"
