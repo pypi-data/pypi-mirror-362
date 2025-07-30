@@ -1,0 +1,237 @@
+# QuantumMetaGPT
+
+[![License: Commercial](https://img.shields.io/badge/License-Commercial-red.svg)](https://github.com/yourusername/QuantumMetaGPT/blob/main/docs/licensing.md)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Qiskit](https://img.shields.io/badge/Qiskit-0.44+-purple.svg)](https://qiskit.org/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://yourusername.github.io/QuantumMetaGPT/)
+
+**Autonomous Quantum AI Research Agent**
+
+QuantumMetaGPT is a cutting-edge system that combines reinforcement learning, large language models, and quantum computing to automatically generate, optimize, and evaluate quantum algorithms.
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Install QuantumMetaGPT
+pip install quantummetagpt
+
+# Get your machine ID for licensing
+python -c "import qmetagpt; print(f'Machine ID: {qmetagpt.get_machine_id()}')"
+
+# Contact bajpaikrishna715@gmail.com with your machine ID for license
+```
+
+### Basic Usage
+
+```python
+import qmetagpt
+import numpy as np
+
+# Initialize RL agent
+agent = qmetagpt.PPOAgent(state_dim=8, action_dim=12)
+agent.build_model()
+
+# Generate quantum circuit
+task_state = np.array([1, 0, 1, 0, 0, 1, 1, 0])
+circuit = agent.generate_circuit(task_state)
+
+# Evaluate performance
+evaluator = qmetagpt.QuantumEvaluator()
+results = evaluator.evaluate(circuit, shots=1024)
+
+print(f"Fidelity: {results['fidelity']:.4f}")
+```
+
+## 📚 Documentation
+
+### Comprehensive Documentation Available
+
+Our complete documentation is available at: **[https://yourusername.github.io/QuantumMetaGPT/](https://yourusername.github.io/QuantumMetaGPT/)**
+
+### Documentation Sections
+
+- **[Installation Guide](docs/installation.md)** - Complete setup instructions
+- **[Quick Start](docs/quickstart.md)** - Get running in 10 minutes
+- **[User Guide](docs/user_guide/overview.md)** - Comprehensive usage documentation
+- **[API Reference](docs/api/core.md)** - Detailed API documentation
+- **[Licensing Guide](docs/licensing.md)** - License tiers and requirements
+- **[Examples](docs/examples/basic.md)** - Practical examples and tutorials
+- **[Configuration](docs/configuration.md)** - Advanced configuration options
+
+### 🛠️ Building Documentation Locally
+
+To build and serve the documentation locally:
+
+```bash
+# Install documentation dependencies
+pip install mkdocs mkdocs-material
+
+# Clone repository
+git clone https://github.com/yourusername/QuantumMetaGPT.git
+cd QuantumMetaGPT
+
+# Serve documentation locally
+mkdocs serve
+# Visit http://127.0.0.1:8000
+
+# Build static documentation
+mkdocs build
+# Output in site/ directory
+```
+
+### 🚀 Deploy Documentation to GitHub Pages
+
+The repository includes automatic GitHub Pages deployment:
+
+1. **Enable GitHub Pages** in repository settings
+2. **Set source to "GitHub Actions"**
+3. **Push to main branch** - documentation deploys automatically
+
+The GitHub Actions workflow (`.github/workflows/docs.yml`) handles:
+- Automatic builds on push to main
+- Validation of documentation
+- Deployment to GitHub Pages
+- Link checking and quality assurance
+
+## 🏗️ Architecture
+
+```mermaid
+graph TB
+    A[Task Input] --> B[Task Synthesizer]
+    B --> C[LLM Paper Parser]
+    C --> D[Algorithm Generator]
+    D --> E[RL Agents]
+    E --> F[Quantum Circuits]
+    F --> G[Evaluation Engine]
+    G --> H[Optimizer Engine]
+    H --> I[Report Generator]
+    I --> J[Results Output]
+    
+    subgraph "License Protection"
+    K[License Enforcer]
+    K -.-> C
+    K -.-> D
+    K -.-> E
+    K -.-> G
+    K -.-> H
+    K -.-> I
+    end
+```
+
+# Set environment variables
+export IBMQ_TOKEN="your_ibmq_token"
+export OPENAI_API_KEY="your_openai_key"
+
+# Generate license
+python -m qmetagpt.security_licensing.cli_license generate
+Usage
+python
+from QuantumMetaGPT import run_pipeline
+
+# Run full pipeline
+run_pipeline(arxiv_id="quant-ph/2310.12345")
+```
+
+### Module Structure
+
+```plaintext
+quantummetagpt/
+├── llm_paper_parser       # arXiv paper processing
+├── task_synthesizer       # Quantum task formalization
+├── quantum_algorithm_generator  # RL-based circuit generation
+├── optimizer_engine       # Hybrid quantum-classical optimization
+├── evaluation_engine      # Quantum hardware evaluation
+├── report_generator       # Scientific report creation
+├── security_licensing     # License management
+└── utils                  # Logging and error handling
+```
+
+Contributing
+Contributions are welcome! Please see our contribution guidelines.
+
+License
+Commercial license required. See LICENSE for details.
+
+## `CONTRIBUTING.md`
+
+```markdown
+# Contribution Guidelines
+
+We welcome contributions to QuantumMetaGPT! Please follow these guidelines:
+
+## Development Setup
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/yourusername/QuantumMetaGPT.git`
+3. Create a virtual environment: `python -m venv venv`
+4. Activate environment: `source venv/bin/activate`
+5. Install dependencies: `pip install -r requirements-dev.txt`
+
+## Coding Standards
+- Follow PEP 8 style guide
+- Use type hints for all function signatures
+- Document public methods with docstrings
+- Write unit tests for new features
+- Keep modules focused and cohesive
+
+## Testing
+Run the test suite with:
+```bash
+pytest --cov=qmetagpt --cov-report=html
+Pull Requests
+Create a new branch for your feature: git checkout -b feature-name
+
+Implement your changes with tests
+
+Ensure all tests pass: pytest
+
+Update documentation if needed
+
+Submit a pull request to the main repository
+
+Reporting Issues
+Please use GitHub issues to report bugs or request features. Include:
+
+Detailed description of the issue
+
+Steps to reproduce
+
+Expected vs actual behavior
+
+Environment details
+
+
+### 16. `LICENSE`
+```text
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+"License" shall mean the terms and conditions for use, reproduction, and distribution...
+
+[Standard Apache 2.0 License Text]
+17. .env.example
+env
+# IBM Quantum credentials
+IBMQ_TOKEN="your_ibmq_token"
+
+# OpenAI API
+OPENAI_API_KEY="your_openai_key"
+
+# LLM configuration
+LLM_MODEL="gpt-4"
+LLM_TEMPERATURE=0.7
+
+# Quantum backend
+QUANTUM_BACKEND="ibmq_manila"
+USE_HARDWARE=false
+SHOTS=1024
+
+# RL training
+RL_AGENT="PPO"
+RL_TIMESTEPS=50000
