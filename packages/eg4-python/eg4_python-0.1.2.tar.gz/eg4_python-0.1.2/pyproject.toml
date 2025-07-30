@@ -1,0 +1,103 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eg4-python"
+version = "0.1.2"
+description = "Python client for EG4 solar inverter monitoring with async/sync support"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Matt Dreyer", email = "matt_dreyer@hotmail.com"}
+
+]
+keywords = ["eg4", "solar", "inverter", "monitoring", "api", "async", "home-assistant"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Monitoring",
+    "Topic :: Home Automation",
+    "Topic :: Scientific/Engineering",
+    "Framework :: AsyncIO",
+]
+
+dependencies = [
+    "aiohttp>=3.8.0",
+    "python-dotenv>=0.19.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "black>=22.0.0",
+    "pre-commit>=2.20.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/matt-dreyer/eg4_python"
+Documentation = "https://github.com/matt-dreyer/eg4_python"
+Repository = "https://github.com/matt-dreyer/eg4_python"
+"Bug Tracker" = "https://github.com/matt-dreyer/eg4_python/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["eg4_python*"]
+exclude = ["tests*"]
+
+[tool.ruff]
+target-version = "py38"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "B",   # bugbear
+    "I",   # isort
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "ASYNC", # async-related rules
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]  # Allow assert statements in tests
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "--cov=eg4_python --cov-report=html --cov-report=term-missing"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["eg4_python"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.",
+]
