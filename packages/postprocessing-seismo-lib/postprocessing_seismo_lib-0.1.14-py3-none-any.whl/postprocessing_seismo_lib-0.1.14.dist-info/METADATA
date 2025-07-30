@@ -1,0 +1,344 @@
+Metadata-Version: 2.1
+Name: postprocessing-seismo-lib
+Version: 0.1.14
+Summary: A library for building and parsing Seismology API message bodies.
+Home-page: UNKNOWN
+Author: Ryan Tam
+Author-email: rwtam@caltech.edu
+License: UNKNOWN
+Project-URL: Documentation, https://pypi-postprocessing-seismic-data.readthedocs.io/en/latest/
+Project-URL: Source, https://scsngit.gps.caltech.edu/services
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: jsonschema>=4.0.0
+Requires-Dist: pandas
+Requires-Dist: xmltodict
+Requires-Dist: importlib-resources; python_version < "3.7"
+
+# postprocessing_seismo_lib
+
+`postprocessing_seismo_lib` is a lightweight Python library for building and parsing structured API messages, especially for use with nested JSON structures used in event-based data systems. Currently, the library works on building out the Response format for seismology associator outputs, or extracting the body out of its Response format.
+
+This library is vetted and works against python 3.10.5. This library does not work with any python libraries below 3.10 (it has been specifically vetted against python 3.6.5 and python 3.8.10 and found not to work).
+
+## Features
+
+- Extract the `body` section from a structured JSON file using `extract_body_from_file`
+- Create request for a body object using `wrap_data`, with provided associator or pickfilter files. 
+- Validates if input and output formats are to specification using `wrap_data`
+- Builds a full message with status, headers and body using `convert_file_to_json`, with provided csv, arcout or quakeml files
+
+## Use cases of this library
+1.	Individual users
+2.	Pipeline scripts
+
+## Installation
+
+```
+pip install postprocessing-seismo-lib 
+OR 
+pip install --upgrade postprocessing-seismo-lib
+```
+
+After installation, we have provided sample files that can be vetted against the library's functions, specifically against the three features listed above. Run the below script to analyze the contents of each file, and see if the outputs are generated locally:
+
+```
+import json, importlib.resources
+from postprocessing_seismo_lib import wrap_data, extract_body_from_file, convert_file_to_json
+
+pick_file = json.load(importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('xxxx_file_containing_picks.json').open('r'))
+print("Picks")
+print(pick_file)
+
+filtered_pick_file = json.load(importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('xxxx_file_containing_filtered_picks.json').open('r'))
+print("Filtered picks")
+print(pick_file)
+
+
+json_path = importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('40584759_csv.json')
+print("JSON file with body")
+print(json_path)
+
+
+#FIRST USE CASE: Extract body from a JSON file
+body_data = extract_body_from_file(str(json_path))
+print("Body extracted:")
+print(body_data)
+
+
+#SECOND USE CASE: Create RetrieveParameter wrapping around input data for various modules
+input_path = importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('xxxx_file_containing_filtered_picks.json')
+
+wrap_data(
+    input_file_path=str(input_path),
+    output_file_path='output_associator.json',
+    evid='evid_filtered_picks',
+    module='associator'
+)
+
+input_path = importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('xxxx_file_containing_picks.json')
+
+wrap_data(
+    input_file_path=str(input_path),
+    output_file_path='output_pickfilter.json',
+    evid='evid_picks',
+    module='pickfilter'
+)
+
+
+#THIRD USE CASE: Create Response wrapping around known data
+gamma_events = importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('40584759_gamma_events.csv')
+gamma_picks = importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('40584759_gamma_picks.csv')
+
+xml_file_nosignifier = importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('40584759_events_testGOUA')
+xml_file_signifier = importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('40584759_events_test.xml')
+arcout_file = importlib.resources.files('postprocessing_seismo_lib.example_data').joinpath('z78966423_api_stproc_9999.arcout')
+
+print("GaMMa events")
+print(gamma_events)
+print(type(gamma_events))
+
+print("GaMMa picks")
+print(gamma_picks)
+print(type(gamma_picks))
+
+# For CSV
+convert_file_to_json(
+    input_file="",  # not used for CSV
+    output_file="response_csv.json",
+    id="id_testing",
+    event_file=str(gamma_events),
+    pick_file=str(gamma_picks),
+    error_log_file="csv_error_log.txt"
+)
+
+# For QuakeML XML (this input file has no XML signifiers but was parsed successfully as XML here)
+convert_file_to_json(
+    input_file=str(xml_file_nosignifier),
+    output_file="response_quakeml_nosignifiers.json",
+    id="id testing",
+    error_log_file="quakeml_error_log_one.txt"
+)
+
+#Conventional QuakeML XML here
+convert_file_to_json(
+    input_file=str(xml_file_signifier),
+    output_file="response_quakeml_signifiers.json",
+    id="id testing",
+    error_log_file="quakeml_error_log_two.txt"
+)
+
+
+# For ArcOut
+convert_file_to_json(
+    input_file=str(arcout_file),
+    output_file="response_arcout.json",
+    id="id testing",
+    error_log_file="arcout_error_log.txt"
+)
+```
+
+
+## Example Scenarios 
+
+### Extraction of body
+
+The below function allows for extracting out the body from an output response file:
+
+```
+from postprocessing_seismo_lib import extract_body_from_file
+
+body_data = extract_body_from_file("output_response_association.json")
+body_data = extract_body_from_file("output_response_pickfilter.json")
+
+where as an example, output_response_association.json is:
+
+{
+  "status": 404,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "id": "78604159",
+    "format": "none.noeventsfound",
+    "data": []
+  }
+}
+```
+
+### Creation of the request for a body object
+
+The below function creates the request from the body object, which can be extracted from the above function. All four variables listed below need to be specified:
+
+```
+from postprocessing_seismo_lib import wrap_data
+
+#creating the request for the associator input
+wrap_data(
+    input_file_path='[xxxx_file_containing_filtered_picks].json',
+    output_file_path='output_associator.json',
+    evid='[Name of choice]',
+    module='associator'
+)
+
+#creating the request for the pickfilter input
+wrap_data(
+    input_file_path='[xxxx_file_containing_picks].json',
+    output_file_path='output_pickfilter.json',
+    evid='[Name of choice]',
+    module='pickfilter'
+)
+```
+
+The request format will be different across each module. Currently, the module takes in 'associator' and 'pickfilter' but this will be expanded in future updates. 
+
+Specifically, this function reads a list of pick dictionaries from a JSON file specified by `input_file_path`, validates them against a schema, wraps the data into a module-specific JSON structure, validates the output, and writes it to a new file specified by `output_file_path`. Any errors are logged to a file named `wrap_data_errors.log`.
+
+As an example, our input_file_path='[xxxx_file_containing_picks].json' might look like this (as a list of dictionaries):
+
+```
+[
+    {
+        "Amplitude": {
+            "Amplitude": 1039.6302490234,
+            "SNR": 11.074
+        },
+        "Filter": [
+            {
+                "HighPass": 1.0,
+                "Type": "HighPass"
+            }
+        ],
+        "Onset": "emergent",
+        "Phase": "S",
+        "Picker": "deep-learning",
+        "Polarity": "no-result",
+        "Quality": [
+            {
+                "Standard": "PhaseNet",
+                "Value": 0.851
+            },
+            {
+                "Standard": "hypoinverse",
+                "Value": 2
+            }
+        ],
+        "Site": {
+            "Channel": "HHE",
+            "Location": "",
+            "Network": "CI",
+            "Station": "WOR"
+        },
+        "Source": {
+            "AgencyID": "CI",
+            "Author": "hypoPN"
+        },
+        "Time": "2025-04-22T21:51:15.148Z",
+        "Type": "Pick"
+    },
+    {
+        ...
+    }
+]
+```
+
+and its output would be the necessary format to POST into the associator API endpoint:
+
+```
+{
+  "RetrieveParameters": {
+    "pickFile": "Ryan_testingAgainPicks_picks.json",
+    "pickDataStr": [
+      {
+        "Amplitude": {
+          "Amplitude": 1039.6302490234,
+          "SNR": 11.074
+        },
+        "Filter": [
+          {
+            "HighPass": 1.0,
+            "Type": "HighPass"
+          }
+        ],
+        "Onset": "emergent",
+        "Phase": "S",
+        "Picker": "deep-learning",
+        "Polarity": "no-result",
+        "Quality": [
+          {
+            "Standard": "PhaseNet",
+            "Value": 0.851
+          },
+          {
+            "Standard": "hypoinverse",
+            "Value": 2
+          }
+        ],
+        "Site": {
+          "Channel": "HHE",
+          "Location": "",
+          "Network": "CI",
+          "Station": "WOR"
+        },
+        "Source": {
+          "AgencyID": "CI",
+          "Author": "hypoPN"
+        },
+        "Time": "2025-04-22T21:51:15.148Z",
+        "Type": "Pick"
+      },
+      ...
+    ]
+  }
+}
+```
+
+###  Creation of full response format
+
+Below shows how to build out the Response format for provided files. In all cases below, you provide an ID and an output file name (of type json). Also, provide the error log file, in case any errors occur. If any errors exist, a file of the name you specified will be generated. If no errors exist, the output JSON file will be generated at the path where you run the python script.
+
+If you are converting from csv to json, you provide the _events.csv and _picks.csv that are generated from pinging the associator API, and set them to event_file and pick_file. Leave the input_file blank. For quakeML or arcout conversion to json, specify the input_file.
+
+```
+from postprocessing_seismo_lib import convert_file_to_json
+
+# For CSV
+convert_file_to_json(
+    input_file="",  # not used for CSV
+    output_file="[Output file name].json",
+    id="[Name of choice]",
+    event_file="[xxxx]_gamma_events.csv",
+    pick_file="[xxxx]_gamma_picks.csv",
+    error_log_file="csv_error_log.txt"
+)
+
+# For QuakeML XML (this input file has no XML signifiers but was parsed successfully as XML here)
+convert_file_to_json(
+    input_file="[xxxx]_events_test",
+    output_file="[xxxx]_quakeml.json",
+    id="[Name of choice]",
+    error_log_file="quakeml_error_log.txt"
+)
+
+#Conventional QuakeML XML here
+convert_file_to_json(
+    input_file="[xxxx]_events_test.xml",
+    output_file="[xxxx]_quakeml.json",
+    id="[Name of choice]",
+    error_log_file="quakeml_error_log.txt"
+)
+
+
+# For ArcOut
+convert_file_to_json(
+    input_file="[xxxx]_api_stproc_9999.arcout",
+    output_file="[Output file name].json",
+    id="[Name of choice]",
+    error_log_file="arcout_error_log.txt"
+)
+```
+
