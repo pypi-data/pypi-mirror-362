@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "checklistfabrik"
+authors = [
+    { name = "Linuxfabrik GmbH, Zurich, Switzerland", email = "info@linuxfabrik.ch" },
+]
+description = "ChecklistFabrik is a Python 3 tool to simplify and automate process management using HTML checklists backed by YAML files."
+dynamic = [
+    "dependencies",
+    "version",
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.9"
+
+[project.urls]
+Download = "https://github.com/linuxfabrik/checklistfabrik/releases/"
+Homepage = "https://github.com/linuxfabrik/checklistfabrik/"
+Source = "https://github.com/linuxfabrik/checklistfabrik/"
+Tracker = "https://github.com/linuxfabrik/checklistfabrik/issues/"
+
+[tool.pip-tools]
+generate-hashes = true
+
+[tool.setuptools.dynamic]
+dependencies = { file = "requirements.in" }
+version = { attr = "checklistfabrik.core.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+clf-play = "checklistfabrik.core.cli.play:main"
