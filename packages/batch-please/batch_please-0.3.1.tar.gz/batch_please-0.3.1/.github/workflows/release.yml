@@ -1,0 +1,91 @@
+name: Deploy Documentation and Publish Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
+      - name: Install dependencies
+        run: uv sync --extra dev
+      - name: Build documentation
+        run: uv run mkdocs build --clean --strict
+      - name: Check build result
+        run: |
+          if [ ! -d "site" ]; then
+            echo "Documentation build failed"
+            exit 1
+          fi
+      - name: Upload built docs as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages
+          path: site/
+
+  deploy-docs:
+    needs: build-docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Remove old site directory
+        run: rm -rf site
+
+      - name: Download built docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: site/
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages
+
+  publish-pypi:
+    name: Publish Package to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/p/batch-please
+
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Sync only production dependencies
+        run: uv sync --extra dev
+
+      - name: Build package
+        run: uv build --sdist --wheel --out-dir dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          verbose: true
