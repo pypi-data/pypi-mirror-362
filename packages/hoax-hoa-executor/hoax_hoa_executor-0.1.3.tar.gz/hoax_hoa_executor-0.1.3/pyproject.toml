@@ -1,0 +1,42 @@
+[project]
+name = "hoax-hoa-executor"
+version = "0.1.3"
+description = "Execute HOA omega-automata"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Luca Di Stefano", email = "luca.di.stefano@tuwien.ac.at" }]
+requires-python = ">=3.12,<=3.12.3"
+dependencies = [
+    "hoa-utils",
+    "typer>=0.15.4,<0.16",
+    "msgspec>=0.18.6,<0.19",
+    "tomli>=2.0.1,<3",
+    "networkit",
+    "msgpack>=1.1.0",
+]
+
+[project.urls]
+Repository = "https://github.com/lou1306/hoax"
+Issues = "https://github.com/lou1306/hoax/issues"
+
+[project.scripts]
+hoax = "hoax.main:app"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.16.0",
+    "pytest~=5.2",
+]
+
+[tool.uv]
+
+[tool.uv.sources]
+hoa-utils = { path = "./hoa-utils" }
+networkit = { git = "https://github.com/networkit/networkit", rev = "06c3fea" }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hoax"]
