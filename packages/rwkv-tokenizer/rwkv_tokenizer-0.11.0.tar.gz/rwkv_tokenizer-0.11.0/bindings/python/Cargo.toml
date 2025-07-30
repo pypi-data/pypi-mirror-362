@@ -1,0 +1,26 @@
+[package]
+name = "rwkv_tokenizer"
+version = "0.9.1"
+edition = "2021"
+authors = ["Cahya Wirawan <cahya.wirawan@gmail.com>"]
+description = "A fast RWKV Tokenizer"
+license = "Apache-2.0"
+documentation = "https://github.com/cahya-wirawan/rwkv-tokenizer"
+exclude = [
+    "data/performance-comparison.png",
+    "rwkv_tokenizer/",
+    "tools/",
+    "tests/test_tokenization.py"
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "rwkv_tokenizer"
+# Use ["cdylib", "lib"] for unit test
+crate-type = ["cdylib"]
+# crate-type = ["cdylib", "lib"]
+
+[dependencies]
+pyo3 = "0.23.5"
+rt = { package = "rwkv-tokenizer", path = "../../rwkv-tokenizer" }
+rayon = "1.10.0"
