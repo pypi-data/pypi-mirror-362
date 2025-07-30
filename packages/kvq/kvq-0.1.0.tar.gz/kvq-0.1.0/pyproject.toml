@@ -1,0 +1,53 @@
+# https://peps.python.org/pep-0621/
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kvq"
+dynamic = ["version"]
+authors = [
+  {name = "Mohsen Hariri", email = "mohsen.hariri@case.edu"},
+]
+description = "Norm-Aware KVQuant: Precision Where It Counts"
+keywords = ["Large Language Models", "Cache", "Quantization", "Compression", "Optimization"]
+license = {text = "MIT"}
+# https://github.com/pypi/warehouse/issues/869
+readme = "README.rst"
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3.10",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "transformers>=4.28.0",
+  "optimum-quanto>=0.2.7" 
+]
+
+[project.urls]
+Homepage = "https://mohsenhariri.github.io/kvq/"
+Repository = "https://github.com/mohsenhariri/kvq"
+Issues = "https://github.com/mohsenhariri/kvq/issues"
+
+
+[tool.setuptools]
+packages = ["kvq"]
+
+[tool.setuptools.dynamic]
+version = {file = ["VERSION"]}
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+
+[tool.ruff]
+src = ["kvq"]
+target-version = "py38"
+
+[tool.isort]
+profile = "black"
+known_first_party = "kvq"
+skip_glob = ["**/__init__.py"]

@@ -1,0 +1,84 @@
+==============
+kvq
+==============
+
+Norm-Aware KV Cache Quantization
+
+- `Quantize What Counts: Bit Allocation Insights Informed by Spectral Gaps in Keys and Values <https://arxiv.org/abs/2502.15075v2/>`_.
+
+- Norm-Aware KVQuant: Precision Where It Counts 
+
+
+Installation
+------------
+
+To install the package from PyPI, run the following command:
+
+.. code-block:: bash
+
+    pip install kvq
+
+
+Usage
+-----
+
+1. Initialization
+
+   1.1. Creating a KVQ object using a configuration object:
+
+   .. code-block:: python
+
+        import torch
+        from kvq import KVQConfig, KVQ
+
+        
+        config = KVQConfig(
+            budget = 4, 
+            model="meta-llama/Llama-3.1-8B-Instruct"
+            residual_length=32,
+            group_size={"k": 64, "v": 64}, # Group size for keys and values
+            axis={"k": 0, "v": 0}, # Axis along which to quantize
+        )
+
+        kv_cache = KVQ(config)
+
+        text = "What is the meaning of life?"
+
+        inputs = tokenizer(text, return_tensors="pt").to(model.device)
+
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=256,
+            past_key_values=kv_cache,
+            use_cache=True,
+            pad_token_id=tokenizer.eos_token_id, 
+        )
+
+
+
+GitHub Repository
+-----------------
+
+The source code is hosted on GitHub:
+
+`https://github.com/mohsenhariri/spectral-kv <https://github.com/mohsenhariri/spectral-kv>`_
+
+Feel free to open issues, suggest improvements, or submit pull requests!
+
+
+Citation
+--------
+
+
+If you find our work useful or interesting, please consider citing our paper:
+
+.. code-block:: bibtex
+
+    @article{hariri2025quantize,
+    title     = {Quantize What Counts: Bit Allocation Insights Informed by Spectral Gaps in Keys and Values},
+    author    = {Hariri, Mohsen and Luo, Alan and Nemati, Mohammadreza and Nguyen, Lam and Zhong, Shaochen and Wang, Qifan and Hu, Xia and Han, Xiaotian and Chaudhary, Vipin},
+    journal   = {arXiv preprint arXiv:2502.15075},
+    year      = {2025},
+    url       = {https://arxiv.org/abs/2502.15075v2},
+    }
+
