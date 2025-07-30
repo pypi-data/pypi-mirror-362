@@ -1,0 +1,56 @@
+# This TOML file contains the hints used to populate the placeholder text
+# for input fields associated with configuring layers, exlusions, and
+# transforms.
+#
+# Adding any hints should folow the pattern:
+#
+# [hints.<entity>.<type>]
+# param1 = "placeholder text"
+# param2 = "placeholder text"
+#
+# where,
+#   <entity> :
+#       is the layer, exclusion, or transform
+#   <type> :
+#       is the "type" of <entity> class.  e.g. the transform LaPDXYTransform
+#       has <type> == lapd_xy, and exclusion CircularLayer has
+#       <type> == circle
+#   param1, param2, ... :
+#       are the input arguments for the class being configurated,  e.g.
+#       CircularExlusion would have param1 == radius, param2 == center,
+#       and param3 == exlude
+#
+#       Note that not all input parameters need configured.  You only
+#       need to configure input you want to add placeholder test for.
+#
+[hints.transform.lapd_xy]
+pivot_to_center = "58.771  # ball valve pivot to LaPD center"
+pivot_to_drive = "116.84  # ball valve pivot to vertical drive centerline"
+pivot_to_feedthru = "53.8  # ball valve pivot to front of probe feedthru"
+probe_axis_offset = "21.5  # distance from probe shaft to vertical drive pivot"
+
+[hints.exclusion.circle]
+radius = "5.0"
+center = "[x, y]"
+exclude = "inside  # possible options: outside or inside"
+
+[hints.exclusion.divider]
+mb = "[slope, intercept]  # use [inf, x] for vertical line"
+exclude = "-e0  # negative/left side of the line"
+
+[hints.exclusion.shadow_2d]
+source_point = "[x, y]  # source of shadow caster"
+
+[hints.layer.grid]
+limits = "[[x_min, x_max], [y_min, y_max], ...]"
+npoints = "[Nx, Ny, ...]"
+
+[hints.layer.grid_CNStep]
+center = "[x_0, y_0, ...]"
+npoints = "[Nx, Ny, ...]"
+step_size = "[dx, dy, ...]"
+
+[hints.layer.grid_CNSize]
+center = "[x_0, y_0, ...]"
+npoints = "[Nx, Ny, ...]"
+size = "[Lx, Ly, ...]"
