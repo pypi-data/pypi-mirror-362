@@ -1,0 +1,16 @@
+@dlt.table(
+    temporary=True,
+)
+def {{ target_table }}():
+    """{{ description }}"""
+    {% if sql %}
+    df = spark.sql("""{{ sql }}""")
+    {% else %}
+    {% if readMode == "stream" %}
+    df = spark.readStream.table("{{ source_view }}")
+    {% else %}
+    df = spark.read.table("{{ source_view }}")
+    {% endif %}
+    {% endif %}
+
+    return df 
