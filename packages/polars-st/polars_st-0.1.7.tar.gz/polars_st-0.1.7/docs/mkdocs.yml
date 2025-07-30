@@ -1,0 +1,101 @@
+site_name: Polars ST
+site_description: Polars ST Documentation
+repo_name: oreilles/polars-st
+repo_url: https://github.com/oreilles/polars-st
+
+strict: true
+
+docs_dir: pages
+
+nav:
+  - User Guide:
+    - index.md
+  - API Reference:
+    - api-reference/index.md
+    - Geometry creation: api-reference/creation.md
+    - Column Selection: api-reference/columns.md
+    - Expression Shorthand: api-reference/sugar.md
+    - GeoExpr: api-reference/geoexpr.md
+    - GeoSeries: api-reference/geoseries.md
+    - GeoDataFrame: api-reference/geodataframe.md
+    - GeoLazyFrame: api-reference/geolazyframe.md
+    - Typing: api-reference/typing.md
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tabs
+    - navigation.footer
+    - navigation.indexes
+    - content.tabs.link
+    - content.tooltips
+    - content.footnote.tooltips
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+    - navigation.top
+  palette:
+    - media: "(prefers-color-scheme)"
+      primary: custom
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  favicon: https://raw.githubusercontent.com/Oreilles/polars-st/main/assets/favicon.svg
+  logo: https://raw.githubusercontent.com/Oreilles/polars-st/main/assets/logo-blank.svg
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - "style.css"
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [.]
+          import:
+          - url: https://docs.python.org/3/objects.inv
+            domains: [std, py]
+          - https://docs.pola.rs/api/python/stable/objects.inv
+          - https://geopandas.org/en/stable/objects.inv
+          - https://altair-viz.github.io/objects.inv
+          options:
+            show_source: false
+            members_order: source
+            docstring_section_style: list
+            line_length: 80
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            show_if_no_docstring: true
+            merge_init_into_class: true
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: "#"
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
