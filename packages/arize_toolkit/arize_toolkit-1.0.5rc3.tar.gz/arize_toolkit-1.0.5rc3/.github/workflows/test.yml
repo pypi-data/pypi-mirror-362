@@ -1,0 +1,45 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+      fail-fast: false  # Continue running other matrix jobs even if one fails
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+    
+    - name: Create virtual environment and install dependencies
+      run: |
+        uv venv
+        uv pip install -e ".[dev,prompt_optimizer]"
+    
+    - name: Run tests (Python < 3.12)
+      if: ${{ matrix.python-version != '3.12' }}
+      run: |
+        uv run pytest -v --continue-on-collection-errors
+        
+    - name: Run tests (Python 3.12)
+      if: ${{ matrix.python-version == '3.12' }}
+      run: |
+        # snapshottest is automatically excluded for Python 3.12 via pyproject.toml
+        # Run tests with plugin loading disabled for problematic plugins  
+        uv run pytest -v --continue-on-collection-errors -p no:snapshottest
