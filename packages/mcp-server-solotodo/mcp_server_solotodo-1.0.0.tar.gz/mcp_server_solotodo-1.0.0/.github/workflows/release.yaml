@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+      - rc
+
+env:
+  WORKLOAD_IDENTITY_PROVIDER: projects/179598088593/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+  SERVICE_ACCOUNT: github-actions@rauli-ai.iam.gserviceaccount.com
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - name: Get secrets from Secret Manager
+        id: secrets
+        uses: google-github-actions/get-secretmanager-secrets@v2
+        with:
+          secrets: |-
+            pypi-api-key:projects/rauli-ai/secrets/mcp-server-solotodo-pypi-api-key/versions/latest
+            test-pypi-api-key:projects/rauli-ai/secrets/mcp-server-solotodo-test-pypi-api-key/versions/latest
+
+      - name: Set UV_PUBLISH_TOKEN based on branch
+        run: |
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            echo "UV_PUBLISH_TOKEN=${{ steps.secrets.outputs.pypi-api-key }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref_name }}" = "rc" ]; then
+            echo "UV_PUBLISH_TOKEN=${{ steps.secrets.outputs.test-pypi-api-key }}" >> $GITHUB_ENV
+          fi
+
+      - name: Run semantic-release
+        run: |
+          npm install -g semantic-release @semantic-release/exec
+          semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

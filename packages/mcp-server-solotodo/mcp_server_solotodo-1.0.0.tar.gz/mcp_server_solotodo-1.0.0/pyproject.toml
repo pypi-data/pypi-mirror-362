@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-server-solotodo"
+dynamic = ["version"]
+description = "MCP server for searching laptops on SoloTodo.cl"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]>=1.10.1",
+    "requests>=2.32.4",
+]
+
+[project.scripts]
+mcp-server-solotodo = "mcp_server_solotodo.mcp:run"
+
+[tool.hatch.version]
+source = "vcs"
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
+[dependency-groups]
+dev = [
+    "pandas>=2.3.0",
+    "requests>=2.32.4",
+]

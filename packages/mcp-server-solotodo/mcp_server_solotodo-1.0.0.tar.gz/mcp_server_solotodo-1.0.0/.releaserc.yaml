@@ -1,0 +1,63 @@
+branches:
+  - master
+  - name: rc
+    prerelease: true
+
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - - "@semantic-release/exec"
+    - verifyConditionsCmd: |
+        echo "Verifying environment for Python package release..."
+        
+        # Check if uv is installed
+        if ! command -v uv >/dev/null 2>&1; then
+          echo "ERROR: uv is not installed or not in PATH"
+          exit 1
+        fi
+        echo "✓ uv found: $(uv --version)"
+        
+        # Check required environment variables for PyPI upload
+        if [ -z "$UV_PUBLISH_TOKEN" ]; then
+          echo "ERROR: UV_PUBLISH_TOKEN environment variable is not set"
+          exit 1
+        fi
+        echo "✓ UV_PUBLISH_TOKEN is set"
+        
+        echo "Environment verification complete!"
+      prepareCmd: |
+        echo "Building package with version ${nextRelease.version}..."
+        
+        # Set the version for setuptools-scm
+        export SETUPTOOLS_SCM_PRETEND_VERSION=${nextRelease.version}
+        
+        # Build the package using uv
+        uv build
+        
+        echo "Package built successfully!"
+        ls -la dist/
+      publishCmd: |
+        echo "Publishing package ${nextRelease.version} to PyPI..."
+        
+        # Determine which index to use based on prerelease status
+        if [ "${branch.type}" = "prerelease" ]; then
+          echo "Prerelease detected, publishing to TestPyPI..."
+          if ! uv publish --index testpypi; then
+            echo "ERROR: Failed to publish to TestPyPI"
+            exit 1
+          fi
+        else
+          echo "Stable release, publishing to PyPI..."
+          if ! uv publish; then
+            echo "ERROR: Failed to publish to PyPI"
+            exit 1
+          fi
+        fi
+        
+        echo "Package published successfully!"
+  - - "@semantic-release/github"
+    - assets:
+        - path: "dist/*.whl"
+          label: "Python Wheel"
+        - path: "dist/*.tar.gz"
+          label: "Source Distribution"
