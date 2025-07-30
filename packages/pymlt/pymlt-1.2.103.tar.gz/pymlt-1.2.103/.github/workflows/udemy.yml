@@ -1,0 +1,342 @@
+name: Udemy  # name of workflow
+
+# set type of trigger
+on:
+  # schedule:
+  #  - cron: "30 12 * * 1"
+  workflow_dispatch:
+  push: # once pr is approved a push is triggered
+  #   # use if to make job branch specific
+    branches:
+  #     - main
+      - develop
+  #     - feature/*
+  #     # matches feature/bv/..
+  #     - feature/**
+  #     # exclude branch
+  #     - "!feature/foo/*"
+  #   paths-ignore:
+  #     - docs/*
+  #     - docs/**
+  #     - '**/README.md'
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - assigned
+  #     - closed
+  #     - reopened
+  #   branches:
+  #     - main
+  #     - develop
+
+env:
+  # worklfow env vars
+  WF_ENV: Available to all jobs
+  WF_ENV_BAR: ${{ secrets.WF_ENV_BAR}}
+  WF_ENV_GHT: ${{ secrets.GITHUB_TOKEN}}
+
+jobs:
+  # name of job
+  run-ubuntu-commands:
+    # gh runner w/ preinstalled: curl, git, npm, yarm, pip, python
+    runs-on: ubuntu-latest
+    if: false
+    timeout-minutes: 10
+    env:
+      # job env var
+      JOB_ENV: Available to only this job
+    steps:  # define your steps here
+      - name: Print env variables
+        continue-on-error: true
+        timeout-minutes: 10 # default is 360
+        env:
+          STEP_ENV: Available to only this step
+        # of | or > for long text
+        run: |
+          echo "WF_ENV: ${WF_ENV}"
+          echo "JOB_ENV: ${JOB_ENV}"
+          echo "STEP_ENV: ${STEP_ENV}"
+      - name: Print default env variables
+        # failure() returns true if previous step failed
+        # success() returns true if previous step succeded
+        # always() returns true always
+        if: always()
+        run: |
+          echo "HOME: ${HOME}"
+          echo "GITHUB_WORKFLOW: ${GITHUB_WORKFLOW}"
+          echo "GITHUB_ACTION: ${GITHUB_ACTION}"
+          echo "GITHUB_ACTIONS: ${GITHUB_ACTIONS}"
+          echo "GITHUB_ACTOR: ${GITHUB_ACTOR}"
+          echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}"
+          echo "GITHUB_EVENT_NAME: ${GITHUB_EVENT_NAME}"
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+          echo "GITHUB_SHA: ${GITHUB_SHA}"
+          echo "GITHUB_REF: ${GITHUB_REF}"
+      - name: Checkout repo
+        # 'uses' refers to an Action
+        uses: actions/checkout@v2 # use @ for versions, branches, or commits
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        # use with to provide input
+        with:
+          python-version: 3.9
+      - name: Echo a string
+        run: echo "Hello World"
+      - name: Multiline script
+        run: |  # use > for long text
+           node -v
+           npm -v
+           python -V
+      - name: Run python commands
+        run: |
+          import platform
+          print(platform.processor())
+        shell: python  # bash shell is default for ubuntu; you can change this to python
+      - name: List all files
+        run: |
+          pwd
+          ls -a
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with pytest
+        run: |
+          pytest .
+
+  lint:
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - uses: actions/checkout@v2
+      # black action
+      - uses: psf/black@stable
+
+  run-test-create-issue:
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test with pytest
+        # use makefile
+        run: |
+          make hello
+          make test
+      - name: Create issue bacause pytest failed
+        if: failure()
+        uses: actions-ecosystem/action-create-issue@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          title: "failed pytest"
+          body: |
+            ## failed pytest
+            [...]
+          labels: |
+            pytest
+
+  run-windwos-commands:
+    runs-on: windows-latest
+    if: false
+    # dependent on other job(s)
+    # needs: ["run-ubuntu-commands"]
+    steps:
+      - name: Directory PowerShell
+        run: Get-Location  # equivalent to pwd
+      - name: Directory Bash
+        run: pwd
+        shell: bash  # change dafault i.e. powershell to bash
+
+  run-github-actions:
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - name: Simple JS Action
+        id: greet  # create id to reference output vars
+        uses: actions/hello-world-javascript-action@v1
+        with:
+          who-to-greet: John
+      - name: Log Greeting Time
+        # check documentation of this action to see available vars
+        run: echo "${{ steps.greet.outputs.time }}"
+
+  node-version-matrix:
+    # set strategy amd matrix
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        node_version: [6, 8, 10]
+        include:  # include does not add extra cell to matrix but adds a configuration variable
+          - os: ubuntu-latest
+            node_version: 8
+            is_ubuntu_8: "true"
+        exclude:
+          - os: ubuntu-latest
+            node_version: 6
+          - os: macos-latest
+            node_version: 8
+      max-parallel: 2 # gh will try to optimize this, use this if you want to maximize
+      fail-fast: true # fails if one option in matrix fails
+    runs-on: ${{ matrix.os }} # matrix. context refers to matrix set above
+    if: false
+    env:
+      IS_UBUNTU_8: ${{ matrix.is_ubuntu_8 }}  # create env var
+    steps:
+      - name: Log node version
+        run: node -v
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node_version }}  # matrix. context refers to matrix set at start of job
+      - name: Log node version
+        # echo env var to confirm it only prints in ubuntu + node version 8
+        run:  |
+          node -v
+          echo $IS_UBUNTU_8
+
+  functions:
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - name: dump
+        # $ {{ }} = expression
+        # $ {{ 1 ==1 }} will return true
+        run: |
+          echo ${{ contains( 'hello', 'll' ) }}
+          echo ${{ startsWith( 'hello', 'he' ) }}
+          echo ${{ endsWith( 'hello', 'lo' ) }}
+          echo ${{ format( 'Hello {0} {1} {2}', 'World', '!', '!' ) }}
+
+  one:
+    runs-on: ubuntu-latest
+    # if expression is true, job or step will run
+    if: false
+    # if: github.event_name == 'push'
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJson(job) }}
+        run: echo "$JOB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Dump runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+      - name: Dump strategy context
+        env:
+          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+        run: echo "$STRATEGY_CONTEXT"
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: echo "$MATRIX_CONTEXT"
+      - name: Test
+        # ${{ }} = expression
+        # you can print e.g. secrets. or github. contexts
+        run: |
+          echo "${{ github.repository }}"
+
+  node-docker:
+    runs-on: ubuntu-latest
+    if: false
+    # installs container on vm above
+    # docker containers can only run on ubuntu
+    container:
+      # notation = dockerhub-username:image
+      image: node:13.5.0-alpine3.10
+      # env:
+      # ports:
+      # options:
+    # these steps will run in the container
+    steps:
+      - name: Log node version
+        run: |
+          node -v
+          cat /etc/os-release
+      - name: Step w/ docker - echo
+        # this step uses this container
+        # container will execute entrypoint if set
+        uses: docker://node:13.5.0-alpine3.10
+        with:
+          # key will overwrite entrypoint
+          entrypoint: '/bin/echo'
+          args: 'hello world'
+      - name: Step w/ docker - node
+        # this step uses this container
+        # container will execute entrypoint if set
+        uses: docker://node:13.5.0-alpine3.10
+        with:
+          # key will overwrite entrypoint
+          entrypoint: '/usr/local/bin/node'
+          args: '-v'
+      - uses: actions/checkout@v2
+      - name: Step w/ docker - run script
+        uses: docker://node:13.5.0-alpine3.10
+        with:
+          # had to run 'chmod +x script.sh' in terminal to make sript.sh executable
+          entrypoint: './script.sh'
+          args: 'some string'
+          # script w/ content below need in root folder
+          # #!/bin/sh
+          # # $1 prints first command line argument
+          # echo $1 $2
+          # echo "hello world?"
+
+
+  build:
+    runs-on: ubuntu-latest
+    if: false
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Cashing packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          # new hash when requirements.txt changes
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          # look for restore key if none available
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Test with pytest
+        run: |
+          pytest .
+      - name: Build
+        if: github.event_name == 'push'
+        run: |
+          echo building ...
+      - name: Deploy
+        if: github.event_name == 'push'
+        # todo: login with secret credentials!
+        run: |
+          echo deploying ... ${{ secrets.token }}
