@@ -1,0 +1,61 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: (C) 2022 Avnet Embedded GmbH
+# SPDX-License-Identifier: GPL-3.0-only
+
+
+set -e
+
+VMNAME="@@VMNAME@@"
+KERNEL="@@KERNEL@@"
+DISK="@@DISK@@"
+APPSIMAGE="@@APPSIMAGE@@"
+OSINFO="$(virt-install --osinfo list | grep "^linux" | head -n 1)"
+
+while [ $# -gt 0 ]; do
+	case $1 in
+	*)
+		VMNAME="$1"
+		break
+		;;
+	esac
+done
+
+check_for_network() {
+	index=$1
+	name=$2
+	mac=$3
+	uuid=$(uuidgen)
+	if ! virsh net-list --all | grep ${name}; then
+		echo "Network ${name} not found, creating a new one"
+		tmpfile=$(mktemp)
+		echo "<network>" > "${tmpfile}"
+		# shellcheck disable=SC2129
+		echo "<name>${name}</name>" >> "${tmpfile}"
+		echo "<uuid>${uuid}</uuid>" >> "${tmpfile}"
+		echo "<forward mode='nat'/>" >> "${tmpfile}"
+		echo "<bridge name='virbr${index}' stp='on' delay='0' />" >> "${tmpfile}"
+		echo "<mac address='${mac}'/>" >>" ${tmpfile}"
+		echo "<ip address='192.169.${index}.1' netmask='255.255.255.0'><dhcp><range start='192.169.${index}.2' end='192.169.${index}.254'/></dhcp></ip>" >> "${tmpfile}"
+		echo "</network>" >> "${tmpfile}"
+		virsh net-define "${tmpfile}"
+	fi
+	echo "Starting network ${name}"
+	virsh net-start "${name}" || true
+}
+
+if [ -n "${OSINFO}" ]; then
+	APPSIMAGE=$(realpath "${APPSIMAGE}")
+	check_for_network 100 simplecore-1 2A:22:33:44:55:66
+	check_for_network 101 simplecore-2 2A:22:33:44:55:67
+	echo "Installing new bundle"
+	virt-install --name "${VMNAME}" --import --memory 4096 \
+					--boot kernel="${KERNEL}",cmdline=root=/dev/vda \
+					--disk "${DISK}" \
+					--disk "${APPSIMAGE},bus=scsi,format=raw" \
+					--import --noautoconsole --destroy-on-exit \
+					--network network=simplecore-1 \
+					--network network=simplecore-2 \
+					--osinfo "${OSINFO}"
+else
+	echo "Unable to create the VM. There is no linuxXXXX os in your osinfo-db, please update it."
+fi
