@@ -1,0 +1,90 @@
+Metadata-Version: 2.4
+Name: streamlit_lexical
+Version: 1.2.0
+Summary: Streamlit component that allows you to use Meta's Lexical rich text editor
+Home-page: https://github.com/musubi-labs/streamlit_lexical
+Author: Ben F
+Author-email: ben@musubilabs.ai
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: streamlit>=1.36.0
+Provides-Extra: devel
+Requires-Dist: wheel; extra == "devel"
+Requires-Dist: pytest==7.4.0; extra == "devel"
+Requires-Dist: playwright==1.39.0; extra == "devel"
+Requires-Dist: requests==2.31.0; extra == "devel"
+Requires-Dist: pytest-playwright-snapshot==1.0; extra == "devel"
+Requires-Dist: pytest-rerunfailures==12.0; extra == "devel"
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# streamlit_lexical
+
+Streamlit component that allows you to use Meta's [Lexical](https://lexical.dev/) as a rich text plugin. 
+
+## Installation instructions
+
+```sh
+pip install streamlit-lexical
+```
+
+## Usage instructions
+
+```python
+import streamlit as st
+
+from streamlit_lexical import streamlit_lexical
+
+markdown = streamlit_lexical(value="initial value in **markdown**",
+                             placeholder="Enter some rich text", 
+                             height=800,
+                             debounce=500,
+                             key='1234', 
+                             on_change=None
+                            )
+
+
+st.markdown(rich_text_dict)
+```
+
+## Development instructions
+
+After cloning the github repo...
+
+In __init__.py, set:
+```python
+RELEASE = False
+```
+And you can test out the example.py with your changes by doing the following:
+
+```sh
+cd streamlit_lexical/frontend
+npm install (or yarn install)
+npm run start # Start the Webpack dev server
+```
+
+Then, in a separate terminal, run:
+```python
+pip install -e .
+streamlit run example.py
+```
+
+Further, to build the package (after making changes/adding features), you can install it locally like: 
+```sh
+cd streamlit_lexical/frontend
+npm install (or yarn install)
+npm run build
+cd ../..
+pip install -e ./
+```
+
+Make sure the __init__.py file RELEASE is set to True in this case. 
