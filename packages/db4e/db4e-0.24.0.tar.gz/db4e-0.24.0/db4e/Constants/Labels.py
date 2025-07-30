@@ -1,0 +1,48 @@
+"""
+db4e/Constants/Labels.py
+
+    Database 4 Everything
+    Author: Nadim-Daniel Ghaznavi 
+    Copyright (c) 2024-2025 NadimGhaznavi <https://github.com/NadimGhaznavi/db4e>
+    License: GPL 3.0
+"""
+
+ABORT_LABEL = "Abort"
+CONFIG_LABEL = "Configuration"
+DB4E_LABEL = "Db4E Core"
+DB4E_LONG_LABEL = "Database 4 Everything"
+DB4E_GROUP_LABEL = "Db4E Group"
+DB4E_USER_LABEL = "Db4E User"
+DELETE_LABEL = "Delete"
+DEPLOYMENT_DIR_LABEL = "Deployment Directory"
+DEPLOYMENT_MGR_LABEL = "Deployment Manager"
+DEPLOYMENTS_LABEL = "Deployments"
+DONATIONS_LABEL = "Donations"
+GROUP_LABEL = "Linux Group"
+HEALTH_LABEL = "Health Checks"
+INITIAL_SETUP_LABEL = "Initial Setup"
+INSTALL_DIR_LABEL = "Install Directory"
+INSTANCE_LABEL = "Instance"
+IP_ADDR_LABEL = "Hostname/IP Address"
+METRICS_LABEL = "Metrics"
+MONERO_WALLET_LABEL = "Monero Wallet"
+MONEROD_LABEL = "Monero Daemon"
+MONEROD_REMOTE_LABEL = "Remote Monero Daemon"
+MONEROD_SHORT_LABEL = "Monero"
+NEW_LABEL = "New"
+NUM_THREADS_LABEL = "Number of Threads"
+P2POOL_LABEL = "P2Pool Daemon"
+P2POOL_REMOTE_LABEL = "Remote P2Pool Daemon"
+P2POOL_SHORT_LABEL = "P2Pool"
+PROCEED_LABEL = "Proceed"
+RESULTS_LABEL = "Results"
+RPC_BIND_PORT_LABEL = "RPC Bind Port"
+STARTUP_SCRIPT = "Startup Script"
+STRATUM_PORT_LABEL = "Stratum Port"
+UPDATE_LABEL = "Update"
+USER_LABEL = "Linux User"
+WELCOME_LABEL = "Welcome"
+XMRIG_LABEL = "XMRig Miner"
+XMRIG_SHORT_LABEL = "XMRig"
+ZMQ_PUB_PORT_LABEL = "ZMQ Pub Port"
+
