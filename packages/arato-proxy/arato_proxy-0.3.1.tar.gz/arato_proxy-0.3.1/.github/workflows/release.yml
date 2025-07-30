@@ -1,0 +1,127 @@
+name: Build and Publish to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      test_pypi:
+        description: 'Publish to Test PyPI instead of PyPI'
+        required: false
+        default: false
+        type: boolean
+      version_bump:
+        description: 'Version bump type (patch, minor, major) or specific version'
+        required: false
+        default: 'patch'
+        type: string
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Required for trusted publishing
+      contents: write # Required for creating tags
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for tags
+      
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: Set up Python
+      run: uv python install 3.11
+      
+    - name: Extract version from tag
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "release" ]; then
+          VERSION=${{ github.event.release.tag_name }}
+        else
+          # Get the latest tag from all tags, not just reachable from current commit
+          LATEST_TAG=$(git tag --list --sort=-version:refname | head -n1)
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No tags found, using default version"
+            VERSION="0.1.0"
+          else
+            # For manual dispatch, handle version bumping
+            if [ "${{ inputs.version_bump }}" == "patch" ] || [ "${{ inputs.version_bump }}" == "minor" ] || [ "${{ inputs.version_bump }}" == "major" ]; then
+              # Extract current version numbers
+              CURRENT_VERSION=${LATEST_TAG#v}
+              IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+              
+              case "${{ inputs.version_bump }}" in
+                "patch")
+                  patch=$((patch + 1))
+                  ;;
+                "minor")
+                  minor=$((minor + 1))
+                  patch=0
+                  ;;
+                "major")
+                  major=$((major + 1))
+                  minor=0
+                  patch=0
+                  ;;
+              esac
+              
+              VERSION="$major.$minor.$patch"
+            else
+              # Use specific version provided
+              VERSION="${{ inputs.version_bump }}"
+            fi
+          fi
+        fi
+        # Remove 'v' prefix if present
+        VERSION=${VERSION#v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Extracted version: $VERSION"
+        
+    - name: Update version in pyproject.toml
+      run: |
+        sed -i 's/version = ".*"/version = "${{ steps.version.outputs.version }}"/' pyproject.toml
+        echo "Updated pyproject.toml version to ${{ steps.version.outputs.version }}"
+        
+    - name: Create and push tag for manual dispatch
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Check if tag already exists
+        if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+          echo "Tag v${{ steps.version.outputs.version }} already exists, skipping tag creation"
+        else
+          git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+          echo "Created and pushed tag v${{ steps.version.outputs.version }}"
+        fi
+        
+    - name: Build package
+      run: uv build
+      
+    - name: Check package
+      run: |
+        uv tool run twine check dist/*
+        
+    - name: Publish to Test PyPI
+      if: ${{ inputs.test_pypi }}
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        
+    - name: Publish to PyPI
+      if: ${{ !inputs.test_pypi }}
+      uses: pypa/gh-action-pypi-publish@release/v1
+      
+    - name: Create build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+        retention-days: 30

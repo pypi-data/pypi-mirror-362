@@ -1,0 +1,44 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+      
+    - name: Install dependencies
+      run: uv sync --dev
+      
+    - name: Run tests
+      run: uv run pytest test_custom_callbacks.py -v
+      
+    - name: Test package build
+      run: uv build
+      
+    - name: Test CLI installation
+      run: |
+        uv tool install --from dist/arato_proxy-*.whl arato-proxy
+        arato-proxy --help
+        
+    - name: Test CLI help
+      run: |
+        uv run python -m arato_proxy.cli --help
