@@ -1,0 +1,93 @@
+Metadata-Version: 2.4
+Name: qtasks
+Version: 1.5.0
+Summary: Queue Tasks Framework
+Author-email: txello <txello@inbox.ru>
+Project-URL: Homepage, https://github.com/txello/qtasks
+Project-URL: Issues, https://github.com/txello/qtasks/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: typing-extensions>=4.12.2
+Requires-Dist: redis>=5.2.1
+Requires-Dist: anyio>=4.9.0
+Requires-Dist: asyncio_atexit>=1.0.1
+Requires-Dist: apscheduler>=3.11.0
+Provides-Extra: redis
+Requires-Dist: redis>=5.2.1; extra == "redis"
+Provides-Extra: rabbitmq
+Requires-Dist: aio-pika>=9.5.5; extra == "rabbitmq"
+Requires-Dist: pika>=1.3.2; extra == "rabbitmq"
+Provides-Extra: kafka
+Requires-Dist: kafka>=2.2.10; extra == "kafka"
+Requires-Dist: aiokafka>=0.12.0; extra == "kafka"
+Dynamic: license-file
+
+# QTasks - Фреймворк для очередей задач.
+![CI](https://github.com/txello/qtasks/actions/workflows/ci.yml/badge.svg)
+![Docs](https://github.com/txello/qtasks/actions/workflows/docs.yml/badge.svg)
+
+Документация: https://txello.github.io/qtasks/
+
+PyPI: https://pypi.org/project/qtasks/
+
+QTasks — это современный фреймворк для обработки задач, разработанный с упором на простоту, гибкость и расширяемость. Он легко интегрируется в проекты любого масштаба и подходит как новичкам, так и опытным разработчикам.
+
+## Особенности
+* Простой — Легко настраивается и быстро осваивается. Интуитивный API и понятная структура проекта.
+* Настраиваемый — Каждый компонент можно заменить или адаптировать под свои нужды. Вы управляете логикой выполнения.
+* Расширяемый — Поддержка плагинов и модулей позволяет легко добавлять новые возможности и интеграции.
+
+## Установка
+
+### Базовая установка (Redis по умолчанию)
+```bash
+pip install qtasks
+```
+
+### Установка с поддержкой других брокеров
+#### RabbitMQ
+```bash
+pip install qtasks[rabbitmq]
+```
+#### Kafka
+```bash
+pip install qtasks[kafka]
+```
+
+## Пример
+```py
+from qtasks import QueueTasks
+
+app = QueueTasks()
+
+@app.task(name="mytest") # Пример обычной задачи
+def mytest(text: str):
+    print(text)
+    return text
+
+@app.task(name="error_zero") # Пример задачи с ошибкой
+def error_zero():
+    result = 1/0
+    return
+
+
+# Поддерживает генераторы!
+def gen_func(result):
+    return result + 1
+@app.task(generate_handler=gen_func)
+async def test_gen(n: int):
+    for _ in range(n):
+        n += 1
+        yield n
+
+app.run_forever()
+
+# Вызов задачи:
+# app.add_task("mytest", args=("Тест",)). task.returning: "Тест"
+# error_zero.add_task(). task.status: "ERROR"
+# test_gen.add_task(args=(5,)). task.returning: [7, 8, 9, 10, 11]
+```
