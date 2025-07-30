@@ -1,0 +1,286 @@
+Metadata-Version: 2.4
+Name: job-application-automator
+Version: 1.0.0
+Summary: Automated job application form extraction and filling with MCP integration
+Home-page: https://github.com/jobautomator/job-application-automator
+Author: Job Automator Team
+Author-email: Job Automator Team <contact@jobautomator.dev>
+License: MIT
+Project-URL: Homepage, https://github.com/jobautomator/job-application-automator
+Project-URL: Documentation, https://github.com/jobautomator/job-application-automator#readme
+Project-URL: Repository, https://github.com/jobautomator/job-application-automator
+Project-URL: Issues, https://github.com/jobautomator/job-application-automator/issues
+Keywords: mcp,job-application,automation,claude-desktop,form-filling,playwright,web-automation
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Office/Business
+Classifier: Topic :: Internet :: WWW/HTTP :: Browsers
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: mcp>=1.11.0
+Requires-Dist: playwright>=1.40.0
+Requires-Dist: undetected-playwright>=0.3.0
+Requires-Dist: beautifulsoup4>=4.12.0
+Requires-Dist: lxml>=4.9.0
+Requires-Dist: requests>=2.28.0
+Requires-Dist: geocoder>=1.38.1
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: typing-extensions>=4.8.0
+Requires-Dist: httpx
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# Job Application Automator
+
+🤖 **Automated job application form extraction and filling with Claude Desktop integration via Model Context Protocol (MCP).**
+
+Streamline your job search by automating form data extraction and filling while maintaining full control over submissions.
+
+## 🚀 Quick Install
+
+```bash
+pip install job-application-automator
+job-automator-setup
+```
+
+**Restart Claude Desktop** and you're ready to go!
+
+## ✨ Features
+
+- **🔍 Form Extraction**: Automatically extract form fields from any job posting URL
+- **📝 Intelligent Form Filling**: Fill forms with your information while keeping browser open for review
+- **💼 Cover Letter Generation**: Create personalized cover letters for each application  
+- **📊 Applied Jobs Tracking**: Beautiful dashboard showing all your job applications
+- **🔒 Privacy First**: All processing happens locally on your machine
+- **🛡️ Stealth Mode**: Uses undetected browser automation to avoid bot detection
+- **🎯 Claude Desktop Integration**: Seamless MCP integration with Claude Desktop
+
+## 💡 Usage
+
+After installation, interact with Claude Desktop using natural language:
+
+### Extract Form Data
+```
+Extract form fields from https://company.com/careers/software-engineer
+```
+
+### Fill Job Application
+```
+Fill the job application form with my information:
+- Name: John Doe
+- Email: john@example.com
+- Phone: +1-555-0123
+- Resume: /path/to/resume.pdf
+```
+
+### View Application History
+```
+Show me my applied jobs dashboard
+```
+
+### Generate Cover Letter
+```
+Create a cover letter for the Software Engineer position at TechCorp
+```
+
+## 🛠️ What's Included
+
+### MCP Tools Available in Claude Desktop:
+
+1. **`simple_form_extraction`**
+   - Extracts form structure from job posting URLs
+   - Identifies required fields, field types, and form layout
+   - Handles complex forms (Greenhouse, Workday, etc.)
+
+2. **`simple_form_filling`** 
+   - Fills forms with your provided information
+   - Opens browser for manual review before submission
+   - Supports file uploads (resume, cover letter)
+
+3. **`create_cover_letter`**
+   - Generates personalized cover letters
+   - Saves with timestamp and company info
+   - Customizable templates
+
+4. **`get_applied_jobs`**
+   - Shows beautiful dashboard of all applications
+   - Tracks application dates and statuses
+   - Export capabilities
+
+5. **`health_check`**
+   - Monitor server status
+   - Check browser automation health
+   - Debug connection issues
+
+## 🔧 Manual Setup
+
+If you prefer manual configuration:
+
+### 1. Install Package
+```bash
+pip install job-application-automator
+```
+
+### 2. Configure Claude Desktop
+
+Add to your Claude Desktop config file:
+
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`  
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**Linux**: `~/.config/claude/claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "job-automator": {
+      "command": "job-automator-mcp"
+    }
+  }
+}
+```
+
+### 3. Install Browser Dependencies
+```bash
+playwright install chromium
+```
+
+### 4. Restart Claude Desktop
+
+## 📋 System Requirements
+
+- **Python**: 3.10 or higher
+- **Operating System**: Windows, macOS, or Linux  
+- **Claude Desktop**: Latest version
+- **Memory**: 4GB+ RAM recommended
+- **Storage**: 500MB for dependencies
+
+## 🔒 Privacy & Security
+
+- **Local Processing**: All form data stays on your machine
+- **No Data Collection**: Nothing is sent to external services  
+- **Manual Control**: You review every form before submission
+- **Stealth Browsing**: Avoids website bot detection
+- **Secure Storage**: Temporary files are automatically cleaned up
+
+## 🏗️ Architecture
+
+```
+Claude Desktop ←→ MCP Server ←→ Form Modules ←→ Browser Automation
+     ↑                ↑              ↑              ↑
+  User Chat      FastMCP        Extractor/      Playwright
+               Protocol       Filler Logic    (Undetected)
+```
+
+**How it works:**
+1. You ask Claude to extract or fill a form
+2. Claude calls the appropriate MCP tool
+3. MCP server delegates to form automation modules  
+4. Browser automation handles the web interaction
+5. Results are returned to you through Claude
+
+## 🚀 Example Workflow
+
+1. **Find Job Posting**
+   ```
+   "Extract form data from https://greenhouse.io/company/job/apply"
+   ```
+
+2. **Review Extracted Fields**
+   Claude shows you all the form fields that were found
+
+3. **Fill Application**
+   ```
+   "Fill the form with my information:
+   Name: Jane Smith
+   Email: jane@example.com
+   Phone: +1-555-0123
+   Resume: C:\Documents\resume.pdf"
+   ```
+
+4. **Review & Submit**
+   Browser opens with form pre-filled - you review and submit manually
+
+5. **Track Application**
+   ```
+   "Show my job applications dashboard"
+   ```
+
+## 🛠️ Development
+
+### Local Development Setup
+```bash
+git clone https://github.com/jobautomator/job-application-automator
+cd job-application-automator
+pip install -e .
+job-automator-setup
+```
+
+### Run Tests
+```bash
+pytest tests/
+```
+
+### Project Structure
+```
+job_application_automator/
+├── __init__.py              # Package initialization
+├── mcp_server.py            # Main MCP server
+├── form_extractor.py        # Form extraction logic
+├── form_filler.py           # Form filling automation  
+├── setup_claude.py          # Claude Desktop setup
+└── mcp/                     # MCP configuration files
+    ├── __init__.py
+    └── ...
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Areas We Need Help With:
+- Additional job board integrations
+- UI/UX improvements for the dashboard
+- Performance optimizations
+- Documentation improvements
+- Test coverage expansion
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Issues**: [GitHub Issues](https://github.com/jobautomator/job-application-automator/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/jobautomator/job-application-automator/discussions)
+- **Email**: contact@jobautomator.dev
+
+## 🙏 Acknowledgments
+
+- [Model Context Protocol](https://modelcontextprotocol.io/) by Anthropic
+- [Playwright](https://playwright.dev/) for browser automation
+- [Undetected Playwright](https://github.com/kaliiiiiiiiii/undetected-playwright) for stealth automation
+- [FastMCP](https://github.com/modelcontextprotocol/python-sdk) for MCP server framework
+
+## 📈 Roadmap
+
+- [ ] **v1.1**: GUI application for non-technical users
+- [ ] **v1.2**: Integration with more job boards (Indeed, LinkedIn, etc.)
+- [ ] **v1.3**: AI-powered application optimization suggestions
+- [ ] **v1.4**: Team collaboration features
+- [ ] **v1.5**: Mobile app support
+
+---
+
+**Made with ❤️ for job seekers everywhere**
+
+*Automate the tedious, focus on what matters - landing your dream job!*
