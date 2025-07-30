@@ -1,0 +1,135 @@
+# mvcluster: Multiview Clustering Python Package
+
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/) 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) 
+[![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)](#) 
+[![Tests Coverage](https://img.shields.io/badge/coverage-90%25%2B-yellowgreen.svg)](#) 
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-compatible-orange.svg)](https://scikit-learn.org/stable/) 
+[![torch](https://img.shields.io/badge/torch-optional-red.svg)](https://pytorch.org/) 
+[![networkx](https://img.shields.io/badge/networkx-2.6%2B-blueviolet.svg)](https://networkx.org/) 
+[![Sphinx Docs](https://img.shields.io/badge/docs-Sphinx%20%2B%20ReadTheDocs-success)](https://mvcluster.readthedocs.io/) 
+[![GitHub](https://img.shields.io/badge/source-GitHub-black.svg)](https://github.com/yourusername/mvcluster)
+
+
+- [mvcluster: Multiview Clustering Python Package](#mvcluster-multiview-clustering-python-package)
+  - [Project Overview](#project-overview)
+  - [Key Features](#key-features)
+  - [Installation](#installation)
+  - [Requirements:](#requirements)
+  - [Quick Start](#quick-start)
+  - [Documentation](#documentation)
+  - [Research Context](#research-context)
+  - [Contributing](#contributing)
+  - [Citation](#citation)
+  - [Contact](#contact)
+
+---
+
+## Project Overview
+mvcluster is an open-source Python package developed during my research internship at Centre Borelli (Université Paris Cité) from April to July 2025. The package implements advanced algorithms for multiview clustering, with a focus on graph-structured data.
+
+## Key Features
+- Implementation of LMGEC (Linear Multiview Graph Embedding and Clustering) algorithm  
+- Standardized scikit-learn compatible API  
+- Comprehensive documentation and examples  
+- Extensive test coverage (>90%)  
+- Support for multiple multiview datasets  
+- Visualization tools for clustering results  
+
+## Installation
+
+```bash
+pip install mvcluster
+```
+
+## Requirements:
+
+- Python ≥ 3.8
+
+- numpy ≥ 1.21
+
+- scipy ≥ 1.7
+
+- scikit-learn ≥ 1.0
+
+- torch ≥ 1.9.0 (optional for GPU acceleration)
+
+- networkx ≥ 2.6
+  
+## Quick Start
+```bash
+from mvcluster.cluster import LMGEC
+from mvcluster.utils.datagen import datagen
+# Load sample dataset
+As, Xs, y = datagen('dblp')
+
+# Initialize and fit LMGEC model
+model = LMGEC(beta=2, temperature=10)
+labels = model.fit_predict(X)
+
+# Evaluate clustering
+from sklearn.metrics import adjusted_rand_score
+print(f"ARI: {adjusted_rand_score(y, labels):.3f}")
+```
+
+## Documentation
+Full documentation is available at: https://gackouhamady.github.io/mvcluster/
+
+** Includes:
+
+- API reference
+
+- Tutorials
+
+- Theory behind the algorithms
+
+- Contribution guidelines
+
+## Research Context
+Developed during my research internship at Centre Borelli under the supervision of Lazhar Labiod. The project focused on:
+
+- Developing efficient algorithms for multiview graph clustering
+
+- Creating a user-friendly Python package
+
+- Benchmarking against existing methods
+
+- Applying techniques to real-world datasets
+
+Supported Datasets
+- DBLP academic network
+
+- ACM citation network
+
+- IMDB movie database
+
+- Amazon product graphs
+
+- Wikipedia article network
+  
+- Aloi
+  
+- Mfeat
+  
+- Arabidopsis
+
+## Contributing
+We welcome contributions! Please see our Contribution Guidelines for details.
+
+## Citation
+If you use mvcluster in your research, please cite:
+
+@inproceedings{fettal2023efficient,
+  author = {Fettal, Chakib and Labiod, Lazhar and Nadif, Mohamed},
+  title = {Simultaneous Linear Multi-view Attributed Graph Representation Learning and Clustering},
+  booktitle = {Proceedings of the 16th ACM International Conference on Web Search and Data Mining},
+  year = {2023},
+  doi = {10.1145/3539597.3570367}
+}
+## Contact
+For questions or support, please contact: [researcherdatascientist@gmail.com]
+
+License: MIT
+Status: Active development
+Python versions: 3.8+
+Source Code: https://github.com/gackouhamady/mvcluster
