@@ -1,0 +1,62 @@
+name: Run tests
+
+on: [push]
+
+jobs:
+  run-tests:
+    runs-on: [geoit-managed-runner-ubuntu]
+    container:
+      image: python:${{ matrix.python-version }}-bookworm
+      credentials:
+        username: ${{ vars.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - "3.8"
+        - "3.9"
+        - "3.10"
+        - "3.11"
+        - "3.12"
+        - "3.13"
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install pipenv
+      run: |
+        pip install pipenv
+    - name: Install dependencies
+      run: |
+        pipenv sync --dev
+    - name: Run tests
+      run: pipenv run tests
+
+  publish-package:
+    name: Build and publish package
+    needs: [run-tests]
+    if: ${{ github.ref_type == 'tag' }}
+    runs-on: [geoit-managed-runner-ubuntu]
+    container:
+      image: python:3.8-bookworm
+      credentials:
+        username: ${{ vars.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install pipenv
+      run: |
+        pip install pipenv
+    - name: Install dependencies
+      run: |
+        pipenv sync --dev
+    - name: Set version
+      run: echo "__version__='${{ github.ref_name }}'" > __about__.py
+    - name: Build package
+      run: pipenv run hatchling build
+    - name: Publish package to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: pipenv run twine upload dist/*
