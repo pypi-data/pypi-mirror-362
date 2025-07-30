@@ -1,0 +1,131 @@
+# coding: utf-8
+from __future__ import unicode_literals
+
+from educommon.django.db.model_view import AttrValue
+from educommon.django.db.model_view import FieldChoiceValue
+from educommon.django.db.model_view import FieldVerboseName
+from educommon.django.db.model_view import ModelVerboseName
+from educommon.django.db.model_view import HtmlTableView
+
+
+related_model_views = (
+    HtmlTableView(
+        model='get_data.GetDataSession',
+        description=ModelVerboseName(),
+        columns=(
+            dict(
+                header=FieldVerboseName('timestamp'),
+                data=AttrValue('timestamp')
+            ),
+            dict(
+                header=FieldVerboseName('session'),
+                data=AttrValue('session')
+            ),
+            dict(
+                header=FieldVerboseName('processed'),
+                data=FieldChoiceValue('processed')
+            ),
+            dict(
+                header=FieldVerboseName('message'),
+                data=AttrValue('message')
+            ),
+        )
+    ),
+    HtmlTableView(
+            model='get_data.GetDataStatistic',
+            description=ModelVerboseName(),
+            columns=(
+                dict(
+                    header=FieldVerboseName('session'),
+                    data=AttrValue('session.session')
+                ),
+                dict(
+                    header=FieldVerboseName('count'),
+                    data=AttrValue('count')
+                ),
+            )
+    ),
+    HtmlTableView(
+            model='get_data.GetDataPerson',
+            description=ModelVerboseName(),
+            columns=(
+                dict(
+                    header=FieldVerboseName('external_id'),
+                    data=AttrValue('external_id')
+                ),
+                dict(
+                    header=FieldVerboseName('session'),
+                    data=AttrValue('session.session')
+                ),
+                dict(
+                    header=FieldVerboseName('created'),
+                    data=AttrValue('created')
+                ),
+                dict(
+                    header=FieldVerboseName('first_name'),
+                    data=AttrValue('first_name')
+                ),
+                dict(
+                    header=FieldVerboseName('middle_name'),
+                    data=AttrValue('middle_name')
+                ),
+                dict(
+                    header=FieldVerboseName('last_name'),
+                    data=AttrValue('last_name')
+                ),
+                dict(
+                    header=FieldVerboseName('birth_date'),
+                    data=AttrValue('birth_date')
+                ),
+            )
+    ),
+    HtmlTableView(
+            model='get_data.GetDataPersonDocument',
+            description=ModelVerboseName(),
+            columns=(
+                dict(
+                    header=FieldVerboseName('external_id'),
+                    data=AttrValue('external_id')
+                ),
+                dict(
+                    header=FieldVerboseName('session'),
+                    data=AttrValue('session.session')
+                ),
+                dict(
+                    header=FieldVerboseName('type'),
+                    data=AttrValue('type')
+                ),
+                dict(
+                    header=FieldVerboseName('series'),
+                    data=AttrValue('series')
+                ),
+                dict(
+                    header=FieldVerboseName('number'),
+                    data=AttrValue('number')
+                ),
+            )
+        ),
+    HtmlTableView(
+        model='get_data.GetDataChanges',
+        description=ModelVerboseName(),
+        columns=(
+            dict(
+                header=FieldVerboseName('local_id'),
+                data=AttrValue('local_id')
+            ),
+            dict(
+                header=FieldVerboseName('applied'),
+                data=AttrValue('applied')
+            ),
+            dict(
+                header=FieldVerboseName('data'),
+                data=AttrValue('data')
+            ),
+            dict(
+                header=FieldVerboseName('status'),
+                data=FieldChoiceValue('status')
+            ),
+        )
+    ),
+)
+
