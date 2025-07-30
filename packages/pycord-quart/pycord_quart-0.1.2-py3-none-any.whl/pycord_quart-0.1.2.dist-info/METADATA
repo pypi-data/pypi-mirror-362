@@ -1,0 +1,113 @@
+Metadata-Version: 2.4
+Name: pycord-quart
+Version: 0.1.2
+Summary: A pycord extension for Discord OAuth2 authentication in Quart applications.
+Home-page: https://github.com/ParrotXray/pycord-quart
+Author: ParrotXray
+Author-email: 
+License: MIT
+Project-URL: Homepage, https://github.com/ParrotXray/pycord-quart
+Project-URL: Repository, https://github.com/ParrotXray/pycord-quart
+Project-URL: Issue Tracker, https://github.com/ParrotXray/pycord-quart/issues
+Project-URL: Source, https://github.com/ParrotXray/pycord-quart
+Keywords: discord,ipc,quart,websocket,asyncio,py-cord
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: AsyncIO
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Communications
+Classifier: Topic :: Internet
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Networking
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: aiohttp
+Requires-Dist: typing-extensions; python_version < "3.11"
+Requires-Dist: py-cord
+Requires-Dist: pydantic
+Requires-Dist: quart-cors
+Requires-Dist: quart
+Provides-Extra: docs
+Requires-Dist: sphinx; extra == "docs"
+Requires-Dist: sphinx-rtd-theme; extra == "docs"
+Requires-Dist: sphinxcontrib-trio; extra == "docs"
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-asyncio; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: isort; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Provides-Extra: speed
+Requires-Dist: aiohttp[speedups]; extra == "speed"
+Requires-Dist: cchardet; extra == "speed"
+Requires-Dist: aiodns; extra == "speed"
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# pycord-quart
+A pycord extension for Discord OAuth2 authentication in Quart applications.
+
+# Installation 
+Python >= 3.10.x is required.
+```bash=
+# Windows
+pip install --upgrade pycord-quart
+
+# Linux
+pip3 install --upgrade pycord-quart
+```
+# Examples
+```py= 
+from quart import Quart, request, session, redirect, url_for, jsonify
+from pycord.ipc import Client
+from pycord.quart import DiscordAuth, require_auth, get_current_user
+
+app = Quart(__name__)
+ipc_client = Client(secret_key=<"your IPCSecret">, host=<"your IPC Server IP">, port=<"your IPC Server Port">)
+
+app.config["SECRET_KEY"] = <"your SecretKey">
+
+discord_auth = DiscordAuth(
+    client_id=<"your DiscordClientID">,
+    client_secret=<"your DiscordClientSecret">,
+    redirect_uri=<"your DiscordRedirectURI">,
+    scopes=['identify', 'email', 'guilds'],
+)
+
+@app.route("/api/auth/login", methods=["GET"])
+async def api_login():
+    response = await discord_auth.login_handler()
+    
+    return jsonify(response.to_json), response.code
+
+@app.route("/api/auth/callback", methods=["GET"])
+async def api_callback():
+    response = await discord_auth.callback_handler()
+
+    return jsonify(response.to_json), response.code
+
+@app.route("/api/auth/logout", methods=["POST"])
+async def api_logout():
+    response = await discord_auth.logout_handler()
+
+    return jsonify(response.to_json), response.code
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)
+```
