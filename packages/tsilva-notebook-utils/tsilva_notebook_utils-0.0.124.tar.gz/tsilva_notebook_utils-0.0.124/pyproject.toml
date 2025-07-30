@@ -1,0 +1,206 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tsilva_notebook_utils"
+version = "0.0.124"
+description = "Utility functions for Jupyter/Colab notebooks"
+authors = [
+    {name = "Tiago Silva"}
+]
+readme = "README.md"
+requires-python = ">=3.6"
+dependencies = [
+    "ipython>=7.0.0",
+    "opencv-python>=4.0.0",
+    "imageio>=2.0.0",
+    "numpy>=1.19.0",
+    "tqdm>=4.0.0",
+    "python-dotenv",
+    "huggingface_hub",
+    "pynvml",
+    "bokeh",
+    "scikit-learn",
+    "datasets",
+    "pytorch-lightning"
+]
+
+[project.optional-dependencies]
+colab = [
+    "google-colab",
+    "python-dotenv",
+    "tqdm"
+]
+datasets = [
+    "datasets",
+    "Pillow",
+    "torch",
+    "torchvision"
+]
+github = [
+    "requests"
+]
+gymnasium = [
+    "imageio",
+    "numpy",
+    "pytorch-lightning",
+    "torch",
+    "wandb",
+    "Pillow",
+    "stable-baselines3"
+]
+huggingface = [
+    "huggingface_hub",
+    "torch"
+]
+lightning = [
+    "pytorch-lightning",
+    "torch",
+    "torchvision",
+    "Pillow"
+]
+notifications = [
+    "requests"
+]
+openrouter = [
+    "openai"
+]
+plots = [
+    "matplotlib",
+    "seaborn",
+    "umap-learn",
+    "bokeh",
+    "Pillow",
+    "scikit-learn",
+    "torch"
+]
+torch = [
+    "torch",
+    "torchvision",
+    "Pillow",
+    "numpy"
+]
+video = [
+    "opencv-python",
+    "imageio-ffmpeg",
+    "torch",
+    "torchvision"
+]
+wandb = [
+    "wandb",
+    "torch"
+]
+
+test = [
+    "pytest>=6.0",
+    "pytest-cov>=2.10",
+    "pytest-xvfb>=2.0",
+    "coverage>=5.0"
+]
+
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.10",
+    "pytest-xvfb>=2.0",
+    "coverage>=5.0",
+    "black>=22.0",
+    "isort>=5.0",
+    "flake8>=4.0"
+]
+
+all = [
+    "google-colab",
+    "python-dotenv",
+    "tqdm",
+    "datasets",
+    "Pillow",
+    "torch",
+    "torchvision",
+    "requests",
+    "imageio",
+    "numpy",
+    "pytorch-lightning",
+    "wandb",
+    "stable-baselines3",
+    "huggingface_hub",
+    "matplotlib",
+    "seaborn",
+    "umap-learn",
+    "bokeh",
+    "scikit-learn",
+    "opencv-python",
+    "imageio-ffmpeg",
+    "openai",
+    "pytest>=6.0",
+    "pytest-cov>=2.10",
+    "pytest-xvfb>=2.0",
+    "coverage>=5.0"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["tsilva_notebook_utils"]
+
+[tool.hatch.publish.index]
+url = "https://upload.pypi.org/legacy/"
+token = "env:PYPI_TOKEN"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["tsilva_notebook_utils"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "setup.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if typing.TYPE_CHECKING:",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
