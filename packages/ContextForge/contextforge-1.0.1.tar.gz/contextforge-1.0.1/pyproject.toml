@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ContextForge"
+version = "1.0.1"
+description = "A web-based tool"
+readme = "readme.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["code"]
+authors = [
+    {name = "Seth Burkart"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Flask",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+]
+dependencies = [
+    "flask>=2.3.0",
+    "pathlib2>=2.3.0",
+    "platformdirs>=4.3.6",
+    "tiktoken>=0.7.0",
+    "watchdog>=4.0.2",
+    "waitress>=2.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sethburkart123"
+
+[project.scripts]
+ContextForge = "main:main"
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "app.py",
+    "main.py", 
+    "__main__.py",
+    "diff_processor.py",
+    "xml_formatting.txt",
+    "templates/",
+    "static/"
+]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "flask>=2.3.0",
+]
+
+[tool.hatch.envs.default.scripts]
+serve = "python main.py"
+dev = "python app.py"
