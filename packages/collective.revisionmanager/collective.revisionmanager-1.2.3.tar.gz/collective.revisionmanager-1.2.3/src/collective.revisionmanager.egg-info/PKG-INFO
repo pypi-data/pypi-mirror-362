@@ -1,0 +1,276 @@
+Metadata-Version: 2.1
+Name: collective.revisionmanager
+Version: 1.2.3
+Summary: Manage CMFEditions Histories
+Home-page: https://pypi.python.org/pypi/collective.revisionmanager
+Author: Thomas Schorr
+Author-email: t_schorr@gmx.de
+License: GPL version 2
+Keywords: Python Plone
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Plone
+Classifier: Framework :: Plone :: 4.3
+Classifier: Framework :: Plone :: 5.0
+Classifier: Framework :: Plone :: 5.1
+Classifier: Framework :: Plone :: 5.2
+Classifier: Framework :: Plone :: 6.0
+Classifier: Intended Audience :: System Administrators
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: GNU General Public License v2 (GPLv2)
+Requires-Dist: AccessControl
+Requires-Dist: Acquisition
+Requires-Dist: plone.api
+Requires-Dist: plone.autoform
+Requires-Dist: plone.batching
+Requires-Dist: plone.protect
+Requires-Dist: Products.CMFEditions>=2.2.16
+Requires-Dist: Products.CMFPlone>=4.3
+Requires-Dist: Products.CMFUid
+Requires-Dist: Products.GenericSetup
+Requires-Dist: setuptools
+Requires-Dist: transaction
+Requires-Dist: z3c.form
+Requires-Dist: zope.component
+Requires-Dist: zope.i18nmessageid
+Requires-Dist: zope.interface
+Requires-Dist: zope.publisher
+Requires-Dist: zope.schema
+Provides-Extra: test
+Requires-Dist: plone.app.contenttypes; extra == "test"
+Requires-Dist: plone.app.robotframework; extra == "test"
+Requires-Dist: plone.app.testing; extra == "test"
+Requires-Dist: plone.browserlayer; extra == "test"
+Requires-Dist: plone.testing; extra == "test"
+Requires-Dist: testfixtures; extra == "test"
+
+.. This README is meant for consumption by humans and pypi. Pypi can render rst files so please do not use Sphinx features.
+   If you want to learn more about writing documentation, please check out: http://docs.plone.org/about/documentation_styleguide_addons.html
+   This text does not appear on pypi or github. It is a comment.
+
+==============================================================================
+collective.revisionmanager
+==============================================================================
+
+.. image:: https://img.shields.io/pypi/v/collective.revisionmanager.svg
+    :target: https://pypi.python.org/pypi/collective.revisionmanager
+
+.. image:: https://img.shields.io/coveralls/collective/collective.revisionmanager/master.svg
+    :target: https://coveralls.io/r/collective/collective.revisionmanager
+
+collective.revisionmanager is a Plone add-on that lets you manage Products.CMFEditions histories.
+It can be used with Plone 6.0, 5.2, 5.1, 5.0 (untested) and Plone 4.3.
+You will need Products.CMFEditions version >= 2.2.16.
+This is available by default in the latest bugfix releases of all supported Plone versions.
+
+Features
+--------
+
+- Sorted listing of histories storage (portal_historiesstorage) contents. Sort by: history id, number of versions, history size, size state, portal type or path
+- Purge revisions or delete entire histories
+- Maintain a cache for the statistics
+- Plone controlpanel interface for portal_purgepolicy
+
+Translations
+------------
+
+Brazilian Portuguese, German and Spanish translations are available.
+
+Installation
+------------
+
+Install collective.revisionmanager by adding it to your buildout::
+
+    [buildout]
+
+    ...
+
+    eggs =
+        collective.revisionmanager
+
+and then running ``bin/buildout``. During installation, ``collective.revisionmanager`` will check wether the ``cmf_uid`` catalog index is there - if not, the index will be added and indexed. This step may require a considerable amount of time depending on the number of objects and object revisions in your database. Also, a cache for the statistics will be created.
+
+After installation, you will have to calculate the statistics initially before you can see anything. Statistics calculation was done automatically during installation in earlier releases, but for sites with large databases and limited memory it may be necessary to configure subtransactions prior to updating the cache.
+
+Calculating Statistics
+----------------------
+
+Before you can use `collective.revisionmanager` you need to fill its history statistics cache. You can do so by visting Plone Control Panel -> Addon Configuration -> Manage Revisions and then clicking on the ``Recalculate Statistics`` button. Calculation may take a lot of time if you have lots of objects and object revisions in your database.
+
+You will have to recalculate statistics from time to time to keep them up to date at intervals depending on database activity.
+
+**Dealing with catalog inconsistencies**
+
+If the installation fails with an ``AttributeError`` in ``Products.ZCatalog.CatalogBrains``, your ``portal_catalog`` is inconsistent and you need to `rebuild <https://docs.plone.org/develop/plone/searching_and_indexing/catalog.html>`_ it. As a quick workaround, you can also simply clear (or even delete) the ``cmf_uid`` catalog index - ``collective.revisionmanager`` will rebuild it during installation. But be aware that your ``portal_catalog`` is still inconsistent and needs rebuilding.
+
+Always make sure the ``cmf_uid`` index is consistent because it is used to determine the working copy of a history. Incorrectly indexed content will show up as having no working copy in the histories list!
+
+Contribute
+----------
+
+- Issue Tracker: https://github.com/collective/collective.revisionmanager/issues
+- Source Code: https://github.com/collective/collective.revisionmanager
+- Documentation: https://github.com/collective/collective.revisionmanager/README.rst
+
+License
+-------
+
+The project is licensed under the GPLv2.
+
+Contributors
+============
+
+- Thomas Schorr, t_schorr@gmx.de
+- Hector Velarde
+
+Changelog
+=========
+
+1.2.3 (2025-07-15)
+------------------
+
+- Internal: create a universal wheel and use setuptools<69 for releasing.  [maurits]
+
+
+1.2.2 (2022-09-16)
+------------------
+
+- Added Dutch translations.  [jladage]
+
+- Use Bootstrap classes on buttons to look nicer in Plone 6. [jladage]
+
+
+1.2.1 (2022-07-05)
+------------------
+
+- Let the histories table look nicer in Plone 6.  [maurits]
+
+- Fixed link to Site Setup to work in all supported Plone versions.  [maurits]
+
+
+1.2.0 (2021-10-28)
+------------------
+
+- Allow all Managers to use the full control panel.
+  Until now, for some parts you needed to be Manager in the Zope root.
+  Fixes `issue 30 <https://github.com/collective/collective.revisionmanager/issues/30>`_.
+  [maurits]
+
+- Test with Plone 6 (still also on 4.3, 5.1, 5,2) and on GitHub Actions.
+  [maurits]
+
+
+1.1.0 (2021-09-16)
+------------------
+
+- Fixes a bug in Plone 5.2 ('RequestContainer' object has no attribute
+  'translate')
+  [pysailor]
+
+- Drop CMFQuickInstaller dependency.  [pbauer]
+
+
+1.0.0 (2020-08-18)
+------------------
+
+- Add support for Python 3.
+  [pbauer,maurits,tschorr]
+
+
+0.9 (2019-10-07)
+----------------
+
+- Fixed deleting orphans in Plone 5.1+ (CMFEditions 3).
+  Fixes `issue #19 <https://github.com/collective/collective.revisionmanager/issues/19>`_.  [maurits]
+
+- Fixed startup error by loading the CMFCore zcml.  [maurits]
+
+
+0.8 (2017-08-31)
+----------------
+
+- Do not fail on ``BrokenModified`` while calculating storage statistics.
+  [pbauer]
+
+- UX-Improvements: Display size in a human-readable format, allow to increase the batch-size with a query-string, allow selecting all items.
+  [pbauer]
+
+- In addition to the overall number of revisions, also display the number of purged revisions (fixes `#14 <https://github.com/collective/collective.revisionmanager/issues/14>`_).
+  [tschorr]
+
+- Decrease log level for logging processing of each history (fixes `#15 <https://github.com/collective/collective.revisionmanager/issues/15>`_).
+  [tschorr]
+
+- Add script to rebuild i18n stuff and update translations.
+  [hvelarde]
+
+
+0.7 (2016-11-29)
+----------------
+
+- Do not fail on ``POSKeyError`` while calculating storage statistics (fixes `#9 <https://github.com/collective/collective.revisionmanager/issues/9>`_).
+  [tschorr]
+
+- Storage statistics calculation now works behind a proxy (fixes `#8 <https://github.com/collective/collective.revisionmanager/issues/8>`_).
+  [tschorr]
+
+- Fix a typo. This requires to run an update step (see `#10 <https://github.com/collective/collective.revisionmanager/issues/10>`_).
+  [tschorr]
+
+
+0.6 (2016-11-04)
+----------------
+
+- Add Brazilian Portuguese and Spanish translations.
+  [hvelarde]
+
+- Fix package uninstall.
+  [hvelarde]
+
+- Fix package dependencies.
+  Remove needless dependency on z3c.jbot.
+  [hvelarde]
+
+
+0.5 (2016-04-29)
+----------------
+
+- do not calculate statistics during installation. This allows to
+  configure subtransactions (and thereby memory consumption) before
+  calculating statistics initially
+- add more german translations
+- more work on i18n
+- fix KeyError when sorting by portal_type
+- add button to delete all histories without working copy at once
+
+0.4 (2016-04-19)
+----------------
+
+- introducing subtransactions to save memory
+- more work on german translations
+
+0.3 (2016-04-06)
+----------------
+
+- add some german translations
+- handle POSKeyError when accessing inconsistent histories storage
+
+0.2 (2016-03-02)
+----------------
+
+- revisions controlpanel now works in Plone 5
+- Replace Update Statistics View by a button in controlpanel
+- Travis testing for Plone 4.3.x and 5.0.x
+- check for marker file in post install step
+
+0.1 (2016-03-01)
+----------------
+
+- Initial release.
+
