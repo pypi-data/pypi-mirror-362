@@ -1,0 +1,14 @@
+from rest_framework import status
+from rest_framework.exceptions import APIException
+
+
+class InvalidToken(APIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = "Token is invalid or expired"
+    default_code = "TOKEN_NOT_VALID"
+
+
+class NotAuthenticated(APIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = "Authentication credentials were not provided."
+    default_code = "NOT_AUTHENTICATED"
