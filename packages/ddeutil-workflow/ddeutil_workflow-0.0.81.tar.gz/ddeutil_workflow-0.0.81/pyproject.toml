@@ -1,0 +1,191 @@
+[build-system]
+requires = [ "setuptools>=68.0" ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddeutil-workflow"
+description = "Lightweight workflow orchestration with YAML template"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {text = "MIT"}
+authors = [{ name = "ddeutils", email = "korawich.anu@gmail.com" }]
+keywords = ['orchestration', 'workflow']
+classifiers = [
+    "Topic :: Utilities",
+    "Natural Language :: English",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.9.13"
+dependencies = [
+    "ddeutil[checksum]>=0.4.8",
+    "ddeutil-io[yaml,toml]>=0.2.14",
+    "pydantic==2.11.7,<3.0.0",
+    "pydantic-extra-types>=2.10.4,<3.0.0",
+    "python-dotenv>=1.1.0",
+    "typer>=0.16.0",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+all = [
+    "fastapi>=0.115.0,<1.0.0",
+    "uvicorn",
+    "httpx",
+    "ujson",
+    "aiofiles",
+    "aiohttp",
+    "requests==2.32.4",
+]
+docker = [
+    "docker==7.1.0",
+]
+azure = [
+    "azure-batch>=13.0.0",
+    "azure-storage-blob>=12.0.0",
+]
+aws = [
+    "boto3>=1.39.0",
+]
+gcp = [
+    "google-cloud-batch>=0.17.0",
+    "google-cloud-storage>=2.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/ddeutils/ddeutil-workflow/"
+"Source Code" = "https://github.com/ddeutils/ddeutil-workflow/"
+
+[project.scripts]
+workflow-cli = "ddeutil.workflow.__main__:app"
+
+[tool.setuptools.dynamic]
+version = {attr = "ddeutil.workflow.__about__.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.shelf.version]
+version = "./src/ddeutil/workflow/__about__.py"
+changelog = "CHANGELOG.md"
+files = ["json-schema.json"]
+commit_msg_format = "- {subject}"
+
+[tool.shelf.git]
+commit_prefix_force_fix = true
+
+[tool.coverage.run]
+branch = true
+relative_files = true
+concurrency = ["thread", "multiprocessing"]
+source = ["src.ddeutil.workflow"]
+omit = [
+    "src/ddeutil/workflow/__about__.py",
+    "src/ddeutil/workflow/__cron.py",
+    "src/ddeutil/workflow/__main__.py",
+    "src/ddeutil/workflow/__types.py",
+    "src/ddeutil/workflow/cli.py",
+    "src/ddeutil/workflow/api/__init__.py",
+    "src/ddeutil/workflow/api/log_conf.py",
+    "src/ddeutil/workflow/api/routes/__init__.py",
+    "src/ddeutil/workflow/api/routes/job.py",
+    "src/ddeutil/workflow/api/routes/logs.py",
+    "src/ddeutil/workflow/api/routes/workflows.py",
+    "src/ddeutil/workflow/plugins/providers/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "raise NotImplementedError",
+    "pragma: no cov",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+asyncio_default_fixture_loop_scope = "fuction"
+# NOTE: You can deslect multiple markers by '-m "not (asyncio or api)"'
+markers = [
+    "api: marks tests as api (deselect with '-m \"not api\"')",
+    "asyncio: marks async test cases",
+]
+console_output_style = "count"
+addopts = [
+    "--strict-config",
+    "--strict-markers",
+    "--ignore=tests/providers",
+#    "-p no:launch",
+#    "-p no:launch_ros",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore::pytest.PytestUnraisableExceptionWarning",
+]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s [%(levelname)-7s] (%(cut_id)s) %(message)-120s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y%m%d %H:%M:%S"
+
+[tool.black]
+line-length = 80
+target-version = ['py39']
+exclude = """
+(
+    /(
+        \\.git
+        | \\.eggs
+        | \\.__pycache__
+        | \\.idea
+        | \\.ruff_cache
+        | \\.rust
+        | \\.mypy_cache
+        | \\.pytest_cache
+        | \\.venv
+        | build
+        | dist
+        | venv
+    )/
+)
+"""
+
+[tool.ruff]
+line-length = 80
+exclude = [
+    "__pypackages__",
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".rust",
+    ".venv",
+    "build",
+    "dist",
+    "venv",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+    "F401",
+    "F403",
+]
