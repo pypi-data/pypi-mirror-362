@@ -1,0 +1,240 @@
+[project]
+name = "logxide"
+version = "0.1.0"
+description = "High-performance, Rust-powered drop-in replacement for Python's logging module"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Indosaram", email = "freedomzero91@gmail.com"},
+]
+maintainers = [
+    {name = "Indosaram", email = "freedomzero91@gmail.com"},
+]
+keywords = [
+    "logging",
+    "rust",
+    "async",
+    "performance",
+    "drop-in-replacement",
+    "high-performance",
+    "thread-safe",
+    "structured-logging",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Logging",
+    "Topic :: System :: Systems Administration",
+    "Typing :: Typed",
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Indosaram/logxide"
+Repository = "https://github.com/Indosaram/logxide"
+Documentation = "https://Indosaram.readthedocs.io/logxide"
+"Bug Tracker" = "https://github.com/Indosaram/logxide/issues"
+Changelog = "https://github.com/Indosaram/logxide/blob/main/CHANGELOG.md"
+"Source Code" = "https://github.com/Indosaram/logxide"
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "logxide"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pyright",
+    "ruff",
+    "pre-commit",
+    "maturin>=1.0,<2.0",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "pymdown-extensions",
+    "django>=4.2.23",
+    "fastapi>=0.116.1",
+    "flask>=3.1.1",
+    "flask-sqlalchemy>=3.1.1",
+    "httpx>=0.28.1",
+    "uvicorn>=0.35.0",
+]
+
+# ===== Tool Configurations =====
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "target",
+]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# Assume Python 3.9+ (matching requires-python)
+target-version = "py39"
+
+[tool.ruff.lint]
+# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
+# Additionally enable:
+# - pyupgrade (`UP`) - upgrade syntax for newer versions of Python
+# - flake8-bugbear (`B`) - find likely bugs and design problems
+# - flake8-simplify (`SIM`) - suggest simpler alternatives
+# - isort (`I`) - import sorting
+# - flake8-comprehensions (`C4`) - improve list/dict/set comprehensions
+select = ["E", "F", "UP", "B", "SIM", "I", "C4"]
+
+ignore = [
+    # Allow non-abstract empty methods in abstract base classes
+    "B027",
+    # Allow boolean positional values in function calls, like `dict.get(... True)`
+    "FBT003",
+    # Ignore checks for possible passwords
+    "S105", "S106", "S107",
+    # Ignore complexity
+    "C901",
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252", "E501", "F841", "B007", "E722"]
+# Examples can have magic values, assertions, and imports not at top (due to logxide.install())
+"examples/**/*" = ["PLR2004", "S101", "E402", "F401", "E501", "F841"]
+# Benchmark scripts can have long lines and unused variables
+"benchmark/**/*" = ["E501", "F841", "F401"]
+# Main package
+"logxide/__init__.py" = ["E402", "SIM102"]
+# Root level test files
+"test_*.py" = ["E501"]
+# Debug and format test files
+"tests/debug_*.py" = ["E402"]
+"tests/test_formatting.py" = ["E402"]
+"tests/test_sqlalchemy_simple.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["logxide"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+    "--cov=logxide",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "threading: marks tests that involve threading",
+    "formatting: marks tests for log formatting",
+]
+
+[tool.coverage.run]
+source = ["logxide"]
+omit = [
+    "*/tests/*",
+    "*/examples/*",
+    "setup.py",
+    "*/venv/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\(Protocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+ignore = []
+reportMissingImports = "none"
+reportAttributeAccessIssue = "none"
+reportUndefinedVariable = "none"
+reportCallIssue = "none"
+reportUnsupportedDunderAll = "none"
+reportUnknownMemberType = "none"
+reportUnknownParameterType = "none"
+reportUnknownArgumentType = "none"
+reportUnknownVariableType = "none"
+reportMissingTypeStubs = "none"
+pythonVersion = "3.9"
+
+[dependency-groups]
+dev = [
+    "maturin>=1.9.1",
+]
