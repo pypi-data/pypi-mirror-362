@@ -1,0 +1,113 @@
+Great — since this is proprietary software and not open source, we’ll update your README.md accordingly by:
+	•	Removing references to MIT or open licensing
+	•	Adding a “License & Usage” section clarifying restrictions
+	•	Branding it clearly as proprietary and commercial
+
+Here’s your updated README.md for minaki-vpn:
+
+⸻
+
+
+# minaki-vpn
+
+![MinakiLabs](https://minaki.io/static/logo.svg)
+
+> 🛰️ Official CLI for MinakiLabs — easily connect to your secure WireGuard-based VPN in seconds.
+
+---
+
+## ✨ Features
+
+- 🔐 Secure API key authentication
+- 📦 Pull WireGuard configuration directly from Minaki backend
+- ⚡ One-command connect, disconnect, restart
+- 📁 Config and key storage in `~/.minaki/`
+- 💬 Beautiful terminal output using `rich`
+- 🧰 CLI tool installable via pip or PyPI
+
+---
+
+## 📦 Installation
+
+Install with pip:
+
+```bash
+pip install minaki-vpn
+
+Or from source:
+
+git clone https://github.com/minakilabs/minaki-vpn.git
+cd minaki-vpn
+pip install .
+
+
+⸻
+
+⚙️ Available Commands
+
+Command	Description
+configure	Save your API key locally to ~/.minaki/cli-config.json
+status	Check your VPN lease status and IP assignment
+pull-config	Download your WireGuard .conf file from the API
+connect	Bring up the VPN tunnel using wg-quick
+disconnect	Tear down the VPN tunnel
+restart	Restart the VPN (disconnect + reconnect)
+install-wg	Check if WireGuard is installed; prompt if not
+
+
+⸻
+
+🛠️ Quick Start
+
+# 1. Set your API Key
+minaki-vpn configure
+
+# 2. Connect to the VPN
+minaki-vpn connect
+
+# 3. View current tunnel status
+minaki-vpn status
+
+# 4. Disconnect when done
+minaki-vpn disconnect
+
+
+⸻
+
+🔐 Authentication & Config Files
+	•	Your API key is securely stored in:
+
+~/.minaki/cli-config.json
+
+
+	•	VPN configuration is downloaded to:
+
+~/.minaki/wg2.conf
+
+
+
+⸻
+
+🧠 Requirements
+	•	Python 3.7+
+	•	WireGuard tools (wg-quick, wg)
+	•	Valid API access with MinakiLabs (https://minaki.io)
+
+⸻
+
+📛 License & Usage
+
+This is proprietary software owned by MinakiLabs, Inc.
+Usage is subject to the terms and conditions of your commercial license agreement.
+You may not copy, redistribute, or modify this software without explicit permission.
+
+For licensing inquiries, contact support@minakilabs.com.
+
+⸻
+
+👤 Author
+
+Andrew Polykandriotis
+CEO, MinakiLabs
+📧 support@minakilabs.com
+
