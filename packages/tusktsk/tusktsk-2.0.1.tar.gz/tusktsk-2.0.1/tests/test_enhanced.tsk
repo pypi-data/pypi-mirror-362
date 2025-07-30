@@ -1,0 +1,88 @@
+# Test Enhanced Python TuskLang Parser
+# =====================================
+# This file demonstrates all new syntax features
+
+# Global variables (accessible everywhere)
+$app_name: "Enhanced Python Demo"
+$version: "2.0.0" 
+$environment: @env("APP_ENV", "development")
+
+# Basic app configuration
+app_name: $app_name
+version: $version
+environment: $environment
+debug: $environment != "production"
+
+# Traditional [section] syntax
+[database]
+host: "localhost"
+port: 5432
+name: "tusklang"
+
+# Curly brace object syntax {
+server {
+    host: @env("SERVER_HOST", "0.0.0.0")
+    port: @env("SERVER_PORT", 8080)
+    workers: $environment == "production" ? 4 : 1
+}
+
+# Angle bracket object syntax >
+cache >
+    driver: "redis"
+    ttl: "5m"
+    enabled: true
+<
+
+# Features with intelligent configuration
+[features]
+database_queries: true
+cross_file_refs: true
+intelligent_cache: true
+auto_optimization: $environment == "production"
+
+# Date and time functions
+[timestamps]
+created: @date("Y-m-d H:i:s")
+year: @date("Y")
+iso_date: @date("c")
+
+# Range syntax
+[ports]
+web_range: 8000-9000
+api_range: 3000-4000
+
+# Cross-file references (would work with other .tsk files)
+[external]
+db_config: @config.tsk.get("database.host")
+shared_secret: @secrets.tsk.get("api.key")
+
+# Conditional expressions
+[scaling]
+instances: $environment == "production" ? 10 : 2
+memory: $environment == "production" ? "2GB" : "512MB" 
+log_level: $environment == "production" ? "error" : "debug"
+
+# String concatenation
+[messages]
+welcome: "Welcome to " + $app_name + " v" + $version
+greeting: "Hello from " + @env("HOSTNAME", "localhost")
+
+# Arrays and objects in new syntax
+[config]
+allowed_origins: ["localhost", "127.0.0.1", "*.example.com"]
+settings: {
+    max_connections: 100,
+    timeout: 30,
+    retry_count: 3
+}
+
+# Database query placeholder
+[queries]
+user_count: @query("SELECT COUNT(*) FROM users")
+active_users: @query("Users").where("active", true).count()
+
+# @ operators
+[advanced]
+cached_data: @cache("5m", "expensive_computation_result")
+system_metric: @metrics("requests", 1)
+feature_flag: @feature("new_dashboard")

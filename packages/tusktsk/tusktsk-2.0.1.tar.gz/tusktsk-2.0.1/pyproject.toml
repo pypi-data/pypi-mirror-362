@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tusktsk"
+version = "2.0.1"
+authors = [
+  { name="Cyberboost LLC", email="packages@tuskt.sk" },
+]
+description = "TuskTsk - Configuration with a Heartbeat"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "msgpack>=1.0.0",
+    "watchdog>=2.0.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=6.0", "black", "flake8"]
+databases = ["psycopg2-binary>=2.8", "pymongo>=3.11", "redis>=3.5"]
+
+[project.urls]
+"Homepage" = "https://tuskt.sk"
+"Bug Tracker" = "https://github.com/cyber-boost/tusktsk/issues"
+"License" = "https://tuskt.sk/license"
+
+[tool.setuptools]
+packages = ["tusktsk"]
+
+[project.scripts]
+tusk = "tusktsk.cli.main:main"
