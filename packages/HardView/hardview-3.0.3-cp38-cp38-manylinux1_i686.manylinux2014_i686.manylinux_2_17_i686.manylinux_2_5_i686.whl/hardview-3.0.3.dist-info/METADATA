@@ -1,0 +1,74 @@
+Metadata-Version: 2.1
+Name: HardView
+Version: 3.0.3
+Summary: A comprehensive Python library for collecting hardware information and performance monitoring with dual JSON/Python object output support.
+Home-page: https://github.com/gafoo173/HardView
+Author: gafoo
+Author-email: omarwaled3374@gmail.com
+Project-URL: Bug Reports, https://github.com/gafoo173/HardView/issues
+Project-URL: Source, https://github.com/gafoo173/HardView
+Project-URL: Documentation, https://github.com/gafoo173/HardView#readme
+Project-URL: API Guide, https://github.com/gafoo173/HardView/What.md
+Project-URL: Changelog, https://github.com/gafoo173/HardView/CHANGELOG.md
+Keywords: hardware system monitoring performance cpu ram disk network gpu bios windows linux wmi python-objects json dual-output
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Topic :: System :: Hardware
+Classifier: Topic :: System :: Monitoring
+Classifier: Topic :: System :: Networking
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: Intended Audience :: Information Technology
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Systems Administration
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: pytest >=6.0 ; extra == 'dev'
+Requires-Dist: pytest-cov >=2.0 ; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: sphinx >=4.0 ; extra == 'docs'
+Requires-Dist: sphinx-rtd-theme >=1.0 ; extra == 'docs'
+
+
+HardView 3.0.3 - Advanced Hardware Information and Performance Monitoring Library
+
+A comprehensive Python library for querying low-level hardware information and monitoring system performance on Windows and Linux systems with enhanced dual output support.
+
+NEW FEATURES IN 3.0.3:
+
+-Fixed the default value error in the objects functions that was causing them to return JSON when false was not explicitly specified.
+
+
+Usage Examples:
+```python
+import HardView
+
+bios_json = HardView.get_bios_info()
+cpu_json = HardView.get_cpu_info()
+
+bios_objects = HardView.get_bios_info_objects(0)
+cpu_objects = HardView.get_cpu_info_objects(0)
+
+cpu_usage = HardView.get_cpu_usage_objects(0)
+ram_usage = HardView.get_ram_usage_objects(0)
+
+cpu_monitoring = HardView.monitor_cpu_usage_duration_objects(10, 500)
+```
+
+Cross-platform Support:
+- Windows: WMI (Windows Management Instrumentation) queries
+- Linux: /proc, /sys filesystem reading and system calls
+- Enhanced error handling and memory management
+- Platform-specific optimizations
+
+All functions return structured data in both JSON format and native Python objects for maximum flexibility.
+    
