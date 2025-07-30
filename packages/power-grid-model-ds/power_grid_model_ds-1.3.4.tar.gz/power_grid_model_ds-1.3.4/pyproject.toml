@@ -1,0 +1,131 @@
+# SPDX-FileCopyrightText: Contributors to the Power Grid Model project <powergridmodel@lfenergy.org>
+#
+# SPDX-License-Identifier: MPL-2.0
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "power-grid-model-ds"
+authors = [
+  { name = "Contributors to the Power Grid Model project", email = "powergridmodel@lfenergy.org" },
+]
+description = "Power Grid Model extension which provides a grid data structure for simulation and analysis"
+readme = "README.md"
+keywords = ["power grid model"]
+license = { text = "MPL-2.0" }
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Topic :: Scientific/Engineering :: Physics",
+]
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "power-grid-model>=1.7",
+    "rustworkx>= 0.15.1",
+    "numpy>=1.21",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.2.1"]
+dev = [
+  "pylint>=3.1.0",
+  "pytest>=8.1.1",
+  "coverage>=7.4.4",
+  "black>=24.3.0",
+  "ruff>=0.3.5",
+  "isort>=5.13.2",
+  "mypy>=1.9.0",
+  "pre-commit>=4",
+  # Visualization (make sure these stay equalivalent to the 'visualizer' group)
+  "dash>=3.0.0",
+  "dash-bootstrap-components>=2.0.0",
+  "dash-cytoscape>=1.0.2",
+]
+
+visualizer = [
+  # Visualization (make sure these are also updated in the 'dev' group)
+  "dash>=3.0.0",
+  "dash-bootstrap-components>=2.0.0",
+  "dash-cytoscape>=1.0.2",
+]
+
+doc = [
+  "sphinx",
+  "myst-nb",
+  "sphinx_rtd_theme",
+  "readthedocs-sphinx-search",
+  "sphinx-hoverxref",
+  "numpydoc",
+]
+
+
+[project.urls]
+Home-page = "https://lfenergy.org/projects/power-grid-model/"
+GitHub = "https://github.com/PowerGridModel/power-grid-model-ds"
+Documentation = "https://power-grid-model-ds.readthedocs.io/en/stable/"
+Mailing-list = "https://lists.lfenergy.org/g/powergridmodel"
+Discussion = "https://github.com/orgs/PowerGridModel/discussions"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.setuptools.dynamic]
+version = { file = "PYPI_VERSION" }
+
+[tool.pylint.messages_control]
+disable = [
+  "logging-fstring-interpolation", # allows usage of f-strings in logging
+  "missing-module-docstring",
+  "too-few-public-methods",
+]
+good-names = ["id"]
+extension-pkg-allow-list = ["rustworkx"]
+max-parents = 15
+max-line-length = 120
+
+[tool.ruff]
+output-format = "github"
+line-length = 120
+show-fixes = true
+
+[tool.ruff.lint]
+select = [
+  # pycodestyle
+  "E",
+  # Pyflakes
+  "F",
+  # # pyupgrade
+  # "UP",
+  # # flake8-bugbear
+  # "B",
+  # # flake8-simplify
+  # "SIM",
+  # isort
+  "I",
+  # Numpy 2.0 downstream : https://numpy.org/devdocs/numpy_2_0_migration_guide.html
+  "NPY201",
+]
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.mypy]
+disable_error_code = ["assignment", "import-untyped"]
+
+[tool.coverage.run]
+relative_files = true
+branch = true
+
+[tool.coverage.report]
+exclude_also = [
+  'if TYPE_CHECKING:',
+]
