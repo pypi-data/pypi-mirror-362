@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+#
+# This file belongs to coshsh.
+# Copyright Gerhard Lausser.
+# This software is licensed under the
+# GNU Affero General Public License version 3 (see the file LICENSE).
+
+import sys
+sys.dont_write_bytecode = True
+import os
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+import importlib
+try:
+    import importlib
+    importlib.reload(sys)
+except Exception:
+    import imp
+    imp.reload(sys)
+from optparse import OptionParser
+from subprocess import Popen, PIPE, STDOUT
+import time
+
+try:
+    import coshsh
+except Exception:
+    if 'COSHSH_HOME' in os.environ:
+        coshsh_home = os.environ['COSHSH_HOME']
+    else:
+        coshsh_home = os.path.join(os.path.dirname(__file__), '..')
+        os.environ['COSHSH_HOME'] = coshsh_home
+    sys.path.append(coshsh_home)
+    try:
+        import coshsh
+    except Exception:
+        print("Could not load package coshsh. Check your PYTHONPATH")
+        sys.exit(3)
+from coshsh.generator import Generator
+
+
+
+if __name__ == '__main__':
+    VERSION = "1.0"
+
+    parser = OptionParser(
+        "%prog [options] --cookbook cookbookfile [--recipe recipe]",
+        version="%prog " + VERSION)
+    parser.add_option('--cookbook', action='append',
+                      dest="cookbook_files",
+                      help='One or more Config files')
+    parser.add_option('--recipe', action='store',
+                      dest="default_recipe",
+                      help="Cook a configuration following <recipe>")
+    parser.add_option('--template', action='store',
+                      dest="template_name",
+                      help="Build a template hierarchy for this service profile")
+    parser.add_option('--force', action='store_true',
+                      default=False,
+                      dest="force",
+                      help="Force datasource to be read")
+    parser.add_option('--safe-output', action='store_true',
+                      default=False,
+                      dest="safe_output",
+                      help="Do not commit when hosts disappeared")
+
+    parser.add_option('--debug', action='store_const',
+                      const="debug",
+                      default="info",
+                      dest="default_log_level",
+                      help="Output additional messages on stdout")
+
+    opts, args = parser.parse_args()
+    generator = Generator()
+    if opts.cookbook_files:
+        generator.set_default_log_level(opts.default_log_level)
+        generator.read_cookbook(opts.cookbook_files, opts.default_recipe, opts.force, opts.safe_output)
+        cookbook = generator.cookbook
+        if not opts.template_name:
+            parser.error("Which template hierarchy should i create? Use --template")
+
+    else:
+        parser.error("Use option -c/--cookbook")
+    if args:
+        parser.error("Does not accept any argument. Use option -c/--cookbook")
+
+    for recipe in generator.recipes.values():
+        #recipe.collect()
+        basedir = recipe.objects_dir + "/static/service_templates"
+        if os.path.exists(recipe.objects_dir):
+            if not os.path.exists(recipe.objects_dir + "/static"):
+                os.mkdir(recipe.objects_dir + "/static")
+            if not os.path.exists(recipe.objects_dir + "/static/service_templates"):
+                os.mkdir(recipe.objects_dir + "/static/service_templates")
+
+        template = opts.template_name
+        created = False
+        while template.find("_") != -1:
+            template, sep, tail = template.rpartition("_")
+            output = "define service {\n  name %s\n  use %s\n  register 0\n}\n" % (template + sep + tail, template)
+            template_file = os.path.join(basedir, template + sep + tail + ".cfg")
+            if not os.path.exists(template_file):
+                print("create %s" % template_file)
+                with open(template_file, "w") as f:
+                    f.write(output)
+                    created = True
+            else:
+                print("confirm %s" % template_file)
+        if created and os.path.exists(recipe.objects_dir + '/static/.git'):
+            save_dir = os.getcwd()
+            os.chdir(recipe.objects_dir + '/static')
+            process = Popen(["git", "add", "."], stdout=PIPE, stderr=STDOUT)
+            output, unused_err = process.communicate()
+            retcode = process.poll()
+            commitmsg = time.strftime("%Y-%m-%d-%H-%M-%S") + " create template %s" % (template, )
+            process = Popen(["git", "commit", "-a", "-m", commitmsg], stdout=PIPE, stderr=STDOUT)
+            output, unused_err = process.communicate()
+            retcode = process.poll()
+            print(output)
+            os.chdir(save_dir)
+
