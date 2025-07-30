@@ -1,0 +1,38 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+exclude: ^.*/secrets.yml$
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        description: Check type errors
+        entry: mypy
+        args: [ "--pretty" ]
+        language: python
+        types_or: [python, pyi]
+        pass_filenames: false
+
+      - id: ruff
+        name: ruff
+        description: "Run 'ruff' python linting"
+        entry: ruff check --force-exclude --fix
+        language: system
+        types_or: [ python, pyi, jupyter ]
+        require_serial: true
+
+      - id: ruff-format
+        name: ruff-format
+        description: "Run 'ruff format' python formatting"
+        entry: ruff format --force-exclude
+        language: system
+        types_or: [ python, pyi, jupyter ]
+        require_serial: true
