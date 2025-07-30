@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+
+import jsii
+import sys
+import os
+
+if "JSII_RUNTIME_PACKAGE_CACHE" not in os.environ:
+    os.environ["JSII_RUNTIME_PACKAGE_CACHE"] = "disabled"
+
+__jsii_assembly__ = jsii.JSIIAssembly.load(
+    "@aws/pdk", "0.26.14", "aws_pdk", "pdk@0.26.14.jsii.tgz"
+)
+
+exit_code = __jsii_assembly__.invokeBinScript("@aws/pdk", "pdk", sys.argv[1:])
+exit(exit_code)
