@@ -1,0 +1,68 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+set -x
+
+# Install rmtoo system-wide
+mkdir -p /usr/local/pkg
+cd /usr/local/pkg
+virtualenv rmtoo
+# The activate needs some care
+set +u
+source rmtoo/bin/activate
+set -u
+pip install --upgrade pip setuptools wheel
+pip install --only-binary=numpy,scipy numpy scipy
+pip install rmtoo
+
+# Set the profile.d
+cat >/etc/profile.d/R50-activate-rmtoo.sh <<EOF
+source /usr/local/pkg/rmtoo/bin/activate
+MANPATH=/usr/local/pkg/rmtoo/share/man
+export MANPATH
+EOF
+chmod a+x /etc/profile.d/R50-activate-rmtoo.sh
+
+# Set the man path
+cat >>/etc/manpath.config <<EOF
+MANDATORY_MANPATH /usr/local/pkg/rmtoo/share/man
+MANPATH_MAP     /usr/local/pkg/rmtoo/bin /usr/local/pkg/rmtoo/share/man
+MANDB_MAP       /usr/local/pkg/rmtoo/rmtoo/doc/man /var/cache/man/rmtoo
+EOF
+
+mandb
+
+# Adapt the motd
+
+cat >>/etc/motd <<EOF
+
+**************************************************************************
+*                                 rmToo                                  *
+*              Preinstalled Virtual Machine - Flavor: small              *
+*                                                                        *
+* To start with rmToo, read the Readme:                                  *
+* $ less /usr/local/pkg/rmtoo/rmtoo/doc/readme/Readme-PreinstalledVM.rst *
+* or use a browser:                                                      *
+* http://goo.gl/HN5uWX                                                   *
+**************************************************************************
+EOF
+
+# Depending on the distribution and defaults there is the need
+# to change the shell.
+
+DEFAULT_USERNAME=debian
+
+sed -i -e "s|DSHELL=.*|DSHELL=/bin/bash|g" /etc/adduser.conf
+useradd -D --shell /bin/bash
+
+# Also set a passwordless sudo
+cat > /etc/sudoers.d/${DEFAULT_USERNAME} << EOF
+${DEFAULT_USERNAME} ALL=(ALL) NOPASSWD:ALL
+EOF
+chmod 0440 /etc/sudoers.d/${DEFAULT_USERNAME}
+visudo -c || rm /etc/sudoers.d/${DEFAULT_USERNAME}
