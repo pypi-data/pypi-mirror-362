@@ -1,0 +1,201 @@
+{% set testcases = campaign_report.get_child_list('testcases') %}
+{% set contexte = config_global.get_node('report').get_node('report_context').config %}
+{# Regles d'affichage detaille des resultats du rapport
+ Affichage detaille si mode debug pas plus de 2 tests a afficher #}
+{# set detail_testcase_ok = config_global.get('core::global_log_level') == 'debug' or campaign_report.nb_children < 3 #}
+{% set detail_testcase_ok = true %}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>Resultats des tests</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <style>
+    .testcase_title{
+      font-size: 200%;
+    }
+    .exigences_title,.scenario_title{
+      font-size: 180%;
+    }
+    .exigences_body{
+      color: green;
+    }
+    .scenario_body{
+
+    }
+    .collapse{
+      border-left: thin solid black;
+      margin-left: 1em;
+      padding-left: 1em;
+      font-size: 0.95em;
+    }
+    .deploiement_title,.verifieurs_title{
+      font-weight: bold;
+    }
+    .verifieur_file_title{
+
+    }
+    .verifieurs_testfunction_title{
+      text-indent: 2em;
+    }
+    .failure_message{
+      color:red;
+      font-weight: bold;
+    }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+{# Liste des testcases KO #}
+{% if campaign_report.nb_children_ko > 0 %}
+        <div class="col-sm-6">
+          <h2 style='color:red;'>{{ campaign_report.nb_children_ko }} tests KO</h2>
+          <ul>
+  {% for testcase in testcases %}
+      {% if not testcase.result %}
+            <li>{{ testcase.elem_name }}</li>
+      {% endif %}
+  {% endfor %}
+          </ul>
+        </div>
+{% endif %}
+{# Liste des testcases OK #}
+{% if campaign_report.nb_children_ok > 0 %}
+        <div class="col-sm-6">
+          <h2 style='color:green;'>{{ campaign_report.nb_children_ok }} tests OK soit {{ (campaign_report.nb_children_ok / campaign_report.nb_children) * 100 }}% des tests</h2>
+          <ul>
+  {% for testcase in testcases %}
+      {% if testcase.result %}
+            <li>{{ testcase.elem_name }}</li>
+      {% endif %}
+  {% endfor %}
+          </ul>
+        </div>
+{% endif %}
+      </div>
+{# Affichage detaille des testcases #}
+{% for testcase in testcases %}
+  {% if detail_testcase_ok or not testcase.result %}
+    {% set testcase_id = testcase.elem_name | replace('.', '_') %}
+      <div class="row" style='font-size:80%;'>
+        <div class="col-sm-12">
+          <p>
+            <button class="testcase_title btn btn-link" type="button" data-toggle="collapse" data-target="#{{ testcase_id }}" aria-expanded="true" aria-controls="{{ testcase_id }}">
+              Test case {{ testcase.elem_name }} : {{ testcase.result | result_to_text }}
+            </button>
+          </p>
+          <div class="collapse" id="{{ testcase_id }}">
+    {% if testcase.tags|length > 0 %}
+            <p>
+              <button class="exigences_title btn btn-link" type="button" data-toggle="collapse" data-target="#{{ testcase_id }}_exigences" aria-expanded="true" aria-controls="{{ testcase_id }}_exigences">
+                  Exigences couvertes ({{ testcase.tags|length }})
+              </button>
+            </p>
+            <div class="exigences_body collapse" id="{{ testcase_id }}_exigences">
+              <ul>
+      {% for tag in testcase.tags %}
+                <li>{{ tag }}</li>
+      {% endfor %}
+              </ul>
+            </div>
+    {% endif %}
+    {% set scenarios = testcase.get_child_list('scenarios') %}
+    {% for scenario in scenarios %}
+      {% set scenario_id = testcase_id ~ "_scenario" ~ loop.index %}
+            <p>
+              <button class="scenario_title btn btn-link" type="button" data-toggle="collapse" data-target="#{{ scenario_id }}" aria-expanded="true" aria-controls="{{ scenario_id }}">
+                {{ loop.index }} - Scenario {{ scenario.title }} : {{ scenario.result | result_to_text }}
+              </button>
+            </p>
+            <div class="scenario_body collapse" id="{{ scenario_id }}">
+              <p>
+                <b>Name :</b> {{ scenario.elem_name }} <br />
+                <b>description :</b> <br />
+                {{ scenario.description }}
+              </p>
+      {% for deploiement in scenario.get_child_list('deployments') %}
+          {% set deploiement_id = scenario_id ~ "_deploiement" ~ loop.index %}
+              <p>
+                <button class="deploiement_title btn btn-link" type="button" data-toggle="collapse" data-target="#{{ deploiement_id }}" aria-expanded="true" aria-controls="{{ deploiement_id }}">
+                  Deploiement : {{ deploiement.result | result_to_text }}
+                </button>
+              </p>
+              <div class="deploiement_body collapse" id="{{ deploiement_id }}">
+                  <p>{{ deploiement.stdout | replace('\n', '<br />') }}</p>
+              </div>
+      {% endfor %}
+      {% if scenario.get_verifier() is not none %}
+        {% set verifier = scenario.get_verifier() %}
+              <p>
+                <button class="verifieurs_title btn btn-link" type="button" data-toggle="collapse" data-target="#{{ scenario_id }}_verifieurs" aria-expanded="true" aria-controls="{{ scenario_id }}_verifieurs">
+                  Verifieurs : {{ verifier.result | result_to_text }}
+                </button>
+              </p>
+              <div class="verifieurs_body collapse" id="{{ scenario_id }}_verifieurs">
+        {# Affichage du retour recupere de junit.xml #}
+        {% set verifier_data = verifier.verifier_data %}
+        {# Pour chaque fichier verifier #}
+        {% for verifier_name, verifier in verifier_data['verifiers'].items() %}
+          {% set verifier_file_id = scenario_id ~ "_" ~ verifieurs ~ loop.index %}
+                <p>
+                  <button class="verifieur_file_title btn btn-link" type="button" data-toggle="collapse" data-target="#{{ verifier_file_id }}" aria-expanded="true" aria-controls="{{ verifier_file_id }}">
+                    {{ loop.index }} - {{ verifier_name }} : {{ verifier['result'] | result_to_text }}
+                  </button>
+                </p>
+                <div class="verifieur_file_body collapse" id="{{ verifier_file_id }}">
+          {% for verifier_test, testcase_content in verifier['testcases'].items() %}
+            {% set verifier_testfunction_id = verifier_file_id ~ "_" ~ verifier_test %}
+                  <p>
+                    <button class="verifieurs_testfunction_title btn btn-link" type="button" data-toggle="collapse" data-target="#{{ verifier_testfunction_id }}" aria-expanded="true" aria-controls="{{ verifier_testfunction_id }}">
+                      {{ verifier_test }} : {{ testcase_content['result'] | result_to_text }}
+                    </button>
+                  </p>
+                  <div class="verifieurs_testfunction_body collapse" id="{{ verifier_testfunction_id }}">
+                    <ul>
+              {% for failure in testcase_content['failures'] %}
+                      <li>
+                        <b><u>Failure : </u></b> <span class="failure_message">{{ failure['message'] }}</span><br />
+                        {{ failure['stdout'] | replace('\n', '<br />') }}
+                      </li>>
+              {%endfor %}
+                    </ul>
+                    <ul>
+              {% for skipped in testcase_content['skipped'] %}
+                      <li>skipped : {{ skipped  }}</li>
+              {%endfor %}
+                    </ul>
+              {% if testcase_content['stdout'] != "" %}
+                    <p>
+                      <b>Stdout</b><br />
+                      {{ testcase_content['stdout'] | replace('\n', '<br />') }}
+                    </p>
+              {% endif %}
+                  </div> {# verifieurs_testfunction_body #}
+          {%endfor %}
+                </div> {# verifieur_file_body #}
+        {% endfor %} {# Pour chaque fichier verifier #}
+                  {# Affichage du stdout de py.test sans analyse #}
+                  <p class="global_stdout_title">
+                    <button class="verifieur_file_title btn btn-link" type="button" data-toggle="collapse" data-target="#{{ scenario_id }}_verifieurs_globalstdout" aria-expanded="true" aria-controls="{{ scenario_id }}_verifieurs_globalstdout">
+                      Global stdout
+                    </button>
+                  </p>
+                  <div class="verifieurs_global_stdout_body collapse" id="{{ scenario_id }}_verifieurs_globalstdout">
+                    <p>
+                      {{ verifier.stdout | replace('\n', '<br />') }}
+                    </p>
+                  </div>
+              </div> {# verifieurs_body par scenario #}
+      {% endif %} {# scenario.get_verifier #}
+            </div> {# scenario_body par scenario #}
+    {% endfor %} {# Pour chaque scenario #}
+          </div> {# testcase_body #}
+        </div> {# col-sm-12 par test case #}
+      </div> {# row par testcase #}
+  {% endif %} {# Si testcase a afficher #}
+{% endfor %} {# Par test case #}
+    </div> {# Container #}
+  </body>
+</html>

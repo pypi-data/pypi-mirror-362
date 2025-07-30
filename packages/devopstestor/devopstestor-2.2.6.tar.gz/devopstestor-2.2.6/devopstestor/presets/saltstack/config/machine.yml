@@ -1,0 +1,31 @@
+preset_name: saltstack_dockerincontainer
+
+presets:
+  saltstack_vagrant:
+    controller_class_name: "VagrantController"
+    vagrant_dir: "presets/saltstack/machine/vagrant-saltstack"
+
+
+  saltstack_dockerincontainer:
+    controller_class_name: "DockerController"
+    dockerfile_path: "presets/saltstack/machine/salt-machine-debian"
+    docker_run_args:
+      image: "alexporz/devopstestor-salt-machine"
+      tag: debian-$(this::core::version)
+      tty: True
+      detach: True
+    host_config:
+      privileged: True
+      network_mode: "testauto"
+  
+  saltstack_dockerincontainer_novolume:
+    controller_class_name: "DockerNoVolumeController"
+    dockerfile_path: "presets/saltstack/machine/salt-machine-debian"
+    docker_run_args:
+      image: "alexporz/devopstestor-salt-machine"
+      tag: debian-$(this::core::version)
+      tty: True
+      detach: True
+    host_config:
+      privileged: True
+      network_mode: "testauto"
