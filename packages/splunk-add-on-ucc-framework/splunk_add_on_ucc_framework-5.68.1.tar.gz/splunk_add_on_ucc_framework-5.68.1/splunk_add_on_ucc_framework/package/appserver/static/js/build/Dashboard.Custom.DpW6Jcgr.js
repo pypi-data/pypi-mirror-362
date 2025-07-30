@@ -1,0 +1,2 @@
+import{p as t}from"./entry_page.js";import{d as o,E as s,a as e}from"./Dashboard.EnterpriseViewOnlyPreset.lJXxGQQR.js";import"./Paginator.C8e2uXc2.js";import"./ErrorBoundary.ClUY_An4.js";const m=({dashboardDefinition:r})=>r?t.jsx(o.DashboardContextProvider,{preset:s,initialDefinition:r,children:t.jsx(e.DashboardCore,{width:"100%",height:"auto"})}):null;export{m as CustomDashboard,m as default};
+//# sourceMappingURL=Dashboard.Custom.DpW6Jcgr.js.map
