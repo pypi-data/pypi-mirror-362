@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>MCP Server Login</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f5f7fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 1rem;
+      }
+      .login-box {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+      }
+      .logo {
+        text-align: center;
+        margin-bottom: 1rem;
+        background-color: #556cd6;
+        padding: 1rem;
+        border-radius: 8px;
+      }
+      .logo img {
+        max-width: 120px;
+        height: auto;
+      }
+      h2 {
+        margin: 1rem 0;
+        font-size: 1.5rem;
+        color: #333;
+        text-align: center;
+      }
+      .info {
+        background: #e6f2ff;
+        color: #00529b;
+        border: 1px solid #b3d4fc;
+        border-radius: 4px;
+        padding: 0.75rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #555;
+      }
+      input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background: #556cd6;
+        border: none;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      button:hover {
+        background: #3b4bb5;
+      }
+      .error {
+        background: #fdecea;
+        color: #b71c1c;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      @media (max-width: 480px) {
+        .login-box {
+          padding: 1.5rem;
+        }
+        h2 {
+          font-size: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-box">
+      <div class="logo">
+        <img
+          src="https://assets.devopness.com/images/logo-devopness-white.svg"
+          alt="Devopness logo"
+        />
+      </div>
+      <h2>Authorize Devopness MCP Server</h2>
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %}
+      <div class="info">
+        <p>
+          By logging in, you authorize <strong>Devopness MCP Server</strong> to
+          access your account and manage your cloud infrastructure securely.
+        </p>
+        <p>
+          This includes provisioning resources, deploying apps, and performing
+          CI/CD tasks on your behalf.
+        </p>
+      </div>
+      <form method="POST" action="/authenticate">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            autocomplete="email"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+        <button type="submit">Authorize</button>
+      </form>
+    </div>
+  </body>
+</html>
