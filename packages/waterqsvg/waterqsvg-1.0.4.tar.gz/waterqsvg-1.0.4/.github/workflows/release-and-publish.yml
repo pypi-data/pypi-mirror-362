@@ -1,0 +1,145 @@
+name: Release and Publish WaterQSVG
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write  # 用于PyPI可信发布
+
+jobs:
+  release-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install uv and dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install uv twine
+        uv --version
+        
+    - name: Get version info
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.tag }}"
+        else
+          VERSION="${{ github.ref_name }}"
+        fi
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "Version: ${VERSION}"
+        
+    - name: Build package
+      run: |
+        echo "Building WaterQSVG package..."
+        uv build
+        echo "Build completed. Contents:"
+        ls -la dist/
+        
+    - name: Verify package
+      run: |
+        echo "Verifying package integrity..."
+        python -m twine check dist/*
+        
+    - name: Test installation
+      run: |
+        echo "Testing package installation..."
+        python -m pip install dist/*.whl
+        python -c "
+        import waterqsvg
+        print(f'Successfully installed waterqsvg {waterqsvg.__version__}')
+        print('Package import test passed!')
+        "
+        waterqsvg --help
+        echo "CLI test passed!"
+        
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        print-hash: true
+        # 使用API token发布
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: WaterQSVG ${{ steps.version.outputs.version }}
+        body: |
+          ## 🎉 WaterQSVG ${{ steps.version.outputs.version }} 发布
+          
+          ### 📦 安装方式
+          
+          ```bash
+          # 从PyPI安装
+          pip install waterqsvg
+          
+          # 使用uv安装
+          uv add waterqsvg
+          ```
+          
+          ### 🚀 快速开始
+          
+          ```bash
+          # 命令行使用
+          waterqsvg --zip-url "https://example.com/data.zip"
+          
+          # 使用JSON配置
+          waterqsvg --zip-url "/path/to/config.json"
+          
+          # 标准输入
+          echo "https://example.com/data.zip" | waterqsvg
+          ```
+          
+          ### 📋 主要功能
+          - 🌊 专业水质数据SVG热力图生成
+          - 🔗 支持OSS直连下载和本地文件
+          - 📊 15+种水质指标自动识别
+          - 🎨 多种颜色映射方案
+          - 🗺️ 高精度地理边界信息输出
+          - 🧮 Alpha Shape边界检测算法
+          - 📱 跨平台兼容 (Windows/Linux/macOS)
+          
+          ### 🔗 相关链接
+          - 📖 [文档](https://github.com/1034378361/waterqsvg#readme)
+          - 🐛 [问题反馈](https://github.com/1034378361/waterqsvg/issues)
+          
+          ---
+          
+          **完整更新日志**: [CHANGELOG.md](https://github.com/1034378361/waterqsvg/blob/${{ steps.version.outputs.version }}/CHANGELOG.md)
+        files: |
+          dist/*
+        draft: false
+        prerelease: false
+        
+    - name: Post-release summary
+      run: |
+        echo "## 🎉 发布完成！" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "WaterQSVG ${{ steps.version.outputs.version }} 已成功发布到:" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ PyPI: https://pypi.org/project/waterqsvg/" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ GitHub Releases: https://github.com/1034378361/waterqsvg/releases" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 安装测试" >> $GITHUB_STEP_SUMMARY
+        echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo "pip install waterqsvg" >> $GITHUB_STEP_SUMMARY
+        echo "waterqsvg --help" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
