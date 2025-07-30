@@ -1,0 +1,84 @@
+[project]
+name = "gcache"
+version = "1.0.1"
+description = "Fine grained caching."
+authors = [{ name = "Galileo Technologies Inc.", email = "team@rungalileo.io" }]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dynamic = ["dependencies"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^2.11.4"
+prometheus-client = "^0.22.1"
+cachetools = "^5.5.2"
+types-cachetools = "^6.0.0.20250525"
+redis = "^6.2.0"
+uvloop = "^0.21.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.4.1"
+pytest-xdist = "^3.6.1"
+coverage = "^7.8.0"
+pytest-cov = "^6.2.1"
+pytest-asyncio = "^0.26.0"
+redislite = "^6.2.912183"
+
+[tool.poetry.group.dev.dependencies]
+invoke = "^2.2.0"
+ruff = "^0.11.12"
+pytest-asyncio = "^0.26.0"
+mypy = "^1.15.0"
+pre-commit = "^4.1.0"
+types-cachetools = "^6.0.0.20250525"
+
+[build-system]
+requires = ["poetry-core>=2.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+pythonpath = ["./src/"]
+asyncio_default_fixture_loop_scope = "function"
+
+# Linters and formatters.
+[tool.ruff]
+line-length = 120
+fix = true
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "ASYNC"]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["galileo_core"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.docformatter]
+style = "numpy"
+recursive = true
+wrap-summaries = 120
+wrap-descriptions = 120
+
+
+[tool.mypy]
+mypy_path = ["src"]
+ignore_missing_imports = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+# Release.
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+version_source = "tag"
+commit_message = "chore(release): v{version}"
+
+[tool.semantic_release.commit_parser_options]
+# Release patch version on these tags,
+# https://python-semantic-release.readthedocs.io/en/latest/configuration.html#commit-parser-options-dict-str-any
+patch_tags = ["fix", "perf", "chore", "docs", "style", "refactor"]
