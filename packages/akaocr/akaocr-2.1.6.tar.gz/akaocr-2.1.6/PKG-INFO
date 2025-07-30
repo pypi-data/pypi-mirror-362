@@ -1,0 +1,188 @@
+Metadata-Version: 2.1
+Name: akaocr
+Version: 2.1.6
+Summary: akaOCR Package Tools
+Home-page: UNKNOWN
+Author: LauNT
+Author-email: ttruongllau@gmail.com
+License: Apache License 2.0
+Platform: UNKNOWN
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# akaOCR
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Python 3.7](https://img.shields.io/badge/python-3.7+-aff.svg)](https://www.python.org/downloads/release/python-370/)
+[![ONNX Compatible](https://img.shields.io/badge/ONNX-Compatible-brightgreen)](https://onnx.ai/)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.google/)
+
+## ✨ Description
+
+This package is compatible with [akaOCR](https://app.akaocr.io/) for ocr pipeline program (Text Detection, Text Recognition & Text Rotation), using [ONNX](https://onnx.ai/) format model (CPU & GPU speed can be **x2 Times Faster**). This code is referenced from [this awesome repo](https://github.com/PaddlePaddle/PaddleOCR).
+
+## 🚀 Features
+
+### 1. **Text Detection**.
+
+```python
+from akaocr import BoxEngine
+import cv2
+
+# Load image
+img_path = "path/to/image.jpg"
+image = cv2.imread(img_path)
+
+# Initialize text detector
+box_engine = BoxEngine(
+    model_path=None,             # Path to detection model
+    side_len=None,               # Minimum image size for inference
+    conf_thres=0.5,              # Confidence threshold
+    mask_thes=0.4,               # Binarization threshold
+    unclip_ratio=2.0,            # Margin for expanding box
+    max_candidates=1000,         # Maximum number of boxes
+    device='cpu'                 # 'cpu' or 'gpu'
+)
+
+# Run inference
+results = box_engine(image)
+# Output: List of bounding boxes as np.array([[x1, y1], [x2, y2], [x3, y3], [x4, y4]], dtype=np.float32)
+```
+
+### 2. **Text Recognition**.
+
+```python
+from akaocr import TextEngine
+import cv2
+
+# Load cropped image
+img_path = "path/to/cropped_image.jpg"
+cropped_image = cv2.imread(img_path)
+
+# Initialize text recognizer
+text_engine = TextEngine(
+    model_path=None,             # Path to recognition model
+    vocab_path=None,             # Path to vocabulary file
+    use_space_char=True,         # Include space in predictions
+    batch_sizes=32,              # Batch size for inference
+    model_shape=[3, 48, 320],    # Expected input shape [C, H, W]
+    max_wh_ratio=None,           # Max width-height ratio for resizing
+    device='cpu'                 # 'cpu' or 'gpu'
+)
+
+# Run inference
+results = text_engine(cropped_image)
+# Output: List of tuples: (recognized_text, confidence_score)
+
+```
+
+### 3. **Text Rotation**.
+
+```python
+from akaocr import ClsEngine
+import cv2
+
+# Load cropped image
+img_path = "path/to/cropped_image.jpg"
+cropped_image = cv2.imread(img_path)
+
+# Initialize orientation classifier
+rotate_engine = ClsEngine(
+    model_path=None,             # Path to rotation classification model
+    conf_thres=0.75,             # Confidence threshold
+    device='cpu'                 # 'cpu' or 'gpu'
+)
+
+# Run inference
+results = rotate_engine(cropped_image)
+# Output: List of tuples: (label: 0 or 180, confidence_score)
+```
+
+## 🔥 Usage
+```python
+import numpy as np
+import cv2
+
+from akaocr import BoxEngine, TextEngine
+from typing import List, Tuple
+
+
+class Pipeline:
+    def __init__(self, device: str = 'cpu'):
+        # Initializes the OCR pipeline. The computation device to use ('cpu' or 'gpu').
+
+        self.box_engine = BoxEngine(device=device)
+        self.text_engine = TextEngine(device=device)
+
+    @staticmethod
+    def _transform_image(image: np.ndarray, box: np.ndarray) -> np.ndarray:
+        """
+        Applies a perspective transform to straighten a detected text box.
+
+        Args:
+            image (np.ndarray): The source image.
+            box (np.ndarray): A 4x2 numpy array of corner points for the text box.
+
+        Returns:
+            np.ndarray: The cropped and straightened image of the text region.
+        """
+        if not isinstance(box, np.ndarray) or box.shape != (4, 2):
+            raise ValueError("Input 'box' must be a 4x2 NumPy array.")
+
+        # Ensure points are float32 for cv2 functions
+        box = box.astype(np.float32)
+
+        # Calculate the width and height of the destination image
+        width = int(max(np.linalg.norm(box[0] - box[1]), np.linalg.norm(box[2] - box[3])))
+        height = int(max(np.linalg.norm(box[0] - box[3]), np.linalg.norm(box[1] - box[2])))
+
+        # Define the destination points for a standard rectangle
+        dst_pts = np.array([
+            [0, 0],
+            [width - 1, 0],
+            [width - 1, height - 1],
+            [0, height - 1]
+        ], dtype=np.float32)
+
+        # Get the perspective transform matrix and apply it
+        matrix = cv2.getPerspectiveTransform(box, dst_pts)
+        warped_img = cv2.warpPerspective(
+            image, matrix, (width, height),
+            borderMode=cv2.BORDER_REPLICATE,
+            flags=cv2.INTER_CUBIC
+        )
+        return warped_img
+
+    def __call__(self, image: np.ndarray) -> List[Tuple[np.ndarray, str]]:
+        """
+        Processes an image to detect and recognize text.
+
+        Args:
+            image (np.ndarray): The input image in BGR format.
+
+        Returns:
+            List[Tuple[np.ndarray, str]]: A list of tuples, where each tuple
+            contains the bounding box (4x2 array) and the recognized text.
+        """
+        print("Starting text detection...")
+        boxes = self.box_engine(image)
+        if not boxes:
+            print("No text boxes detected.")
+            return []
+        
+        print(f"Detected {len(boxes)} text boxes.")
+
+        # Prepare all cropped images for batch processing
+        transformed_images = [self._transform_image(image, box) for box in boxes]
+
+        print("Starting text recognition on detected boxes...")
+        texts = self.text_engine(transformed_images)
+        print("Text recognition complete.")
+
+        # Combine boxes with their corresponding recognized text
+        return list(zip(boxes, texts))
+```
+
+**Note**: akaOCR (Transform documents into useful data with AI-based IDP - Intelligent Document Processing) - helps make inefficient manual entry a thing of the past—and reliable data insights a thing of the present. Details at: https://app.akaocr.io
+
