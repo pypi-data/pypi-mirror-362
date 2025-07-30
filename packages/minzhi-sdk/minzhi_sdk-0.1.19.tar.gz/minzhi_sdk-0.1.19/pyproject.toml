@@ -1,0 +1,27 @@
+[project]
+name = "minzhi-sdk"
+version = "0.1.19"
+description = "敏智 Python SDK - 提供自动化执行和CMDB客户端功能"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "loguru",
+    "pycryptodome", 
+    "requests",
+]
+
+[project.scripts]
+get_token = "minzhi.cli.get_token:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["minzhi"]
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
