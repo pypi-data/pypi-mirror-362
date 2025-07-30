@@ -1,0 +1,106 @@
+[tool.poetry]
+name = "muffin-session"
+version = "2.6.0"
+description = "Signed Cookie-Based HTTP sessions for the Muffin framework"
+readme = "README.rst"
+homepage = "https://github.com/klen/muffin-session"
+repository = "https://github.com/klen/muffin-session"
+authors = ["Kirill Klenov <horneds@gmail.com>"]
+license = "MIT"
+keywords = ["asyncio", "trio", "asgi", "muffin", "web", "cookie", "sessions", "session"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Internet :: WWW/HTTP",
+  "Framework :: AsyncIO",
+  "Framework :: Trio",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+muffin = "*"
+asgi-sessions = { version = "^1", extras = ["jwt"] }
+
+# Optional dependencies
+pyjwt = { version = "*", optional = true }
+cryptography = { version = "*", optional = true }
+
+[tool.poetry.extras]
+jwt = ["pyjwt"]
+fernet = ["cryptography"]
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+cryptography = "*"
+ipdb = "*"
+pre-commit = "*"
+pyjwt = "*"
+pytest = "*"
+pytest-aio = { version = "*", extras = ["curio", "trio"] }
+pytest-mypy = "*"
+ruff = "*"
+
+[tool.pytest.ini_options]
+addopts = "-lxsv tests.py"
+log_cli = true
+
+[tool.mypy]
+packages = ["muffin_session"]
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310,py311,py312,py313,pypy310
+
+[testenv]
+deps = -e .[tests]
+commands =
+	pytest --mypy tests.py
+
+[testenv:pypy310]
+deps = -e .[tests]
+commands =
+	pytest tests.py
+"""
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ARG",
+  "D",
+  "UP",
+  "ANN",
+  "DJ",
+  "EM",
+  "COM",
+  "RSE",
+  "SLF",
+  "RET",
+  "S101",
+  "PLR2004",
+  "PLR0912",
+  "N804",
+  "RUF012",
+  "A003",
+  "TRY003",
+  "TD",
+  "FIX",
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
