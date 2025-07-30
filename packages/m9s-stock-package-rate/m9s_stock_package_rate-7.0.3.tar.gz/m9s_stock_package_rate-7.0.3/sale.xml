@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="ir.ui.view" id="sale_view_form">
+            <field name="model">sale.sale</field>
+            <field name="inherit" ref="sale.sale_view_form"/>
+            <field name="name">sale_view_form</field>
+        </record>
+        <record model="ir.ui.view" id="apply_shipping_start_form">
+            <field name="model">sale.sale.apply_shipping.start</field>
+            <field name="type">form</field>
+            <field name="name">apply_shipping_start_form</field>
+        </record>
+        <record model="ir.ui.view" id="apply_shipping_select_rate_form">
+            <field name="model">sale.sale.apply_shipping.select_rate</field>
+            <field name="type">form</field>
+            <field name="name">apply_shipping_select_rate_form</field>
+        </record>
+        <record model="ir.action.wizard" id="wizard_sale_apply_shipping">
+            <field name="name">Apply Shipping</field>
+            <field name="wiz_name">sale.sale.apply_shipping</field>
+            <field name="model">sale.sale</field>
+        </record>
+        <record model="ir.action.keyword" id="act_wizard_sale_apply_shipping">
+            <field name="keyword">form_action</field>
+            <field name="model">sale.sale,-1</field>
+            <field name="action" ref="wizard_sale_apply_shipping"/>
+        </record>
+
+        <!-- Buttons -->
+        <record model="ir.model.button" id="sale_apply_shipping_button">
+            <field name="name">apply_shipping</field>
+            <field name="string">Apply Shipping</field>
+            <field name="model" search="[('model', '=', 'sale.sale')]"/>
+        </record>
+        <record model="ir.model.button-res.group" id="sale_apply_shipping_button_group_sale">
+            <field name="button" ref="sale_apply_shipping_button"/>
+            <field name="group" ref="sale.group_sale"/>
+        </record>
+    </data>
+</tryton>
