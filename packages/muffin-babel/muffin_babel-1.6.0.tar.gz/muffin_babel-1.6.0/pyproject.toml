@@ -1,0 +1,102 @@
+[tool.poetry]
+name = "muffin-babel"
+version = "1.6.0"
+description = "Localization support for the Muffin Framework"
+readme = "README.md"
+license = "MIT"
+authors = ["Kirill Klenov <horneds@gmail.com>"]
+keywords = ["localization", "internationalization", "muffin", "babel", "asyncio", "trio", "asgi"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Internet :: WWW/HTTP",
+  "Framework :: AsyncIO",
+  "Framework :: Trio",
+]
+homepage = "https://github.com/klen/muffin-babel"
+repository = "https://github.com/klen/muffin-babel"
+packages = [{ include = "muffin_babel" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+asgi-babel = "*"
+muffin = "*"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "*"
+black = "*"
+pre-commit = "*"
+pytest = "*"
+pytest-mypy = "*"
+pytest-aio = { version = "*", extras = ["curio", "trio"] }
+uvicorn = "*"
+muffin-jinja2 = "*"
+
+[tool.pytest.ini_options]
+addopts = "-xsv tests.py"
+log_cli = true
+
+[tool.mypy]
+packages = ["muffin_babel"]
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310,py311,py312,py313,pypy310
+
+[testenv]
+deps = -e .[tests]
+commands =
+	pytest --mypy tests.py
+
+[testenv:pypy310]
+deps = -e .[tests]
+commands =
+	pytest tests.py
+"""
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [".venv", "docs", "examples"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ANN",
+  "ARG",
+  "UP",
+  "D",
+  "DJ",
+  "COM",
+  "EM",
+  "RSE",
+  "SLF",
+  "RET",
+  "S101",
+  "PLR2004",
+  "PLR0912",
+  "N804",
+  "A003",
+  "TRY003",
+  "RUF001",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312", "py313"]
+preview = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
