@@ -1,0 +1,142 @@
+{# bsicon/templates/bsicon/icon_selector_include.html #}
+{% load static i18n %}
+
+<div class="bsicon-header">
+    <h2>{% trans "Select Bootstrap Icon" %}</h2>
+    <p class="help">
+        {% trans "Click on an icon to select it. Search by name or keywords." %}
+    </p>
+</div>
+
+<div class="bsicon-controls">
+    <div class="search-container">
+        <input type="text" 
+               class="search" 
+               placeholder="{% trans 'Search icons...' %}" 
+               aria-label="{% trans 'Search icons' %}">
+        <span class="search-icon bi bi-search"></span>
+    </div>
+    
+    <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all">
+            {% trans "All" %}
+        </button>
+        <button class="filter-btn" data-filter="outline">
+            {% trans "Outline" %}
+        </button>
+        <!-- Solo un estilo en Bootstrap Icons, pero dejamos espacio para futuras expansiones -->
+    </div>
+</div>
+
+<div class="bsicon-main">
+    <div class="icon-list">
+        <div class="list">
+            {% for icon in icons %}
+            <div class="icon-item" 
+                 data-name="{{ icon.name }}" 
+                 data-styles="{{ icon.styles|join:' ' }}"
+                 data-search="{{ icon.name }} {{ icon.search_terms }}">
+                <div class="icon-preview" 
+                     data-icon="{{ icon.name }}"
+                     title="{{ icon.name }}">
+                    <i class="bi bi-{{ icon.name }}"></i>
+                </div>
+                <div class="icon-name">{{ icon.name }}</div>
+            </div>
+            {% empty %}
+            <div class="no-icons">
+                <i class="bi bi-exclamation-circle"></i>
+                {% trans "No icons found. Try a different search." %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="bsicon-footer">
+        <div class="selected-icon-preview">
+            <span class="preview-label">{% trans "Selected:" %}</span>
+            <span id="selected-icon-preview">
+                <i class="bi bi-{{ selected_icon|default:'question-circle' }}"></i>
+            </span>
+            <span id="selected-icon-name">{{ selected_icon|default:"None" }}</span>
+        </div>
+        
+        <div class="actions">
+            <button type="button" class="cancel-button">
+                {% trans "Cancel" %}
+            </button>
+            <button type="button" class="select-button" disabled>
+                {% trans "Select Icon" %}
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Este script se moverá al archivo principal en el paso siguiente
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicialización de List.js
+        const iconList = new List('bsicon-container', {
+            valueNames: [
+                { name: 'icon-name', attr: 'textContent' },
+                { data: ['search'] }
+            ],
+            searchClass: 'search',
+            listClass: 'list'
+        });
+        
+        // Filtrado por estilo
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                if (filter === 'all') {
+                    iconList.filter();
+                } else {
+                    iconList.filter(item => {
+                        return item.values().styles.includes(filter);
+                    });
+                }
+            });
+        });
+        
+        // Selección de icono
+        document.querySelectorAll('.icon-preview').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const iconName = this.dataset.icon;
+                
+                // Actualizar vista previa
+                document.getElementById('selected-icon-preview').innerHTML = 
+                    `<i class="bi bi-${iconName}"></i>`;
+                document.getElementById('selected-icon-name').textContent = iconName;
+                
+                // Habilitar botón de selección
+                document.querySelector('.select-button').disabled = false;
+                
+                // Resaltar icono seleccionado
+                document.querySelectorAll('.icon-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                this.closest('.icon-item').classList.add('selected');
+            });
+        });
+        
+        // Botón de selección
+        document.querySelector('.select-button').addEventListener('click', function() {
+            const iconName = document.getElementById('selected-icon-name').textContent;
+            if (iconName && iconName !== 'None') {
+                window.opener.document.getElementById(window.name).value = iconName;
+                window.close();
+            }
+        });
+        
+        // Botón de cancelar
+        document.querySelector('.cancel-button').addEventListener('click', function() {
+            window.close();
+        });
+    });
+</script>
