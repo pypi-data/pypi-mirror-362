@@ -1,0 +1,928 @@
+{
+    "id": "8f61807d-6f25-49c2-ba36-c95899074af0",
+    "key": "store://demo-etl/run/python+run/8f61807d-6f25-49c2-ba36-c95899074af0",
+    "kind": "python+run",
+    "metadata": {
+      "name": "8f61807d-6f25-49c2-ba36-c95899074af0",
+      "updated_by": "digitalhubdev",
+      "project": "demo-etl",
+      "updated": "2024-11-20T11:11:37.419Z",
+      "created_by": "digitalhubdev",
+      "created": "2024-11-20T11:08:33.742Z"
+    },
+    "name": "8f61807d-6f25-49c2-ba36-c95899074af0",
+    "project": "demo-etl",
+    "spec": {
+      "init_parameters": {"test": "test"},
+      "outputs": {},
+      "instructions": [
+        "apt-get update"
+      ],
+      "image": "debian:1.22.04",
+      "requirements": [
+        "requests"
+      ],
+      "inputs": {
+        "di": "store://demo-etl/dataitem/dataitem/dataitem1:fd83dqa7vnh-73e45-m3pqawew"
+      },
+      "profile": "1xa100",
+      "source": {
+        "source": "main.py",
+        "handler": "handler",
+        "base64": "ZGVmIGhhbmRsZXIoKToKICAgIHByaW50KCJIZWxsbyB3b3JsZCEiKQ==",
+        "lang": "python"
+      },
+      "local_execution": false,
+      "task": "python+build://demo-etl/e9f4c0ef-579f-495c-9f65-4360f2181e4f",
+      "base_image": "debian:1.22.04",
+      "function": "python://demo-etl/func3a:e9f4c0ef-579f-495c-9f65-4360f2181e4f",
+      "python_version": "PYTHON3_10",
+      "parameters": {
+        "param1": 100
+      },
+      "resources": {
+        "cpu": {
+          "requests": "0100m",
+          "limits": "0200m"
+        },
+        "mem": {
+          "requests": "0100Ki",
+          "limits": "0200Ki"
+        },
+        "gpu": {
+          "limits": "01"
+        }
+      },
+      "envs": [
+        {
+          "name": "USER",
+          "value": "test"
+        }
+      ],
+      "secrets": [
+        "secret-key"
+      ],
+      "volumes": [
+        {
+          "name": "volume1",
+          "volume_type": "empty_dir",
+          "mount_path": "/volume1"
+        },
+        {
+          "name": "volume2",
+          "volume_type": "persistent_volume_claim",
+          "mount_path": "/volume2"
+        }
+      ],
+      "node_selector": [
+        {
+          "key": "node1",
+          "value": "value1"
+        }
+      ]
+    },
+    "status": {
+      "state": "ERROR",
+      "transitions": [
+        {
+          "status": "ERROR",
+          "message": "Job failed: 1",
+          "time": "2024-11-20T11:11:37.345902996Z"
+        },
+        {
+          "status": "RUNNING",
+          "time": "2024-11-20T11:08:33.813874519Z"
+        },
+        {
+          "status": "READY",
+          "time": "2024-11-20T11:08:33.765888996Z"
+        },
+        {
+          "status": "BUILT",
+          "time": "2024-11-20T11:08:33.749435871Z"
+        }
+      ],
+      "message": "Job failed: 1",
+      "k8s": {
+        "pods": [
+          {
+            "metadata": {
+              "creationTimestamp": 1732100913,
+              "generateName": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-8f61807d-6f25-49c2-ba36-c95899074af0",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "8f61807d-6f25-49c2-ba36-c95899074af0",
+                "batch.kubernetes.io/controller-uid": "d6f1fe22-6ab5-4df3-9cf1-972e17dbd5ae",
+                "batch.kubernetes.io/job-name": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0",
+                "controller-uid": "d6f1fe22-6ab5-4df3-9cf1-972e17dbd5ae",
+                "dhcore/framework": "k8sbuild",
+                "dhcore/function": "func3a",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "python",
+                "job-name": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732100913
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kubelet",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732101064
+                }
+              ],
+              "name": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0-gv5wr",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "batch/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "Job",
+                  "name": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0",
+                  "uid": "d6f1fe22-6ab5-4df3-9cf1-972e17dbd5ae"
+                }
+              ],
+              "resourceVersion": "129034",
+              "uid": "6b99f704-d5b8-48bc-ab70-1dd867308c1e"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "--dockerfile=/init-config-map/Dockerfile",
+                    "--context=/shared",
+                    "--destination=registry.tenant1.digitalhub-dev.smartcommunitylab.it/digitalhub-tenant1-debian:8f618"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                    },
+                    {
+                      "name": "PYTHONPATH",
+                      "value": "${PYTHONPATH}:/shared/"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "8f61807d-6f25-49c2-ba36-c95899074af0"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "gcr.io/kaniko-project/executor:latest",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0",
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/shared",
+                      "name": "shared-dir"
+                    },
+                    {
+                      "mountPath": "/init-config-map",
+                      "name": "init-config-map"
+                    },
+                    {
+                      "mountPath": "/kaniko/.docker",
+                      "name": "registry-credentials"
+                    },
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-kj4vm",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "initContainers": [
+                {
+                  "command": [
+                    "/bin/bash",
+                    "-c",
+                    "/app/builder-tool.sh"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                    },
+                    {
+                      "name": "PYTHONPATH",
+                      "value": "${PYTHONPATH}:/shared/"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "8f61807d-6f25-49c2-ba36-c95899074af0"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool:latest",
+                  "imagePullPolicy": "Always",
+                  "name": "init-container-8f61807d-6f25-49c2-ba36-c95899074af0",
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/shared",
+                      "name": "shared-dir"
+                    },
+                    {
+                      "mountPath": "/init-config-map",
+                      "name": "init-config-map"
+                    },
+                    {
+                      "mountPath": "/kaniko/.docker",
+                      "name": "registry-credentials"
+                    },
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-kj4vm",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "nodeName": "digitalhub-dev-md-0-jkh8r-snphp",
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Never",
+              "schedulerName": "default-scheduler",
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "emptyDir": {
+                    "sizeLimit": {
+                      "number": 104857600,
+                      "format": "BINARY_SI"
+                    }
+                  },
+                  "name": "shared-dir"
+                },
+                {
+                  "configMap": {
+                    "defaultMode": 420,
+                    "name": "init-config-map-8f61807d-6f25-49c2-ba36-c95899074af0"
+                  },
+                  "name": "init-config-map"
+                },
+                {
+                  "name": "registry-credentials",
+                  "secret": {
+                    "defaultMode": 420,
+                    "items": [
+                      {
+                        "key": ".dockerconfigjson",
+                        "path": "config.json"
+                      }
+                    ],
+                    "secretName": "registry-credentials"
+                  }
+                },
+                {
+                  "name": "kube-api-access-kj4vm",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101064,
+                  "status": "False",
+                  "type": "PodReadyToStartContainers"
+                },
+                {
+                  "lastTransitionTime": 1732100918,
+                  "status": "True",
+                  "type": "Initialized"
+                },
+                {
+                  "lastTransitionTime": 1732101063,
+                  "reason": "PodFailed",
+                  "status": "False",
+                  "type": "Ready"
+                },
+                {
+                  "lastTransitionTime": 1732101063,
+                  "reason": "PodFailed",
+                  "status": "False",
+                  "type": "ContainersReady"
+                },
+                {
+                  "lastTransitionTime": 1732100913,
+                  "status": "True",
+                  "type": "PodScheduled"
+                }
+              ],
+              "containerStatuses": [
+                {
+                  "containerID": "containerd://1bb5adb90cd59c1167bc535fdaaf1a4725a618803fdaca420f1e5e807df51517",
+                  "image": "gcr.io/kaniko-project/executor:latest",
+                  "imageID": "gcr.io/kaniko-project/executor@sha256:9e69fd4330ec887829c780f5126dd80edc663df6def362cd22e79bcdf00ac53f",
+                  "name": "c-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0",
+                  "ready": false,
+                  "restartCount": 0,
+                  "started": false,
+                  "state": {
+                    "terminated": {
+                      "containerID": "containerd://1bb5adb90cd59c1167bc535fdaaf1a4725a618803fdaca420f1e5e807df51517",
+                      "exitCode": 1,
+                      "finishedAt": 1732101051,
+                      "reason": "Error",
+                      "startedAt": 1732100921
+                    }
+                  }
+                }
+              ],
+              "hostIP": "10.1.0.4",
+              "hostIPs": [
+                {
+                  "ip": "10.1.0.4"
+                }
+              ],
+              "initContainerStatuses": [
+                {
+                  "containerID": "containerd://6a545a27dfd37f5202715c582705276fa7c329d17c382bc6a0a7f1dbda610eb1",
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool:latest",
+                  "imageID": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool@sha256:c302d32dce6c34bd00c7ee72e24d70cb0a1c4a970be785bc82d1738e51c2f26d",
+                  "name": "init-container-8f61807d-6f25-49c2-ba36-c95899074af0",
+                  "ready": true,
+                  "restartCount": 0,
+                  "started": false,
+                  "state": {
+                    "terminated": {
+                      "containerID": "containerd://6a545a27dfd37f5202715c582705276fa7c329d17c382bc6a0a7f1dbda610eb1",
+                      "exitCode": 0,
+                      "finishedAt": 1732100916,
+                      "reason": "Completed",
+                      "startedAt": 1732100916
+                    }
+                  }
+                }
+              ],
+              "phase": "Failed",
+              "podIP": "192.168.1.216",
+              "podIPs": [
+                {
+                  "ip": "192.168.1.216"
+                }
+              ],
+              "qosClass": "BestEffort",
+              "startTime": 1732100913
+            }
+          }
+        ],
+        "job": {
+          "metadata": {
+            "creationTimestamp": 1732100913,
+            "generation": 1,
+            "labels": {
+              "app.kubernetes.io/instance": "dhcore-8f61807d-6f25-49c2-ba36-c95899074af0",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "8f61807d-6f25-49c2-ba36-c95899074af0",
+              "dhcore/framework": "k8sbuild",
+              "dhcore/function": "func3a",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "python"
+            },
+            "managedFields": [
+              {
+                "apiVersion": "batch/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "Kubernetes Java Client",
+                "operation": "Update",
+                "time": 1732100913
+              },
+              {
+                "apiVersion": "batch/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "subresource": "status",
+                "time": 1732101065
+              }
+            ],
+            "name": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0",
+            "namespace": "digitalhub-tenant1",
+            "resourceVersion": "129035",
+            "uid": "d6f1fe22-6ab5-4df3-9cf1-972e17dbd5ae"
+          },
+          "apiVersion": "batch/v1",
+          "kind": "Job",
+          "spec": {
+            "activeDeadlineSeconds": 259200,
+            "backoffLimit": 0,
+            "completionMode": "NonIndexed",
+            "completions": 1,
+            "manualSelector": false,
+            "parallelism": 1,
+            "podReplacementPolicy": "TerminatingOrFailed",
+            "selector": {
+              "matchLabels": {
+                "batch.kubernetes.io/controller-uid": "d6f1fe22-6ab5-4df3-9cf1-972e17dbd5ae"
+              }
+            },
+            "suspend": false,
+            "template": {
+              "metadata": {
+                "labels": {
+                  "app.kubernetes.io/instance": "dhcore-8f61807d-6f25-49c2-ba36-c95899074af0",
+                  "app.kubernetes.io/managed-by": "dhcore",
+                  "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                  "app.kubernetes.io/version": "8f61807d-6f25-49c2-ba36-c95899074af0",
+                  "batch.kubernetes.io/controller-uid": "d6f1fe22-6ab5-4df3-9cf1-972e17dbd5ae",
+                  "batch.kubernetes.io/job-name": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0",
+                  "controller-uid": "d6f1fe22-6ab5-4df3-9cf1-972e17dbd5ae",
+                  "dhcore/framework": "k8sbuild",
+                  "dhcore/function": "func3a",
+                  "dhcore/project": "demo-etl",
+                  "dhcore/runtime": "python",
+                  "job-name": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                },
+                "name": "j-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "args": [
+                      "--dockerfile=/init-config-map/Dockerfile",
+                      "--context=/shared",
+                      "--destination=registry.tenant1.digitalhub-dev.smartcommunitylab.it/digitalhub-tenant1-debian:8f618"
+                    ],
+                    "env": [
+                      {
+                        "name": "DH_RUN_SECRET_NAME",
+                        "value": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                      },
+                      {
+                        "name": "PYTHONPATH",
+                        "value": "${PYTHONPATH}:/shared/"
+                      },
+                      {
+                        "name": "DHCORE_ACCESS_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ACCESS_TOKEN",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_REFRESH_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_REFRESH_TOKEN",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_CLIENT_ID",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_CLIENT_ID",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_TOKEN_TYPE",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_TOKEN_TYPE",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_ISSUER",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ISSUER",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "PROJECT_NAME",
+                        "value": "demo-etl"
+                      },
+                      {
+                        "name": "DHCORE_EXPIRES_IN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_EXPIRES_IN",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "RUN_ID",
+                        "value": "8f61807d-6f25-49c2-ba36-c95899074af0"
+                      }
+                    ],
+                    "envFrom": [
+                      {
+                        "configMapRef": {
+                          "name": "digitalhub-common-env"
+                        }
+                      },
+                      {
+                        "secretRef": {
+                          "name": "digitalhub-common-creds"
+                        }
+                      }
+                    ],
+                    "image": "gcr.io/kaniko-project/executor:latest",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "c-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0",
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/shared",
+                        "name": "shared-dir"
+                      },
+                      {
+                        "mountPath": "/init-config-map",
+                        "name": "init-config-map"
+                      },
+                      {
+                        "mountPath": "/kaniko/.docker",
+                        "name": "registry-credentials"
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "initContainers": [
+                  {
+                    "command": [
+                      "/bin/bash",
+                      "-c",
+                      "/app/builder-tool.sh"
+                    ],
+                    "env": [
+                      {
+                        "name": "DH_RUN_SECRET_NAME",
+                        "value": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                      },
+                      {
+                        "name": "PYTHONPATH",
+                        "value": "${PYTHONPATH}:/shared/"
+                      },
+                      {
+                        "name": "DHCORE_ACCESS_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ACCESS_TOKEN",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_REFRESH_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_REFRESH_TOKEN",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_CLIENT_ID",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_CLIENT_ID",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_TOKEN_TYPE",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_TOKEN_TYPE",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_ISSUER",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ISSUER",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "PROJECT_NAME",
+                        "value": "demo-etl"
+                      },
+                      {
+                        "name": "DHCORE_EXPIRES_IN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_EXPIRES_IN",
+                            "name": "sec-pythonbuild-8f61807d-6f25-49c2-ba36-c95899074af0"
+                          }
+                        }
+                      },
+                      {
+                        "name": "RUN_ID",
+                        "value": "8f61807d-6f25-49c2-ba36-c95899074af0"
+                      }
+                    ],
+                    "envFrom": [
+                      {
+                        "configMapRef": {
+                          "name": "digitalhub-common-env"
+                        }
+                      },
+                      {
+                        "secretRef": {
+                          "name": "digitalhub-common-creds"
+                        }
+                      }
+                    ],
+                    "image": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool:latest",
+                    "imagePullPolicy": "Always",
+                    "name": "init-container-8f61807d-6f25-49c2-ba36-c95899074af0",
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/shared",
+                        "name": "shared-dir"
+                      },
+                      {
+                        "mountPath": "/init-config-map",
+                        "name": "init-config-map"
+                      },
+                      {
+                        "mountPath": "/kaniko/.docker",
+                        "name": "registry-credentials"
+                      }
+                    ]
+                  }
+                ],
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "emptyDir": {
+                      "sizeLimit": {
+                        "number": 104857600,
+                        "format": "BINARY_SI"
+                      }
+                    },
+                    "name": "shared-dir"
+                  },
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "init-config-map-8f61807d-6f25-49c2-ba36-c95899074af0"
+                    },
+                    "name": "init-config-map"
+                  },
+                  {
+                    "name": "registry-credentials",
+                    "secret": {
+                      "defaultMode": 420,
+                      "items": [
+                        {
+                          "key": ".dockerconfigjson",
+                          "path": "config.json"
+                        }
+                      ],
+                      "secretName": "registry-credentials"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "status": {
+            "conditions": [
+              {
+                "lastProbeTime": 1732101065,
+                "lastTransitionTime": 1732101065,
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "Failed"
+              }
+            ],
+            "failed": 1,
+            "ready": 0,
+            "startTime": 1732100913,
+            "terminating": 0
+          }
+        }
+      }
+    },
+    "user": "digitalhubdev"
+  }

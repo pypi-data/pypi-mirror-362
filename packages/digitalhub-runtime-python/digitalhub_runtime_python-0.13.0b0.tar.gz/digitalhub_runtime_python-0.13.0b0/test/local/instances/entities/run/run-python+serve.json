@@ -1,0 +1,1973 @@
+{
+    "id": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+    "key": "store://demo-etl/run/python+run/3c620611-b8dc-41f2-bee6-3b21e3d35265",
+    "kind": "python+run",
+    "metadata": {
+      "name": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+      "updated_by": "digitalhubdev",
+      "project": "demo-etl",
+      "updated": "2024-11-20T12:21:38.853Z",
+      "created_by": "digitalhubdev",
+      "created": "2024-11-20T11:11:08.481Z"
+    },
+    "name": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+    "project": "demo-etl",
+    "spec": {
+      "init_parameters": {"test": "test"},
+      "outputs": {},
+      "image": "debian:1.22.04",
+      "requirements": [
+        "requests"
+      ],
+      "replicas": 3,
+      "inputs": {
+        "di": "store://demo-etl/dataitem/dataitem/dataitem1:fd83dqa7vnh-73e45-m3pqawew"
+      },
+      "profile": "1xa100",
+      "source": {
+        "source": "main.py",
+        "handler": "handler",
+        "base64": "ZGVmIGhhbmRsZXIoKToKICAgIHByaW50KCJIZWxsbyB3b3JsZCEiKQ==",
+        "lang": "python"
+      },
+      "local_execution": false,
+      "service_type": "NodePort",
+      "task": "python+serve://demo-etl/e9f4c0ef-579f-495c-9f65-4360f2181e4f",
+      "base_image": "debian:1.22.04",
+      "function": "python://demo-etl/func3a:e9f4c0ef-579f-495c-9f65-4360f2181e4f",
+      "python_version": "PYTHON3_10",
+      "parameters": {
+        "param1": 100
+      },
+      "resources": {
+        "cpu": {
+          "requests": "0100m",
+          "limits": "0200m"
+        },
+        "mem": {
+          "requests": "0100Ki",
+          "limits": "0200Ki"
+        },
+        "gpu": {
+          "limits": "01"
+        }
+      },
+      "envs": [
+        {
+          "name": "USER",
+          "value": "test"
+        }
+      ],
+      "secrets": [
+        "secret-key"
+      ],
+      "volumes": [
+        {
+          "name": "volume1",
+          "volume_type": "empty_dir",
+          "mount_path": "/volume1"
+        },
+        {
+          "name": "volume2",
+          "volume_type": "persistent_volume_claim",
+          "mount_path": "/volume2"
+        }
+      ],
+      "node_selector": [
+        {
+          "key": "node1",
+          "value": "value1"
+        }
+      ]
+    },
+    "status": {
+      "state": "ERROR",
+      "transitions": [
+        {
+          "status": "ERROR",
+          "message": "k8s:  {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"deployments.apps \\\"d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265\\\" not found\",\"reason\":\"NotFound\",\"details\":{\"name\":\"d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265\",\"group\":\"apps\",\"kind\":\"deployments\"},\"code\":404}\n ",
+          "time": "2024-11-20T12:21:38.550448572Z"
+        },
+        {
+          "status": "RUNNING",
+          "message": "deployment d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265 created, service s-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265 created",
+          "time": "2024-11-20T11:11:08.753814182Z"
+        },
+        {
+          "status": "READY",
+          "time": "2024-11-20T11:11:08.676823944Z"
+        },
+        {
+          "status": "BUILT",
+          "time": "2024-11-20T11:11:08.662087601Z"
+        }
+      ],
+      "message": "k8s:  {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"deployments.apps \\\"d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265\\\" not found\",\"reason\":\"NotFound\",\"details\":{\"name\":\"d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265\",\"group\":\"apps\",\"kind\":\"deployments\"},\"code\":404}\n ",
+      "service": {
+        "name": "s-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+        "namespace": "digitalhub-tenant1",
+        "type": "NodePort",
+        "clusterIP": "10.106.216.89",
+        "ports": [
+          {
+            "name": "port8080",
+            "nodePort": 30566,
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "url": "s-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265.digitalhub-tenant1:8080"
+      },
+      "k8s": {
+        "pods": [
+          {
+            "metadata": {
+              "creationTimestamp": 1732101068,
+              "generateName": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6dbc-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "dhcore/framework": "k8sserve",
+                "dhcore/function": "func3a",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "python",
+                "dhcore/template": "1xa100",
+                "pod-template-hash": "6755dc6dbc"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101068
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-scheduler",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732103131
+                }
+              ],
+              "name": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6klnxm",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "apps/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "ReplicaSet",
+                  "name": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6dbc",
+                  "uid": "8a4bcf9e-ff45-4079-8f67-31fd1a98c6d5"
+                }
+              ],
+              "resourceVersion": "161151",
+              "uid": "d234830f-23cc-4256-ab00-a94c626a1b6a"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "/shared/entrypoint.sh",
+                    "--processor",
+                    "/usr/local/bin/processor",
+                    "--config",
+                    "/shared/function.yaml",
+                    "--requirements",
+                    "/shared/requirements.txt"
+                  ],
+                  "command": [
+                    "/bin/bash"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    },
+                    {
+                      "name": "PYTHONPATH",
+                      "value": "${PYTHONPATH}:/shared/"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "debian:1.22.04",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 5,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/shared",
+                      "name": "shared-dir"
+                    },
+                    {
+                      "mountPath": "/init-config-map",
+                      "name": "init-config-map"
+                    },
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-2p9sc",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "initContainers": [
+                {
+                  "command": [
+                    "/bin/bash",
+                    "-c",
+                    "/app/builder-tool.sh"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    },
+                    {
+                      "name": "PYTHONPATH",
+                      "value": "${PYTHONPATH}:/shared/"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool:latest",
+                  "imagePullPolicy": "Always",
+                  "name": "init-container-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 5,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/shared",
+                      "name": "shared-dir"
+                    },
+                    {
+                      "mountPath": "/init-config-map",
+                      "name": "init-config-map"
+                    },
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-2p9sc",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Always",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "fs_group": 1000,
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoSchedule",
+                  "key": "nvidia.com/gpu",
+                  "operator": "Equal",
+                  "value": "a100"
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "emptyDir": {
+                    "sizeLimit": {
+                      "number": 104857600,
+                      "format": "BINARY_SI"
+                    }
+                  },
+                  "name": "shared-dir"
+                },
+                {
+                  "configMap": {
+                    "defaultMode": 420,
+                    "name": "init-config-map-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                  },
+                  "name": "init-config-map"
+                },
+                {
+                  "name": "kube-api-access-2p9sc",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101068,
+                  "message": "0/7 nodes are available: 1 Insufficient cpu, 3 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }, 4 Insufficient nvidia.com/gpu. preemption: 0/7 nodes are available: 3 Preemption is not helpful for scheduling, 4 No preemption victims found for incoming pod.",
+                  "reason": "Unschedulable",
+                  "status": "False",
+                  "type": "PodScheduled"
+                }
+              ],
+              "phase": "Pending",
+              "qosClass": "Burstable"
+            }
+          },
+          {
+            "metadata": {
+              "creationTimestamp": 1732101068,
+              "generateName": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6dbc-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "dhcore/framework": "k8sserve",
+                "dhcore/function": "func3a",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "python",
+                "dhcore/template": "1xa100",
+                "pod-template-hash": "6755dc6dbc"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101068
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-scheduler",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732103131
+                }
+              ],
+              "name": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6mctbh",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "apps/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "ReplicaSet",
+                  "name": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6dbc",
+                  "uid": "8a4bcf9e-ff45-4079-8f67-31fd1a98c6d5"
+                }
+              ],
+              "resourceVersion": "161149",
+              "uid": "0f3c1584-b019-43a9-b5f9-3df5a49da733"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "/shared/entrypoint.sh",
+                    "--processor",
+                    "/usr/local/bin/processor",
+                    "--config",
+                    "/shared/function.yaml",
+                    "--requirements",
+                    "/shared/requirements.txt"
+                  ],
+                  "command": [
+                    "/bin/bash"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    },
+                    {
+                      "name": "PYTHONPATH",
+                      "value": "${PYTHONPATH}:/shared/"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "debian:1.22.04",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 5,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/shared",
+                      "name": "shared-dir"
+                    },
+                    {
+                      "mountPath": "/init-config-map",
+                      "name": "init-config-map"
+                    },
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-94jkn",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "initContainers": [
+                {
+                  "command": [
+                    "/bin/bash",
+                    "-c",
+                    "/app/builder-tool.sh"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    },
+                    {
+                      "name": "PYTHONPATH",
+                      "value": "${PYTHONPATH}:/shared/"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool:latest",
+                  "imagePullPolicy": "Always",
+                  "name": "init-container-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 5,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/shared",
+                      "name": "shared-dir"
+                    },
+                    {
+                      "mountPath": "/init-config-map",
+                      "name": "init-config-map"
+                    },
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-94jkn",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Always",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "fs_group": 1000,
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoSchedule",
+                  "key": "nvidia.com/gpu",
+                  "operator": "Equal",
+                  "value": "a100"
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "emptyDir": {
+                    "sizeLimit": {
+                      "number": 104857600,
+                      "format": "BINARY_SI"
+                    }
+                  },
+                  "name": "shared-dir"
+                },
+                {
+                  "configMap": {
+                    "defaultMode": 420,
+                    "name": "init-config-map-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                  },
+                  "name": "init-config-map"
+                },
+                {
+                  "name": "kube-api-access-94jkn",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101068,
+                  "message": "0/7 nodes are available: 1 Insufficient cpu, 3 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }, 4 Insufficient nvidia.com/gpu. preemption: 0/7 nodes are available: 3 Preemption is not helpful for scheduling, 4 No preemption victims found for incoming pod.",
+                  "reason": "Unschedulable",
+                  "status": "False",
+                  "type": "PodScheduled"
+                }
+              ],
+              "phase": "Pending",
+              "qosClass": "Burstable"
+            }
+          },
+          {
+            "metadata": {
+              "creationTimestamp": 1732101068,
+              "generateName": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6dbc-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "dhcore/framework": "k8sserve",
+                "dhcore/function": "func3a",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "python",
+                "dhcore/template": "1xa100",
+                "pod-template-hash": "6755dc6dbc"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101068
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-scheduler",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732103131
+                }
+              ],
+              "name": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6npvsb",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "apps/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "ReplicaSet",
+                  "name": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6dbc",
+                  "uid": "8a4bcf9e-ff45-4079-8f67-31fd1a98c6d5"
+                }
+              ],
+              "resourceVersion": "161152",
+              "uid": "b69042e3-2461-434a-8361-68483cb75140"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "/shared/entrypoint.sh",
+                    "--processor",
+                    "/usr/local/bin/processor",
+                    "--config",
+                    "/shared/function.yaml",
+                    "--requirements",
+                    "/shared/requirements.txt"
+                  ],
+                  "command": [
+                    "/bin/bash"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    },
+                    {
+                      "name": "PYTHONPATH",
+                      "value": "${PYTHONPATH}:/shared/"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "debian:1.22.04",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 5,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/shared",
+                      "name": "shared-dir"
+                    },
+                    {
+                      "mountPath": "/init-config-map",
+                      "name": "init-config-map"
+                    },
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-gxzp9",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "initContainers": [
+                {
+                  "command": [
+                    "/bin/bash",
+                    "-c",
+                    "/app/builder-tool.sh"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    },
+                    {
+                      "name": "PYTHONPATH",
+                      "value": "${PYTHONPATH}:/shared/"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool:latest",
+                  "imagePullPolicy": "Always",
+                  "name": "init-container-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                  "resources": {
+                    "limits": {
+                      "cpu": {
+                        "number": 5,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    },
+                    "requests": {
+                      "cpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      },
+                      "nvidia.com/gpu": {
+                        "number": 1,
+                        "format": "DECIMAL_SI"
+                      }
+                    }
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/shared",
+                      "name": "shared-dir"
+                    },
+                    {
+                      "mountPath": "/init-config-map",
+                      "name": "init-config-map"
+                    },
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-gxzp9",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Always",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "fs_group": 1000,
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoSchedule",
+                  "key": "nvidia.com/gpu",
+                  "operator": "Equal",
+                  "value": "a100"
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "emptyDir": {
+                    "sizeLimit": {
+                      "number": 104857600,
+                      "format": "BINARY_SI"
+                    }
+                  },
+                  "name": "shared-dir"
+                },
+                {
+                  "configMap": {
+                    "defaultMode": 420,
+                    "name": "init-config-map-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                  },
+                  "name": "init-config-map"
+                },
+                {
+                  "name": "kube-api-access-gxzp9",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101068,
+                  "message": "0/7 nodes are available: 1 Insufficient cpu, 3 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }, 4 Insufficient nvidia.com/gpu. preemption: 0/7 nodes are available: 3 Preemption is not helpful for scheduling, 4 No preemption victims found for incoming pod.",
+                  "reason": "Unschedulable",
+                  "status": "False",
+                  "type": "PodScheduled"
+                }
+              ],
+              "phase": "Pending",
+              "qosClass": "Burstable"
+            }
+          }
+        ],
+        "secret": {
+          "secret": {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+              "labels": {
+                "dhcore/framework": "k8sserve",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "dhcore/function": "func3a",
+                "dhcore/template": "1xa100",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "python",
+                "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+              },
+              "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+              "namespace": "digitalhub-tenant1"
+            }
+          }
+        },
+        "configMap": {
+          "configMap": {
+            "metadata": {
+              "labels": {
+                "dhcore/framework": "k8sserve",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "dhcore/function": "func3a",
+                "dhcore/template": "1xa100",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "python",
+                "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+              },
+              "name": "init-config-map-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+            }
+          }
+        },
+        "service": {
+          "metadata": {
+            "creationTimestamp": 1732101068,
+            "labels": {
+              "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+              "dhcore/framework": "k8sserve",
+              "dhcore/function": "func3a",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "python",
+              "dhcore/template": "1xa100"
+            },
+            "managedFields": [
+              {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "manager": "Kubernetes Java Client",
+                "operation": "Update",
+                "time": 1732101068
+              }
+            ],
+            "name": "s-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+            "namespace": "digitalhub-tenant1",
+            "resourceVersion": "129100",
+            "uid": "5114c0b0-34aa-487d-a1f8-b3b28a6a050a"
+          },
+          "apiVersion": "v1",
+          "kind": "Service",
+          "spec": {
+            "clusterIP": "10.106.216.89",
+            "clusterIPs": [
+              "10.106.216.89"
+            ],
+            "externalTrafficPolicy": "Cluster",
+            "internalTrafficPolicy": "Cluster",
+            "ipFamilies": [
+              "IPv4"
+            ],
+            "ipFamilyPolicy": "SingleStack",
+            "ports": [
+              {
+                "name": "port8080",
+                "nodePort": 30566,
+                "port": 8080,
+                "protocol": "TCP",
+                "targetPort": 8080
+              }
+            ],
+            "selector": {
+              "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+              "dhcore/framework": "k8sserve",
+              "dhcore/function": "func3a",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "python",
+              "dhcore/template": "1xa100"
+            },
+            "sessionAffinity": "None",
+            "type": "NodePort"
+          }
+        },
+        "deployment": {
+          "metadata": {
+            "annotations": {
+              "deployment.kubernetes.io/revision": "1"
+            },
+            "creationTimestamp": 1732101068,
+            "generation": 1,
+            "labels": {
+              "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+              "dhcore/framework": "k8sserve",
+              "dhcore/function": "func3a",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "python",
+              "dhcore/template": "1xa100"
+            },
+            "managedFields": [
+              {
+                "apiVersion": "apps/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "Kubernetes Java Client",
+                "operation": "Update",
+                "time": 1732101068
+              },
+              {
+                "apiVersion": "apps/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "subresource": "status",
+                "time": 1732101669
+              }
+            ],
+            "name": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+            "namespace": "digitalhub-tenant1",
+            "resourceVersion": "138514",
+            "uid": "5c0d11f8-eab5-4891-bdd6-efec848f0ddf"
+          },
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "spec": {
+            "progressDeadlineSeconds": 600,
+            "replicas": 3,
+            "revisionHistoryLimit": 10,
+            "selector": {
+              "matchLabels": {
+                "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                "dhcore/framework": "k8sserve",
+                "dhcore/function": "func3a",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "python",
+                "dhcore/template": "1xa100"
+              }
+            },
+            "strategy": {
+              "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+              },
+              "type": "RollingUpdate"
+            },
+            "template": {
+              "metadata": {
+                "labels": {
+                  "app.kubernetes.io/instance": "dhcore-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                  "app.kubernetes.io/managed-by": "dhcore",
+                  "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                  "app.kubernetes.io/version": "3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                  "dhcore/framework": "k8sserve",
+                  "dhcore/function": "func3a",
+                  "dhcore/project": "demo-etl",
+                  "dhcore/runtime": "python",
+                  "dhcore/template": "1xa100"
+                },
+                "name": "d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "args": [
+                      "/shared/entrypoint.sh",
+                      "--processor",
+                      "/usr/local/bin/processor",
+                      "--config",
+                      "/shared/function.yaml",
+                      "--requirements",
+                      "/shared/requirements.txt"
+                    ],
+                    "command": [
+                      "/bin/bash"
+                    ],
+                    "env": [
+                      {
+                        "name": "DH_RUN_SECRET_NAME",
+                        "value": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                      },
+                      {
+                        "name": "PYTHONPATH",
+                        "value": "${PYTHONPATH}:/shared/"
+                      },
+                      {
+                        "name": "DHCORE_ACCESS_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ACCESS_TOKEN",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_REFRESH_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_REFRESH_TOKEN",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_CLIENT_ID",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_CLIENT_ID",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_TOKEN_TYPE",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_TOKEN_TYPE",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_ISSUER",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ISSUER",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "PROJECT_NAME",
+                        "value": "demo-etl"
+                      },
+                      {
+                        "name": "DHCORE_EXPIRES_IN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_EXPIRES_IN",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "RUN_ID",
+                        "value": "3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                      }
+                    ],
+                    "envFrom": [
+                      {
+                        "configMapRef": {
+                          "name": "digitalhub-common-env"
+                        }
+                      },
+                      {
+                        "secretRef": {
+                          "name": "digitalhub-common-creds"
+                        }
+                      }
+                    ],
+                    "image": "debian:1.22.04",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "c-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                    "resources": {
+                      "limits": {
+                        "cpu": {
+                          "number": 5,
+                          "format": "DECIMAL_SI"
+                        },
+                        "nvidia.com/gpu": {
+                          "number": 1,
+                          "format": "DECIMAL_SI"
+                        }
+                      },
+                      "requests": {
+                        "cpu": {
+                          "number": 1,
+                          "format": "DECIMAL_SI"
+                        },
+                        "nvidia.com/gpu": {
+                          "number": 1,
+                          "format": "DECIMAL_SI"
+                        }
+                      }
+                    },
+                    "securityContext": {
+                      "allowPrivilegeEscalation": false,
+                      "privileged": false,
+                      "runAsNonRoot": true
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/shared",
+                        "name": "shared-dir"
+                      },
+                      {
+                        "mountPath": "/init-config-map",
+                        "name": "init-config-map"
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "imagePullSecrets": [
+                  {
+                    "name": "registry-credentials"
+                  }
+                ],
+                "initContainers": [
+                  {
+                    "command": [
+                      "/bin/bash",
+                      "-c",
+                      "/app/builder-tool.sh"
+                    ],
+                    "env": [
+                      {
+                        "name": "DH_RUN_SECRET_NAME",
+                        "value": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                      },
+                      {
+                        "name": "PYTHONPATH",
+                        "value": "${PYTHONPATH}:/shared/"
+                      },
+                      {
+                        "name": "DHCORE_ACCESS_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ACCESS_TOKEN",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_REFRESH_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_REFRESH_TOKEN",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_CLIENT_ID",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_CLIENT_ID",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_TOKEN_TYPE",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_TOKEN_TYPE",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_ISSUER",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ISSUER",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "PROJECT_NAME",
+                        "value": "demo-etl"
+                      },
+                      {
+                        "name": "DHCORE_EXPIRES_IN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_EXPIRES_IN",
+                            "name": "sec-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                          }
+                        }
+                      },
+                      {
+                        "name": "RUN_ID",
+                        "value": "3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                      }
+                    ],
+                    "envFrom": [
+                      {
+                        "configMapRef": {
+                          "name": "digitalhub-common-env"
+                        }
+                      },
+                      {
+                        "secretRef": {
+                          "name": "digitalhub-common-creds"
+                        }
+                      }
+                    ],
+                    "image": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool:latest",
+                    "imagePullPolicy": "Always",
+                    "name": "init-container-3c620611-b8dc-41f2-bee6-3b21e3d35265",
+                    "resources": {
+                      "limits": {
+                        "cpu": {
+                          "number": 5,
+                          "format": "DECIMAL_SI"
+                        },
+                        "nvidia.com/gpu": {
+                          "number": 1,
+                          "format": "DECIMAL_SI"
+                        }
+                      },
+                      "requests": {
+                        "cpu": {
+                          "number": 1,
+                          "format": "DECIMAL_SI"
+                        },
+                        "nvidia.com/gpu": {
+                          "number": 1,
+                          "format": "DECIMAL_SI"
+                        }
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/shared",
+                        "name": "shared-dir"
+                      },
+                      {
+                        "mountPath": "/init-config-map",
+                        "name": "init-config-map"
+                      }
+                    ]
+                  }
+                ],
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                  "fs_group": 1000,
+                  "runAsNonRoot": true
+                },
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                  {
+                    "effect": "NoSchedule",
+                    "key": "nvidia.com/gpu",
+                    "operator": "Equal",
+                    "value": "a100"
+                  }
+                ],
+                "volumes": [
+                  {
+                    "emptyDir": {
+                      "sizeLimit": {
+                        "number": 104857600,
+                        "format": "BINARY_SI"
+                      }
+                    },
+                    "name": "shared-dir"
+                  },
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "init-config-map-3c620611-b8dc-41f2-bee6-3b21e3d35265"
+                    },
+                    "name": "init-config-map"
+                  }
+                ]
+              }
+            }
+          },
+          "status": {
+            "conditions": [
+              {
+                "lastTransitionTime": 1732101068,
+                "lastUpdateTime": 1732101068,
+                "message": "Deployment does not have minimum availability.",
+                "reason": "MinimumReplicasUnavailable",
+                "status": "False",
+                "type": "Available"
+              },
+              {
+                "lastTransitionTime": 1732101669,
+                "lastUpdateTime": 1732101669,
+                "message": "ReplicaSet \"d-pythonserve-3c620611-b8dc-41f2-bee6-3b21e3d35265-6755dc6dbc\" has timed out progressing.",
+                "reason": "ProgressDeadlineExceeded",
+                "status": "False",
+                "type": "Progressing"
+              }
+            ],
+            "observedGeneration": 1,
+            "replicas": 3,
+            "unavailableReplicas": 3,
+            "updatedReplicas": 3
+          }
+        }
+      }
+    },
+    "user": "digitalhubdev"
+  }
