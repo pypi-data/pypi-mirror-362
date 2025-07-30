@@ -1,0 +1,27 @@
+from taskvine_report.utils import *
+from flask import Blueprint, jsonify, current_app
+
+file_transferred_size_bp = Blueprint('file_transferred_size', __name__, url_prefix='/api')
+
+@file_transferred_size_bp.route('/file-transferred-size')
+@check_and_reload_data()
+def get_file_transferred_size():
+    try:
+        df = read_csv_to_fd(current_app.config["RUNTIME_STATE"].csv_file_file_transferred_size)
+        points, unit = extract_size_points_from_df(df, 'time', 'cumulative_size_mb')
+        
+        x_domain = get_current_time_domain()
+        y_domain = extract_y_range_from_points(points)
+
+        return jsonify({
+            'points': downsample_points(points),
+            'x_domain': x_domain,
+            'y_domain': y_domain,
+            'x_tick_values': compute_linear_tick_values(x_domain),
+            'y_tick_values': compute_linear_tick_values(y_domain),
+            'x_tick_formatter': d3_time_formatter(),
+            'y_tick_formatter': d3_size_formatter(unit)
+        })
+    except Exception as e:
+        current_app.config["RUNTIME_STATE"].log_error(f"Error in get_file_transferred_size: {e}")
+        return jsonify({'error': str(e)}), 500
