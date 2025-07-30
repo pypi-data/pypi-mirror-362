@@ -1,0 +1,165 @@
+Metadata-Version: 2.4
+Name: chibi
+Version: 0.17.0
+Summary: python snippets and other useful things
+Home-page: https://github.com/dem4ply/chibi
+Author: dem4ply
+Author-email: dem4ply@gmail.com
+License: WTFPL
+Keywords: chibi
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: Public Domain
+Classifier: Natural Language :: English
+Classifier: Natural Language :: Spanish
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Utilities
+License-File: LICENSE
+License-File: AUTHORS.rst
+Requires-Dist: python-magic>=0.4.15
+Requires-Dist: dateutils>=0.6.6
+Requires-Dist: xmltodict>=0.12.0
+Requires-Dist: pyyaml>=5.1.2
+Requires-Dist: chibi-donkey>=1.0.1
+Requires-Dist: chibi-atlas>=1.0.2
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: summary
+
+=====
+chibi
+=====
+
+.. image:: https://img.shields.io/pypi/v/chibi.svg
+        :target: https://pypi.python.org/pypi/chibi
+
+.. image:: https://readthedocs.org/projects/chibi/badge/?version=latest
+    :target: https://chibi.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+
+python snippets and other useful things
+
+this package is for i can put snippets and other useful things
+and i do not need to write the same thing for fifth time
+
+
+* Free software: WTFPL
+* Documentation: https://chibi-apache.readthedocs.io.
+
+*************
+cosas utitles
+*************
+
+Chibi_path
+==========
+
+the chibi path work like strings but with operators have sense for folders
+and files
+
+.. code-block:: python
+
+	from chibi.file import Chibi_path
+
+	tmp = Chibi_path( '/tmp/folder' )
+	isinstance( tmp, str ) == True
+	tmp.mkdir()
+	# return a generator with all the files and folders in
+	# the path
+	ls = list( tmp.ls() )
+	print( ls )
+	p = tmp + 'file.json'
+	str( p ) == '/tmp/folder/file.json'
+	f = p.open()
+	f.write('some string')
+	# check the file to see if it contains the string
+	'some string' in f
+
+	# write a dict like json in the file
+	f.write( { 'stuff': 'str' } )
+	# read the json and transform the dict in a Chibi_atlas
+	json = f.read()
+	json.stuff == 'str'
+
+	# the same but in yaml
+	f = tmp + 'file.yaml'
+	y = f.open()
+
+	y.write( { 'stuff': 'str' } )
+	yaml = y.read()
+	yaml.stuff == 'str'
+
+
+Chibi_atlas
+===========
+
+esta herramienta se migro al paquete chibi-atlas
+
+this is a dict but his keys can be access like attribute
+
+.. code-block:: python
+
+	from chibi.atlas import Chibi_atlas
+
+
+	c = Chibi_atlas( { 'stuff': 'str', 'l': [ 1, { 'more_stuff': 'str_2' } ] } )
+	isinstance( c, dict ) == True
+	c.stuff == 'str'
+	c.l[0] == 1
+	c.l[1].more_stuff == 'str_2'
+
+
+=======
+History
+=======
+
+*******************
+0.17.0 (2025-03-12)
+*******************
+
+* los config de los envars ahora funcionan como chibi_atlas para encadenar 
+  atributos
+
+*******************
+0.16.1 (2025-03-12)
+*******************
+
+* cuando no hay un home no carga el archivo de configuracion de chibi
+
+*******************
+0.16.0 (2025-03-11)
+*******************
+
+* se agrego el parametro para no elimnar los chibi_path_temp cuando se eliminen
+
+******
+0.14.0
+******
+
+* inicio de migracion de pillow a chibi_miru
+
+*******
+0.11.10
+*******
+
+* se migro chibi.atlas a un paquete separado chibi-atlas
+
+******************
+0.0.1 (2019-12-18)
+******************
+
+* First release on PyPI.
