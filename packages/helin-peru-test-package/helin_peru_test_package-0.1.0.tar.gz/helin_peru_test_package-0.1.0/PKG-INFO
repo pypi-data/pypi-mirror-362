@@ -1,0 +1,274 @@
+Metadata-Version: 2.4
+Name: helin-peru-test-package
+Version: 0.1.0
+Summary: A simple test package for PyPI publishing and Amazon Peru testing
+Project-URL: Homepage, https://github.com/rpidhe/helin-peru-test-package
+Project-URL: Repository, https://github.com/rpidhe/helin-peru-test-package
+Project-URL: Issues, https://github.com/rpidhe/helin-peru-test-package/issues
+Author-email: He Lin <2830585822@qq.com>
+License-Expression: Apache-2.0
+License-File: LICENSE
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.12
+Provides-Extra: dev
+Requires-Dist: pytest-cov>=4.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Helin Peru Test Package
+
+A simple Python test package designed for PyPI publishing workflows and Amazon Peru environment testing. This package demonstrates modern Python packaging practices using uv and hatch, with automated GitHub Actions publishing.
+
+## Features
+
+- Simple, reliable API for testing package functionality
+- Modern Python packaging with uv and hatch
+- Automated PyPI publishing via GitHub Actions
+- Apache 2.0 open source license
+- Python 3.12+ support
+
+## Installation
+
+Install from PyPI using pip:
+
+```bash
+pip install helin-peru-test-package
+```
+
+Or using uv:
+
+```bash
+uv add helin-peru-test-package
+```
+
+## Usage
+
+### Basic Usage
+
+```python
+from pypi_test_package import hello_peru, get_version
+
+# Get a greeting message
+message = hello_peru()
+print(message)  # Output: "Hello from Peru! This package is working correctly."
+
+# Get the package version
+version = get_version()
+print(f"Package version: {version}")
+```
+
+### Amazon Peru Environment Testing
+
+This package is specifically designed to test functionality in Amazon Peru environments. Here's a complete example for Peru testing:
+
+```python
+#!/usr/bin/env python3
+"""
+Amazon Peru Environment Test Script
+This script verifies that the pypi-test-package works correctly in Peru.
+"""
+
+import sys
+import traceback
+from pypi_test_package import hello_peru, get_version
+
+def test_peru_environment():
+    """Test package functionality in Amazon Peru environment."""
+    print("=== PyPI Test Package - Peru Environment Test ===")
+    print()
+    
+    try:
+        # Test 1: Package import
+        print("✓ Package imported successfully")
+        
+        # Test 2: Version check
+        version = get_version()
+        print(f"✓ Package version: {version}")
+        
+        # Test 3: Core functionality
+        greeting = hello_peru()
+        print(f"✓ Core function result: {greeting}")
+        
+        # Test 4: Verify expected output
+        expected_message = "Hello from Peru! This package is working correctly."
+        if greeting == expected_message:
+            print("✓ Function output matches expected result")
+        else:
+            print(f"✗ Unexpected output. Expected: {expected_message}")
+            return False
+            
+        print()
+        print("🎉 All tests passed! Package is working correctly in Peru environment.")
+        return True
+        
+    except Exception as e:
+        print(f"✗ Error during testing: {e}")
+        print("Stack trace:")
+        traceback.print_exc()
+        return False
+
+def main():
+    """Main test execution."""
+    print(f"Python version: {sys.version}")
+    print(f"Platform: {sys.platform}")
+    print()
+    
+    success = test_peru_environment()
+    sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    main()
+```
+
+### Quick Verification
+
+For a quick test to verify the package is working:
+
+```python
+# One-liner test
+from pypi_test_package import hello_peru; print(hello_peru())
+```
+
+## API Reference
+
+### `hello_peru() -> str`
+
+Returns a greeting message specifically designed for Peru environment testing.
+
+**Returns:**
+- `str`: A greeting message confirming the package is working correctly
+
+**Example:**
+```python
+message = hello_peru()
+# Returns: "Hello from Peru! This package is working correctly."
+```
+
+### `get_version() -> str`
+
+Returns the current version of the package.
+
+**Returns:**
+- `str`: The package version number
+
+**Example:**
+```python
+version = get_version()
+# Returns: "0.1.0" (or current version)
+```
+
+## Development
+
+### Requirements
+
+- Python 3.12+
+- uv (for package management)
+- hatch (for building)
+
+### Setup Development Environment
+
+```bash
+# Clone the repository
+git clone https://github.com/rpidhe/helin-peru-test-package.git
+cd helin-peru-test-package
+
+# Install dependencies with uv
+uv sync
+
+# Run tests
+uv run pytest
+
+# Build the package
+uv run hatch build
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+uv run pytest
+
+# Run with coverage
+uv run pytest --cov=src/pypi_test_package
+
+# Run specific test file
+uv run pytest tests/test_basic.py
+```
+
+### Building and Publishing
+
+This package uses GitHub Actions for automated publishing. To release a new version:
+
+1. Update the version in `src/pypi_test_package/__init__.py`
+2. Commit your changes
+3. Create and push a git tag:
+   ```bash
+   git tag v0.1.1
+   git push origin v0.1.1
+   ```
+4. GitHub Actions will automatically build and publish to PyPI
+
+## Project Structure
+
+```
+helin-peru-test-package/
+├── src/
+│   └── pypi_test_package/
+│       └── __init__.py          # Main package code
+├── tests/
+│   └── test_basic.py           # Unit tests
+├── .github/
+│   └── workflows/
+│       └── publish.yml         # GitHub Actions workflow
+├── pyproject.toml              # Package configuration
+├── README.md                   # This file
+├── LICENSE                     # Apache 2.0 license
+└── .gitignore                  # Git ignore rules
+```
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+### Apache License 2.0
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Support
+
+This is a test package designed for PyPI publishing workflows. For issues or questions:
+
+- Check the [Issues](https://github.com/rpidhe/helin-peru-test-package/issues) page
+- Review the documentation above
+- Test in your local environment first
+
+## Changelog
+
+### v0.1.0
+- Initial release
+- Basic `hello_peru()` and `get_version()` functions
+- Apache 2.0 license
+- GitHub Actions publishing workflow
