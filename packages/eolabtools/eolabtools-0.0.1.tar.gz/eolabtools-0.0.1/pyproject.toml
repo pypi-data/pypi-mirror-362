@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eolabtools"
+description = "Collection of tools for data"
+version = "0.0.1"
+requires-python = ">=3.8.13"
+dependencies = []
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+NightOsmReg = [
+    "pytest",
+    "pytest-cov",
+    "pyyaml",
+    "numpy",
+    "gdal==3.11.0",
+    "fiona==1.9.6",
+    "pyogrio",
+    "shapely>=2",
+    "geopandas",
+    "pyrosm",
+    "rasterio",
+    "scikit-image",
+    "opencv-python",
+    "matplotlib"
+]
+SunMapGen = [
+    "pytest",
+    "pytest-cov",
+    "pyyaml",
+    "gdal==3.5.0",
+    "numpy<2",
+    "timezonefinder",
+    "ephem"
+]
+DetecOrCult = [
+    "pytest",
+    "pytest-cov",
+    "pyyaml",
+    "geopandas==0.12.2",
+    "fiona==1.9.6",
+    "rasterio",
+    "gdal==3.11.0",
+    "scikit-learn",
+    "opencv-contrib-python",
+    "rasterstats",
+    "numpy==1.26.4",
+    "pandas==1.5.3"
+]
+
+[project.urls]
+homepage = "https://github.com/CNES/eolabtools"
+repository = "https://github.com/CNES/eolabtools"
+
+[project.scripts]
+night_osm_image_registration = "eolabtools.night_osm_registration.register_image:main"
+night_osm_vector_registration = "eolabtools.night_osm_registration.register_vector:main"
+
+detection_orientation_culture = "eolabtools.detection_orientation_culture.orientation_detection:main"
+
+sun_map_generation = "eolabtools.sun_map_generation.SunMapGenerator:main"
