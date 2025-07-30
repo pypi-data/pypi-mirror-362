@@ -1,0 +1,63 @@
+[build-system]
+requires = [ "poetry-core",]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "pytest-f3ts"
+version = "1.0.15"
+description = "Pytest Plugin for communicating test results and information to a FixturFab Test Runner GUI"
+authors = [ "Duncan Lowder <duncan@fixturfab.com>", "Marzieh Barnes <marzieh@fixturfab.com>",]
+readme = "README.md"
+[[tool.poetry.packages]]
+include = "pytest_f3ts"
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+line_length = 88
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^7.2.1"
+pyyaml = "^6.0"
+requests = "^2.31.0"
+fastapi = "^0.101.0"
+websockets = "^11.0.3"
+websocket-client = "^1.6.2"
+sqlalchemy-file = "^0.5.0"
+pytest-reportlog = "^0.4.0"
+pytest-html = "^4.1.1"
+toml = "^0.10.2"
+tenacity = "^8.2.3"
+
+[tool.pytest.ini_options]
+junit_family = "xunit1"
+enable_assertion_pass_hook = "true"
+
+[tool.poetry.dependencies.pydantic]
+extras = [ "email",]
+version = "^1.10.10"
+
+[tool.poetry.plugins.pytest11]
+f3ts = "pytest_f3ts"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+flake8 = "^5.0.4"
+isort = "^5.12.0"
+pre-commit = "^3.1.1"
+pytest-cov = "^4.0.0"
+tox = "^4.4.6"
+twine = "^4.0.2"
+google-auth = "^2.23.4"
+semver = "^3.0.2"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.4.2"
+mkdocs-material = "^9.0.15"
+mkdocs-minify-plugin = "^0.7.1"
+
+[tool.poetry.group.docs.dependencies.mkdocstrings]
+extras = [ "python",]
+version = "^0.27.0"
