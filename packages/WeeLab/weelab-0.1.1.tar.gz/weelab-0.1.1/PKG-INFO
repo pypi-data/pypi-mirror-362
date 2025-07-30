@@ -1,0 +1,86 @@
+Metadata-Version: 2.4
+Name: WeeLab
+Version: 0.1.1
+Summary: Unified control library for lab equipment (oscilloscopes, power supplies, lasers, etc.)
+Author-email: Vsevolod Yeroshenko <vsevolod.yeroshenko@weeroc.com>
+License-Expression: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: pyserial
+Requires-Dist: pyvisa
+Requires-Dist: python-vxi11
+Requires-Dist: colorama
+
+# Weeroc Lab Devices Package
+
+This is an attempt to make a single python package containing all the tools for controlling the lab equipment as simply as possible.
+
+## Install
+
+### PyPI
+
+To install the package use `pip install weelab`
+
+### For developer use
+
+``` bash
+git clone http://192.168.2.117/vyeroshenko/labpack.git
+cd labpack
+pip install -e .
+```
+
+## Currently available devices
+
+- CAEN A7585 SiPM power supply **(device tested)**
+
+    ``` python
+    from WeeLab import SerialConnection, CAEN_A7585
+    caen = CAEN_A7585(
+        conn=SerialConnection(port="COM6", baudrate=115200))
+    caen.set_voltage(30)  # Set voltage to 30V
+    caen.wait_setpoint_reached()  # Wait until the setpoint is reached
+    caen.get_IV()  # Get the current and voltage values
+    ```
+
+- Lecroy WaveRunner **(device tested)**
+
+    ``` python
+    from WeeLab import Vxi11Connection, LeCroyWaveRunner
+    lecroy = LeCroyWaveRunner(conn=Vxi11Connection(ip="192.168.2.21"))
+    p1_mean = lecroy.getMeasure(1, "MEAN") # Returns mean value of P1 measurement 
+    lecroy.clear_sweeps() # Clear sweeps
+    ```
+
+- NKT Pilas Laser **(device tested)**
+
+    ``` python
+    from WeeLab import SerialConnection, NktPilasLaser
+    laser = NktPilasLaser(
+        conn=SerialConnection(port="COM6", baudrate=19200))
+    laser.set_tune(500) # Sets tune 50%
+    laser.set_frequency(20_000_00) # Sets frequency 20 MHz
+    laser.enable() # Enables radiation
+    ```
+
+- Tektronix AWG generator *(test TODO)*
+
+    ``` python
+    from WeeLab import VisaConnection, Tektronix_AFG3252
+    afg = Tektronix_AFG3252(
+        conn=VisaConnection("USB0::0x0699::0x0345::C010630::INSTR"))
+    afg.do_set_voltage_ch1(5) # Sets voltage on ch1 to 5 V
+    afg.set_frequency_ch1(10_000) # Sets frequency 10 kHz
+    afg.do_set_status_ch1("on") # Enables generation in ch1
+    ```
+
+- WeeMove translation stage *(test TODO)*
+
+    ``` python
+    from WeeLab import SerialConnection, Stage
+    stage = Stage(
+        conn=SerialConnection(port="COM4", baudrate=9600))
+    stage.move(10, 20) # Moves to x=10cm, y=20cm
+    stage.wait_arrived() # Waits until the stage is no longer moving
+    stage.ask_position() # Prints current position
+    ```
+
