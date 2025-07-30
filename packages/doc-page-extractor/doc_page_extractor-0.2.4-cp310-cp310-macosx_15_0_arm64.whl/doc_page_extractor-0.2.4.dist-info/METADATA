@@ -1,0 +1,88 @@
+Metadata-Version: 2.3
+Name: doc-page-extractor
+Version: 0.2.4
+Summary: 
+License: AGPL-3.0
+Author: Tao Zeyu
+Author-email: i@taozeyu.com
+Maintainer: Tao Zeyu
+Maintainer-email: i@taozeyu.com
+Requires-Python: >=3.10,<3.13
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Provides-Extra: cpu
+Provides-Extra: cuda
+Requires-Dist: accelerate (>=1.6.0,<2.0)
+Requires-Dist: doclayout_yolo (>=0.0.3)
+Requires-Dist: huggingface_hub (>=0.33.0,<1.0)
+Requires-Dist: numpy (>=1.24.0,<2.0)
+Requires-Dist: onnxruntime (==1.21.0) ; extra == "cpu"
+Requires-Dist: onnxruntime-gpu (==1.21.0) ; extra == "cuda"
+Requires-Dist: opencv-python (>=4.10.0,<5.0)
+Requires-Dist: pillow (>=10.3,<11.0)
+Requires-Dist: pix2tex (>=0.1.4,<=0.2.0)
+Requires-Dist: pyclipper (>=1.2.0,<2.0)
+Requires-Dist: shapely (>=2.0.0,<3.0)
+Requires-Dist: transformers (>=4.42.4,<=4.47)
+Project-URL: Repository, https://github.com/moskize91/doc-page-extractor
+Description-Content-Type: text/markdown
+
+# doc page extractor
+
+English | [中文](./README_zh-CN.md)
+
+## Introduction
+
+doc page extractor can identify text and format in images and return structured data.
+
+## Installation
+
+```shell
+pip install doc-page-extractor[cpu]
+```
+
+## Using CUDA
+
+Please refer to the introduction of [PyTorch](https://pytorch.org/get-started/locally/) and select the appropriate command to install according to your operating system.
+
+The installation mentioned above uses the following command.
+
+```shell
+pip install doc-page-extractor[cuda]
+```
+
+## Example
+
+```python
+from PIL import Image
+from doc_page_extractor import DocExtractor
+
+extractor = DocExtractor(
+  model_dir_path=model_path, # Folder address where AI model is downloaded and installed
+  device="cpu", # If you want to use CUDA, please change to device="cuda".
+)
+with Image.open("/path/to/your/image.png") as image:
+  result = extractor.extract(
+  image=image,
+  lang="ch", # Language of image text
+)
+for layout in result.layouts:
+  for fragment in layout.fragments:
+    print(fragment.rect, fragment.text)
+```
+
+## Acknowledgements
+
+The code of `doc_page_extractor/onnxocr` in this repo comes from [OnnxOCR](https://github.com/jingsongliujing/OnnxOCR).
+
+- [DocLayout-YOLO](https://github.com/opendatalab/DocLayout-YOLO)
+- [OnnxOCR](https://github.com/jingsongliujing/OnnxOCR)
+- [layoutreader](https://github.com/ppaanngggg/layoutreader)
+- [StructEqTable](https://github.com/Alpha-Innovator/StructEqTable-Deploy)
+- [LaTeX-OCR](https://github.com/lukas-blecher/LaTeX-OCR)
