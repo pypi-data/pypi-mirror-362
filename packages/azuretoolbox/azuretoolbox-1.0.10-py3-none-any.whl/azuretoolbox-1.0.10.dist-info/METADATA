@@ -1,0 +1,100 @@
+Metadata-Version: 2.4
+Name: azuretoolbox
+Version: 1.0.10
+Summary: Tools for Azure
+Project-URL: Homepage, https://github.com/ciuliene/azuretoolbox
+Project-URL: Issues, https://github.com/ciuliene/azuretoolbox/issues
+Author-email: Giuliano Errico <errgioul2@gmail.com>
+License-File: LICENSE
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.11
+Requires-Dist: azure-common==1.1.28
+Requires-Dist: azure-core==1.35.0
+Requires-Dist: azure-identity==1.23.1
+Requires-Dist: azure-keyvault-secrets==4.10.0
+Requires-Dist: certifi==2025.7.14
+Requires-Dist: cffi==1.17.1
+Requires-Dist: charset-normalizer==3.4.2
+Requires-Dist: cryptography==45.0.5
+Requires-Dist: idna==3.10
+Requires-Dist: isodate==0.7.2
+Requires-Dist: msal-extensions==1.3.1
+Requires-Dist: msal==1.32.3
+Requires-Dist: packaging==25.0
+Requires-Dist: portalocker==3.2.0
+Requires-Dist: pycparser==2.22
+Requires-Dist: pyjwt==2.10.1
+Requires-Dist: pyodbc==5.2.0
+Requires-Dist: requests==2.32.4
+Requires-Dist: six==1.17.0
+Requires-Dist: typing-extensions==4.14.1
+Requires-Dist: urllib3==2.5.0
+Description-Content-Type: text/markdown
+
+# AzureToolbox
+
+[![Build, test and Package](https://github.com/ciuliene/azuretoolbox/actions/workflows/CICD.yml/badge.svg)](https://github.com/ciuliene/azuretoolbox/actions/workflows/CICD.yml)
+
+Utilities for working with Azure services. This version provides tools for:
+
+- Keyvault
+- Database
+
+## Installation
+
+```bash
+pip install azuretoolbox
+```
+
+## Keyvault
+
+Get secrets from Azure Keyvault.
+
+### Prerequisites
+
+To use the Keyvault utilities, you need to have the following environment variables set:
+
+- AZURE_TENANT_ID
+- AZURE_CLIENT_ID
+- AZURE_CLIENT_SECRET
+
+```sh
+export AZURE_TENANT_ID="<your-tenant-id>"
+export AZURE_CLIENT_ID="<your-client-id>"
+export AZURE_CLIENT_SECRET="<your-client-secret>"
+```
+
+### Usage
+
+```python
+from azuretoolbox.keyvault import KeyVault
+
+vault_url = "https://<keyvault-name>.vault.azure.net"
+secret = KeyVault(vault_url).get_secret("SecretName")
+print(secret)
+```
+
+## Database
+
+Connect to and query an Azure SQL Database.
+
+### Prequisites
+
+To use the Database utilities, you need to have `ODBC Driver 18 for SQL Server` installed. You can download it from [here](https://learn.microsoft.com/en-us/sql/connect/odbc/microsoft-odbc-driver-for-sql-server?view=sql-server-ver16).
+
+### Usage
+
+```python
+from azuretoolbox.database import Database
+
+db = Database()
+server = '<server>' # Typically 'tcp:<server-name>.database.windows.net,1433'
+database = '<database-name>'
+username = '<username>'
+password = '<password>'
+db.connect(server, database, username, password)
+
+print(db.query('<query-string>'))
+```
