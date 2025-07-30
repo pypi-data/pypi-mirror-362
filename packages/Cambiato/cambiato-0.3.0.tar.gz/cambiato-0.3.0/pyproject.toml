@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Cambiato"
+authors = [
+  { name="Anton Lydell", email="anton.lydell@tuta.com" },
+]
+description = "The simple yet powerful system for changing utility devices."
+readme = "README.rst"
+license = { text = "GNU General Public License v3 (GPLv3)" }
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Environment :: Web Environment",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Other Audience",
+    "Natural Language :: English",
+    "Natural Language :: Swedish",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business",
+    "Topic :: Scientific/Engineering",
+]
+keywords = [
+    "Change",
+    "Device",
+    "Device Change",
+    "District Cooling",
+    "District Heating",
+    "Electricity",
+    "Meter",
+    "Meter Change",
+    "Utility",
+    "Streamlit",
+    "Water",
+    "Web",
+]
+
+dynamic = ["version"]
+
+dependencies = [
+    "click >= 8.0",
+    "pydantic >= 2.0",
+    "streamlit >= 1.40",
+    "streamlit-passwordless >= 0.16",
+    "sqlalchemy >= 2.0",
+]
+
+[project.scripts]
+cambiato = "cambiato.cli.main:main"
+
+[project.urls]
+"Bug Tracker" = "https://github.com/antonlydell/Cambiato/issues"
+"Documentation" = "https://github.com/antonlydell/Cambiato"
+"Source Code" = "https://github.com/antonlydell/Cambiato"
+
+[tool.setuptools.dynamic]
+version = {attr = "cambiato.metadata.__version__"}
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+ignore = ['E501']
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-rsxX --showlocals --tb=short --strict-markers"
+xfail_strict = true
+testpaths = "tests"
+markers = [
+    "raises: Tests that are expected to raise an exception.",
+]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+warn_return_any = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["cambiato.*"]
+ignore_missing_imports = true
