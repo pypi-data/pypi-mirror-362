@@ -1,0 +1,104 @@
+name: Cut Hotfix/Patch Release
+
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+    inputs:
+      minor_version:
+        description: 'Minor version to update (vX.Y)'
+        required: true
+        type: string
+
+env:
+  REGISTRY_USER: kumo+kumo_internal
+  GH_TOKEN: ${{ github.token }}
+  MINOR_VERSION: ${{ inputs.minor_version }}
+
+
+jobs:
+  cut-release:
+    name: Cut New Release of Kumo API
+    runs-on: ubuntu-22.04
+    outputs:
+      release_success: ${{ steps.set-output.outputs.success }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.KUMO_GITHUB_BOT_TOKEN }}
+
+      - uses: fregante/setup-git-user@024bc0b8e177d7e77203b48dab6fb45666854b35  # v2.0.2
+
+      - name: Get Next Hotfix/Patch Version
+        run: |
+          git fetch origin --tags
+          git checkout ${MINOR_VERSION}
+
+          # add v to version in pyproject.toml for comparing:
+          CURRENT_VERSION=v$(awk '/^\[project\]/{p=1;next} p&&/^version/{gsub(/[^0-9.]/, "", $3);print $3;exit}' pyproject.toml)
+          echo "Current version from pyproject.toml: $CURRENT_VERSION"
+          # check that CURRENT_VERSION matches up with existing tags:
+          LATEST_TAG=$(git tag | grep "^${MINOR_VERSION}" | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$" | sort -V | tail -1)
+          if [[ "$CURRENT_VERSION" != "$LATEST_TAG" ]]; then
+            echo "Error: current version $CURRENT_VERSION does not match latest tag $LATEST_TAG, resolve pyproject.toml and release discrepency before continuing"
+            exit 1
+          fi
+
+          # determine vx.y.(z+1)
+          NEW_PATCH=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF += 1 ; print}')
+          echo "New minor version: $NEW_PATCH"
+          echo "NEW_PATCH=$NEW_PATCH" >> $GITHUB_ENV
+          echo "PREV_VERSION=$LATEST_TAG" >> $GITHUB_ENV
+
+
+      - name: Update pyproject.toml on Version Branch
+        run: |
+          git checkout ${MINOR_VERSION}
+          git pull origin $MINOR_VERSION
+          echo "current branch: $(git branch --show-current) NEW MINOR: $NEW_PATCH"
+          awk -v version_line="version = \"${NEW_PATCH#v}\"" -i inplace '/^\[project\]/{p=1} p&&/^version/{if(!done){sub(/^version = .*/,version_line);done=1}} 1' pyproject.toml
+          awk -v version_line="version = \"${NEW_PATCH#v}\"" -i inplace '/^\[tool.poetry\]/{p=1} p&&/^version/{if(!done){sub(/^version = .*/,version_line);done=1}} 1' pyproject.toml
+          git add pyproject.toml
+          git commit -m "Update version to $NEW_PATCH"
+          git push origin $MINOR_VERSION
+
+
+      - name: Cut Release
+        run: |
+          echo "current branch: $(git branch --show-current)"
+          echo "PREV_VERSION for notes: $PREV_VERSION"
+          NOTES_ARG="--notes-start-tag ${PREV_VERSION}"
+
+          git tag $NEW_PATCH
+          git push origin $NEW_PATCH
+          gh release create $NEW_PATCH --verify-tag --generate-notes --title $NEW_PATCH $NOTES_ARG
+
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Publish to PyPI
+        run: |
+          if [ -n "$GITHUB_TOKEN" ];
+          then
+            echo 'GITHUB_TOKEN is set, not safe to publish to pypi'
+            exit 1
+          fi
+          pip install twine build
+          python -m build
+          TWINE_CHECK=$(twine check dist/* | grep "PASSED" | wc -l)
+          if [ $TWINE_CHECK -ne 2 ]; then
+            echo "twine check failed"
+            exit 1
+          fi
+          twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+
+      - name: Set output
+        if: ${{ success() }}
+        id: set-output
+        run: echo "success=true" >> $GITHUB_OUTPUT
