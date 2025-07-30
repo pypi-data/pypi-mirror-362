@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robot KPI Metrics</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
+  <style>
+    body {
+      font-family: -apple-system, sans-serif;
+      background-color: #eeeeee;
+      display: flex;
+    }
+
+    .tablecard {
+      background-color: white;
+      font-size: 14px;
+    }
+
+    .sidebar {
+      width: 80px;
+      background-color: #343a40;
+      color: white;
+      min-height: 100vh;
+      text-align: center;
+      position: fixed;
+    }
+
+    .section {
+      padding-left: 80px;
+    }
+
+    .sidebar .brand {
+      font-size: 16px;
+      padding: 15px 0;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .sidebar .nav-link {
+      color: #ccc;
+      padding: 15px 0;
+      cursor: pointer;
+    }
+
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      color: white;
+      background-color: #495057;
+    }
+
+    .sidebar .icon {
+      font-size: 24px;
+    }
+
+    .sidebar .count {
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding: 20px;
+    }
+
+    .loader {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      background-color: rgb(249, 249, 249);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loader i {
+      font-size: 60px;
+      color: #333;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    tfoot input {
+      width: 100%;
+      padding: 3px;
+      box-sizing: border-box;
+    }
+
+    tfoot {
+      display: table-header-group;
+    }
+
+    .dt-button {
+      border: none;
+      color: #fff;
+      margin: 5px;
+      border-radius: 12px;
+      cursor: pointer;
+      padding-left: 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .dt-button.copyButton {
+      background-color: seashell;
+    }
+
+    .dt-button.csvButton {
+      background-color: cornsilk;
+    }
+
+    .dt-button.excelButton {
+      background-color: lavender;
+    }
+
+    .dt-button.printButton {
+      background-color: whitesmoke;
+    }
+
+    .dt-button.colviButton {
+      background-color: gainsboro;
+    }
+
+    th,
+    td {
+      text-align: center;
+      max-width: 100px;
+    }
+
+    .dt-buttons {
+      margin-left: 5px;
+    }
+
+    .row {
+      padding: 5px;
+    }
+
+    .rowcard {
+      padding: 10px;
+      border-radius: 15px;
+      background-color: white;
+    }
+
+    .card-header-new {
+      font-weight: bold;
+      color: gray;
+      padding-left: 5px;
+    }
+
+    .card-table,
+    .suite-table,
+    .ecard-table,
+    .table {
+      width: 100%;
+    }
+
+    .suite-table th {
+      width: 25%;
+      color: #666;
+    }
+
+    .ecard-table tr,
+    .table tr {
+      height: 25px;
+      padding-left: 5px;
+    }
+
+    .table td,
+    .table tr {
+      font-style: italic;
+      font-size: 14px;
+    }
+
+    .ecard-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .card-table tr {
+      height: 25px;
+    }
+
+    .card-table td {
+      width: 50%;
+    }
+
+    .card-table tr:first-child {
+      font-size: 30px;
+    }
+
+    .card-table tr:last-child {
+      font-size: 10px;
+      color: gray;
+    }
+
+    .total {
+      color: brown;
+    }
+
+    .pass,
+    .text-success {
+      color: green;
+    }
+
+    .fail,
+    .text-danger {
+      color: red;
+    }
+
+    .skip,
+    .text-warning {
+      color: orange;
+    }
+
+    .td_left {
+      word-wrap: break-word;
+      max-width: 250px;
+      white-space: normal;
+      text-align: left;
+    }
+
+    .suite-list,
+    .suite-details {
+      padding: 10px;
+    }
+
+    .scroll {
+      height: 800px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .suite-card,
+    .test-item {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .suite-card:hover,
+    .test-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .suite-card.pass .card-body,
+    .test-item.pass .card-body {
+      border-left: 5px solid green;
+    }
+
+    .suite-card.fail .card-body,
+    .test-item.fail .card-body {
+      border-left: 5px solid red;
+    }
+
+    .suite-card.skip .card-body,
+    .test-item.skip .card-body {
+      border-left: 5px solid orange;
+    }
+
+    .test-details p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .keyword-item {
+      padding-left: 20px;
+      font-size: 0.85rem;
+      color: #d9534f;
+    }
+
+    .col-md-4,
+    .col-md-8 {
+      overflow-y: auto;
+    }
+
+    .suite-tracker {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .suite-card {
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .suite-card.pass {
+      background-color: #e6f4ea;
+      color: #2e7d32;
+    }
+
+    .suite-card.fail {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    .suite-card.skip {
+      background-color: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .filter-buttons button {
+      padding: 8px 12px;
+      margin-right: 5px;
+      border: 1px solid #ddd;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .filter-buttons button:hover {
+      background-color: #ddd;
+    }
+
+    .search-container input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    .error-message-box {
+      background-color: #f8d7da;
+      border-left: 5px solid #f5c2c7;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      color: #842029;
+      font-size: 0.85rem;
+    }
+
+    .title {
+      word-wrap: break-word;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="loader">
+    <i class="fa fa-spinner fa-spin"></i>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar d-flex flex-column">
+    <div class="brand" style="color:darkgoldenrod">KPI Metrics</div>
+    <a class="nav-link" data-target="dashboard" href="#dashboard" style="color:teal">
+      <i class="icon fas fa-tachometer-alt"></i>
+      <div class="count">Dashboard</div>
+    </a>
+    <a class="nav-link" data-target="suite" href="#suite" style="color: skyblue">
+      <i class="icon fas fa-folder"></i>
+      <div class="count">Suite</div>
+    </a>
+    <a class="nav-link" data-target="test" href="#test" style="color:green">
+      <i class="icon fas fa-vial"></i>
+      <div class="count">Test</div>
+    </a>
+    <a class="nav-link {{hide_kw_times_menu}}" data-target="kwtimes" href="#kwtimes" style="color:tomato">
+      <i class="icon fas fa-stopwatch"></i>
+      <div class="count">KW Times</div>
+    </a>
+    <a class="nav-link" data-target="details" href="#details" style="color:burlywood">
+      <i class="icon fas fa-info-circle"></i>
+      <div class="count">Details</div>
+    </a>
+    <a class="nav-link" data-target="metadata" href="#metadata" style="color:mediumorchid">
+      <i class="icon fas fa-tags"></i>
+      <div class="count">Metadata</div>
+    </a>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content">
+
+    <div class="section" id="dashboard">
+      <h2 style="color:silver">KPI Dashboard</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Test Status:</span>
+            <div class="col-md-12" style="display: flex; align-items: center; justify-content: center;">
+              <div id="testPie"></div>
+            </div>
+            <div class="col-md-12">
+              <table class="card-table">
+                <tr>
+                  <td class="total">{{test_stats['Total']}}</td>
+                  <td class="pass">{{test_stats['Pass']}}</td>
+                </tr>
+                <tr>
+                  <td>Total</td>
+                  <td>Pass</td>
+                </tr>
+              </table>
+              <table class="card-table">
+                <tr>
+                  <td class="fail">{{test_stats['Fail']}}</td>
+                  <td class="skip">{{test_stats['Skip']}}</td>
+                </tr>
+                <tr>
+                  <td>Fail</td>
+                  <td>Skip</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="col-md-12">
+            <div class="col-md-12 rowcard">
+              <span class="card-header-new">Suite Status:</span>
+              <div class="col-md-12">
+                <div id="suitePie"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row"></div>
+
+          <div class="col-md-12">
+            <div class="col-md-12 rowcard">
+              <span class="card-header-new">Test Case Status:</span>
+              <div class="col-md-12">
+                <div id="testCasePie"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row"></div>
+
+          <div class="col-md-12">
+            <div class="col-md-12 rowcard">
+              <span class="card-header-new">Keyword Status:</span>
+              <div class="col-md-12">
+                <div id="keywordPie"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Execution Duration (m):</span>
+            <table class="table">
+              <tr>
+                <th>Type</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+              </tr>
+              <tr>
+                <td class="suite-list" style="text-align: left;">Suite</td>
+                <td class="suite-list">{{(suite_stats['Min']/60000)|round(2)}}</td>
+                <td class="suite-list">{{(suite_stats['Max']/60000)|round(2)}}</td>
+                <td class="suite-list">{{(suite_stats['Avg']/60000)|round(2)}}</td>
+              </tr>
+              <tr>
+                <td class="suite-list" style="text-align: left;">Test</td>
+                <td class="suite-list">{{(test_stats['Min']/60000)|round(2)}}</td>
+                <td class="suite-list">{{(test_stats['Max']/60000)|round(2)}}</td>
+                <td class="suite-list">{{(test_stats['Avg']/60000)|round(2)}}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="row"></div>
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Execution Info:</span>
+            <table class="table">
+              <tr>
+                <th>Action</th>
+                <th>Time</th>
+              </tr>
+              <tr>
+                <td class="suite-list" style="text-align: left;">Start Time</td>
+                <td>{{ execution_stats[0] }}</td>
+              </tr>
+              <tr>
+                <td class="suite-list" style="text-align: left;">End Time</td>
+                <td>{{ execution_stats[1] }}</td>
+              </tr>
+              <tr>
+                <td class="suite-list" style="text-align: left;">Duration</td>
+                <td>{{ execution_stats[2] }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="row"></div>
+
+      </div>
+      <div class="row"></div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Top 10 Failed Suites:</span>
+            <div class="col-md-12">
+              <div id="suiteFailureLineID"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Test Count By Elapsed Time:</span>
+            <div class="col-md-12">
+              <div id="testExecutionTrends"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row"></div>
+      </div>
+
+      <!-- Performance KPIs -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Top 10 Slowest Tests (Performance KPI):</span>
+            <div class="col-md-12">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">Test Name</th>
+                    <th style="text-align: left;">Suite</th>
+                    <th style="text-align: left;">Duration (s)</th>
+                    <th style="text-align: left;">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for test in tests|sort(attribute='Time', reverse=true) %}
+                  {% if loop.index <= 10 %}
+                  <tr>
+                    <td class="td_left" style="font-size: 12px; max-width: 200px;">{{ test['Test Name'] }}</td>
+                    <td class="td_left" style="font-size: 12px; max-width: 150px;">{{ test['Suite Name'] }}</td>
+                    <td style="font-weight: bold;">{{ (test['Time']/1000)|round(2) }}</td>
+                    <td>
+                      {% if test['Status'] == 'PASS' %}
+                      <span class="pass">{{ test['Status'] }}</span>
+                      {% elif test['Status'] == 'FAIL' %}
+                      <span class="fail">{{ test['Status'] }}</span>
+                      {% else %}
+                      <span class="skip">{{ test['Status'] }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Top 10 Longest Keywords (Performance KPI):</span>
+            <div class="col-md-12">
+              {% if not keyword_times.empty %}
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">Keyword Name</th>
+                    <th style="text-align: left;">Max Duration (s)</th>
+                    <th style="text-align: left;">Avg Duration (s)</th>
+                    <th style="text-align: left;">Times Used</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for key, value in keyword_times.iterrows() %}
+                  {% if loop.index <= 10 %}
+                  <tr>
+                    <td class="td_left" style="font-size: 12px; max-width: 200px;">{{ value['Name'] }}</td>
+                    <td style="font-weight: bold;">{{ (value['time_max']/1000)|round(2) }}</td>
+                    <td>{{ (value['time_mean']/1000)|round(2) }}</td>
+                    <td>{{ value['times'] }}</td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% else %}
+              <p style="text-align: center; color: gray; font-style: italic;">No keyword timing data available</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suite Data -->
+    <div class="section" id="suite">
+      <h2 style="color:silver">Suite KPI Metrics</h2>
+      <div class="row"></div>
+      <table id="sm" class="display tablecard" style="width:100%">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Pass</th>
+            <th>Fail</th>
+            <th>Skip</th>
+            <th>Time (s)</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th><input type="text" placeholder="Search Name" /></th>
+            <th><input type="text" placeholder="Search Status" /></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% for suite in suites %}
+          <tr>
+            <td class="td_left" data-toggle="tooltip" title="{{ suite['Name'] }}"
+              onclick="openInNewTab('{{ log_name }}#{{ suite['Id'] }}','#{{ suite['Id'] }}')"
+              style="cursor: pointer; color:blue;">
+              {{ suite['Name'] }}</td>
+            {% if (suite['Status'] == "PASS") %}
+            <td style="color: green">{{ suite['Status'] }}</td>
+            {% elif (suite['Status'] == "FAIL") %}
+            <td style="color: red">{{ suite['Status'] }}</td>
+            {% else %}
+            <td style="color: orange">{{ suite['Status'] }}</td>
+            {% endif %}
+            <td>{{ suite['Total'] }}</td>
+            <td style="color: green">{{ suite['Pass'] }}</td>
+            <td style="color: red">{{ suite['Fail'] }}</td>
+            <td style="color: orange">{{ suite['Skip'] }}</td>
+            <td>{{ (suite['Time']/1000)|round(2) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Test Case Data -->
+    <div class="section" id="test">
+      <h2 style="color:silver">Test KPI Metrics</h2>
+      <div class="row"></div>
+      <table id="tm" class="display tablecard" style="width:100%">
+        <thead>
+          <tr>
+            <th style="width: 20%;">Suite Name</th>
+            <th style="width: 20%;">Test Name</th>
+            <th style="width: 10%;">Status</th>
+            <th style="width: 10%;">Time (s)</th>
+            <th style="width: 20%;">Message</th>
+            <th style="width: 20%;" class="{{hide_tags}}">Tags</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th><input type="text" placeholder="Search Suite" /></th>
+            <th><input type="text" placeholder="Search Name" /></th>
+            <th><input type="text" placeholder="Search Status" /></th>
+            <th></th>
+            <th><input type="text" placeholder="Search Message" /></th>
+            <th class="{{hide_tags}}"></th>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% for test in tests %}
+          <tr>
+            <td class="td_left" style="width: 200px;">{{ test['Suite Name'] }}</td>
+            <td class="td_left" data-toggle="tooltip" title="{{ test['Test Name'] }}"
+              onclick="openInNewTab('{{ log_name }}#{{ test['Test Id'] }}','#{{ test['Test Id'] }}')"
+              style="cursor: pointer; color:blue;width: 200px;">
+              {{ test['Test Name'] }}</td>
+            {% if (test['Status'] == "PASS") %}
+            <td style="color:green">{{ test['Status'] }}</td>
+            {% elif (test['Status'] == "FAIL") %}
+            <td style="color:red">{{ test['Status'] }}</td>
+            {% else %}
+            <td style="color:orange">{{ test['Status'] }}</td>
+            {% endif %}
+            <td>{{ (test['Time']/1000)|round(2) }}</td>
+            <td class="td_left" style="font-size: 12px">{{
+              test['Message'] }}</td>
+            <td class="{{hide_tags}} td_left">{{ test['Tags'] }}
+            </td>
+          </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Keyword Average -->
+    <div class="section {{hide_kw_times_menu}}" id="kwtimes">
+      <h2 style="color:silver">KW Times KPI Metrics</h2>
+      <div class="row"></div>
+      <table id="kmt" class="display tablecard" style="width:100%">
+        <thead>
+          <tr>
+            <th>Keyword Name</th>
+            <th>Times</th>
+            <th>Fail Count</th>
+            <th>Min Duration(s)</th>
+            <th>Max Duration(s)</th>
+            <th>Average Duration(s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if not keyword_times.empty %}
+          {% for key, value in keyword_times.iterrows() %}
+          <tr>
+            <td class="td_left">{{ value['Name'] }}</td>
+            <td>{{ value['times'] }}</td>
+            <td>{{ value['fail_count'] }}</td>
+            <td>{{ (value['time_min']/1000)|round(2) }}</td>
+            <td>{{ (value['time_max']/1000)|round(2) }}</td>
+            <td>{{ (value['time_mean']/1000)|round(2) }}</td>
+          </tr>
+          {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="details">
+      <h2 style="color:silver">Details</h2>
+      <div class="search-container">
+        <input type="text" hidden id="suiteSearch" placeholder="Search suites..." onkeyup="filterSuites()">
+      </div>
+
+      <!-- Status Filter Buttons -->
+      <div class="filter-buttons">
+        <button class="total" onclick="filterByStatus('all')">All</button>
+        <button class="pass" onclick="filterByStatus('pass')">Pass</button>
+        <button class="fail" onclick="filterByStatus('fail')">Fail</button>
+        <button class="skip" onclick="filterByStatus('skip')">Skip</button>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 scroll suite-tracker">
+          <div class="suite-list" id="suiteList">
+            {% for suite in suites_list %}
+            {% if suite['tests'] %}
+            <div class="card suite-card {{ suite['status']|lower }}" id="{{ suite['suite_id'] }}"
+              data-status="{{ suite['status']|lower }}" onclick="updateDetails('{{ suite['suite_id'] }}')">
+              <div class="title">{{ suite["suite_name"] }}</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="col-md-8 scroll">
+          <div class="suite-details">
+            <div id="suite-description">
+              {% for suite in suites_list %}
+              {% if suite['tests'] %}
+              <div class="suite-content" id="{{ suite['suite_id'] }}_details" style="display: none;">
+                <h4 class="title" style="color:gray">{{ suite['suite_name'] }}</h4>
+
+                <table class="suite-table">
+                  <thead>
+                    <tr>
+                      <th>Total</th>
+                      <th>Pass</th>
+                      <th>Fail</th>
+                      <th>Skip</th>
+                      <th>Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><b>{{ suite['total'] }}</b></td>
+                      <td class="text-success"><b>{{ suite['pass_count'] }}</b></td>
+                      <td class="text-danger"><b>{{ suite['fail_count'] }}</b></td>
+                      <td class="text-warning"><b>{{ suite['skip_count'] }}</b></td>
+                      <td>{{ suite['elapsed_time'] }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="row"></div>
+                {% for test in suite['tests'] %}
+                <div class="card test-item">
+                  <div class="card-body">
+                    <h5 class="test-name {{ test['status']|lower }} title">{{ test["test_name"] }}</h5>
+                    <div class="test-details">
+                      <p><b>Duration:</b> {{ test['elapsed_time'] }}</p>
+                      <p><b>Tags:</b> {{ test['tags'] }}</p>
+                      {% if test['status'] == "FAIL" %}
+                      <p><b>Message:</b></p>
+                      <div class="error-message-box">
+                        <p> {{ test['message'] }}</p>
+                      </div>
+                      <div>
+                        <p><b>Failed Keywords:</b></p>
+                        <div class="card-body">
+                          {% for keyword in test['keywords'] %}
+                          {% if keyword['keyword_status'] == "FAIL" %}
+                          <p class="text-danger title">{{ keyword['keyword_name'] }}</p>
+                          {% endif %}
+                          {% endfor %}
+                        </div>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metadata Section -->
+    <div class="section" id="metadata">
+      <h2 style="color:silver">Test Execution Metadata</h2>
+      
+      <!-- Summary Information -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Summary Information:</span>
+            <div class="col-md-12">
+              <table class="table">
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>Status:</strong></td>
+                  <td class="suite-list" style="text-align: left;">
+                    <span class="pass">{{ test_stats['Pass'] }} tests passed</span>, 
+                    <span class="skip">{{ test_stats['Skip'] }} tests skipped</span>
+                    {% if test_stats['Fail'] > 0 %}, <span class="fail">{{ test_stats['Fail'] }} tests failed</span>{% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>Start Time:</strong></td>
+                  <td class="suite-list" style="text-align: left;">{{ execution_stats[0] }}</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>End Time:</strong></td>
+                  <td class="suite-list" style="text-align: left;">{{ execution_stats[1] }}</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>Elapsed Time:</strong></td>
+                  <td class="suite-list" style="text-align: left;">{{ execution_stats[2] }}</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>Log File:</strong></td>
+                  <td class="suite-list" style="text-align: left;">
+                    <a href="{{ log_name }}" target="_blank" style="color: blue;">{{ log_name }}</a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Information -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Project Information:</span>
+            <div class="col-md-12">
+              <table class="table">
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>bundle_version:</strong></td>
+                  <td class="suite-list" style="text-align: left;">0.13.0.23</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>machine:</strong></td>
+                  <td class="suite-list" style="text-align: left;">8e25352d0c9b</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>project:</strong></td>
+                  <td class="suite-list" style="text-align: left;">IDC-Demo</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>qnx_build_timestamp:</strong></td>
+                  <td class="suite-list" style="text-align: left;">2025-07-03 00:28:39</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>tester:</strong></td>
+                  <td class="suite-list" style="text-align: left;">-</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="col-md-12 rowcard">
+            <span class="card-header-new">Version Information:</span>
+            <div class="col-md-12">
+              <table class="table">
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>testtool:</strong></td>
+                  <td class="suite-list" style="text-align: left;">Robot Framework 6.1 (Python 3.9.2 on linux)</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>version_hw:</strong></td>
+                  <td class="suite-list" style="text-align: left;">None</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>version_sw:</strong></td>
+                  <td class="suite-list" style="text-align: left;">unknown</td>
+                </tr>
+                <tr>
+                  <td class="suite-list" style="text-align: left;"><strong>version_test:</strong></td>
+                  <td class="suite-list" style="text-align: left;">Commit</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+
+    <script>
+
+      function showSection(targetId) {
+        // Remove active class from all links and sections
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll('.content .section').forEach(section => section.style.display = 'none');
+
+        // Add active class to the clicked link and show the corresponding section
+        document.querySelector(`.sidebar .nav-link[href="#${targetId}"]`).classList.add('active');
+        document.getElementById(targetId).style.display = 'block';
+
+      }
+
+      // Event listener for hash change and initial load
+      window.addEventListener('hashchange', () => {
+        const targetId = window.location.hash.replace('#', '') || 'dashboard';
+        showSection(targetId);
+      });
+
+      // Initial load based on hash or default to 'dashboard'
+      document.addEventListener('DOMContentLoaded', () => {
+        const targetId = window.location.hash.replace('#', '') || 'dashboard';
+        showSection(targetId);
+      });
+
+      // Initialize DataTables
+      $(document).ready(function () {
+        // Initialize DataTables
+        $('#sm, #tm, #kmt').DataTable({
+          dom: '<"top"lfB>rtip',
+          order: [[2, 'desc']],
+          buttons: [
+            {
+              extend: 'copy',
+              className: 'copyButton dt-button',
+              text: 'Copy',
+              filename: function () {
+                return "KPI-Metrics" + '-' + new Date().toLocaleString();
+              },
+              exportOptions: {
+                columns: ':visible'
+              }
+            },
+            {
+              extend: 'csv',
+              className: 'csvButton dt-button',
+              text: 'CSV',
+              filename: function () {
+                return "KPI-Metrics" + '-' + new Date().toLocaleString();
+              },
+              exportOptions: {
+                columns: ':visible'
+              }
+            },
+            {
+              extend: 'excel',
+              className: 'excelButton dt-button',
+              text: 'Excel',
+              filename: function () {
+                return "KPI-Metrics" + '-' + new Date().toLocaleString();
+              },
+              exportOptions: {
+                columns: ':visible',
+              }
+            },
+            {
+              extend: 'print',
+              className: 'printButton dt-button',
+              text: 'Print',
+              filename: function () {
+                return "KPI-Metrics" + '-' + new Date().toLocaleString();
+              },
+              exportOptions: {
+                columns: ':visible',
+                alignment: 'left',
+              }
+            },
+            {
+              extend: 'colvis',
+              className: 'colviButton dt-button',
+              text: 'Hide',
+              postfixButtons: ['colvisRestore']
+            }
+          ],
+          lengthMenu: [[10, 20, 50, 100, -1], [10, 20, 50, 100, "All"]],
+          responsive: true,
+          initComplete: function () {
+            this.api().columns().every(function () {
+              var column = this;
+              $('input', this.footer()).on('keyup change', function () {
+                if (column.search() !== this.value) {
+                  column.search(this.value).draw();
+                }
+              });
+            });
+          }
+        });
+      });
+    </script>
+
+    <script>
+      window.onload = function () {
+        barChart('#suitePie', "{{suite_stats['Pass']}}", "{{suite_stats['Fail']}}", "{{suite_stats['Skip']}}");
+        pieChart('#testPie', "{{test_stats['Pass']}}", "{{test_stats['Fail']}}", "{{test_stats['Skip']}}");
+        barChart('#testCasePie', "{{test_stats['Pass']}}", "{{test_stats['Fail']}}", "{{test_stats['Skip']}}");
+        barChart('#keywordPie', "{{kw_stats['Pass']}}", "{{kw_stats['Fail']}}", "{{kw_stats['Skip']}}");
+      };
+    </script>
+    <script>
+      function pieChart(chartID, passed, failed, skipped) {
+        var options = {
+          series: [parseInt(passed), parseInt(failed), parseInt(skipped)],
+          chart: {
+            type: 'donut',
+            width: 440,
+          },
+          labels: ["Pass", "Fail", "Skip"],
+          legend: {
+            show: false,
+          },
+          colors: ['#2ecc71', '#fc6666', '#ffa500'],
+        };
+
+        var chart = new ApexCharts(document.querySelector(chartID), options);
+        chart.render();
+      }
+    </script>
+    <script>
+      function barChart(chartID, passed, failed, skipped) {
+        var options = {
+          series: [{
+            name: 'Pass',
+            data: [parseInt(passed)]
+          },
+          {
+            name: 'Fail',
+            data: [parseInt(failed)]
+          },
+          {
+            name: 'Skip',
+            data: [parseInt(skipped)]
+          }],
+          chart: {
+            type: 'bar',
+            height: 120,
+            stacked: true,
+            toolbar: {
+              show: false
+            },
+          },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+              dataLabels: {
+                total: {
+                  enabled: true,
+                  offsetX: 0,
+                  style: {
+                    fontSize: '12px',
+                    fontWeight: 100
+                  }
+                }
+              }
+            },
+          },
+          stroke: {
+            width: 2,
+            colors: ['#fff']
+          },
+          labels: [""],
+          legend: {
+            show: false,
+          },
+          colors: ['#2ecc71', '#fc6666', '#ffa500'],
+        };
+
+        var chart = new ApexCharts(document.querySelector(chartID), options);
+        chart.render();
+      }
+    </script>
+    <script>
+      var passArray = [];
+      var failArray = [];
+      var catgArray = [];
+
+      {% for key, value in suite_error_stats.iterrows() %}
+      {% if (value['Name'] != "") %}
+      catgArray.push("{{value['Name']}}");
+      passArray.push({{ value['percent']| round(2) }});
+      failArray.push({{ value['Fail']}});
+      {% endif %}
+      {% endfor %}
+
+      var options = {
+        series: [{
+          name: 'Fail Percentage',
+          data: passArray,
+          type: "line"
+        }, {
+          name: 'Fail',
+          data: failArray,
+          type: "column",
+        }],
+        chart: {
+          type: 'line',
+          height: 350,
+          // stacked: true,
+        },
+
+        plotOptions: {
+          bar: {
+            dataLabels: {
+              position: 'center',
+              hideOverflowingLabels: true
+            }
+          },
+        },
+        colors: ['#ea9999', '#fc6666'],
+        xaxis: {
+          categories: catgArray,
+          tickPlacement: 'off',
+          labels: {
+            show: false,
+            trim: true
+          }
+        },
+        yaxis: [{
+          title: {
+            text: 'Suite Fail Percentage',
+          },
+
+        }, {
+          opposite: true,
+          title: {
+            text: 'Suite Fail Count'
+          }
+        }],
+        fill: {
+          opacity: 0.9
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return val
+            }
+          },
+          x: {
+            show: true
+          }
+        }
+      };
+
+      var chart = new ApexCharts(document.querySelector("#suiteFailureLineID"), options);
+      chart.render();
+
+    </script>
+    <script>
+      var time_group = [];
+      var test_count = [];
+
+      {% for key, value in test_time_group.iterrows() %}
+      time_group.push("{{value['time_group']}}");
+      test_count.push({{ value['test_case_count']}});
+      {% endfor %}
+
+      var options = {
+        series: [{
+          name: "Test Count",
+          data: test_count
+        }],
+        chart: {
+          type: 'area',
+          height: 350
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 4,
+            borderRadiusApplication: 'end',
+            horizontal: true,
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        xaxis: {
+          categories: time_group,
+        }
+      };
+
+      var chart = new ApexCharts(document.querySelector("#testExecutionTrends"), options);
+      chart.render();
+
+    </script>
+    <script>
+      function openInNewTab(url, element_id) {
+        var element_id = element_id;
+        var win = window.open(url, '_blank');
+        win.focus();
+        $('body').scrollTo(element_id);
+      }
+    </script>
+    <script>
+      $(window).on('load', function () { $('.loader').fadeOut(); });
+    </script>
+    <script>
+      function updateDetails(selectedSuite) {
+        // Hide all issue content divs
+        const contents = document.querySelectorAll('.suite-content');
+        contents.forEach(content => {
+          content.style.display = 'none';
+        });
+
+        // Show the selected suite details
+        const selectedContent = document.getElementById(selectedSuite + '_details');
+        if (selectedContent) {
+          selectedContent.style.display = 'block';
+        }
+
+      }
+    </script>
+    <script>
+      function filterSuites() {
+        const searchInput = document.getElementById('suiteSearch').value.toLowerCase();
+        const suites = document.querySelectorAll('.suite-card');
+        suites.forEach(suite => {
+          const suiteName = suite.innerText.toLowerCase();
+          suite.style.display = suiteName.includes(searchInput) && isStatusVisible(suite) ? "" : "none";
+        });
+      }
+
+      function filterByStatus(status) {
+        document.querySelector('.filter-buttons').dataset.status = status;
+        filterSuites(); // Reapply filters to update visibility
+      }
+
+      function isStatusVisible(suite) {
+        const status = document.querySelector('.filter-buttons').dataset.status;
+        return status === 'all' || suite.dataset.status === status;
+      }
+    </script>
+
+</body>
+
+</html>
