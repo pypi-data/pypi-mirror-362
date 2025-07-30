@@ -1,0 +1,47 @@
+Metadata-Version: 2.4
+Name: mujoco-scenes
+Version: 0.0.16
+Summary: The mujoco-scenes project
+Home-page: https://github.com/kscalelabs/mujoco-scenes
+Author: Benjamin Bolte
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: etils
+Requires-Dist: mujoco
+Requires-Dist: numpy
+Requires-Dist: Pillow
+Provides-Extra: dev
+Requires-Dist: black; extra == "dev"
+Requires-Dist: darglint; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Dynamic: author
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# mujoco-scenes
+
+This package contains a collection of utility functions for generating different types of scenes in Mujoco.
+
+This is a programmatic way to compose scene files, inspired by [Mujoco Menagerie](https://github.com/google-deepmind/mujoco_menagerie).
+
+## Usage
+
+To load a robot into a particular scene, you can use the following code:
+
+```python
+from mujoco_scenes.mjcf import load_mjmodel
+
+model = load_mjmodel("path/to/robot.xml", "smooth")
+
+# To view the model, you can use:
+mujoco.viewer.launch(model)
+```
