@@ -1,0 +1,12 @@
+#!/bin/bash
+jobdir=$PWD
+  gfile=$(basename $1)
+  gdir=$(dirname $1)
+  uuid=$(uuidgen)
+  scrdir=$HOME/tmp/$1_$uuid
+  mkdir -p $scrdir
+  cp $1.inp $scrdir
+  cd $scrdir
+  qmrun-orca6-stdout $gfile > ${jobdir}/${gdir}/$gfile.out
+  cd $jobdir
+  rm -r $scrdir
