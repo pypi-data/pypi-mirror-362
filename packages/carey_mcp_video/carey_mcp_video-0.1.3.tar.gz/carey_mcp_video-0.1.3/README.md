@@ -1,0 +1,82 @@
+# Video Service MCP
+
+An MCP server that provides video processing services.
+
+## Features
+
+- **Frame Extraction**: Extract frames from a video, ensuring the first and last frames are included.
+- **Video Concatenation**: Concatenate multiple videos into a single video.
+
+## Installation
+
+```bash
+pip install -e .
+```
+
+## Environment Variables
+
+The following environment variables must be set for TOS (Tencent Object Storage) integration:
+
+- `TOS_ACCESS_KEY`: Your TOS access key
+- `TOS_SECRET_KEY`: Your TOS secret key
+- `TOS_BUCKET_NAME`: Your TOS bucket name
+- `TOS_ENDPOINT` (optional): TOS endpoint (default: "tos-cn-beijing.volces.com")
+- `TOS_REGION` (optional): TOS region (default: "cn-beijing")
+
+## Usage
+
+### Starting the Server
+
+```bash
+carey_mcp_video --transport sse
+```
+
+### API
+
+#### Extract Frames
+
+Extracts frames from a video and uploads them to TOS.
+
+```python
+extract_frames(video_url: str, num_frames: int = 10)
+```
+
+**Parameters**:
+- `video_url`: URL of the video to extract frames from.
+- `num_frames`: Number of frames to extract (minimum 2 for first and last frames).
+
+**Returns**:
+- A dictionary containing:
+  - `success`: Boolean indicating if the operation was successful
+  - `message`: Human-readable message about the result
+  - `frames`: List of frame URLs (on success)
+
+#### Concatenate Videos
+
+Concatenates multiple videos using FFmpeg and uploads the result to TOS.
+
+```python
+concatenate_videos(video_urls: List[str])
+```
+
+**Parameters**:
+- `video_urls`: List of URLs of videos to concatenate.
+
+**Returns**:
+- A dictionary containing:
+  - `success`: Boolean indicating if the operation was successful
+  - `message`: Human-readable message about the result
+  - `url`: URL of the concatenated video (on success)
+
+## Dependencies
+
+- fastmcp
+- loguru
+- requests
+- opencv-python
+- tos
+- FFmpeg (system dependency)
+
+## License
+
+MIT

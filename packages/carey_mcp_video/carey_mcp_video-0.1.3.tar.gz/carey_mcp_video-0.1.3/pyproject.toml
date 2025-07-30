@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling>=1.23"]
+build-backend = "hatchling.build"
+
+[project]
+name = "carey_mcp_video"
+version = "0.1.3"
+description = "An MCP server that provides video processing services"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{name = "Carey", email = "carey@example.com"}]
+license = {text = "MIT"}
+keywords = ["video", "processing", "mcp", "concatenation", "frame-extraction"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Software Development :: Libraries",
+]
+
+dependencies = [
+  "fastmcp>=0.4.0",
+  "loguru>=0.7.0",
+  "requests>=2.32",
+  "opencv-python>=4.8.0",
+  "tos>=2.0.0",
+  "moviepy>=1.0.3",
+]
+[project.scripts]
+carey_mcp_video = "video_service.cli:cli"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/**", "README.md", "LICENSE"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/video_service"]
