@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mobiflows"
+dynamic = ["version"]
+description = 'Mobility flows'
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+license = "MIT"
+keywords = ["human mobility", "origin-destination matrix", "flow network"]
+authors = [
+  { name = "muskuloes", email = "tuekam@lmu.de" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "geopandas==1.1.0",
+  "pandas==2.2.3",
+  "pandas-stubs~=2.2.3",
+  "polars==1.27.1",
+  "pyarrow==19.0.1",
+  "pytest==8.3.5",
+]
+
+[project.urls]
+Documentation = "https://github.com/muskuloes/mobiflows#readme"
+Issues = "https://github.com/muskuloes/mobiflows/issues"
+Source = "https://github.com/muskuloes/mobiflows"
+
+[tool.hatch.version]
+path = "src/mobiflows/__about__.py"
+
+[tool.hatch.envs.dev]
+dependencies = [
+  "python-lsp-server[all]",
+  "black",
+]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13"]
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/mobiflows tests}"
+[tool.mypy]
+ignore_missing_imports = true
+disable_error_code = "operator,arg-type,union-attr"
+
+[tool.hatch.envs.test]
+dependencies = [
+  "pytest",
+  "pytest-cov",
+]
+[tool.hatch.envs.test.scripts]
+run-coverage = "pytest --cov-config=pyproject.toml --cov=mobiflows --cov=tests"
+test = "run-coverage"
+
+[tool.coverage.run]
+source_pkgs = ["mobiflows", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/mobiflows/__about__.py",
+]
+
+[tool.coverage.paths]
+mobiflows = ["src/mobiflows", "*/mobiflows/src/mobiflows"]
+tests = ["tests", "*/mobiflows/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
