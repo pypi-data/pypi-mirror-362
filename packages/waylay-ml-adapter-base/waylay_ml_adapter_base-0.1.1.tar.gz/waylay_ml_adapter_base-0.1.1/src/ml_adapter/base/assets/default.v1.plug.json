@@ -1,0 +1,65 @@
+{
+    "$schema": "waylay:/registry/v2/schemas/plugs-manifest-01",
+    "version": "0.0.1",
+    "type": "sensor",
+    "runtime": "plug-python3",
+    "interface": {
+      "states": [
+        "PREDICTED",
+        "FAILED"
+      ],
+      "input": [
+        {
+          "name": "instances",
+          "dataType": "object",
+          "mandatory": true
+        }
+      ],
+      "output": [
+        {
+          "name": "predictions",
+          "dataType": "object",
+          "mandatory": true
+        },
+        {
+          "name": "error",
+          "dataType": "string",
+          "mandatory": false
+        }
+      ]
+    },
+    "metadata": {
+      "tags": [
+        { "name": "MLAdapter", "color": "#4153ea" }
+      ],
+      "documentation": {
+        "description": "",
+        "states": [
+          {
+            "name": "PREDICTED",
+            "description": "The model inference succeeded."
+          },
+          {
+            "name": "FAILED",
+            "description": "The model inference failed."
+          }
+        ],
+        "input": [
+          {
+            "name": "instances",
+            "description": "A tensor of numeric input data (KServe V1 protocol)"
+          }
+        ],
+        "output": [
+          {
+            "name": "predictions",
+            "description": "A tensor of numeric output data (KServe V1 protocol)"
+          },
+          {
+            "name": "error",
+            "description": "Failure reasion when FAILED. the predictions will be empty."
+          }
+        ]
+      }
+    }
+  }

@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61","wheel","setuptools-git-versioning<2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[project]
+name = "waylay-ml-adapter-base"
+description = "ml-adapter base classes."
+requires-python = ">=3.11"
+authors = [{name = "Waylay", email = "info@waylay.io"}]
+license={file = "LICENSE.txt"}
+readme = "README.md"
+dependencies = [
+  "waylay-ml-adapter-api",
+  "openapi-spec-validator",
+]
+dynamic = ["version"]
+
+
+[project.optional-dependencies]
+dill = [ "dill" ]
+joblib = [ "joblib" ]
+starlette = [ "httpx", "starlette" ]
+dev = [
+  "waylay-ml-adapter-devtools",
+  "joblib",
+  "dill",
+  "httpx",
+  "starlette"
+]
+
+[tool.setuptools.package-data]
+"ml_adapter.base" = ["py.typed"]
+"ml_adapter.base.assets" = ["*.json"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+include = ["pyproject.toml", "src/**/*.py", "test/**/*.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "UP",  "B", "SIM", "I", "D1", "D4"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/*test.py" = ["D"] # no docstyle required
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
