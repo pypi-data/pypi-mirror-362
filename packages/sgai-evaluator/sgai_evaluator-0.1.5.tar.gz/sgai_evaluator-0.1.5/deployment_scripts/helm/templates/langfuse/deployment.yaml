@@ -1,0 +1,185 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "langfuse.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "langfuse.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.langfuse.autoscaling.enabled }}
+  replicas: {{ .Values.langfuse.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "langfuse.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "langfuse.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/langfuse/configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/langfuse/secrets.yaml") . | sha256sum }}
+    spec:
+      {{- with .Values.security.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.langfuse.image.repository }}:{{ .Values.langfuse.image.tag }}"
+        imagePullPolicy: {{ .Values.langfuse.image.pullPolicy }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "langfuse.fullname" . }}-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "langfuse.fullname" . }}-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "langfuse.fullname" . }}-config
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "langfuse.fullname" . }}-config
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: database-password
+        - name: DATABASE_URL
+          value: "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?pool_timeout=60&connection_limit={{ .Values.langfuse.connectionPools.postgres.maxConnections }}"
+        - name: DIRECT_URL
+          value: "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?pool_timeout=60&connection_limit={{ .Values.langfuse.connectionPools.postgres.maxConnections }}"
+        - name: NEXTAUTH_URL
+          value: {{ .Values.config.nextAuthUrl }}
+        - name: NEXTAUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: nextauth-secret
+        - name: SALT
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: salt
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: encryption-key
+        - name: LANGFUSE_INIT_ORG_ID
+          value: {{ .Values.config.langfuseInitOrgId }}
+        - name: LANGFUSE_INIT_ORG_NAME
+          value: {{ .Values.config.langfuseInitOrgName }}
+        - name: LANGFUSE_INIT_PROJECT_ID
+          value: {{ .Values.config.langfuseInitProjectId }}
+        - name: LANGFUSE_INIT_PROJECT_NAME
+          value: {{ .Values.config.langfuseInitProjectName }}
+        - name: LANGFUSE_INIT_USER_EMAIL
+          value: {{ .Values.config.langfuseInitUserEmail }}
+        - name: LANGFUSE_INIT_USER_NAME
+          value: {{ .Values.config.langfuseInitUserName }}
+        - name: TELEMETRY_ENABLED
+          value: {{ .Values.config.telemetryEnabled | quote }}
+        - name: LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES
+          value: {{ .Values.config.enableExperimentalFeatures | quote }}
+        - name: LANGFUSE_AUTO_POSTGRES_MIGRATION_DISABLED
+          value: {{ .Values.config.autoPostgresMigrationDisabled | quote }}
+        - name: LANGFUSE_ENABLE_BACKGROUND_PROCESSING
+          value: "false"
+        - name: LANGFUSE_BACKGROUND_MIGRATIONS_ENABLED
+          value: {{ .Values.config.backgroundMigrationsEnabled | quote }}
+        - name: CLICKHOUSE_URL
+          value: "http://{{ include "langfuse.fullname" . }}-clickhouse:8123"
+        - name: CLICKHOUSE_USER
+          value: {{ .Values.clickhouse.auth.username }}
+        - name: CLICKHOUSE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: clickhouse-password
+        - name: CLICKHOUSE_DB
+          value: {{ .Values.clickhouse.auth.database }}
+        resources:
+          {{- toYaml .Values.langfuse.resources | nindent 12 }}
+        livenessProbe:
+          httpGet:
+            path: /api/public/health
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /api/public/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 8
+        startupProbe:
+          httpGet:
+            path: /api/public/health
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: cache
+          mountPath: /app/.next/cache
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+{{- if .Values.langfuse.autoscaling.enabled }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "langfuse.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "langfuse.fullname" . }}
+  minReplicas: {{ .Values.langfuse.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.langfuse.autoscaling.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.langfuse.autoscaling.targetCPUUtilizationPercentage }}
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.langfuse.autoscaling.targetMemoryUtilizationPercentage }}
+{{- end }} 

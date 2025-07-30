@@ -1,0 +1,54 @@
+{{- if .Values.langfuse.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "langfuse.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  minAvailable: {{ .Values.langfuse.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "langfuse.selectorLabels" . | nindent 6 }}
+{{- end }}
+
+{{- if and .Values.clickhouse.enabled (gt (.Values.clickhouse.replicaCount | int) 1) }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "langfuse.fullname" . }}-clickhouse
+  namespace: {{ .Values.global.namespace }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: clickhouse
+{{- end }}
+
+{{- if and .Values.redis.enabled (eq .Values.redis.architecture "replication") }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "langfuse.fullname" . }}-redis
+  namespace: {{ .Values.global.namespace }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: redis
+{{- end }}
+
+{{- if and .Values.minio.enabled (gt (.Values.minio.replicaCount | int) 1) }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "langfuse.fullname" . }}-minio
+  namespace: {{ .Values.global.namespace }}
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: minio
+{{- end }} 

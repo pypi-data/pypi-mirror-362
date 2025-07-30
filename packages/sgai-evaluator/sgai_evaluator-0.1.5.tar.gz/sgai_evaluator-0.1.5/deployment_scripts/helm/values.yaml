@@ -1,0 +1,234 @@
+# Global settings
+global:
+  environment: development
+  namespace: ai-observability
+  domain: "" # Set your domain here
+  monitoring:
+    enabled: true
+  tls:
+    enabled: true
+    certManager:
+      enabled: true
+
+# Security settings
+security:
+  networkPolicies:
+    enabled: false
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+
+# Secrets
+# The following secrets should be created manually before deployment in langfuse-secrets:
+# - database-password: PostgreSQL password
+# - nextauth-secret: NextAuth secret
+# - salt: Salt for hashing
+# - encryption-key: Encryption key
+# - clickhouse-password: ClickHouse password
+# - redis-password: Redis password (if using Redis)
+# - minio-root-password: MinIO root password (if using MinIO)
+
+# LangFuse settings
+langfuse:
+  image:
+    repository: langfuse/langfuse
+    tag: "3.79.0"
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1
+  
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  worker:
+    enabled: true
+    replicaCount: 4
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "250m"
+      limits:
+        memory: "2Gi"
+        cpu: "500m"
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 8
+
+  connectionPools:
+    postgres:
+      maxConnections: 10
+    redis:
+      maxClients: 1000
+
+# ClickHouse settings
+clickhouse:
+  enabled: true
+  image:
+    repository: clickhouse/clickhouse-server
+    tag: "23.12"
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 2
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+  
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  auth:
+    database: langfuse
+    username: langfuse
+
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"
+    retention:
+      daily: 7
+      weekly: 4
+      monthly: 3
+
+# Redis settings (using Bitnami chart)
+redis:
+  enabled: true
+  architecture: replication
+  replicaCount: 3
+  auth:
+    enabled: true
+    existingSecret: redis-secrets
+    existingSecretPasswordKey: redis-password
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: "managed-premium"
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "500m"
+
+# MinIO settings (using Bitnami chart)
+minio:
+  enabled: true
+  mode: distributed
+  replicaCount: 4
+  auth:
+    rootUser: langfuse
+    existingSecret: minio-secrets
+    existingSecretKey: root-password
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: "managed-premium"
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "500m"
+    limits:
+      memory: "4Gi"
+      cpu: "1000m"
+
+# Zookeeper settings
+zookeeper:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: bitnami/zookeeper
+    tag: "3.8.1"
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: "managed-premium"
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "500m"
+
+# Monitoring settings
+monitoring:
+  prometheus:
+    enabled: true
+    retention: 15d
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "1000m"
+  grafana:
+    enabled: true
+    adminPassword: "" # Set via secret
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "250m"
+      limits:
+        memory: "2Gi"
+        cpu: "500m"
+
+# Logging settings
+logging:
+  elasticsearch:
+    enabled: true
+    replicas: 3
+    resources:
+      requests:
+        memory: "4Gi"
+        cpu: "1000m"
+      limits:
+        memory: "8Gi"
+        cpu: "2000m"
+  kibana:
+    enabled: true
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "250m"
+      limits:
+        memory: "2Gi"
+        cpu: "500m"
+
+# Configuration
+config:
+  nextAuthUrl: "http://localhost:3000"
+  langfuseInitOrgId: "default"
+  langfuseInitOrgName: "Default Organization"
+  langfuseInitProjectId: "default"
+  langfuseInitProjectName: "Default Project"
+  langfuseInitUserEmail: "admin@example.com"
+  langfuseInitUserName: "Admin"
+  telemetryEnabled: "false"
+  enableExperimentalFeatures: "false"
+  autoPostgresMigrationDisabled: "false"
+  backgroundMigrationsEnabled: "true" 
