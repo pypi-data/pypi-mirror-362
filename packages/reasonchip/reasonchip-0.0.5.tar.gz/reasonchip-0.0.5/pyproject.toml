@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools >= 66.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+requires-python = ">=3.12"
+name = "reasonchip"
+license = "GPL-3.0-or-later"
+version = "0.0.5"
+authors = [
+	{ name="South Patron LLC", email = "support@reasonchip.io" }
+]
+description = "Agentic workflow tools"
+readme = "README.md"
+classifiers = [
+	'Development Status :: 4 - Beta',
+	'Environment :: Console',
+	'Intended Audience :: Developers',
+	'Intended Audience :: Information Technology',
+	'Operating System :: POSIX',
+	'Programming Language :: Python :: 3',
+	'Topic :: Software Development :: Libraries',
+	'Topic :: System :: Distributed Computing',
+]
+dynamic = ["dependencies"]
+
+[project.urls]
+"Homepage" = "https://www.reasonchip.io/"
+"Source Code" = "https://github.com/SouthPatron/reasonchip"
+"Bug Tracker" = "https://github.com/SouthPatron/reasonchip/issues/"
+"Documentation" = "https://www.reasonchip.io/docs/"
+
+[project.scripts]
+reasonchip = "reasonchip.cli.reasonchip:main"
+
+[tool.setuptools.dynamic]
+dependencies = {file = "requirements.txt"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"reasonchip" = ["data/*"]
+
+[tool.black]
+line-length = 80
+target-version = ['py312']
+exclude = '''
+/(
+    \.git
+  | \.github
+  | \.venv
+  | build
+  | dist
+  | examples
+  | website
+  | __pycache__
+  | .*\.egg-info
+)/
+'''
+
