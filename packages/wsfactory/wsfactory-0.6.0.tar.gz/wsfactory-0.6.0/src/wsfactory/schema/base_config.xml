@@ -1,0 +1,47 @@
+<WSConfig xmlns="http://bars-open.ru/schema/wsfactory"
+    ApplicationClass="spyne.application.Application"
+    WsgiClass="spyne.server.django.DjangoApplication"
+    ServiceClass="spyne.service.ServiceBase"
+    ApiHandler="wsfactory.views.api_handler">
+  <Protocols>
+    <!-- Протоколы -->
+    <Protocol code="soap11" direction="BOTH" module="spyne.protocol.soap.soap11.Soap11" name="SOAP 1.1"/>
+    <Protocol code="json" direction="BOTH" module="spyne.protocol.json.JsonDocument" name="JSON Protocol"/>
+    <Protocol code="http-rpc" direction="IN" module="spyne.protocol.http.HttpRpc" name="HTTP RPC"/>
+
+    <!-- установите модуль spyne-smev и раскомментируйте следующие строки, чтобы добавить поддежку протоколв СМЭВ -->
+    <Protocol code="soap11wsse" direction="BOTH" module="spyne_smev.wsse.Soap11WSSE" name="SOAP 1.1 WSSE"/>
+    <Protocol code="smev256" direction="BOTH" module="spyne_smev.smev256.Smev256" name="СМЭВ 2.5.6"/>
+
+  </Protocols>
+  <ApiRegistry>
+    <!-- API-методы -->
+    <Api code="Code" id="Id" module="some.module.ApiFunction" name="Do some action"/>
+  </ApiRegistry>
+  <Services>
+    <!-- Сервисы, они же услуги - наборы методов-API -->
+    <Service code="Service" name="Sample service">
+      <Api id="Id"/>
+    </Service>
+  </Services>
+  <SecurityProfile>
+    <!-- Профили безопасности WS-Security. Требует установки модуля spyne-smev -->
+    <Modules>
+      <!-- Описание модулей -->
+      <Module code="x509token" path="spyne_smev.wsse.protocols.X509TokenProfile" name="X509 Token Profile"/>
+    </Modules>
+    <Security module="x509token" code="security" name="Default security profile">
+      <!-- Декларация объектов профилей безопасности -->
+      <Param key="certificate" valueType="string">path_to_certificate_file</Param>
+      <Param key="private_key" valueType="string">path_to_pkey_file</Param>
+      <Param key="private_key_pass" valueType="string">pkey_password</Param>
+    </Security>
+  </SecurityProfile>
+  <Applications>
+    <!-- Реестр веб-сервисов (Соответствия протоколов-сервисов) -->
+    <Application name="SampleApp" service="Service" url="^sample/service$">
+      <InProtocol code="soap11"/>
+      <OutProtocol code="soap11"/>
+    </Application>
+  </Applications>
+</WSConfig>
