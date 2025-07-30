@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling", "hatch-semver"]
+build-backend = "hatchling.build"
+
+[project]
+name = "parnoid"
+description = "Parnoid SDK for Python"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.32.3",
+    "cryptography>=44.0.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "LicenseRef-Proprietary"
+license-files = ["LICEN[CS]E*"]
+
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "boto3>=1.39.6"
+]
+
+[project.urls]
+Homepage = "https://www.parnoid.io"
+
+[tool.hatch.version]
+source = "regex"
+path = "VERSION"
+scheme = "semver"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/**/*.py",
+]
