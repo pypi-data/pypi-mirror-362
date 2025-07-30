@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View for Replay Requests Wizard -->
+    <record id="replay_requests_wizard_view_form" model="ir.ui.view">
+        <field name="name">replay.requests.wizard.form</field>
+        <field name="model">replay.requests.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Replay REST Requests">
+                <p>
+                    You are about to replay <field name="total_requests" class="oe_inline"/> selected requests.
+                    Please select the target configuration below.
+                </p>
+                <group>
+                    <field name="config_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="request_log_ids" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_replay_requests" string="Replay Requests" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window Action to launch the wizard -->
+    <record id="action_replay_requests_wizard" model="ir.actions.act_window">
+        <field name="name">Replay Requests to Odoo 17</field>
+        <field name="res_model">replay.requests.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_rest_request_log"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+</odoo> 
