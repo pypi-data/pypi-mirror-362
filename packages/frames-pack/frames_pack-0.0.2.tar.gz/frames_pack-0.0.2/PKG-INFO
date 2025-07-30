@@ -1,0 +1,57 @@
+Metadata-Version: 2.4
+Name: frames_pack
+Version: 0.0.2
+Summary: frames pack compiler & viewer
+Project-URL: Homepage, https://github.com/cubao/frames-pack
+Author-email: district10 <dvorak4tzx@gmail.com>
+License-Expression: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Python: >=3.8
+Requires-Dist: easydict
+Requires-Dist: fastapi
+Requires-Dist: fire
+Requires-Dist: loguru
+Requires-Dist: msgpack
+Requires-Dist: msgspec
+Requires-Dist: numpy
+Requires-Dist: pybind11-geobuf
+Requires-Dist: scipy
+Requires-Dist: tqdm
+Requires-Dist: uvicorn[standard]
+Requires-Dist: zstd
+Provides-Extra: full
+Description-Content-Type: text/markdown
+
+## FramesPack
+
+![](data/65ce63c95fbf245fbffd97419d48af2e.mp4)
+
+
+```
+make install
+make clitest
+python3 main.py
+
+# 可以指定所用的 frames pack 文件
+#   FALLBACK_FRAMES_PACK_PATH=build/frames_pack2.bin python3 main.py
+```
+
+然后打开 localhost:8000
+
+如果你要启动新的前端（frontend/viewer），在运行 python3 main.py 的基础上，
+cd frontend/viewer
+npm run dev
+
+http://192.168.31.241:3000/#framespack=http://192.168.31.241:3000/frames_pack.bin
+
+(可以在容器内测试：`make test_in_dev_container`，运行测试有可能卡主，原因不明)
