@@ -1,0 +1,189 @@
+# Prompt Gear
+
+🧠 **YAML-powered prompt manager with multi-backend support**
+
+Prompt Gear is a flexible prompt management tool that can be embedded into any Python application (LangGraph, LangChain, FastAPI, etc.). It supports multiple storage backends and provides both CLI and Python SDK interfaces.
+
+## ✨ Features
+
+- ✅ **Multi-backend storage**: Filesystem (YAML), SQLite, PostgreSQL
+- ✅ **YAML-based prompt format**: Human-readable and version-controllable
+- ✅ **Advanced version management**: Sequence-based versioning with explicit latest tracking
+- ✅ **Dual interface**: CLI tool + Python SDK
+- ✅ **Flexible configuration**: System prompts, user prompts, and custom config
+- ✅ **Environment-based config**: Use `.env` files for backend configuration
+- ✅ **Robust data integrity**: Transaction-based operations with automatic rollback
+- ✅ **uv + pyproject.toml**: Modern Python packaging ready for PyPI
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+pip install prompt-gear
+```
+
+### Initialize in your project
+
+```bash
+# Initialize with filesystem backend (default)
+promptgear init --backend filesystem
+
+# Initialize with SQLite backend
+promptgear init --backend sqlite
+
+# Initialize with PostgreSQL backend
+promptgear init --backend postgres
+```
+
+### Create a prompt
+
+```bash
+promptgear create chatbot_greeting --version v1 \
+  --system "You are a helpful assistant that speaks politely." \
+  --user "Hello! How can I help you? {{user_input}}" \
+  --config '{"temperature": 0.7, "max_tokens": 512}'
+```
+
+### Use in Python
+
+```python
+from promptgear import PromptManager
+
+pm = PromptManager()
+prompt = pm.get_prompt("chatbot_greeting", "v1")
+
+print(prompt.system_prompt)
+print(prompt.user_prompt)
+print(prompt.config["temperature"])
+```
+
+## 📁 YAML Format
+
+Prompts are stored in YAML format:
+
+```yaml
+name: chatbot_greeting
+version: v1
+system_prompt: >
+  You are a helpful assistant that speaks politely.
+user_prompt: >
+  Hello! How can I help you? {{user_input}}
+config:
+  temperature: 0.7
+  max_tokens: 512
+```
+
+## 🔧 Configuration
+
+Configure via `.env` file:
+
+```env
+# Filesystem backend
+PROMPT_GEAR_BACKEND=filesystem
+PROMPT_GEAR_PROMPT_DIR=./prompts
+
+# SQLite backend
+PROMPT_GEAR_BACKEND=sqlite
+PROMPT_GEAR_DB_URL=sqlite:///prompts.db
+
+# PostgreSQL backend
+PROMPT_GEAR_BACKEND=postgres
+PROMPT_GEAR_DB_URL=postgresql://user:pass@localhost/prompts
+```
+
+## � Version Management
+
+Prompt Gear uses an advanced sequence-based versioning system:
+
+### Version Sequence Numbers
+- Each prompt version gets an auto-incrementing sequence number
+- Sequence numbers are maintained independently per prompt name
+- Deleted versions don't affect sequence numbering (e.g., v1→v2→v4 after deleting v3)
+
+### Latest Version Tracking
+- Each prompt has exactly one version marked as "latest"
+- Creating a new version automatically updates the latest flag
+- Deleting the latest version automatically promotes the highest sequence number version
+
+### Examples
+
+```python
+# Create versions - sequence numbers auto-assigned
+v1 = pm.create_prompt("example", "v1", "System v1", "User v1")  # seq=1, latest=True
+v2 = pm.create_prompt("example", "v2", "System v2", "User v2")  # seq=2, latest=True
+
+# v1 is automatically marked as not latest
+v1_updated = pm.get_prompt("example", "v1")  # seq=1, latest=False
+
+# Get latest version without specifying version
+latest = pm.get_prompt("example")  # Returns v2
+
+# Delete latest version
+pm.delete_prompt("example", "v2")
+new_latest = pm.get_prompt("example")  # Returns v1 (automatically promoted)
+```
+
+## �📚 CLI Commands
+
+- `promptgear init` - Initialize Prompt Gear with backend selection
+- `promptgear create` - Create a new prompt (automatically becomes latest)
+- `promptgear get` - Get a prompt (latest version if version not specified)
+- `promptgear list` - List all prompts with their latest versions
+- `promptgear delete` - Delete a prompt version (auto-promotes new latest)
+- `promptgear versions` - List all versions of a prompt
+- `promptgear status` - Show backend status and statistics
+
+## 🧩 Python SDK
+
+```python
+from promptgear import PromptManager
+
+# Initialize
+pm = PromptManager()
+
+# Create prompt (automatically gets sequence number and latest flag)
+prompt = pm.create_prompt(
+    name="my_prompt",
+    version="v1",
+    system_prompt="You are helpful.",
+    user_prompt="{{user_input}}",
+    config={"temperature": 0.8}
+)
+
+# Get latest version (no version specified)
+latest = pm.get_prompt("my_prompt")
+
+# Get specific version
+specific = pm.get_prompt("my_prompt", "v1")
+
+# List prompts (returns latest versions)
+prompts = pm.list_prompts()
+
+# List all versions of a prompt
+versions = pm.list_versions("my_prompt")
+
+# Update prompt
+pm.update_prompt("my_prompt", "v1", system_prompt="Updated system prompt")
+
+# Delete prompt version
+pm.delete_prompt("my_prompt", "v1")  # Latest flag auto-managed
+```
+
+## 🏗️ Development Status
+
+Currently in **Phase 3** development:
+- ✅ Basic schema and filesystem backend
+- ✅ Core PromptManager functionality
+- ✅ CLI interface with backend selection
+- ✅ SQLite backend with structured storage
+- ✅ PostgreSQL backend with connection pooling
+- ✅ Advanced version management with sequence numbers
+- ✅ Robust data integrity and transaction support
+- ✅ Comprehensive test coverage across all backends
+- ⏳ Advanced features and optimizations (Phase 4)
+- ⏳ PyPI packaging (Phase 4)
+
+## 📄 License
+
+MIT License

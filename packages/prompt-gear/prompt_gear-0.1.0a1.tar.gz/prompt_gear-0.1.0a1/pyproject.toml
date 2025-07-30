@@ -1,0 +1,95 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "prompt-gear"
+version = "0.1.0a1"
+description = "YAML-powered prompt manager with multi-backend support"
+authors = [
+    {name = "miniGears", email = "wenyi@wygears.com"},
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+keywords = ["prompt", "template", "AI", "LLM", "management"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "typer>=0.9.0",
+    "python-dotenv>=1.0.0",
+    "PyYAML>=6.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+sqlite = []
+postgres = ["psycopg2-binary>=2.9.0"]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=7.2.0",
+    "mypy>=1.0.0",
+]
+
+[project.scripts]
+promptgear = "promptgear.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/miniGears/prompt-gear"
+Repository = "https://github.com/miniGears/prompt-gear"
+Documentation = "https://github.com/miniGears/prompt-gear#readme"
+Issues = "https://github.com/miniGears/prompt-gear/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["promptgear"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "scripts/",
+    "tests/",
+    ".pytest_cache",
+    ".coverage",
+    ".venv",
+    "docker/",
+    "DEPLOYMENT.md",
+    "DEPLOYMENT_READY.md",
+    "DOCUMENTATION_UPDATES.md",
+    "PROJECT_STATUS.md",
+    "Makefile",
+    "docker-compose.yml",
+    "uv.lock",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=promptgear"
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "build>=1.2.2.post1",
+    "twine>=6.1.0",
+]
