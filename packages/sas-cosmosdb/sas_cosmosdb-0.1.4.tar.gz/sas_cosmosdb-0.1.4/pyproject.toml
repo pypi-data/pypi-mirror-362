@@ -1,0 +1,75 @@
+[project]
+name = "sas-cosmosdb"
+version = "0.1.4"
+description = "A comprehensive Python library for working with Azure Cosmos DB using both MongoDB and SQL APIs"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "DB Lee", email = "db.lee@microsoft.com" }]
+keywords = ["azure", "cosmosdb", "mongodb", "sql", "database", "sas"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "aiohttp>=3.12.13",
+    "azure-appconfiguration>=1.7.1",
+    "azure-cosmos>=4.9.0",
+    "azure-identity>=1.22.0",
+    "black>=25.1.0",
+    "pydantic>=2.11.5",
+    "pydantic-settings>=2.9.1",
+    "pymongo>=4.13.2",
+    "twine>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.0",
+    "pytest-asyncio>=1.0.0",
+    "pytest-cov>=6.2.1",
+    "black>=24.0.0",
+    "isort>=5.13.0",
+    "mypy>=1.9.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mcaps-microsoft/python_cosmosdb_helper"
+Documentation = "https://github.com/mcaps-microsoft/python_cosmosdb_helper/blob/main/README.md"
+Repository = "https://github.com/mcaps-microsoft/python_cosmosdb_helper"
+Issues = "https://github.com/mcaps-microsoft/python_cosmosdb_helper/issues"
+Changelog = "https://github.com/mcaps-microsoft/python_cosmosdb_helper/releases"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["sas*"]
+exclude = ["samples*"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = ["--import-mode=importlib"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+
+[dependency-groups]
+dev = [
+    "build>=1.2.2.post1",
+    "pydantic-settings>=2.10.1",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+    "pytest-cov>=6.2.1",
+    "twine>=6.1.0",
+]
