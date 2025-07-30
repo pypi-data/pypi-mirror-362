@@ -1,0 +1,110 @@
+Metadata-Version: 2.4
+Name: mareana-k8s-mcp-server
+Version: 0.1.1
+Summary: Kubernetes MCP Server for pod management and monitoring via Dashboard API
+Project-URL: Homepage, https://github.com/mareana/k8s-mcp-server
+Project-URL: Repository, https://github.com/mareana/k8s-mcp-server
+Project-URL: Documentation, https://github.com/mareana/k8s-mcp-server/blob/main/README.md
+Project-URL: Issues, https://github.com/mareana/k8s-mcp-server/issues
+Author-email: Shashanka G <shashanka.g@mareana.com>
+License: MIT
+Keywords: dashboard,devops,k8s,kubernetes,mcp,monitoring,pod
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Monitoring
+Classifier: Topic :: System :: Systems Administration
+Requires-Python: >=3.10
+Requires-Dist: mcp>=1.0.0
+Requires-Dist: requests>=2.31.0
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == 'dev'
+Requires-Dist: build>=0.10.0; extra == 'dev'
+Requires-Dist: mypy>=1.0.0; extra == 'dev'
+Requires-Dist: pytest>=7.0.0; extra == 'dev'
+Requires-Dist: twine>=4.0.0; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Kubernetes MCP Server
+
+An MCP server for fetching Kubernetes pod logs. This server provides AI assistants with the ability to list namespaces, pods, and access pod logs.
+
+## Features
+
+- List available namespaces
+- List pods in a namespace
+- Get pod logs (with optional container selection and line limiting)
+- Stream pod logs in real-time
+
+## Setup
+
+1. Install dependencies:
+```bash
+pip install -e .
+```
+
+2. Configure Kubernetes access:
+
+   **Option A: Using Environment Variables (Recommended for specific cluster)**
+   ```bash
+   export K8S_API_SERVER="https://your-k8s-api-server"
+   export K8S_TOKEN="your-service-account-token"
+   ```
+
+   **Option B: Using Local Kubeconfig**
+   - The server will automatically try to use in-cluster configuration if running inside Kubernetes
+   - Otherwise, it will fall back to using your local kubeconfig file
+
+   **For the Mareana dashboard cluster:**
+   ```bash
+   # Use the provided configuration
+   source config.example.sh
+   
+   # Or set manually:
+   export K8S_API_SERVER="https://dashboard-dev.mareana.com/api/v1"
+   export K8S_TOKEN="test-dummy-token"
+   export K8S_VERIFY_SSL="true"
+   ```
+
+   Make sure you have the necessary permissions to access pod logs with your service account.
+
+## Running the Server
+
+```bash
+python -m k8s_mcp_server.server
+```
+
+## Available Resources
+
+The server provides the following resources:
+
+1. Namespaces:
+   ```
+   namespace/{namespace_name}
+   ```
+
+2. Pods:
+   ```
+   pod/{namespace_name}/{pod_name}
+   ```
+
+## Available Tools
+
+1. Get Pod Logs:
+   - Tool: `get_pod_logs`
+   - Parameters:
+     - `namespace`: Kubernetes namespace
+     - `pod_name`: Name of the pod
+     - `container`: (optional) Container name
+     - `tail_lines`: (optional) Number of lines to return from the end
+
+2. List Namespace Pods:
+   - Tool: `list_namespace_pods`
+   - Parameters:
+     - `namespace`: Kubernetes namespace 

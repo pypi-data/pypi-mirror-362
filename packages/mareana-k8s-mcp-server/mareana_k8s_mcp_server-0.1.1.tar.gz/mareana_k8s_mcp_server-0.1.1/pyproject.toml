@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mareana-k8s-mcp-server"
+version = "0.1.1"
+description = "Kubernetes MCP Server for pod management and monitoring via Dashboard API"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Shashanka G", email = "shashanka.g@mareana.com"}
+]
+keywords = ["mcp", "kubernetes", "k8s", "pod", "monitoring", "dashboard", "devops"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "mcp>=1.0.0",
+    "requests>=2.31.0"
+]
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/mareana/k8s-mcp-server"
+Repository = "https://github.com/mareana/k8s-mcp-server"
+Documentation = "https://github.com/mareana/k8s-mcp-server/blob/main/README.md"
+Issues = "https://github.com/mareana/k8s-mcp-server/issues"
+
+[project.scripts]
+mareana-k8s-mcp-server = "k8s_mcp_server.server:main_entry"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0"
+]
+
+[tool.hatch.version]
+path = "src/k8s_mcp_server/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/k8s_mcp_server"]
+
+[tool.hatch.metadata]
+allow-direct-references = true 
+
+[dependency-groups]
+dev = [
+    "build>=1.2.2.post1",
+    "twine>=6.1.0",
+]
