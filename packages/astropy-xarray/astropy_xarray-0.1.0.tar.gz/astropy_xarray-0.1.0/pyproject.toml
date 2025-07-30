@@ -1,0 +1,115 @@
+[build-system]
+requires = ["setuptools >= 64", "setuptools_scm >= 7.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "astropy-xarray"
+authors = [
+  { name = "Tom Nicholas", email = "tomnicholas1@googlemail.com" },
+  { name = "Callan Gray", email = "calj.gray@gmail.com" },
+]
+description = "Physical units interface to xarray using astropy"
+license = { text = "Apache-2" }
+readme = "README.md"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy >= 1.23",
+  "xarray >= 2022.06.0",
+  "astropy >= 5.0.0",
+]
+dynamic = ["version"]
+
+[project.urls]
+Home = "https://github.com/calgray/astropy-xarray"
+Documentation = "https://astropy-xarray.readthedocs.io/en/stable"
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.0",
+]
+docs = [
+  "sphinx>=8.0",
+  "sphinx_auto_summary_accessors",
+  "nbsphinx",
+  "sphinx_rtd_theme",
+]
+
+[tool.setuptools.packages.find]
+include = [
+  "astropy_xarray",
+  "astropy_xarray.tests",
+]
+
+[tool.setuptools_scm]
+fallback_version = "999"
+
+[tool.pytest.ini_options]
+junit_family = "xunit2"
+
+[tool.isort]
+profile = "black"
+skip_gitignore = "true"
+force_to_top = "true"
+
+[tool.ruff]
+target-version = "py310"
+builtins = ["ellipsis"]
+exclude = [
+  ".git",
+  ".eggs",
+  "build",
+  "dist",
+  "__pycache__",
+]
+line-length = 100
+
+[tool.ruff.lint]
+# E402: module level import not at top of file
+# E501: line too long - let black worry about that
+# E731: do not assign a lambda expression, use a def
+ignore = [
+  "E402",
+  "E501",
+  "E731",
+  "UP038",
+]
+select = [
+  "F",   # Pyflakes
+  "E",   # Pycodestyle
+  "I",   # isort
+  "UP",  # Pyupgrade
+  "TID", # flake8-tidy-imports
+  "W",
+]
+extend-safe-fixes = [
+  "TID252", # absolute imports
+]
+fixable = ["I", "TID252"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["astropy_xarray"]
+known-third-party = ["xarray"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Disallow all relative imports.
+ban-relative-imports = "all"
+
+[tool.coverage.run]
+source = ["astropy_xarray"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING"]
