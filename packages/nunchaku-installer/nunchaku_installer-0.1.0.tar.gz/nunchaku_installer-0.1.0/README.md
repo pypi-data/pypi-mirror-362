@@ -1,0 +1,61 @@
+# Nunchaku Installer
+
+A simple command-line tool to easily install the [Nunchaku](https://github.com/nunchaku-tech/nunchaku) Python library, working around the file size limit on PyPI.
+
+## Why this tool?
+
+The Nunchaku library is distributed as `.whl` files that exceed the maximum size allowed by PyPI (over 100 MB). This installer automates the process of:
+1.  Detecting your system configuration (OS, Python version, PyTorch version).
+2.  Finding the corresponding Nunchaku version on [GitHub releases](https://github.com/nunchaku-tech/nunchaku/releases).
+3.  Downloading and installing the correct `.whl` file.
+
+## Installation
+
+You can install `nunchaku-installer` via pip:
+
+```bash
+pip install nunchaku-installer
+```
+
+## Usage
+
+### Installing the latest version of Nunchaku
+
+The basic command automatically detects your system and installs the latest compatible version of Nunchaku.
+
+```bash
+nunchaku-installer install
+```
+
+### Installing a specific version
+
+You can specify an exact version by using its GitHub release tag.
+
+```bash
+nunchaku-installer install --version v0.3.1
+```
+
+### Using `uv` as the installation backend
+
+If you prefer to use `uv` (an ultra-fast installer), you can specify it with the `--backend` option.
+
+```bash
+# Make sure 'uv' is installed (pip install uv)
+nunchaku-installer install --backend uv
+```
+
+### Listing available versions
+
+To see all the Nunchaku versions that you can install:
+
+```bash
+nunchaku-installer list-versions
+```
+
+## Acknowledgements
+
+This installer is a community-driven companion tool created to facilitate the installation of the main [Nunchaku](https://github.com/nunchaku-tech/nunchaku) library. A big thank you to the entire `nunchaku-tech` team for their incredible work.
+
+## License
+
+This project is licensed under the MIT License.
