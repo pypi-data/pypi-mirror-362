@@ -1,0 +1,561 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import asyncio
+import json
+import base64
+from datetime import timedelta
+import pathlib
+import nbformat
+import re
+
+import tornado.web
+
+from google.oauth2 import credentials
+from google.cloud import storage
+
+from gcs_jupyter_plugin.commons.constants import CONTENT_TYPE, STORAGE_SERVICE_NAME
+
+
+class Client(tornado.web.RequestHandler):
+    def __init__(self, credentials, log, client_session):
+        self.log = log
+        if not (
+            ("access_token" in credentials)
+            and ("project_id" in credentials)
+            and ("region_id" in credentials)
+        ):
+            self.log.exception("Missing required credentials")
+            raise ValueError("Missing required credentials")
+        self._access_token = credentials["access_token"]
+        self.project_id = credentials["project_id"]
+        self.region_id = credentials["region_id"]
+        self.client_session = client_session
+
+    async def list_buckets(self, prefix=None):
+        try:
+            bucket_list = []
+            token = self._access_token
+            project = self.project_id
+            creds = credentials.Credentials(token)
+
+            loop = asyncio.get_running_loop()
+
+            def _get_buckets_from_gcs():
+                client = storage.Client(project=project, credentials=creds)
+                return client.list_buckets(prefix=prefix)
+
+            buckets = await loop.run_in_executor(None, _get_buckets_from_gcs)
+
+            for bucket in buckets:
+                bucket_list.append(
+                    {
+                        "items": {
+                            "name": bucket.name,
+                            "updated": (
+                                bucket.updated.isoformat() if bucket.updated else ""
+                            ),
+                        }
+                    }
+                )
+            return bucket_list
+        except Exception as e:
+            self.log.exception("Error fetching datasets list.")
+            return {"error": str(e)}
+
+    # gcs -- list files implementation
+    async def list_files(self, bucket, prefix):
+        try:
+            result = {}
+            file_list = []
+            subdir_list = []
+            token = self._access_token
+            project = self.project_id
+            creds = credentials.Credentials(token)
+
+            loop = asyncio.get_running_loop()
+
+            def _get_blobs_from_gcs():
+                client = storage.Client(project=project, credentials=creds)
+                return client.list_blobs(
+                    bucket,
+                    prefix=prefix,
+                    delimiter="/",
+                    fields="items(name,size,timeCreated,updated,contentType),prefixes",
+                )
+
+            blobs = await loop.run_in_executor(None, _get_blobs_from_gcs)
+
+            files = list(blobs)
+
+            # Adding Sub-directories
+            if blobs.prefixes:
+                for pref in blobs.prefixes:
+                    subdir_list.append({"prefixes": {"name": pref}})
+
+            # Adding Files
+            for file in files:
+                if not (file.name == prefix and file.size == 0):
+                    file_list.append(
+                        {
+                            "items": {
+                                "name": file.name,
+                                "timeCreated": (
+                                    file.time_created.isoformat()
+                                    if file.time_created
+                                    else ""
+                                ),
+                                "updated": (
+                                    file.updated.isoformat() if file.updated else ""
+                                ),
+                                "size": file.size,
+                                "content_type": file.content_type,
+                            }
+                        }
+                    )
+
+            result["prefixes"] = subdir_list
+            result["files"] = file_list
+            return result
+
+        except Exception as e:
+            self.log.exception(f"Error listing files: {e}")
+            return []  # Return empty list on error.
+
+    async def get_file(self, bucket_name, file_path, format):
+        try:
+            token = self._access_token
+            project = self.project_id
+            creds = credentials.Credentials(token)
+            client = storage.Client(project=project, credentials=creds)
+            bucket = client.bucket(bucket_name)
+            blob = bucket.blob(file_path)
+
+            if format == "base64":
+                file_content = blob.download_as_bytes()
+                try:
+                    base64_encoded = base64.b64encode(file_content).decode("utf-8")
+                    return base64_encoded
+                except Exception:
+                    return []
+
+            if file_path.endswith(".ipynb"):
+                file_content = blob.download_as_text()
+                return nbformat.reads(
+                    file_content, as_version=4, capture_validation_error=True
+                )
+            elif format == "json":
+                file_content = blob.download_as_text()
+                return file_content
+            else:
+                return blob.download_as_text()
+
+        except Exception as e:
+            raise e
+
+    async def create_folder(self, bucket, path, folder_name):
+        try:
+            token = self._access_token
+            project = self.project_id
+            creds = credentials.Credentials(token)
+            client = storage.Client(project=project, credentials=creds)
+
+            # Format the folder path
+            new_folder_path = str(pathlib.PosixPath(path).joinpath(folder_name))+"/"
+            
+            self.log.info(f"Creating folder at: {new_folder_path}")
+
+            # Get the bucket
+            bucket_obj = client.bucket(bucket)
+            # Create an empty blob with a trailing slash to indicate a folder
+            blob = bucket_obj.blob(new_folder_path)
+            # Upload empty content to create the folder
+            blob.upload_from_string("")
+
+            # Return the folder information
+            return {
+                "name": new_folder_path,
+                "bucket": bucket,
+                "id": f"{bucket}/{new_folder_path}",
+                "kind": "storage#object",
+                "mediaLink": blob.media_link,
+                "selfLink": blob.self_link,
+                "generation": blob.generation,
+                "metageneration": blob.metageneration,
+                "contentType": "application/x-www-form-urlencoded;charset=UTF-8",
+                "timeCreated": (
+                    blob.time_created.isoformat() if blob.time_created else ""
+                ),
+                "updated": blob.updated.isoformat() if blob.updated else "",
+                "storageClass": blob.storage_class,
+                "size": "0",
+                "md5Hash": blob.md5_hash,
+                "etag": blob.etag,
+            }
+        except Exception as e:
+            self.log.exception("Error creating folder.")
+            return {"error": str(e)}
+
+    async def save_content(
+        self, bucket_name, destination_blob_name, content, upload_flag
+    ):
+        """Upload content directly to Google Cloud Storage.
+
+        Args:
+            bucket_name: The name of the GCS bucket
+            destination_blob_name: The path in the bucket where the content should be stored
+            content: The content to upload (string or JSON)
+            uploadFlag: true if uploading a file, false when saving a file
+
+        Returns:
+            Dictionary with metadata or error information
+        """
+        try:
+            # Ensure content is in string format if it's not already
+            processed_content = content
+            if isinstance(content, bytes):
+                processed_content = content
+            elif isinstance(content, dict):
+                processed_content = json.dumps(content)
+            elif isinstance(content, str) and content.startswith('data:'):
+                data_url_match = re.match(r'data:([^;]+);base64,(.*)', content)
+                if data_url_match:
+                    base64_data = data_url_match.group(2)
+                    processed_content = base64.b64decode(base64_data)
+
+            token = self._access_token
+            project = self.project_id
+            creds = credentials.Credentials(token)
+            storage_client = storage.Client(project=project, credentials=creds)
+            bucket = storage_client.bucket(bucket_name)
+            blob = bucket.blob(destination_blob_name)
+
+            if (
+                blob.exists() and upload_flag
+            ):  # when uploadFlag false, user is peroforming save. So file should present.
+                return {
+                    "name": destination_blob_name,
+                    "bucket": bucket_name,
+                    "exists": True,
+                    "success": False,
+                    "error": f"A file with name {destination_blob_name} already exists in the destination.",
+                    "status": 409,  # Conflict
+                }
+
+            blob.upload_from_string(
+                processed_content,
+                content_type="media",
+            )
+
+            return {
+                "name": destination_blob_name,
+                "bucket": bucket_name,
+                "size": blob.size,
+                "contentType": blob.content_type,
+                "timeCreated": (
+                    blob.time_created.isoformat() if blob.time_created else ""
+                ),
+                "updated": blob.updated.isoformat() if blob.updated else "",
+                "success": True,
+            }
+
+        except Exception as e:
+            if upload_flag:
+                self.log.exception(
+                    f"Error uploading content to {destination_blob_name}."
+                )
+            else:
+                self.log.exception(f"Error saving content to {destination_blob_name}.")
+            return {"error": str(e), "status": 500}
+
+    async def delete_file(self, bucket, path):
+        try:
+            token = self._access_token
+            project = self.project_id
+            creds = credentials.Credentials(token)
+            client = storage.Client(project=project, credentials=creds)
+
+            # Get the bucket
+            bucket_obj = client.bucket(bucket)
+
+            # Check if it's a folder/bucket deletion attempt
+            if path == "" or path == "/":
+                return {
+                    "error": "Deleting Bucket is not allowed.",
+                    "status": 409,
+                }
+
+            is_file = True
+            target_blob = bucket_obj.blob(path)
+            if target_blob.exists():
+                # It's a file or a 0-byte folder marker
+                if target_blob.size == 0 and target_blob.name.endswith("/"):
+                    # It's explicitly an empty folder marker
+                    is_file = False
+                else:
+                    # It's a regular file
+                    is_file = True
+            else:
+                # If the exact blob doesn't exist, check if it's a folder (prefix)
+                # We append '/' to the path to check for objects *within* that folder.
+                blobs_under_prefix = list(bucket_obj.list_blobs(prefix=path + "/"))
+                if len(blobs_under_prefix) > 0:
+                    is_file = False
+                elif bucket_obj.blob(path + "/").exists():
+                    # It might be a 0-byte object created for an empty folder
+                    is_file = False
+                else:
+                    return {"error": "File/Folder not found.", "status": 404}
+
+            if is_file:
+                # Delete a single file
+                try:
+                    target_blob.delete()
+                    self.log.info(f"Successfully deleted file: {path}")
+                    return {"success": True, "status": 200}
+                except Exception as e:
+                    self.log.exception(f"Error deleting file {path}.")
+                    return {"error": str(e), "status": 500}
+            else:
+                # Delete a folder (recursively delete all blobs with the prefix)
+                folder_prefix = path if path.endswith("/") else path + "/"
+                self.log.info(f"Attempting to delete non-empty folder: {folder_prefix}")
+                try:
+                    blobs_to_delete = list(bucket_obj.list_blobs(prefix=folder_prefix))
+                    if not blobs_to_delete:
+                        # This case handles if list_blobs returns empty for some reason,
+                        # but we already determined it's a folder, possibly an empty marker.
+                        # Try deleting the 0-byte marker if it exists.
+                        empty_folder_blob = bucket_obj.blob(folder_prefix)
+                        if empty_folder_blob.exists() and empty_folder_blob.size == 0:
+                            empty_folder_blob.delete()
+                            self.log.info(
+                                f"Successfully deleted empty folder marker: {folder_prefix}"
+                            )
+                            return {"success": True, "status": 200}
+                        else:
+                            return {
+                                "error": f"Folder '{path}' found no contents to delete.",
+                                "status": 404,
+                            }
+
+                    for blob_to_delete in blobs_to_delete:
+                        self.log.info(f"Deleting blob: {blob_to_delete.name}")
+                        blob_to_delete.delete()
+
+                    self.log.info(
+                        f"Successfully deleted non-empty folder and its contents: {path}"
+                    )
+                    return {"success": True, "status": 200}
+
+                except Exception as e:
+                    self.log.exception(f"Error deleting non-empty folder {path}.")
+                    return {"error": str(e), "status": 500}
+
+        except Exception as e:
+            self.log.exception(f"Error deleting file {path}.")
+            return {"error": str(e), "status": 500}
+
+    async def rename_file(self, bucket_name, blob_name, new_name):
+        """
+        Renames a blob using the rename_blob method.
+        Note: This only works within the same bucket.
+        """
+        try:
+            token = self._access_token
+            project = self.project_id
+            creds = credentials.Credentials(token)
+            storage_client = storage.Client(project=project, credentials=creds)
+
+            # Get the bucket and blob
+            bucket = storage_client.bucket(bucket_name)
+            blob = bucket.blob(blob_name)
+            # Check if source blob exists
+            is_file = True
+            if not blob.exists():
+                # It might be a folder, so adding trail slash and checking for a blob (0 byte object will be returned)
+                # using blobs , we can exclude the 0 byte blob and count the children
+                blobs = bucket.list_blobs(
+                    prefix=(blob_name if blob_name.endswith("/") else blob_name + "/")
+                )
+
+                blob_count = 0
+                for iblob in blobs:
+                    # For empty folders, gcs creates a zero-byte object with a trailing slash to simulate a folder.
+                    # here we exclude that 0 byte object.
+                    blob = iblob
+                    if (
+                        iblob.name[:-1] if iblob.name.endswith("/") else iblob.name
+                    ) != blob_name:
+                        blob_count += 1
+                        # breaking the loop here, since we just want to know whether at-least 1 file present or not.
+                        # Folder cannot be renamed even if 1 file/folder present
+                        if blob_count > 1:
+                            break
+                if (
+                    blob.exists()
+                    and blob_count == 0
+                    and (blob.name[:-1] if blob.name.endswith("/") else blob.name)
+                    == blob_name
+                ):
+                    # Only 0 byte Object present
+                    is_file = False
+                elif blob_count > 0:
+                    self.log.info("Renaming a non-empty folder.")
+                    return await self.rename_non_empty_folder(
+                        bucket, blob_name, new_name
+                    )
+                else:
+                    return {"error": f"{blob_name} not found", "status": 404}
+
+            # Check for availability of new name ( if already present, return error)
+            if is_file:
+                blob_new = bucket.blob(new_name)
+
+                if blob_new.exists():
+                    return {
+                        "error": f"A file with name {blob_new.name} already exists in the destination.",
+                        "status": 409,
+                    }
+            else:
+                # Adding Trailing slash to avoid partial match of other folders
+                blob_new = bucket.blob(new_name)
+                blobs = bucket.list_blobs(prefix=new_name + "/")
+                if any(blobs):
+                    return {
+                        "error": f"A folder with name {blob_new.name} already exists in the destination.",
+                        "status": 409,
+                    }
+
+            # Rename the blob
+            if is_file:
+                new_blob = bucket.rename_blob(blob, new_name)
+            else:
+                new_blob = bucket.rename_blob(blob, new_name + "/")
+
+            # Return success response
+            return {
+                "name": new_blob.name,
+                "bucket": bucket_name,
+                "success": True,
+                "status": 200,
+            }
+
+        except Exception as e:
+            self.log.exception(f"Error renaming from {blob_name} to {new_name}.")
+            return {"error": str(e), "status": 500}
+
+    async def rename_non_empty_folder(
+        self, bucket: storage.Bucket, source_prefix: str, new_prefix: str
+    ):
+        source_prefix_normalized = (
+            source_prefix if source_prefix.endswith("/") else source_prefix + "/"
+        )
+        new_prefix_normalized = (
+            new_prefix if new_prefix.endswith("/") else new_prefix + "/"
+        )
+
+        blobs_to_rename = list(bucket.list_blobs(prefix=source_prefix_normalized))
+
+        if not blobs_to_rename:
+            empty_folder_blob = bucket.blob(source_prefix_normalized)
+            if empty_folder_blob.exists() and empty_folder_blob.size == 0:
+                self.log.info(
+                    f"Renaming empty folder marker '{source_prefix_normalized}' to '{new_prefix_normalized}'."
+                )
+                new_blob = bucket.rename_blob(empty_folder_blob, new_prefix_normalized)
+                return {
+                    "name": new_blob.name,
+                    "bucket": bucket.name,
+                    "success": True,
+                    "status": 200,
+                    "message": "Empty folder marker renamed.",
+                }
+            else:
+                return {
+                    "error": f"Folder '{source_prefix}' not found or has no objects to rename.",
+                    "status": 404,
+                }
+
+        if (
+            new_prefix_normalized.startswith(source_prefix_normalized)
+            and new_prefix_normalized != source_prefix_normalized
+        ):
+            return {
+                "error": f"Cannot rename folder '{source_prefix}' to a sub-path of itself '{new_prefix}'.",
+                "status": 400,
+            }
+
+        renamed_blobs = []
+        try:
+            for blob in blobs_to_rename:
+                relative_path = blob.name[len(source_prefix_normalized) :]
+                new_blob_name = new_prefix_normalized + relative_path
+
+                if bucket.blob(new_blob_name).exists():
+                    self.log.error(
+                        f"Conflict detected during manual folder rename: '{new_blob_name}' already exists."
+                    )
+                    raise ValueError(
+                        f"Destination object '{new_blob_name}' already exists. Aborting rename."
+                    )
+
+                new_blob = bucket.copy_blob(blob, bucket, new_name=new_blob_name)
+                renamed_blobs.append(new_blob)
+                blob.delete() 
+
+            return {
+                "message": f"Folder '{source_prefix}' and its contents renamed to '{new_prefix}'.",
+                "bucket": bucket.name,
+                "success": True,
+                "status": 200,
+            }
+        except Exception as e:
+            self.log.error(
+                f"Error during manual folder rename. Attempting to restore original files: {e}"
+            )
+            for blob in renamed_blobs:
+                original_blob_name = (
+                    source_prefix_normalized + blob.name[len(new_prefix_normalized) :]
+                )
+                try:
+                    self.log.warning(
+                        f"Attempting to revert '{blob.name}' to '{original_blob_name}'"
+                    )
+                    bucket.copy_blob(blob, bucket, new_name=original_blob_name)
+                    blob.delete()
+                except Exception as revert_e:
+                    self.log.error(
+                        f"Failed to revert blob '{blob.name}' to '{original_blob_name}': {revert_e}"
+                    )
+            return {
+                "success": False,
+                "error": f"Failed to rename folder: {str(e)}",
+                "status": 500,
+            }
+
+    async def download_file(self, bucket_name, file_path, name, format):
+        try:
+            token = self._access_token
+            project = self.project_id
+            creds = credentials.Credentials(token)
+            client = storage.Client(project=project, credentials=creds)
+            bucket = client.bucket(bucket_name)
+            blob = bucket.blob(file_path)
+
+            return blob.download_as_bytes()
+
+        except Exception as e:
+            self.log.exception(f"Error getting file: {e}")
+            return []  # Return Empty File
