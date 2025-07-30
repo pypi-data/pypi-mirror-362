@@ -1,0 +1,7 @@
+{% for k,v in environment_variables.items() %}
+SETX {{ k }} {{ v }}
+{% endfor %}
+
+{% for installer in installers %}
+call {{ installer }}\{% if create_envs %}create_env.bat{% else %}update_env.bat{% endif %}
+{% endfor %}
