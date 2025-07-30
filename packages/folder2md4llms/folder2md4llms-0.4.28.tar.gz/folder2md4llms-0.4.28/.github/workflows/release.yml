@@ -1,0 +1,67 @@
+name: Release to PyPI
+
+# This is a dummy comment to force a new commit and trigger workflow re-evaluation.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for hatch-vcs
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "latest"
+
+    - name: Setup environment
+      run: |
+        uv sync --dev
+
+    - name: Run tests
+      run: uv run pytest
+
+    - name: Check version matches tag
+      run: |
+        VERSION=$(uv run python -c "from folder2md4llms.__about__ import __version__; print(__version__)")
+        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+
+        echo "Package version: $VERSION"
+        echo "Tag version: $TAG_VERSION"
+
+        if [ "$VERSION" != "$TAG_VERSION" ]; then
+          echo "Error: Version mismatch between package ($VERSION) and git tag (v$TAG_VERSION)."
+          echo "Ensure the auto-generated file 'src/folder2md4llms/__about__.py' is in your .gitignore."
+          exit 1
+        fi
+
+    - name: Build package
+      run: |
+        echo "Building package..."
+        uv build
+        # List the built packages
+        ls -la dist/
+        # Verify the built packages have the correct version
+        echo "Built packages:"
+        for file in dist/*; do
+          echo "  $file"
+        done
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        verbose: true
