@@ -1,0 +1,21 @@
+{% filter rewrap(text_width) %}
+{% if skymaps|length != 1 %}The preferred sky map at this time is {{preferred_skymap}}. {% endif %}
+For the {{preferred_skymap}} sky map, the {{cl}}% credible region is
+{% if not include_ellipse %}
+{{greedy_area|round|int}} deg2.
+{% else %}
+well fit by an ellipse with an area of {{ellipse_area|round|int}} deg2 described
+by the following DS9 region (right ascension, declination, semi-major axis,
+semi-minor axis, position angle of the semi-minor axis):
+   icrs; ellipse(
+      {{- ra.to_string(unit='hourangle', fields=2, pad=True, alwayssign=False) }},
+      {{- ' ' }}{{ dec.to_string(unit='deg', fields=2, pad=True, alwayssign=True) }},
+      {{- ' ' }}{{ a.to_string(unit='deg', precision=2, decimal=True) }}d,
+      {{- ' ' }}{{ b.to_string(unit='deg', precision=2, decimal=True) }}d,
+      {{- ' ' }}{{ pa.to_string(unit='deg', precision=2, decimal=True) }}d)
+{% endif %}
+{% if distmu %}
+Marginalized over the whole sky, the a posteriori luminosity distance estimate is {{distmu|round|int}} +/- {{distsig|round|int}} Mpc (a posteriori mean +/- standard deviation).
+{% endif %}
+
+{% endfilter %}

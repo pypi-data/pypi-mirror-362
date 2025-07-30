@@ -1,0 +1,10 @@
+{% from 'macros.jinja2' import naturalclassifications, evidence_for,
+                               probability %}
+{% filter rewrap(text_width) %}
+{% if classifications|length > 0 %}
+{% if p_astro_pipeline == 'rapidpe_rift' %}After parameter estimation by RapidPE-RIFT [{{citation_index['rapidpe_rift']}}], the {% if subject == 'Update' %}updated {% endif %}{% elif subject == 'Update' %} %}Assuming the candidate is astrophysical, the updated {% else %}The {% endif %}classification of the GW signal, in order of descending probability,
+is {{naturalclassifications(classifications)}}.
+{% else %}
+{% endif %}
+
+{% endfilter %}

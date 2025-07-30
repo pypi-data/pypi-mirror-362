@@ -1,0 +1,34 @@
+{% from 'macros.jinja2' import citeskymap_number %}
+
+{% filter rewrap(text_width) %}
+{% include 'authors.jinja2' %}
+
+A LLAMA search has been performed for LIGO/Virgo/KAGRA
+gravitational-wave candidates consistent with the sky localization of
+IceCube alert {{icecube_alert}} (** <add link to notice> **) in a
+time range of 1000 seconds {{citeskymap_number('llama', citation_index)}} centered on the alert event time
+({{tl_datetime}} UTC to {{th_datetime}} UTC).
+
+Gravitational-wave candidate {{gracedb_id}} has been identified by this
+search. This candidate does not meet the LIGO/Virgo/KAGRA public alert
+criteria based on analysis of the gravitational-wave data alone, but
+it is found to be in spatial and temporal coincidence with
+{{icecube_alert}} public alert. The properties of the GW
+candidate can be found at this URL:
+
+{{ gracedb_service_url }}{{ gracedb_id }}
+
+The neutrino trigger time is xxx.xx seconds before(after) the gravitational-wave
+candidate event. The p-value associated with the joint observation is {{'%.4g'|format(llama_fap)}}.
+We encourage further observation of the localization area of {{icecube_alert}}
+and we provide a joint localization probability map at:
+
+<gracedb link here>
+
+Further information about analysis methodology can be found at
+https://multimessenger.science/.
+{% endfilter %}
+{% include 'userguide_conclusion.jinja2' %}
+{% filter rewrap(text_width) %}
+{% include 'numbered_pipeline_citations.jinja2' %}
+{% endfilter %}

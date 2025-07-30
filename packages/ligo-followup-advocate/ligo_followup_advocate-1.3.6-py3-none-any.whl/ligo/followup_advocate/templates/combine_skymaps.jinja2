@@ -1,0 +1,14 @@
+{% filter rewrap(text_width) %}
+{% if combined_skymaps|length == 1 %}
+
+A combined sky map is also available:
+{% else %}
+
+Combined sky maps are also available:
+{% endif %}
+{% for skymap in combined_skymaps %}
+ * {{skymap.filename}}, an {% if skymap.alert_type in ['preliminary','initial'] %}initial{% elif skymap.alert_type == 'earlywarning' %}early-warning{% else %}updated{% endif %} localization, distributed via GCN and SCiMMA notices about {{skymap.latency|abs|naturaldelta}} {% if skymap.latency < 0 %}before {% else %}after {% endif %}the candidate event time.
+{% endfor %}
+
+For the {{combined_skymap}} sky map, the {{cl}}% credible region is {{combined_skymap_greedy_area|round|int}} deg2.
+{% endfilter %}

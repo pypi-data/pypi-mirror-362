@@ -1,0 +1,282 @@
+Macro to join a list of terms with Oxford commas, as in "one, two, and three."
+
+{% macro oxford_commas(seq, conjunction='and') %}
+{% for item in seq %}
+{% if caller %}{{caller(item)}}{% else %}{{item}}{% endif -%}
+{% if loop.length > 2 and not loop.last %},{% endif %}
+{% if loop.length > 1 and not loop.last %} {% endif %}
+{% if loop.length > 1 and loop.revindex == 2 %}{{conjunction}} {% endif %}
+{% endfor %}
+{%- endmacro %}
+
+
+Macro to translate a probability between 0 and 100. These thresholds are
+roughly derived by assuming that we have a binary classification problem,
+calculating the odds ratio as K=P/(1-P), and using thresholds based on the
+table of Kass and Raftery (1995, https://doi.org/10.2307%2F2291091).
+
+{% macro evidence_for(value) %}
+{% if 95 <= value %}
+strong evidence for
+{%- elif 75 <= value < 95 %}
+evidence for
+{%- elif 25 <= value < 75 %}
+indeterminate evidence for
+{%- elif 5 <= value < 25 %}
+evidence against
+{%- else %}
+strong evidence against
+{%- endif %}
+{%- endmacro %}
+
+
+Macro to render a percentage between 0 and 100, capping at <1% and >99%.
+
+{% macro probability(value) %}
+{% if value > 99 %}
+>99
+{%- elif value < 1 %}
+<1
+{%- else %}
+{{value|round|int}}
+{%- endif %}
+%
+{%- endmacro %}
+
+
+Macro to write Update type in natural-language
+
+{% macro naturalupdatetype(update_type) %}
+{% if 'sky_localization' == update_type|lower %}Sky localization{% elif 'p_astro' == update_type|lower %}Source Classification{% elif 'em_bright' == update_type|lower %}EM Bright Classification{% elif 'cgmi' == update_type|lower %}Mass Estimate{% elif 'raven' == update_type|lower %}Coincidence with External Event{% endif %}
+{%- endmacro %}
+
+
+Macro to write Update type subject
+{% macro naturalupdatesubject(update_types) %}
+{% if update_types|length == 1 %}{{naturalupdatetype(update_types[0])}}
+{% elif update_types|length == 2 %}{{naturalupdatetype(update_types[0])}} and {{naturalupdatetype(update_types[1])}}
+{% elif update_types|length > 2 %}
+{% for update_type in update_types[:-1] %}{{naturalupdatetype(update_type)}}, {% endfor %}and {{naturalupdatetype(update_types[-1])}}{% endif %}
+{%- endmacro %}
+
+
+Macro to transform a list like ['H1', 'L1', 'V1'] to natural-language list like
+"H1 (LIGO Hanford Observatory), L1 (LIGO Livingston Observatory), and V1 (Virgo
+Observatory)".
+
+{% macro naturalinstruments(instruments) %}
+{% set long_instruments = {'H1': 'LIGO Hanford Observatory',
+                           'L1': 'LIGO Livingston Observatory',
+                           'V1': 'Virgo Observatory',
+                           'K1': 'KAGRA Observatory'} %}
+{% call(instrument) oxford_commas(instruments) %}
+{% if instrument in long_instruments %}
+{{long_instruments[instrument]}} ({{instrument}})
+{%- else %}
+{{instrument}}
+{%- endif %}
+{%- endcall %}
+{%- endmacro %}
+
+
+{% set skymapcitationnumber = namespace(count=0) %}
+
+Macro to cite sky maps. Since citations are enumerated, the citation number must start with
+number of all GW analysis pipelines + 1.
+
+{% macro citeskymap(skymappipeline, citation_index) %}
+{{skymappipeline.split('_')[0]}}{% if skymappipeline|lower in citations %} [{{ citation_index[skymappipeline|lower] }}]
+{%- endif -%}
+{%- endmacro %}
+
+
+Macro to simply write the citation number of a skymap in brackets.
+
+{% macro citeskymap_number(skymappipeline, citation_index) %}
+{% if skymappipeline|lower in citations %}[{{ citation_index[skymappipeline|lower] }}]
+{%- endif -%}
+{%- endmacro %}
+
+
+Macro to transform a list of other GW analysis pipelines like ['gstlal_ssm', 'mbta_allsky', 'pycbc_earlywarning']
+to a natural-language list like "gstlal [2], mbtaonline [3], and pycbc [4]".
+
+{% macro naturalpipelines(pipeline_searches, citation_index, conjunction='and') %}
+{% for pipeline_search in pipeline_searches %}
+{% if 'pycbc' in pipeline_search|lower %}PyCBC Live{% elif 'gstlal' in pipeline_search|lower %}GstLAL{% elif 'spiir' in pipeline_search|lower %}SPIIR{% elif 'cwb' in pipeline_search|lower %}cWB{% elif 'aframe' in pipeline_search|lower %}Aframe{% else %}{{pipeline_search.split('_')[0]}}{% endif %}{% if 'allsky' in pipeline_search|lower %}{% elif 'ssm' in pipeline_search|lower %} SSM{% else %} {{pipeline_search.split('_')[1]}}{% endif %} [{{citation_index[pipeline_search|lower]}}]
+{%- if loop.length > 2 and not loop.last %},{% endif %}
+{%- if loop.length > 1 and not loop.last %} {% endif %}
+{%- if loop.length > 1 and loop.revindex == 2 %}{{conjunction}} {% endif %}
+{% endfor %}
+{%- endmacro %}
+
+
+Macro to transform a list of GW analysis early warning pipelines like ['gstlal_earlywarning', 'mbta_allsky', 'pycbc_earlywarning']
+to a natural-language list like "gstlal [2], mbtaonline [3], and pycbc [4]".
+
+{% macro naturalearlywarningpipelines(early_warning_pipeline_searches, citation_index, conjunction='and') %}
+{% for pipeline_search in early_warning_pipeline_searches %}
+{% if 'pycbc' in pipeline_search|lower %}PyCBC Live{% elif 'gstlal' in pipeline_search|lower %}GstLAL{% elif 'spiir' in pipeline_search|lower %}SPIIR{% elif 'aframe' in pipeline_search|lower %}Aframe{% else %}{{pipeline_search.split('_')[0]}}{% endif %} [{{citation_index[pipeline_search|lower]}}]
+{%- if loop.length > 2 and not loop.last %},{% endif %}
+{%- if loop.length > 1 and not loop.last %} {% endif %}
+{%- if loop.length > 1 and loop.revindex == 2 %}{{conjunction}} {% endif %}
+{% endfor %}
+{%- endmacro %}
+
+
+Macro to grab citation of pipeline, going to default value of pipeline if pipeline_search not in list
+
+{%- macro citepipeline(key) -%}
+{% if key in citations %}{{citations[key|lower]}}{% else %}{{citations[key.split('_')[0]+'_allsky'|lower]}}{% endif %}
+{%- endmacro -%}
+
+Macro to enumerate and cite all GW analysis pipelines involved for the superevent; including the
+skymap pipelines.
+
+{%- macro citenumberedpipelines(citation_index) -%}
+{% for key in citation_index %}
+ [{{ citation_index[key|lower] }}] {{citepipeline(key)}}
+{% endfor %}
+{%- endmacro -%}
+
+
+Macro to transform a list of GRB-GW exclusions/detections like ['CBC', 'Burst'] to a natural-language
+list like "triggered CBC pipeline (PyGRB) [1] and triggered Burst pipeline (X-Pipeline) [2]".
+
+{%- macro naturalgrbmediumlatencypipelines(pipelines, citation_index) -%}
+{% for pipeline in pipelines %}
+{% if pipeline == 'xpipeline' %}X-Pipeline GRB-unmodeled transient analysis{% elif pipeline == 'pygrb' %}PyGRB binary merger analysis{% endif %} [{{citation_index[pipeline|lower]}}]
+{%- if loop.length > 1 and not loop.last %} {% endif %}
+{%- if loop.length > 1 and loop.revindex == 2 %}and {% endif %}
+{% endfor %}
+{%- endmacro %}
+
+
+Macro to transform a list of other external pipelines like ['Fermi', 'Swift', 'INTEGRAL']
+to a natural-language list like "Fermi-GBM, Swift/BAT, and INTEGRAL".
+
+{% macro naturalotherexternalpipelines(other_pipelines, conjunction='and') %}
+{% for pipeline in other_pipelines %}
+{{grbmission(pipeline)}}
+{%- if loop.length > 2 and not loop.last %},{% endif %}
+{%- if loop.length > 1 and not loop.last %} {% endif %}
+{%- if loop.length > 1 and loop.revindex == 2 %}{{conjunction}} {% endif %}
+{% endfor %}
+{%- endmacro %}
+
+Macro to round FAPs to single decimal place
+
+{% macro naturalfap(fap) %}
+{{'%.1e'|format(fap)}}
+{%- endmacro %}
+
+
+Macro to format FARs using natural-language time, capped at 1/100 years.
+
+{% macro naturalfar(far) %}
+{{'%.2g'|format(far)}} Hz, or about one in
+{% if far * 365 * 86400 * 100 > 1 %}
+{{(1 / far)|naturaldelta}}
+{%- else %}
+1e{{(1 / (365 * 86400 * far))|log10|round|int}} years
+{%- endif %}
+{%- endmacro %}
+
+
+Macro to format a dictionary of source classifications as a natural-language
+list, sorted by descending probability.
+
+{% macro naturalclassifications(classifications) %}
+{% set items = classifications|dictsort(by='value', reverse=True) %}
+{% call(item) oxford_commas(items, 'or') %}
+{% if item[0] == 'Terr' %}
+terrestrial
+{%- else %}
+{{item[0]}}
+{%- endif %} ({{probability(item[1])}})
+{%- endcall %}
+{%- endmacro %}
+
+
+Macro to replace jargon terms CBC and Burst.
+
+{%- macro renamegroup(group, pipeline_search) -%}
+{%- if group|lower == 'cbc' or pipeline_search|lower == 'cwb_bbh' -%}
+compact binary merger
+{%- elif group|lower == 'burst' -%}
+unmodeled transient
+{%- else -%}
+{{group}}
+{%- endif -%}
+{%- endmacro -%}
+
+
+Macro to include which mission reported the GRB.
+
+{%- macro grbmission(external_pipeline) -%}
+{%- if external_pipeline|lower == 'fermi' -%}
+Fermi GBM
+{%- elif external_pipeline|lower == 'swift' -%}
+Swift/BAT
+{%- elif external_pipeline|lower == 'agile' -%}
+AGILE MCAL
+{%- elif external_pipeline|lower == 'svom' -%}
+SVOM/ECLAIRS
+{%- else -%}
+{{external_pipeline}}
+{%- endif -%}
+{%- endmacro -%}
+
+
+Macro to include which subthreshold targeted mission reported the GRB.
+
+{%- macro grbmission_targeted(external_pipeline) -%}
+{%- if external_pipeline|lower == 'fermi' -%}
+Fermi GBM
+{%- elif external_pipeline|lower == 'swift' -%}
+Swift/BAT-GUANO
+{%- else -%}
+{{external_pipeline}}
+{%- endif -%}
+{%- endmacro -%}
+
+
+Macro to include the word `candidate' or not when referring to external_trigger.
+
+{%- macro propername(external_trigger) -%}
+{%- if 'grb' in external_trigger|lower -%}
+{{external_trigger}}
+{%- else -%}
+candidate with ID {{external_trigger}}
+{%- endif -%}
+{%- endmacro -%}
+
+
+Dictionary of common citations.
+Note that if the pipeline_search combination is missing, we will default back
+to the pipeline_allsky choice.
+
+{% set citations = {'pycbc_allsky': 'Dal Canton et al. ApJ 923, 254 (2021) doi:10.3847/1538-4357/ac2f9a',
+                    'pycbc_earlywarning': 'Nitz A. H., Schafer M., Dal Canton T. ApJL 902, 2 (2020) doi:10.3847/2041-8213/abbc10',
+                    'mbta_allsky': 'Allene et al. CQG 42, 105009 (2025) doi:10.1088/1361-6382/add234',
+                    'gstlal_allsky': 'Tsukada et al. PRD 108, 043004 (2023) doi:10.1103/PhysRevD.108.043004 and Ewing et al. PRD 109, 042008 (2024) doi:10.1103/PhysRevD.109.042008',
+                    'gstlal_earlywarning': 'Sachdev et al. ApJL 905, 2 (2020) doi:10.3847/2041-8213/abc753',
+                    'gstlal_ssm': 'Hanna et al. (2024) arXiv 2412.10951',
+                    'spiir_allsky': 'Chu et al. PRD 105, 024023 (2022) doi:10.1103/PhysRevD.105.024023',
+                    'spiir_earlywarning': 'Kovalam et al. ApJL 927, 1 (2022) doi:10.3847/2041-8213/ac5687',
+                    'cwb_allsky': 'Klimenko et al. PRD 93, 042004 (2016) doi:10.1103/PhysRevD.93.042004',
+                    'cwb_bbh': 'T. Mishra et al. PRD 105, 083018 (2022) doi:10.1103/PhysRevD.105.083018',
+                    'olib_allsky': 'Lynch et al. PRD 95, 104046 (2017) doi:10.1103/PhysRevD.95.104046',
+                    'mly_allsky': 'Skliris et al. PRD 110, 104034 (2024) doi:10.1103/PhysRevD.110.104034',
+                    'em_bright': 'Chatterjee et al. ApJ 896, 54 (2020) doi:10.3847/1538-4357/ab8dbe',
+                    'pygrb': 'Williamson et al. PRD 90, 122004 (2014) doi:10.1103/PhysRevD.90.122004',
+                    'xpipeline': 'Was et al. PRD 86, 022003 (2012) doi:10.1103/PhysRevD.86.022003',
+                    'llama': 'Baret et al., Astroparticle Physics 35, 1 (2011) doi:10.1016/j.astropartphys.2011.04.001',
+                    'llama_stat': 'Bartos et al. PRD 100, 083017 (2019) doi:10.1103/PhysRevD.100.083017 and Countryman et al. (2019) arXiv:1901.05486',
+                    'bayestar': 'Singer & Price PRD 93, 024013 (2016) doi:10.1103/PhysRevD.93.024013',
+                    'bilby': 'Ashton et al. ApJS 241, 27 (2019) doi:10.3847/1538-4365/ab06fc and Morisaki et al. PRD 108, 123040 (2023) doi:10.1103/PhysRevD.108.123040',
+                    'lalinference': 'Veitch et al. PRD 91, 042003 (2015) doi:10.1103/PhysRevD.91.042003',
+                    'rapidpe_rift': 'Rose et al. (2022) arXiv:2201.05263 and Pankow et al. PRD 92, 023002 (2015) doi:10.1103/PhysRevD.92.023002',
+                    'raven': 'Urban, A. L. 2016, Ph.D. Thesis https://dc.uwm.edu/etd/1218 and Piotrzkowski, B. J. 2022, Ph.D. Thesis https://dc.uwm.edu/etd/3060',
+                    'aframe_allsky': 'Marx et al. PRD 111, 042010 (2025) doi:10.1103/PhysRevD.111.042010',
+                    'amplfi': 'Chatterjee et al. MLST 5, 045030 (2024) doi:10.1088/2632-2153/ad8982'} %}

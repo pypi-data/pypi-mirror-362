@@ -1,0 +1,21 @@
+{% from 'macros.jinja2' import citeskymap_number %}
+{% filter rewrap(text_width) %}
+{% if pipeline_search|lower == 'cwb_bbh' and not update_alert %}
+The redshifted (detector frame) chirp mass falls with highest probability in
+the bin {{mchirp_bin}} solar
+{% else %}
+The source chirp mass falls with highest probability in the bin {{mchirp_bin}}
+solar
+{% endif %}
+{% if update_alert %}
+masses after parameter estimation {{citeskymap_number(updated_skymap.pipeline, citation_index)}},
+{% else %}
+masses,
+{% endif %}
+assuming the candidate is astrophysical in origin.
+{% if pipeline_search|lower == 'cwb_bbh' and not update_alert %}
+For cWB BBH events, no distance or redshift information is available in low
+latency.
+{% endif %}
+
+{% endfilter %}

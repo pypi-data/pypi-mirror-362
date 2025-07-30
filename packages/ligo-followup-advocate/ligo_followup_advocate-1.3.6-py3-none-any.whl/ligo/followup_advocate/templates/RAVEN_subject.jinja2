@@ -1,0 +1,8 @@
+{% from 'macros.jinja2' import grbmission, renamegroup, propername %}
+{% if not change_significance_statement %}
+SUBJECT: LIGO/Virgo/KAGRA {{gracedb_id}}: Identification of a GW {{renamegroup(group, pipeline_search)}} candidate possibly associated with {% if subthreshold %}sub-threshold {% endif %}{{grbmission(external_pipeline)}} {{propername(external_trigger)}}
+{% else %}
+SUBJECT: {{grbmission(external_pipeline)}} {{propername(external_trigger)}}: LIGO/Virgo/KAGRA identification of a low-significance GW {{renamegroup(group, pipeline_search)}} counterpart, {{gracedb_id}}
+{% if subthreshold%} **NOTE TO ADVOCATES: If our circular is the first one to mention the sub-threshold GRB, please use the subject line:
+SUBJECT: LIGO/Virgo/KAGRA {{gracedb_id}}: Identification of a GW {{renamegroup(group, pipeline_search)}} candidate possibly associated with {% if subthreshold %}sub-threshold {% endif %}{{grbmission(external_pipeline)}} {{propername(external_trigger)}}**{% endif %}
+{% endif %}

@@ -1,0 +1,53 @@
+{% from 'macros.jinja2' import citeskymap_number %}
+
+{% filter rewrap(text_width) %}
+{% include 'authors.jinja2' %}
+
+Searches have been performed for {% if neutrinos|length == 1 %}a {% endif %}track-like muon neutrino event{% if neutrinos|length > 1 %}s{% endif %} 
+detected by IceCube consistent with the the time and sky localization
+of the gravitational-wave (GW) candidate {{gracedb_id}}. The GW candidate's
+properties can be found at this URL:
+
+{{ gracedb_service_url }}{{ gracedb_id }}
+
+Based on the analysis of gravitational-wave data alone, this candidate
+does not meet LIGO/Virgo/KAGRA criteria for a public alert.
+
+IceCube data was searched in a time range of 1000 seconds {{citeskymap_number('llama', citation_index)}} centered
+on the GW event time ({{tl_datetime}} UTC to {{th_datetime}} UTC).
+During this time period IceCube was collecting
+good quality data. The hypothesis test employed by LLAMA uses a
+Bayesian approach to quantify the joint GW + neutrino event
+significance. {{citeskymap_number('llama_stat', citation_index)}}
+From this analysis, {{neutrinos|length|int}} track-like event{% if neutrinos|length > 1 %}s were{% else %} was{% endif %} found
+in spatial and temporal coincidence with the gravitational-wave
+candidate {{gracedb_id}}.
+
+Properties of the coincident neutrino{% if neutrinos|length > 1 %}s{% endif %} together with the p-value{% if neutrinos|length > 1 %}s{% endif %} associated
+with the joint observation {% if neutrinos|length > 1 %}are{% else %}is{% endif %} shown below. 
+
+{% endfilter %}
+dt         ra        dec      Angular Uncertainty(deg)     p-value
+------------------------------------------------------------------
+{% for line in neutrinos %}
+{{line}}
+{% endfor %}
+
+where:
+dt = Time offset (sec) of track event with respect to GW trigger.
+Angular uncertainty = Angular uncertainty of track event: the radius of a
+    circle representing 90% CL containment by area.
+p-value = the p-value for this specific track event from each search.
+{% filter rewrap(text_width) %}
+
+The IceCube Neutrino Observatory is a cubic-kilometer neutrino detector
+operating at the geographic South Pole, Antarctica. The IceCube realtime alert
+point of contact can be reached at roc@icecube.wisc.edu
+
+Further information about analysis methodology can be found at
+https://multimessenger.science/.
+{% endfilter %}
+{% include 'userguide_conclusion.jinja2' %}
+{% filter rewrap(text_width) %}
+{% include 'numbered_pipeline_citations.jinja2' %}
+{% endfilter %}
