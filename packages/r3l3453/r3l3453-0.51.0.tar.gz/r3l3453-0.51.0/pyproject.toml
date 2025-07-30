@@ -1,0 +1,79 @@
+[build-system]
+requires = ['flit_core >=3.2,<4']
+build-backend = 'flit_core.buildapi'
+
+[project]
+name = 'r3l3453'
+description = 'Bump version, tag, commit, release to pypi, bump again, and push.'
+classifiers = [
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    'Natural Language :: English',
+    'Topic :: Software Development',
+]
+# required for nested f-strings
+requires-python = '>=3.12'
+dependencies = [
+    'parver',
+ 'cyclopts',
+ 'ruff',
+ 'cookiecutter',
+ 'flit',
+ 'tomlkit',
+ 'twine',
+ 'uv',
+ "loguru>=0.7.3",
+]
+dynamic = ['version']
+
+[project.license]
+text = 'GNU General Public License v3 (GPLv3)'
+
+[project.readme]
+file = 'README.rst'
+content-type = 'text/x-rst'
+
+[project.urls]
+Homepage = 'https://github.com/5j9/r3l3453'
+
+[project.scripts]
+r3l3453 = 'r3l3453.__init__:console_scripts_entry_point'
+
+[[project.authors]]
+name = '5j9'
+email = '5j9@users.noreply.github.com'
+
+[tool.ruff]
+line-length = 79
+format.quote-style = 'single'
+lint.isort.combine-as-imports = true
+lint.extend-select = [
+    'W605', # invalid-escape-sequence
+    'FA',  # flake8-future-annotations
+    'I',  # isort
+    'UP',  # pyupgrade
+    'RUF', # Ruff-specific rules (RUF)
+]
+lint.ignore = [
+    'E721',  # Do not compare types, use `isinstance()`
+    'RUF001',  # ambiguous-unicode-character-string	
+    'RUF002',  # ambiguous-unicode-character-docstring
+    'RUF003',  # ambiguous-unicode-character-comment
+    'RUF012',  # mutable-class-default
+]
+
+[tool.pytest.ini_options]
+addopts = '--quiet --tb=short'
+
+[tool.pyright]
+typeCheckingMode = 'standard'
+reportDeprecated = "warning"
+reportPropertyTypeMismatch = "warning"
+reportUnnecessaryCast = "warning"
+reportUnnecessaryContains = "warning"
+reportUnnecessaryIsInstance = "warning"
+reportUnnecessaryTypeIgnoreComment = true
+reportConstantRedefinition = 'error'
+reportTypeCommentUsage = 'warning'
+reportUnnecessaryComparison = 'warning'
+reportInvalidStringEscapeSequence = false
