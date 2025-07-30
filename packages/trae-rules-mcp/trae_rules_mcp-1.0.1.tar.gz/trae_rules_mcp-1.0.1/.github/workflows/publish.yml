@@ -1,0 +1,141 @@
+name: 🚀 发布到 PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:  # 允许手动触发
+    inputs:
+      environment:
+        description: '发布环境'
+        required: true
+        default: 'testpypi'
+        type: choice
+        options:
+        - testpypi
+        - pypi
+
+jobs:
+  publish:
+    name: 📦 构建和发布
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'pypi' }}
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 🐍 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 安装 uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: 🔧 安装依赖
+      run: |
+        uv sync
+        uv add --dev build twine
+    
+    - name: 🧹 清理构建文件
+      run: rm -rf dist/ build/ *.egg-info/
+    
+    - name: 🔨 构建分发包
+      run: uv run python -m build
+    
+    - name: ✅ 检查分发包
+      run: uv run twine check dist/*
+    
+    - name: 📋 显示构建结果
+      run: |
+        echo "📦 构建的分发包:"
+        ls -la dist/
+        echo "📊 包大小:"
+        du -h dist/*
+    
+    - name: 🧪 发布到 TestPyPI
+      if: github.event.inputs.environment == 'testpypi' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'testpypi')
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      run: |
+        echo "🧪 发布到 TestPyPI..."
+        uv run twine upload --repository testpypi dist/*
+        echo "✅ 已发布到 TestPyPI!"
+        echo "🔗 查看: https://test.pypi.org/project/trae-rules-mcp/"
+    
+    - name: 🚀 发布到 PyPI
+      if: github.event_name == 'release' || (github.event.inputs.environment == 'pypi')
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        echo "🚀 发布到正式 PyPI..."
+        uv run twine upload dist/*
+        echo "🎉 已发布到 PyPI!"
+        echo "🔗 查看: https://pypi.org/project/trae-rules-mcp/"
+    
+    - name: 📤 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-packages
+        path: dist/
+        retention-days: 30
+    
+    - name: 📝 创建发布总结
+      run: |
+        echo "## 🎉 发布完成!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 构建信息" >> $GITHUB_STEP_SUMMARY
+        echo "- **版本**: $(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')" >> $GITHUB_STEP_SUMMARY
+        echo "- **Python 版本**: 3.11" >> $GITHUB_STEP_SUMMARY
+        echo "- **构建时间**: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📋 分发包" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        ls -la dist/ >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ github.event.inputs.environment }}" = "testpypi" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "### 🧪 TestPyPI" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔗 [查看包](https://test.pypi.org/project/trae-rules-mcp/)" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 安装: \`pip install --index-url https://test.pypi.org/simple/ trae-rules-mcp\`" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### 🚀 PyPI" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔗 [查看包](https://pypi.org/project/trae-rules-mcp/)" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 安装: \`pip install trae-rules-mcp\`" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  test-install:
+    name: 🧪 测试安装
+    needs: publish
+    runs-on: ubuntu-latest
+    if: always() && needs.publish.result == 'success'
+    
+    steps:
+    - name: 🐍 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: ⏳ 等待包可用
+      run: sleep 60  # 等待包在 PyPI 上可用
+    
+    - name: 📦 测试安装 (TestPyPI)
+      if: github.event.inputs.environment == 'testpypi'
+      run: |
+        pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ trae-rules-mcp
+        python -c "import main; print('✅ TestPyPI 安装测试成功!')"
+    
+    - name: 📦 测试安装 (PyPI)
+      if: github.event_name == 'release' || github.event.inputs.environment == 'pypi'
+      run: |
+        pip install trae-rules-mcp
+        python -c "import main; print('✅ PyPI 安装测试成功!')"
+    
+    - name: 📝 测试总结
+      run: |
+        echo "## ✅ 安装测试完成!" >> $GITHUB_STEP_SUMMARY
+        echo "包已成功安装并可以正常导入。" >> $GITHUB_STEP_SUMMARY
