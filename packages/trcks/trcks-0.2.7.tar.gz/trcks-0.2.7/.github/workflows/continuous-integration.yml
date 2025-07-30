@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  - push
+
+permissions: { }
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/set-up-uv
+        with:
+          install-and-cache-dependencies: true
+      - run: uv run --no-sync pydoctor
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apidocs
+  build-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Required for hatch-vcs to work correctly
+          # (see https://github.com/ofek/hatch-vcs/issues/72#issuecomment-2561960617):
+          fetch-depth: 0
+      - uses: ./.github/actions/set-up-uv
+      - run: uv build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-files
+          path: |
+            dist/
+            pyproject.toml
+  lint-and-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/set-up-uv
+        with:
+          install-and-cache-dependencies: true
+          python-version: ${{ matrix.python-version }}
+      - uses: ./.github/actions/run-pre-commit
+        with:
+          cache-key-suffix: ${{ matrix.os }}-${{ matrix.python-version }}
+      - name: Run tests and type checks with dependencies specified in uv.lock file
+        uses: ./.github/actions/run-tests-and-type-checks
+      - name: Run tests and type checks with lowest direct dependencies
+        uses: ./.github/actions/run-tests-and-type-checks
+        with:
+          locked: false
+          resolution-strategy: lowest-direct
+  publish-docs:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    if: github.ref_type == 'tag'
+    needs:
+      - build-docs
+      - build-package
+      - lint-and-test
+    permissions:
+      id-token: write
+      pages: write
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+  publish-package:
+    environment:
+      name: PyPI
+      url: https://pypi.org/project/trcks/
+    if: github.ref_type == 'tag'
+    needs:
+      - publish-docs
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-files
+      - uses: ./.github/actions/set-up-uv
+      - run: uv publish
