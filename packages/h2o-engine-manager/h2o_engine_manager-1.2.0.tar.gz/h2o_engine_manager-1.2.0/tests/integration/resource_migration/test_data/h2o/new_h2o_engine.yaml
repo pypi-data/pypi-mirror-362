@@ -1,0 +1,41 @@
+apiVersion: engine.h2o.ai/v1
+kind: H2O
+metadata:
+  annotations:
+    custom.engine.h2o.ai/foo: bar
+    engine.h2o.ai/created: "true"
+    engine.h2o.ai/creator: users/6e4ae693-a4a7-4179-ac9c-331932544a73
+    engine.h2o.ai/creator-display-name: test-user
+    engine.h2o.ai/display-name: Proboscis monkey
+    engine.h2o.ai/gpu-resource-name: nvidia.com/gpu
+    engine.h2o.ai/last-idle-duration: 22.747s
+    engine.h2o.ai/name: workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93/h2oEngines/new-h2o-engine
+    engine.h2o.ai/page-token: d67e2f7dfb7ab51de509b3d0d8e6a60487f523038789e750b862dbf6ef97d715
+    engine.h2o.ai/parent: workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93
+    engine.h2o.ai/session: 540c4164-6cf2-4e9c-b255-bd46f4577799
+  name: 829cee5d-a40e-48a5-879d-5bbe5d4fec93.new-h2o-engine
+spec:
+  command:
+    - /bin/bash
+    - -c
+    - java --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED
+      --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+      -XX:+UseContainerSupport -XX:MaxRAMPercentage=90 -cp /ephemeral/jars/*:/opt/h2oai/mojo2-runtime.jar:/opt/h2oai/h2o-3/h2o.jar
+      -Djava.library.path=/opt/h2oai/h2o-3/xgb_lib_dir -Djava.io.tmpdir=/ephemeral -Djava.io.tmpdir=/ephemeral
+      water.H2OApp -name new-h2o-engine -context_path /workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93/h2oEngines/new-h2o-engine
+      -flow_dir /ephemeral/h2oflow -ice_root /ephemeral/ice -use_external_xgboost
+  contextPath: workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93/h2oEngines/new-h2o-engine
+  image: 353750902984.dkr.ecr.us-east-1.amazonaws.com/h2oai-enginemanager-mockh2o:latest
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets:
+    - name: regcred
+  maxIdleDuration: 2h0m0s
+  maxRunningDuration: 12h0m0s
+  nodeCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+  terminate: false
+  profile: workspaces/global/h2oEngineProfiles/whatever
+  h2oEngineVersion: workspaces/global/h2oEngineVersions/3.40.0.4

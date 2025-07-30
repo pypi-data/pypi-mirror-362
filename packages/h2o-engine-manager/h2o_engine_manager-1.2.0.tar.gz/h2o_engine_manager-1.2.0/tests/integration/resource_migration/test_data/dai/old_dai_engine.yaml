@@ -1,0 +1,75 @@
+apiVersion: engine.h2o.ai/v1
+kind: DriverlessAI
+metadata:
+  annotations:
+    engine.h2o.ai/created: "true"
+    engine.h2o.ai/creator: users/6e4ae693-a4a7-4179-ac9c-331932544a73
+    engine.h2o.ai/creator-display-name: test-user
+    engine.h2o.ai/display-name: My engine 1
+    engine.h2o.ai/gpu-resource-name: nvidia.com/gpu
+    engine.h2o.ai/introspection-iss: http://keycloak.aiem-system:9080/realms/hac-dev
+    engine.h2o.ai/introspection-jwks-uri: http://keycloak.aiem-system:9080/realms/hac-dev/protocol/openid-connect/certs
+    engine.h2o.ai/name: workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93/daiEngines/old-dai-engine
+    engine.h2o.ai/parent: workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93
+    engine.h2o.ai/version: 1.10.6.1
+  name: 829cee5d-a40e-48a5-879d-5bbe5d4fec93.old-dai-engine
+spec:
+  paused: false
+  coreConfig:
+    api_token_introspection_enabled: "true"
+    api_token_introspection_method: OAUTH2_TOKEN_INTROSPECTION
+    auth_oidc_identity_source: id_token
+    auth_oidc_issuer_url: http://keycloak.aiem-system:9080/realms/hac-dev
+    auth_oidc_post_logout_url: http://localhost:8080/workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93/daiEngines/old-dai-engine/oidc/login
+    auth_oidc_username_claim: preferred_username
+    auth_openid_client_id: hac-steam
+    auth_openid_client_secret: ""
+    auth_openid_redirect_uri: http://localhost:8080/workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93/daiEngines/old-dai-engine/oidc/callback
+    auth_openid_scope: openid offline_access profile
+    auth_openid_token_introspection_url: http://localhost:9876/introspect
+    auth_openid_use_objectpath_expression: $.sub is "6e4ae693-a4a7-4179-ac9c-331932544a73"
+    auth_openid_use_objectpath_match: "true"
+    authentication_method: oidc
+    base_url: /workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93/daiEngines/old-dai-engine/
+    check_system: "false"
+    disablelogout: "true"
+    disk_limit_gb: "0"
+    enable_startup_checks: "false"
+    http_cookie_attributes: '{ ''path'': ''/workspaces/829cee5d-a40e-48a5-879d-5bbe5d4fec93/daiEngines/old-dai-engine''
+      }'
+    local_administrator_list: '[''test-user'']'
+    memory_limit_gb: "0"
+    migrate_all_entities_to_user: test-user
+    override_virtual_cores: "1"
+    virtual_cores_per_physical_core: "2"
+    xdg_cache_home: /tmp/cache
+  engineConfig:
+    feature_engineering_effort: "5"
+    max_runtime_minutes: "120"
+  image: 353750902984.dkr.ecr.us-east-1.amazonaws.com/h2oai-enginemanager-mockdai:latest
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets:
+    - name: regcred
+  licenseSecret:
+    name: dai-license
+    namespace: aiem-system
+  maxIdleDuration: 15m0s
+  maxRunningDuration: 48h0m0s
+  podEnv:
+    - name: DAI_IMPORT_TENSORFLOW_GLOBALLY
+      value: "0"
+    - name: DAI_IMPORT_TENSORFLOW_GLOBALLY_LATER
+      value: "1"
+    - name: H2O_CLOUD_ENVIRONMENT
+      value: https://not.used.h2o.ai
+    - name: DAI_FROM_HAIC
+      value: "1"
+    - name: NCCL_SOCKET_IFNAME
+      value: eth0
+  pvcResources:
+    requests:
+      storage: 1Gi
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi

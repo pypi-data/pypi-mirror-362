@@ -1,0 +1,151 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[project]
+name = "h2o-engine-manager"
+dynamic = ["version", "dependencies"]
+description = 'Python client for H2O Engine Manager'
+readme = "PUBLIC_README.md"
+requires-python = ">=3.8"
+keywords = []
+authors = [
+    { name = "H2O.ai", email = "support@h2o.ai" },
+]
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[project.urls]
+Documentation = "https://docs.h2o.ai/ai-engine-manager/py/initialization"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/h2o_engine_manager"]
+
+[tool.hatch.version]
+path = "../../VERSION"
+pattern = "(?P<version>.*)"
+
+[tool.hatch.envs.test]
+dependencies = [
+    "pytest==8.1.1",
+    "pytest-timeout==2.3.1",
+    "kubernetes==28.1.0",
+    "websocket-client==1.7.0",
+    "pytest-httpserver==1.0.10",
+    "trustme==1.1.0",
+    "pytest-xdist==3.5.0",
+    "pyyaml==6.0.1",
+    "deepdiff==6.7.1",
+    "pyjwt==2.10.1",
+]
+
+[tool.hatch.envs.test.scripts]
+unit = "python -m pytest tests/unit"
+api = [
+    "python -m pytest tests/integration/sequential/",
+    "python tests/integration/setup.py",
+    "python -m pytest tests/integration/authz.py",
+    # Temporarily skipping all API DAI tests (all DAI API methods are still tested in e2e tests).
+    "python -m pytest tests/integration/api --ignore=tests/integration/api/dai/",
+]
+e2e = [
+    "python tests/integration/setup.py",
+    "python -m pytest tests/integration/authz.py",
+    "python -m pytest -n auto tests/integration/e2e",
+]
+full = [
+    "python tests/integration/setup_full.py",
+    "python -m pytest tests/integration/authz.py",
+    "python -m pytest -n auto tests/integration/full --timeout=900"
+]
+resource-migration-setup = [
+    "python tests/integration/resource_migration/setup.py",
+]
+resource-migration = [
+    "python -m pytest tests/integration/authz.py",
+    "python -m pytest tests/integration/resource_migration",
+]
+example = [
+    "python -m pytest tests/integration/authz.py",
+    "python local/example.py"
+]
+
+example-notebook = [
+    "python -m pytest tests/integration/authz.py",
+    "python local/example_notebook.py"
+]
+
+
+[tool.pytest.ini_options]
+timeout = 10
+
+[tool.hatch.envs.lint]
+python = "3.10"
+dependencies = [
+    "black==23.1.0",
+    "isort==5.12.0",
+    "mypy==1.6.0",
+]
+
+[tool.hatch.envs.lint.scripts]
+# TODO use flake8 and mypy
+check = [
+    "black --check --diff .",
+    "isort --check --diff .",
+    # In case a third-party library does not have type hints, we can "--install-types"
+    # which installs stub packages that contain type hints for another library (but not actual code)
+    # so mypy can check correctly passed types to these libraries.
+    "mypy --install-types --non-interactive src"
+]
+fix = [
+    "black .",
+    "isort ."
+]
+
+[tool.black]
+exclude = ["src/h2o_engine_manager/gen"]
+skip-magic-trailing-comma = true
+
+[tool.isort]
+skip = ["src/h2o_engine_manager/gen"]
+force_single_line = true
+known_application = ["h2o_engine_manager"]
+profile = "black"
+
+[tool.mypy]
+exclude = [
+    "src/h2o_engine_manager/gen",
+    "src/testing",
+]
+
+# Even if the gen folder is excluded, mypy will still check it because gen
+# is imported into our other src code and mypy by default checks all imports as well.
+# This is telling mypy to not check the imported code (so we check only our src code).
+follow_imports = "silent"
+
+check_untyped_defs = true
+
+# Definining extra mypy rules for driverlessai
+[[tool.mypy.overrides]]
+module = "driverlessai"
+# driverlessai library is not typed so we ignore it whenever it is used in our project.
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "deepdiff"
+# deepdif library is not typed so we ignore it whenever it is used in our project.
+ignore_missing_imports = true
+
+[tool.hatch.envs.docs]
+# pdoc3 generates different results for different python versions
+# use fixed python version for stable docs output
+python = "3.10"
+dependencies = [
+    "pdoc3==0.10.0",
+]
+
+[tool.hatch.envs.docs.scripts]
+generate = [
+    "pdoc3 --force --template-dir docs/templates --output-dir ../../docs/docs/py src/h2o_engine_manager/clients"
+]
