@@ -1,0 +1,24 @@
+[package]
+name = "pybop-diffsol"
+version = "0.1.1"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "pybop_diffsol"
+crate-type = ["cdylib"]
+
+[features]
+diffsol-llvm = []
+diffsol-llvm15 = ["diffsol/diffsl-llvm15", "diffsol-llvm"]
+diffsol-llvm16 = ["diffsol/diffsl-llvm16", "diffsol-llvm"]
+diffsol-llvm17 = ["diffsol/diffsl-llvm17", "diffsol-llvm"]
+diffsol-cranelift = ["diffsol/diffsl-cranelift"]
+extension-module = ["pyo3/extension-module"]
+
+[dependencies]
+diffsol = { version = "0.6.6" }
+faer = "0.22.6"
+nalgebra = "0.33.2"
+numpy = "0.25.0"
+pyo3 = { version = "0.25.0", features = ["abi3-py38"] }
