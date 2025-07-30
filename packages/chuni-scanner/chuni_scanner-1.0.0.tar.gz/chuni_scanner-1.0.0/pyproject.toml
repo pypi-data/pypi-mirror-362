@@ -1,0 +1,76 @@
+[project]
+name = "chuni-scanner"
+version = "1.0.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "aiopath>=0.7.7",
+    "asyncmy>=0.2.10",
+    "coloredlogs>=15.0.1",
+    "greenlet>=3.2.3",
+    "pydantic>=2.11.7",
+    "ruff>=0.12.3",
+    "setuptools>=80.9.0",
+    "sqlalchemy>=2.0.41",
+    "wheel>=0.45.1",
+]
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.format]
+line-ending = "lf"
+
+[tool.ruff.lint]
+select = [
+    "F", # Pyflakes
+    "W", # pycodestyle warnings
+    "E", # pycodestyle errors
+    "I", # isort
+    "UP", # pyupgrade
+    "ASYNC", # flake8-async
+    "C4", # flake8-comprehensions
+    "T10", # flake8-debugger
+    "T20", # flake8-print
+    "PYI", # flake8-pyi
+    "PT", # flake8-pytest-style
+    "Q", # flake8-quotes
+    "TID", # flake8-tidy-imports
+    "RUF", # Ruff-specific rules
+]
+ignore = [
+    "E402", # module-import-not-at-top-of-file
+    "UP037", # quoted-annotation
+    "RUF001", # ambiguous-unicode-character-string
+    "RUF002", # ambiguous-unicode-character-docstring
+    "RUF003", # ambiguous-unicode-character-comment
+]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["chuni-scanner", "tests/*"]
+extra-standard-library = ["typing_extensions"]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.uv.sources]
+chuni-scanner = { workspace = true }
+
+[project.scripts]
+chuni-scanner = "chuni_scanner.__main__:main"  # 安装后可通过 mycli 命令调用 cli.main
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "chuni-scanner",
+]
