@@ -1,0 +1,35 @@
+Enable defining properties in conceptual data model which are not defined for any concept (dangling properties) (#1248)
+
+# Description
+
+This PR adds support for defining dangling properties—properties in the
+conceptual data model that are not yet associated with any specific
+concept.
+
+**Justification**:
+When generating a conceptual data model from an OWL ontology, it’s
+common to encounter properties (e.g., owl:ObjectProperty,
+owl:DatatypeProperty) that are declared but not explicitly linked to any
+defined class via domain or range. Supporting dangling properties
+ensures these are not lost during transformation and allows the model to
+faithfully represent the source ontology structure. It also enables
+incremental refinement, where associations can be added later as
+understanding of the domain evolves.
+
+**Note**: This PR is stacked on top of #1247
+
+## Bump
+
+- [x] Patch
+- [ ] Minor
+- [ ] Skip
+
+## Changelog
+### Improved
+
+- Added support for dangling properties in conceptual models, useful for
+OWL imports with undefined domains/ranges.
+
+---------
+
+Co-authored-by: Nikola Vasiljevic <nikola@Nikolas-MacBook-Air.local>
