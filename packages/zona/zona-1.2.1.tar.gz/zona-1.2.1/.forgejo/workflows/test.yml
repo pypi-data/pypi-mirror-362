@@ -1,0 +1,18 @@
+# this workflow checks if the project can be built successfully.
+# it also serves to test whether based-alpine and uv-cache are working properly.
+# Unit tests will be added here eventually
+on: [push]
+jobs:
+  test-build:
+    runs-on: based-alpine
+    steps:
+      - name: checkout source
+        uses: actions/checkout@v4
+      - name: setup cache
+        id: uv-cache
+        uses: https://git.ficd.sh/ficd/uv-cache@v1
+      - name: sync and build
+        run: |
+          uv sync
+          uv build
+          uv run zona --version

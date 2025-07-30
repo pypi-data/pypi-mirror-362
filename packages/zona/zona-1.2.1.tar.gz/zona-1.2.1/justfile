@@ -1,0 +1,37 @@
+# list recipes
+default:
+    @just --list
+
+clean:
+    #!/bin/sh
+    if [ ! -d "dist" ] && [ ! -d "__pycache__" ]; then
+        echo "Nothing to clean."
+        exit 0
+    fi
+    if [ -d "dist" ]; then
+        echo "Removing dist/"
+        rm -r dist/
+    fi
+    if [ -d "__pycache__" ]; then
+        echo "Removing __pycache__/"
+        rm -r "__pycache__"
+    fi
+
+publish:
+    #!/bin/sh
+    just clean
+    uv build
+    export UV_PUBLISH_TOKEN="$(pass show pypi)"
+    uv publish
+
+format:
+    uv run ruff format
+
+check:
+    uv run ruff check .
+
+fix:
+    uv run ruff check --fix .
+
+test:
+    uv run pytest
