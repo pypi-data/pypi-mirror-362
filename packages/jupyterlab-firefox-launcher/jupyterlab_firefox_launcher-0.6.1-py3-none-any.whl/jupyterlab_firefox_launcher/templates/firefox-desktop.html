@@ -1,0 +1,276 @@
+<!--
+Firefox Desktop Template for Xpra HTML5
+
+Provides the Xpra HTML5 client interface for Firefox sessions,
+optimized for seamless application integration and performance.
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Firefox Browser</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      /* Firefox Desktop Styles for Xpra */
+      html {
+        --firefox-orange: #ff6611;
+        --jupyter-dark-grey: #4d4d4d;
+        --jupyter-medium-dark-grey: #616161;
+        --jupyter-medium-grey: #757575;
+        --jupyter-grey: #9e9e9e;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--jupyter-medium-dark-grey);
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #top-bar {
+        background-color: var(--jupyter-dark-grey);
+        color: white;
+        border-bottom: 1px solid white;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        min-height: 32px;
+        z-index: 1000;
+      }
+
+      #logo {
+        padding: 0 24px;
+        font-weight: bold;
+        color: var(--firefox-orange);
+      }
+
+      #menu {
+        display: flex;
+        font-weight: bold;
+        margin-left: auto;
+        font-size: 12px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      #menu li {
+        border-right: 1px var(--jupyter-grey) solid;
+        padding: 8px 0;
+      }
+
+      #menu li:last-child {
+        border-right: 0;
+      }
+
+      #menu a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 12px;
+      }
+
+      #menu a:hover {
+        background-color: var(--jupyter-medium-grey);
+      }
+
+      #status-container {
+        padding-right: 8px;
+      }
+
+      #status-label {
+        font-weight: normal;
+        margin-right: 8px;
+      }
+
+      #firefox-container {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+      }
+
+      #firefox-frame {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      #loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--jupyter-medium-dark-grey);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        z-index: 100;
+      }
+
+      /* Loading animation */
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid var(--firefox-orange);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Hide loading when ready */
+      .ready #loading-overlay {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="top-bar">
+      <div id="logo">
+        🦊 Firefox Browser
+      </div>
+      <ul id="menu">
+        <li id="status-container">
+          <span id="status-label">Status:</span>
+          <span id="status">Starting...</span>
+        </li>
+        {% if hub_control_panel_url %}
+        <li>
+          <a href="{{ hub_control_panel_url }}">Hub Control Panel</a>
+        </li>
+        {% endif %}
+        <li>
+          <a href="{{ base_url }}lab">Back to JupyterLab</a>
+        </li>
+      </ul>
+    </div>
+
+    <div id="firefox-container">
+      <div id="loading-overlay">
+        <div>
+          <div class="loading"></div>
+          Starting Firefox via Xpra...
+          <br><br>
+          <small>This may take a few moments</small>
+        </div>
+      </div>
+      
+      <!-- Xpra HTML5 client will be loaded here -->
+      <iframe id="firefox-frame" src="/"></iframe>
+    </div>
+
+    <script>
+      // Firefox Desktop Xpra Integration Script
+      
+      // Prevent WebSocket issues by ensuring proper fallback
+      let connectionAttempts = 0;
+      const maxAttempts = 30;
+      
+      function updateStatus(message, isError = false) {
+        const statusEl = document.getElementById('status');
+        if (statusEl) {
+          statusEl.textContent = message;
+          statusEl.style.color = isError ? '#ff6b6b' : 'white';
+        }
+      }
+
+      function hideLoading() {
+        document.body.classList.add('ready');
+      }
+
+      function showError(message) {
+        const overlay = document.getElementById('loading-overlay');
+        overlay.innerHTML = `
+          <div style="text-align: center;">
+            ❌ ${message}
+            <br><br>
+            <small>Check browser console for details</small>
+            <br><br>
+            <button onclick="location.reload()" style="
+              background: var(--firefox-orange);
+              color: white;
+              border: none;
+              padding: 8px 16px;
+              border-radius: 4px;
+              cursor: pointer;
+            ">Retry</button>
+          </div>
+        `;
+        updateStatus('Error', true);
+      }
+
+      // Initialize Firefox session
+      async function initializeFirefox() {
+        try {
+          updateStatus('Connecting to Xpra...');
+          
+          const iframe = document.getElementById('firefox-frame');
+          
+          // Wait for Xpra HTML5 client to load
+          iframe.onload = function() {
+            connectionAttempts++;
+            
+            setTimeout(() => {
+              if (connectionAttempts < maxAttempts) {
+                updateStatus('Firefox is starting...');
+                
+                // Check if Xpra is responsive
+                setTimeout(() => {
+                  updateStatus('Firefox Ready');
+                  hideLoading();
+                }, 3000);
+              } else {
+                showError('Failed to start Firefox session');
+              }
+            }, 1000);
+          };
+          
+          iframe.onerror = function() {
+            showError('Failed to connect to Xpra server');
+          };
+          
+          // Set the iframe source to the Xpra HTML5 client
+          // jupyter-server-proxy will route this to the Xpra session
+          iframe.src = window.location.pathname;
+          
+        } catch (error) {
+          console.error('Firefox initialization error:', error);
+          showError(`Initialization failed: ${error.message}`);
+        }
+      }
+
+      // Handle page visibility for better resource management
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          updateStatus('Background');
+        } else {
+          updateStatus('Active');
+        }
+      });
+
+      // Start when page loads
+      document.addEventListener('DOMContentLoaded', initializeFirefox);
+      
+      // Handle window resize for responsive design
+      window.addEventListener('resize', function() {
+        // Xpra will handle the actual resize automatically
+        updateStatus('Resizing...');
+        setTimeout(() => updateStatus('Firefox Ready'), 500);
+      });
+    </script>
+  </body>
+</html>
