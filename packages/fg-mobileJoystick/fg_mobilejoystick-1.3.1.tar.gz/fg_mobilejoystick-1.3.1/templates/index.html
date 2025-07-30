@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>
+			Mobile Joystick
+		</title>
+	</head>
+	<body>
+		<h1>Mobile Joystick</h1>
+		Copyright (c) 2025 Gordon Zhang
+		Licensed under GNU GPL v3
+		<script>
+		function throttle(func, limit) {
+			let lastFunc;
+			let lastRan;
+			return function(...args) {
+				if (!lastRan) {
+					func.apply(this, args);
+					lastRan = Date.now();
+				} else {
+					clearTimeout(lastFunc);
+					lastFunc = setTimeout(() => {
+						if ((Date.now() - lastRan) >= limit) {
+							func.apply(this, args);
+							lastRan = Date.now();
+						}
+					}, limit - (Date.now() - lastRan));
+				}
+			};
+		}
+
+		var sendOrientation = throttle(function(a, b, g) {
+			dataURL = `/data/${a}/${b}/${g}`;
+			fetch(dataURL);
+		}, 50); // Limit to once every 200ms
+
+		window.addEventListener("deviceorientation", (event) => {
+			const alpha = event.alpha;
+			const beta = event.beta;
+			const gamma = event.gamma;
+			
+			sendOrientation(alpha, beta, gamma);
+		});
+		</script>
+	</body>
+</html>
