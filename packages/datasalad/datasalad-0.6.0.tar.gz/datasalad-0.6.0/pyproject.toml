@@ -1,0 +1,233 @@
+[build-system]
+requires = [
+  "hatchling",
+  "hatch-vcs",
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "datasalad"
+dynamic = ["version"]
+description = 'utilities for working with data in the vicinity of Git and git-annex'
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+keywords = [
+  "datalad",
+  "git",
+  "git-annex",
+  "iterator",
+  "subprocess",
+]
+authors = [
+  { name = "Michael Hanke", email = "michael.hanke@gmail.com" },
+]
+maintainers = [
+  { name = "Michael Hanke", email = "michael.hanke@gmail.com" },
+]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: End Users/Desktop",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Version Control",
+  "Topic :: Software Development :: Version Control :: Git",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/datalad/datasalad"
+Documentation = "https://github.com/datalad/datasalad#readme"
+Issues = "https://github.com/datalad/datasalad/issues"
+Source = "https://github.com/datalad/datasalad"
+Changelog = "https://github.com/datalad/datasalad/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+docs = [
+  "sphinx",
+  "sphinx_rtd_theme",
+]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "datasalad/_version.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  ".github",
+  "tools",
+  "docs/build",
+]
+
+[tool.hatch.envs.hatch-test]
+default-args = ["datasalad"]
+extra-args = ["--doctest-modules"]
+extra-dependencies = [
+  "more_itertools",
+  "pytest",
+  # if you come here, because coverage combination crashed for you
+  # run `hatch test --cover` and/or see
+  # https://github.com/pypa/hatch/issues/1565#issuecomment-2163773123
+  "pytest-cov",
+]
+
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+[tool.hatch.envs.types]
+description = "type checking with MyPy"
+extra-dependencies = [
+  "mypy>=1.0.0",
+  "pytest",
+  "argcomplete",
+  # for test type-checking
+  "more_itertools",
+]
+[tool.hatch.envs.types.scripts]
+check = [
+  "mypy --install-types --non-interactive --python-version 3.9 --pretty --show-error-context {args:datasalad}",
+]
+
+[tool.hatch.envs.docs]
+description = "build Sphinx-based docs"
+extra-dependencies = [
+  "sphinx",
+  "sphinx_rtd_theme",
+]
+[tool.hatch.envs.docs.scripts]
+build = [
+  "make -C docs html",
+]
+clean = [
+  "rm -rf docs/generated",
+  "make -C docs clean",
+]
+
+[tool.hatch.envs.cz]
+description = "commit compliance, changelog, and release generation"
+detached = true
+extra-dependencies = [
+  "commitizen",
+]
+[tool.hatch.envs.cz.scripts]
+check-commits = [
+  # check all commit messages since we switched to conventional commits
+  # only (no merge commits also)
+  "cz check --rev-range a518855b7e2a08d8a5ba6a36070425457271857b..HEAD",
+]
+show-changelog = [
+  # show the would-be changelog on stdout
+  "cz changelog --dry-run",
+]
+bump-version = [
+  # bump version (also tags) and update changelog
+  "cz bump --changelog",
+]
+
+[tool.hatch.envs.codespell]
+description = "spell checking"
+detached = true
+extra-dependencies = [
+  "codespell",
+]
+[tool.hatch.envs.codespell.scripts]
+check = "codespell"
+fix = "codespell --write-changes"
+
+[tool.codespell]
+skip = ".git,build,.*cache,dist,./docs/_build/*"
+#exclude-file = ".codespell-exclude"
+
+
+[tool.coverage.run]
+source_pkgs = ["datasalad", "tests"]
+branch = true
+parallel = true
+omit = [
+#  "src/datasalad/__about__.py",
+]
+data_file = "${COVERAGE_ROOT-.}/.coverage"
+
+[tool.coverage.paths]
+datasalad = ["src/datasalad", "*/datasalad/src/datasalad"]
+tests = ["tests", "*/datasalad/tests"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+]
+
+[tool.ruff]
+exclude = [
+  # sphinx
+  "docs",
+]
+line-length = 88
+indent-width = 4
+target-version = "py39"
+[tool.ruff.format]
+# Prefer single quotes over double quotes.
+quote-style = "single"
+[tool.ruff.lint.per-file-ignores]
+"**/test_*" = [
+  # permit assert statements in tests
+  "S101",
+  # permit relative import in tests
+  "TID252",
+  # permit versatile function names in tests
+  "N802",
+]
+# permit relative import in subpackage root
+"datasalad/*/__init__.py" = ["TID252"]
+# maintain iterable_subprocess tests largely "verbatim" for now
+"datasalad/iterable_subprocess/test_iterable_subprocess.py" = [
+  "ARG001",
+  "B007",
+  "EM101",
+  "F841",
+  "PLR2004",
+  "PT012",
+  "SIM117",
+  "TRY002",
+  "TRY003",
+]
+
+[tool.commitizen]
+name = "cz_customize"
+tag_format = "v$version"
+version_scheme = "pep440"
+version_provider = "scm"
+changelog_incremental = true
+template = ".changelog.md.j2"
+gpg_sign = true
+
+[tool.commitizen.customize]
+commit_parser = "^((?P<change_type>feat|fix|rf|perf|test|doc|BREAKING CHANGE)(?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?|\\w+!):\\s(?P<message>.*)?(?P<body>.*)?"
+change_type_order = ["BREAKING CHANGE", "feat", "fix", "rf", "perf", "doc", "test"]
+changelog_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
+bump_pattern = "^((BREAKING[\\-\\ ]CHANGE|\\w+)(\\(.+\\))?!?):"
+schema_pattern = "(?s)(ci|doc|feat|fix|perf|rf|style|test|chore|revert|bump)(\\(\\S+\\))?!?:( [^\\n\\r]+)((\\n\\n.*)|(\\s*))?$"
+
+[tool.commitizen.customize.bump_map]
+"^\\w+!" = "MAJOR"
+"^BREAKING" = "MAJOR"
+"^feat" = "MINOR"
+"^fix" = "PATCH"
