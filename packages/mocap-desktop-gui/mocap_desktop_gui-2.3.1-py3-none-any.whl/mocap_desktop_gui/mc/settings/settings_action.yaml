@@ -1,0 +1,532 @@
+version: 1.1.0.dev0
+general_cfg:
+  foo: 'bar'
+
+ops:
+  OpsDownloadDataset: false
+  OpsInputVideosAudios: true  # atm this just validates the videos metadata if is_gopro is true.
+  OpsSyncMultiviewVideos: true
+  OpsCorrectCalib: false
+  # cpp pose and tracking op
+  OpsMocap: true
+  # ea jersey pose and tracking op (this is an alternative to OpsMocap)
+  OpsMdcDetections: false
+  OpsJerseyClassify: false
+  OpsMdcTracking: false
+
+  OpsDetectObjects: false
+  OpsDetectMarkerObjects:  false
+  OpsPose3dMultiview: false  # runs pose-3d for mdc, mainly useful for 2 camera cases.
+  OpsPrepKalmanData: true
+  OpsKalman: true
+  OpsHand3dPoseOnTracks: false
+  OpsFloorPlaneRootAdjustment: false
+  OpsMarkerKalmanFilter: false
+  OpsMarkersToBlend: false
+  OpsBlenderFBXExport: true
+  OpsMayaExport: false
+
+#  OpsFinalizeARun: false  # if true. upload results to remote storage, etc.
+#failure_ops: OpsOnFailure
+
+
+ops_cfg:
+  OpsDownloadDataset:
+    dataset:
+      - in_files: # input video files
+          - "s3://testcases.moveai/MDC/case6/videos/cam01.mov"
+          - "s3://testcases.moveai/MDC/case6/videos/cam02.mov"
+          - "s3://testcases.moveai/MDC/case6/videos/cam03.mov"
+          - "s3://testcases.moveai/MDC/case6/videos/cam04.mov"
+          - "s3://testcases.moveai/MDC/case6/videos/cam05.mov"
+          - "s3://testcases.moveai/MDC/case6/videos/cam06.mov"
+        out_path: "~/MOX_projects/videos"
+        unzip: false
+      - in_files: [ "s3://testcases.moveai/MDC/case6/calib/cam01.pkl",  # calib files
+                   "s3://testcases.moveai/MDC/case6/calib/cam02.pkl",
+                   "s3://testcases.moveai/MDC/case6/calib/cam03.pkl",
+                   "s3://testcases.moveai/MDC/case6/calib/cam04.pkl",
+                   "s3://testcases.moveai/MDC/case6/calib/cam05.pkl",
+                   "s3://testcases.moveai/MDC/case6/calib/cam06.pkl" ]
+        out_path: "~/MOX_projects/calib"
+        unzip: false
+      - in_files: [ "s3://testcases.moveai/MDC/case1/sdc_rig.zip" ] # rig compressed directory
+        out_path: "~/MOX_projects/rig"
+        unzip: true
+      - in_files: [ "s3://testcases.moveai/MDC/case1/scene/scene_3d.blend" ]  # scene file
+        out_path: "~/MOX_projects/scene"
+        unzip: false
+
+  OpsInputVideosAudios:
+    is_gopro: false
+    inputs:
+      video_raw_dir: '~/MOX_projects/videos'
+    outputs:
+      log_dir: '~/MOX_projects/log'
+
+  OpsSyncMultiviewVideos:
+    # auto sync settings
+    # set action_ss and action_to if you want to crop a specific time range in input videos.
+    # warning: 'ss' and 'to' must be specified on the video whose lag is smallest; otherwise, it could fail
+    # for the case when the lag between videos are large.
+    # example. action_start_time: '20.15' action_end_time: '30.35' means action stats from the seconds 20.15 to 30.35
+    action_start_time: 0 # start time of the action in format seconds.millisecond. ffmpeg -ss
+    action_end_time: "" # end time of the action in the format seconds.millisecond. ffmpeg -to
+    search_win: [2.0, 6.0] # clap hand time range, in seconds. If no range is specified then search_win
+    # is calculated automatically in the code based on clapping.
+    delete_input_videos: false
+    inputs:
+      video_raw_dir: '~/MOX_projects/videos'
+    outputs:
+      log_dir: '~/MOX_projects/log'
+      video_dir: '~/MOX_projects/videos_processed'
+      sync_vis_dir: '~/MOX_projects/sync_vis'
+    # Use iphone metadata to sync
+    iphone_sync:
+      use_host_timecode: false
+      use_tentacle: false
+    # manual sync settings
+    manual_sync:
+      active: false # set it to true if you want to run manual sync given delay in timestamp
+      # seconds.milliseconds. relative offset. earliest camera should have ss = 0.0
+      cams_lag: # ffmpeg -ss
+        cam01: 0.0
+        #cam02: 0.02
+        #cam03: 0.04
+        #....
+      # all cameras share the same duration and starting time
+      base_ss: 0.0 # seconds.milliseconds
+      duration: 0.0 # ffmpeg -t seconds.milliseconds. 0.0 means the whole video.
+    win_len_samples: 1024
+    win_step_sec: 0.001
+    use_audio_files: false
+    timecode: false
+
+
+  OpsCorrectCalib:
+    bump_threshold: 0.01
+    inputs:
+      calib_pkl_dir: '~/MOX_projects/calib'
+      video_dir: '~/MOX_projects/videos_processed'
+    outputs:
+      calib_quality_dir: '~/MOX_projects/calib_quality'
+
+  OpsMocap:
+    max_actor_number: 1
+    enable_vis_debug: true # expensive video debugging
+    vis_debug_rate_ms: 1000 # one frame every second
+    enable_new_track_vis_debug: true # cheap debugging that output the first frame of a new cross-view match
+    max_cpp_running_time_minutes: 2000
+    use_actor_profile_if_avail: false
+    use_cuda_decoder: true
+    use_jersey_id_prediction: false
+    MocapCppParams:
+      DebugCaptureVolumeVisDir: ""
+      DebugLabeledBBoxVisDir: ""
+      CudaGraphInference: false
+
+      YoloModelMaxBs: -1
+      YoloModelType: "yolov5m"
+      YoloModelFp16: true
+
+      JerseyModelName: "jersey_model_7"
+      DetectJerseyNumber: false
+      DetectJerseyFramePeriod: 3
+
+      PoseModelFp16: true
+      UseVerticalPoseAlignment: false
+      PoseModelMaxBs: -1
+      Single2DPoseModelName: "pose_2D_vit_large_moveai29"
+      use_temporal_2D_pose_refinement: false
+      Temporal2DPoseModelName: "pose_2D_refine_3"
+      UseTemporalRefinementPostProcess: false
+      TemporalRefinementPostProcessQueueSize: 4
+
+      NewTrackRequireHandOverShoulder: false
+
+      NewTrackCheckInsideCaptureVolume: true
+      NewTrackMinCaptureVolumeEdgeDist: 0.0
+      NewTrackMinReprojectionError: 0.15
+      NewTrackMinMultiviewKeypoints: 2
+      NewTrackMinCameraNumbers: 2
+      NewTrackMinDistanceFromOthers: 0.25
+
+      ActorProfileMatchMaxTimestampDifference: 1000
+      ActorProfileMatchMinIoU: 0.25
+      ActorProfileMatchMinValidObsCount: 1
+
+      NumMaxPeople: 1
+      DebugNumMaxActors: -1
+      NumMaxBoundingBoxPerFrameFactor: 4
+
+      TrackingBBOX_LPF_Parameter: 0.1
+      PoseTorsoDir_LPF_Parameter: 0.1
+      PoseKpts_LPF_Parameter: 0.1
+      BBOXVerticalScalingFactor: 1.0
+      BBOXHorizontalScalingFactor: 1.0
+
+      ExportSpineHeatmap: false
+
+      Clamp2DBBoxSizeChange: true
+      MaxBBSizeChangePercentage: 0.1
+
+      TrackFilterTopKBest2DPoses: 4
+      FilterBadObjectAssociation: false
+      FilterBadObjectAssociationTemporalDstFactor: 1.5
+      FilterBadObjectAssociationBBoxWidthFactor: 0.4
+
+      Clamp3DJointLocationChange: true
+      Max3DJointLocationChange: 0.5
+      Max3DJointLocationMaxAcclerationFactor: 5.0
+      ClampJointStateChange: true
+      MaxJointStateChange: 0.5
+      MaxJointStateMaxAcclerationFactor: 5.0
+
+      UseKalmanFilter: false
+      KalmanLatencyUpdateFrames: 0
+      NumKalmanTransitionFrames: 20
+      NumFramesBeforeKalmanFilter: 50
+
+      NumBoneLengthOptimzationFrames: 50
+      UseBoneLengthFromTriangulation: true
+
+      PinoStateUpdateFactor: 0.0
+      MaxPoseOptimizeIteration: 10
+      MaxBoneOptimizeIteration: 10
+      PoseFunctionTolerance: 0.01
+      PoseParameterTolerance: 0.01
+      PoseSolverHeightNormalization: true
+      BoneLengthFunctionTolerance: 0.01
+      BoneLengthParameterTolerance: 0.01
+      NumCeresThreads: 4
+
+      CalcCircularCaptureAreaFrom2CameraPositions: true
+      CalcCaptureAreaFromCameraPositions: true
+
+    inputs:
+      video_dir: '~/MOX_projects/videos_processed'
+      calib_pkl_dir: '~/MOX_projects/calib'
+      mocap_path: '/usr/local/moveai/bin/mocap-nogui'
+      settings_path: '/usr/local/moveai/settings_rt.ini'
+      actor_profile_dir: null
+      actor_prior_obs_dir: null
+    outputs:
+      log_dir: '~/MOX_projects/log'
+      mocap_result_dir: '~/MOX_projects/mocap_result'
+      mocap_new_track_debug_dir: '~/MOX_projects/mocap_new_track_debug'
+      mocap_viz_debug_dir: '~/MOX_projects/mocap_viz_debug'
+      vis_calib_area_dir: '~/MOX_projects/vis_calib_area'
+      prelabelled_bb_dir: '~/MOX_projects/prelabelled_bb'
+      pose2d_dir: '~/MOX_projects/pose2d_track'
+      calib_yaml_dir: '~/MOX_projects/mocap_calib'
+
+  OpsPose3dMultiview:
+    torch_batch_size: 4
+    inputs:
+      metrabs_3dpose_ckpt_path: "/usr/local/moveai/models/metrabs/metrabs_eff2l_384px_800k_28ds_pytorch"
+      video_dir: "~/MOX_projects/videos_processed"
+      calib_pkl_dir: "~/MOX_projects/calib"
+      pose2d_dir: "~/MOX_projects/pose2d_track"
+    outputs:
+      pose3d_dir: "~/MOX_projects/pose_3d"
+
+
+  OpsPrepKalmanData:
+    run_type: multiview
+    mdc_use_3d_bone_dir_obs: false
+    inputs:
+      video_path: '~/MOX_projects/videos_processed'
+      pose2d_dir: '~/MOX_projects/pose2d_track'
+      pose3d_dir: null # '~/MOX_projects/pose_3d'
+      calib_pkl_dir: '~/MOX_projects/calib'
+      odometry_dir: null
+      actor_prior_obs_dir: '~/MOX_projects/actor_prior_obs'
+    outputs:
+      kalman_dir: '~/MOX_projects/kalman'
+      actor_profile_dir: '~/MOX_projects/actor_profile'
+      actor_track_mapping_dir: '~/MOX_projects/actor_track_mapping'
+
+
+  OpsKalman:
+    run_type: multiview
+    kinematic_model_id: 9
+    use_3d_bone_dir_obs: false
+    use_2d_pose_obs: true
+    use_spine_observations: false
+    run_second_kalman_pass: true
+    run_locomotion_model: false
+    use_foot_contact: true
+    use_dynamics: true
+    sync_mobs_observations: true
+    planar_floor_cfg:
+      assume_planar_floor: false
+      n_frames_blend: 10
+      use_outwards_blend: true
+      ransac_n_iterations: 10
+      ransac_grid_bin_size: 0.1
+      ransac_min_bin: 10
+      ransac_sample_size: 10
+      ransac_max_delta_angle: 5
+      ransac_percentage_inliers: 70.0
+      ransac_threshold_Z: 0.02
+      foot_contact_dist_plane_thresh: 0.05
+      force_all_foot_above_single_plane: false
+    resample: false
+    frame_ranges:
+    - 0.0
+    - 0.0
+    - 0.001
+    motion_definitions:
+      slowest: 0.25
+      slow: 0.5
+      normal: 1.0
+      fast: 3.5
+      fastest: 7.0
+    motion_selections:
+    - fast
+    - slow
+    animation_fps: -1.0
+    ik_pose3d_error_threshold: 1.5
+    inputs:
+      pose2d_dir: ~/MOX_projects/pose2d_track
+      kalman_dir: ~/MOX_projects/kalman
+    outputs:
+      kalman_dir: ~/MOX_projects/kalman
+
+  OpsQualityMetrics:
+    visualize_epipolar_line: true
+
+
+  OpsFloorPlaneRootAdjustment:
+    enforce_spatial_distribution: true  # To spatially distribute the sample points
+    grid_size: 1.0  # [m]
+    n_pts_in_cell_max: 20  # Max number of points per cell for each sample
+    iterations: 2500
+    Z_threshold: 0.05  # [m]
+    ransac_sample_perc: 0.2
+    inputs:
+      pose2d_dir: '~/MOX_projects/pose2d_track'
+      kalman_dir: '~/MOX_projects/kalman'
+
+
+  OpsMarkersToBlend:
+    export_fbx: true
+    export_gltf: true
+    inputs:
+      video_dir: ~/MOX_projects/videos_processed
+      marker_kalman_dir: ~/MOX_projects/markers_kalman
+      marker_track_path: ~/MOX_projects/markers_kalman
+    outputs:
+      log_dir: ~/MOX_projects/log
+      props_dir: ~/MOX_projects/props_anims
+      export_dir: ~/MOX_projects/blender
+
+
+  OpsBlenderFBXExport:
+    camera_model: unknown
+    export_fbx: true
+    rig_to_export: both
+    render_viz: true
+    resolution_x: 640
+    resolution_y: 360
+    resolution_percentage: 100
+    ffmpeg_container: MPEG4
+    render_engine: EEVEE
+    render_fps: 30
+    export_fps: null
+    urdf_mapping_path: MoveAIKinematics9_Joint_Rotation_Mapping.csv
+    import_fingers: false
+    export_bvh: false
+    export_gltf: true
+    export_c3d: false
+    export_usd: true
+    do_render_overlay: false
+    overlay_padding: 30
+    overlay_scale: 0.19
+    rig_origin: feet
+    background_videos_import: true
+    background_camera_num: 0
+    background_faster_playback: false
+    use_namespaces: true
+    rest_pose_on_1st_frame: false
+    timecode_sync: false
+    output_name_video: render
+    output_name_3d_assets: main
+    inputs:
+      calib_pkl_dir: ~/MOX_projects/calib
+      kalman_dir: ~/MOX_projects/kalman
+      video_dir: ~/MOX_projects/videos_processed
+      rig_dir: ~/MOX_projects/rig
+      fingers_dir: ~/MOX_projects/hands
+      props_dir:  ~/MOX_projects/props_anims
+      actor_dir: ~/MOX_projects/actor_profile
+      jersey_nums_mapping_path: null
+      state_paths: {}
+      urdf_paths: {}
+      user_mapping_body_path: ~/MOX_projects/rig/mapping_body.csv
+      user_mapping_fingers_path: ~/MOX_projects/rig/mapping_fingers.csv
+      user_rig_blend_path: null
+    outputs:
+      bone_len_dir: ~/MOX_projects/bone_lens
+      blender_dir: ~/MOX_projects/blender
+      log_dir: ~/MOX_projects/log
+      calib_bld_path: ~/MOX_projects/blender/calib.blend
+
+  OpsHand3dPoseOnTracks:
+    run_type: "multicam"
+    enable_denoising: false
+    inputs:
+      video_path: '~/MOX_projects/videos_processed'
+      smplx_path: '/usr/local/moveai/models/hands/SMPLX_NEUTRAL.pkl'
+      model_path: '/usr/local/moveai/models/hands/pose_shape_best.pth'
+      pose2d_dir: '~/MOX_projects/pose2d_track'
+      pose3d_dir: '~/MOX_projects/kalman'
+      calib_pkl_dir: '~/MOX_projects/calib'
+    outputs:
+      hand_dir: '~/MOX_projects/hands'
+
+
+  OpsDetectObjects:
+    # sort all detect bbs using area or score, then pick the first n_max_objects, if it > 0
+    n_max_objects: -1 # -1 for taking all object bounding boxes.
+    n_max_objects_selection_strategy: "area" # in ["score", "area", "score_area"]
+    batch_size: 8
+    # for YOLOV5.
+    conf_thres: 0.25 # NNS threshold
+    iou_thres: 0.45 # NNS threshold
+    augment: false # flipping augmentation.
+    yolov5_class_ids: [ 32 ]
+    yolov5_class_names: [ 'ball' ]
+    visualize: false
+    inputs:
+      video_dir: '~/MOX_projects/videos_processed'
+      model_path: '/usr/local/moveai/models/yolo/yolov5x_updated.pt'
+    outputs:
+      detect_dir: '~/MOX_projects/detect_obj_2d'
+      detect_vis_dir: '~/MOX_projects/detect_obj_2d_viz'
+
+
+  OpsDetectMarkerObjects:
+    marker_settings: [ { "object": "ball", "n_markers": 1, "n_objects": 1 } ]
+    inputs  :
+      video_dir: '~/MOX_projects/videos_processed'
+      detect_dir: '~/MOX_projects/detect_obj_2d'
+    outputs:
+      detect_semantic_dir: '~/MOX_projects/detect_semantic_obj_2d'
+
+
+  OpsMarkerKalmanFilter:
+    marker_settings: [ { "object": "ball", "n_markers": 1, "n_objects": 1 } ]
+    inputs:
+      detect_semantic_dir: '~/MOX_projects/detect_semantic_obj_2d'
+      calib_pkl_dir: '~/MOX_projects/calib'
+    outputs:
+      marker_kalman_dir: '~/MOX_projects/markers_kalman'
+
+  OpsOnFailure:
+    inputs:
+      run_dir: '~/MOX_projects'
+      log_dir: '~/MOX_projects/logs'
+    output_run_dir: "s3://testcases.moveai/dummy_run/"
+
+
+  OpsMdcDetections:
+    max_people: 4  # TODO: no. of people to track
+    use_gpu_decoder_if_possible: true
+    num_parallel_process: 2
+    vitpose_cfg_path: 'ViTPose/configs/wholebody/2d_kpt_sview_rgb_img/topdown_heatmap/coco-wholebody/ViTPose_large_moveai29.py'
+
+    debug_vis_detection: false
+
+    use_pose_fp16: true
+    use_yolo_fp16: true
+
+    yolo_imgsz: 1920
+    yolo_score_threshold: 0.2
+    yolo_nms_threshold: 0.4
+
+    yolo_num_split_regions: 0
+    yolo_crop_top_margin: 0.00
+    yolo_split_ver_margin_factor: 0.3
+    yolo_split_hor_margin_factor: 0.2
+
+    inputs:
+      video_dir: '~/MOX_projects/videos_processed'
+      calib_pkl_dir: '~/MOX_projects/calib'
+      vitpose_model_path: '/usr/local/moveai/models/vit/large_coco_finetuned.pth'
+      yolo_model_path: "/usr/local/moveai/models/yolo/yolov9e.pt"
+    outputs:
+      detect_dir: '~/MOX_projects/mdc_detects'
+      debug_vis_dir: '~/MOX_projects/mdc_detects_vis'
+
+
+  OpsJerseyClassify:
+    use_gpu_decoder_if_possible: true
+    num_parallel_process: 2
+
+    num_jersey_classes: 13
+    num_color_classes: 3
+
+    color_model_input_size: 224
+    jersey_model_input_size: 224
+
+    vis_debug: False
+
+    inputs:
+      video_dir: '~/MOX_projects/videos_processed'
+      detect_dir: "~/MOX_projects/mdc_detects"
+      jersey_model_path: "/usr/local/moveai/models/jersey/jersey_model_v5.pth"
+      team_color_model_path: "/usr/local/moveai/models/jersey/color_model_v8_3_cls_resnet_224.pth"
+    outputs:
+      jersey_detect_dir: "~/MOX_projects/mdc_detects_jersey"
+      jersey_debug_vis_dir: "~/MOX_projects/jersey_debug"
+
+
+  OpsMdcTracking:
+    max_people: 4  # TODO THIS IS THE CORRECT NUMBER OF ACTORS IN YOUR TAKE, SET IT ACCORDINGLY
+
+    run_visualization: False
+
+    good_object_cri_min_bbox_width: 25
+    good_object_cri_min_bbox_height: 50
+    good_object_cri_hor_edge_margin: 10
+    good_object_cri_ver_edge_margin: 10
+    good_object_cri_min_valid_kpt_score: 0.25
+    good_object_cri_min_valid_kpt_count_per_pose_percent: 0.5
+
+    tracking_max_idle_time_ms_to_death: 1000
+    estimator_type: 'Estimator3dType.ONE_EURO'
+    use_ransac_triangulation: true
+    merge_tracks_with_same_jersey_ids: true
+
+    new_track_min_reproject_error_affinity_score: 0.5
+    new_track_min_num_views: 3
+    new_track_min_reproject_error_affinity_score_if_two_views: 0.9
+    new_track_check_inside_capture_area: True
+    new_track_min_dst_to_capture_area_edge: 1.0
+    new_track_max_per_frame: 5
+
+    debug_new_track: False
+    debug_cross_view_association: False
+    debug_vis_tracking: False
+    debug_temporal_track_association: False
+    debug_temporal_track_association_per_view: False
+    debug_track_id: -1
+    debug_load_img_start_frm_idx: -1
+    debug_load_img_end_frm_idx: -1
+
+    inputs:
+      video_dir: '~/MOX_projects/videos_processed'
+      calib_pkl_dir: '~/MOX_projects/calib'
+      jersey_detect_dir: '~/MOX_projects/mdc_detects_jersey'
+    outputs:
+      debug_vis_dir: '~/MOX_projects/mdc_detects_vis'
+      pose2d_dir: '~/MOX_projects/pose2d_track'
+      debug_pose2d_tracking_dir: '~/MOX_projects/mdc_detects_tracking'
+      track_2_team_jersey_path: "~/MOX_projects/track_2_team_jersey/track_2_team_jersey.json" # optional, can have null value
+      debug_track_3d_dir: null # optional, can have null value
+      debug_kalman_state_dir: null # optional, can have null value
+      debug_cross_view_association_dir: "~/MOX_projects/mdc_tracking_mv_assoc_vis" # optional, can have null value
+      debug_temporal_track_association_dir: "~/MOX_projects/mdc_temporal_track_assoc_vis" # optional, can have null value
+      debug_temporal_track_association_view_dir: "~/MOX_projects/mdc_temporal_track_assoc_vis_cams" # optional, can have null value
+      debug_new_track_dir: "~/MOX_projects/mdc_new_track_vis" # optional, can have null value

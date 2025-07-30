@@ -1,0 +1,170 @@
+version: 1.1.0.dev0
+general_cfg:
+  webapp_input_args:
+    status_sns_arn: ""
+    processing_job_guid: ""
+    output_metadata:
+      user_guid: ""
+
+ops:
+  OpsInputVideosAudios: true
+  OpsSyncMultiviewVideos: true
+  OpsTrackingCalib: true
+  OpsCalibrate: true
+  OpsReportCalib: true
+  OpsVisualization: false
+#  OpsFinalizeARun: false # if true. upload results to remote storage, etc.
+#failure_ops: [] # list of ops to run in case of failure
+
+ops_cfg:
+  OpsDownloadDataset:
+    dataset:
+      - in_files:
+        - "s3://testcases.moveai/MDC/case5/videos/cam01.mov"
+        - "s3://testcases.moveai/MDC/case5/videos/cam02.mov"
+        - "s3://testcases.moveai/MDC/case5/videos/cam03.mov"
+        - "s3://testcases.moveai/MDC/case5/videos/cam04.mov"
+        - "s3://testcases.moveai/MDC/case5/videos/cam05.mov"
+        - "s3://testcases.moveai/MDC/case5/videos/cam06.mov"
+        out_path: "~/MOX_projects_calib/videos"
+        unzip: false
+
+  OpsInputVideosAudios:
+    is_gopro: false
+    inputs:
+      video_raw_dir: '~/MOX_projects_calib/videos'
+    outputs:
+      log_dir: '~/MOX_projects_calib/log'
+
+  OpsSyncMultiviewVideos:
+    # auto sync settings
+    # set action_ss and action_to if you want to crop a specific time range in input videos.
+    # warning: 'ss' and 'to' must be specified on the video whose lag is smallest; otherwise, it could fail
+    # for the case when the lag between videos are large.
+    # example. action_start_time: '20.15' action_end_time: '30.35' means action stats from the seconds 20.15 to 30.35
+    action_start_time: 0 # start time of the action in format seconds.millisecond. ffmpeg -ss
+    action_end_time: "" # end time of the action in the format seconds.millisecond. ffmpeg -to
+    search_win: [2.0, 6.0] # clap hand time range, in seconds. If no range is specified then search_win
+    # is calculated automatically in the code based on clapping.
+    delete_input_videos: false
+    inputs:
+      video_raw_dir: '~/MOX_projects_calib/videos'
+    outputs:
+      log_dir: '~/MOX_projects_calib/log'
+      video_dir: '~/MOX_projects_calib/videos_processed'
+      sync_vis_dir: '~/MOX_projects_calib/sync_vis'
+    # Use iphone metadata to sync
+    iphone_sync:
+      use_host_timecode: false
+      use_tentacle: false
+    # manual sync settings
+    manual_sync:
+      active: false # set it to true if you want to run manual sync given delay in timestamp
+      # seconds.milliseconds. relative offset. earliest camera should have ss = 0.0
+      cams_lag: # ffmpeg -ss
+        cam01: 0.0
+        #cam02: 0.02
+        #cam03: 0.04
+        #....
+      # all cameras share the same duration and starting time
+      base_ss: 0.0 # seconds.milliseconds
+      duration: 0.0 # ffmpeg -t seconds.milliseconds. 0.0 means the whole video.
+    win_len_samples: 1024
+    win_step_sec: 0.001
+    use_audio_files: false
+    timecode: false
+
+
+  OpsTrackingCalib:
+    enable_vis_debug: true # expensive video debugging
+    vis_debug_rate_ms: 1000 # one frame every 1000ms
+    n_max_people: 1
+    capture_area_type: normal
+    min_move_factor: 2.0 # the tracklet head width / 0.25*mean_bb_width must be greater than this threshold
+    min_head_kps_score: 0.6  # tracklet must have medium score of at least 0.6
+    min_object_calib_score: 0.1 # calib object [human] must have confidence score of at least 0.8
+    is_background_people_moving: false
+    min_hand_over_shoulder_perc: 0.3 # hand over shoulder for at least 25% of track duration
+    min_tracklet_duration: 0.25 # seconds
+    max_initial_idle_secs: 3 # the first few seconds when the calib person does not move
+    use_detection_cpp: true
+    use_nonoverlapping_rule: true
+    use_cuda_decoder: true
+    CalibCppParams:
+      NumMaxObjectPerFrame: 16
+      YoloModelType: "yolov5m"
+      YoloModelFp16: true
+      YoloModelMaxBs: -1
+
+      PoseModelMaxBs: -1
+      PoseModelBsFactor: 2
+      Single2DPoseModelName: "pose_2D_vit_large_moveai29"
+      PoseModelFp16: true
+      CudaGraphInference: false
+
+      UseTracking: true
+      DetectionIntervalMs: 2000
+    inputs:
+      video_dir: '~/MOX_projects_calib/videos_processed'
+      mocap_path: '/usr/local/moveai/bin/mocap-calibration'
+      settings_path: '/usr/local/moveai/settings_rt.ini'
+    outputs:
+      pose2d_dir: '~/MOX_projects_calib/pose2d_track'
+      calib_detections_dir: '~/MOX_projects_calib/calib_detections'
+      log_dir: '~/MOX_projects_calib/log'
+      debug_viz_dir: '~/MOX_projects_calib/calib_detect_viz_debug'
+
+  OpsCalibrate:
+    is_intrinsic_k_from_video: false
+    subject_height: 1.77
+    capture_area_type: normal
+    cam_intrinsics: {}
+    # if all cameras are the same model, using only a single cam_k
+    # if cameras are different, have one line for each camera. The number of lines must be equal to the number of cameras.
+    cam_k:
+      - [ [ 885.98, 0, 960.04 ], [ 0, 900.27, 533.31 ], [ 0, 0, 1 ] ]
+    secs_to_use_scale: [ 0, 1.0 ]
+    frames_to_use_calib: [ 0, -1 ]
+    frames_to_use_floor: [ [ 0, -1 ] ]
+
+    recalibrate: true # run calibration again with bad keypoint filtering
+    err_threshold: 50 # bad keypoint re-projection threshold, used with recalibration
+    use_bundle_adjustment: true
+    optimize_plane: false
+    max_dist: 0.02
+    # just run calibration for keypoints whose confidences above this value.
+    min_kps_confidence: 0.8
+    # Filter keypoints used for the estimation of scaling factor according to their confidence scores.
+    min_confidence_scaling: { 'normal': 0.5, 'large': 0.85 }
+    scale_factor_capture_area: 1.15
+    inputs:
+      pose2d_dir: '~/MOX_projects_calib/pose2d_track'
+      video_dir: "~/MOX_projects_calib/videos_processed"
+      video_raw_dir: "~/MOX_projects_calib/videos"
+    outputs:
+      calib_pkl_dir: '~/MOX_projects_calib/calib'
+      calib_quality_dir: '~/MOX_projects_calib/calib_quality'
+      calib_yaml_dir: '~/MOX_projects_calib/mocap_calib'
+
+
+  OpsReportCalib:
+    inputs:
+      calib_quality_dir: '~/MOX_projects_calib/calib_quality'
+      video_dir: "~/MOX_projects_calib/videos_processed"
+    outputs:
+      report_pdf_path: '~/MOX_projects_calib/calib_quality/report.pdf'
+
+
+  OpsVisualization:
+    inputs:
+      pose2d_dir: '~/MOX_projects_calib/pose2d_track'
+      video_dir: "~/MOX_projects_calib/videos_processed"
+    outputs:
+      viz_dir: '~/MOX_projects_calib/calib_vis'
+
+
+  OpsOnFailure:
+    inputs:
+      run_dir: '~/MOX_projects_calib'
+      log_dir: '~/MOX_projects_calib/logs'
+    output_run_dir: "s3://testcases.moveai/dummy_run/"
