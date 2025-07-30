@@ -1,0 +1,2462 @@
+Changes
+-------
+
+1.1.8
+-----
+- remove reference to subject dashboard for Notes admin (edc-qareports)
+- add logging filter to ignore specific host (edc-utils)
+- add date range filters to CRF and Requisition admins (edc-metadata)
+
+1.1.7
+-----
+- bump edc-pharmacy 1.2.3
+
+1.1.6
+-----
+- fix edc-sites version
+
+1.1.5
+-----
+- fix regression in confirm_stock when creating Confirmation
+  model instance (edc-pharmacy)
+- if site fk set do not call get_current_site when creating
+  new instances (edc-site)
+
+1.1.4
+-----
+- bump edc-pharmacy 1.2.1
+
+1.1.3
+-----
+- bump edc-pharmacy 1.1.6
+
+1.1.2
+-----
+- add hba1c dummy grading ref (edc-reportable)
+- default allow_create to True when metadata is missing (edc-metadata)
+- bump edc-pharmacy 1.1.5. Fixes issues with unit_qty_in and adds
+  transaction protection to long updates (edc-pharmacy)
+- remove DESC indexes (edc-export)
+- bump DJ 5.2.3
+
+1.1.1
+-----
+- fix issues where refresh appointments ignoring offschedule datetime
+  (edc-visit-schedule)
+
+1.1.0
+-----
+- fix issue where stock requests incorrectly see dispensed stock as "in stock"
+  (edc-pharmacy)
+- update list filters on Stock admin  (edc-pharmacy)
+- bump DJ 5.2
+
+1.0.9
+-----
+- remove refs to tracking_identifier field (edc-egfr, edc-ltfu)
+
+1.0.8
+----------
+- bump Django 5.1.7
+- update edc-pharmacy, edc-pdf-reports
+
+1.0.7
+----------
+- add django-admin-rangefilter as requirement
+
+1.0.6
+-----
+- minor, refactor imports (edc-appointment)
+
+1.0.5
+-----
+- bump edc-dashboard, edc-randomization
+
+1.0.4 (skip to 1.0.5)
+-----
+- fix pagination in subject review dashboard (edc-dashboard)
+- fix missing TMG/TMG2 - add rangefilters to admins (edc-pharmacy)
+- convert stock out report to show stock availability with
+  links to stock items and storage bins (edc-pharmacy)
+Death report "Add" panel on TMG dashboard
+  (edc-adverse-event)
+- refactor ModelToDataframe to improve performance. move from
+  `edc_pdutils` to `edc-model-to-dataframe`.
+  (edc-pdutils, edc-model-to-dataframe)
+- update Next appointment CRF model mixin and tests, dataframe utils
+  (edc-appointment)
+- minor changes to pharmacy models and admin (edc-pharmacy)
+
+1.0.3
+-----
+- add (optional) output to reset_visit_code_sequence_or_pass and enable
+  on management command (edc_appointment)
+
+1.0.2
+-----
+- remove reset_visit_code_sequence_for_subject from view mixin
+  (edc-visit-schedule)
+
+1.0.1
+-----
+- fix issue with unscheduled appointments and visit code sequence
+  (edc_appointment)
+
+1.0.0
+-----
+- update use of format_html for DJ6 (most modules)
+- remove all references in templates to `bootstrap3` folders
+  (most modules)
+- update test settings in modules still using old func_main
+
+0.6.26
+------
+- pass same params for site to create next action (edc-action-item)
+
+0.6.25
+------
+- move ReviewQuestions form clean field methods to mixin (edc-consent)
+- add missing migration (edc-visit-schedule)
+
+0.6.24
+------
+- fix issue to ensure create appointments uses explicitly
+  passed site_id instead of current site_id
+  (edc_appointment, edc_visit_schedule, edc_sites,
+  edc-action-item)
+- fix tests
+
+0.6.23
+------
+- fix tests (edc-metadata, edc-action-item)
+
+0.6.22
+------
+- add ConsentDefinitionExtension (edc-consent)
+- update to truncate subjects visit schedule based on consent
+  extension. (edc-appointment, edc-visit-schedule,
+  edc-visit-tracking, edc-metadata)
+
+0.6.21
+------
+- move truncate_string() to edc-utils (edc-utils, edc-qareports)
+
+0.6.20
+------
+- standardise new line insertion around docstrings and fix trailing
+  whitespace (edc-form-describer)
+- prevent 'Add/Change CRF' button wrapping on whitespace (edc-qareports)
+
+0.6.19
+------
+- fix regression with pdf_report not having a default NumberedCanvas
+  (edc-pdf-report)
+- call func to get vars for get_context_data - easier to override in
+  tests (edc-sites)
+- update test settings (edc-device)
+
+0.6.18
+------
+- split perms in roles (edc-pharmacy)
+
+0.6.17
+------
+- fix perms on pharmacy navbar in admin templates (edc-model-admin)
+- remove get_boostrap_ver for templates (edc-dashboard, edc-navbar)
+- add missing migrations (edc-pharmacy)
+- update test settings (edc-appointment, edc-adherence,
+  edc-appconfig, edc-dashboard, edc-navbar)
+
+
+0.6.16
+------
+- separate site/central perms (edc-pharmacy)
+- add exception if raised when checking celery (edc-utils)
+
+0.6.15
+------
+- require `edc-pylabels` as an app that integrates django-pylabels
+  into the edc (edc)
+- refactor and add new stock management models, label printing,
+  document printing and functionality to follow chain-of-custody from
+  original IMP order to dispensing at site. This is a major update.
+  (edc-pharmacy)
+- remove from administration page (edc-crf, edc-offstudy)
+- allow pad value to be passed as arg to to_file() (edc-form-describer)
+- move ModelButton dataclasses to edc-view-utils (edc-view-utils)
+- change screening_model attr on ConsentDefinition to accept a list
+  of model names for when screening uses proxy models
+  (edc-consent)
+- requirements:
+    - align requirements.tests (and dev_repos.sh) files with setup.cfg
+    - add script update_reqs_from_setup.py to align files in future
+    - add release.txt requirements file
+    - add third party package dependencies
+      (edc-form-runners, edc-pdf-reports)
+
+0.6.14
+------
+- improve date handling in dataframes (edc-pdutils, edc-analytics)
+- add model method to manually recreate views for unmanaged model
+  using DBView mixin (edc-qareports)
+
+0.6.13
+------
+- minor refactor, update exception text (edc-consent)
+- fix CRP units/normal ranges (edc-lab-results, edc-reportable)
+- fix sodium normal ranges (edc-reportable)
+
+0.6.12
+------
+- add requisition_id_field attr to RequisitionCase (edc-qareports)
+
+0.6.11
+------
+- update change_button template (edc-qareports)
+- add index to Rx model (edc-pharmacy)
+
+0.6.10
+------
+- fix list_display type when concatenating for column order
+  (edc-sites)
+
+0.6.9
+-----
+- bump edc-lab-panel
+
+0.6.8
+-----
+- include site in list filter and list display if viewallsites
+  perms (edc-sites)
+- add custom attr to set site column insert pos (edc-sites)
+- use constants for UTEST ids (edc-lab-panel)
+- rename attr for blood results lipid to blood results lipids
+  (edc-lab-results)
+- expand signature for get_eos (edc-pdutils)
+- refactor QaCase into CrfCase and RequisitionCase (edc-qareports)
+
+0.6.7
+-----
+- use class QaCase instead of dict (edc-qareports)
+
+0.5.66 - 0.6.6
+--------------
+- improvements to edc-qareports
+
+0.5.65
+------
+- add classes/funcs to generate SQL for view_definitions.
+  Add model/admin mixins for OnStudyMissingValues report
+  (edc-qareports)
+
+0.5.64
+------
+- remove deprecated linked-based navbar logout item in favor
+  of logout form (edc-navbar)
+- remove deprecated linked-based logout on admin template
+  logout button in favor of a logout form (edc-model-admin)
+
+0.5.63
+------
+- move NoteModelAdmin code to a modeladmin mixin (edc-qareports)
+- use get_status_display to render status column correctly in
+  Admin (edc-qareports)
+
+0.5.62
+------
+- refactor get_crf (edc-pdutils)
+- add method to safely render change list note (edc-model-admin)
+- exclude listfilter of nbote column not used (edc-qareports)
+
+0.5.62
+------
+- add fbg and ogtt list filters (edc-glucose)
+- check for empty column before using .dt accessor (edc-pdutils)
+
+0.5.61
+------
+- add default index to QAReportsModelMixn (edc-qareports)
+- check for empty column before using .dt accessor (edc-pdutils)
+- fix breadcrumbs on change_form (edc-model-admin)
+- add sample systemd service files for celery
+
+0.5.60
+------
+- remove property user_may_view_other_sites incorrectly overriding
+  method on QaReportLogSummaryAdmin (edc-qareports)
+- convert DurationField class values to pd.TimeDelta (edc-pdutils)
+- bump django-crypto-fields 0.4.2
+
+0.5.99
+------
+- when building list of codenames with get_app_codenames, use
+  default_permissions on model Meta class. Note: default permissions
+  are customized for models using BaseUuidModel and models using
+  model mixins in edc-qareports. (edc-auth, edc-qareports)
+- deprecate `get_qareports_codenames`, add viewallsites to
+  default Note model. (edc-qareports)
+
+0.5.98
+------
+- add django-pandas to requirements
+
+0.5.97
+------
+- fix issue where braces in AE descriptions broke the AE reports
+  admin pages (edc-adverse-event)
+- add escape_braces text function (edc-utils)
+- add postgres to the gh-action matrix for updated edc modules
+  (this will be done for other modules are they are updated)
+- skip checks and postmigrate signals for apps not found in
+  INSTALLED_APPS (edc-appconfig)
+- add option to prevent Django from creating the default
+  "example.com" site using settings.EDC_SITES_CREATE_DEFAULT.
+  The default is still to create the default site. Deleting the
+  default site raises an Operational error for unmanaged "sql view"
+  models that have a FK to Site. (edc-appconfig, edc-sites)
+- add django_db_views to requirements.
+- update to use django_db_views and add view scripts for
+  mysql, postgres and sqlite3 (edc-qareports)
+- recognize `viewallsites` codename. The new codename allows
+  administrator to allocate permissions to a user to see instances
+  from all sites in a changelist by model. Limit unmanaged models
+  using QAReportsModelMixin to "view, viewallsites, export"
+  codenames. (edc-sites, edc-qareports)
+- refactor of QaReports and related Notes to facilitate
+  overriding (edc-qareports)
+- tighten up handling of str/bytes data and typing of signatures for
+  methods receiving str and/or bytes data. Add support for postgres.
+  Add field classes for additional datatypes:
+    - EncryptedIntegerField
+    - EncryptedDecimalField
+    - EncryptedDateField
+    - EncryptedDateTimeField
+  (django-crypto-fields)
+- in test setup for updated edc modules, import `DefaultSettings`
+  from `edc-test-settings` where `test_settings.py` is in the test
+  folder and the `DJANGO_SETTINGS_MODULE` is set in `runtests.py`
+  using `func_main2`. For an example, see edc_appconfig.
+  (edc-test-settings)
+- add edc-analytics
+
+0.5.96
+------
+- add new funcs when using pandas dataframes, e.g get_crf,
+  get_subject_visit (edc-pdutils)
+
+0.5.95
+------
+- fix issue where 'nav_' codenames omitted from view only
+  codenames (edc-auth)
+- minor README/docstring fixes (edc-qareports)
+- add edc-qareports status badges to edc README
+
+0.5.94
+------
+- add QA REPORTS AUDIT group and role (edc-qareports)
+- fix minor issue in list_filter (edc-sites)
+- add attribute `user_may_view_other_sites` to bypass
+  site filter at the admin class if set to False
+  (edc-sites)
+
+0.5.93
+------
+- add new module, edc-qareports
+- fix missing link to app_index on Admin template (edc-model-admin)
+- add link to model's changelist from data dictionary
+  (edc-data-manager)
+
+0.5.92
+------
+- add ListFilter to filter number of days appointment overdue
+  (AppointmentOverdueListFilter) to default AppointmentAdmin
+  class. (edc-appointment)
+
+0.5.91
+------
+- ListFilter to filter changelists on subject's schedule
+  status, e.g. ON schedule, OFF schedule. (edc-visit-schedule)
+- Add 'Attended' category to 'Status' ListFilter. Add
+  (ScheduleStatusListFilter) to default AppointmentAdmin
+  class. (edc-appointment)
+- bump django-simple-history to 3.7.0
+
+0.5.90
+------
+- add func duration_hm_to_timedelta (edc-model)
+- remove indexes=[] from Meta on mixin (edc-crf)
+- change error text when diagnosis not detected (edc-dx)
+- add type hints, return obj from validation check (edc-dx-review)
+- update fasting factory field fasting_duration_minutes to
+  fasting_duration_delta calc delta on model save (edc-glucose)
+
+0.5.89
+------
+- add model validators to screening report_datetime (edc-screening)
+- add MySQL roles and read only users docs (edc)
+
+0.5.88
+------
+- (edc-consent)
+  - enforce consent definitions must be in UTC
+  - convert report_datetime to utc when getting consents
+  - always add consents to dashboard
+
+0.5.87
+------
+- fix issue to prevent appointment creator from resetting appointment
+  datetime for appointments that are not NEW. (edc-appointment)
+
+0.5.86
+------
+- refresh medata on each render of subject dashboard is current.
+  Performance penalty is negligible (edc-metadata)
+- catch ObjectDoesNotExist and pass when validating ae_initial
+  outcome date if AeInitial relation does not exist.
+  (edc-adverse-event)
+
+0.5.85
+------
+- fix regression in site_consents where consent definitions were not
+  filtered by site before querying for consent model instances. This
+  resulted in irrelevant links to consents showing on the subject
+  dashboard. (edc-consent)
+- fix syntax error in popover templates.
+  (edc-prn, edc-subject-dashboard)
+- fix regression where action item button was not passing parent
+  reference model instance id to new form. For example, given the
+  sequence aeinitial->aefolllowup->aefollowup, the last aefollowup
+  action item pop over list item link was not passing the aeinitial
+  id to the add form for AeFollowup. (edc-action-item)
+
+0.5.84
+------
+- add gettext wrappers to field validator messages. (edc-model)
+- minor, allow import of show_urls from root __init__. (edc-utils)
+- remove edc-next-appointment as a default module
+
+0.5.83
+-----
+- improve consent definition validity period comparisons (edc-consent)
+
+0.5.82
+-----
+ - allow action_identifier to be passed when creating an ActionItem
+   (edc-action-item)
+ - also skip get_site_on_create() if self.site_id (edc-sites)
+
+0.5.81
+------
+- add `site` to signatures for get_consent_or_raise, etc
+  (edc-consent, edc-appointment, edc-crf)
+
+0.5.80
+------
+- fix issue where requisition rule group incorrectly tries to run rules
+  when appointment is missed. (edc-metadata)
+
+0.5.79
+------
+- minor, separate age from dob on subject dashboard (edc-subject-dashboard)
+
+0.5.78
+------
+- fix outdated call in view mixin to site_consents from
+  'get_consent_or_raise' to 'get_consents'. (edc-consent)
+- (edc-action-item)
+  - fix search field list not finding subject_identifier;
+  - check for action_identifier before looking up reference_obj.
+- bump to django-audit-fields 0.3.17
+- bump to django-multisite2 2.0.1
+- add management command `sync_sites` to manually sync and review
+  site related models from edc_sites, django_sites and multisite.
+  Also review ALLOWED_HOSTS for current settings file. (edc-sites)
+
+0.5.76
+------
+- fix regression where dynamic site middleware incorrectly tried to
+  determine site after calling get_response in __call__.
+  (django-multisite2)
+
+0.5.75
+------
+- fix export_model management command incorrectly enumerating model
+  names (edc-pdutils)
+- prefix regex strings with 'r' (edc-identifier, edc-lab)
+- (django-crypto-fields) 0.4.1
+  - major refactor
+  - use cache framework for encryption keys
+- (edc-consent)
+  - remove 'updates_by' from ConsentDefinition init and instead set
+    when registering the ConsentDefinition with site_consents.register.
+  - change 'updates' to only accept a ConsentDefinition
+  - update system checks that warn of duplicate versions
+    and period overlap when using the same proxy_for_model.
+ - (django-multisite2)
+   - switch to django-multisite2
+   - major refactor
+   - add MULTISITE_REGISTER_POST_MIGRATE_SYNC_ALIAS settings attr
+ - (edc-sites)
+   - require --settings when running migrate
+   - require MULTISITE_REGISTER_POST_MIGRATE_SYNC_ALIAS = False so
+     multisite post-migrate signal NOT be registered by multisite2
+ - connect multisite2 post-migrate signal AFTER edc-site post migrate
+   signal (edc-appconfig)
+
+0.5.74
+------
+yanked because of edc-consent
+
+0.5.73
+------
+- Move fieldsets to modeladmin mixin (edc-adherence)
+- Django 4.2.11
+
+0.5.72
+------
+- add missing migrations (edc-locator, edc-visit-tracking)
+- replace deprecated dataframe manipulation for pandas v2.2. Add
+  ValueError exception if remove_illegal_characters() operates
+  on a non-str Series (edc-pdutils)
+- rename data dictionary field from "default" to "default_value"
+  (edc-data-dictionary)
+- change site_consent system checks that look for duration overlap
+  from errors to warnings (edc-consent)
+ - get consent definition directly from site_consents on PRN
+   models that do not have access to a schedule (edc-prn)
+
+0.5.71
+------
+- refactor to handle multiple versions of consents and consents that
+  update previous versions (edc-consent)
+- query consent attr thru consent definition (edc-crf, edc-screening,
+  edc-visit-schedule)
+- use RequiresConsentModelAdminMixin for modeladmin classes that
+  require consent (edc-model-admin)
+
+0.5.70
+------
+- show field_cls.metadata in reference document (edc-form-describer)
+- use 'custom_name' to capture 3rd element of tuple in list_data,
+  if it exists. Add ListModelMixin2 and class to convert a choices
+  tuple to something the list_data loader can handle
+  (edc-list-data)
+- add iter to custom Choices class (edc-model-field)
+- change precision for ALP to 2 places, ALT to 2 places, magnesium to
+  2 places (edc-lab-results)
+- update precision on equalities for magnsium, uric acid, neutrophils
+  (edc-reportable)
+
+0.5.69
+------
+- fix timeuntil on aefollowup "description" template
+  (edc-adverse-event)
+
+0.5.68
+------
+- add missing action_identifier to extra kwargs coming from popover
+  (edc-action-item)
+- fix issue where runner fails if no fieldset defined in ModelAdmin.
+  Check get_related_visit_model_attr has value before calling.
+  (edc-form-runners)
+- check creatinine has value before attempting to calculate eGFR drop
+  (edc-egfr)
+- fix signature on get_next_related_visit to include
+  `include_interim=True` (edc-pharmacy, edc-visit-tracking)
+- change form validation error to use message from
+  ScheduledVisitWindowError when date is outside window period
+  (edc-appointment)
+- skip some form validation until report_datetime has value
+  (edc-visit-schedule)
+- get ConsentDefinition from Screening model if not enough
+  data to get from schedule.get_consent_definition
+  (edc-consent)
+
+0.5.67
+------
+- add `is_required_by_date` method to allow a metadata_rule user to
+  hardcode a date before which the rule always returns not_required
+  (edc-he)
+- fix issue where the action item popover template incorrectly gets
+  the color style from the Action instance instead of the Action
+  class (edc-action-item)
+
+0.5.66
+------
+- minor changes to system checks
+- update pre-commit config
+- force metadata_handler to create missing metadata,
+  allow_create=True (edc-metadata)
+- fix regression where visit_code and visit_code sequence are
+  incorrectly saved as booleans on the Issues model
+  (edc-form-runners)
+- fix timezone setting on to_local, to_utc (edc-utils)
+- check value of creatinine before calculating drop (edc-egfr)
+- fix how refill_end_datetime is set (edc-pharmacy)
+
+0.5.65
+------
+- remove fields reference_model and related_reference_model from ActionItem.
+  Fields already appear on ActionType. (edc-action_item)
+- display window period boundaries on changelist (edc-appointment)
+- skip system check if migrating (edc-sites)
+- fix run_form_runners command incorrectly including skipped models
+  (edc-form-runners)
+- bump to Django 4.2.10
+
+0.5.64
+------
+- remove redundant check from Holiday model (edc-facility)
+- fix render TmgButton when reference_obj is None by passing
+  subject_identifier (edc-adverse-event)
+- remove edc-model-wrapper, edc-subject-model-wrapper from
+  requirements
+- fix issue where missing CRF/Requisition metadata is not
+  created using subject dashboard's refresh button
+  (edc-metadata)
+- rework TMG dashboard, add navigation for TMG Role members
+  to navigate to new, open, closed TMG summaries from subject
+  dashboard and subject review dashboard (edc-adverse-event,
+  edc-subject-dashboard, edc-review-dashboard)
+- add Choices class and custom fields to accept standardized field
+  names and standardized categorical field values in choices as
+  metadata when building model classes for standardized forms.
+  (edc-model-fields)
+
+0.5.63
+------
+- minor fixes to templates (edc-dashboard, edc-subject-dashboard,
+  edc-navbar)
+- add system check against SubjectScheduleHistory and the OnSchedule
+  model (edc-visit-schedule, edc-appconfig)
+- management command to delete invalid onschedule instances
+  (edc-visit-schedule)
+- fix issue where form runner fails on PRN forms that do not
+  have visit schedule fields (edc-form-runners)
+
+0.5.62
+------
+- add checks to confirm reference_model matches (edc-action_item)
+- skip admin classes without custom modelform classes
+  (edc-form-runner)
+- fix modelform not finding site for PRN forms (edc-site)
+
+0.5.61
+------
+- add related_visit_model_cls attr to form validator mixin
+  (edc-visit-tracking)
+-
+0.5.60
+------
+- fix regression on updating missed appointments in signal
+  (edc-appointment)
+- fix query on userprofile.role raising exception
+  (edc-auth)
+
+0.5.59
+------
+- use get_locator_model to access SUBJECT_LOCATOR_MODEL
+  settings attribute (edc_locator)
+
+0.5.58
+------
+- disabled refresh appointments and refresh data collection schedule
+  if multisite viewer or auditor (edc-subject-dashboard)
+
+0.5.57
+------
+- add `is_multisite_viewer` boolean to UserProfile model. This field
+  value replaces the use of a special codename for multisite data
+  view (edc-auth)
+- redirect to screening_listboard if not a registered subject in
+  view_on_site (edc-model-admin)
+- move refresh_appointments to utils, check appt_datetime is not
+  before previous appt (edc-appointment)
+- change DeathReportTmgSecond mixin to be used with a proxy of death
+  report tmg (edc-adverse-event)
+- Add subject consent buttons for listboards and subject-dashboards
+  (edc-subject-dashboard)
+- Rework resequencing when visit code sequences and dates not
+  correctly ordered (edc-appointment)
+- add schedule button to review listboard (edc-review-listboard)
+
+0.5.56
+------
+- add new app edc_appconfigs
+  - call all site global autodiscover() in ready
+  - register system checks that access site globals in ready
+  - register post-migrate signals that access site globals in ready
+- move NavbarItem class validation to system_checks. Rename
+  NavbarItem.append_item method to register (edc-navbar)
+- refactor edc_protocol, rename class to ResearchProtocolConfig
+  (edc-protocol)
+- minor changes to subject dashboard template (edc-subject-dashboard)
+- require consent definition as class attr on screening models
+  (edc-screening)
+- refactor notification, raise exception any entries, referred to
+  by Action classes, are missing from EMAIL_CONTACTS
+- wrap search form in button div (edc-listboard)
+
+0.5.55 yanked
+-------------
+
+0.5.54 yanked
+-------------
+- refactor to remove modelwrappers and other listboard and
+  dashboard improvements
+- refactor TMG listboard
+- refactor subject dashboard, screening and subject listboards
+
+0.5.53
+------
+- refactor edc-consent
+- AE PDF reports for changes in edc_pdf_reports:
+    - set `pdf_report_cls` on AE models (death report, AE initial)
+    - update modeladmin changelist (death report, AE initial)
+    - add urls from edc_pdf_reports
+    - See edc_pdf_reports README
+- user is now redirected to effect_ae changelists instead of AE
+  listboards. Remove effect_ae from administration section.
+  (changes from edc-adverse-event)
+- migrations for indexes triggered from other modules e.g.
+  edc-list-data, edc-model, etc
+- remove redundant edc-sites post-migrate signal
+- update edc_sites import paths
+
+0.5.51
+------
+- reset migrations. may need to review existing migrations before
+  updating (edc-form-runners)
+- split index migrations to avoid mem issues during migrations.
+  may need to review existing migrations before updating
+  (edc-data-manager)
+- fix decimal_places==0 treated as falsy (edc-lab-panel)
+- pass current site and locale into form_validator (edc-form-validators)
+- SodiumModelMixin (edc-lab-results)
+- add inclusive option to report_datetime validators (edc-form-validators)
+- major refactor of edc_sites:
+    - register sites from sites.py. sites must be registered
+      with the new sites global. ``sites`` uses autodiscover
+      to find ``sites.py`` in root of an app.
+    - move most functionality related to sites onto the
+      `sites`` global instance.
+    - add funcs to allow a configuration where an auditor type
+      user, with view only access, is able to view data from
+      other sites while logged into the current site.
+    - set current site and locale from request object in get_forms
+- update dashboard apps to accommodate expanded auditor type
+  role using funcs from edc_sites (edc-dashboard, edc-listboard,
+  edc-subject-dashboard, edc-review-dashboard)
+- update tests to either register a default site or add sites.py
+  to the test setup (most modules)
+- add DJ50 to testing matrix, drop DJ41.
+
+0.5.50 (yanked)
+------
+  ** skip this release, goto 0.5.51
+- bump django-audit-fields
+
+0.5.49 (yanked)
+------
+  ** skip this release, goto 0.5.51
+- bump django-audit-fields, django-crypto-fields
+- track locale on model instance add/change (django-audit-fields)
+- convert Meta.unique_together to new Meta.constraints
+- review index inheritance and fix where not working
+- add indexes to improve performance (edc-metadata, edc-action-item)
+
+0.5.48
+------
+- remove invalid permissions codename (edc-data-manager)
+
+0.5.47 (yanked)
+------
+  ** skip this release, goto 0.5.48
+- require module `edc_form_runners`
+- fix missing model name in breadcrumbs (edc-model-admin)
+- use self.subject_identifier from base class when looking up
+  ``action_cls`` in `ActionItemModelFormMixin` (edc-action-item)
+- add custom form_runner (edc_appointment)
+- use proxy model to make custom admin class for edc_form_runner
+  Issue model (edc-data-manager)
+- add link to edc_data_manager.Issue changelist from subject
+  dashboard and issue badge with hover text on subject dashboard
+  CRF/Requisitions (edc-subject-dashboard,
+  edc-subject-model-wrappers)
+
+0.5.46
+------
+- minor, updates to translation files (edc-he)
+
+0.5.45
+------
+- updates to HE 'PropertyModelMixin' (edc-he)
+    - add 'calculated_land_surface_area' field (standardised to m2)
+    - add additional units: Decimals (1/100th of Acre), Sq. feet
+    - convert 'land_surface_area' to decimal field
+- minor, remove additional refs to edc_reference in tests (edc-utils)
+
+0.5.44
+------
+- fix issue where appointment creator may lose the site id
+  for funcs run from the django console on a multisite
+  installation (edc-appointment, edc-visit-schedule, edc-sites)
+
+0.5.43
+------
+- method to calculated relative previous appt with a subject visit
+  report (edc_appointment)
+
+0.5.42 (invalid)
+------
+- fix where scheduled crf collection incorrectly combines
+  crfs_unscheduled + crfs_prn instead of crfs + crfs_prn
+  (edc-metadata)
+
+0.5.41
+------
+- docs (edc)
+- add 'appt_status' property to form validation, trivial
+  (edc-appointment)
+
+0.5.40
+------
+- remove `edc_reference` from setup.cfg
+- fix additional exceptions not caught in modelform
+  (edc-appointment, edc-visit-tracking)
+- fix prn metadata not updating (edc-metadata)
+- refactor form collections in visit class (edc-visit-tracking)
+
+0.5.39
+------
+- fix minor typos in fieldsets (edc-lab-results)
+- catch exception into form when unscheduled appointment not allowed
+  (edc-appointment)
+- remove additional refs to edc_reference in tests
+
+0.5.38
+------
+- add further validation to death report model and form validation
+  mixins (edc-adverse-event)
+- minor doc updates
+
+0.5.37
+------
+- remove dependency `edc_reference`. `edc-reference` maintained a
+  single table, "edc_reference.Reference", with values needed for
+  metadata-rules. The table was updated on a `post_save` signal
+  for CRF/Requisition and other models using the
+  `ReferenceModelMixin`. By removing `edc_reference`, `edc-metadata` now
+  directly queries CRF/Requisition models instead of querying model
+  "edc_reference.Reference". This change has bumped most edc modules. The
+  dependency was required for a few modules or, as in most cases, just for
+  tests. The model mixin `ReferenceModelMixin` and the site controller
+  `site_reference_configs` are no longer required. You may remove from
+  your app any reference to `edc-reference` and the file
+  `reference_model_configs`.
+
+0.5.36
+------
+- add missing migrations (edc-data-manager)
+
+0.5.35
+------
+- remove imports from base constructor (edc-visit-schedule)
+- update imports for changes to edc-visit-schedule
+  and drop 3.10/DJ4.1 (all)
+
+0.5.34
+------
+- add import path for ScreeningManager to model_mixins (edc-screening)
+
+0.5.33
+------
+- merge edc-next-appointment into edc-appointment.
+  edc-next-appointment is now deprecated.
+- refactor mixin paths (edc-appointment)
+- update modules to reflect path changes in edc-appointment
+  (edc-crf, edc-timepoint, edc-visit-tracking, edc-facility)
+
+0.5.32
+------
+- add site to SubjectScheduleHistory model (edc-visit-schedule)
+- change signature on UnscheduledAppointmentCreator; allow signal
+  to create unscheduled/interim appointment when using next
+  appointment CRF based on `allow_create_interim` field value.
+  (edc-appointment)
+- update mixins with `allow_create_interim` field.
+  (edc-next-appointment)
+- allow proxy models but use the proxy_for_model model name to
+  update and get references (edc-reference).
+- add data manager to recipients list (edc-data-manager)
+- use title case for "Data Collection Status" app name (edc-metadata)
+
+0.5.31
+------
+- refactor update_skipped_appointments management command
+  (edc-appointment)
+- add SiteModelAdminMixin to SubjectRefusalAdmin to filter by site
+  (edc-refusal)
+- change to use non-ISO numbering (edc-facility)
+- fix administration page template failing if app_list is None.
+  (edc-model-admin)
+
+0.5.30
+------
+- fix issues when setting appointments as skipped, resetting
+  appointments (edc-appointment, edc-next-appointment)
+- (edc-visit-tracking)
+    - use Django's get_model_related to determine `related_visit` and
+      other similar properties.
+    - enforce appointment sequence when saving CRFs in model save.
+
+0.5.29
+------
+- reset migrations. You need to drop the `edc_visit_tracking`
+  models and delete any migrations under django_migrations
+  where app="edc_visit_tracking" before running
+  `migrate`. (edc_visit_tracking)
+- add SKIPPED_APPT appointment status; update admin, form classes;
+  Add settings.EDC_APPOINTMENT_ALLOW_SKIPPED_APPT_USING.
+  (edc-appointment, edc-next-appointment, edc-visit-tracking)
+- minor change to admin (edc-he)
+
+0.5.28
+------
+- fix import and minor typos (edc-crf)
+- add custom language internationalization constants (edc-constants)
+- refactor SingleSite interface to accept list of `language_codes`
+  instead of a dict of `languages` (edc-sites)
+    - NOTE: this is a "breaking" change.  Protocol specific sites.py
+      modules that already declare `languages` will need to be
+      updated use 'language_codes' instead.
+
+0.5.27
+------
+- add constants (edc-constants)
+- use django_apps to get model to prevent circular
+  import in tests (edc-sites)
+
+0.5.26
+------
+- change from 'confirm' to 'transcribe' (edc-adherence)
+- add proxy_models to list of models to be used by consent
+  object (edc-consent)
+- removed `PiiModelAdminMixin` (edc-consent)
+- use getters for some class attributes (changelist_url,
+  post_full_url_on_delete,  post_url_on_delete_name) to make
+  it easier to override and to access request object
+  (edc-model-admin)
+- add `country` templatetag; change signature for
+  `get_current_country` to accept both `site` and `request`
+  (edc-sites)
+
+0.5.25
+------
+- include django.mo file in MANIFEST.IN for modules with
+  locale messages (django-audit-fields, edc-adverse-event,
+  edc-constants, edc-crf, edc-dashboard, edc-he, edc-model-admin,
+  edc-protocol, edc-qol, edc-review-dashboard, edc-subject-dashboard,
+  edc-visit-tracking)
+
+0.5.24
+------
+- ICECAP-A sw translation (edc-qol)
+- add translation funcs, sw translation (edc-visit-tracking
+  and others)
+- slight refactor PiiModelAdminMixin (edc-model-admin)
+
+0.5.23
+------
+- fix filter_fieldsets_for_pii_permissions (edc-consent)
+
+0.5.22
+------
+- setup apps for translation, add partially updated po files for
+  locale sw.
+- add set language template (edc-navbar)
+- expect default settings of USE_I18N and USE_L10N to be `True`
+  on main project apps
+
+0.5.21
+------
+- edc-adverse-event
+  - check for pdf report class on model class as well as on view mixin;
+  - rename reports as `AePdfReport` and `DeathPdfReport`;
+  - Check for "susar" model instance field attribute in `signal` before
+    updating.
+  - add hospitalization codenames for auth
+  - use get_edc_adverse_event_app_label() (edc-transfer)
+  - add migration; update tests (edc-he)
+  - access ADVERSE_EVENT_APP_LABEL settings attr through function
+    get_adverse_event_app_label
+
+0.5.20
+------
+- remove default contact date from subject visit missed
+  (edc-visit-tracking)
+
+0.5.19
+------
+- use related visit attr for singleton model mixin lookup
+  (edc-crf)
+- fix spelling error in constant (edc-he)
+
+0.5.18
+------
+- modify metadata rules to update the CrfMetadata of previous
+  timepoints if HE forms are filled in over more than one timepoint;
+  fix minor validation issues; improve test coverage (edc-he)
+- add `time-machine` to testing dependencies
+
+0.5.17
+------
+- add Meta option to declare PredicateCollection on a RuleGroup;
+  update README (edc-metadata)
+- add models and other classes (edc-he)
+- and method `get_models` to list all models associated with a visit
+  (edc-visit-schedule)
+- add model_mixin method `update_references_on_save` to update ALL
+  references on save (edc-reference)
+
+0.5.16
+------
+- move model, admin, form, etc from intecomm to edc-he (edc-he)
+- add extra_value column to ListModelMixin to inspect in
+  admin class (edc-list-data)
+- set instance attr in get() instead of get_context_data()
+  (edc-listboard, edc-appointment, edc-registration)
+- add disaster recovery (from backup) docs (edc)
+- minor updates to backup docs (edc)
+
+0.5.15
+------
+- minor updates to email subject and body for new/changed user
+  accounts (edc-auth)
+- update backup docs (edc)
+- add SubjectVisit concrete model/admin; raise exception if related
+  visit model, or SubjectVisit, is a proxy model; deprecate
+  func get_subject_visit_model_cls (edc-visit-tracking)
+- raise exception if attempting to get an invalid visit_code from
+  the visit schedule (edc-visit-schedule)
+- add related_visit_model to RuleGroups to allow related visit model
+  to be from an outside app; fix issue where Rule runner relied on
+  related visit model for the app_label to get rules from site global
+  (edc-metadata)
+- use `get_appointment_model_cls` instead of directly importing
+  Appointment model; add tests for admin class (edc-appointment)
+- add missing mixins to QueryRule admin class (edc-data-manager)
+- add checks to form validator (edc-facility)
+- update tests to use SubjectVisit from edc-visit-tracking (all)
+- add more typing hints (all)
+
+0.5.14
+------
+- raise if locator model in settings does not match visit schedule
+  (edc-locator, edc-visit-schedule)
+
+0.5.13
+------
+- 0.5.12 has wrong version of edc-facility, bump to  0.3.16
+
+0.5.12
+------
+- add missing edc-next-appointment
+
+0.5.11
+------
+- add HealthFacility model/form/admin (edc-facility)
+- rename func get_clinic_codenames to get_app_codenames,
+  deprecate get_clinic_codenames (edc-auth)
+- fix issue where unable to read selected models from the
+  post/session (edc-export)
+- improve SubjectLocator changelist (edc-locator)
+- Add additional date filters to custom ListFilter class,
+  yes_no_coloring templatetag (edc-model-admin)
+- new module with mixins for NextAppointment CRF
+  (edc-next-appointment)
+
+0.5.10
+------
+- 0.5.9 has wrong version of django-crypto-fields,
+  bump to 0.3.7
+
+0.5.9
+------
+- limit data export to the sites listed in userprofile; use
+  protocol name for zip archive `base_dir`; update modeladmin
+  classes (edc-export)
+- add func to get all sites for user (edc-sites)
+- filter data by site using sites param (edc-pdutils)
+- add unregister method for site_action_items (edc-action-item)
+- add verbose_name_plural; move ModelAdmin functionality to
+  SubjectLocatorModelAdminMixin (edc-locator)
+- add ModelAdmin mixin to remove PII/encrypted fields from changelist
+  and search for users not in PII/PII_VIEW permission groups;
+  move dashboard functionality to ModelAdminDashboardMixin.
+  (edc-model-admin)
+- add unregister method for site_prn_forms (edc-prn)
+- use `get_locator_model` instead of hardcoded locator model
+  (edc-subject-dashboard, edc-subject-model-wrappers)
+
+0.5.8
+-----
+- use SQLAlchemy to prepare sql text for pandas, upgrade pandas
+  to latest, require SQLAlchemy (edc-pdutils)
+- typing hints (edc-pdutils, edc-export)
+- check settings before loading load_data (edc-list-data)
+- add func to get all sites for country (edc-sites)
+
+0.5.7
+-----
+- change field `return_in_days` to `rx_days` (edc-rx)
+
+0.5.6
+-----
+- major refactor; eliminated use of TargetHandler classes; removed
+  post processing validation checks no longer necessary with
+  these fixes (edc-metadata)
+- raise addition exception if field not on source model
+  (edc-reference)
+
+0.5.5
+-----
+- refactor options for get and create; wrap create in transaction
+  (edc-reference)
+- wrap site lookup in transaction (edc-sites)
+- fix sidebar template metadata panel href (edc-subject-dashboard)
+
+0.5.4
+-----
+- Add 'By country' list filter and group permitted sites by country
+  (edc-auth)
+- set default manager to `objects` using BaseUuidModel (edc-model)
+- add additional validation to protect site id on models and other
+  actions (edc-site)
+- validate site when creating actions (edc-action)
+- validate site when creating appointments (edc-appointment)
+- add attrs to allow lower bound to extend with gap days
+  (edc-appointment)
+- refactor MetadataRefresher, MetadateGetter and management command;
+  Add custom modeladmin classes and forms; change naming to
+  "Data collection status" (edc-metadata)
+- hide delete button on condition; refactor dashboard button method;
+  show/hide history object tool;custom change form title.
+  (edc-model-admin)
+ - link changelist to subject_dashboard; refactor ReferenceGetter to
+   respect site. Customize ModelAdmin class. (edc-reference)
+ - add link to edc_metadata from dashboard (edc-subject-dashboard)
+ - remove unique constraint on legal_name (edc-model)
+
+0.5.3
+-----
+- accept FieldError on get_queryset if using SiteModelAdminMixin for
+  model without field `site`. (edc-sites)
+
+0.5.2
+-----
+- force all models to use `objects` as default manager (edc-model)
+- add new mixins to handle redirects, delete button (edc-model-admin)
+- update admin mixin to handle fks/m2ms in modelform (edc-site)
+- move managers from fields mixin to screening_model_mixin
+  (edc-screening)
+
+0.5.1
+------
+- add additional validation to check screening identifier and the
+  screening eligibility boolean. (edc-consent)
+- add mixin to redirect all forms to a selected changelist
+  (edc-model-admin)
+- improve redirect on delete (edc-model-admin)
+
+0.4.99
+------
+- fix rounding issue with md section numbers, allow opt out of
+  timestamp on every form rendered (edc-form-describer)
+
+0.4.98
+------
+- allow fbg date to be 'on or after' report date instead of only after
+  (edc-glucose)
+- minor fix in date_is_after_or_raise validation message when using
+  inclusive=True (edc-form-validators)
+
+0.4.97
+------
+- raise incorrectly skipped exception in form validator (edc-dx-review)
+- specify action type when querying death report actions
+  by parent action item (edc-adverse-event)
+
+0.4.96
+------
+- minor fix access id via lookup sep instead of '.' in get_display_appt_type
+  (edc-appointment)
+- use local fields instead of across lookups on admin (edc-subject_visit)
+- add new code for revised HE crf (edc-he)
+- add new code for new QoL CRF (edc-qol)
+
+0.4.95
+------
+- add model admin mixins (edc-qol)
+
+0.4.94
+------
+- add mixins for new HE crf (edc-he)
+
+0.4.93
+------
+- update precommit config, setup python_requires = >=3.10,
+  gh-actions for 3.10, 3.11, dj4.1, dj4.2 (all edc modules)
+- use factory for model_mixin, RESULT_QUANTIFIER_NA, optional
+  field name for fasting, get fieldset from func (edc-glucose)
+- minor refactoring to increase use of constants (edc-adverse-event)
+- fix form validator (edc_dx)
+
+0.4.92
+------
+- override methods for url and message in validator (edc-screening)
+
+0.4.91
+------
+- add attr for custom identity fields in search (edc-listboard)
+
+0.4.90
+------
+- add block to add buttons to top_bar (edc-subject-dashboard)
+
+0.4.89
+------
+- add button to refresh appointments (edc-subject-dashboard)
+- delete actionitems and recreate if multiple objects
+  exist (edc-locator)
+
+0.4.88
+------
+- fix applicable_if_diagnosed validator (edc-dx)
+
+0.4.87
+------
+- add func to get appointment by datetime (edc-appointment)
+- move icecapa fields to model_mixin (edc-qol)
+
+0.4.86
+------
+- add NA option th choices (edc-lab)
+
+0.4.85
+------
+- accept site_id if known when creating identifiers. Useful
+  when creating identifiers in data migrations.
+  (edc-identifier)
+
+0.4.84
+------
+- fix comparison of db datetime with milliseconds vs django datetime without
+  (edc-appointment, edc-visit-schedule)
+- add new block to template for demographics title (edc-subject-dashboard)
+- render to response and just buffer (edc-pdf-report)
+- handle null identifier (edc-identifier)
+- add ICECAP-A version 2 (edc-qol)
+- add additional disease constants (edc-constants)
+
+0.4.83
+------
+- limit export of sensitive data to members of EXPORT_PII group. Only allow
+  users specified in settings to be added to EXPORT_PII group.
+  (edc-pdutils, edc-export)
+- add fieldset tuple to work with glucose model mixins (edc-glucose)
+- add NA option to rx_init (edc-dx-review)
+- fix validation issues with field `return_in_days` (edc-rx)
+
+0.4.82
+------
+- compare rx_init_date to report_datetime (edc-dx-review)
+
+0.4.81
+------
+- add additional fields and form logic to clinical review
+  baseline (edc-dx-review)
+- clean up unused test tags
+- setup configs
+
+0.4.80
+------
+- export by model (edc-pdutils)
+- other minor fixes (edc-dx-review, edc-form-validators)
+
+0.4.79
+------
+- bump to edc-dx-review 0.1.33
+
+0.4.78
+------
+- bump to django-crypto-fields 0.3.5
+
+0.4.77
+------
+- require edc-rx
+
+0.4.76
+------
+- simplify clinical baseline review, change initial review fields to be more
+  consistent. Use factories for model mixins. (edc-dx-review)
+- fix tests (edc-dx)
+- detect list models using ListUuidModelMixin (edc-pdutils)
+
+0.4.75
+------
+- additional features to export data (edc-pdutils)
+
+0.4.74
+------
+- add human readable identifier (edc-identifier)
+
+0.4.73
+----------
+- add more validation to ClinicalReviewFollowupFormValidatorMixin (edc-dx-review)
+- bump edc-rx
+
+0.4.72
+------
+- add signals to SubjectRefusal to update SubjectScreening model on add/delete (edc-refusal)
+
+0.4.71
+------
+- update neutrophil and lymphocyte model mixin settings (edc-lab-results)
+- trivial (edc-model-form)
+- add management command for CSV and STATA dataset export (edc-pdutils)
+
+0.4.70
+------
+- remove subject_consent_form_validator mixin from crf_form_validator.
+  Consent version and timing is verified in the modelform (edc-crf)
+- move model code to mixin (edc-data-manager)
+- trivial (edc-sites)
+
+0.4.69
+------
+- fix missing codename in DATA_MANAGER_SUPER group, on migrate (edc-data-manager)
+- add Python 3.11 support
+- drop Python 3.9 support
+
+0.4.68
+------
+- modeladmin mixin that selects the Form class conditionally by
+  user permission. Custom Form class removes all validation but
+  could be any Form class. (edc-model-admin)
+- add DATA_MANAGER_SUPER group, add codename tuple used by
+  modeladmin to select Form class by inspecting user perms.
+  (edc-data-manager)
+- add `special` to list of allowed codename prefixes (edc-auth)
+
+0.4.65
+------
+- ignore metadata rule if source model not in the current visits crfs
+  (edc-metadata)
+
+0.4.64
+------
+- add `HeartRateField` and `RespiratoryRateField` (edc-vitals)
+
+0.4.63
+------
+- add constants (edc-constants)
+- fix misspelled attr (edc-dx-review)
+
+0.4.62
+------
+- change `appointment.appt_type` model field to foreign key and
+  get choices from list_data. (edc-appointment)
+- add settings attributes for default appt_type choices, referenced
+  in list_data, and default value. (edc-appointment)
+- add fields familiar_name, full_name to registered subject
+  (edc-registration)
+- add late lower and upper to visit class (edc-visit-schedule)
+- now can customize name field and identity regex using class attrs
+  on SubjectListboardView (edc-listboard)
+- add option to customize identifier field name for utils and
+  other funcs. (edc-randomization)
+
+0.4.61
+------
+- remove 'None' choice from 'cause_of_death_agreed' in Death Report TMG (edc-adverse-event)
+- fix AE TMG Report readonly fields not pulling in ae_description,
+  ae_classification etc. (edc-adverse-event)
+
+0.4.60
+------
+- add missing migrations (edc-protocol-incident)
+- update docs on creation of MySQL users for connections from remote Django hosts
+
+0.4.59
+------
+- add option to withdraw AE after TMG review on AE followup (edc-adverse-event)
+- add investigator AE classification if not in agreement with initial
+  (edc-adverse-event)
+ - add option to withdraw incident report (edc-protocol-incident)
+
+0.4.58
+------
+- add `language` to site class, `languages` to site_profile model
+  and intercept choices in modeladmin mixin (edc-sites)
+- update verbose_name and help_text on `familiar_name` field (edc-model)
+
+0.4.57
+------
+- move some respond mixins (edc-dx, edc-dx-review)
+
+0.4.56
+------
+- remove editable=False from eligibility model fields to show them as readonly
+  on modeladmin section (edc-screening)
+
+0.4.55
+------
+- fix missing method call in `get_changelist_url` (edc-model)
+- add new Names model mixin for legal_name, familiar_name (edc-model)
+- update consent to handle legal_name, familiar_name (edc-consent)
+- new attrs for modeladmin to add help and notes to custom changelist
+  (edc-model-admin)
+
+0.4.54
+------
+- allow to override criteria to select an unallocated registration instance
+  (edc-randomization)
+
+0.4.53
+------
+- add `get_changelist_url` to default model mixin (edc-model)
+- randomizer may identifier fields other than
+  `subject_identifier` (edc-randomization)
+- may use custom registration model (edc-registration)
+
+0.4.52
+------
+- fix regression in test sites following update to SingleSite init signature (edc-sites)
+- add PrnModelAdminMixin (edc-prn)
+- additional constants (edc-constants)
+
+0.4.51
+------
+- fix regressions causing list filter to always return an empty queryset
+  caused by not distinguishing `no date` (null) from filter not selected
+  (edc-model-admin, edc-constants)
+
+0.4.50
+------
+- * move list filter code as base class to edc-model-admin;
+  * ignore validation if appointment is cancelled;
+  * refactor missed appointment handling. (edc-appointment)
+
+0.4.49
+------
+- move reason updater to appointment (edc-appointment, edc-visit-tracking)
+- default offschedule action (edc-visit-schedule)
+- add current site to form class (edc-sites)
+- add mixins to query current site on screening form (edc-screening)
+
+0.4.48
+------
+- remove edc-egfr as a dependency
+
+0.4.47
+------
+- never export rando tables, even if user is unblinded (edc-export)
+- refactor blinded/unblined funcs (edc-randomization)
+- take code out of app_config and move to funcs in utils (edc-facility)
+- slight refactor, typing hints (edc-screening)
+
+0.4.46
+------
+- add css hack for wrapping radiolists in admin forms (edc-model-admin)
+- fix func signature (edc-form-describer)
+
+0.4.45
+------
+- fix regression that dropped linked to jQuery in edc base template
+  (edc-dashboard)
+- update rel.to to related_model for inlines (edc-crf)
+
+0.4.44
+------
+- add migration for help_text changes (edc-appointment)
+
+0.4.43
+------
+- change TabularInlineMixin to insert an inline before a fieldset
+  instead of after a field. Revert to using Django original
+  fieldset.html. Default to insert inlines before the audit
+  fieldset. (edc-model-admin)
+- move edc_protocol vars used in template context to middleware
+  (edc_protocol, edc-auth, edc-dashboard)
+- fix appointment radio widget missing class-radiolist
+- use new 4.1 template block to disable dark mode, update all
+  local admin templates (edc-model-admin)
+- set logout view to use default template. (edc-auth)
+- changes require you to run collectstatic and to clear
+  the cache on the browser to ensure jquery 3.6.0 loads.
+
+
+0.4.42
+------
+- drop mixin in favor of directly accessing func
+  `estimated_date_from_ago` (edc-dx-review)
+- fix signal attempting to delete unrleated action items
+  (edc-action-item)
+- remove code in AppConfig that auto creates export folders
+  (edc-export, edc-pdutils)
+- slight refactor (edc-timepoint)
+- clarify in exception message that edc-appointment has a reverse
+  relation to the related visit model (edc-appointment)
+- change blood result question prompt for field assay_datetime to
+  "Assay date and time" (edc-lab)
+- move save code to model method for consistency (edc-offstudy)
+- add additional unique_together constraint plus migration
+  (edc-appointment)
+- fix tests, test on py3.10 / DJ 4.1.1 primarily
+
+0.4.41
+------
+- add missing migration (edc-appointment)
+- fix import path (edc-glucose)
+
+0.4.40
+------
+- tighten up date validations across model/form/validators.
+- handle a number of regressions
+
+0.4.39
+------
+- update tests
+
+0.4.38
+------
+- update test models
+
+0.4.37
+------
+- handle a number of regressions
+- consolidate model managers and managers on model mixins
+  to make it easier to predict the _default_manager. Users
+  should add unitests to confirm concrete model classes
+  have the expected _default_manager (all with model mixins)
+- floor sec/microsec on datetimes when comparing in form
+  and form-validator validation (edc-appointment
+  edc-visit-schedule, edc-visit-tracking, edc-crf)
+- remove `SiteModelMixin` from default on/off schedule
+  model mixins. Add this mixin manually to the concrete
+  class.
+
+0.4.36
+------
+- add related visit methods to historical model (edc-model)
+- minor fixes to off/on schedule models
+
+0.4.35
+------
+- added base method to access offschedule_datetime, typing (edc-crf)
+- removed features/fields that create `next refill` on submission of
+  study medication report (edc-pharmacy)
+- trivial (edc-protocol-incident)
+- fixed issue that incorrectly compares int to str when confirming
+  that the grade from the user matches the grade from the evaluator
+  (edc-reportable)
+
+0.4.34
+------
+- rename module edc-protocol-deviation to edc-protocol-incident. This
+  requires manually renaming tables to reflect the app name and updating
+  the django_migration table app column with the new app name. Migrations
+  have been squashed for future users (edc-protocol-incident)
+- deprecate path form_validator_mixin for  form_validator_mixins
+  (edc-form-validator)
+
+0.4.31
+------
+- refactor modelform, model, and view mixins to derive subject_identifier,
+  report_datetime, related_visit_model_attr, related_visit in a consistent
+  manner. Changes added to most modules.
+  modules.
+- remove ContextMixin from view mixins. Add this to the concrete View.
+- add new typing hints in 3.10 style, convert existing ones to 3.10 style.
+- add form validation to compare user select grade with evaluated grade
+  (edc-reportable).
+- increase BMI upper bound to 75 (edc-reportable)
+- fix validation on modelform/validator mixin (edc-glucose)
+
+0.4.25
+------
+- fix issue where egfr calculator defaults to ethnicity = OTHER.
+- change rounding strategy (edc-utils and apps that round up).
+- add plural_name field to list models.
+
+0.4.24
+------
+- add data migrations to remove residual permissions
+  (edc-dashboard, edc-navbar).
+- minor update to group updater handling duplicates (edc-auth).
+
+0.4.21 - 0.4.23
+---------------
+- refactor `visit_model_attr` to `related_visit_model_attr`
+- refactor model mixin method `visit` to avoid conflict with same
+  method name used in edc-visit-schedule. Use `related_visit` to
+  return a visit model instance and `visit` to return a schedule
+  visit object.
+- introduce py3.10 typing style
+- remove visit code/sequence link between study medication reports
+  and pharmacy refills (edc-pharmacy)
+- fix issue with pharmacy codenames not appearing in pharmacy
+  groups (edc-pharmacy)
+- enforce use of end date for a pharmacy refill. Adjust dates
+  if a refill is inserted between scheduled visits (edc-pharmacy)
+- confirm a group exists before adding to a role (edc-auth)
+
+0.4.20
+------
+- remove tracking identifier from all modules
+- make action_identifier nullable and blank=True (edc-action-item)
+- update custom tuple
+
+0.4.19
+------
+- minor updates (edc-utils, edc-appointment, edc-consent)
+
+0.4.18
+------
+- store custom permissions in owner app. default model is now
+  <app_label>.edcpermissions. Move away from storing all custom
+  permissions in edc-dashboard and edc-navbar. clean up auths
+  modules (most modules)
+- update references to perms in templates and navbars
+- add context-processors for apps that own constants
+  (edc-appointment, edc-constants, edc-visit-tracking)
+- add dashboard middleware (edc_review_dashboard)
+- add system checks to enforce context processors
+
+
+0.4.17
+------
+- fix regression deepcopy/copy (edc_form_validators)
+- add migrations for modules with models that use action_identifier
+
+0.4.15
+------
+- hold back support for Django 4.1 (problems with m2m on admin page)
+- move imports out of root __init__ in edc_model_admin
+- override delete_confirmation.html in admin
+
+0.4.14
+------
+
+0.4.13
+------
+- update breadcrumbs and branding for admin templates (edc-model-admin)
+- update and add fontawesomefree to requirements
+- require "fontawesomefree" in INSTALLED_APPS
+- add theme variables thru "edc_model_admin.context_processors.admin_theme"
+  if added to TEMPLATES context_processor
+- add simple themes configured from settings.EDC_MODEL_ADMIN_CSS_THEME
+- add attr to TemplateModelAdminMixin to override view_on_site and history
+  labels in object-tools
+- add TEST/LIVE badge, site name and number to admin templates
+- improve navigation between admin and edc
+- change topbar on subject dashboard to always show subject identifier
+- register auth models with edc_auth_admin, update urls
+
+0.4.12
+------
+- add to admin list_display, update imports (edc-auth)
+- carry over required fields from randomizer to importer
+  to verifier (edc-randomization)
+
+0.4.11
+------
+- refactor randomizer, verify on every import, add assignment description map,
+  add system check to validate blinded user list (edc-randomization).
+- remove formatted html from verbose names (edc-glucose)
+- rename get_subject_screening_model_name to get_subject_screening_model
+  (edc-consent)
+- add ActionItemModelAdminMixin to BloodResultsModelAdminMixin (edc-lab-results)
+- update admin templates to have consistent topbar (edc-model-admin)
+- remove coerce to datetime with astype() (edc-pdutil)
+
+0.4.10
+-----
+- add admin mixin, weight param (edc-egfr)
+- add func to 'get' references name (edc-reportable)
+- minor changes to update imports / lint (edc-data-manager, edc-lab-results,
+  edc-action, edc-timepoint, edc-registration, edc-metadata, edc-crf, edc-action-item)
+
+0.4.9
+-----
+- bump edc-egfr
+
+0.4.8
+-----
+- move all eGFR code to edc-egfr module
+  (edc-egfr, edc-lab-results, edc-reportables)
+
+0.4.7
+-----
+- add pre-commit to changed modules, update tests
+
+0.4.6
+-----
+- fix minor issues with date timezone using gettz instead of ZoneInfo
+- enforce base timepoint in schedules, don't floor first timepoint
+  lower bound date for base visits (edc-visit-schedule)
+- add pre-commit to changed modules
+
+0.4.5
+-----
+- update more  modeladmin mixins to return tuples
+- add pre-commit to changed modules
+
+0.4.4
+-----
+- update more  modeladmin mixins to return tuples
+- add pre-commit to changed modules
+
+0.4.3
+-----
+- expect all modeladmin mixins to return tuples
+- add pre-commit to changed modules
+
+0.4.2
+-----
+- minimize use of arrow across all modules in favor of
+  get_utcnow() or datetime and ZoneInfo
+- gradually add pre-commit to changed modules
+- expand testing to py3.10/dj4.1
+- fix holiday using dict instead of model instance and queryset (edc-facility)
+
+0.4.1
+-----
+- fix permissions error when attempting to add an unscheduled appointment
+  (edc-appointment)
+- expect all modeladmin mixins to return tuples (edc-adverse-event)
+
+0.4.0
+-----
+- add site_id as param for simpleidentifier to use in migrations (edc-identifier)
+
+0.3.99
+------
+- fix ethinicty factor from 0.1.50 to 0.1.59 in 2009 CKI-GFR calculator (edc-reportable)
+- check permissions before creating unscheduled appointment (edc-appointment)
+- add quantifier as default field in result factory (edc-lab-panel
+- fix perms param not iterable in listboard (edc-dashboard)
+
+0.3.98
+------
+- add egfr_drop to rft panel (edc-lab-panel)
+- add egfr and egfr_drop to DAIDS and normal range;
+  fix egfr_percent func to return percents
+  (edc-reportables)
+- add subject_identifier attrs to modelform Meta
+  (edc-action-item)
+- add custom appt_datetime listfilter to appointment modeladmin
+  (edc-appointment)
+- add custom sites listfilter to user modeladmin (edc-auth,
+  edc-action-item))
+- remove support for sentry
+- move custom modelform fields to attrs on Meta (edc-adverse-event)
+
+0.3.97
+------
+- add fields `missing`, `missing_count` to blood result models to
+  be viewed in admin to track missing results within an instance.
+  Will trigger a schema migration for your project. You will need
+  to write a data migration to update existing records.
+  See also: meta_edc.meta_subject migration 0124.
+  (edc-lab-results)
+
+0.3.96
+------
+- add refresh button to subject dashboard, refreshes metadata for
+  the current visit (edc-subject-dashbaord)
+- fix date validation against report_datetime failing on inlines
+  (edc-model-admin)
+- add method for persistant singletons to predicate collection
+  (edc-metadata)
+
+0.3.95
+------
+- minor fixes to urls from admin changelist to subject dashboard
+  (edc-prn, edc-metadata)
+- add DATA MANAGER models to AUDITOR role
+- fix dashboard url from admin (edc-dashboard)
+- fix verbose name (edc-adherence)
+
+0.3.94
+------
+- bump django-simple-history add migrations
+- add BP funcs (edc-vitals)
+- improve refill/dispense calculations, rename stock/product
+  models (edc-pharmacy)
+
+0.3.93
+------
+- display message on changelist if data manager (edc-data-manager)
+- include subjectvisitmissed in REQUIRED CRFs when determining
+  completed CRFs (edc-metadata)
+- get subjectvisit from instance if not in cleaned data in
+  reporatbles form validator (edc-reportable)
+- accept site_id when creating simple identifier (edc-identifier)
+
+0.3.92
+------
+- is_baseline works for CRFs (edc-visit-schedule)
+- add calculator for egfr percent change (edc-reportable)
+- add protocol incident model (edc-protocol-violation)
+- not_applicable_if_true (edc-form-validators)
+- enforce a sensible appt_status on save (edc-appointment)
+
+
+0.3.91
+------
+- add missing install requires (edc-notification)
+
+0.3.90
+------
+- refactor some references to settings to do so thru funcs
+  (e.g. EDC_BOOTSTRAP)
+
+0.3.88
+------
+- interim release
+
+0.3.87
+------
+- fix validation issues with consent modelform mixins / validator
+  (edc-consent)
+
+0.3.86
+------
+- add migrations (edc-appointment,, edc-protocol-violation)
+- refactor paths in edc_model, fix references in other modules
+
+0.3.85
+------
+- rebuild edc-data-manager
+
+0.3.84
+------
+- refactor paths in edc_model, fix references in other modules
+
+0.3.83
+------
+- refactor paths in edc_model, fix references in other modules
+- add django-multisite-edc to install_requires, remove git+url
+- configure new build for more edc modules
+
+0.3.82
+------
+- improve context sensitive showing of subject dashboard's unscheduled appt
+  button (edc-appointment, edc-subject-dashboard)
+- reorder unscheduled appointments if a deletion breaks the sequence
+  (edc-appointment)
+- cascade changed appointment visit_code_sequence to subject visit and
+  crf/requisition metadata (edc-appointment, edc-visit-tracking)
+- declare metadata helper mixin as a model mixin also (edc-metadata)
+- add metadata helper to appointment and visit tracking models
+
+0.3.81
+------
+- remove dependencies: ipware, django-import-export
+
+0.3.80
+------
+- fix issues with test runners and install requires
+
+0.3.79
+------
+- improvements to handling of window period, duplicate appointment and visit dates, etc
+  (edc-appointment, edc-visit-tracking, edc-visit-schedule, edc-metadata)
+- improve handling of missed visits, ensure metadata-rules do not create
+  unwanted required forms when missed. (edc-metadata, edc-visit-tracking,
+  edc-apointment)
+- add appt_timing field (edc-appointment)
+- improve subject dashboard to always force user to validate data through
+  appointment and visit tracking forms, and other minor improvements
+  (edc-subject-dashboard, edc-metadata)
+- use _meta.get_fields instead of _meta.fields where found
+
+0.3.71
+------
+- auto-create subject-visit with reason=missed if appointment is missed
+  tighen up window period restriction
+  recalculate appointment dates relative to baseline appointment
+  (edc-appointment)
+- tighten up report datetime relative to the appointment
+  add window period checks (edc-visit-tracking)
+- add option to skip baseline when recalculating appointment dates
+  (edc-visit-schedule)
+- add _clean method to call default behaviour
+  fix module typo (edc-form-validators)
+- convert form date to utc to compare with db date (edc-crf)
+- fix issue with PRN metadata entry status (edc-metadata)
+- change build system (multiple modules)
+
+0.3.70
+------
+- add date validators relative to report_datetime (edc-form-validators)
+- fix not returning to subject dashboard after CRF delete
+  (edc-model-admin)
+- add form validator mixins for FBG abd OGTT (edc-glucose)
+
+0.3.69
+------
+- change fasting blood glucode abbreviation from ifg to fbg.
+  Affects field names (edc-glucose)
+- add date validator method much like model validator date funcs
+  (edc-form-validators)
+
+0.3.68
+------
+- rename IFG to FBG (edc-blood-result)
+- rename IFG to FBG, add model factory for FBG, add utestid as field
+  name prefix in factories and form validators (edc-glucose)
+- bump edc-pharmacy to 0.1.7
+
+0.3.67
+------
+- remove code in model save() duplicated in ScreeninEligibility class
+
+0.3.66
+------
+- move field class factory to edc-lab-panel (edc-blood-result)
+- add additional panels (edc-lab-panel)
+- add additional assertions for tests (edc-form-validator)
+- add model mixins for CRFs with requisitions (edc-lab)
+
+0.3.65
+------
+- correctly handle ranges in FC of eligibility (edc-screening)
+- update site ID from model in update_action_identifier (edc-action-item)
+- add minor (alter) migration (edc-auth, edc-export)
+- consider panel name when validating requisition metadata (edc-metadata)
+
+0.3.64
+------
+- add func to register actions (edc-action-item)
+
+0.3.63
+------
+- fix misspelled settings attr to EDC_LTFU_MODEL_NAME- (edc-ltfu)
+
+0.3.62
+------
+- add duration field class (edc-model)
+- add form validator asserts for tests (edc-form-validators)
+- enforce sid count for tests (edc-randomization)
+- add settings attr for severe HTN (edc-vitals)
+
+0.3.61
+------
+- add additional validation to eligibility base class (edc-screening)
+- change file not found exception to RandomizationListFileNotFound (edc-randomization)
+
+0.3.60
+------
+- add migrations and auths (edc-dx_review)
+
+
+0.3.59
+------
+- change screening eligibility mixin add abstract methods.
+  Review your code before upgrading.(edc-screening)
+- change auth group names. Review your code before
+  upgrading. (edc-randomization)
+- move auth objects to owner app from edc-auth (edc-auth and other apps)
+
+
+0.3.58
+------
+- edc-pharmacy models changed
+
+0.3.54
+------
+- fix issue when adding a RequisitionPanelGroup, instead of a RequisitionPanel, in LapProfile (edc-lab)
+
+0.3.53
+------
+- use objects manager, instead of _default_manager, on select PRN forms (edc-data-manager)
+- prevent add/edit access if site does not match current (edc-subject-dashboard)
+- add link to subject schedule history on Subject Review dashboard (edc-review-dashboard)
+
+0.3.52
+------
+- change options for dashboard url (edc-metadata)
+- methods to list visits for required forms (edc-visit-schedule)
+
+0.3.51
+------
+- calculate ALP, AST, Creatinine relative to ULN. (edc-reportable)
+- when registering references ranges with `site_reportables`
+  a new parameter can limit the list of reportable grades. Defaults to
+  grade3/4 only. (edc-reportable)
+- fix issue where assigning a role on User `add` raises
+  an ObjectDoesNotExist exception. (edc-auth)
+
+0.3.50
+------
+- add management command to update metadata (edc-metadata)
+
+0.3.49
+------
+- add groups to default roles from edc-auth (edc-screening, edc-offstudy)
+- refresh user roles as last step in AuthUpdater (edc-auth)
+- allow data manager to lock a generated data query that
+  cannot be resolved and should not be re-opened (edc-data-manager)
+
+0.3.48
+------
+- minor fixes to 0.3.47
+
+0.3.47
+------
+- add management command to update query rules (edc-data-manager)
+- fix metadata inspector to not filter on site ID.
+  Add management command to update metadata and run metadata rules
+  (edc-medadata)
+
+0.3.46
+------
+- fix looping on undistinct list when updateing query rules. Add management
+  command to run rules. Create query on save. (edc-data-manager)
+
+0.3.45
+------
+- remove custom "export" codenames
+
+0.3.44
+------
+- add and update auths config for edc modules. Move app specific objects
+  from edc_auth to edc_***.auths and edc_***.auth_objects (edc_auth)
+
+0.3.42
+------
+- add and update auths config for edc modules. Move app specific objects
+  from edc_auth to edc_***.auths and edc_***.auth_objects (edc_auth)
+
+0.3.41
+------
+- minor fixes
+
+0.3.40
+------
+- allow opt out of requisition if POC (edc-blood-results)
+- add extra fields as a separate model mixin for the death report
+  (edc-adverse-event)
+- add site_auth global to discover auths configurations in modules
+  instead of defining all permissions in edc-auth (edc-auth)
+- update edc modules to use new site_auth, auths.py (edc_xxx)
+- add edc-unblinding of models for managing blinding/unblinding
+  in RCTs (edc-unblinding)
+
+0.3.39
+------
+- add role for statistician (edc-auth)
+- add new module to handle vitals, BP, weight, height (edc-vitals)
+- refactor BMI/EGFR. fix syntax in uric acid string (edc-reportable)
+- get_by_model defaults to model randomizationlist (edc_randomization)
+- util to detect inline models (edc-model)
+- add grade and grade description field to capture result of realtime
+  assessment against reference list (edc-blood-results)
+- move APPT_REASON_CHOICES to form class to avoid triggering a
+  migration when using a custom set of CHOICES (edc-appointment)
+
+0.3.38
+------
+- model form mixin for inline CRFs (edc-crf)
+- bypass query updates for inline models (edc-data-manager)
+- allow required_if to access inline fields (edc-form-validators)
+- add util to detect inline models (edc-model)
+- model form mixin for parent form or inlines (edc-model-form)
+- move crf model mixin to edc-crf (edc-visit-tracking)
+
+0.3.37
+------
+- add back deprecated field class paths (edc-model)
+
+0.3.36
+------
+- add codenames for (edc-auth)
+- introduce edc-vitals, move `vitals` field classes from edc-model
+  to edc-vitals (edc-vitals)
+- bloodpressure model mixins for both single and double measurement.
+  Calculate average if two measurements. Use BMI for validation (edc-vitals)
+- Add models, etc for Insulin (edc-blood-results)
+- Add form validator to intercept errors from ConsentObject (edc-consent)
+- Add BP avg calculator to blood result mixin (edc-dx-review)
+- Add option N/A to glucose units (edc-glucose)
+- Add panel for insulin (edc-lab-panel)
+- make `check_loaded` a class method (edc-randomization)
+- remove code that passed on LookupError (edc-registration)
+- fix syntax error in uric-acid parse string, add dummy parser for
+  utest_ids without defined ranges, refactor BMI/EGFR calculators (edc-reportable)
+
+
+
+0.3.35
+------
+- remove `identity_or_pk` field from registered_subject (edc-registration)
+- improve edc-dx, edc-dx-review
+- several minor Q/A fixes
+- improve test coverage on some modules
+
+0.3.34
+------
+- raise on duplicates, replace default list data, remove unique
+  field update function (edc-list-data)
+
+0.3.33
+------
+- edc-adherence
+- edc-dx
+
+0.3.31
+------
+- access list imported through randomizer class, add methods that can be
+  overriden to add extra stratification criteria (edc-randomization)
+- get registered subject model by func (edc-registration)
+- add mcv, mch, mchc, amyl, chol, creat (edc-blood-results, edc-lab-panel)
+- refactor objects to use `ltfu` in naming (edc-ltfu)
+
+0.3.26
+------
+- improve field attr consistency for glucose, fasting, etc
+- improve form validators for glucose
+
+0.3.24
+------
+- add panel groups, add list of utest-ids to panels (edc-lab)
+- add edc-lab-panels, edc-blood-result dependencies
+
+0.3.22
+------
+- fix missing attr in AdminSite (edc-action-item)
+- get current schedule objects from current appointment
+  (edc-subject-dashboard, edc-subject-model-wrapper)
+- include Roles in AdminSite (edc-auth)
+
+0.3.18
+------
+- fix issue with setup.py (edc-model-admin)
+- add django-log-entry@master to requirements
+
+0.3.17
+------
+- default EDC adminsite to urls catch_all_view=False (edc-model-admin)
+- bump to Django 3.2
+
+0.3.16
+------
+- fix validation error in data query form (edc-data-manager)
+- update tests/test env. Add migration (edc-pharmacy)
+
+0.3.15
+------
+- fix inlines not showing edc custom submit row by making the modified inline
+  change_form.html the default for all forms (edc-model-admin)
+
+0.3.14
+------
+- fix to set screening identifier in one place only; ScreeningModelMixin
+  (edc-screening)
+- modify tox and gh-actions configs for py38, py39 and dj31, dj32 (all).
+- change default auto id to bigintautofield if not uuidautofield
+- add default_auto_field to apps config where needed (edc-export,
+  edc-sites, edc-data-manager)
+- add css for custom changelist buttons (edc-dashboard)
+
+0.3.12
+------
+- fix grade notification not emitting on grade escalation (edc-adverse-event)
+- expand model notification to consider C(r)UD operations (edc-notification)
+- subclass graded event notification from model notification (edc-notification)
+
+0.3.11
+------
+- minor
+
+0.3.8
+-----
+- start adding typing hints
+- merge edc-metadata-rules into edc-metadata
+- Django 3.1.7
+
+0.3.6
+-----
+- gh-actions, isort, black (for all requirements, the rest ...)
+
+0.3.5
+-----
+- add django-defender
+
+0.3.4
+-----
+- Django 3.1.6 (for all requirements)
+- gh-actions, isort, black (for all requirements)
+
+0.1.73
+------
+- bump to django 3.1.5
+
+0.1.72
+------
+- add migrations for model Meta class changes
+
+0.1.71
+------
+- add missing model Meta class inheritance (edc_action, edc-adverse-event)
+- load permissions through post-migrate (edc-auth)
+- load sites through post-migrate (edc-sites)
+- load lists through post-migrate (edc-list-data)
+- add LIST_MODEL_APP_LABEL settings attribute (edc-list-data)q
+- remove ugettext, force_text (several modules)
+
+0.1.68
+------
+- minor fixes
+
+0.1.65
+------
+- add ltfu_date to model mixin, form validator to check model
+  exists and date matches (edc-ltfu)
+- set action item as singleton (edc-offstudy)
+- fix assessment of current visit schedule / schedule for
+  view mixin (edc-visit-schedule)
+
+0.1.64
+------
+- track LTFU model in schedule, fix view detecting wrong schedule
+  if more than one exists (edc-visit-schedule)
+- fix incorrect action description, get next action using LTFU
+  model name (edc-visit-tracking)
+
+0.1.62
+------
+- fix required_if_true to equate blank and None (edc-form-validator)
+- fix issues with subjectvisitmissed validator (edc-visit-tracking)
+
+0.1.61
+------
+- add new requirement (edc-ltfu)
+
+0.1.60
+------
+- also inspect crfs_missed when querying CrfMetadata for subject
+  visit (edc-metadata)
+- add testcase methods for getting appointment and next appointment
+  (edc-appointment)
+- add subjectvisitmissed formvalidator mixin, model mixin, action item
+  (edc-visit-tracking)
+- more constants (edc-constants)
+- allow to opt-out of TMG workflow in actions, add attr for offschedule
+  reason field (edc-adverse-event)
+- add method `m2m_applicable_if_true` (edc-form-validators)
+- move load_list_data to function (edc-list-data)
+- refer to action by name using constant (edc-locator)
+- add slider widget and resources for adherence visual scale
+  (edc-model-fields)
+- add off study action item (edc-offstudy)
+- register CRFs listed in crfs_missed (edc-reference)
+
+
+
+
+
+0.1.59
+------
+- modify how facility selects an available appt date by changing the
+  order of precedence (edc-facility)
+- enforce window period defined on the visit object
+  from edc-visit-schedule (edc-appointment)
+- enforce window period using visit lower/upper for scheduled appointments
+  and lower as visit.lower and upper as next_visit.lower for
+  unscheduled appointments (edc-visit-schedule)
+- rename method `visit` to `visit_from_schedule` to avoid being overriden
+  by AppointmentModelMixin. Keep `visit` available as a wrapper for
+  `visit_from_schedule` (edc-visit-schedule)
+- add days, `d`, to duration YMD field and validation (edc-model)
+- add slider widget (edc-model)
+- add `in` operator to predicate evaluation (edc-metadata-rules)
+- default responses to `other` in m2m_other_specify (edc-form-validators)
+- add `export_format` to user profile (edc-auth)
+- remove `site` framework from model (edc-reference)
+
+
+0.1.56
+------
+- check metadata_obj exists when evaluating rule (edc-metadata-rule)
+
+0.1.54
+------
+- remove site framework from app (edc-reference)
+
+0.1.53
+------
+- carry site id from visit instance (edc-reference, edc-metadata)
+- raise exception if invalid visit code refered to (edc-appointment)
+- remove any code referring to unused reviewer site id (edc-sites)
+
+0.1.52
+------
+- query references using objects manager instead of on_site manager (edc-reference)
+- minor pep8 / code cleanup
+
+0.1.51
+------
+- hold at Django == 3.0.9
+- add export user (edc-auth)
+
+0.1.50
+------
+- hold at Django == 3.0.9
+- add manager migration (edc-appointment)
+
+0.1.48
+------
+- hold at Django == 3.0.9
+- minor, mostly tests and pep8
+- update interface to ipware (edc-device)
+- bypass validation for reason_unscheduled if not in cleaned data (edc-visit-tracking)
+
+0.1.47
+------
+- hold at Django == 3.0.9
+- add EDC_APPOINTMENT_APPT_REASON (edc-appointment)
+- preload list data in autodiscover instead of in app `list_data` files (edc-list-data)
+
+0.1.32
+------
+- evaluate actions on m2m-change (edc-action-item)
+- use `get_subject_visit` to get more reliably (edc-consent)
+- add m2m "not" other specify method (edc-form-validators)
+- use get visit model (edc-data-manager)
+- recover if metadata is out of sync (edc-metadata)
+
+0.1.30
+------
+- add crfs_missed to Visit object
+
+0.1.29
+------
+- fix minor issues with "export" permission updater (edc-auth)
+- fix "appointment_mark_as_done" admin action (edc-appointment)
+- increase systolic max for BP field class (edc-model)
+- add crf collection option for "missed" visits (edc-metadata)
+
+0.1.26
+------
+- update MANIFEST.in files in edc-auth, edc-crf
+- move fix for export permissions to edc-auth
+- add offschedule datetime to appointment export resource
+
+0.1.25
+------
+- minor fix (edc-model)
+
+0.1.24
+------
+- add "export" as a default permission to ``BaseUuidModelMixin.Meta`` (edc_model)
+- add ``CrfStatus`` model to track the ``crf_status`` of models using
+  the mixin (edc_crf)
+- add "export" as a default permission to ``CrfModelMixin.Meta`` (edc_crf)
+- fix change_list in CrfMetadata (edc_metadata)
+- add dashboard link to change_list, and admin action to bulk update ``appt_status``
+  (edc_appointment)
+- integrate ``django-import-export`` as a new dependency.
+- add ``export`` codenames to be referred to in change_list when
+  exporting using ``django-import-export`` (edc-auth)
+- add links to CRF metadata, CRF status, appointments in home template (edc_data_manager)
+- separate ``get_country`` and ``get_current_country`` into separate funcs (edc-sites)
+
+0.1.23
+------
+- add base.html and load lab specific css/js (edc-lab-dashboard)
+
+0.1.22
+------
+- in base.html, update bootstrap3 version to latest (edc-dashboard)
+- in base.html, update jquery 1 version to latest (edc-dashboard)
+- in base.html and overridden admin forms, update fontawesome (edc-dashboard, edc-model-admin)
+- in base.html, pull js and css from cdn (bootstrap/jquery) (edc-dashboard)
+- in base.html, remove unused js and css (edc-dashboard)
+- include minor migration (edc-data-manager)
+
+0.1.20
+------
+- additional constants/choices (edc-constants)
+- other very minor changes / formatting
+
+0.1.19
+------
+- add additional constants/choices (edc-constants)
+- other very minor changes / formatting
+
+0.1.18
+------
+- fix date comparison error when submitting requisitions that traced back to verifying
+  the report_datetime to the consent_datetime. (edc-consent)
+- raise a custom EDC exception if the DoB is not provided when calculating age. (edc-utils)
+
+0.1.17
+------
+- register `holiday` system checks to run on deploy only. Run the `check` management
+  command with the `--deploy` option. (edc-facility)
+- register `rando` checks to run on deploy only. Add utility to generate
+  dummy randomization list for trials that do not randomized at the patient
+  level. (edc-randomization)
+- raise an exception if settings.EDC_PROTOCOL_NUMBER is not set. (edc-protocol)
+- add `enrolment` codenames by default. Add `my` codenames used by ListView to
+  filter the queryset for records created by the current user only. (edc-auth)
+
+0.1.16
+------
+- improve handling of sites grouped by country. (edc-sites)
+- fix problem with exportables class that broke the export html page. (edc-export)
+
+0.1.15
+------
+- Add django's ``site`` and ``auth`` models to the list of exportable models. (edc-export)
+- Add edc_sites` model to the list of exportables. (edc-site)
+
+0.1.14
+------
+- minor bug fixes. (edc-sites, edc-facility)
+
+0.1.13
+------
+- change approach to multi-country, multi-site deployments to that of django-multisite.
+  Add ``django-multisite`` as a requirement.
+  Using erikvw/django-multisite until PR is accepted.
+- SITE_ID is now extracted from the site name in the url (django-multisite)
+- use SingleSite class to wrap site information (edc-sites)
+- get country and other site attributes from edc-sites class instead from settings (edc-facility)
+- fix model backend incorrectly referring to site_id instead of site.id (edc-auth)
+
+0.1.12
+------
+- add site utils for multi-country, multi-site deployments (edc-sites)
+- update all modules to get subject and screening identifier patterns from edc-protocol
+
+0.1.10
+------
+- fix model_mixin import in test app (edc-review-dashboard)
+- add `fasting` as a default field for normal and grading references (edc-reportable)
+- add back settings attribute to overwrite the default randomizer's assignment map, `EDC_RANDOMIZATION_ASSIGNMENT_MAP` (edc-randomization)
+
+0.1.9
+-----
+- `get_datetime_from_env` to convert env list to timezone-aware datetime
+  (edc-utils)
+- test on django 3 / python 3.8
+- add SUBJECT_SCREENING_MODEL settings attr used by, for example,
+  consent form validator mixin (edc-screening, edc-consent, edc-test-utils)
+- change to django-simple-history branch admin_revert_permissions2 (dj3)
+- simple-history modeladmin change_message (edc-model-admin)
+- removed dependency to django.utils.six in offline serializers (django-collect-offline)
