@@ -1,0 +1,22 @@
+#################################################################################
+##               -- Define the global execution context --                     ##
+#################################################################################
+# This file provides a complete context for using TanaT runner on admissions data.
+# Usage: 
+# - mkdir admissions
+# - cd admissions
+# - python3 -m tanat init ./config --with-preset
+# - python3 -m tanat run --config-path $PWD/config --config-name config_admissions
+#################################################################################
+
+BASE_OUTPUT_DIR: ./outputs
+defaults:
+- workflow: admissions
+- workenv: workenv_admissions
+- _self_
+hydra:
+  run:
+    dir: ${BASE_OUTPUT_DIR}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${BASE_OUTPUT_DIR}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: run-${hydra:job.num}
