@@ -1,0 +1,33 @@
+from encord_agents.core.dependencies.serverless import (
+    DAssetPath,
+    DEncordClient,
+    DObjectCrops,
+    DObjectsInstances,
+    DSingleFrame,
+    DStorageItem,
+    DVideoIterator,
+    dep_asset,
+    dep_client,
+    dep_object_crops,
+    dep_objects,
+    dep_single_frame,
+    dep_storage_item,
+    dep_video_iterator,
+)
+
+__all__ = [
+    "DAssetPath",
+    "dep_asset",
+    "DEncordClient",
+    "dep_client",
+    "DObjectCrops",
+    "dep_object_crops",
+    "DObjectsInstances",
+    "dep_objects",
+    "DSingleFrame",
+    "dep_single_frame",
+    "DStorageItem",
+    "dep_storage_item",
+    "DVideoIterator",
+    "dep_video_iterator",
+]
