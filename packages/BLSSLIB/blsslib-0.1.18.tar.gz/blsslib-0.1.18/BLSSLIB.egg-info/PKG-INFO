@@ -1,0 +1,36 @@
+Metadata-Version: 2.1
+Name: BLSSLIB
+Version: 0.1.18
+Summary: A Python library for encoding and decoding Build logic save data.
+Author: Back
+License: GPL-3.0-or-later
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+Functions
+BLSSLIB.DecodeBlockItem(raw:str) -> dict
+    - raw : is the raw string of a block item that is not in a save of any kind or is in relation to another block (ie it is not wired)
+
+    OUTPUT:
+    a python dict that contains the basic data of the block
+    id : its name in the game like block or EEPROM
+    position : the x y and z of the block if it is a multiblock then its made location ie form were it was placed from will be shown 
+    colour : the rgb colour (can some times not exist for components but this is for block only)
+    rotation : a chr showing the 1 ofr 24 rotation values
+
+BLSSLIB.DecodeBlockSave(save : str) -> list[dict[str:str]]
+    basicly splits by the ; and does the DecodeBlockItem on each block
+
+BLSSLIB.EncodeBlockItem(block:dict) -> str
+    does the opposit of the BLSSLIB.DecodeBlockItem()
+
+BLSSLIB.EncodeBlockSave(blocks:list[dict[str:str]]) -> str
+    taskes each dict of block data convets to save steign and adds a ; to it and repeat
+
+BLSSLIB.addEeprom8(data:list[int|str], world: list[dict[str:str]], position: tuple[int, int, int], rotation: str) -> dict
+    so takes in data that is converted into a eeprom at 0 0 0 with a function then it extracts the data part of the eeprom save and puts it in a new empty eeprom at position and rotation it also raises a error if the positon .. +1 to z .. ... .. +8 to z is any of those positon are alredy in the world (defined later)
+
+    world is a list of the dict of your decoded save you are likely to have this as when you decode a save you get a list of dict that you edit and use to sore the save to be further Encoded
