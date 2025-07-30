@@ -1,0 +1,557 @@
+import shutil
+import subprocess
+from datetime import datetime
+from pathlib import Path
+
+from cyclopts import App
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
+app = App(help="Gemini worktree management CLI")
+console = Console()
+
+
+def check_gitignore(repo_root: Path) -> bool:
+    """Check if .gemini-wt/worktrees is in .gitignore"""
+    gitignore_path = repo_root / ".gitignore"
+    if not gitignore_path.exists():
+        return False
+
+    gitignore_content = gitignore_path.read_text()
+    # Check for exact match or pattern that would include it
+    lines = [line.strip() for line in gitignore_content.split("\n")]
+
+    for line in lines:
+        if line in [
+            ".gemini-wt/worktrees",
+            ".gemini-wt/worktrees/",
+            ".gemini-wt/*",
+            ".gemini-wt/**",
+        ]:
+            return True
+
+    return False
+
+
+@app.command
+def new(
+    query: str = "",
+    branch: str = "",
+    name: str = "",
+):
+    """Create a new worktree and launch Gemini.
+
+    Parameters
+    ----------
+    query : str
+        Query to send to Gemini
+    branch : str
+        Source branch to create worktree from
+    name : str
+        Name suffix for the worktree branch
+    """
+    # Get repo root
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    repo_root = Path(result.stdout.strip())
+
+    # Check if .gemini-wt/worktrees is in .gitignore
+    if not check_gitignore(repo_root):
+        panel_content = """gemini creates worktrees in your repo at [cyan].gemini-wt/worktrees[/cyan].
+
+This directory must be added to .gitignore to prevent committing worktree data.
+
+[yellow]→[/yellow] Please run [bold]gemini init[/bold] to automatically add .gemini-wt/worktrees to .gitignore"""
+
+        console.print(
+            Panel(
+                panel_content,
+                title="[bold red]⚠️  Setup Required[/bold red]",
+                border_style="red",
+                width=60,
+            )
+        )
+        raise SystemExit(1)
+
+    # Get source branch (default to current branch)
+    if branch:
+        source_branch = branch
+    else:
+        result = subprocess.run(
+            ["git", "-C", str(repo_root), "branch", "--show-current"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        source_branch = result.stdout.strip()
+
+    # Sync with origin
+    subprocess.run(["git", "-C", str(repo_root), "fetch", "origin"], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo_root), "switch", "--quiet", source_branch], check=True
+    )
+    subprocess.run(
+        ["git", "-C", str(repo_root), "pull", "--ff-only", "--quiet"], check=True
+    )
+
+    # Generate worktree branch name
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    suffix = name or timestamp
+    branch_name = f"gemini-wt-{suffix}"
+
+    # Create branch if needed
+    try:
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo_root),
+                "show-ref",
+                "--verify",
+                "--quiet",
+                f"refs/heads/{branch_name}",
+            ],
+            check=True,
+        )
+    except subprocess.CalledProcessError:
+        subprocess.run(
+            ["git", "-C", str(repo_root), "branch", branch_name, source_branch],
+            check=True,
+        )
+
+    # Setup worktree path
+    wt_path = repo_root / ".gemini-wt" / "worktrees" / branch_name
+    wt_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Create worktree if needed
+    if not wt_path.exists():
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo_root),
+                "worktree",
+                "add",
+                "--quiet",
+                str(wt_path),
+                branch_name,
+            ],
+            check=True,
+        )
+
+    # Print helpful info
+    panel_content = f"""[dim]Source branch:[/dim] [cyan]{source_branch}[/cyan]
+
+[green]🟢 Resume this session:[/green] [bold]gemini-wt resume {suffix}[/bold]
+[blue]🧹 Delete this session:[/blue] [bold]gemini-wt clean {suffix}[/bold]
+[red]🧨 Delete all sessions:[/red] [bold]gemini-wt clean --all[/bold]"""
+
+    console.print(
+        Panel(
+            panel_content,
+            title="[bold cyan]Session Created[/bold cyan]",
+            border_style="cyan",
+            expand=False,
+        )
+    )
+
+    # Launch Gemini
+    gemini_path = shutil.which("gemini")
+    if not gemini_path:
+        console.print("[red]Error: gemini not found[/red]")
+        raise SystemExit(1)
+    gemini_cmd = [gemini_path]
+    if query:
+        gemini_cmd.extend(["--prompt", query])
+
+    subprocess.run(gemini_cmd, cwd=wt_path, check=True)
+
+
+@app.command
+def resume(branch_name: str):
+    """Resume an existing worktree session.
+
+    Parameters
+    ----------
+    branch_name : str
+        Branch name to resume
+    """
+    try:
+        # Get repo root
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        repo_root = Path(result.stdout.strip())
+
+        # Find worktree path using git
+        full_branch_name = f"gemini-{branch_name}"
+        result = subprocess.run(
+            ["git", "-C", str(repo_root), "worktree", "list", "--porcelain"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        # Parse worktree list to find the matching branch
+        wt_path = None
+        current_wt = {}
+        for line in result.stdout.split("\n"):
+            if line.startswith("worktree "):
+                if current_wt and current_wt.get("branch") == full_branch_name:
+                    wt_path = Path(current_wt["path"])
+                    break
+                current_wt = {"path": line[9:]}
+            elif line.startswith("branch "):
+                current_wt["branch"] = line[7:]
+
+        # Check the last worktree entry
+        if current_wt and current_wt.get("branch") == full_branch_name:
+            wt_path = Path(current_wt["path"])
+
+        if not wt_path or not wt_path.exists():
+            console.print(
+                f"[red]Error: Worktree for branch '{branch_name}' not found[/red]"
+            )
+            raise SystemExit(1)
+
+        console.print(
+            f"[yellow]🔄 Resuming session for branch:[/yellow] [bold]{branch_name}[/bold]"
+        )
+
+        gemini_path = shutil.which("gemini")
+        if not gemini_path:
+            console.print("[red]Error: gemini not found[/red]")
+            raise SystemExit(1)
+        gemini_cmd = [gemini_path]
+        subprocess.run(["cd", str(wt_path)], check=True)
+        subprocess.run(gemini_cmd)
+
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise SystemExit(1)
+    except Exception as e:
+        console.print(f"[red]Unexpected error: {e}[/red]")
+        raise SystemExit(1)
+
+
+@app.command
+def clean(
+    branch_name: str = "",
+    all: bool = False,
+):
+    """Delete gemini worktrees and branches.
+
+    Parameters
+    ----------
+    branch_name : str
+        Specific branch to clean
+    all : bool
+        Clean all gemini sessions
+    """
+    try:
+        # Require either branch_name or --all
+        if not branch_name and not all:
+            console.print(
+                "[red]Error: Must specify either a branch name or --all flag[/red]"
+            )
+            raise SystemExit(1)
+
+        if branch_name and all:
+            console.print(
+                "[red]Error: Cannot specify both branch name and --all flag[/red]"
+            )
+            raise SystemExit(1)
+
+        # Get repo root
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        repo_root = Path(result.stdout.strip())
+        wt_root = repo_root / ".gemini-wt" / "worktrees"
+
+        if branch_name:
+            # Clean specific branch
+            full_branch_name = f"gemini-{branch_name}"
+            wt_path = wt_root / full_branch_name
+
+            # Remove worktree
+            if wt_path.exists():
+                subprocess.run(
+                    [
+                        "git",
+                        "-C",
+                        str(repo_root),
+                        "worktree",
+                        "remove",
+                        "--force",
+                        str(wt_path),
+                    ],
+                    check=True,
+                )
+                console.print(f"[green]✅ Removed worktree:[/green] {wt_path}")
+
+            # Delete branch
+            try:
+                subprocess.run(
+                    ["git", "-C", str(repo_root), "branch", "-D", full_branch_name],
+                    check=True,
+                )
+                console.print(f"[green]✅ Deleted branch:[/green] {full_branch_name}")
+            except subprocess.CalledProcessError:
+                console.print(
+                    f"[yellow]⚠️  Branch {full_branch_name} not found[/yellow]"
+                )
+        else:
+            # Clean all gemini branches/worktrees
+            with console.status("[bold cyan]Cleaning all gemini sessions..."):
+                # Get all worktrees from git and remove gemini ones
+                console.print("[cyan]Removing gemini worktrees...[/cyan]")
+                try:
+                    result = subprocess.run(
+                        [
+                            "git",
+                            "-C",
+                            str(repo_root),
+                            "worktree",
+                            "list",
+                            "--porcelain",
+                        ],
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    )
+
+                    # Parse worktree list to find gemini worktrees
+                    worktrees = []
+                    current_wt = {}
+                    for line in result.stdout.split("\n"):
+                        if line.startswith("worktree "):
+                            if current_wt:
+                                worktrees.append(current_wt)
+                            current_wt = {"path": line[9:]}
+                        elif line.startswith("branch "):
+                            current_wt["branch"] = line[7:]
+                    if current_wt:
+                        worktrees.append(current_wt)
+
+                    # Remove gemini worktrees
+                    for wt in worktrees:
+                        branch_name = wt.get("branch", "")
+                        if branch_name.startswith("gemini-"):
+                            try:
+                                subprocess.run(
+                                    [
+                                        "git",
+                                        "-C",
+                                        str(repo_root),
+                                        "worktree",
+                                        "remove",
+                                        "--force",
+                                        wt["path"],
+                                    ],
+                                    check=True,
+                                )
+                                console.print(
+                                    f"  [green]✅ Removed {branch_name}[/green]"
+                                )
+                            except subprocess.CalledProcessError:
+                                console.print(
+                                    f"  [red]❌ Failed to remove {branch_name}[/red]"
+                                )
+                except subprocess.CalledProcessError:
+                    console.print("  [yellow]No worktrees found[/yellow]")
+
+                # Delete branches
+                console.print("[cyan]Deleting gemini branches...[/cyan]")
+                try:
+                    result = subprocess.run(
+                        [
+                            "git",
+                            "-C",
+                            str(repo_root),
+                            "branch",
+                            "--list",
+                            "gemini-*",
+                        ],
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    )
+                    branches = [
+                        b.strip().lstrip("* ")
+                        for b in result.stdout.split("\n")
+                        if b.strip()
+                    ]
+
+                    for branch in branches:
+                        if branch:
+                            try:
+                                subprocess.run(
+                                    [
+                                        "git",
+                                        "-C",
+                                        str(repo_root),
+                                        "branch",
+                                        "-D",
+                                        branch,
+                                    ],
+                                    check=True,
+                                )
+                                console.print(
+                                    f"  [green]✅ Deleted branch {branch}[/green]"
+                                )
+                            except subprocess.CalledProcessError:
+                                console.print(
+                                    f"  [red]❌ Failed to delete branch {branch}[/red]"
+                                )
+                except subprocess.CalledProcessError:
+                    console.print("  [yellow]No gemini-* branches found[/yellow]")
+
+            console.print("[green bold]🧹 Cleanup complete![/green bold]")
+
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise SystemExit(1)
+    except Exception as e:
+        console.print(f"[red]Unexpected error: {e}[/red]")
+        raise SystemExit(1)
+
+
+@app.command
+def list():
+    """List all gemini worktrees."""
+    try:
+        # Get repo root
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        repo_root = Path(result.stdout.strip())
+        repo_name = repo_root.name
+
+        # Get all worktrees from git
+        result = subprocess.run(
+            ["git", "-C", str(repo_root), "worktree", "list", "--porcelain"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        # Parse worktree list output
+        worktrees = []
+        current_wt = {}
+        for line in result.stdout.split("\n"):
+            if line.startswith("worktree "):
+                if current_wt:
+                    worktrees.append(current_wt)
+                current_wt = {"path": line[9:]}  # Remove 'worktree ' prefix
+            elif line.startswith("branch "):
+                current_wt["branch"] = line[7:]  # Remove 'branch ' prefix
+        if current_wt:
+            worktrees.append(current_wt)
+
+        # Filter for gemini worktrees
+        gemini_worktrees = [
+            wt for wt in worktrees if wt.get("branch", "").startswith("gemini-")
+        ]
+
+        if not gemini_worktrees:
+            console.print("[yellow]No gemini worktrees found.[/yellow]")
+            return
+
+        # Create table
+        table = Table(title=f"gemini worktrees for [bold cyan]{repo_name}[/bold cyan]")
+        table.add_column("Status", style="green", justify="center")
+        table.add_column("Session", style="cyan", min_width=15)
+        table.add_column("Path", style="dim", overflow="fold")
+
+        for wt in sorted(gemini_worktrees, key=lambda x: x.get("branch", "")):
+            branch_name = wt.get("branch", "")
+            suffix = branch_name.replace("gemini-", "")
+            wt_path = wt["path"]
+
+            # Check if worktree path still exists
+            status = "[green]✅[/green]" if Path(wt_path).exists() else "[red]❌[/red]"
+
+            table.add_row(status, suffix, wt_path)
+
+        console.print(table)
+
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise SystemExit(1)
+    except Exception as e:
+        console.print(f"[red]Unexpected error: {e}[/red]")
+        raise SystemExit(1)
+
+
+@app.command
+def init():
+    """Initialize gemini for this repository."""
+    try:
+        # Get repo root
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        repo_root = Path(result.stdout.strip())
+
+        # Check if already in gitignore
+        if check_gitignore(repo_root):
+            console.print(
+                "[green]✅ .gemini-wt/worktrees is already in .gitignore[/green]"
+            )
+            return
+
+        gitignore_path = repo_root / ".gitignore"
+
+        # Read existing content
+        if gitignore_path.exists():
+            existing_content = gitignore_path.read_text()
+            # Add a newline if the file doesn't end with one
+            if existing_content and not existing_content.endswith("\n"):
+                existing_content += "\n"
+        else:
+            existing_content = ""
+
+        # Add the ignore entry
+        new_content = (
+            existing_content + "\n# Gemini worktree management\n.gemini-wt/worktrees\n"
+        )
+
+        # Write back to file
+        gitignore_path.write_text(new_content)
+
+        console.print("[green]✅ Added .gemini-wt/worktrees to .gitignore[/green]")
+
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise SystemExit(1)
+    except Exception as e:
+        console.print(f"[red]Unexpected error: {e}[/red]")
+        raise SystemExit(1)
+
+
+@app.command
+def version():
+    """Show version information."""
+    console.print("gemini 0.1.0")
+
+
+if __name__ == "__main__":
+    app()
