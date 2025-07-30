@@ -1,0 +1,373 @@
+Used rule collections:
+BSI rule collection, STRIDE rule collection
+
+29 threats have been found. (21 different threats and a total of 4 involved
+locations)
+
+#1 Threat source: Hashing of Passwords
+
+             Description: Passwords must be hashed
+        Long Description: According to guidelines CON.8.A5, CON.10.A7,
+                          APP.3.1.A14, and APP.3.2.A5 of the
+                          IT-Grundschutzkompendium, passwords stored on the
+                          server MUST be stored using a secure salted hash
+                          algorithm. According to the BSI Technical Guideline
+                          TR-02102, these include: SHA-256, SHA-512/256,
+                          SHA-384, SHA-512, SHA3-256, SHA3-384, SHA3-512.
+       Mitigation Option: Check that one of the recommended hashing methods is
+                          used
+             Requirement: Hash function: one of {SHA3_256, SHA3_384, SHA3_512,
+                          SHA_256, SHA_384, SHA_512, SHA_512_256}
+               Locations:
+                          Database:
+                            Attribute missing: Stores credentials
+                            Attribute missing: Hash function
+                          Management State: Undecided
+
+
+#2 Threat source: Encryption of Confidential Data
+
+             Description: Confidential data must be encrypted
+        Long Description: According to the IT-Grundschutzkompendium guidelines
+                          CON.8.A5, CON.10.A18, APP.4.3.A24, and SYS.1.8.A23,
+                          confidential data SHOULD be encrypted using a secure
+                          cryptographic method. These include: AES-128, AES-192,
+                          and AES-256.
+       Mitigation Option: Check that one of the recommended encryption methods
+                          is used
+             Requirement: Encryption method: one of {AES_128, AES_192, AES_256}
+               Locations:
+                          Database:
+                            Attribute missing: Handles confidential data
+                            Attribute missing: Encryption method
+                          Management State: Undecided
+
+
+#3 Threat source: Authentication Protocols for SAN fabric
+
+             Description: Ensuring storage integrity through secure protocols
+        Long Description: To ensure the integrity of the storage solution,
+                          protocols with additional security features SHOULD be
+                          used and configured accordingly. Following the
+                          guideline SYS.1.8.A24 of the IT-Grundschutzkompendium,
+                          these include: DH-CHAP, FCAP, FCPAP.
+       Mitigation Option: Check that one of the recommended protocols is used
+             Requirement: Authentication protocol: one of {DH_CHAP, FCAP, FCPAP}
+               Locations:
+                          Database:
+                            Attribute missing: Is SAN fabric
+                            Attribute missing: Authentication protocol
+                          Management State: Undecided
+
+
+#4 Threat source: Multi Factor Authentication
+
+             Description: Multi-factor authentication
+        Long Description: If authentication is required according to guidelines
+                          CON.10.A16, APP.3.1.A1, and CON.8.A5 of the
+                          IT-Grundschutzkompendium, the list of authentication
+                          factors SHOULD include two or more elements.
+       Mitigation Option: Add authentication factors
+             Requirement: Authentication factors: count >= 2
+               Locations:
+                          Database:
+                            Attribute missing: Requires authentication
+                            Attribute missing: Authentication factors
+                          Management State: Undecided
+
+                          Application:
+                            Attribute missing: Requires authentication
+                            Attribute missing: Authentication factors
+                          Management State: Undecided
+
+
+#5 Threat source: Multi Factor Authentication for High Security
+
+             Description: Authentication factors for high security requirements
+        Long Description: If high security requirements exist, secure
+                          multi-factor authentication SHOULD be used in
+                          accordance with the guidelines ORP.4.A21 and CON.8.A5
+                          of the IT-Grundschutzkompendium. For example, with
+                          cryptographic certificates, chip cards, or tokens.
+       Mitigation Option: Add authentication factors
+             Requirement: Authentication factors: one of {PIN, OTP, Biometric
+                          Data, Digital Certificate, Chip Card, Security Token}
+               Locations:
+                          Database:
+                            Attribute missing: Handles confidential data
+                            Attribute missing: Authentication factors
+                            Attribute missing: Requires authentication
+                          Management State: Undecided
+
+                          Application:
+                            Attribute missing: Handles confidential data
+                            Attribute missing: Authentication factors
+                            Attribute missing: Requires authentication
+                          Management State: Undecided
+
+
+#6 Threat source: Least Privileges
+
+             Description: Only grant necessary permissions
+        Long Description: Processes MUST be able to be executed with the fewest
+                          possible privileges in accordance with guideline
+                          CON.8.A5 of the IT-Grundschutzkompendium. Users SHOULD
+                          only be granted the authorizations necessary to
+                          perform their tasks.
+       Mitigation Option: Check whether all granted rights are necessary
+             Requirement: Required permissions same as Given permissions
+               Locations:
+                          User:
+                            Attribute missing: Required permissions
+                            Attribute missing: Given permissions
+                          Management State: Undecided
+
+                          Application:
+                            Attribute missing: Required permissions
+                            Attribute missing: Given permissions
+                          Management State: Undecided
+
+
+#7 Threat source: Input Validation
+
+             Description: Input validation
+        Long Description: According to the guidelines CON.8.A5 and CON.10.A8 of
+                          the IT-Grundschutzkompendium, all input data, data
+                          streams, and secondary data, such as session IDs, MUST
+                          be validated on the server side.
+       Mitigation Option: Validate all input data
+             Requirement: Input data and Input validation
+               Locations:
+                          Application:
+                            Attribute missing: Input data
+                            Attribute missing: Input validation
+                          Management State: Undecided
+
+
+#8 Threat source: Signature of Logging Data
+
+             Description: Digital signature for logging data
+        Long Description: According to guideline OPS.1.1.5.A12 of the BSI
+                          IT-Grundschutzkompendium, stored logging data SHOULD
+                          be digitally signed. The recommended signature methods
+                          according to BSI's Technical Guideline TR-02102
+                          include: RSA, DSA, ECDSA, ECKDSA, ECGDSA, XMSS, and
+                          LMS.
+       Mitigation Option: Verify that logging data is signed using a recommended
+                          method
+             Requirement: Signature scheme: one of {DSA, ECDSA, ECGDSA, ECKDSA,
+                          LMS, RSA, XMSS}
+               Locations:
+                          Database:
+                            Attribute missing: Handles logs
+                            Attribute missing: Signature scheme
+                          Management State: Undecided
+
+
+#9 Threat source: Untrustworthy Data Flow
+
+             Description: Transport protocol for connections outside the trust
+                          boundary
+        Long Description: According to guidelines APP.3.2.A11 and NET.1.1.A7 of
+                          the BSI IT-Grundschutzkompendium, a secure transport
+                          protocol, such as TLS, MUST be used to maintain data
+                          confidentiality if a data flows is crossing a trust
+                          boundary.
+       Mitigation Option: Employ TLS
+             Requirement: Transport protocol: one of {HTTPS, TLS 1.2, TLS 1.3}
+               Locations:
+                          http_request: User -> Database:
+                            Attribute missing: Transport protocol
+                          Management State: Undecided
+
+
+#10 Threat source: Secure HTTP Configuration
+
+             Description: Secure HTTP configuration for web applications
+        Long Description: According to guidelines CON.10.A14, APP.3.1.A21 of the
+                          BSI IT-Grundschutzkompendium, suitable HTTP response
+                          headers SHOULD be used to protect against
+                          clickjacking, cross-site scripting, and other attacks.
+                          At least Content-Security-Policy,
+                          Strict-Transport-Security, Content-Type,
+                          X-Content-Options, and Cache-Control. The HTTP headers
+                          SHOULD be tailored to the web application and SHOULD
+                          be as restrictive as possible.
+       Mitigation Option: Check that all required HTTP response headers are set
+             Requirement: HTTP header: all of {Content Security Policy, Strict
+                          Transport Security, Content Type, X Content Options,
+                          Cache Control}
+               Locations:
+                          http_request: User -> Database:
+                            Attribute missing: Transport protocol
+                            Attribute missing: HTTP header
+                          Management State: Undecided
+
+
+#11 Threat source: Integrity of External Entities
+
+             Description: Integrity check of external elements
+        Long Description: According to guideline CON.8.A20 of the BSI
+                          IT-Grundschutzkompendium, external components and data
+                          from external elements MUST be checked for their
+                          integrity and vulnerabilities. Integrity MUST be
+                          verified using checksums or cryptographic
+                          certificates. Outdated versions of external components
+                          SHOULD NOT be used.
+       Mitigation Option: Use checksums or digital certificates to verify
+                          integrity
+             Requirement: Integrity check: one of {check sum, digital
+                          certificate, ECDSA}
+               Locations:
+                          http_request: User -> Database:
+                            Attribute missing: Integrity check
+                          Management State: Undecided
+
+
+#12 Threat source: Use of Proxies
+
+             Description: Use of TLS/SSL proxies
+        Long Description: According to guideline DER.1.A10 of the BSI
+                          IT-Grundschutzkompendium, TLS/SSL proxies SHOULD be
+                          deployed at the gateways to external networks to check
+                          transmitted data for malware. These proxies SHOULD be
+                          protected against unauthorized access.
+                          Security-relevant events SHOULD be detected
+                          automatically.
+       Mitigation Option: Employ proxies
+             Requirement: Uses proxy = True
+               Locations:
+                          http_request: User -> Database:
+                            Attribute missing: Uses proxy
+                          Management State: Undecided
+
+
+#13 Threat source: Generic Spoofing Node Rule
+
+             Description: Generic Spoofing Threat
+        Long Description: Spoofing refers to the attack where an adversary gains
+                          unauthorized access to data or a system by falsifying
+                          their identity and pretending to be a trusted contact.
+                          The threat violates the property of authenticity.
+               Locations:
+                          User:
+                          Management State: Undecided
+
+                          Application:
+                          Management State: Undecided
+
+
+#14 Threat source: Generic Tampering Node Rule
+
+             Description: Generic Tampering Threat
+        Long Description: Tampering refers to the unlawful modification of data
+                          or systems so that they pose a danger to normal users.
+                          The threat violates the property of integrity.
+               Locations:
+                          Database:
+                          Management State: Undecided
+
+                          Application:
+                          Management State: Undecided
+
+
+#15 Threat source: Generic Repudiation Node Rule
+
+             Description: Generic Repudiation Threat
+        Long Description: Repudiation refers to the threat where a contact does
+                          not claim responsibility and rejects the confession of
+                          a certain act like modifying data. The threat violates
+                          the property of non-repudiability.
+               Locations:
+                          User:
+                          Management State: Undecided
+
+                          Application:
+                          Management State: Undecided
+
+
+#16 Threat source: Generic Information Disclosure Node Rule
+
+             Description: Generic Information Disclosure Threat
+        Long Description: Information disclosure refers to the threat where data
+                          leaves the confines of its supposed authority scope
+                          and unauthorized contacts can access it. The threat
+                          violates the property of confidentiality.
+               Locations:
+                          Database:
+                          Management State: Undecided
+
+                          Application:
+                          Management State: Undecided
+
+
+#17 Threat source: Generic Denial of Service Node Rule
+
+             Description: Generic Denial of Service Threat
+        Long Description: Denial of service refers to the threat of maliciously
+                          overloading the resources of the system with the
+                          intent of harming usability and making services
+                          unavailable. The thrat violates the property of
+                          availability.
+               Locations:
+                          Database:
+                          Management State: Undecided
+
+                          Application:
+                          Management State: Undecided
+
+
+#18 Threat source: Generic Elevation of Privilege Node Rule
+
+             Description: Generic Elevation of Privilege Threat
+        Long Description: Elevation of privilege refers to the threat where an
+                          adversary can gain unlawful authorization to systems
+                          or data by escalating their level of privileges by
+                          exploiting bugs or gaps in security. The threat
+                          violates the property of authorization.
+               Locations:
+                          Application:
+                          Management State: Undecided
+
+
+#19 Threat source: Generic Tampering Dataflow Rule
+
+             Description: Generic Tampering Threat
+        Long Description: Tampering refers to the unlawful modification of data
+                          or systems so that they pose a danger to normal users.
+                          The threat violates the property of integrity.
+               Locations:
+                          http_request: User -> Database:
+                          Management State: Undecided
+
+
+#20 Threat source: Generic Information Disclosure Dataflow Rule
+
+             Description: Generic Information Disclosure Threat
+        Long Description: Information disclosure refers to the threat where data
+                          leaves the confines of its supposed authority scope
+                          and unauthorized contacts can access it. The threat
+                          violates the property of confidentiality.
+               Locations:
+                          http_request: User -> Database:
+                          Management State: Undecided
+
+
+#21 Threat source: Generic Denial of Service Dataflow Rule
+
+             Description: Generic Denial of Service Threat
+        Long Description: Denial of service refers to the threat of maliciously
+                          overloading the resources of the system with the
+                          intent of harming usability and making services
+                          unavailable. The thrat violates the property of
+                          availability.
+               Locations:
+                          http_request: User -> Database:
+                          Management State: Undecided
+
+
+References:
+
+BSI IT-Grundschutzkompendium checklist:
+https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Grundschutz/IT-GS-Kompendiu-
+m/checklisten_2023.html
