@@ -1,0 +1,173 @@
+/* toolbox.css */
+
+.toolbox-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.toolbox-panel {
+    background-color: white;
+    border: 2px solid #cccccc;
+    border-radius: 3rem;
+    padding: 2rem;
+    position: absolute;
+    width: max-content;
+    min-width: 180px;
+    max-width: 250px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    right: 100%;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 12px;
+}
+
+.toolbox-panel::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #d1d5db;
+}
+
+.toolbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+}
+
+.toolbox-group::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background-color: #d1d5db;
+}
+
+
+.toolbox-row-full,
+.toolbox-row-split {
+    display: flex;
+    width: 100%;
+    padding: 3px 0px;
+    margin: 0;
+    gap: 10px;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.toolbox-row-split > * {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.toolbox-row-full > * {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.toolbox-row-split .report-button,
+.toolbox-row-split .toolbox-input,
+.toolbox-row-split .toolbox-selector  {
+    width: 100%;
+    min-width: 0;
+}
+
+.toolbox-toggle-button {
+    padding: 10px 0px;
+    width: 100%;
+    height: auto;
+    writing-mode: vertical-lr;
+    transform-origin: bottom left;
+    font-weight: 600;
+    background-color: #f0f0f0;
+    color: black;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0;
+    font-size: 12px;
+}
+
+.toolbox-toggle-button:hover {
+    background-color: #e5e7eb;
+}
+
+.show {
+    display: block !important;
+    opacity: 1;
+}
+
+.hide {
+    display: none;
+}
+
+
+/* buttons and selectors in the toolbox */
+.report-button,
+.toolbox-input,
+.toolbox-selector {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    font-weight: normal;
+    height: 28px;
+    line-height: 1;
+    white-space: nowrap;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.report-button:hover {
+    cursor: pointer;
+    border-color: #999;
+    box-shadow: 0 0 4px rgba(102, 175, 233, 0.5);
+}
+
+.report-button-active {
+    background: linear-gradient(to right, #cccccc, #d4d4d4);
+}
+
+.toolbox-selector {
+    cursor: pointer;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3Csvg fill='black' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
+    padding-right: 2rem;
+}
+.toolbox-selector:hover {
+    border-color: #999;
+    box-shadow: 0 0 4px rgba(102, 175, 233, 0.5);
+}
+
+.toolbox-input:hover {
+    cursor: text;
+    border-color: #999;
+    box-shadow: 0 0 4px rgba(102, 175, 233, 0.5);
+}
+
+.toolbox-input[type="number"]::-webkit-inner-spin-button,
+.toolbox-input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
