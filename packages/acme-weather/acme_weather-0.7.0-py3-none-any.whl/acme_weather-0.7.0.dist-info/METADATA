@@ -1,0 +1,84 @@
+Metadata-Version: 2.4
+Name: acme-weather
+Version: 0.7.0
+Summary: Add your description here
+Project-URL: Documentation, https://github.com/philion/clw#readme
+Project-URL: Issues, https://github.com/philion/clw/issues
+Project-URL: Source, https://github.com/philion/clw
+License-File: LICENSE
+Requires-Python: >=3.13
+Requires-Dist: astral>=3.2
+Requires-Dist: numpy>=2.2.3
+Requires-Dist: openmeteo-requests>=1.3.0
+Requires-Dist: pandas>=2.2.3
+Requires-Dist: pex>=2.33.1
+Requires-Dist: pillow>=10.4.0
+Requires-Dist: requests-cache>=1.2.1
+Requires-Dist: requests>=2.32.3
+Requires-Dist: retry-requests>=2.0.0
+Requires-Dist: textual-dev>=1.7.0
+Requires-Dist: textual-image>=0.7.0
+Requires-Dist: textual>=1.0.0
+Description-Content-Type: text/markdown
+
+An experiement with weather and sunrise times.
+
+## tl;dr
+```
+uvx acme-weather
+```
+
+## Run
+
+Currently using `uv` for development. See [uv install instructions](https://docs.astral.sh/uv/getting-started/installation/)
+
+```sh
+git clone https://github.com/philion/clw
+cd clw
+uv run clw
+```
+
+![screenshot of clw tool showing the 12 hour weather forecast](./screenshot.png)
+
+
+## Build
+
+Standard [uv build and publish](https://docs.astral.sh/uv/guides/projects/) tools are used.
+
+```
+cd clw
+uv build
+# insert testing here
+uv publish
+```
+
+To make `uv publish` smooth, I set the env var `UV_PUBLISH_TOKEN` with a valid PyPI token:
+```
+export UV_PUBLISH_TOKEN=pypi-yourReallyLongPyPIPublishingToken
+```
+
+## To Do
+
+Current near-term implementation plans:
+- [x] day-or-night based on sun rise/set times
+- [ ] clean up visuals, provide external CSS
+- [x] published to PyPI - https://pypi.org/project/acme-weather/
+- [x] commandline app packaging with uv support
+- [ ] add release management, to bump version, test and publish
+- [ ] visual high and low temps: hottest, hot, warm, average, cool, cold, coldest
+- [ ] visual percipitation ???
+- [ ] add moon rise, zenith, set and phase
+- [ ] add icons for dawn, sunrise, noon, sunset, dusk
+- [ ] add images overlay for weather + sun/moon states
+- [ ] better text-only *report*
+- [ ] 15-minute version
+- [ ] live-update mini-version
+- [ ] standard set of widgets for [Textual](https://github.com/Textualize/textual)
+
+### Thoughts on build automation
+
+1. work in dev branch (or any)
+2. completed pr/merge in `main` triggers **publish** pipline
+3. bump version, build, test publish.
+
+On commit or merge to and non-main branch, just run validate pipeline: test, coverage, format, ruff, etc.
