@@ -1,0 +1,19 @@
+#IMPORTING THE LIBRARY FROM THE SOURCE.
+#SECOND INSTALL REQUIREMENTS:
+1. MATPLOTLIB
+2. MATH
+
+#THIRD SYNTAX USAGE:
+1. ENTER SADU
+2. ENTER UNCERTAINTY
+3. ENTER QUANTUM OSCILLATORS
+4. CHOOSE THE FUNCTION OF DESIRE
+
+#EXAMPLE:
+from SaduQuantumFinance import QuantumOscillators
+QuantumOscillators.WaveFunction('***arguments***) #OR ANY FUNCTION OF DESIRE.
+
+OR
+
+from SaduQuantumFinance import QuantumOscillators as SPT
+SPT.WaveFunction('***arguments***) #OR ANY FUNCTION OF DESIRE.
