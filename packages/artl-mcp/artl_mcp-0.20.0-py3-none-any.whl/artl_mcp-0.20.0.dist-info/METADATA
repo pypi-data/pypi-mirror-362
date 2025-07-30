@@ -1,0 +1,107 @@
+Metadata-Version: 2.4
+Name: artl-mcp
+Version: 0.20.0
+Summary: PydanticAI and MCP approaches for getting textual representations of scientific literature from PMIDs, DOIs, etc.
+Project-URL: Homepage, https://github.com/contextualizer-ai/artl-mcp
+Project-URL: Repository, https://github.com/contextualizer-ai/artl-mcp
+Project-URL: Issues, https://github.com/contextualizer-ai/artl-mcp/issues
+Project-URL: Documentation, https://github.com/contextualizer-ai/artl-mcp#readme
+Author-email: Mark Andrew Miller <MAM@lbl.gov>, Justin Reese <justaddcoffee@gmail.com>
+License: MIT
+License-File: LICENSE
+Keywords: doi,mcp,pmid,pubmed,scientific-literature
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.11
+Requires-Dist: beautifulsoup4>=4.9.0
+Requires-Dist: fastmcp>=2.8.1
+Requires-Dist: lxml>=4.6.0
+Requires-Dist: pdfminer-six>=20250506
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: requests>=2.25.0
+Description-Content-Type: text/markdown
+
+# All Roads to Literature
+
+An MCP for retrieving scientific literature metadata and content using PMIDs, DOIs, and other identifiers.
+
+## Features
+
+- Retrieve metadata for scientific articles using DOIs
+- Fetch abstracts from PubMed using PMIDs
+- MCP-based architecture for easy extensibility
+
+## Installation
+
+### Prerequisites
+
+- Python 3.11 or higher
+- uv (optional but recommended)
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/all-roads-to-literature.git
+   cd all-roads-to-literature
+   ```
+
+2. Install with uv (recommended):
+   ```bash
+   uv venv
+   uv pip install -e .
+   ```
+
+   Or with standard pip:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install -e .
+   ```
+
+## Usage
+
+### Starting the MCP Server
+
+To start the MCP server (default behavior):
+
+```bash
+uv run artl-mcp
+```
+
+This starts the server by default. The server provides access to all registered tools through FastMCP's interface.
+
+### CLI Usage
+
+You can also use the tool directly from the command line:
+
+```bash
+# Search for PMIDs by keywords
+uv run artl-mcp --pmid-search "machine learning" --max-results 10
+
+# Query DOI directly
+uv run artl-mcp --doi-query "10.1099/ijsem.0.005153"
+```
+
+### Running the Tests
+
+```bash
+uv run pytest tests/
+```
+
+## Architecture
+
+The project follows this structure:
+
+- `main.py`: Entry point that creates and configures the MCP server
+- `tools.py`: Contains the tool implementations that the MCP server exposes
+
+
