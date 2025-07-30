@@ -1,0 +1,39 @@
+
+#include <stdint.h>
+
+#include "include/forward.hpp"
+
+// Layer & memory configurations
+{% for header in headers -%}
+{%- if header.startswith('"') or header.startswith('<') %}
+#include {{ header }}
+{%- else %}
+#include "{{ header }}"
+{%- endif %}
+{%- endfor %}
+
+// Memory block
+{%- if mem_section == None %}
+static unsigned char mem[{{peak_mem}}];
+{%- else %}
+static unsigned char mem[{{peak_mem}}] __attribute__((section("{{ mem_section }}")));
+{%- endif %}
+
+{# Forward function #}
+{#- Support multiple inputs with different datatypes and multiple outputs with different datatypes -#}
+void {{ func_name }} (
+    {%- for i in range(inputs_name | length) -%}
+    const {{ inputs_dtype[i] }}* {{ inputs_name[i] }},
+    {%- endfor -%}
+    {%- for o in range(outputs_name | length) -%}
+    {{ outputs_dtype[o] }}** {{ outputs_name[o] }}_ptr{% if not loop.last %}, {% endif %}
+    {%- endfor -%})
+{
+    {%- for action in actions %}
+    {{ action }}
+    {%- endfor %}
+
+    {%- for output_name in outputs_name %}
+    *{{ output_name }}_ptr = {{ output_name }};
+    {%- endfor %}
+}

@@ -1,0 +1,12 @@
+#ifndef EXPORT_ATTRIBUTES_{{name|upper}}_H
+#define EXPORT_ATTRIBUTES_{{name|upper}}_H
+
+{%- set half_length = (begin_end_borders|length / 2)|int -%}
+{% for i in range(half_length) %}
+#define _{{name|upper}}_BEGIN_BORDERS_{{i}}  {{begin_end_borders[2*i]}}
+#define _{{name|upper}}_END_BORDERS_{{i}}  {{begin_end_borders[2*i+1]}}
+{%- endfor %}
+#define _{{name|upper}}_BORDER_TYPE {{border_type|int}}
+#define _{{name|upper}}_BORDER_VALUE {{border_value}}
+
+#endif /* EXPORT_ATTRIBUTES_{{name|upper}}_H */

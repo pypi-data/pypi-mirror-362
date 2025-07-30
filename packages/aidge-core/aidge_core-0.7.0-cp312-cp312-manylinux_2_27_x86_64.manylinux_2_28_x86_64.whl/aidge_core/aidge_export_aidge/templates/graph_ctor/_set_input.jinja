@@ -1,0 +1,7 @@
+{# NOTE: Trying a shorter notation like {%- for input in inputs if input[0] %}
+will mess up loop.index as the input set up at None will not increment ! #}
+{%- for input_node, out_id in node.inputs() %}
+{%- if input_node %}
+{{input_node.name()}}->addChild({{name}}, {{out_id}}, {{loop.index - 1}}); {# NOTE: loop.index begin at 1 #}
+{%- endif %}
+{%- endfor %}

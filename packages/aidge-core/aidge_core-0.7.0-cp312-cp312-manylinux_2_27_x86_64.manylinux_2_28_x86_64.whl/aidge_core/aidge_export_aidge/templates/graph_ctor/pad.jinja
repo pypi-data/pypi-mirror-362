@@ -1,0 +1,17 @@
+{% filter indent(width=4, first=False) %}
+/*** {{name|upper}} ***/
+{%- set half_length = (begin_end_borders|length / 2)|int -%}
+std::shared_ptr<Aidge::Node> {{name}} =
+        Aidge::Pad<{{half_length}}>(
+            {
+            {%- for i in range(half_length) -%}
+                _{{name|upper}}_BEGIN_BORDERS_{{i}},  _{{name|upper}}_END_BORDERS_{{i}} {%- if not loop.last %}, {% endif -%}
+            {%- endfor -%}
+            },
+            "{{name}}",
+             static_cast<Aidge::PadBorderType>(_{{name|upper}}_BORDER_TYPE),
+             _{{name|upper}}_BORDER_VALUE
+        );
+{% include "./_set_input.jinja" %}
+graph->add({{name}});
+{% endfilter %}
