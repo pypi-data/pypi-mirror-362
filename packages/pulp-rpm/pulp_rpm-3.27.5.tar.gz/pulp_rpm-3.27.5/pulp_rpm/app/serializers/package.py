@@ -1,0 +1,371 @@
+import logging
+import traceback
+from gettext import gettext as _
+
+from pulpcore.plugin.serializers import (
+    ContentChecksumSerializer,
+    SingleArtifactContentUploadSerializer,
+)
+from pulpcore.plugin.util import get_domain_pk
+from rest_framework import serializers
+from pulp_rpm.app.fields import CustomJSONField
+from rest_framework.exceptions import NotAcceptable
+
+from pulp_rpm.app.models import Package
+from pulp_rpm.app.shared_utils import format_nvra, read_crpackage_from_artifact
+
+log = logging.getLogger(__name__)
+
+
+class PackageSerializer(SingleArtifactContentUploadSerializer, ContentChecksumSerializer):
+    """
+    A Serializer for Package.
+
+    Add serializers for the new fields defined in Package and add those fields to the Meta class
+    keeping fields from the parent class as well. Provide help_text.
+    """
+
+    name = serializers.CharField(
+        help_text=_("Name of the package"),
+        read_only=True,
+    )
+    epoch = serializers.CharField(
+        help_text=_("The package's epoch"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    version = serializers.CharField(
+        help_text=_("The version of the package. For example, '2.8.0'"),
+        read_only=True,
+    )
+    release = serializers.CharField(
+        help_text=_("The release of a particular version of the package. e.g. '1.el7' or '3.f24'"),
+        read_only=True,
+    )
+    arch = serializers.CharField(
+        help_text=_(
+            "The target architecture for a package." "For example, 'x86_64', 'i686', or 'noarch'"
+        ),
+        read_only=True,
+    )
+
+    pkgId = serializers.CharField(
+        help_text=_("Checksum of the package file"),
+        read_only=True,
+    )
+    checksum_type = serializers.CharField(
+        help_text=_("Type of checksum, e.g. 'sha256', 'md5'"),
+        read_only=True,
+    )
+
+    summary = serializers.CharField(
+        help_text=_("Short description of the packaged software"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    description = serializers.CharField(
+        help_text=_("In-depth description of the packaged software"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    url = serializers.CharField(
+        help_text=_("URL with more information about the packaged software"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+
+    changelogs = CustomJSONField(
+        help_text=_("Changelogs that package contains"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+    files = CustomJSONField(
+        help_text=_("Files that package contains"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+
+    requires = CustomJSONField(
+        help_text=_("Capabilities the package requires"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+    provides = CustomJSONField(
+        help_text=_("Capabilities the package provides"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+    conflicts = CustomJSONField(
+        help_text=_("Capabilities the package conflicts"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+    obsoletes = CustomJSONField(
+        help_text=_("Capabilities the package obsoletes"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+    suggests = CustomJSONField(
+        help_text=_("Capabilities the package suggests"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+    enhances = CustomJSONField(
+        help_text=_("Capabilities the package enhances"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+    recommends = CustomJSONField(
+        help_text=_("Capabilities the package recommends"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+    supplements = CustomJSONField(
+        help_text=_("Capabilities the package supplements"),
+        default="[]",
+        required=False,
+        read_only=True,
+    )
+
+    location_base = serializers.CharField(
+        help_text=_("Base location of this package"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    location_href = serializers.CharField(
+        help_text=_("Relative location of package to the repodata"),
+        read_only=True,
+    )
+
+    rpm_buildhost = serializers.CharField(
+        help_text=_("Hostname of the system that built the package"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    rpm_group = serializers.CharField(
+        help_text=_("RPM group (See: http://fedoraproject.org/wiki/RPMGroups)"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    rpm_license = serializers.CharField(
+        help_text=_("License term applicable to the package software (GPLv2, etc.)"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    rpm_packager = serializers.CharField(
+        help_text=_("Person or persons responsible for creating the package"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    rpm_sourcerpm = serializers.CharField(
+        help_text=_("Name of the source package (srpm) the package was built from"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    rpm_vendor = serializers.CharField(
+        help_text=_("Name of the organization that produced the package"),
+        allow_blank=True,
+        required=False,
+        read_only=True,
+    )
+    rpm_header_start = serializers.IntegerField(
+        help_text=_("First byte of the header"),
+        read_only=True,
+    )
+    rpm_header_end = serializers.IntegerField(
+        help_text=_("Last byte of the header"),
+        read_only=True,
+    )
+    is_modular = serializers.BooleanField(
+        help_text=_("Flag to identify if the package is modular"),
+        required=False,
+        read_only=True,
+    )
+
+    size_archive = serializers.IntegerField(
+        help_text=_("Size, in bytes, of the archive portion of the original package file"),
+        read_only=True,
+    )
+    size_installed = serializers.IntegerField(
+        help_text=_("Total size, in bytes, of every file installed by this package"),
+        read_only=True,
+    )
+    size_package = serializers.IntegerField(
+        help_text=_("Size, in bytes, of the package"),
+        read_only=True,
+    )
+
+    time_build = serializers.IntegerField(
+        help_text=_("Time the package was built in seconds since the epoch"),
+        read_only=True,
+    )
+    time_file = serializers.IntegerField(
+        help_text=_(
+            "The 'file' time attribute in the primary XML - "
+            "file mtime in seconds since the epoch."
+        ),
+        read_only=True,
+    )
+
+    def __init__(self, *args, **kwargs):
+        """Initializer for RpmPackageSerializer."""
+
+        super().__init__(*args, **kwargs)
+        if "relative_path" in self.fields:
+            self.fields["relative_path"].required = False
+
+    def deferred_validate(self, data):
+        """
+        Validate the rpm package data.
+
+        Args:
+            data (dict): Data to be validated
+
+        Returns:
+            dict: Data that has been validated
+
+        """
+        data = super().deferred_validate(data)
+        # export META from rpm and prepare dict as saveable format
+        try:
+            new_pkg = Package.createrepo_to_dict(read_crpackage_from_artifact(data["artifact"]))
+        except OSError:
+            log.info(traceback.format_exc())
+            raise NotAcceptable(detail="RPM file cannot be parsed for metadata")
+
+        filename = (
+            format_nvra(
+                new_pkg["name"],
+                new_pkg["version"],
+                new_pkg["release"],
+                new_pkg["arch"],
+            )
+            + ".rpm"
+        )
+        if not data.get("relative_path"):
+            data["relative_path"] = filename
+            new_pkg["location_href"] = filename
+        else:
+            new_pkg["location_href"] = data["relative_path"]
+
+        data.update(new_pkg)
+        return data
+
+    def retrieve(self, validated_data):
+        return Package.objects.filter(
+            pkgId=validated_data["pkgId"],
+            pulp_domain=get_domain_pk(),
+        ).first()
+
+    class Meta:
+        fields = (
+            ContentChecksumSerializer.Meta.fields
+            + SingleArtifactContentUploadSerializer.Meta.fields
+            + (
+                "name",
+                "epoch",
+                "version",
+                "release",
+                "arch",
+                "pkgId",
+                "checksum_type",
+                "summary",
+                "description",
+                "url",
+                "changelogs",
+                "files",
+                "requires",
+                "provides",
+                "conflicts",
+                "obsoletes",
+                "suggests",
+                "enhances",
+                "recommends",
+                "supplements",
+                "location_base",
+                "location_href",
+                "rpm_buildhost",
+                "rpm_group",
+                "rpm_license",
+                "rpm_packager",
+                "rpm_sourcerpm",
+                "rpm_vendor",
+                "rpm_header_start",
+                "rpm_header_end",
+                "is_modular",
+                "size_archive",
+                "size_installed",
+                "size_package",
+                "time_build",
+                "time_file",
+            )
+        )
+        model = Package
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        sign_package = self.context.get("sign_package", None)
+        # choose branch, if not set externally
+        if sign_package is None:
+            sign_package = bool(
+                validated_data.get("repository")
+                and validated_data["repository"].package_signing_service
+            )
+            self.context["sign_package"] = sign_package
+
+        # normal branch
+        if sign_package is False:
+            return validated_data
+
+        # signing branch
+        if not validated_data["repository"].package_signing_fingerprint:
+            raise serializers.ValidationError(
+                _(
+                    "To sign a package on upload, the associated Repository must set both"
+                    "'package_signing_service' and 'package_signing_fingerprint'."
+                )
+            )
+
+        if not validated_data.get("file") and not validated_data.get("upload"):
+            raise serializers.ValidationError(
+                _("To sign a package on upload, a file or upload must be provided.")
+            )
+
+        return validated_data
+
+
+class MinimalPackageSerializer(PackageSerializer):
+    """
+    A minimal serializer for RPM packages.
+    """
+
+    class Meta:
+        fields = SingleArtifactContentUploadSerializer.Meta.fields + (
+            "name",
+            "epoch",
+            "version",
+            "release",
+            "arch",
+            "pkgId",
+            "checksum_type",
+        )
+        model = Package
