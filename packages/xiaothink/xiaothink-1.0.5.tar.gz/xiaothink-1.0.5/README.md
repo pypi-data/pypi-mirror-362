@@ -1,0 +1,118 @@
+# Xiaothink Python 模块使用文档
+
+Xiaothink 是一个以自然语言处理（NLP）为核心的AI研究组织，致力于提供高效、灵活的工具来满足各种应用场景的需求。Xiaothink Python 模块是该组织提供的核心工具包，涵盖了图像生成、文本续写、颜值评分以及对话模型等多种功能。以下是详细的使用指南和代码示例。
+
+## 目录
+1. [安装](#安装)
+2. [本地对话模型](#本地对话模型)
+
+---
+
+## 安装
+
+首先，您需要通过 pip 安装 Xiaothink 模块：
+
+```bash
+pip install xiaothink
+```
+
+---
+
+## 注：由于业务范围调整，2025年7月17日后，小思框架将暂停所有WebAI服务，转向端侧AI模型领域研究，本代码库也同步删除相关接口。
+
+
+## 本地对话模型
+
+对于本地加载的对话模型，根据模型类型的不同，应调用相应的函数来进行对话。
+
+### 单轮对话
+
+适用于单轮对话场景。
+
+### 示例代码
+
+```python
+import xiaothink.llm.inference.test_formal as tf
+
+model = tf.QianyanModel(
+    ckpt_dir=r'path/to/your/t6_model',
+    MT='t6_beta_dense',
+    vocab=r'path/to/your/vocab'# vocab文件在模型储存库中已给出
+)
+
+while True:
+    inp = input('【问】：')
+    if inp == '[CLEAN]':
+        print('【清空上下文】\n\n')
+        model.clean_his()
+        continue
+    re = model.chat_SingleTurn(inp, temp=0.32)  # 使用 chat_SingleTurn 进行单轮对话
+    print('\n【答】：', re, '\n')
+```
+
+### 多轮对话
+
+适用于多轮对话场景。
+
+### 示例代码
+
+```python
+import xiaothink.llm.inference.test_formal as tf
+
+model = tf.QianyanModel(
+    ckpt_dir=r'path/to/your/t6_model',
+    MT='t6_beta_dense',
+    vocab=r'path/to/your/vocab'# vocab文件在模型储存库中已给出
+)
+
+while True:
+    inp = input('【问】：')
+    if inp == '[CLEAN]':
+        print('【清空上下文】\n\n')
+        model.clean_his()
+        continue
+    re = model.chat(inp, temp=0.32)  # 使用 chat 进行单轮对话
+    print('\n【答】：', re, '\n')
+```
+
+
+
+### 文本续写
+
+适用于更灵活的文本续写场景
+
+### 示例代码
+
+
+```python
+import xiaothink.llm.inference.test as test
+
+MT = 't6_beta_dense'
+m, d = test.load(
+    ckpt_dir=r'path/to/your/t6_model',
+    MT='t6_beta_dense',
+    vocab=r'path/to/your/vocab'# vocab文件在模型储存库中已给出
+)
+
+
+
+
+
+inp='你好！'
+belle_chat = '{"conversations": [{"role": "user", "content": {inp}}, {"role": "assistant", "content": "'.replace('{inp}', inp)    # t6系列中经过指令微调的模型支持的instruct格式
+inp_m = belle_chat
+
+ret = test.generate_texts_loop(m, d, inp_m,    
+                               num_generate=100,
+                               every=lambda a: print(a, end='', flush=True),
+                               temperature=0.32,
+                               pass_char=['▩'])    #▩是t6系列模型的<unk>标识
+```
+
+**重要提示**：对于本地模型，单论对话模型应调用 `model.chat_SingleTurn` 函数，多轮对话模型应调用 `model.chat` 函数，未进行指令微调的预训练模型模型建议调用 `model.chat` 函数。
+
+---
+
+以上就是 Xiaothink Python 模块的主要功能及使用方法。
+
+如有任何疑问或建议，请随时联系我们：xiaothink@foxmail.com。
