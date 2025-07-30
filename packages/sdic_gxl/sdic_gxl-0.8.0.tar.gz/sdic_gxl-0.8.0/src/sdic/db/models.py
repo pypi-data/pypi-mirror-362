@@ -1,0 +1,467 @@
+from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy import Column, String, Date, DateTime, Integer, TIMESTAMP, PrimaryKeyConstraint, Float, ForeignKey
+
+from .base import Base
+
+
+class F330ProjListed(Base):
+    """
+    上市项目收益表
+    """
+    __tablename__ = 'F330_PROJ_LISTED'
+    __table_args__ = (
+        PrimaryKeyConstraint('日期', '投资ID', '基金ID'),
+        {'schema': 'DWP_FIA'}
+    )
+    日期 = Column(Date)
+    上证指数 = Column(Float)
+    首批拨付日期 = Column(Date)
+    投资ID = Column(String(96))
+    项目简称 = Column(String(300))
+    基金ID = Column(String(600))
+    基金名称 = Column(String(150))
+    团队ID = Column(String(90))
+    团队 = Column(String(600))
+    行业 = Column(String(4000))
+    项目证券化 = Column(String(1500))
+    初始持股数量 = Column(Float)
+    初始成本单价 = Column(Float)
+    初始成本 = Column(Float)
+    现金股利_发生 = Column(Float)
+    现金股利_累计 = Column(Float)
+    股票股利_累计 = Column(Float)
+    股票股利_发生值 = Column(Float)
+    变动_调整后成本 = Column(Float)
+    减持_减持股数_发生 = Column(Float)
+    减持_减持股数_累计 = Column(Float)
+    减持_减持收入额_发生 = Column(Float)
+    减持_减持收入额_累计 = Column(Float)
+    减持_解禁日期 = Column(Date)
+    减持_转出金额_发生 = Column(Float)
+    减持_转出金额 = Column(Float)
+    减持_成本_发生 = Column(Float)
+    减持_成本 = Column(Float)
+    减持_收益额_发生 = Column(Float)
+    减持_收益额 = Column(Float)
+    减持_收益率 = Column(Float)
+    减持_减持股数占比 = Column(Float)
+    减持_收回占成本比 = Column(Float)
+    持有股数 = Column(Float)
+    收盘价 = Column(Float)
+    持仓市值 = Column(Float)
+    收益额 = Column(Float)
+    综合收益率 = Column(Float)
+    IRR = Column(Float)
+    UP_DATE = Column(TIMESTAMP)
+    汇率 = Column(Float)
+    减持_上市日期 = Column(Date)
+    证券代码 = Column(String(10))
+
+
+class DIMInvestProject(Base):
+    """
+    投资项目维度表
+    """
+    __tablename__ = 'DIM_INVEST_PROJECT'
+    __table_args__ = (
+        {'schema': 'DWP_FIA'}
+    )
+    FD_ID = Column(String(256), primary_key=True, nullable=False)
+    FD_SHOR_NAME = Column(String(256))
+    FD_ITEM_CODE = Column(String(256))
+    FD_PROJECT_SCALE = Column(String(256))
+    FD_INVESTMENT_TYPE = Column(String(256))
+    FD_PROJECT_PHASE = Column(String(256))
+    DIM_PROJECT_PHASE_CODE = Column(String(256))
+    DIM_PROJECT_PHASE_NAME = Column(String(256))
+    FD_INVESTMENT_ROUNDS_ID = Column(String(256))
+    DIM_INVEST_ROUND_FD_NAME = Column(String(256))
+    FD_INVESTMENT_STATUS = Column(String(256))
+    FD_FINANC_TIME = Column(TIMESTAMP(6))
+    FD_INVESTMENT_VALUATION = Column(String(256))
+    FD_IS_CONTROL = Column(Integer)
+    FD_PROJECT_PROVIDER = Column(String(256))
+    FD_IS_LISTE = Column(Integer)
+    FD_ORG_PROJECT_PROVIDER = Column(String(256))
+    FD_STOCK_CODE = Column(String(256))
+    FD_CONTROLL_SHAREHOLDER = Column(String(256))
+    FD_C_S_TYPE = Column(String(256))
+    FD_ACTUAL_CONTROLLER = Column(String(256))
+    FD_IS_SM_ENTERPRISE = Column(Integer)
+    FD_IS_HT_ENTERPRISE = Column(Integer)
+    FD_IS_ST_ENTERPRISE = Column(Integer)
+    FD_IS_ENJOY_POLICIES = Column(Integer)
+    COMPANY_INTRODUCTION = Column(String(4000))
+    DOC_STATUS = Column(String(256))
+    DOC_SUBJECT = Column(String(256))
+    FD_UNIFIED_CODE = Column(String(256))
+    FD_LEGAL_PERSON = Column(String(256))
+    FD_REGISTERE_CAPITAL = Column(String(256))
+    FD_REGISTRATION_TIME = Column(TIMESTAMP(6))
+    FD_ENTERPRISE_ID = Column(String(256))
+    DIM_ENTERPRISE_FD_EE_NAME = Column(String(256))
+    DIM_ENTERPRISE_FD_UNIFIED_CODE = Column(String(256))
+    DIM_ENTERPRISE_FD_TYPE = Column(String(256))
+    DIM_ENTERPRISE_FD_LEGAL_PERSON = Column(String(256))
+    DIM_ENTERPRISE_FD_REGISTERE_CAPITAL = Column(String(256))
+    DIM_ENTERPRISE_FD_REGISTRATION_TIME = Column(TIMESTAMP(6))
+    DIM_ENTERPRISE_FD_BUSINESS_START_DATE = Column(TIMESTAMP(6))
+    DIM_ENTERPRISE_FD_BUSINESS_CLOS_DATE = Column(TIMESTAMP(6))
+    DIM_ENTERPRISE_FD_STANDARD_DATE = Column(TIMESTAMP(6))
+    DIM_ENTERPRISE_FD_IN_INDUSTRY = Column(String(256))
+    DIM_ENTERPRISE_FD_ADDRESS = Column(String(256))
+    DIM_ENTERPRISE_FD_BUSINESS_SCOPE = Column(String(4000))
+    DIM_ENTERPRISE_FD_IS_PROJECT = Column(Integer)
+    FD_PROJECT_MANAGE_ID = Column(String(256))
+    DIM_MEMBER_FD_NAME = Column(String(256))
+    FD_DEPT_ID = Column(String(256))
+    DIM_INVEST_TEAM_TEAM_NAME = Column(String(256))
+    DIM_INVEST_TEAM_FD_THIS_LEADERID = Column(String(256))
+    DIM_INVEST_TEAM_THIS_FD_NAME = Column(String(256))
+    DIM_INVEST_TEAM_FD_SUPER_LEADERID = Column(String(256))
+    DIM_INVEST_TEAM_SUPER_FD_NAME = Column(String(256))
+    FD_INVESTMENT_STAGE_ID = Column(String(256))
+    DIM_INVEST_STAGE_FD_NAME = Column(String(256))
+    FD_IS_LEAD_INVESTMENT_ID = Column(String(256))
+    FD_INVESTMENT_THEME_ID = Column(String(256))
+    DIM_INVEST_THEME_FD_NAME = Column(String(256))
+    FD_CURRENCY_ID = Column(String(256))
+    FD_INVESTMENT_STAGE_FUNDIA_ID = Column(String(256))
+    DIM_INVEST_STAGE_FUND_FD_NAME = Column(String(256))
+    FD_INVESTMENT_NATURE_ID = Column(String(256))
+    DIM_INVESTMENT_NATURE_FD_NAME = Column(String(256))
+    FD_PROJECT_TYPE_ID = Column(String(256))
+    DIM_PROJECT_TYPE_NAME = Column(String(256))
+    FD_FOCUS_CATEGORY_ID = Column(String(256))
+    FD_PROJECT_SOURCE_ID = Column(String(256))
+    DIM_PROJECT_SOURCE_FD_NAME = Column(String(256))
+    FD_ORG_ID = Column(String(256))
+    FD_PARTNER_ID = Column(String(256))
+    DIM_HZDX_FD_NAME = Column(String(256))
+    FD_INDUSTRY_CHAIN_ID = Column(String(256))
+    DIM_INDUSTRY_CHAIN_FD_NAME = Column(String(256))
+    FD_REGISTRATION_AREA_ID = Column(String(256))
+    DIM_REGISTER_ADDR_FD_NAME = Column(String(256))
+    FD_ENTERPRISE_NATURE_ID = Column(String(256))
+    DIM_ENTERPRISE_NATURE_FD_NAME = Column(String(256))
+    FD_REGISTRATION_PLACE_ID = Column(String(256))
+    FD_N_S_INDUSTRY_ID = Column(String(256))
+    DIM_INDUSTRY_STANDARD_LVL1_ID = Column(String(256))
+    DIM_INDUSTRY_STANDARD_LVL1_NAME = Column(String(256))
+    DIM_INDUSTRY_STANDARD_LVL2_ID = Column(String(256))
+    DIM_INDUSTRY_STANDARD_LVL2_NAME = Column(String(256))
+    DIM_INDUSTRY_STANDARD_LVL3_ID = Column(String(256))
+    DIM_INDUSTRY_STANDARD_LVL3_NAME = Column(String(256))
+    DIM_INDUSTRY_STANDARD_LVL4_ID = Column(String(256))
+    DIM_INDUSTRY_STANDARD_LVL4_NAME = Column(String(256))
+    DIM_INDUSTRY_STANDARD_NAME = Column(String(256))
+    FD_SW_INDUSTRY_ID = Column(String(256))
+    DIM_SW_INDUSTRY_LVL1_ID = Column(String(256))
+    DIM_SW_INDUSTRY_LVL1_NAME = Column(String(256))
+    DIM_SW_INDUSTRY_LVL2_ID = Column(String(256))
+    DIM_SW_INDUSTRY_LVL2_NAME = Column(String(256))
+    DIM_SW_INDUSTRY_LVL3_ID = Column(String(256))
+    DIM_SW_INDUSTRY_LVL3_NAME = Column(String(256))
+    DIM_SW_INDUSTRY_NAME = Column(String(256))
+    FD_FA_INDUSTRY_ID = Column(String(256))
+    FD_INTERNAL_INDUSTRY_ID = Column(String(256))
+    DIM_INTERIOR_INDUSTRY_LVL1_ID = Column(String(256))
+    DIM_INTERIOR_INDUSTRY_LVL1_NAME = Column(String(256))
+    DIM_INTERIOR_INDUSTRY_LVL2_ID = Column(String(256))
+    DIM_INTERIOR_INDUSTRY_LVL2_NAME = Column(String(256))
+    DIM_INTERIOR_INDUSTRY_LVL3_ID = Column(String(256))
+    DIM_INTERIOR_INDUSTRY_LVL3_NAME = Column(String(256))
+    DIM_INTERIOR_INDUSTRY_NAME = Column(String(256))
+    FD_PLATFORM = Column(String(256))
+    FD_INTRODUCTION = Column(String(4000))
+    LX_TIME = Column(TIMESTAMP(6))
+    TJ_TIME = Column(TIMESTAMP(6))
+    FD_PROVINCE_VISIT = Column(String(1000))
+    FD_CITY = Column(String(1000))
+    FD_COUNTY = Column(String(3000))
+    FD_AREA = Column(String(1000))
+    FD_EMPLOY = Column(String(4000))
+    FD_INVESTMENT_MODE = Column(String(256))
+    FD_TZID = Column(String(256))
+    FD_EXIT_FULL_DATE = Column(TIMESTAMP(6))
+    FD_EXIT_SIGNED_DATE = Column(TIMESTAMP(6))
+    FD_EXIT_CAST_DATE = Column(TIMESTAMP(6))
+    FD_EXIT_APPROVAL_DATE = Column(TIMESTAMP(6))
+    FD_NEVER_HEARING_DATE = Column(TIMESTAMP(6))
+    FD_PCODE = Column(String(256))
+    FD_CONTACT_NUMBER = Column(String(256))
+    FD_EMAIL = Column(String(256))
+    FD_PERSON = Column(String(256))
+    FD_PHONE = Column(String(256))
+    FD_TYPE = Column(String(256))
+    FD_REGISTRATION_PLACE = Column(String(256))
+    FD_IS_LITIGATION = Column(String(10))
+    FD_LAWSUIT_DECISION_DATE = Column(TIMESTAMP(6))
+    DS_FROM = Column(String(8))
+    DS = Column(String(8))
+    UPDATES = Column(TIMESTAMP(6))
+    FD_SUBMIT_TYPE = Column(String(100))
+    FD_INDUSTRY_CHAIN_TAG1 = Column(String(100))
+    FD_INDUSTRY_CHAIN_TAG2 = Column(String(100))
+    FD_SHOR_NAMES = Column(String(200))
+    FD_NICK_NAME = Column(String(200))
+    WIND_CODE = Column(String(20))
+    ESG_DESC = Column(String(4000))
+    CUST_PRO_ADDR = Column(String(1000))
+    IS_VIEW = Column(Integer, default=1)
+    FD_SM_ENTERPRISE_TYPE = Column(String(100))
+    FD_SPECIALIZED = Column(String(10))
+    FD_GSTYPE = Column(String(10))
+
+
+class FCTReductionBase(Base):
+    """
+    减持表
+    """
+    # 上市项目减持明细表
+    __tablename__ = 'FCT_REDUCTION_BASE'
+    __table_args__ = (
+        {'schema': 'DWP_FIA'}
+    )
+    FD_ID = Column(String(256), primary_key=True, nullable=False)
+    FD_OPEN_DATE = Column(Date)
+    FD_IPO_DATE = Column(Date)
+    FD_REDUCTION_DATE = Column(Date)
+    FD_FIXED_INCREASE_PRICE = Column(String(256))
+    FD_ADJUSTED_COST = Column(String(256))
+    FD_SHAREHOLDING_RATIO = Column(String(256))
+    FD_SHARES_HELD_NUMBER = Column(String(256))
+    FD_SHARES_REDUCED_NUMBER = Column(String(256))
+    FD_REDUCTION_PRICE = Column(Float)
+    FD_LIQUIDATION_AMOUNT = Column(Float)
+    FD_COST = Column(String(256))
+    FD_TRANSFER_OUT = Column(String(256))
+    FD_INCOME = Column(Float)
+    FD_YIELD = Column(String(256))
+    FD_CHANGES_FAIR_VALUE = Column(String(256))
+    FD_PUSH_STATE = Column(String(256))
+    FD_PP_VUPRICE = Column(String(256))
+    FD_RETURN_INVESTMENT = Column(Float)
+    FD_SHARES_OUTSTANDING_HNUMBER = Column(Float)
+    FD_LIQUIDITY_DISCOUNT = Column(String(256))
+    FD_REMARKS = Column(String(256))
+    FD_PROJECT_ABBREVIATION = Column(String(256))
+    FD_BUSINESS_TEAM = Column(String(256))
+    FD_INVESTMENT_MANAGER = Column(String(256))
+    FD_PROJECT_ID = Column(String(256), ForeignKey('DWP_FIA.DIM_INVEST_PROJECT.FD_ID'))
+    FD_FUND_ID = Column(String(256))
+    DS = Column(String(256))
+    project = relationship('DIMInvestProject', backref='deduction')
+
+
+class VInvestProject(Base):
+    """
+    投资项目视图
+    """
+    __tablename__ = 'V_INVEST_PROJECT'
+    __table_args__ = (
+        PrimaryKeyConstraint('FD_FUND_ID', 'FD_PROJECT_ID'),
+        {'schema': 'DWP_FIA'}
+    )
+    EXIT_SIGNED_DATE = Column(String(256))
+    FD_ITEM_CODE = Column(String(256))
+    FD_UNIFIED_CODE = Column(String(256))
+    NATURE_FD_NAME = Column(String(256))
+    FD_IS_CONTROL = Column(String(256))
+    REGISTRATION_TIME = Column(String(256))
+    REGISTER_CAPITAL = Column(String(256))
+    FD_ENTERPRISE_ID = Column(String(256))
+    PROJECT_TYPE = Column(String(256))
+    DIM_SW_INDUSTRY_NAME = Column(String(256))
+    DOC_CREATE_TIME = Column(String(256))
+    FD_INDUSTRY_NAME = Column(String(256))
+    SW_INDUSTRY_LVL2_NAME = Column(String(256))
+    ADJUST_VALUATION = Column(String(256))
+    ADJUST_VALUATION_FSS = Column(String(256))
+    FD_NICK_NAME = Column(String(256))
+    FD_INTRODUCTION = Column(String(256))
+    FD_SM_ENTERPRISE_TYPE = Column(String(256))
+    FD_SPECIALIZED = Column(String(256))
+    FD_INVESTMENT_ROUNDS_ID = Column(String(256))
+    FD_INVESTMENT_ROUNDS_NAME = Column(String(256))
+    FD_AMOUNT_TH = Column(String(256), comment='退回本金')
+    FD_SHOR_NAME = Column(String(256), comment='项目简称')
+    FD_FUND_ID = Column(String(256), comment='基金ID')
+    FD_PROJECT_ID = Column(String(256), comment='项目ID')
+    VC_INVEST_ID = Column(String(256))
+    VC_FUND_ID = Column(String(256))
+    VC_FUND_NAME = Column(String(256), comment='基金名称')
+    L_MONEY = Column(String(256), comment='投资金额')
+    L_MONEY3 = Column(String(256), comment='立项金额')
+    L_MONEY7 = Column(String(256), comment='投决金额')
+    D_STAGE7 = Column(String(256), comment='投决日期')
+    D_STAGE3 = Column(String(256), comment='立项日期')
+    FIRST_FD_DATE = Column(String(256), comment='首次拨付日期')
+    EXIT_STATUS = Column(String(256), comment='退出状态')
+    EXIT_DATE = Column(String(256))
+    TEAM_ID = Column(String(256))
+    TEAM_NAME = Column(String(256))
+    FD_PROJECT_MANAGE_ID = Column(String(256))
+    DIM_MEMBER_FD_NAME = Column(String(256))
+    FD_PLATFORM = Column(String(256))
+    INDUSTRY_CHAIN = Column(String(256))
+    FD_INVESTMENT_MODE = Column(String(256))
+    FD_SECURITY_MODE = Column(String(256))
+    SECURITY_TYPE = Column(String(256))
+    FD_SECURITY = Column(String(256))
+    PARTER_TYPE = Column(String(256))
+    SW_LV1_ID = Column(String(256))
+    SW_LV1_NAME = Column(String(256), )
+    FD_REGISTRATION_AREA_ID = Column(String(256))
+    FD_REGISTRATION_AREA_NAME = Column(String(256))
+    INVEST_NATURE = Column(String(256))
+    FD_INVESTMENT_AMOUNT_TOTAL = Column(String(256))
+    FUND_AI_PROPORTION = Column(String(256), comment='股比')
+    PHASE_NAME = Column(String(256))
+    VC_PROJECT_CODE = Column(String(256))
+    FD_FULL_PROJECT_NAME = Column(String(256))
+    II_LV1_NAME = Column(String(256))
+    II_LV2_NAME = Column(String(256))
+    FD_SIGNING_DATE = Column(String(256))
+    LISTING_DATE = Column(String(256))
+    LIFTING_DATE = Column(String(256))
+    BUSINESS_SCOPE = Column(String(256))
+    PRICE_SHARE = Column(String(256))
+    TOTAL_NUM_SHARE = Column(String(256))
+    ENTERPRISE_ADDRESS = Column(String(256))
+    D_EXIT_LX = Column(String(256))
+    D_EXIT_TJ = Column(String(256))
+    FD_EMPLOY = Column(String(256))
+    FD_IS_LISTE = Column(String(256))
+    STOCK_CODE = Column(String(256))
+    FD_REGISTRATION_PLACE = Column(String(256))
+    AMOUNT_BF = Column(String(256), comment='拨付金额')
+    AMOUNT_EXIT = Column(String(256))
+    CLS_INVESTMENT_MODE = Column(String(256))
+    LIQUIDITY_DISCOUNT = Column(String(256))
+    FD_IS_LITIGATION = Column(String(256))
+    FD_LAWSUIT_DECISION_DATE = Column(String(256))
+    ZX_MEASURES_NAME = Column(String(256))
+    IS_REPURCHASE = Column(String(256))
+    FD_TZQX = Column(String(256))
+    GUARANTEED_YIELD = Column(String(256))
+    FD_INVESTMENT_STATUS = Column(String(256))
+    FD_CONTROLL_SHAREHOLDER = Column(String(256))
+    FD_C_S_TYPE = Column(String(256))
+    CLS_PROJECT_TYPE = Column(String(256))
+    D_LAST_BF = Column(String(256))
+    D_FIRST_EXIT = Column(String(256))
+    D_LAST_EXIT = Column(String(256))
+    D_STAGE_TJS = Column(String(256))
+    D_STAGE_LAST_TJ = Column(String(256))
+    FD_GSTYPE = Column(String(256))
+
+
+class FCTCashflowBase(Base):
+    """
+    现金流表
+    """
+    __tablename__ = 'FCT_CASHFLOW_BASE'
+    __table_args__ = {'schema': 'DWP_FIA'}
+
+    FD_ID = Column(String(256), primary_key=True)
+    FD_DATE = Column(Date)
+    FD_AMOUNT = Column(Float)
+    FD_SHOR_NAME = Column(String(256))
+    FD_PROJECT_ID = Column(String(256))
+    FD_FUND_ID = Column(String(256))
+    CAPITAL_TYPE = Column(String(256))
+    VC_FUND_ID = Column(String(100))
+    VC_FUND_NAME = Column(String(256))
+    VC_INVEST_ID = Column(String(256))
+    FD_ROUNDS = Column(String(30))
+    FD_COUNTPART = Column(String(256))
+    CAPITAL_TYPE_ORGIN = Column(String(256))
+
+
+class DPFinProjectEvaDetail(Base):
+    """
+    项目估值表
+    """
+    __tablename__ = 'DP_FIN_PROJECT_EVA_DETAIL'
+    __table_args__ = (
+        PrimaryKeyConstraint('FD_PROJECT_ID', 'FD_FUND_ID', 'FD_DATE', 'CAPITAL_TYPE'),
+        {'schema': 'DWP_FIA'}
+    )
+    FD_ID = Column(String(200))
+    FD_PROJECT_ID = Column(String(200))
+    FD_FUND_ID = Column(String(200))
+    # FD_DATE = Column(String(50))
+    # 数据库存的是varchar,此处想要转换为datetime
+    FD_DATE = Column(DateTime)
+    VALUATION_RESULT = Column(Float)
+    FD_SHOR_NAME = Column(String(200))
+    DS = Column(String(20))
+    CAPITAL_TYPE = Column(String(100))
+    CUR_VALUE_SHARE = Column(Float)
+    LIQUIDITY_DISCOUNT = Column(String(100))
+    EVA_TYPE = Column(String(100))
+
+
+class FCTValuationBase(Base):
+    __tablename__ = 'FCT_VALUATION_BASE'
+    __table_args__ = (
+        PrimaryKeyConstraint('FD_PROJECT_ID', 'FD_FUND_ID', 'D_START'),
+        {'schema': 'DWP_FIA'}
+    )
+    FD_SHOR_NAME = Column(String(256))
+    FD_PROJECT_ID = Column(String(256))
+    FD_FUND_ID = Column(String(256))
+    VC_INVEST_ID = Column(String(300))
+    VC_FUND_ID = Column(String(300))
+    EVA = Column(Float)
+    D_START = Column(Date)
+    LIQUIDITY_DISCOUNT = Column(Float)
+    CREATE_DATE = Column(Date)
+    DATA_TYPE = Column(String(100))
+
+
+class DWDInvestProject(Base):
+    """
+    项目归属表
+    """
+    __tablename__ = 'DWD_INVEST_PROJECT'
+    __table_args__ = (
+        PrimaryKeyConstraint('FD_PROJECT_ID', 'FD_FUND_ID'),
+        {'schema': 'DWP_FIA'}
+    )
+
+    VC_FUND_NAME = Column(String(100))
+    FD_FUND_ID = Column(String(100))
+    FD_PROJECT_ID = Column(String(100), nullable=False)
+    FD_SHOR_NAME = Column(String(100))
+    FIRST_BF_DATE = Column(Date)
+    INVEST_TEAM = Column(String(100))
+    MNT_TEAM = Column(String(100))
+    INVEST_MANAGER = Column(String(100))
+    MNT_MANAGER = Column(String(100))
+    ALTER_DATE = Column(Date)
+    OPER_NAME = Column(String(100))
+
+
+class FCTInvestExit(Base):
+    """
+    项目退出表
+    """
+    __tablename__ = 'FCT_INVEST_EXIT'
+    __table_args__ = (
+        PrimaryKeyConstraint('FD_PROJECT_ID', 'FD_FUND_ID', '退出状态'),
+        {'schema': 'DWP_FIA'}
+    )
+
+    VC_INVEST_ID = Column(String(96))
+    VC_FUND_ID = Column(String(256))
+    FD_PROJECT_ID = Column(String(256))
+    FD_FUND_ID = Column(String(256))
+    FD_SHOR_NAME = Column(String(256))
+    退出状态 = Column(String(1500))
+    退出阶段 = Column(String(1500))
+    退出方式 = Column(String(4000))
+    D_EXIT_START = Column(Date)
+    D_EXIT_END = Column(Date)
+    FD_EXIT_SIGNDATE = Column(Date)
