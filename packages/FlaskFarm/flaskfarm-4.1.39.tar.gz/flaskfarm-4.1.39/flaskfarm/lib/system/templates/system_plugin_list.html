@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+  {{ macros.setting_input_text_and_buttons('_plugin_git', '플러그인 설치', [['plugin_install_btn', '설치']], value='https://github.com/', desc=None) }}
+  {{ macros.m_hr_head_top() }}
+  {{ macros.m_row_start('0') }}
+  {{ macros.m_col_wide(1, macros.m_strong('Idx'), 'center') }}
+  {{ macros.m_col_wide(2, macros.m_strong('Title')) }}
+  {{ macros.m_col_wide(2, macros.m_strong('Package Name')) }}
+  {{ macros.m_col_wide(1, macros.m_strong('Dev.')) }}
+  {{ macros.m_col_wide(1, macros.m_strong('Version')) }}
+  {{ macros.m_col_wide(5, macros.m_strong('Description')) }}
+  {{ macros.m_row_end() }}
+  {{ macros.m_hr_head_bottom() }}
+  <div id="plugin_list_div"></div>
+</div>
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+  globalSendCommand('get_plugin_list', null, null, null, function(data){
+    make_plugin_list(data.data);
+  });
+});
+
+$("body").on('click', '#plugin_install_btn', function(e){ 
+  e.preventDefault();
+  globalSendCommand('plugin_install', $('#_plugin_git').val());
+});
+
+function make_plugin_list(data) {
+  current_data = data;
+  str = ''
+  for (i in data) {
+    //console.log(data[i]);
+    str += j_row_start();
+    str += j_col_wide(1, (parseInt(i)+1), 'center')
+    if (data[i].title == null) {
+      str += j_col_wide(2, '');
+      str += j_col_wide(2, data[i].package_name);
+      str += j_col_wide(5, data[i].status, 'center');
+      tmp = j_button('uninstall_btn', '삭제', {'package_name':data[i].package_name}, 'danger', false, true);
+    } else {
+      str += j_col_wide(2, data[i].title);
+      
+      str += j_col_wide(2, data[i].package_name);
+      str += j_col_wide(1, data[i].developer);
+      str += j_col_wide(1, data[i].version);
+      if (data[i].loading == false) {
+        tmp = data[i].description + '<br>' + text_color('[로딩 실패] ') + data[i].status;
+        str += j_col_wide(3, tmp);
+
+      } else {
+        str += j_col_wide(3, data[i].description);
+      }
+      
+      tmp = ''
+      
+      tmp += j_button_small('globalOpenBtn', '홈페이지', {'url':data[i].home}, 'primary', false, true);
+      tmp += j_button_small('uninstall_btn', '삭제', {'package_name':data[i].package_name, 'title':data[i].title}, 'danger', false, true);
+      tmp += j_button_small('json_btn', 'JSON', {'idx':i}, 'info', false, true);
+    }
+    tmp = j_button_group(tmp)
+    str += j_col_wide(2, tmp, 'right')
+    str += j_row_end();
+    if (i != current_data.length -1) str += j_hr(0);
+  }
+  $("#plugin_list_div").html(str);
+}
+
+$("body").on('click', '#json_btn', function(e){
+  e.preventDefault();
+  item_id = $(this).data('idx');
+  showModal(current_data[item_id]);
+});
+
+
+$("body").on('click', '#uninstall_btn', function(e){ 
+  e.preventDefault();
+  $("#confirm_title").html("삭제 확인");
+  $("#confirm_body").html($(this).data('title') + " 플러그인을 삭제 하시겠습니까?");
+  package_name = $(this).data('package_name');
+  $('#confirm_button').attr('onclick', "javascript:uninstall(package_name);");
+  $("#confirm_modal").modal();
+});
+
+
+function uninstall(package_name) {
+  globalSendCommand('uninstall', package_name, null, null, function(ret) {
+  });
+}
+
+
+$("body").on('click', '#plugin_uninstall_btn', function(e){ 
+  e.preventDefault();
+  plugin_name = $(this).data('plugin_name')
+  $.ajax({
+    url: '/' + package_name + '/ajax/plugin_uninstall',
+    type: "POST", 
+    cache: false,
+    data:{plugin_name:plugin_name},
+    success: function (data) {
+      if (data == 'success') {
+        $.notify('<strong>재시작시 적용됩니다.</strong>', {
+          type: 'success'
+        });
+      } else {
+        $.notify('<strong>실패하였습니다.</strong>', {
+          type: 'warning'
+        });
+      }
+    }
+  });  
+});
+
+
+</script>    
+{% endblock %}
