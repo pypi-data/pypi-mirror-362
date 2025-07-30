@@ -1,0 +1,51 @@
+[project]
+name = "zen-sight"
+version = "0.2.1"
+description = "A 3D simplicial complex visualizer"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "flask>=3.1.0",
+  "flask-cors>=5.0.0",
+  "networkx>=3.4.2",
+  "numpy>=2.2.5",
+  "zen-mapper>=0.3.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff", 
+    "mypy",
+    "hatch",
+    "scikit-learn",
+    "networkx",
+    "matplotlib",
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "myst-parser",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.txt", "*.md"]
+zen_sight = ["static/**/*"]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "uv",
+]
+
+
