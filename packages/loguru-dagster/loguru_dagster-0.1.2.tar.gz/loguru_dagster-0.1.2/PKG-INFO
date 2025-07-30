@@ -1,0 +1,67 @@
+Metadata-Version: 2.4
+Name: loguru-dagster
+Version: 0.1.2
+Summary: A bridge to integrate Loguru logging with Dagster context.log.
+Home-page: https://github.com/albersfast/loguru-dagster
+Author: Ahmet Sahiner
+Author-email: Ahmet Sahiner <ahmethasimsahiner@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/albertfast/loguru-dagster
+Project-URL: Repository, https://github.com/albertfast/loguru-dagster
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: loguru>=0.7.2
+Requires-Dist: dagster>=1.5.0
+Requires-Dist: dagster-webserver>=1.5.0
+Requires-Dist: dagster-dg-cli>=1.5.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: ipython; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: build; extra == "dev"
+Requires-Dist: twine; extra == "dev"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# loguru-dagster
+
+**loguru-dagster** is a lightweight utility package that bridges [Loguru](https://github.com/Delgan/loguru) with [Dagster](https://dagster.io/).  
+It enables **colorized, contextual logging** inside Dagster pipelines with a single decorator.
+
+## 🚀 Installation
+
+```bash
+pip install loguru-dagster
+```
+
+This will automatically install the required `loguru` and `dagster` dependencies.
+
+## 📦 Import Path
+
+```python
+from loguru_dagster import dagster_context_sink, with_loguru_logger
+```
+
+## 🧪 Usage Example
+
+```python
+from loguru import logger
+from loguru_dagster import dagster_context_sink, with_loguru_logger
+
+@dg.asset
+@with_loguru_logger
+def my_asset(context: dg.AssetExecutionContext):
+    logger.info("Hello loguru-dagster!")
+
+defs = dg.Definitions(
+    assets=[my_asset]
+)
+```
+
+## 🔗 Repository
+
+[https://github.com/albertfast/loguru-dagster](https://github.com/albertfast/loguru-dagster)
