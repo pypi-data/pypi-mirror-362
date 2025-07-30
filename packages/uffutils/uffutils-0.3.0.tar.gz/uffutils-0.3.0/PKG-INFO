@@ -1,0 +1,79 @@
+Metadata-Version: 2.4
+Name: uffutils
+Version: 0.3.0
+Summary: A set of commandline tools for manipulating UFF files.
+Author-email: Jan Hein de Jong <janhein.dejong@gmail.com>
+Requires-Python: >=3.13
+Requires-Dist: click<9.0.0,>=8.1.8
+Requires-Dist: pyuff<3.0.0,>=2.4.6
+Description-Content-Type: text/markdown
+
+# UFF Utils 
+
+UFF Utils is a command-line tool for manipulating UFF files. For example: 
+
+```powershell
+uffutils modify input.uff output.uff --scale-length 100 --rotate 90,90,90 --translate 100,100,100
+```
+
+## Installing
+
+A good way to run UFF utils is through [`uv`](https://docs.astral.sh/uv/getting-started/installation/). Once you have installed `uv`, you can run `uffutils` like so: 
+
+```powershell 
+uvx uffutils --help
+```
+
+## The `inspect` command 
+
+The `inspect` command allows you to view the contents of a UFF file. Example usage: 
+
+```sh 
+uffutils inspect my_file.uff  # Print nice overview 
+uffutils inspect my_file.uff --nodes # Print full list of nodes
+```
+
+## The `modify` command
+
+The `modify` command allows you to modify a UFF file. For example, you can create a file with a subset of nodes in various ways: 
+
+```sh
+uffutils modify my_file.uff list_of_nodes.uff --node-selection "1, 2, 3"
+uffutils modify my_file.uff first_ten_nodes.uff --node-count 10 
+uffutils modify my_file.uff every_tenth_node.uff --node-step 10 
+```
+
+You can scale length: 
+
+```sh
+uffutils modify my_file.uff m_to_mm.uff --scale-length 1000 
+```
+
+And do various other operations: 
+
+```sh
+uffutils modify my_file.uff in_global_frame.uff --to-global-frame 
+uffutils modify my_file.uff rotated_euler_xyz.uff --rotate "90,90,90" 
+uffutils modify my_file.uff translated_xyz.uff --translate "10,20,30"
+```
+
+And you do all these things at once: 
+
+```sh 
+uffutils modify my_file.uff my_output.uff `
+    --node-selection "1,2,3" `
+    --scale-length 1000 `
+    --to-global-frame `
+    --rotate 90,90,90 `
+    --translate 100,100,100
+```
+
+## Alternative implementation
+
+I considered doing something with piping, but got stuck in the fact the the PyUFF library I'm using can't handle streams. It would've looking something like this: 
+
+```sh
+uffutils subset my_original_file.uff my_subset_file.uff --step 100 
+uffutils subset my_file.uff - --nodes $(uffutils describe my_subset_file.uff --nodes) | 
+uffutils scale - my_output.uff --length 1000 
+```

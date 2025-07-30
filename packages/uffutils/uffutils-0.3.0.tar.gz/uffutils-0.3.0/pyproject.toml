@@ -1,0 +1,33 @@
+[project]
+name = "uffutils"
+version = "0.3.0"
+description = "A set of commandline tools for manipulating UFF files."
+authors = [{ name = "Jan Hein de Jong", email = "janhein.dejong@gmail.com" }]
+requires-python = ">=3.13"
+readme = "README.md"
+dependencies = [
+    "pyuff (>=2.4.6,<3.0.0)",
+    "click (>=8.1.8,<9.0.0)",
+]
+
+[project.scripts]
+uffutils = "uffutils.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4,<9",
+    "ruff>=0.9.1,<0.10",
+    "mypy>=1.14.1,<2",
+    "black>=24.10.0,<25",
+]
+
+[tool.ruff]
+extend-exclude = ["data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+extend-ignore = ["B008"]
