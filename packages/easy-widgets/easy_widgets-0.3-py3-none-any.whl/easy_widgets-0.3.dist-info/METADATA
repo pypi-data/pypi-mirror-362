@@ -1,0 +1,138 @@
+Metadata-Version: 2.4
+Name: easy_widgets
+Version: 0.3
+Summary: Make widget management in CLI easy
+Home-page: https://github.com/fantastic001/easy_widgets
+Download-URL: https://github.com/fantastic001/easy_widgets/tarball/0.2
+Author: Stefan Nožinić
+Author-email: stefan@lugons.org
+License: MIT
+Keywords: curses,CLI,widgets
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: urwid>=3.0.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: download-url
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Easy Widgets
+
+**Easy Widgets** is a Python library designed to simplify widget management in CLI applications. It leverages the power of `urwid` to create dynamic and interactive command-line interfaces with ease.
+
+## Features
+
+- Simplifies the creation and management of CLI widgets.
+- Supports Python versions 3.7 and above.
+- Lightweight and easy to integrate into existing projects.
+
+## Installation
+
+You can install **Easy Widgets** via pip:
+
+```bash
+pip install easy_widgets
+```
+
+## Usage
+
+Here’s a basic example of how to use **Easy Widgets**:
+
+```python
+
+
+from easy_widgets import * 
+
+Application.init()
+
+menu = Menu("Just exit now")
+menu.addOption("OK", lambda b,p: Application.exit())
+
+
+name = ""
+times = 0 
+
+def setName(x):
+    global name 
+    name = x
+def setTimes(x):
+    global times 
+    times = x
+
+w = Wizzard(menu)\
+    .withChoices("Select number", "times", [(1, "one"), (2, "two")])\
+    .withInput("Enter your name", "name")\
+    .withParam("name", setName)\
+    .withParam("times", setTimes)
+
+
+w.show()
+
+Application.run()
+print(name * times)
+
+
+
+
+```
+
+Refer to the documentation for more advanced usage.
+
+## Requirements
+
+- Python >= 3.7
+- `urwid` >= 3.0.0
+
+## Development
+
+### Setup
+
+Clone the repository:
+
+```bash
+git clone https://github.com/fantastic001/easy_widgets.git
+cd easy_widgets
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-name`).
+3. Commit your changes (`git commit -m "Add feature"`).
+4. Push to the branch (`git push origin feature-name`).
+5. Open a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+
+## Links
+
+- [GitHub Repository](https://github.com/fantastic001/easy_widgets)
+- [PyPI Package](https://pypi.org/project/easy_widgets/)
