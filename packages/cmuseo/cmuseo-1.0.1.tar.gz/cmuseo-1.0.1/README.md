@@ -1,0 +1,55 @@
+# cmuseo
+
+**cmuseo** is a Python package that provides *perceptually uniform colormaps*, ensuring accurate gradients and accessible data interpretation for scientific visualization, with palette names reflecting the key colors of each colormap.
+
+- **_vivian_** transitions smoothly from midnight *vi*olet through refreshing teal-green (*vi*ridian) to bright pale c*an*ary yellow, forming a vibrant palette well-suited for clear, engaging visualizations in data science and research.
+
+- **_indira_** moves from deep *indi*go through plum purple and brilliant orange into light st*ra*w yellow, offering a luminous, warm palette ideal for visualizations requiring energy and contrast.
+
+- **_elsa_** progresses from dark *el*derberry purple through deep blue and pastel *sa*pphire to frosty mint and pale jade, creating a cool, crystalline palette suited for visualizations with an icy aesthetic and arctic clarity.
+
+
+![cmuseo colormaps preview](https://www.iup.uni-bremen.de/carbon_ghg/products/cmuseo/colormaps_preview.png)
+
+## Features
+
+- Unique RGB colormaps designed with perceptual uniformity in mind  
+- Easy integration with `matplotlib`  
+- Openly licensed under GNU GPL v3.0  
+
+## Installation
+
+```bash
+pip install cmuseo
+```
+
+## Usage
+
+### Basic usage
+
+```python
+import cmuseo
+```
+
+### Example: Previewing colormaps
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+import cmuseo
+
+colormaps = ['vivian', 'indira', 'elsa']
+
+fig, axs = plt.subplots(len(colormaps), 1, figsize=(8, 0.8*len(colormaps)))
+
+gradient = np.linspace(0, 1, 256).reshape(1, -1)
+
+for ax, cmap_name in zip(axs, colormaps):
+    ax.imshow(gradient, aspect='auto', cmap=cmap_name)
+    ax.text(-0.02, 0.5, cmap_name, va='center', ha='right', transform=ax.transAxes)
+    ax.set_axis_off()
+
+plt.tight_layout()
+plt.show()
+```
+
