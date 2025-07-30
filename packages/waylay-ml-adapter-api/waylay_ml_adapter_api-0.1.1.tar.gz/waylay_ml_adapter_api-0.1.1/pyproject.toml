@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61","wheel","setuptools-git-versioning<2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[project]
+name = "waylay-ml-adapter-api"
+description = "API models for the ml-adapter."
+requires-python = ">=3.11"
+authors = [{name = "Waylay", email = "info@waylay.io"}]
+license={file = "LICENSE.txt"}
+readme = "README.md"
+dependencies = [
+]
+dynamic = ["version"]
+
+
+[project.optional-dependencies]
+dev = [
+  "waylay-ml-adapter-devtools"
+]
+
+[tool.setuptools.package-data]
+"ml_adapter.api" = ["py.typed"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+include = ["pyproject.toml", "src/**/*.py", "test/**/*.py"]
+
+
+[tool.ruff.lint]
+select = ["E", "F", "UP",  "B", "SIM", "I", "D1", "D4"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/*test.py" = ["D"] # no docstyle required
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
