@@ -1,0 +1,38 @@
+# Copyright (C) 2024 Maxwell G <maxwell@gtmx.me>
+# SPDX-License-Identifier: MIT
+
+upstream_package_name: go2rpm
+srpm_build_deps:
+  - git-core
+  - pipx
+  - rpmdevtools
+packages:
+  # Main package
+  go2rpm:
+    specfile_path: go2rpm.spec
+    actions:
+      fix-spec-file:
+        - "./contrib/main-archive.sh go2rpm.spec"
+      create-archive:
+        - "./contrib/main-archive.sh go2rpm.spec"
+        - "sh -c 'ls go2rpm-*.tar.gz'"
+    release_suffix: ""
+osh_diff_scan_after_copr_build: false
+jobs:
+  - job: copr_build
+    packages:
+      - go2rpm
+    targets: &targets
+      fedora-all-x86_64: {}
+    additional_repos:
+      - "copr://@go-sig/go-vendor-tools-dev"
+    trigger: pull_request
+
+  - job: copr_build
+    packages:
+      - go2rpm
+    targets: *targets
+    owner: "@go-sig"
+    project: go-vendor-tools-dev
+    trigger: commit
+    branch: main
