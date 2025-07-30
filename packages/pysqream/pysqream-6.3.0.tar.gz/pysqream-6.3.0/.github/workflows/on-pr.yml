@@ -1,0 +1,143 @@
+name: Pull request to master
+
+concurrency:
+  group: pull-request-${{github.head_ref}}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches: ['master']
+    inputs:
+      sqream-branch:
+        default: develop
+        type: string
+      testing_framework_branch:
+        default: develop
+        type: string
+  workflow_dispatch:
+    inputs:
+      sqream-branch:
+        default: develop
+        type: string
+      testing_framework_branch:
+        default: develop
+        type: string
+
+env:
+  CONTAINER_REGISTRY: ${{vars.GCR_CONTAINER_ARTIFACTORY}}
+  POSTGRESQL_CONTAINER_NAME: postgresql
+  SQREAM_CONTAINER_NAME: sqreamdb
+  TESTING_FRAMEWORK_CONTAINER_NAME: testing_framework
+
+jobs:
+  calculate-containers-image:
+    runs-on: ubuntu-latest
+    outputs:
+      sqreamdb-image: ${{steps.find-sqream-tag.outputs.container-image}}
+      testing-framework-image: ${{steps.find-testing-framework-tag.outputs.container-image}}
+
+    steps:
+      - uses: sqream/gha-find-latest-image-tag@main
+        id: find-sqream-tag
+        with:
+          container-repository: ${{vars.SQREAM_GCR_DEVELOP_REGISTRY}}/sqreamdb
+          git-repository: sqream/sqream
+          git-ref: ${{ inputs.sqream-branch }}
+          gcp-cicd-secret: ${{secrets.GCP_CI_CD_SECRET}}
+          git-token: ${{secrets.CICD_MACHINE_SQREAM_REPO_READER}}
+
+      - uses: sqream/gha-find-latest-image-tag@main
+        name: find-testing-framework-tag
+        id: find-testing-framework-tag
+        with:
+          container-repository: ${{vars.SQREAM_GCR_DEVELOP_REGISTRY}}/testing_framework
+          git-repository: sqream/testing_framework
+          git-ref: ${{ inputs.testing_framework_branch }}
+          gcp-cicd-secret: ${{secrets.GCP_CI_CD_SECRET}}
+          git-token: ${{secrets.CICD_MACHINE_SQREAM_REPO_READER}}
+  test:
+    needs: [ calculate-containers-image ]
+    runs-on: [self-hosted, op, gpu, ubuntu]
+
+
+    steps:
+      - name: output images
+        run: |
+          echo "SQREAMDB_IMAGE=${{needs.calculate-containers-image.outputs.sqreamdb-image}}" >> $GITHUB_ENV
+          echo "TESTING_FRAMEWORK_IMAGE=${{needs.calculate-containers-image.outputs.testing-framework-image}}" >> $GITHUB_ENV                  
+
+      - name: Clean workspace
+        run: |
+          sudo find /home/gh-runner/actions-runner/_work/pysqream/pysqream \( -name "__pycache__" -o -name ".pytest_cache" \) -exec rm -rf {} + || true
+          sudo rm -rf /home/gh-runner/actions-runner/_work/pysqream/pysqream/.github/assets/sqreamd_config_legacy.json || true
+
+      - name: Checkout pysqream
+        uses: actions/checkout@v4
+        with:
+          token: ${{secrets.CICD_MACHINE_SQREAM_REPO_READER}}
+
+      - name: Pull and run SQreamDB container
+        run: |
+          echo "Pulling SQreamDB image: ${SQREAMDB_IMAGE}"
+          docker run --rm -d --name ${SQREAM_CONTAINER_NAME} \
+          --mac-address="02:42:2F:C1:DB:DD" --runtime=nvidia --gpus all -p 5000:5000 -p 3108:3108 -p 3109:3109 \
+          -v ${PWD}/.github/assets/sqreamd_config_legacy.json:/sqream/config/sqreamd_config_legacy.json:ro \
+          ${SQREAMDB_IMAGE} cluster
+
+
+      - name: Run pysqream tests in Docker
+        run: |
+          docker run --rm \
+          --network host \
+          -v ${{ github.workspace }}:/app \
+          -w /app \
+          python:3.9 \
+          bash -c "pip install --upgrade pip && pip install . && pip install -r requirements.txt && python -m pytest ./tests/ -v --maxfail=10"
+
+
+      - name: Run tier1 with updated pysqream connector
+        run: |
+          set -x
+          docker kill ${SQREAM_CONTAINER_NAME}
+          sleep 10
+          docker run -d --rm --name ${SQREAM_CONTAINER_NAME} -v data_dir:/tmp/data-dir:rw --mac-address="02:42:2F:C1:DB:DD" --runtime=nvidia --gpus all -p 5000:5000  $SQREAMDB_IMAGE sqreamdb
+          
+          docker run -d --rm --network host --name ${POSTGRESQL_CONTAINER_NAME} -v data-dir:/home/postgres/suites_dir:rw -e POSTGRES_PASSWORD=postgres11 postgres:11-alpine
+
+          docker run -d --rm --network host --name ${TESTING_FRAMEWORK_CONTAINER_NAME} --entrypoint=tail -v data_dir:/tmp/data-dir:rw ${TESTING_FRAMEWORK_IMAGE} -f /dev/null
+          
+          pwd
+          ls -la
+          echo "Updating pysqream connector for testing"
+          docker cp . ${TESTING_FRAMEWORK_CONTAINER_NAME}:/tmp/pysqream
+          docker exec ${TESTING_FRAMEWORK_CONTAINER_NAME} sh -c "pip3.9 uninstall pysqream -y && pip3.9 install /tmp/pysqream && pip3.9 list | grep pysqream"
+          
+          docker exec ${TESTING_FRAMEWORK_CONTAINER_NAME} /usr/bin/python3.9 -m pytest integration_test/tests/ -m tier1 --suite.external_server --sqream.service_ip=127.0.0.1 \
+          --v1 -sv --sqream.conn=pysqream --jira --sqream.service_port=5000 --suite.remote_type=pgsql --remote.service_ip=127.0.0.1
+
+      - name: cleanup
+        if: always()
+        run: |
+          set -x
+
+          stop_list=($SQREAM_CONTAINER_NAME $TESTING_FRAMEWORK_CONTAINER_NAME $POSTGRESQL_CONTAINER_NAME)
+          clean_list=($SQREAM_CONTAINER_NAME $TESTING_FRAMEWORK_CONTAINER_NAME)
+
+
+          stop() {
+            for i in "${stop_list[@]}"; do
+              docker ps -q --filter "name=$i" | xargs -r docker stop
+            done
+          }
+
+          cleanup() {
+            docker container prune -f
+            docker volume prune -f
+            docker volume rm data-dir
+            for i in "${clean_list[@]}"; do
+              docker images --format "{{.Repository}}:{{.Tag}} {{.CreatedSince}}" | grep -E '(weeks ago|months ago)' | grep -E $i | awk -F' ' '{ print $1 }' | xargs -r docker rmi || true
+            done
+          }
+          
+          stop
+          cleanup
