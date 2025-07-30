@@ -1,0 +1,118 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "knowlang"
+version = "0.3.0"
+description = "AI-powered code understanding assistant that helps developers explore and understand complex codebases through semantic search and intelligent Q&A"
+authors = [
+  { name = "gabhyun kim", email = "kimgb415@gmail.com" },
+  { name = "mukhtar kussaiynbekov", email = "mukhtarkussaiynbekov@gmail.com" },
+  { name = "kolbe yang", email = "kyanghasglasses@gmail.com" },
+]
+license = "Apache-2.0"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10, <3.13"
+dependencies = [
+    "pydantic-ai>=0.1.0",
+    "gitpython>=3.1.44,<4.0.0",
+    "tree-sitter>=0.24.0,<0.25.0",
+    "pydantic-settings>=2.7.1,<3.0.0",
+    "sqlalchemy[asyncio]>=2.0.38,<3.0.0",
+    "aiofiles>=24.1.0",
+    "aiohttp>=3.11.18",
+]
+
+[project.urls]
+Homepage = "https://knowlang.dev"
+Repository = "https://github.com/knowlangorg/know-lang"
+
+[project.scripts]
+knowlang = "knowlang.cli:cli_main"
+
+[dependency-groups]
+# UI Interfaces
+gradio = ["gradio>=5.13.1,<6.0.0"]
+# Databases
+vecs = ["vecs>=0.4.5,<0.5.0"]
+chromadb = ["chromadb>=0.6.3,<0.7.0"]
+ollama = ["ollama>=0.4.7,<0.5.0"]
+# Model Providers
+voyage = ["voyageai>=0.3.2,<0.4.0"]
+pytorch = ["torch>=2.6.0,<3.0.0", "transformers>=4.49.0,<5.0.0"]
+nomic-ai = ["einops>=0.8.1,<0.9.0", "sentence-transformers>=4.0.1,<5.0.0"]
+# Analytics
+mixpanel = ["mixpanel>=4.10.1,<5.0.0"]
+# Additional languages
+python = ["tree-sitter-python>=0.23.6,<0.24.0"]
+cpp = ["tree-sitter-cpp>=0.23.4,<0.24.0"]
+typescript = ["tree-sitter-typescript>=0.23.2,<0.24.0"]
+csharp = ["tree-sitter-c-sharp>=0.23.1"]
+# MCP Integration
+mcp = ["mcp[cli]>=1.6.0,<2.0.0"]
+# Sqlite Vector Store
+sqlite = [
+    "aiosqlite>=0.21.0",
+    "sqlite-vec>=0.1.6",
+]
+# ASGI Server
+server = [
+    "fastapi>=0.115.12",
+    "sse-starlette>=2.3.5",
+]
+# Dev dependencies
+dev = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.2",
+    "ruff>=0.11.10",
+]
+packaging = [
+    "pyinstaller>=6.14.0",
+]
+# All
+all = [
+    { include-group = "gradio" },
+    { include-group = "vecs" },
+    { include-group = "chromadb" },
+    { include-group = "ollama" },
+    { include-group = "voyage" },
+    { include-group = "pytorch" },
+    { include-group = "nomic-ai" },
+    { include-group = "mixpanel" },
+    { include-group = "python" },
+    { include-group = "cpp" },
+    { include-group = "typescript" },
+    { include-group = "csharp" },
+    { include-group = "mcp" },
+    { include-group = "sqlite" },
+    { include-group = "server" },
+    { include-group = "dev" },
+    { include-group = "packaging" },
+]
+# Unity Plugin
+unity = [
+    { include-group = "csharp" },
+    { include-group = "sqlite" },
+    { include-group = "server" },
+    { include-group = "packaging" },
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["knowlang"]
+
+[tool.pytest.ini_options]
+testpaths = "tests"
