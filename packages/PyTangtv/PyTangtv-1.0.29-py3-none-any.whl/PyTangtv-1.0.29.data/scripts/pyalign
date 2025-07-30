@@ -1,0 +1,312 @@
+#!python
+#
+#
+
+import sys
+
+try:
+   from tkinter import *
+except:
+   from Tkinter import *
+try:
+   from PIL import ImageTk,ImageDraw
+   from PIL import ImageChops
+   from PIL import Image as pImage
+except:
+   import ImageTk,ImageDraw
+   import ImageChops
+   import Image as pImage
+
+import getopt
+try:
+    from tkFileDialog import askopenfilename
+except:
+    from  tkinter.filedialog  import askopenfilename
+from math import *
+from pytangtv.pyalign import menu
+from pytangtv.pyalign import controls
+from pytangtv.check4updates import check4updates
+
+try:
+    from PIL.Image import ANTIALIAS
+except:
+    from PIL.Image import LANCZOS as ANTIALIAS
+
+
+spawned = False
+w = 0
+h = 0
+s = 1.0
+winx = 640
+winy = 860
+
+
+
+
+options = [ 'width=','height=','scale=','spawn','winx=','winy=']
+optlist,args = getopt.getopt(sys.argv[1:],'ult:w:h:s:',options)
+optdict = {}
+sys.stderr.write("\n")
+for o in optlist:
+   optdict.update({o[0]:o[1]})
+if '-w' in optdict:
+    w = int(optdict['-w'])
+if '--width' in optdict:
+    w = int(optdict['--width'])
+if '-s' in optdict:
+    s = int(optdict['-s'])
+if '--scale' in optdict:
+    s = int(optdict['--scale'])
+if '-h' in optdict:
+    h = int(optdict['-h'])
+if '--height' in optdict:
+    h = int(optdict['--height'])
+if '--spawn' in optdict:
+    spawned = True
+if '--winx' in optdict:
+    winx = int(optdict['--winx'])
+if '--winy' in optdict:
+    winy = int(optdict['--winy'])
+
+#
+# an image viewer
+
+class UI(Frame):
+
+  def __init__(self, master, im, s=1.0,winx=800,winy=600):
+    self.winx = winx
+    self.winy = winy
+    Frame.__init__(self,master,width=self.winx,height=self.winy)
+    self.pack(side=RIGHT,fill=BOTH,expand=TRUE)
+    self.window = master
+    self.parent = master
+    self.image = im
+    self.dimage = im
+    self.buimage = im
+    self.W, self.H = self.image.size
+    self.xS = s
+    self.yS = s
+    self.draw = ImageDraw.Draw(self.image)
+    self.bitmap = ImageTk.PhotoImage(im)
+    if self.W > self.winx or self.H > self.winy:
+       #self.frame = Frame(self,width=self.winx, height=self.winy)
+       #self.frame.grid(row=0,column=0)
+       self.canvas = Canvas(self,width=self.winx, height=self.winy,scrollregion=(0,0,self.W,self.H))
+       self.canvas.bind("<Button-1>", self.mark)
+       self.canvas.bind("<Button-2>",self.remmark)
+       self.canvas.bind("<Button-3>",self.markrev)
+       self.hbar = Scrollbar(self,orient=HORIZONTAL)
+       self.hbar.pack(side=TOP,fill=X)
+       self.hbar.config(command=self.scrollx)
+       self.vbar = Scrollbar(self,orient=VERTICAL)
+       self.vbar.pack(side=LEFT,fill=Y)
+       self.vbar.config(command=self.scrolly)
+       self.canvas.config(xscrollcommand=self.hbar.set,yscrollcommand=self.vbar.set)
+       self.canvas.create_image(0,0, anchor=NW, image=self.bitmap)
+       self.canvas.pack(side=LEFT,expand=True,fill=BOTH)
+    else:
+       self.canvas = Canvas(self,width=self.W, height=self.H)
+       self.canvas.bind("<Button-1>", self.mark)
+       self.canvas.bind("<Button-2>",self.remmark)
+       self.canvas.bind("<Button-3>",self.markrev)
+       self.canvas.create_image(0,0, anchor=NW, image=self.bitmap)
+       self.canvas.pack()
+       self.hbar = None
+       self.vbar = None
+    self.bgimage = None
+    self.bubgimage = None
+    self.im = im
+    self.hstep = 5
+    self.hpos = 0
+    self.vstep = 5
+    self.vpos = 0
+    self.rstep = 1
+    self.spawned = spawned
+    self.rot = 0
+    self.bl = 0
+    self.wmarks = []
+    self.bmarks = []
+  def scrollx(self,event,step,what=None):
+        if event == "moveto":
+                self.canvas.xview(event,step)
+        if event == "scroll":
+                self.canvas.xview(event,step,what)
+  def scrolly(self,event,step,what=None):
+        if event == "moveto":
+                self.canvas.yview(event,step)
+        if event == "scroll":
+                self.canvas.yview(event,step,what)
+  def mark(self,event):
+    cx = event.x
+    cy = event.y
+    self.wmarks.append((cx,cy))
+    self.refresh()
+  def refreshcb(self, val):
+    self.refresh()
+  def markrev(self,event):
+    cx = event.x
+    cy = event.y
+    self.bmarks.append((cx,cy))
+    self.refresh()
+  def remmark(self,event):
+    self.wmarks = []
+    self.bmarks = []
+    self.refresh()
+  def reset(self):
+    self.hpos = 0
+    self.vpos = 0
+    self.rot = 0
+    self.xposentry.delete(0,END)
+    self.xposentry.insert(0,"%d" % -self.hpos)
+    self.yposentry.delete(0,END)
+    self.yposentry.insert(0,"%d" % -self.vpos)
+    self.rposentry.delete(0,END)
+    self.rposentry.insert(0,"%d" % -self.rot)
+    self.image = self.buimage
+    self.bgimage = self.bubgimage
+    self.refresh()
+  def rightstep(self):
+    self.hstep = int(self.xstepentry.get())
+    self.hpos = self.hpos + self.hstep
+    self.xposentry.delete(0,END)
+    self.xposentry.insert(0,"%d" % self.hpos)
+    self.refresh()
+  def leftstep(self):
+    self.hstep = int(self.xstepentry.get())
+    self.hpos = self.hpos - self.hstep
+    self.xposentry.delete(0,END)
+    self.xposentry.insert(0,"%d" % self.hpos)
+    self.refresh()
+  def downstep(self):
+    self.vstep = int(self.ystepentry.get())
+    self.vpos = self.vpos + self.vstep
+    self.yposentry.delete(0,END)
+    self.yposentry.insert(0,"%d" % -self.vpos)
+    self.refresh()
+  def upstep(self):
+    self.vstep = int(self.ystepentry.get())
+    self.vpos = self.vpos - self.vstep
+    self.yposentry.delete(0,END)
+    self.yposentry.insert(0,"%d" % -self.vpos)
+    self.refresh()
+  def rotr(self):
+    self.rstep = float(self.rstepentry.get())
+    self.rot = self.rot - self.rstep
+    self.rposentry.delete(0,END)
+    self.rposentry.insert(0,"%g" % -self.rot)
+    self.refresh()
+  def rotl(self):
+    self.rstep = float(self.rstepentry.get())
+    self.rot = self.rot + self.rstep
+    self.rposentry.delete(0,END)
+    self.rposentry.insert(0,"%g" % -self.rot)
+    self.refresh()
+  def iwrite(self):
+    self.refresh()
+    self.simage.save('pyalign.tiff')
+  def refresh(self):
+    self.rot = -float(self.rposentry.get())
+    self.hpos = int(self.xposentry.get())
+    self.vpos = -int(self.yposentry.get())
+    self.xS = float(self.xstr.get())
+    self.yS = float(self.ystr.get())
+    xoff = int(self.hpos*self.xS)
+    yoff = int(self.vpos*self.yS)
+    width,height = self.image.size
+    im1 = ImageChops.offset(self.image.rotate(self.rot),xoffset=xoff,yoffset=yoff)
+    
+    if xoff > 0: im1.paste(pImage.new('L',(xoff,height)),(0,0,xoff,height))
+    if xoff < 0: im1.paste(pImage.new('L',(abs(xoff),height)),(width+xoff,0,width,height))
+    if yoff > 0: im1.paste(pImage.new('L',(width,yoff)),(0,0,width,yoff))
+    if yoff < 0: im1.paste(pImage.new('L',(width,abs(yoff))),(0,height+yoff,width,height))
+    wsize = int((float(self.image.size[0])*float(self.xstr.get())))
+    hsize = int((float(self.image.size[1])*float(self.ystr.get())))
+    #hsize = int((float(self.image.size[1])*float(self.xstr.get())))
+    im1 = im1.resize((wsize,hsize),ANTIALIAS)
+    dimage = im1
+    s = self.scale.get()
+
+    if self.bgimage != None:
+       im2 = self.bgimage
+       if self.bl == -1:
+          dimage =  im2
+       elif self.bl == 0:
+          dimage =  im1
+       elif self.bl == 1:
+          dimage =  ImageChops.add(im1,im2)
+       elif self.bl == 2:
+          dimage =  ImageChops.difference(im1,im2)
+       elif self.bl == 3:
+          dimage =  ImageChops.darker(im1,im2)
+       elif self.bl == 4:
+          dimage =  ImageChops.lighter(im1,im2)
+       elif self.bl == 5:
+          dimage =  ImageChops.logical_and(im1.convert("1"),im2.convert("1"))
+       elif self.bl == 6:
+          dimage =  ImageChops.logical_or(im1.convert("1"),im2.convert("1"))
+       elif self.bl == 7:
+          dimage =  ImageChops.logical_xor(im1.convert("1"),im2.convert("1"))
+       elif self.bl == 8:
+          dimage =  ImageChops.multiply(im1,im2)
+       elif self.bl == 9:
+          dimage =  ImageChops.blend(im1,im2,s)
+   
+    self.bitmap = ImageTk.PhotoImage(dimage)
+    self.simage = dimage
+    self.canvas.create_image(0,0, anchor=NW, image=self.bitmap)
+    for m in self.wmarks:
+           self.canvas.create_oval(m[0],m[1],m[0]+2,m[1]+2,outline="white")
+    for m in self.bmarks:
+           self.canvas.create_oval(m[0],m[1],m[0]+2,m[1]+2,outline="black")
+        
+#
+# script interface
+
+if __name__ == "__main__":
+
+    import sys
+
+    try:
+        from importlib import metadata
+        _version = metadata.version('PyTangtv')
+    except:
+        _version = 'Version unknown'
+    check4updates('https://pypi.org/pypi/pytangtv/json',thisver=_version)
+
+    root = Tk()
+
+    if len(args) == 0:
+        filename = askopenfilename(filetypes=[("tiff","*.tiff"),
+                  ("png","*.png"),
+                  ("allfiles","*")])
+
+    else:
+        filename = args[0]
+   
+
+    root.title(filename)
+
+
+    mymenu = menu.mymenu(root)
+    frame = Frame(root)
+    frame.pack(expand=FALSE,fill=BOTH)
+    if s != 1.0:
+       im = pImage.open(filename).convert('L')
+       w, h = im.size
+       w = w * s
+       h = h * s
+       im = pImage.open(filename).convert('L').resize((w,h),ANTIALIAS)
+    elif w != 0:
+       im = pImage.open(filename).convert('L').resize((w,h),ANTIALIAS)
+    else:
+       im = pImage.open(filename).convert('L')
+
+    ui =  UI(frame, im, s, winx=winx,winy=winy)
+    mymenu.addui(ui)
+    if len(args) > 1:
+        ui.bgimage = pImage.open(args[1]).convert('L').resize((ui.W,ui.H),ANTIALIAS)
+    ui.bubgimage = ui.bgimage
+    controls.controls(frame,ui)
+
+
+    root.mainloop()
