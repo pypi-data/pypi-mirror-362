@@ -1,0 +1,81 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "polars_st._lib"
+
+[project]
+name = "polars-st"
+description = "Spatial extension for Polars DataFrames"
+readme = "README.md"
+requires-python = ">=3.10"
+dynamic = ["version", "license"]
+dependencies = [
+    "polars>=1.30.0",
+    "pyarrow>=19.0.1", # TODO: remove once fixed https://github.com/pola-rs/pyo3-polars/pull/132
+    "pyogrio>=0.9.0",
+]
+
+[dependency-groups]
+dev = [
+    "altair>=5.4.1",
+    "black>=24.8.0",
+    "geodatasets>=2024.8.0",
+    "geopandas>=1.0.1",
+    "ipykernel>=6.29.5",
+    "maturin[zig]>=1.7.4",
+    "mkdocs-material>=9.5.34",
+    "mkdocs>=1.6.1",
+    "mkdocstrings-python>=1.11.1",
+    "pyright>=1.1.380",
+    "pytest>=8.3.3",
+    "ruff>=0.6.4",
+    "shapely>=2.0.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/Oreilles/polars-st"
+Documentation = "https://oreilles.github.io/polars-st/"
+Issues = "https://github.com/Oreilles/polars-st/issues"
+
+[tool.uv]
+cache-keys = [{file = "pyproject.toml"}, {file = "Cargo.toml"}, {file = "**/*.rs"}]
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
+doctest_optionflags = "IGNORE_EXCEPTION_DETAIL"
+
+[tool.pyright]
+typeCheckingMode = "basic"
+reportPrivateImportUsage = "none"
+
+[tool.ruff]
+target-version="py310"
+line-length = 100
+
+[tool.ruff.format]
+preview = true
+
+[tool.ruff.lint]
+pydocstyle.convention = "google"
+select = ["ALL"]
+fixable = ["ALL"]
+ignore = [
+    "FBT", # Boolean traps
+    "PIE790", # Unnecessary `...` literal
+    "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
+    "PLR0913", # Too many arguments in function definition
+    "PD901", # Avoid using the generic variable name `df` for DataFrames
+    "ISC001",  # Single line implicit string concatenation (unexpected behavior)
+    "COM812",  # Missing trailing comma (unexpected behavior)
+    "D1", # Missing docstring in public module
+    "PLC0415", # `import` should be at the top-level of a file
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "S101", # Assert
+    "ANN", # Type annotations
+]
