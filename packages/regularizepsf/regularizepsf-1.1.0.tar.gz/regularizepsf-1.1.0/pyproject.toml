@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools", "wheel", "numpy", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["regularizepsf"]
+
+[project]
+name = "regularizepsf"
+dynamic = ["version"]
+requires-python = ">3.10"
+description = "Point spread function modeling and regularization"
+dependencies = [
+      "numpy",
+      "h5py",
+      "sep",
+      "astropy",
+      "scipy",
+      "scikit-image",
+      "matplotlib"
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+
+[project.optional-dependencies]
+test = [
+     "pytest",
+     "pytest-cov",
+     "hypothesis",
+     "coverage",
+     "ruff",
+     "pytest-mpl",
+]
+docs = [
+    "packaging",
+    "sphinx",
+    "pydata-sphinx-theme",
+    "sphinx-autoapi",
+    "nbsphinx",
+    "ipython",
+]
+dev = ["regularizepsf[test, docs]", "pre-commit"]
+
+[tool.setuptools_scm]
+
+[tool.ruff]
+exclude = ['tests/*']
+line-length = 120
+# lint.select = ["ALL"]
+lint.ignore = [ "FBT001", "FBT002", "ANN401", "E731"]
+
+#[tool.ruff.lint]
+#select = ["NPY201"]
+
+[tool.isort]
+balanced_wrapping = true
+default_section = "THIRDPARTY"
+include_trailing_comma = true
+known_compatibility = "future"
+known_first_party = "regularizepsf"
+length_sort = false
+length_sort_sections = "stdlib"
+line_length = 120
+multi_line_output = 3
+no_lines_before = "LOCALFOLDER"
+sections = "FUTURE, COMPATIBILITY, STDLIB, THIRDPARTY, FIRSTPARTY, LOCALFOLDER"
+
+[tool.cibuildwheel]
+# Disable building PyPy wheels on all platforms
+skip = "pp*"
