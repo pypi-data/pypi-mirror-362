@@ -1,0 +1,29 @@
+function:
+  inputs: object
+return:
+  defs:
+    valid: false
+  lastOf:
+    - contribute:
+      - context:
+          value: ${inputs.messages}
+    - repeat:
+        lastOf:
+          - def: answer
+            processor: ${generator}
+            modelResponse: results
+          - defs:
+              valid:
+                lang: python
+                code: result = validator(results)
+                fallback: false
+            if: ${ not valid }
+            then: 
+              text: This is not a valid answer. DO NOT GENERATE THE SAME ANSWER AGAIN.
+              contribute: [context]
+          - data: ${ results }
+            contribute: [result]
+      until: ${ valid }
+      maxIterations: ${ k }
+      join:
+        as: lastOf
