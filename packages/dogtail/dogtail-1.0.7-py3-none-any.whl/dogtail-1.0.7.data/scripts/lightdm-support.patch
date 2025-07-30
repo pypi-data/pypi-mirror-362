@@ -1,0 +1,154 @@
+diff --git a/scripts/dogtail-run-headless-next b/scripts/dogtail-run-headless-next
+index e69de29..f1e2c3a 100755
+--- a/scripts/dogtail-run-headless-next
++++ b/scripts/dogtail-run-headless-next
+@@ class DisplayManagerSession:
+-    gdm_config = "/etc/gdm/custom.conf"
+-    kdm_config = "/etc/kde/kdm/kdmrc"
++    gdm_config     = "/etc/gdm/custom.conf"
++    kdm_config     = "/etc/kde/kdm/kdmrc"
++    lightdm_config = "/etc/lightdm/lightdm.conf"
+ 
+-    gdm_options = {"section": "daemon",
+-                   "enable": "AutomaticLoginEnable",
+-                   "user": "AutomaticLogin"}
+-    kdm_options = {"section": "X-:0-Core",
+-                   "enable": "AutoLoginEnable",
+-                   "user": "AutoLoginUser"}
++    gdm_options = {
++        "section": "daemon",
++        "enable":  "AutomaticLoginEnable",
++        "user":    "AutomaticLogin"
++    }
++    kdm_options = {
++        "section": "X-:0-Core",
++        "enable":  "AutoLoginEnable",
++        "user":    "AutoLoginUser"
++    }
++    lightdm_options = {
++        "section": "Seat:*",
++        "user":    "autologin-user",
++        "timeout": "autologin-user-timeout",
++        "session": "autologin-session"
++    }
+@@     def __init__(self, display_manager="gdm", session="gnome", session_binary="gnome-shell", user=None):
+         if display_manager == "gdm":
+             self.tmp_file = "/tmp/%s" % os.path.basename(self.gdm_config)
+             self.options  = self.gdm_options
+             self.config   = self.gdm_config
+-
+-        elif display_manager == "kdm":
+-            self.tmp_file = "/tmp/%s" % os.path.basename(self.kdm_config)
+-            self.options  = self.kdm_options
+-            self.config   = self.kdm_config
++        elif display_manager == "kdm":
++            self.tmp_file = "/tmp/%s" % os.path.basename(self.kdm_config)
++            self.options  = self.kdm_options
++            self.config   = self.kdm_config
++
++        elif display_manager == "lightdm":
++            self.tmp_file = "/tmp/%s" % os.path.basename(self.lightdm_config)
++            self.options  = self.lightdm_options
++            self.config   = self.lightdm_config
++
++        else:
++            raise ValueError("Unsupported display manager: %s" % display_manager)
+@@     def setup(self, restore=False, force_xorg=False):
+-        if not restore:
+-            config.set(self.options["section"], self.options["enable"], "true")
+-            config.set(self.options["section"], self.options["user"], self.user)
+-            if force_xorg:
+-                config.set(self.options["section"], "WaylandEnable", "false")
+-            else:
+-                pass
+-                #config.set(self.options["section"], "WaylandEnable", "true")
+-        else:
+-            config.remove_option(
+-                self.options["section"], self.options["enable"])
+-            config.remove_option(
+-                self.options["section"], self.options["user"])
++        section = self.options["section"]
++        if not config.has_section(section):
++            config.add_section(section)
++
++        if not restore:
++            if self.display_manager in ("gdm", "kdm"):
++                config.set(section, self.options["enable"], "true")
++                config.set(section, self.options["user"], self.user)
++                if force_xorg and self.display_manager == "gdm":
++                    config.set(section, "WaylandEnable", "false")
++            else:  # lightdm
++                config.set(section, self.options["user"], self.user)
++                config.set(section, self.options["timeout"], "0")
++                if self.session:
++                    config.set(section, self.options["session"], self.session)
++        else:
++            if self.display_manager in ("gdm", "kdm"):
++                config.remove_option(section, self.options["enable"])
++                config.remove_option(section, self.options["user"])
++            else:
++                for key in ("user", "timeout", "session"):
++                    config.remove_option(section, self.options[key])
+@@ def parse():
+-    parser.add_argument("--dm",
+-                        required=False,
+-                        help="\n".join((
+-                            "What display manager to use for spawning session.",
+-                            "Supported are 'gdm' (default) and 'kdm'."
+-                        )))
++    parser.add_argument("--dm",
++                        required=False,
++                        help="\n".join((
++                            "What display manager to use for spawning session.",
++                            "Supported: 'gdm' (default), 'kdm', or 'lightdm'."
++                        )))
+@@ def main():
+-    if args.dm == "gdm" or args.dm is None:
+-        display_manager_name = "gdm"
+-    elif args.dm == "kdm":
+-        display_manager_name = "kdm"
+-    else:
+-        print("dogtail-run-headless-next: I do not recognize the display manager!")
+-        sys.exit(-1)
++    # select display manager
++    if args.dm in (None, "gdm"):
++        display_manager_name = "gdm"
++    elif args.dm == "kdm":
++        display_manager_name = "kdm"
++    elif args.dm == "lightdm":
++        display_manager_name = "lightdm"
++    else:
++        print("dogtail-run-headless-next: Unknown display manager '%s'!" % args.dm)
++        sys.exit(-1)
+@@ def main():
+-    if args.session is None or "gnome" in args.session:
+-        if args.session_binary is None:
+-            args.session_binary = "/usr/bin/gnome-session"
+-
+-    elif "kde" in args.session:
+-        if args.session_binary is None:
+-            args.session_binary = "/usr/bin/kwin"
+-
+-        if args.session == "kde":
+-            args.session = "kde-plasma"
+-
+-    else:
+-        if args.session_binary is None:
+-            print("dogtail-run-headless-next:",
+-                  "Need to specify a --session-binary to get env from in your choosen --session.")
+-            sys.exit(-1)
++    # default session / session-binary per DM
++    if display_manager_name == "lightdm":
++        args.session        = args.session or "mate"
++        args.session_binary = args.session_binary or "/usr/bin/mate-session"
++    elif args.session is None or "gnome" in args.session:
++        args.session_binary = args.session_binary or "/usr/bin/gnome-session"
++    elif "kde" in args.session:
++        args.session_binary = args.session_binary or "/usr/bin/kwin"
++        if args.session == "kde":
++            args.session = "kde-plasma"
++    else:
++        if not args.session_binary:
++            print("dogtail-run-headless-next: Need --session-binary for session '%s'." %
++                  args.session)
++            sys.exit(-1)
