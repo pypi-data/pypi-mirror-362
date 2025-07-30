@@ -1,0 +1,198 @@
+# This file is part of the FastJet package
+
+# define a main runner
+.linux_gcc_runner:
+  image: gcc:latest
+  rules:
+  - when: always
+
+# define a MacOS runner
+.macos_saas_runner:
+  tags:
+    - saas-macos-medium-m1
+  #image: macos-15-xcode-16
+  #before_script:
+  variables:
+    HOMEBREW_NO_AUTO_UPDATE: 1
+  # rules:
+  #   # forks sometimes have trouble running the MacOS jobs. So MacOS jobs run only
+  #   # if this variable is set to true. Set it up in Settings > CI/CD > Variables.
+  #   # Make sure you uncheck "Protect variables" so that it is not restricted
+  #   # to protected branches
+  #   - if: '$RUN_MACOS == "true"'
+  #     when: always
+  #   - when: never
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# a simple autotools example with just C++ plugins, no python or CGAL
+build_and_test_autoconf:
+
+  extends: .linux_gcc_runner
+  stage: build
+  before_script:
+    # since the macos do not run if this is not properly set, examine it here
+    - echo RUN_MACOS is set to $RUN_MACOS
+    #- apt update && apt install -y libcgal-dev
+  script:
+    # this line sets up autotools pieces in both FJ and SISCone
+    - NOCONFIGURE=true ./autogen.sh
+    # and runs configure with the given flags
+    # NB: CGAL has problems as of 2024
+    #- ./configure --enable-allcxxplugins --enable-cgal
+    - ./configure --enable-allcxxplugins
+    - make -j4
+    - make check
+    #
+    # then run some basic tests of the clustering
+    - git clone https://gitlab.com/fastjet/fastjet-validation/data.git
+    - ./regression-tests/test-all-algs.pl -datadir data -nev 100
+
+# a more extensive CMake test with all plugins and python and CGAL
+build_and_test_cmake_and_fjcore:
+  extends: .linux_gcc_runner
+  stage: build
+  before_script:
+    - apt update && apt install -y cmake python3 python3-dev swig libcgal-dev
+  script:
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DFASTJET_ENABLE_CGAL=ON -DFASTJET_ENABLE_PYTHON=ON -DFASTJET_ENABLE_ALLPLUGINS=ON -S . -B build
+    - cmake -LH build
+    - cmake --build build --clean-first --parallel=4
+    - ctest --test-dir build -V
+    - cmake --install build
+    # Check installed fastjet information
+    - fastjet-config --help
+    - fastjet-config --version
+    - fastjet-config --prefix
+    - fastjet-config --cxxflags --libs
+    - fastjet-config --pythonpath
+    - fastjet-config --list-plugins
+    - fastjet-config --config
+    # next run some basic tests of the clustering
+    - git clone https://gitlab.com/fastjet/fastjet-validation/data.git
+    - ./regression-tests/test-all-algs.pl -fjtp-exec build/example/fastjet_timing_plugins -datadir data -nev 100
+    - ./regression-tests/test-all-algs.pl -fjtp-exec build/example/fastjet_timing_plugins -datadir data -nev 100 -strat 1 -areas
+    - ./regression-tests/test-all-algs.pl -fjtp-exec build/example/fastjet_timing_plugins -datadir data -nev 100 -strat 1 -bkgds
+    # run a basic python test
+    # Not in a virtual environment, so manually set PYTHONPATH (should be avoided!)
+    - export PYTHONPATH="$(fastjet-config --pythonpath):${PYTHONPATH}"
+    - python3 -c "import fastjet; print(fastjet)"
+    - python3 -c "import fastjet as fj; jetdef=fj.JetDefinition(fj.antikt_algorithm, 0.4); jets=jetdef([fj.PtYPhiM(100.0, 0.1, 0.1),fj.PtYPhiM(100.0, 0.2, 0.2)]); print(jets[0])"
+    # check that we can produce an fjcore tarball
+    - cd scripts
+    - ./mkfjcore.sh
+    - cd ..
+
+# check cmake from a distribution
+distcheck_build_and_test_cmake:
+  extends: .linux_gcc_runner
+  stage: build
+  before_script:
+    - apt update && apt install -y cmake python3 python3-dev swig
+  script:
+    # first get the tarball
+    - NOCONFIGURE=true ./autogen.sh
+    # and runs configure with the given flags
+    # NB: CGAL has problems as of 2024
+    #- ./configure --enable-allcxxplugins --enable-cgal
+    - ./configure --enable-allcxxplugins --enable-pyext --enable-swig
+    - make -j6 distcheck
+
+    # then unpack and build it
+    - tar -xzf fastjet-3*.tar.gz
+    - cd fastjet-3*/
+    - cmake -DCMAKE_INSTALL_PREFIX=${HOME}/fastjet-install -DPython_EXECUTABLE=$(which python3) -DFASTJET_ENABLE_PYTHON=ON -DFASTJET_ENABLE_ALLPLUGINS=ON -S . -B build
+    - cmake -LH build
+    - cmake --build build --clean-first --parallel=6
+    - ctest --test-dir build -V
+    - cmake --install build
+
+    # Basic python test
+    - export PYTHONPATH="$(${HOME}/fastjet-install/bin/fastjet-config --pythonpath):${PYTHONPATH}"
+    - python3 -c "import fastjet; print(fastjet)"
+    - python3 -c "import fastjet as fj; jetdef=fj.JetDefinition(fj.antikt_algorithm, 0.4); jets=jetdef([fj.PtYPhiM(100.0, 0.1, 0.1),fj.PtYPhiM(100.0, 0.2, 0.2)]); print(jets[0])"
+
+
+build_and_test_macos_cmake:
+  extends: .macos_saas_runner
+  stage: build
+  before_script:
+    - echo "started by ${GITLAB_USER_NAME} / @${GITLAB_USER_LOGIN}"
+    - echo "CI project path is $CI_PROJECT_PATH"
+    - brew install cmake python3 swig
+  script:
+    - cmake -DCMAKE_INSTALL_PREFIX=${HOME}/fastjet-install -DPython_EXECUTABLE=$(which python3) -DFASTJET_ENABLE_PYTHON=ON -DFASTJET_ENABLE_ALLPLUGINS=ON -S . -B build
+    - cmake -LH build
+    - cmake --build build --clean-first --parallel=6
+    - ctest --test-dir build -V
+    - cmake --install build
+
+    # Check installed fastjet information
+    - ${HOME}/fastjet-install/bin/fastjet-config --help
+    - ${HOME}/fastjet-install/bin/fastjet-config --version
+    - ${HOME}/fastjet-install/bin/fastjet-config --prefix
+    - ${HOME}/fastjet-install/bin/fastjet-config --cxxflags --libs
+    - ${HOME}/fastjet-install/bin/fastjet-config --pythonpath
+    - ${HOME}/fastjet-install/bin/fastjet-config --list-plugins
+    - ${HOME}/fastjet-install/bin/fastjet-config --config
+
+    # next run some basic tests of the clustering
+    - git clone https://gitlab.com/fastjet/fastjet-validation/data.git
+    - ./regression-tests/test-all-algs.pl -fjtp-exec build/example/fastjet_timing_plugins -datadir data -nev 100
+    - ./regression-tests/test-all-algs.pl -fjtp-exec build/example/fastjet_timing_plugins -datadir data -nev 100 -strat 1 -areas
+    - ./regression-tests/test-all-algs.pl -fjtp-exec build/example/fastjet_timing_plugins -datadir data -nev 100 -strat 1 -bkgds
+
+    # Basic python test
+    - export PYTHONPATH="$(${HOME}/fastjet-install/bin/fastjet-config --pythonpath):${PYTHONPATH}"
+    - python3 -c "import fastjet; print(fastjet)"
+    - python3 -c "import fastjet as fj; jetdef=fj.JetDefinition(fj.antikt_algorithm, 0.4); jets=jetdef([fj.PtYPhiM(100.0, 0.1, 0.1),fj.PtYPhiM(100.0, 0.2, 0.2)]); print(jets[0])"
+
+
+build_and_test_cmake_windows:
+  tags:
+    - saas-windows-medium-amd64
+  stage: build
+  cache:
+    paths:
+      - C:\ProgramData\chocolatey\lib  # Cache installed Chocolatey packages
+      - C:\vcpkg\installed  # Cache installed vcpkg packages
+      - C:\vcpkg\archives   # Cache binary archives
+      - C:\Strawberry\
+  before_script:
+    - Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+    - refreshenv
+    - choco install swig strawberryperl gzip -y
+    - refreshenv
+    - vcpkg.exe update
+    - vcpkg.exe install getopt
+  script:
+    - cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+    - Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+    - cmake -G Ninja -S . -B build -DCMAKE_BUILD_TYPE=Release -DPython_EXECUTABLE="$(where.exe python.exe)" -DFASTJET_ENABLE_ALLCXXPLUGINS=ON -DFASTJET_ENABLE_PYTHON=ON -Dunofficial-getopt-win32_DIR='C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32' -DSWIG_EXECUTABLE="$(where.exe swig.exe)"
+    - cmake -LH build
+    - cmake --build build --clean-first --parallel=4
+    #- ctest --test-dir build -V
+    - cmake --install build
+    # Check installed fastjet information
+    #- fastjet-config --help
+    #- fastjet-config --version
+    #- fastjet-config --prefix
+    #- fastjet-config --cxxflags --libs
+    #- fastjet-config --pythonpath
+    #- fastjet-config --list-plugins
+    #- fastjet-config --config
+    # next run some basic tests of the clustering
+    - $env:PATH="C:\Program Files (x86)\FastJet\bin;$env:PATH"
+    - git clone https://gitlab.com/fastjet/fastjet-validation/data.git
+    - rm data/Pythia-PtMin50-LHC-10kev.dat.gz
+    - cp data/Pythia-PtMin50-LHC-10kev-DONT-DELETE.dat.gz data/Pythia-PtMin50-LHC-10kev.dat.gz
+    - perl.exe ./regression-tests/test-all-algs.pl -fjtp-exec build\example\fastjet_timing_plugins.exe -datadir data -nev 100 -unzipcmd "gzip.exe -dc"
+    - perl.exe ./regression-tests/test-all-algs.pl -fjtp-exec build\example\fastjet_timing_plugins.exe -datadir data -nev 100 -strat 1 -areas -unzipcmd "gzip.exe -dc"
+    - perl.exe ./regression-tests/test-all-algs.pl -fjtp-exec build\example\fastjet_timing_plugins.exe -datadir data -nev 100 -strat 1 -bkgds -unzipcmd "gzip.exe -dc"
+    # run a basic python test
+    # Not in a virtual environment, so manually set PYTHONPATH (should be avoided!)
+    - $env:PYTHONPATH="C:\Program Files (x86)\FastJet\lib\python3.13\site-packages\;$env:PYTHONPATH"
+    - python.exe -c "import fastjet; print(fastjet)"
+    - python.exe -c "import fastjet as fj; jetdef=fj.JetDefinition(fj.antikt_algorithm, 0.4); jets=jetdef([fj.PtYPhiM(100.0, 0.1, 0.1),fj.PtYPhiM(100.0, 0.2, 0.2)]); print(jets[0])"
+

@@ -1,0 +1,56 @@
+# -*-Makefile-*-
+
+all: fastjet.py 
+
+fastjet.py: fastjet-doc.i fastjet.i
+	swig -python -c++ -I../include -I../tools -o swig_wrap.cpp fastjet.i
+
+fastjet-doc.i: ../xml/index.xml
+	../scripts/doxy2swig/doxy2swig.py -t -f ../xml/index.xml fastjet-doc.i
+
+old: fastjet.i
+	swig -python -c++ -I../include -I../tools fastjet.i
+	$(CXX) -shared `python-config --includes --libs` -DSWIG -I../include -I../tools `fastjet-config --libs` -fPIC -DPIC fastjet_wrap.cxx -o _fastjet.so
+
+clean:
+	rm -f fastjet-doc.i
+	rm -f fastjet.py
+	rm -f swig_wrap.cpp
+	rm -f fastjet_wrap.cxx
+	rm -f _fastjet.so
+
+fastjet.py: ../include/fastjet/config_auto.h
+fastjet.py: ../include/fastjet/config.h
+fastjet.py: ../include/fastjet/internal/base.hh
+fastjet.py: ../include/fastjet/internal/numconsts.hh
+fastjet.py: ../include/fastjet/internal/IsBase.hh
+fastjet.py: ../include/fastjet/internal/deprecated.hh
+fastjet.py: ../include/fastjet/internal/BasicRandom.hh
+fastjet.py: ../include/fastjet/SharedPtr.hh
+fastjet.py: ../include/fastjet/LimitedWarning.hh
+fastjet.py: ../include/fastjet/Error.hh
+fastjet.py: ../include/fastjet/PseudoJetStructureBase.hh
+fastjet.py: ../include/fastjet/PseudoJet.hh
+fastjet.py: ../include/fastjet/FunctionOfPseudoJet.hh
+fastjet.py: ../include/fastjet/RangeDefinition.hh
+fastjet.py: ../include/fastjet/Selector.hh
+fastjet.py: ../include/fastjet/JetDefinition.hh
+fastjet.py: ../include/fastjet/CompositeJetStructure.hh
+fastjet.py: ../include/fastjet/WrappedStructure.hh
+fastjet.py: ../include/fastjet/ClusterSequenceStructure.hh
+fastjet.py: ../include/fastjet/ClusterSequence.hh
+fastjet.py: ../include/fastjet/RectangularGrid.hh
+fastjet.py: ../include/fastjet/NNBase.hh
+fastjet.py: ../include/fastjet/NNH.hh
+fastjet.py: ../include/fastjet/NNFJN2Plain.hh
+fastjet.py: ../include/fastjet/NNFJN2Tiled.hh
+fastjet.py: ../include/fastjet/GhostedAreaSpec.hh
+fastjet.py: ../include/fastjet/AreaDefinition.hh
+fastjet.py: ../include/fastjet/ClusterSequenceAreaBase.hh
+fastjet.py: ../include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh
+fastjet.py: ../include/fastjet/ClusterSequenceActiveArea.hh
+fastjet.py: ../include/fastjet/ClusterSequence1GhostPassiveArea.hh
+fastjet.py: ../include/fastjet/ClusterSequencePassiveArea.hh
+fastjet.py: ../include/fastjet/ClusterSequenceVoronoiArea.hh
+fastjet.py: ../include/fastjet/ClusterSequenceArea.hh
+fastjet.py: FastJetPythonExtensions.hh

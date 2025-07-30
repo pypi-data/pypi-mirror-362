@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# this assumes that
+#  - you have pprof, sed, dc and awk
+#  - you have linked test with google profiler libraries (see src/Makefile)
+get_mem_usage_event(){
+    echo $i;
+    HEAPPROFILE=hp ./test $i
+    heap_file=`ls -1 *.heap | tail -n 1`	
+    pprof --text --alloc_space --files ./test $heap_file | grep "??" > m.dat
+    mem_used=`awk '{print $4}' m.dat`
+}
+
+save_to_file(){
+    echo $i" "$mem_usage" "$mem_usage2 >> mem_usage.dat
+}
+
+#rm mem_usage.dat
+
+get_mem_usage(){
+    mem_usage=0.0
+    mem_usage2=0.0
+    for (( j=0 ; j<$N_runs ; j++ )); do
+	get_mem_usage_event
+	mem_usage=`echo "6 k $mem_usage $mem_used + p" | dc`
+	mem_usage2=`echo "6 k $mem_usage2 $mem_used $mem_used * + p" | dc`
+    done
+    mem_usage=`echo "6 k $mem_usage $N_runs / p" | dc`
+    mem_usage2=`echo "6 k $mem_usage2 $N_runs / $mem_usage $mem_usage * - p" | dc`
+    save_to_file
+}
+
+N_runs=1000
+for (( i=10 ; i<100 ; i+=10 )); do
+    get_mem_usage
+done
+N_runs=100
+for (( i=100 ; i<1000 ; i+=50 )); do
+    get_mem_usage
+done
+N_runs=10
+for (( i=1000 ; i<5001 ; i+=500 )); do
+    get_mem_usage
+done
+#N_runs=5
+#for (( i=6000 ; i<6001 ; i+=500 )); do
+#    get_mem_usage
+#done

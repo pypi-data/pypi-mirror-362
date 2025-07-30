@@ -1,0 +1,74 @@
+set x size 20
+set y size 8
+set font size 14
+set symbol size 0.1
+
+.pi. = {rpn pi}
+.pim. = {rpn pi -1.0 *}
+.pi2. = {rpn pi 2.0 *}
+
+set x type linear
+set x axis -10 10 1.0
+set y axis .pim. .pi. 1.0
+set x name "$\eta$"
+set y name "$\phi$"
+set clip on
+draw axes
+
+open "particles.dat"
+read columns x=1 y=2
+set color black
+set symbol size 0.15
+draw symbol 0
+
+open "jets.dat"
+# read the number of jets
+read .nb_jets. * *
+
+# draw jet centres
+read columns x=1 y=2 z=4
+.ic. = 0
+set color black
+set symbol size 0.5
+while {rpn .ic. .nb_jets. >}
+    .x. = {rpn x .ic. @}
+    .y. = {rpn y .ic. @}
+    draw symbol 1 at .x. .y.
+    .ic. += 1
+end while
+
+# draw jet contents
+set symbol size 0.2
+while {rpn .ic. ..num_col_data.. >}
+    .x. = {rpn x .ic. @}
+    .y. = {rpn y .ic. @}
+    .z. = {rpn z .ic. @}
+    if {rpn .z. 0 ==}
+	set color red
+    else if {rpn .z. 1 ==}
+	set color green
+    else if {rpn .z. 2 ==}
+	set color blue
+    else if {rpn .z. 3 ==}
+	set color cyan
+    else if {rpn .z. 4 ==}
+	set color magenta
+    else if {rpn .z. 5 ==}
+	set color yellow
+    else if {rpn .z. 6 ==}
+	set color black
+    else if {rpn .z. 7 ==}
+	set color orange
+    else if {rpn .z. 8 ==}
+	set color brown
+    else if {rpn .z. 9 ==}
+	set color LightGray
+    else if {rpn .z. 10 ==}
+	set color ForestGreen
+    else
+	set color skyblue
+    end if
+    .z. = {rpn .z. 11 +}
+    draw symbol .z. at .x. .y.
+    .ic. += 1
+end while

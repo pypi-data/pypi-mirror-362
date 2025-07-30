@@ -1,0 +1,54 @@
+
+# Makefile generated automatically by /ada1/lpthe/salam/scripts/mkcxx.pl '-f' '-c'
+# run 'make make' to update it if you add new files
+
+CXXFLAGS = -Wall -g -O2
+
+INCLUDE += `/ada1/lpthe/salam/work/fastjet/fastjet-installation/bin/fastjet-config --cxxflags`
+LIBRARIES  += `/ada1/lpthe/salam/work/fastjet/fastjet-installation/bin/fastjet-config --libs --plugins`
+
+INCLUDE += -I/ada1/lpthe/salam/utils/CmdLine
+LIBRARIES  += -L/ada1/lpthe/salam/utils/CmdLine -lCmdLine
+INCLUDE += $(LCLINCLUDE)
+
+COMMONSRC = fctestc.cc
+F77SRC = 
+COMMONOBJ = fctestc.o 
+
+PROGSRC = checks-for-3.0b1.cc
+PROGOBJ = checks-for-3.0b1.o
+
+INCLUDE += 
+LIBRARIES += 
+
+FC=gfortran
+
+all:  checks-for-3.0b1 
+
+
+checks-for-3.0b1: checks-for-3.0b1.o  $(COMMONOBJ)
+	$(CXX) $(LDFLAGS) -o $@ $@.o $(COMMONOBJ) $(LIBRARIES)
+
+fctest: fctest.o $(COMMONOBJ)
+	$(FC)  $(LDFLAGS) -o $@ $@.o $(COMMONOBJ) $(LIBRARIES) -lstdc++
+
+make:
+	/ada1/lpthe/salam/scripts/mkcxx.pl '-f' '-c'
+
+clean:
+	rm -vf $(COMMONOBJ) $(PROGOBJ)
+
+realclean: clean
+	rm -vf  checks-for-3.0b1 
+
+.cc.o:         $<
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+.cpp.o:         $<
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+.f.o:         $<
+	$(F77) $(FFLAGS) -c $< -o $@
+
+
+depend:
+	makedepend  $(LCLINCLUDE) -Y --   -- $(COMMONSRC) $(PROGSRC)
+# DO NOT DELETE

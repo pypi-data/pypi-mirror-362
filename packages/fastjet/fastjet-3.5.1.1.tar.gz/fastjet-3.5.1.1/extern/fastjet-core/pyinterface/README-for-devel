@@ -1,0 +1,70 @@
+*** THE PART BELOW IS OUT OF DATE (but useful to keep for future projects ***
+***
+*** Current procedure: configure with --enable-pyext --enable-swig
+*** and the python interface will be automatically updated as needed
+***
+
+Questions from Matteo / Gavin:
+
+- set_python_info v. maintaining set_user_info (if the latter works);
+  in the end Matteo is OKish with set_python_info
+
+- Matteo queries nomenclature: UserInfoPython (never to be used by
+  python user) v. SelectorPython (is to be used) -- worries that
+  user might get confused between these internal/external classes
+
+GS: The two questions above are related: I think that providing direct
+    support for set_user_info would be roughly equivalent to providing
+    UserInfoPython. I agree thast the current solution has a
+    class/function mismatch but this is more concise. An alternative
+    would be to have UserInfoPython public i.e. the end-user could do
+    as for the Selector (or Recombiner) and create a UserInfoPython
+    based on one of their classes and then call setuser_info (provided
+    this is feasible at all). Then we could also provide
+    set_python_info as a shortcut.
+
+- can SelectorWorkerPython return the name of the function in its
+  description? (also name for classes that don't have __str__?)
+
+GS: this is one of the (many) examples where I ahve the feeling to
+    walk outside my comfort zone: I tried several things but it looks
+    like a function/claaa automatically has a __str__ by default! (the
+    check at line 80 of FastJetPythinExtension always finds it). I'll
+    try to look a bit more into this.
+
+- do we want selectors that have the "applies_jet_by_jet = false" and
+  a corresponding terminator? [not critical at this stage]
+
+GS: that should be doable by testing "applies_jet_by_jet" in the ctor
+    of SelectorWorkerPython and then make sure that either the object
+    is callable (applies_jet_by_jet==true) of terminator is
+    implemented (applies_jet_by_jet==false). I should be able to
+    handle that :-)
+
+
+
+
+
+----------------------------------------------------------------------
+old procedure to get things working
+
+- build and install fastjet (using clang as a compiler)
+  Following assumes installed in FJINSTALL
+  
+- cd into the pyinterface directory
+
+- parse the interface w swig:
+
+   swig -python -c++ -I../include fastjet.i
+
+- link the module against FJ
+
+   clang++ -shared `python-config --includes --libs` -DSWIG -I../include -L$(FJINSTALL)/lib -lfastjet -Wl,-rpath,$(FJINSTALL)/lib -fPIC -DPIC fastjet_wrap.cxx -o _fastjet.so
+
+
+   OR
+
+   c++ -shared `python-config --includes --libs` -DSWIG -I../include `fastjet-config --libs` -fPIC -DPIC fastjet_wrap.cxx -o _fastjet.so
+
+- test by running
+   ./test.py

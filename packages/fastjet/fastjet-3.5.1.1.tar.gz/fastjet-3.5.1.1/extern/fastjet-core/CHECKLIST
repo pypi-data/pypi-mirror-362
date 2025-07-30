@@ -1,0 +1,1732 @@
+CHECKLIST for releasing fastjet
+-------------------------------
+
+this file will at some point contain the checklist to be carried out
+before each release. If you make a release, update the X.Y.Z numbers
+to indicate you carried out the operation.
+
+
+
+----------------------------------------------------------------------
+checklist for X.Y.Z (make a copy before editing!)
+-------------------
+  preparatory work
+  ~~~~~~~~~~~~~~~~
+X.Y.Z  run 
+         git pull
+         git submodule update
+X.Y.Z  make sure the release system has up to date autoconf and automake
+X.Y.Z  make sure 8 files are symbolic links to the correct automake version
+       - [ ] compile             - [ ] install-sh
+       - [ ] config.guess        - [ ] missing
+       - [ ] config.sub          - [ ] py-compile
+       - [ ] depcomp             - [ ] test-driver
+       if not, try running autogen.sh to see if the situation improves!
+       
+X.Y.Z  make sure headers are up to date with ./scripts/update-headers.pl
+X.Y.Z  update version number with ./scripts/set-version.sh VERSION-NUMBER
+X.Y.Z  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       Note: as of 2015-01-06 tycho only has v1.6.1 which does not
+             behave properly use instead
+             ~salam/software/doxygen-1.8.8/bin/doxygen             
+       Note: as of 2017-02-09 the doxyfile was updated to v1.8.12 so
+             it may not work on tycho (which has no native doxygen)
+X.Y.Z make sure the swig interface is up-to-date: this is done via the
+      --enable-swig (and --enable-pyext) configure option.
+      "make" should build the interface         
+      [old (outdated) version: 
+             make -f makefile.internal clean; make -f makefile.internal]
+X.Y.Z  ensure NEWS is up to date (and has the correct release date!)
+X.Y.Z  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+X.Y.Z  check copyright dates in fjcore preamble (scripts/preamble-fjcore.txt)
+
+  validation/checks
+  ~~~~~~~~~~~~~~~~~
+X.Y.Z  make check 
+X.Y.Z  within zsh, in the examples directory, do either in zsh (see below for bash)
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [Must be done without CGAL? You may have to recompile examples manually]
+       Or in bash
+         echo "mem_test" > out;
+         for a in [01]*.cc; do
+           g++ $a `fastjet-config --cxxflags --libs --plugins` -o ${a%.cc}
+           tmp=`grep 'run it with.*[01].*<' $a | sed 's/.*://'`; cmd=($tmp)
+           echo ${cmd[0]} | tee -a out; valgrind ${cmd[0]} < ${cmd[2]} >> out 2>&1
+         done
+X.Y.Z  go to testsuite; make with an installation of the current version;
+         make clean; make; ./run_tests and ./run-all.sh
+X.Y.Z  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk [--fastjet-config file]
+X.Y.Z  make sure it's committed (before the nightly check)
+X.Y.Z  rerun the nightly check
+X.Y.Z  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-X.Y.Z"
+X.Y.Z  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+  prepare the distributed material
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+X.Y.Z  make distcheck; record the md5sum here (and revision number)
+X.Y.Z  generate fjcore and note its md5sum here
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-X.Y.Z.tar.gz; cd ..
+
+  do the release and announce it
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+X.Y.Z  copy distribution to web: cp -p fastjet-X.Y.Z.tar.gz ~salam/www/fastjet/repository/
+X.Y.Z  copy fjcore to web: cp -p scripts/fjcore-X.Y.Z.tar.gz ~salam/www/fastjet/repository
+X.Y.Z  compile manual
+X.Y.Z  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-X.Y.Z.pdf
+X.Y.Z  doxygen: to avoid spurious files, run doxygen on a tarball
+         tar -xzf fastjet-X.Y.Z.tar.gz
+         cd fastjet-X.Y.Z
+         ./configure --enable-allcxxplugins
+         doxygen
+       then move to web: mv html ~salam/www/fastjet/repository/doxygen-X.Y.Z
+       (or scp -r html tycho:~salam/www/fastjet/repository/doxygen-X.Y.Z)
+       clean: cd ..; rm -Rf fastjet-X.Y.Z
+X.Y.Z  update main web page & menu in devel area
+X.Y.Z  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+X.Y.Z  update main web-page area
+X.Y.Z  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z    
+X.Y.Z  tweet the release
+
+  prepare for the next devel phase
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+X.Y.Z  make sure it's committed with the CHECKLIST
+X.Y.Z  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+X.Y.Z  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+
+----------------------------------------------------------------------
+checklist for 3.3.4
+-------------------
+  preparatory work
+  ~~~~~~~~~~~~~~~~
+3.3.4  run svn up
+3.3.4  make sure the release system has up to date autoconf and automake
+          automake-1.16.2  and autoconf-2.69
+3.3.4  make sure 8 files are symbolic links to the correct automake version
+       - [v] compile             - [v] install-sh
+       - [v] config.guess        - [v] missing
+       - [v] config.sub          - [v] py-compile
+       - [v] depcomp             - [v] test-driver
+       if not, try running autogen.sh to see if the situation improves!  
+3.3.4  make sure headers are up to date with ./scripts/update-headers.pl
+3.3.4  update version number with ./scripts/set-version.sh 3.3.4
+3.3.4  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       Note: as of 2015-01-06 tycho only has v1.6.1 which does not
+             behave properly use instead
+             ~salam/software/doxygen-1.8.8/bin/doxygen             
+       Note: as of 2017-02-09 the doxyfile was updated to v1.8.12 so
+             it may not work on tycho (which has no native doxygen)
+3.3.4 make sure the swig interface is up-to-date: this is done via the
+      --enable-swig (and --enable-pyext) configure option.
+      "make" should build the interface         
+      [old (outdated) version: 
+             make -f makefile.internal clean; make -f makefile.internal]
+3.3.4  ensure NEWS is up to date (and has the correct release date!)
+3.3.4  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.4  check copyright dates in fjcore preamble (scripts/preamble-fjcore.txt)
+
+  validation/checks
+  ~~~~~~~~~~~~~~~~~
+3.3.4  make check 
+3.3.4  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [Must be done without CGAL? You may have to recompile examples manually]
+         echo "mem_test" > out;
+         for a in [01]*.cc; do
+           g++ $a `fastjet-config --cxxflags --libs --plugins` -o ${a%.cc}
+           tmp=`grep 'run it with.*[01].*<' $a | sed 's/.*://'`; cmd=($tmp)
+           echo ${cmd[0]} | tee -a out; valgrind ${cmd[0]} < ${cmd[2]} >> out 2>&1
+         done
+3.3.4  go to testsuite; make with an installation of the current version;
+         make clean; make; ./run_tests and ./run-all.sh
+3.3.4  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk [--fastjet-config file]
+3.3.4  make sure it's committed (before the nightly check)
+3.3.4  rerun the nightly check
+3.3.4  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-3.3.4"
+3.3.4  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+  prepare the distributed material
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.4  make distcheck; record the md5sum here (and revision number)
+       19de6f4be3e7cf7dad29e6174d2739cf  fastjet-3.3.4.tar.gz (rev 4444)
+3.3.4  generate fjcore and note its md5sum here
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-3.3.4.tar.gz; cd ..
+       b3372cdf8f81817536e913beda008c7b  fjcore-3.3.4.tar.gz
+
+  do the release and announce it
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.4  copy distribution to web: cp -p fastjet-3.3.4.tar.gz ~salam/www/fastjet/repository/
+3.3.4  copy fjcore to web: cp -p scripts/fjcore-3.3.4.tar.gz ~salam/www/fastjet/repository
+3.3.4  compile manual
+3.3.4  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.3.4.pdf
+3.3.4  doxygen: to avoid spurious files, run doxygen on a tarball
+         tar -xzf fastjet-3.3.4.tar.gz
+         cd fastjet-3.3.4
+         ./configure --enable-allcxxplugins
+         doxygen
+       then move to web: mv html ~salam/www/fastjet/repository/doxygen-3.3.4
+       (or scp -r html tycho:~salam/www/fastjet/repository/doxygen-3.3.4)
+       clean: cd ..; rm -Rf fastjet-3.3.4       
+3.3.4  update main web page & menu in devel area
+3.3.4  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.3.4
+3.3.4  update main web-page area
+NO!NO  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release 3.3.4
+NO!NO  tweet the release
+
+  prepare for the next devel phase
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.4  make sure it's committed with the CHECKLIST
+3.3.4  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.5  move the version number to 3.3.5-devel with
+       scripts/set-version.sh 3.3.5-devel
+       and indicate this in the ChangeLog
+
+
+----------------------------------------------------------------------
+checklist for 3.3.3 
+-------------------
+  preparatory work
+  ~~~~~~~~~~~~~~~~
+3.3.3  run svn up
+3.3.3  make sure headers are up to date with ./scripts/update-headers.pl
+3.3.3  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.3.3  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       Note: as of 2015-01-06 tycho only has v1.6.1 which does not
+             behave properly use instead
+             ~salam/software/doxygen-1.8.8/bin/doxygen             
+       Note: as of 2017-02-09 the doxyfile was updated to v1.8.12 so
+             it may not work on tycho (which has no native doxygen)
+3.3.3 make sure the swig interface is up-to-date: this is done via the
+      --enable-swig (and --enable-pyext) configure option.
+      "make" should build the interface         
+      [old (outdated) version: 
+             make -f makefile.internal clean; make -f makefile.internal]
+3.3.3  ensure NEWS is up to date (and has the correct release date!)
+3.3.3  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.3  check copyright dates in fjcore preamble (scripts/preamble-fjcore.txt)
+
+  validation/checks
+  ~~~~~~~~~~~~~~~~~
+3.3.3  make check 
+3.3.3  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [Must be done without CGAL? You may have to recompile examples manually]
+         echo "mem_test" > out;
+         for a in [01]*.cc; do
+           g++ $a `fastjet-config --cxxflags --libs --plugins` -o ${a%.cc}
+           tmp=`grep 'run it with.*[01].*<' $a | sed 's/.*://'`; cmd=($tmp)
+           echo ${cmd[0]} | tee -a out; valgrind ${cmd[0]} < ${cmd[2]} >> out 2>&1
+         done
+3.3.3  go to testsuite; make with an installation of the current version;
+         make clean; make; ./run_tests and ./run-all.sh
+3.3.3  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk [--fastjet-config file]
+3.3.3  make sure it's committed (before the nightly check)
+SKIPPED  rerun the nightly check (skipped as last night's one went fine)
+3.3.3  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-X.Y.Z"
+3.3.3  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+  prepare the distributed material
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.3  make distcheck; record the md5sum here (and revision number)
+       9e5397eca91f5a55c3099e95f1055cff  fastjet-3.3.3.tar.gz (rev 4420)
+3.3.3  generate fjcore and note its md5sum here
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-X.Y.Z.tar.gz; cd ..
+       9ea7c6cdb441217b84c3a9bab05ad658  fjcore-3.3.3.tar.gz
+
+  do the release and announce it
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.3  copy distribution to web: cp -p fastjet-3.3.3.tar.gz ~salam/www/fastjet/repository/
+3.3.3  copy fjcore to web: cp -p scripts/fjcore-3.3.3.tar.gz ~salam/www/fastjet/repository
+3.3.3  compile manual
+3.3.3  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.3.3.pdf
+3.3.3  doxygen: to avoid spurious files, run doxygen on a tarball
+         tar -xzf fastjet-3.3.3.tar.gz
+         cd fastjet-3.3.3
+         ./configure --enable-allcxxplugins
+         doxygen
+       then move to web: mv html ~salam/www/fastjet/repository/doxygen-3.3.3
+       (or scp -r html tycho:~salam/www/fastjet/repository/doxygen-3.3.3)
+       clean: cd ..; rm -Rf fastjet-3.3.3
+3.3.3  update main web page & menu in devel area
+3.3.3  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+3.3.3  update main web-page area
+NONO!  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z    
+NONO!  tweet the release
+
+  prepare for the next devel phase
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.3  make sure it's committed with the CHECKLIST
+3.3.3  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.3  move the version number to 3.3.4-devel with
+       scripts/set-version.sh 3.3.4-devel
+       and indicate this in the ChangeLog
+
+----------------------------------------------------------------------
+checklist for 3.3.2
+-------------------
+  preparatory work
+  ~~~~~~~~~~~~~~~~
+3.3.2  run svn up
+3.3.2  make sure headers are up to date with ./scripts/update-headers.pl
+3.3.2  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.3.2  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       Note: as of 2015-01-06 tycho only has v1.6.1 which does not
+             behave properly use instead
+             ~salam/software/doxygen-1.8.8/bin/doxygen             
+       Note: as of 2017-02-09 the doxyfile was updated to v1.8.12 so
+             it may not work on tycho (which has no native doxygen)
+3.3.2 make sure the swig interface is up-to-date: this is done via the
+      --enable-swig (and --enable-pyext) configure option.
+      "make" should build the interface         
+      [old (outdated) version: 
+             make -f makefile.internal clean; make -f makefile.internal]
+3.3.2  ensure NEWS is up to date (and has the correct release date!)
+3.3.2  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.2  check copyright dates in fjcore preamble (scripts/preamble-fjcore.txt)
+
+  validation/checks
+  ~~~~~~~~~~~~~~~~~
+3.3.2  make check 
+3.3.2  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [Must be done without CGAL? You may have to recompile examples manually]
+         echo "mem_test" > out;
+         for a in [01]*.cc; do
+           g++ `fastjet-config --cxxflags --libs --plugins` -o ${a%.cc} $a
+           tmp=`grep 'run it with.*[01].*<' $a | sed 's/.*://'`; cmd=($tmp)
+           echo ${cmd[0]} | tee -a out; valgrind ${cmd[0]} < ${cmd[2]} >> out 2>&1
+         done
+3.3.2  go to testsuite; make with an installation of the current version;
+         make clean; make; ./run_tests and ./run-all.sh
+SKIPPED  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk [--fastjet-config file]
+        *** due to the recent upgrade of HepForge,fj-contrib has not
+        *** yet been updated. We postpone this to later
+3.3.2  make sure it's committed (before the nightly check)
+3.3.2  rerun the nightly check
+3.3.2  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-X.Y.Z"
+3.3.2  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+  prepare the distributed material
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.2  make distcheck; record the md5sum here (and revision number)
+       ca3708785c9194513717a54c1087bfb0  fastjet-3.3.2.tar.gz (rev 4382)
+3.3.2  generate fjcore and note its md5sum here
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-3.3.2.tar.gz; cd ..
+       edde318e04e69d3b96083bf06f815206  fjcore-3.3.2.tar.gz
+       
+  do the release and announce it
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.2  copy distribution to web: cp -p fastjet-3.3.2.tar.gz ~salam/www/fastjet/repository/
+3.3.2  copy fjcore to web: cp -p scripts/fjcore-X.Y.Z.tar.gz ~salam/www/fastjet/repository
+3.3.2  compile manual
+3.3.2  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.3.2.pdf
+3.3.2  doxygen: to avoid spurious files, run doxygen on a tarball
+         tar -xzf fastjet-3.3.2.tar.gz
+         cd fastjet-3.3.2
+         ./configure --enable-allcxxplugins
+         doxygen
+       then move to web: mv html ~salam/www/fastjet/repository/doxygen-X.Y.Z
+       (or scp -r html tycho:~salam/www/fastjet/repository/doxygen-3.3.2)
+       clean: cd ..; rm -Rf fastjet-3.3.2
+3.3.2  update main web page & menu in devel area
+3.3.2  tag: svn cp . svn+ssh://tycho/ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.3.2
+3.3.2  update main web-page area
+NONO!  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z    
+NONO!  tweet the release
+
+  prepare for the next devel phase
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.2  make sure it's committed with the CHECKLIST
+X.Y.Z  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+X.Y.Z  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+
+----------------------------------------------------------------------
+checklist for 3.3.1: from Gavin's laptop
+-------------------
+  preparatory work
+  ~~~~~~~~~~~~~~~~
+3.3.1  run svn up
+3.3.1  make sure headers are up to date with ./scripts/update-headers.pl
+3.3.1  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.3.1  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       Note: as of 2015-01-06 tycho only has v1.6.1 which does not
+             behave properly use instead
+             ~salam/software/doxygen-1.8.8/bin/doxygen             
+       Note: as of 2017-02-09 the doxyfile was updated to v1.8.12 so
+             it may not work on tycho (which has no native doxygen)
+3.3.1 make sure the swig interface is up-to-date: this is done via the
+      --enable-swig (and --enable-pyext) configure option.
+      "make" should build the interface         
+3.3.1  ensure NEWS is up to date (and has the correct release date!)
+3.3.1  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.1  check copyright dates in fjcore preamble (scripts/preamble-fjcore.txt)
+
+  validation/checks
+  ~~~~~~~~~~~~~~~~~
+3.3.1  make check 
+3.3.1  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [Must be done without CGAL? You may have to recompile examples manually]
+         echo "mem_test" > out;
+         for a in [01]*.cc; do
+           g++ `fastjet-config --cxxflags --libs --plugins` -o ${a%.cc} $a
+           tmp=`grep 'run it with.*[01].*<' $a | sed 's/.*://'`; cmd=($tmp)
+           echo ${cmd[0]} | tee -a out; valgrind ${cmd[0]} < ${cmd[2]} >> out 2>&1
+         done
+3.3.1  go to testsuite; make with an installation of the current version;
+         make clean; make; ./run_tests and ./run-all.sh
+*****  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk [--fastjet-config file]
+3.3.1  make sure it's committed (before the nightly check)
+3.3.1  rerun the nightly check
+3.3.1  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-X.Y.Z"
+3.3.1  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+  prepare the distributed material
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.1  make distcheck; record the md5sum here (and revision number)
+       4cc4e07abb1c2ccc54e040c346c3b433 (rev 4364)
+
+3.3.1  generate fjcore and note its md5sum here
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-X.Y.Z.tar.gz; cd ..
+       MD5 (fjcore-3.3.1.tar.gz) = 0df7f46df0c48db931ac10ce03a1e167
+       
+  do the release and announce it
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.1  copy distribution to web: cp -p fastjet-3.3.1.tar.gz ~salam/www/fastjet/repository/
+3.3.1  copy fjcore to web: cp -p scripts/fjcore-3.3.1.tar.gz ~salam/www/fastjet/repository
+3.3.1  compile manual
+3.3.1  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.3.1.pdf
+3.3.1  doxygen: to avoid spurious files, run doxygen on a tarball
+         tar -xzf fastjet-3.3.1.tar.gz
+         cd fastjet-3.3.1
+         ./configure --enable-allcxxplugins
+         doxygen
+       then move to web: mv html ~salam/www/fastjet/repository/doxygen-3.3.1
+       (or scp -r html tycho:~salam/www/fastjet/repository/doxygen-3.3.1)
+       clean: cd ..; rm -Rf fastjet-3.3.1
+3.3.1  update main web page & menu in devel area
+3.3.1  tag: svn cp . ^/tags/fastjet-3.3.1
+3.3.1  update main web-page area
+3.3.1  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z    
+X.Y.Z  tweet the release
+
+  prepare for the next devel phase
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.1  make sure it's committed with the CHECKLIST
+3.3.1  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.1  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+
+----------------------------------------------------------------------
+checklist for 3.3.0
+-------------------
+  preparatory work
+  ~~~~~~~~~~~~~~~~
+3.3.0  run svn up
+3.3.0  update version number with ./scripts/set-version.sh 3.3.0
+3.3.0  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       Note: as of 2015-01-06 tycho only has v1.6.1 which does not
+             behave properly use instead
+             ~salam/software/doxygen-1.8.8/bin/doxygen             
+       Note: as of 2017-02-09 the doxyfile was updated to v1.8.12 so
+             it may not work on tycho (which has no native doxygen)
+3.3.0 make sure the swig interface is up-to-date: this is done via the
+      --enable-swig configure option. "make" should build the interface       
+3.3.0  ensure NEWS is up to date (and has the correct release date!)
+       put today as a tentative release date.
+3.3.0  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.0  check copyright dates in fjcore preamble (scripts/preamble-fjcore.txt)
+
+  validation/checks
+  ~~~~~~~~~~~~~~~~~
+3.3.0  make check 
+3.3.0  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [Must be done without CGAL? You may have to recompile examples manually]
+         echo "mem_test" > out;
+         for a in [01]*.cc; do
+           g++ `fastjet-config --cxxflags --libs --plugins` -o ${a%.cc} $a
+           tmp=`grep 'run it with.*[01].*<' $a | sed 's/.*://'`; cmd=($tmp)
+           echo ${cmd[0]} | tee -a out; valgrind ${cmd[0]} < ${cmd[2]} >> out 2>&1
+         done
+       Ran the 2nd version in bash (the 1st has etra mess due to libtool)
+3.3.0  go to testsuite; make with an installation of the current version;
+         make clean; make; ./run_tests and ./run-all.sh
+3.3.0  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk [--fastjet-config file]
+3.3.0  make sure it's committed (before the nightly check)
+3.3.0  rerun the nightly check
+3.3.0  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-3.3.0"
+3.3.0  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+  prepare the distributed material
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+3.3.0  make distcheck; record the md5sum here (and revision number)
+         732f907dd81922799fd9d8c0d934125a  fastjet-3.3.0.tar.gz (rev 4323)
+3.3.0  generate fjcore and note its md5sum here
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-3.3.0.tar.gz; cd ..
+         fa37cb588d9ac4a93635871d88e8b495  fjcore-3.3.0.tar.gz
+         
+  do the release and announce it
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.0  copy distribution to web: cp -p fastjet-3.3.0.tar.gz ~salam/www/fastjet/repository/
+3.3.0  copy fjcore to web: cp -p scripts/fjcore-3.3.0.tar.gz ~salam/www/fastjet/repository
+3.3.0  compile manual
+3.3.0  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.3.0.pdf
+3.3.0  doxygen: to avoid spurious files, run doxygen on a tarball
+         tar -xzf fastjet-3.3.0.tar.gz
+         cd fastjet-3.3.0
+         ./configure
+         doxygen
+       then move to web: mv html ~salam/www/fastjet/repository/doxygen-3.3.0
+       (or scp -r html tycho:~salam/www/fastjet/repository/doxygen-3.3.0)
+       clean: cd ..; rm -Rf fastjet-3.3.0
+3.3.0  update main web page & menu in devel area
+3.3.0  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.3.0
+3.3.0  update main web-page area
+3.3.0  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release 3.3.0
+X.Y.Z  tweet the release
+
+  prepare for the next devel phase
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.3.0  make sure it's committed with the CHECKLIST
+3.3.0  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+3.3.1-devel  move the version number to 3.3.1-devel with
+       scripts/set-version.sh 3.3.1-devel
+       and indicate this in the ChangeLog
+
+
+----------------------------------------------------------------------
+checklist for 3.2.1
+-------------------
+  preparatory work
+  ~~~~~~~~~~~~~~~~
+3.2.1  run svn up
+3.2.1  update version number with ./scripts/set-version.sh 3.2.1
+3.2.1  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       Note: as of 2015-01-06 tycho only has v1.6.1 which does not
+             behave properly use instead
+             ~salam/software/doxygen-1.8.8/bin/doxygen
+3.2.1  ensure NEWS is up to date (correct release date pushed below)
+3.2.1  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+3.2.1  check copyright dates in fjcore preamble (scripts/preamble-fjcore.txt)
+
+  validation/checks
+  ~~~~~~~~~~~~~~~~~
+3.2.1  make check 
+3.2.1  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [Must be done without CGAL? You may have to recompile examples manually]
+3.2.1  go to testsuite; make with an installation of the current version;
+         make clean; make; ./run_tests and ./run-all.sh
+3.2.1  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk [--fastjet-config file]
+3.2.1  make sure it's committed (before the nightly check)
+3.2.1  rerun the nightly check
+3.2.1  ensure NEWS has the correct release date!
+3.2.1  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-3.2.1"
+3.2.1  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+  prepare the distributed material
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.2.1  make distcheck; record the md5sum here (and revision number)
+         837c66e39653c998de793526bdd16601  fastjet-3.2.1.tar.gz
+         revision 4169
+3.2.1  generate fjcore and note its md5sum here
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-3.2.1.tar.gz; cd ..
+         d8ef0568980f6449f9235633f60d5039  fjcore-3.2.1.tar.gz
+
+  do the release and announce it
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.2.1  copy distribution to web: cp -p fastjet-X.Y.Z.tar.gz ~salam/www/fastjet/repository/
+3.2.1  copy fjcore to web: cp -p scripts/fjcore-X.Y.Z.tar.gz ~salam/www/fastjet/repository
+3.2.1  compile manual
+3.2.1  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.2.1.pdf
+3.2.1  doxygen: to avoid spurious files, run doxygen on a tarball
+         tar -xzf fastjet-3.2.1.tar.gz
+         cd fastjet-3.2.1
+         ./configure
+         doxygen
+       then move to web: mv html ~salam/www/fastjet/repository/doxygen-3.2.1
+       (or scp -r html tycho:~salam/www/fastjet/repository/doxygen-3.2.1)
+       clean: cd ..; rm -Rf fastjet-X.Y.Z
+3.2.1  update main web page & menu in devel area
+3.2.1  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.2.1
+3.2.1  update main web-page area
+NO-NO  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z    
+NO-NO  tweet the release
+
+  prepare for the next devel phase
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.2.1  make sure it's committed with the CHECKLIST
+3.2.1  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+3.2.2-devel  move the version number to 3.2.2-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+----------------------------------------------------------------------
+checklist for 3.2.0
+-------------------
+3.2.0  run svn up
+3.2.0  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.2.0  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       Note: as of 2015-01-06 tycho only has v1.6.1 which does not
+             behave properly use instead
+             ~salam/software/doxygen-1.8.8/bin/doxygen
+       [done on Gregory's home computer w doxygen-1.8.11]
+3.2.0  ensure NEWS is up to date (and has the correct release date!)
+
+3.2.0  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.2.0  make check 
+
+3.2.0  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [Must be done without CGAL?]
+
+3.2.0  go to testsuite; make with an installation of the current version;
+         make clean; make; ./run_tests and ./run-all.sh
+
+3.2.0  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk [--fastjet-config file]
+
+       Note: it comes with a few deprecation warnings:
+         - Njettiness.cc:48:18: SharedPtr<T>::operator()()
+         - Njettiness.cc:65:24: SharedPtr<T>::operator()()
+         - Njettiness.cc:67:21: SharedPtr<T>::operator()()
+         - Njettiness.cc:72:94: SharedPtr<T>::operator()()
+         - Njettiness.cc:76:81: SharedPtr<T>::operator()()
+         - Njettiness.cc:79:94: SharedPtr<T>::operator()()
+
+3.2.0  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-3.2.0"
+
+3.2.0  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+3.2.0  rerun the nightly check
+
+3.2.0  make distcheck; record the md5sum here (and revision number)
+         3aa9d718ce409675c5c029bdfd6d61da  fastjet-3.2.0.tar.gz
+         (revision 4114)
+         
+3.2.0  generate and release fjcore and note its md5sum [check the copyright date in the preamble]
+         e491bb6f82009c7f8b8c662fef4af5e5  fjcore-3.2.0.tar.gz
+         
+3.2.0  copy distribution to web: cp -p fastjet-3.2.0.tar.gz ~salam/www/fastjet/repository/
+3.2.0  copy fjcore to web: cp -p scripts/fjcore-3.2.0.tar.gz ~salam/www/fastjet/repository
+3.2.0  compile manual
+3.2.0  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.2.0.pdf
+3.2.0  run doxygen on the distribution, move to web: mv html ~salam/www/fastjet/repository/doxygen-3.2.0
+3.2.0  update main web page & menu in devel area
+
+3.2.0  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.2.0
+3.2.0  update main web-page area
+
+X.Y.Z  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release 3.2.0
+
+X.Y.Z  tweet the release
+
+3.2.0  make sure it's committed with the CHECKLIST
+
+3.2.0  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.2.1-devel  move the version number to 3.2.1-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+----------------------------------------------------------------------
+checklist for 3.1.0 (make a copy before editing!)
+-------------------
+3.1.0  run svn up
+3.1.0  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.1.0  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+3.1.0  ensure NEWS is up to date (and has the correct release date!)
+
+3.1.0  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.1.0  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-3.1.0"
+
+3.1.0  make check 
+
+3.1.0  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+       [test done on Gregory's home machine to work around valgrind
+       issues in bash; NB: must be done without CGAL]
+
+3.1.0  go to testsuite; make with an installation of the current version;
+         ./run_tests and ./run-all.sh
+
+3.1.0  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+3.1.0  rerun the nightly check
+3.1.0  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk
+       [GS Note: the script expects . to be in your path]
+
+3.1.0  make distcheck; record the md5sum here (and revision number)
+         39b0dd15854935c4e7d76c4a1ac43bb8  fastjet-3.1.0.tar.gz
+         (revision 3713)
+
+3.1.0  generate and release fjcore and note its md5sum
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-3.1.0.tar.gz; cd ..
+         075910ff6de905008492f9fd249f26c1  fjcore-3.1.0.tar.gz
+
+3.1.0  copy distribution to web: cp -p fastjet-3.1.0.tar.gz ~salam/www/fastjet/repository/
+3.1.0  copy fjcore to web: cp -p scripts/fjcore-3.1.0.tar.gz ~salam/www/fastjet/repository
+3.1.0  compile manual
+3.1.0  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.1.0.pdf
+3.1.0  run doxygen on the distribution, move to web: mv html ~salam/www/fastjet/repository/doxygen-3.1.0
+3.1.0  update main web page & menu in devel area
+
+3.1.0  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.1.0
+3.1.0  update main web-page area
+
+3.1.0  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release 3.1.0
+
+Dear FastJet user,
+
+Nearly three years after the major release of FastJet 3.0.0, we are
+pleased to announce FastJet 3.1.0.
+
+Compared to its predecessor, its main feature is a significant speed
+improvement, with a gain of a factor from 1.5 to 10 for particle
+multiplicities between a few thousand and 10^5. A more extensive
+summary of the changes is given at the end of this mail.
+
+As usual, please go to https://fastjet.fr for the download.
+
+Feedback can be sent to fastjet@projects.hepforge.org .
+
+Best regards,
+Matteo, Gavin and Gregory
+
+================================================================
+Summary of changes from v3.0.6 -> v3.1.0: 2014-09-30
+================================================================
+* Significant speed improvements (x1.5-10) for large N (few thousand-10^5)
+* FASTJET_VERSION_NUMBER preprocessor symbol, for easy in-code version testing
+* New JetDefinition::operator(): jets = jet_def(particles);
+* Native particle-mass support in PU estimation (rho_m())
+* Subtraction can use rho_m (set_use_rho_m()) and force m>0 (set_safe_mass())
+* Addition of Winner-Takes-All recomb. schemes (WTA_pt_scheme, WTA_modp_scheme)
+* SISCone updated to v3.0.0 (addition of SISCone with progressive removal)
+* New Recluster class, serving as base for Filter
+* New RectangularGrid class, base for GridMedianEstimator & GridJetPlugin
+* Fixed long-standing issue with coincident points in NlnN strategies
+* Other small additions and changes include:
+  * Selector::sum(particles) to get 4-vector sum of particles that pass selector
+  * pruned_jet.structure_of<Pruner>() has Rcut() and zcut() functions
+  * easy copying of Recombiner info: jet_def1.set_recombiner(jet_def2)
+* Various bug-fixes, build-system tweaks (e.g. default -O2 instead of -O3)
+
+3.1.0  tweet the release
+
+3.1.0  make sure it's committed with the CHECKLIST
+
+3.1.0  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.1.0  move the version number to 3.2.0-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+
+----------------------------------------------------------------------
+checklist for 3.1.0-beta.1 (make a copy before editing!)
+--------------------------
+3.1.0-beta.1  run svn up
+3.1.0-beta.1  update version number with ./scripts/set-version.sh VERSION-NUMBER
+FAILED        doxygen: check dirs are declared for new plugins + check in 
+              the class list that all classes are prefixed by 'fastjet::'
+3.1.0-beta.1  ensure NEWS is up to date (and has the correct release date!)
+
+3.1.0-beta.1  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.1.0-beta.1  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-3.1.0-beta.1"
+
+3.1.0-beta.1  make check 
+
+3.1.0-beta.1  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+
+3.1.0-beta.1  go to testsuite; make with an installation of the current version;
+         ./run_tests
+
+3.1.0-beta.1  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+3.1.0-beta.1  rerun the nightly check ("-only 1")
+3.1.0-beta.1  after make install, from a separate directory, run regression-tests/test-contrib.pl --svn trunk
+
+3.1.0-beta.1  make distcheck; record the md5sum here (and revision number)
+       31daade002743decc6dec1f6b9cd9683  fastjet-3.1.0-beta.1.tar.gz
+       (revision 3635)
+
+3.1.0-beta.1  generate and release fjcore and note its md5sum
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-3.1.0-beta.1.tar.gz; cd ..
+       bbb5e0bd1c9bedb343e4d3ca18cba1d6  fjcore-3.1.0-beta.1.tar.gz
+
+3.1.0-beta.1  copy distribution to web: cp -p fastjet-3.1.0-beta.1.tar.gz ~salam/www/fastjet/repository/
+3.1.0-beta.1  copy fjcore to web: cp -p scripts/fjcore-3.1.0-beta.1.tar.gz ~salam/www/fastjet/repository
+3.1.0-beta.1  compile manual
+3.1.0-beta.1  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.1.0-beta.1.pdf
+3.1.0-beta.1  run doxygen on the distribution, move to web: mv html ~salam/www/fastjet/repository/doxygen-3.1.0-beta.1
+3.1.0-beta.1  update main web page & menu in devel area
+
+3.1.0-beta.1  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.1.0-beta.1
+3.1.0-beta.1  update main web-page area
+
+3.1.0-beta.1  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.1.0-beta.1  make sure it's committed with the CHECKLIST
+
+3.1.0-beta.1  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.1.0-beta.1  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+----------------------------------------------------------------------
+checklist for 3.0.6 (make a copy before editing!)
+-------------------
+3.0.6  run svn up
+3.0.6  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.0.6  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       [ran ~salam/software/doxygen-1.7.4/bin/doxygen]
+3.0.6  ensure NEWS is up to date (and has the correct release date!)
+
+3.0.6  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.0.6  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-3.0.6"
+
+3.0.6  make check 
+
+3.0.6  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+
+3.0.6  go to testsuite; make with an installation of the current version;
+         ./run_tests
+
+3.0.6  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+3.0.6  rerun the nightly check
+
+3.0.6  make distcheck; record the md5sum here (and revision number)
+       640d4c1e860143888915e4f728349fb5  fastjet-3.0.6.tar.gz (rev 3258)
+
+3.0.6  generate and release fjcore and note its md5sum
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-3.0.6.tar.gz; cd ..
+       3ace036ed3fd68f8979156a4e82cdb9d  fjcore-3.0.6.tar.gz
+
+3.0.6  copy distribution to web: cp -p fastjet-3.0.6.tar.gz ~salam/www/fastjet/repository/
+3.0.6  copy fjcore to web: cp -p scripts/fjcore-3.0.6.tar.gz ~salam/www/fastjet/repository
+3.0.6  compile manual
+3.0.6  copy manual to web: cp -p fastjet-doc.pdf ~salam/www/fastjet/repository/fastjet-doc-3.0.6.pdf
+3.0.6  run doxygen on the distribution, move to web: mv html ~salam/www/fastjet/repository/doxygen-3.0.6
+3.0.6  update main web page & menu in devel area
+
+3.0.6  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.0.6
+3.0.6  update main web-page area
+
+NO-NO  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.0.6  make sure it's committed with the CHECKLIST
+
+3.0.6  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.0.6  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+
+----------------------------------------------------------------------
+checklist for 3.0.5 (make a copy before editing!)
+-------------------
+3.0.5  run svn up
+3.0.5  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.0.5  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       [Note: used doxygen-1.7.4] 
+3.0.5  ensure NEWS is up to date (and has the correct release date!)
+
+3.0.5  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.0.5  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-X.Y.Z"
+
+3.0.5  make check 
+
+3.0.5  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+
+3.0.5  go to testsuite; make with an installation of the current version;
+         ./run_tests
+
+3.0.5  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+3.0.5  rerun the nightly check
+
+3.0.5  make distcheck; record the md5sum here (and revision number)
+       f93587b15aa77cb218ac5c5c12ed8c0c  fastjet-3.0.5.tar.gz
+
+3.0.5  generate and release fjcore and note its md5sum
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-X.Y.Z.tar.gz; cd ..
+       911c631e0deda189e8e10782b8f140e5  fjcore-3.0.5.tar.gz
+
+3.0.5  copy distribution to web: cp -p fastjet-X.Y.Z.tar.gz ~/www/fastjet/repository/
+
+3.0.5  copy fjcore to web: cp -p scripts/fjcore-X.Y.Z.tar.gz ~/www/fastjet/repository
+
+3.0.5  compile manual
+3.0.5  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-X.Y.Z.pdf
+3.0.5  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-X.Y.Z
+3.0.5  update main web page & menu in devel area
+
+3.0.5  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+X.Y.Z  update main web-page area
+
+NO-NO  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.0.5  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.0.5  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+3.0.5  make sure it's committed with the CHECKLIST
+
+----------------------------------------------------------------------
+checklist for 3.0.4 (make a copy before editing!)
+-------------------
+3.0.4  run svn up
+3.0.4  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.0.4  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+       NB: used ~salam/software/doxygen-1.7.4/bin/doxygen 
+3.0.4  ensure NEWS is up to date (and has the correct release date!)
+
+3.0.4  make sure siscone points to a tag, not trunk
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.0.4  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-X.Y.Z"
+
+3.0.4  make check 
+
+NO-NO  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+
+3.0.4  go to testsuite; make with an installation of the current version;
+         ./run_tests
+
+3.0.4  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+NO-NO  rerun the nightly check
+
+3.0.4  make distcheck; record the md5sum here (and revision number)
+       975686656bd83f939482300b22bcc75b  fastjet-3.0.4.tar.gz
+
+3.0.4  generate and release fjcore and note its md5sum
+       cd scripts; ./mkfjcore.sh; md5sum fjcore-X.Y.Z.tar.gz; cd ..
+       a75db8c8a1c46694a3cb2b587749604d  fjcore-3.0.4.tar.gz
+
+3.0.4  copy distribution to web: cp -p fastjet-3.0.4.tar.gz ~/www/fastjet/repository/
+
+3.0.4  copy fjcore to web: cp -p scripts/fjcore-3.0.4.tar.gz ~/www/fastjet/repository
+
+3.0.4  compile manual
+3.0.4  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-3.0.4.pdf
+3.0.4  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-3.0.4
+3.0.4  update main web page & menu in devel area
+
+3.0.4  tag: svn cp -m 'released 3.0.4' . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.0.4 
+
+3.0.4  update main web-page area
+
+X.Y.Z  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.0.4  make sure it's committed with the CHECKLIST
+
+3.0.4  reset the SISCone link to the trunk: 
+       svn propedit svn:externals plugins/SISCone; svn up
+
+3.0.4  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version.sh VERSION-NUMBER
+       and indicate this in the ChangeLog
+
+
+----------------------------------------------------------------------
+checklist for 3.0.3 (make a copy before editing!)
+-------------------
+3.0.3  run svn up
+3.0.3  update version number with ./scripts/set-version VERSION-NUMBER
+3.0.3  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+3.0.3  ensure NEWS is up to date (and has the correct release date!)
+
+3.0.3  make sure siscone points to a tag, not trunk
+       cd ../plugins/SISCone; svn propedit svn:externals .; svn up
+
+3.0.3  mention the release in ChangeLog: just say 
+       "Release of FastJet fastjet-X.Y.Z"
+
+3.0.3  make check 
+
+3.0.3  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+
+3.0.3  go to testsuite; make with an installation of the current version;
+         ./run_tests
+
+3.0.3  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+3.0.3  rerun the nightly check
+
+3.0.3  make distcheck; record the md5sum here
+       14fdcbf0e6e38c55c16f0790f78e1404  fastjet-3.0.3.tar.gz
+
+3.0.3  copy distribution to web: cp -p fastjet-X.Y.Z.tar.gz ~/www/fastjet/repository/
+3.0.3  compile manual
+3.0.3  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-X.Y.Z.pdf
+3.0.3  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-X.Y.Z
+3.0.3  update main web page & menu in devel area
+
+3.0.3  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+3.0.3  update main web-page area
+
+NO-NO  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.0.3  make sure it's committed with the CHECKLIST
+
+3.0.3  check everything is OK
+NO-NO  reset the SISCone link to the trunk
+3.0.3  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version VERSION-NUMBER
+
+----------------------------------------------------------------------
+checklist for 3.0.2
+-------------------
+3.0.2  update version number with ./scripts/set-version.sh VERSION-NUMBER
+3.0.2  doxygen: check dirs are declared for new plugins + check in 
+       the class list that all classes are prefixed by 'fastjet::'
+3.0.2  ensure NEWS is up to date (and has the correct release date!)
+
+3.0.2  make sure siscone points to a tag, not trunk
+       cd ../plugins/SISCone; svn propedit svn:externals .; svn up
+
+3.0.2  mention the release in ChangeLog: just say 
+       "Release of fastjet-X.Y.Z"
+
+3.0.2  make check 
+
+3.0.2  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+
+3.0.2  go to testsuite; make with an installation of the current version;
+         ./run_tests
+
+3.0.2  make sure it's committed (before distcheck; so that all files
+       have correct version numbers). Revision 2820.
+
+-----  [NO: rerun the nightly check; NOT DONE]
+
+3.0.2  make distcheck; record the md5sum here
+       57649da3855407981a4b477651390540
+
+3.0.2  copy distribution to web: cp -p fastjet-3.0.2.tar.gz ~/www/fastjet/repository/
+3.0.2  compile manual
+3.0.2  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-3.0.2.pdf
+3.0.2  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-3.0.2
+3.0.2  update main web page & menu in devel area
+
+3.0.2  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.0.2
+3.0.2  update main web-page area
+
+-----  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       [NOT DONE]
+
+3.0.2  make sure it's committed with the CHECKLIST
+
+3.0.2  reset the SISCone link to the trunk: svn propedit svn:externals plugins/SISCone
+X.Y.Z  move the version number to X.Y.(Z+1)-devel with
+       scripts/set-version.sh VERSION-NUMBER
+
+----------------------------------------------------------------------
+checklist for 3.0.1
+-------------------
+3.0.1  make sure version number in configure.ac is correct
+
+3.0.1  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+3.0.1  update doxygen (including the devel) version number + check dirs are declared for new plugins + check in the class list that all classes are prefixed by 'fastjet::'
+3.0.1  version number in manual
+
+3.0.1  ensure NEWS is up to date (and has the correct release date!)
+
+3.0.1  make sure siscone points to a tag, not trunk
+       cd ../plugins/SISCone; svn propedit svn:externals .; svn up
+
+3.0.1  mention the release in ChangeLog (just say "fastjet-3.0.1")
+
+
+3.0.1  make check 
+
+3.0.1  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+
+3.0.1  go to testsuite; make with an installation of the current version;
+         ./run_tests
+
+3.0.1  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+3.0.1  rerun the nightly check
+
+3.0.1  make distcheck; record the md5sum here
+       a3c963e0c4c7c5847ef968681882ba2c fastjet-3.0.1-pre-arXiv.tar.gz (2122417 Nov 25 22:25)
+
+3.0.1  copy distribution to web: cp -p fastjet-3.0.1.tar.gz ~/www/fastjet/repository/
+3.0.1  compile manual
+3.0.1  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-3.0.1.pdf
+3.0.1  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-3.0.1
+3.0.1  update main web page & menu in devel area
+
+3.0.1  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.0.1
+
+NO NO  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.0.1  make sure it's committed with the CHECKLIST
+
+3.0.1  just before 2am/8pm Sunday 27/11/11
+       cd ~salam/www/fastjet/repo
+       ln -s fastjet-3.0.1-pre-arXiv.tar.gz fastjet-3.0.1.tar.gz
+
+3.0.1  update main web-page area (from ada):
+       cd ~salam/www/fastjet3/
+       bzr merge ../fastjet-devel/
+
+3.0.1  just after 2am/8pm Sunday 27/11/11
+       update arXiv number in banner, COPYING & AUTHORS, README
+       sed -i "s/1111\.XXXX/1111.6097/" AUTHORS
+       sed -i "s/1111\.NNNN/1111.6097/" COPYING
+       sed -i "s/1111\.NNNN/1111.6097/" README
+       sed -i "s/1111\.XXXX/1111.6097/" src/ClusterSequence.cc
+       grep "1111" AUTHORS COPYING README src/ClusterSequence.cc
+3.0.1  svn diff; svn ci -m 'included arXiv number'
+3.0.1  make dist
+3.0.1  cp -p fastjet-3.0.1.tar.gz ~/www/fastjet/repository/
+3.0.1  record new md5sum.
+      1c0654c23635c5d3190356f4af4d0ee4 fastjet-3.0.1.tar.gz 2122452 Nov 28 02:11
+3.0.1  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.0.1
+
+3.0.1  check everything is OK
+3.0.1  reset the SISCone link to the trunk
+3.0.1  move the version number to X.Y.(Z+1)-devel
+
+----------------------------------------------------------------------
+checklist for 3.0.0
+-------------------
+3.0.0  make sure version number in configure.ac is correct
+
+3.0.0  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+3.0.0  update doxygen (including the devel) version number + check dirs are declared for new plugins + check in the class list that all classes are prefixed by 'fastjet::'
+3.0.0  version number in manual
+
+3.0.0  ensure NEWS is up to date (and has the correct release date!)
+
+3.0.0  make sure siscone points to a tag, not trunk
+       cd ../plugins/SISCone; svn propedit svn:externals .; svn up
+
+3.0.0  mention the release in ChangeLog (just say "fastjet-X.Y.Z")
+
+3.0.0  make check 
+
+3.0.0  within zsh, in the examples directory, do 
+         echo >! out
+         for a in [01]*.cc
+         (cmd=(`grep 'run it with.*[01].*<' $a | sed 's/.*://'`); echo $cmd[1]; valgrind $cmd[1] < $cmd[3] >>& out) 
+         grep -i error.summary out
+         grep LEAK.SUMMARY out
+       and make sure there are no errors (look through the file too)
+
+3.0.0  go to testsuite; make with an installation of the current version;
+         ./run_tests
+
+3.0.0  make sure it's committed (before distcheck; so that all files
+       have correct version numbers)
+
+3.0.0  rerun the nightly check
+
+3.0.0  make distcheck; record the md5sum here
+       a8fc1cb61eb2f8f17f3fdf44f57c65df  fastjet-3.0.0.tar.gz
+
+3.0.0  copy distribution to web: cp -p fastjet-3.0.0.tar.gz ~/www/fastjet/repository/
+3.0.0  compile manual
+3.0.0  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-3.0.0.pdf
+3.0.0  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-3.0.0
+3.0.0  update main web page & menu in devel area
+
+3.0.0  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.0.0
+3.0.0  update main web-page area
+
+3.0.0  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release 3.0.0       
+
+3.0.0  make sure it's committed with the CHECKLIST
+
+3.0.0  check everything is OK
+3.0.0  reset the SISCone link to the trunk
+3.0.0  move the version number to X.Y.(Z+1)-devel
+
+----------------------------------------------------------------------
+checklist for 3.0beta1
+-----------------------
+3.0b1  make sure version number in configure.ac is correct
+
+3.0b1  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+3.0b1  update doxygen (including the devel) version number + check dirs are declared for new plugins
+3.0b1  version number in manual
+
+3.0b1  ensure NEWS is up to date (and has the correct release date!)
+
+3.0b1  make sure siscone points to a tag, not trunk
+       cd ../plugins/SISCone; svn propedit svn:externals .; svn up
+
+3.0b1  mention the release in ChangeLog (just say "fastjet-X.Y.Z")
+
+3.0b1  make check 
+
+3.0b1  make distcheck
+
+3.0b1  make sure it's committed
+
+3.0b1  rerun the nightly check
+
+3.0b1  copy distribution to web: cp -p fastjet-X.Y.Z.tar.gz ~/www/fastjet/repository/
+3.0b1  compile manual
+3.0b1  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-X.Y.Z.pdf
+3.0b1  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-X.Y.Z
+3.0b1  update main web page & menu in devel area
+
+3.0b1  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+3.0b1  update main web-page area
+
+X.Y.Z  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.0b1  make sure it's committed with the CHECKLIST
+
+3.0b1  check everything is OK
+3.0b1  reset the SISCone link to the trunk
+3.0b1  move the version number to X.Y.(Z+1)-devel
+
+
+----------------------------------------------------------------------
+checklist for 3.0alpha3
+-----------------------
+3.0a3  make sure version number in configure.ac is correct
+
+3.0a3  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+3.0a3  update doxygen (including the devel) version number + check dirs are declared for new plugins
+3.0a3  version number in manual
+
+3.0a3  ensure NEWS is up to date (and has the correct release date!)
+
+3.0a3  make sure siscone points to a tag, not trunk
+       cd ../plugins/SISCone; svn propedit svn:externals .; svn up
+
+3.0a3  mention the release in ChangeLog (just say "fastjet-X.Y.Z")
+
+3.0a3  make check 
+
+3.0a3  make distcheck
+
+3.0a3  make sure it's committed
+
+3.0a3  rerun the nightly check
+
+3.0a3  copy distribution to web: cp -p fastjet-X.Y.Z.tar.gz ~/www/fastjet/repository/
+3.0a3  compile manual
+3.0a3  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-X.Y.Z.pdf
+
+3.0a3  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-X.Y.Z
+3.0a3  update main web page & menu in devel area
+
+3.0a3  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+3.0a3  update main web-page area
+
+NONO!  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.0a3  make sure it's committed with the CHECKLIST
+
+3.0a3  check everything is OK
+3.0a3  reset the SISCone link to the trunk
+3.0a3  move the version number to X.Y.(Z+1)-devel
+
+----------------------------------------------------------------------
+checklist for 3.0alpha2 (make a copy before editing!)
+-------------------
+3.0a2  make sure version number in configure.ac is correct
+
+3.0a2  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+3.0a2  update doxygen (including the devel) version number + check dirs are declared for new plugins
+3.0a2  version number in manual
+
+3.0a2  ensure NEWS is up to date (and has the correct release date!)
+
+3.0a2  make sure siscone points to a tag, not trunk
+       
+
+3.0a2  mention the release in ChangeLog (just say "fastjet-X.Y.Z")
+
+3.0a2  make check 
+
+3.0a2  make distcheck
+
+3.0a2  make sure it's committed
+
+3.0a2  rerun the nightly check
+
+3.0a2  copy distribution to web: cp -p fastjet-3.0a2.tar.gz ~/www/fastjet/repository/
+3.0a2  compile manual
+3.0a2  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-3.0a2.pdf
+3.0a2  run doxygen on the distribution, move to web: mv html ~/www/fastjet/repository/doxygen-3.0a2
+3.0a2  update main web page & menu in devel area
+
+3.0a2  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-3.0alpha2
+3.0a2  update main web-page area
+
+NO NO  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+3.0a2  make sure it's committed with the CHECKLIST
+
+3.0a2  check everything is OK [modulo doxygen PseudoJet link]
+3.0a2  reset the SISCone link to the trunk
+3.0a2  move the version number to X.Y.(Z+1)-devel
+
+
+----------------------------------------------------------------------
+checklist for 3.0alpha1
+-----------------------
+3.0alpha1  make sure version number in configure.ac is correct
+
+3.0alpha1  generate config_win.h: 	    cd src && ./genconfig.sh ../include/fastjet/config_win.h
+3.0alpha1  update doxygen (including the devel) version number + check dirs are declared for new plugins
+3.0alpha1  version number in manual
+
+3.0alpha1  ensure NEWS is up to date (and has the correct release date!)
+
+3.0alpha1  make sure siscone points to a tag, not trunk
+
+3.0alpha1  mention the release in ChangeLog (just say "fastjet-X.Y.Z")
+
+3.0alpha1  make check 
+
+3.0alpha1  make distcheck
+
+3.0alpha1  make sure it's committed
+
+3.0alpha1  rerun the nightly check [did 2,3,????]
+
+3.0alpha1  copy distribution to web: cp -p fastjet-X.Y.Z.tar.gz ~/www/fastjet/repository/
+3.0alpha1  compile manual
+3.0alpha1  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-X.Y.Z.pdf
+3.0alpha1  run doxygen from untarred version, move to web: mv html ~/www/fastjet/repository/doxygen-X.Y.Z
+3.0alpha1  update main web page & menu in devel area
+
+3.0alpha1  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+3.0alpha1  update main web-page area
+
+[not done] send mail to: fastjet-announce@projects.hepforge.org  [NOT DONE FOR THIS ALPHA]
+           subject: FastJet release X.Y.Z       
+
+3.0alpha1  make sure it's committed with the CHECKLIST
+
+3.0alpha1  check everything is OK
+3.0alpha1  reset the SISCone link to the trunk
+3.0alpha1  move the version number to X.Y.(Z+1)-devel
+
+
+----------------------------------------------------------------------
+checklist for 2.4.2
+-------------------
+2.4.2  make sure version number in configure.ac is correct
+
+2.4.2  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+2.4.2  update doxygen version number + check dirs are declared for new plugins
+2.4.2  version number in manual
+2.4.2  tested with CGAL 3.5.1 and it's OK
+
+2.4.2  ensure NEWS is up to date (and has the corect release date!)
+
+2.4.2  make sure siscone points to a tag, not trunk
+
+2.4.2  make check 
+
+2.4.2  make distcheck
+
+2.4.2  make sure it's committed
+
+2.4.2 IN PROGRESS  rerun the nightly check
+
+2.4.2  copy distribution to web: cp -p fastjet-X.Y.Z.tar.gz ~/www/fastjet/repository/
+2.4.2  compile manual
+2.4.2  copy manual to web: cp -p fastjet-doc.pdf ~/www/fastjet/repository/fastjet-doc-X.Y.Z.pdf
+2.4.2  run doxygen, move to web: mv html ~/www/fastjet/repository/doxygen-X.Y.Z
+2.4.2  update main web page & menu in devel area
+
+2.4.2  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+2.4.2  update main web-page area
+
+NOT    send mail to: fastjet-announce@projects.hepforge.org
+DONE   subject: FastJet release X.Y.Z       
+
+2.4.2  make sure it's committed with the CHECKLIST
+
+2.4.2  check everything is OK
+2.4.2  reset the SISCone link to the trunk
+2.4.2  move the version number to X.Y.(Z+1)-devel
+
+
+----------------------------------------------------------------------
+checklist for 2.4.1
+-------------------
+2.4.1  make sure version number in configure.ac is correct
+
+2.4.1  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+2.4.1  update doxygen version number + check dirs are declared for new plugins
+2.4.1  version number in manual
+
+2.4.1  ensure NEWS is up to date 
+
+2.4.1  make sure siscone points to a tag, not trunk
+
+2.4.1  make check 
+
+2.4.1  make distcheck
+
+2.4.1  make sure it's committed
+
+2.4.1  rerun the nightly check
+
+2.4.1  copy distribution to web
+2.4.1  compile manual
+2.4.1  copy manual to web
+2.4.1  run doxygen, copy to web
+2.4.1  update main web page & menu in devel area
+
+2.4.1  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+2.4.1  update main web-page area
+
+NOT DONE  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+2.4.1  make sure it's committed with the CHECKLIST
+
+2.4.1  check everything is OK
+2.4.1  reset the SISCone link to the trunk
+2.4.1  move the version number to X.Y.(Z+1)-devel
+
+
+----------------------------------------------------------------------
+checklist for 2.4.0
+-------------------
+2.4.0  make sure version number in configure.ac is correct
+
+2.4.0  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+2.4.0  update doxygen version number + check dirs are declared for new plugins
+2.4.0  version number in manual
+
+2.4.0  ensure NEWS is up to date
+
+2.4.0  make sure siscone points to a tag, not trunk
+
+2.4.0  make check 
+
+2.4.0  make distcheck
+
+2.4.0  make sure it's committed
+
+2.4.0  rerun the nightly check
+
+2.4.0  copy distribution to web
+2.4.0  compile manual
+2.4.0  copy manual to web
+2.4.0  run doxygen, copy to web
+2.4.0  update main web page & menu
+
+2.4.0  tag: svn cp . file:///ada1/lpthe/salam/svn/fastjet/tags/fastjet-X.Y.Z
+2.4.0  update main web-page area
+
+2.4.0  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+2.4.0  make sure it's committed with the CHECKLIST
+
+
+
+----------------------------------------------------------------------
+checklist for 2.3.4
+-------------------
+2.3.4  make sure version number in configure.ac is correct
+
+2.3.4  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+
+2.3.4  ensure NEWS is up to date
+
+2.3.4  make sure siscone points to a tag, not trunk
+
+2.3.4  make check [how do we deal with various config options?]
+
+2.3.4  make distcheck
+
+2.3.4  copy distribution to web
+2.3.4  update doxygen version number, run doxygen, copy to web
+2.3.4  compile manual, give it current version number [* just linked *]
+2.3.4  copy manual to web
+2.3.4  update main web page & menu
+
+2.3.4  tag
+
+[2.3.4-not-done  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       ]
+
+
+
+----------------------------------------------------------------------
+checklist for 2.3.3
+-------------------
+2.3.3  make sure version number in configure.ac is correct
+
+2.3.3  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+
+2.3.3  ensure NEWS is up to date
+
+2.3.3  make sure siscone points to a tag, not trunk
+
+2.3.3  make check [how do we deal with various config options?]
+
+2.3.3  make distcheck
+
+2.3.3  copy distribution to web
+2.3.3  run doxygen, copy to web
+2.3.3  compile manual, give it current version number
+2.3.3  update main web page & menu
+
+2.3.3  tag
+
+2.3.3  NO! send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+----------------------------------------------------------------------
+checklist for 2.3.2
+-------------------
+2.3.2  change version number in configure.ac
+
+2.3.2  make sure version number in configure.ac is correct
+
+2.3.2  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+
+2.3.2  ensure NEWS is up to date
+
+2.3.2  make sure siscone points to a tag, not trunk
+
+2.3.2  make check [how do we deal with various config options?]
+
+2.3.2  make distcheck
+
+2.3.2  copy distribution to web
+2.3.2  run doxygen, copy to web
+2.3.2  compile manual, give it current version number
+2.3.2  update main web page & menu
+
+2.3.2  tag
+
+2.3.2  DID NOT send mail to: fastjet-announce@projects.hepforge.org
+       DID NOT subject: FastJet release X.Y.Z       
+
+X.Y.Z  change version number in configure.ac
+
+
+----------------------------------------------------------------------
+checklist for 2.3.1
+-------------------
+2.3.1  checked cygwin and it works there
+
+2.3.1  make sure version number in configure.ac is correct
+
+2.3.1  generate config_win.h: cd src && ./genconfig.sh ../include/fastjet/config_win.h
+
+2.3.1  ensure NEWS is up to date
+
+2.3.1  make check [how do we deal with various config options?]
+
+2.3.1  make distcheck
+
+2.3.1  copy distribution to web
+2.3.1  run doxygen, copy to web
+2.3.1  compile manual, give it current version number
+2.3.1  update main web page & menu
+
+2.3.1  tag
+
+2.3.1  send mail to: fastjet-announce@projects.hepforge.org
+       subject: FastJet release X.Y.Z       
+
+2.3.1  change version number in configure.ac

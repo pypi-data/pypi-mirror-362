@@ -1,0 +1,143 @@
+tests_autoconf:
+  image: fedora:latest
+  script:
+  - dnf update -y
+  - dnf install -y g++ git libtool autoconf make gawk
+  
+  - export CXXFLAGS="-std=c++17 -O3 -g -fPIC ${CXXFLAGS}"
+  - bash autogen.sh --prefix=/usr/local/ CXXFLAGS="${CXXFLAGS}"
+  - ./configure --help
+  - make --jobs
+  - make check
+  - make install
+
+  - cd examples
+  - ./siscone --help
+  - ./siscone
+  - ./sample
+  - ./siscone_area --help
+  - ./siscone_area
+  - ./spherical
+  - ./test
+  - ./times
+
+  - g++ ${CXXFLAGS} main.cpp options.cpp -o main -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/usr/local/lib64 -L/usr/local/lib64 -lsiscone
+  - ./main
+  - head -n 10 jets.dat
+  
+tests_dist_and_cmake:
+  image: fedora:latest
+  script:
+
+  - dnf update -y
+  - dnf install -y g++ git libtool autoconf make gawk cmake
+
+  - bash autogen.sh --prefix=/usr/local/ CXXFLAGS="${CXXFLAGS}"
+  - make dist
+  - tar zxf siscone-*.tar.gz
+  - cd siscone-*/
+  - mkdir build
+  - cmake -S . -B build
+  - cmake --build build --parallel=6
+
+
+tests_cmake:
+  image: fedora:latest
+  script:
+  - dnf update -y
+  - dnf install -y g++ git cmake
+
+  - export CXXFLAGS="-std=c++17 -O3 -g -fPIC ${CXXFLAGS}"
+  - cmake -S . -B build
+  - cmake --build build
+  - cmake --install build
+
+  - cd build/examples
+  - cp -r ../../examples/events .
+  - cp ../../examples/jets.gri .
+  - cp ../../examples/main.cpp .
+  - cp ../../examples/options.* .
+  - ./siscone_main --help
+  - ./siscone_main
+  - ./sample
+  - ./siscone_area --help
+  - ./siscone_area
+  - ./spherical
+  - ./siscone_test
+  - ./times
+
+  - g++ ${CXXFLAGS} main.cpp options.cpp -o main -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/usr/local/lib64 -L/usr/local/lib64 -lsiscone
+  - ./main
+  - head -n 10 jets.dat
+
+tests_cmake_macos:
+  tags:
+  - saas-macos-medium-m1
+  rules:
+    # forks sometimes have trouble running the MacOS jobs. So MacOS jobs run only
+    # if this variable is set to true. Set it up in Settings > CI/CD > Variables.
+    # Make sure you uncheck "Protect variables" so that it is not restricted
+    # to protected branches
+    - if: '$RUN_MACOS == "true"'
+      when: always
+    - when: never  
+  variables:
+    HOMEBREW_NO_AUTO_UPDATE: 1
+  before_script:
+  - brew install cmake
+  script:
+  - export CXXFLAGS="-std=c++17 -O3 -g -fPIC ${CXXFLAGS}"
+  - export SISConeInstallDir=${HOME}/siscone-install
+  - cmake -S . -B build -DCMAKE_INSTALL_PREFIX=${SISConeInstallDir}
+  - cmake --build build --parallel=6
+  - cmake --install build
+
+  - cd build/examples
+  - cp -r ../../examples/events .
+  - cp ../../examples/jets.gri .
+  - cp ../../examples/main.cpp .
+  - cp ../../examples/options.* .
+  - ./siscone_main --help
+  - ./siscone_main
+  - ./sample
+  - ./siscone_area --help
+  - ./siscone_area
+  - ./spherical
+  - ./siscone_test
+  - ./times
+
+  - g++ ${CXXFLAGS} -I${SISConeInstallDir}/include main.cpp options.cpp -o main -Wl,-rpath,${SISConeInstallDir}/lib -L${SISConeInstallDir}/lib -Wl,-rpath,${SISConeInstallDir}/lib64 -L${SISConeInstallDir}/lib64 -lsiscone
+  - ./main
+  - head -n 10 jets.dat
+
+tests_cmake_windows:
+  tags:
+  - saas-windows-medium-amd64
+  #rules:
+  #  - if: '$RUN_WINDOWS == "true"'
+  #    when: always
+  #  - when: never
+  before_script:
+  - vcpkg.exe update
+  - vcpkg.exe install getopt
+  - cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+  - Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+  script:
+  - cmake -G Ninja -S . -B build -DCMAKE_BUILD_TYPE=Release -Dunofficial-getopt-win32_DIR=C:\vcpkg\packages\getopt-win32_x64-windows\share\unofficial-getopt-win32
+  - cmake --build build
+  - cmake --install build
+
+  - cd build/examples
+  - $env:PATH="C:\Program Files (x86)\SISCone\bin;C:\vcpkg\packages\getopt-win32_x64-windows\bin;$env:PATH" 
+  - cp -r ../../examples/events .
+  - cp ../../examples/jets.gri .
+  - cp ../../examples/main.cpp .
+  - cp ../../examples/options.* .
+  - ./siscone_main.exe --help
+  - ./siscone_main.exe -e events\single-event.dat
+  - ./sample.exe events\single-event.dat
+  - ./siscone_area.exe --help
+  - ./siscone_area.exe -e events\single-event.dat
+  - ./spherical.exe -e events\single-event.dat
+  - ./siscone_test.exe -e events\single-event.dat
+  - ./times.exe -e events\single-event.dat
