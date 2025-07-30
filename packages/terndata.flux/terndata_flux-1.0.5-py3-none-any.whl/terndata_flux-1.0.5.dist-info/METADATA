@@ -1,0 +1,177 @@
+Metadata-Version: 2.4
+Name: terndata.flux
+Version: 1.0.5
+Summary: TERN flux data access library
+Author-email: "Terrestrial Ecosystem Research Network (TERN)" <esupprt@tern.org.au>
+Maintainer-email: Yong Liaw <y.liaw@uq.edu.au>
+License-Expression: Apache-2.0
+Project-URL: Home, https://github.com/ternaustralia/terndata.flux
+Project-URL: Documentation, https://terndata-flux.readthedocs.io
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: NOTICE
+Requires-Dist: typing-extensions
+Requires-Dist: xarray
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: geopandas
+Requires-Dist: netCDF4
+Requires-Dist: requests
+Requires-Dist: python-dateutil
+Requires-Dist: pytz
+Requires-Dist: xlrd
+Requires-Dist: xlsxwriter
+Requires-Dist: defusedxml
+Requires-Dist: matplotlib
+Dynamic: license-file
+
+# terndata.flux
+
+This is a Python package to work with TERN flux data. It provides API methods to explore and access flux datasets from the TERN THREDDS/DAP server (i.e. dap.tern.org.au).
+
+### Build
+Buid the package wheel locally (docker required):
+    
+    make build
+
+Build the API documentation (set a Github personal token in envvars first):
+
+    make doc
+
+To run unittests:
+
+    make test
+
+    OR
+    
+    Run the script below in Python virtual environment:
+        ./ci-scripts/run-tests.sh
+
+### Installation
+Install from pypi:
+
+    pip install terndata.flux
+
+
+### API Methods
+See the [API documentation](https://terndata-flux.readthedocs.io) generated from the code (see above).
+
+### Getting started
+The following examples are provided to help you get started, with sample output (as indicated by >>>) where appropriate:
+
+```python
+    import terndata.flux as flux 
+    # Get sites where flux data is available
+    flux.get_sites()
+    >>> site           longitude   latitude  ...                start                  end                     geometry
+    AdelaideRiver      131.117800 -13.076900  ...  2007-10-17 11:30:00  2009-05-24 06:00:00    POINT (131.1178 -13.0769)
+    AliceSpringsMulga  133.249000 -22.283000  ...  2010-09-03 00:00:00  2025-01-28 10:00:00      POINT (133.249 -22.283)
+    AlpinePeatland     147.320833 -36.862222  ...  2017-04-12 18:30:00  2022-06-20 23:30:00  POINT (147.32083 -36.86222)
+    Boyagin            116.938559 -32.477093  ...  2017-10-20 13:00:00  2025-02-02 00:00:00  POINT (116.93856 -32.47709)
+    ...
+
+    # get the versions available for the site
+    flux.get_versions("AdelaideRiver")
+    >>> ['2020', '2021_v1', '2022_v1', '2022_v2', '2023_v1', '2023_v2', '2024_v1', '2024_v2']
+    
+    # Get the processing-levels available for a site and version
+    flux.get_processing_levels("AdelaideRiver", "2024_v2")
+    >>> ['L3', 'L4', 'L5', 'L6']
+
+    # Get a 30min dataset from a site, and of a version and processing-level.
+    flux.get_dataset("AdelaideRiver", "2024_v2", "L3")
+    >>> <xarray.Dataset> Size: 18MB
+    Dimensions:             (time: 28070, latitude: 1, longitude: 1)
+    Coordinates:
+    * time                (time) datetime64[ns] 225kB 2007-10-17T11:30:00 ... 2...
+    * latitude            (latitude) float64 8B -13.08
+    * longitude           (longitude) float64 8B 131.1 
+    ...
+
+    # Get a daily dataset
+    flux.get_l6_dataset("AdelaideRiver", "2024_v2", "daily")
+
+    # Get 30min datasets from multiple sites
+    sites = ["AdelaideRiver", "Warra"]
+    flux.get_datasets(sites, "2024_v2", "L6")
+    >>> {'AdelaideRiver': <xarray.Dataset> Size: 24MB
+    Dimensions:             (time: 28070, latitude: 1, longitude: 1)
+    Coordinates:
+    * time                (time) datetime64[ns] 225kB 2007-10-17T11:30:00 ... 2...
+    * latitude            (latitude) float64 8B -13.08
+    * longitude           (longitude) float64 8B 131.1
+    Data variables: (12/142)
+    ...
+    'Warra': <xarray.Dataset> Size: 191MB
+    Dimensions:                  (time: 149851, latitude: 1, longitude: 1)
+    Coordinates:
+    * time                     (time) datetime64[ns] 1MB 2013-03-05T15:00:00 .....
+    * latitude                 (latitude) float64 8B -43.1
+    * longitude                (longitude) float64 8B 146.7
+    Data variables: (12/210)
+    ...
+    }
+
+    # Get a subset of 30min dataset from multiple sites, slice to 2 variables
+    flux.get_subsets(["AdelaideRiver", "Warra"],  "2024_v2", "L3", ["AH", "CO2"])
+    >>> {'AdelaideRiver': <xarray.Dataset> Size: 674kB
+    Dimensions:    (time: 28070, latitude: 1, longitude: 1)
+    Coordinates:
+    * time       (time) datetime64[ns] 225kB 2007-10-17T11:30:00 ... 2009-05-24...
+    * latitude   (latitude) float64 8B -13.08
+    * longitude  (longitude) float64 8B 131.1
+    Data variables:
+        AH         (time, latitude, longitude) float64 225kB ...
+        CO2        (time, latitude, longitude) float64 225kB ...
+    ...
+    'Warra': <xarray.Dataset> Size: 4MB
+    Dimensions:    (time: 149851, latitude: 1, longitude: 1)
+    Coordinates:
+    * time       (time) datetime64[ns] 1MB 2013-03-05T15:00:00 ... 2021-09-21T1...
+    * latitude   (latitude) float64 8B -43.1
+    * longitude  (longitude) float64 8B 146.7
+    Data variables:
+        AH         (time, latitude, longitude) float64 1MB ...
+        CO2        (time, latitude, longitude) float64 1MB ...
+    ...
+
+    # Export dataset as Excel workbook
+    flux.export_as_excel("/home/user/excel_output.xlsx", "AdelaideRiver", "2024_v2", "L6")
+    >>> '/home/user/excel_output.xlsx'
+
+    # Export dataset as oneflux csv format
+    flux.export_oneflux_csv("output_dir", "AdelaideRiver", "2024_v2", "L4")
+    >>> ['output_dir/AU-Adr_qcv_2007.csv', 'output_dir/AU-Adr_qcv_2008.csv', 'output_dir/AU-Adr_qcv_2009.csv']
+```
+
+### Dependencies
+
+* xarray
+* netcdf4
+* packaging
+* numpy
+* pandas
+* requests
+* matplotlib
+* defusedxml
+* xlsxwriter
+* xlrd
+* matplotlib
+
+### Who do I talk to?
+
+* please contact esupport@tern.org.au for any issues in the repository
+
+### How to cite
+Terrestrial Ecosystem Research Network (2025). terndata.flux: A Python package for Accessing TERN Flux data. https://pypi.org/project/terndata.flux/
