@@ -1,0 +1,340 @@
+"""Debug version of custom LLM to help identify issues."""
+
+import json
+import logging
+import requests
+import traceback
+from typing import Any, Dict, Iterator, List, Optional
+from langchain_core.callbacks import CallbackManagerForLLMRun
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import (
+    AIMessage,
+    BaseMessage,
+    HumanMessage,
+    SystemMessage,
+)
+from langchain_core.outputs import ChatGeneration, ChatResult
+from pydantic import Field
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
+class DebugCustomLLM(BaseChatModel):
+    """Debug version of custom LLM implementation."""
+    
+    endpoint_url: str = Field(description="The full endpoint URL")
+    api_key: str = Field(description="API key for authentication")
+    auth_type: str = Field(default="Bearer", description="Authentication type")
+    headers: Dict[str, str] = Field(default_factory=dict, description="Additional headers")
+    temperature: float = Field(default=0.0, description="Temperature for response generation")
+    max_tokens: Optional[int] = Field(default=None, description="Maximum tokens in response")
+    model_name: str = Field(default="custom-model", description="Model name for identification")
+    
+    class Config:
+        """Configuration for this pydantic object."""
+        arbitrary_types_allowed = True
+
+    @property
+    def _llm_type(self) -> str:
+        """Return identifier of llm."""
+        return "debug-custom"
+
+    def _format_message_to_dict(self, message: BaseMessage) -> Dict[str, Any]:
+        """Convert a LangChain message to the format expected by your API."""
+        try:
+            print(f"DEBUG: Formatting message: {type(message)} - {message}")
+            
+            if isinstance(message, HumanMessage):
+                role = "user"
+            elif isinstance(message, AIMessage):
+                role = "assistant"
+            elif isinstance(message, SystemMessage):
+                role = "system"
+            else:
+                role = "user"  # fallback
+            
+            # Handle different content types (text vs multimodal)
+            if isinstance(message.content, str):
+                content = message.content
+            elif isinstance(message.content, list):
+                # Handle multimodal content (text + images)
+                content = message.content
+            else:
+                content = str(message.content)
+            
+            result = {
+                "role": role,
+                "content": content
+            }
+            
+            print(f"DEBUG: Formatted message result: {result}")
+            return result
+            
+        except Exception as e:
+            print(f"ERROR in _format_message_to_dict: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+    def _prepare_request_body(self, messages: List[BaseMessage]) -> Dict[str, Any]:
+        """Prepare the request body for your company's API."""
+        try:
+            print(f"DEBUG: Preparing request body for {len(messages)} messages")
+            
+            formatted_messages = [self._format_message_to_dict(msg) for msg in messages]
+            
+            body = {
+                "messages": formatted_messages,
+                "temperature": self.temperature,
+            }
+            
+            if self.max_tokens:
+                body["max_tokens"] = self.max_tokens
+                
+            print(f"DEBUG: Request body prepared: {json.dumps(body, indent=2)}")
+            return body
+            
+        except Exception as e:
+            print(f"ERROR in _prepare_request_body: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+    def _prepare_headers(self) -> Dict[str, str]:
+        """Prepare headers for the API request."""
+        try:
+            print(f"DEBUG: Preparing headers with auth_type={self.auth_type}")
+            print(f"DEBUG: API key (masked): {'*' * (len(self.api_key) - 4) + self.api_key[-4:] if len(self.api_key) > 4 else '***'}")
+            
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"{self.auth_type} {self.api_key}",
+            }
+            
+            # Add custom headers if they exist and are not None
+            if self.headers and isinstance(self.headers, dict):
+                print(f"DEBUG: Adding custom headers: {list(self.headers.keys())}")
+                headers.update(self.headers)
+            else:
+                print("DEBUG: No custom headers to add")
+                
+            print(f"DEBUG: Final headers (auth masked): {dict((k, '***MASKED***' if k.lower() == 'authorization' else v) for k, v in headers.items())}")
+            return headers
+            
+        except Exception as e:
+            print(f"ERROR in _prepare_headers: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+    def _make_request(self, body: Dict[str, Any]) -> Dict[str, Any]:
+        """Make the actual HTTP request to your company's API."""
+        try:
+            headers = self._prepare_headers()
+            
+            print(f"DEBUG: Making request to {self.endpoint_url}")
+            print(f"DEBUG: Request headers: {headers}")
+            print(f"DEBUG: Request body: {json.dumps(body, indent=2)}")
+            
+            response = requests.post(
+                self.endpoint_url,
+                headers=headers,
+                json=body,
+                timeout=60
+            )
+            
+            print(f"DEBUG: Response status: {response.status_code}")
+            print(f"DEBUG: Response headers: {dict(response.headers)}")
+            print(f"DEBUG: Raw response: {response.text}")
+            
+            # Check if response is successful
+            response.raise_for_status()
+            
+            # Try to parse JSON response
+            try:
+                response_data = response.json()
+                print(f"DEBUG: Parsed response data: {json.dumps(response_data, indent=2)}")
+                return response_data
+            except json.JSONDecodeError as e:
+                print(f"ERROR: Failed to parse JSON response: {e}")
+                print(f"Raw response: {response.text}")
+                raise Exception(f"Invalid JSON response from custom LLM: {e}")
+                
+        except requests.exceptions.Timeout:
+            print("ERROR: Request timed out")
+            raise Exception("Request to custom LLM timed out")
+        except requests.exceptions.ConnectionError as e:
+            print(f"ERROR: Connection error: {e}")
+            raise Exception("Failed to connect to custom LLM endpoint")
+        except requests.exceptions.HTTPError as e:
+            status_code = e.response.status_code
+            error_msg = f"HTTP {status_code} error from custom LLM"
+            print(f"ERROR: {error_msg}")
+            print(f"Response text: {e.response.text}")
+            try:
+                error_data = e.response.json()
+                if "error" in error_data:
+                    error_msg += f": {error_data['error']}"
+                elif "message" in error_data:
+                    error_msg += f": {error_data['message']}"
+            except:
+                error_msg += f": {e.response.text}"
+            raise Exception(error_msg)
+        except requests.exceptions.RequestException as e:
+            print(f"ERROR: Request exception: {e}")
+            raise Exception(f"Request to custom LLM failed: {e}")
+        except Exception as e:
+            print(f"ERROR in _make_request: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+    def _extract_response_content(self, response: Dict[str, Any]) -> str:
+        """Extract the response content from your API's response format."""
+        try:
+            print(f"DEBUG: Extracting content from response with keys: {list(response.keys())}")
+            
+            # OpenAI-style format:
+            if "choices" in response:
+                if response["choices"] and len(response["choices"]) > 0:
+                    choice = response["choices"][0]
+                    if "message" in choice and "content" in choice["message"]:
+                        content = choice["message"]["content"]
+                        print(f"DEBUG: Extracted content (OpenAI style): {content}")
+                        return content
+                    elif "text" in choice:
+                        content = choice["text"]
+                        print(f"DEBUG: Extracted content (text field): {content}")
+                        return content
+            
+            # Alternative formats - adjust based on your API:
+            for key in ["response", "content", "text", "completion", "output", "result", "answer", "reply", "generated_text"]:
+                if key in response:
+                    content = str(response[key])
+                    print(f"DEBUG: Extracted content ({key} field): {content}")
+                    return content
+            
+            # Generic message format:
+            if "message" in response:
+                if isinstance(response["message"], dict) and "content" in response["message"]:
+                    content = response["message"]["content"]
+                    print(f"DEBUG: Extracted content (message.content): {content}")
+                    return content
+                elif isinstance(response["message"], str):
+                    content = response["message"]
+                    print(f"DEBUG: Extracted content (message string): {content}")
+                    return content
+            
+            # If none of the above worked
+            print(f"ERROR: Could not extract content from response")
+            print(f"Available keys: {list(response.keys())}")
+            print(f"Full response: {response}")
+            raise ValueError(f"Could not extract content from response. Available keys: {list(response.keys())}")
+            
+        except Exception as e:
+            print(f"ERROR in _extract_response_content: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+    def _generate(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
+    ) -> ChatResult:
+        """Generate a response from the custom LLM."""
+        try:
+            print(f"DEBUG: Starting _generate with {len(messages)} messages")
+            
+            # Prepare the request
+            body = self._prepare_request_body(messages)
+            
+            # Add any additional parameters from kwargs
+            if stop:
+                body["stop"] = stop
+                print(f"DEBUG: Added stop sequences: {stop}")
+            
+            # Make the request
+            response = self._make_request(body)
+            
+            # Extract the content
+            content = self._extract_response_content(response)
+            
+            # Create the response message
+            message = AIMessage(content=content)
+            generation = ChatGeneration(message=message)
+            
+            print(f"DEBUG: Successfully generated response: {content}")
+            return ChatResult(generations=[generation])
+            
+        except Exception as e:
+            print(f"ERROR in _generate: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+    def _stream(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
+    ) -> Iterator[ChatGeneration]:
+        """Stream responses from the custom LLM."""
+        try:
+            print("DEBUG: Starting _stream (non-streaming implementation)")
+            result = self._generate(messages, stop, run_manager, **kwargs)
+            yield result.generations[0]
+        except Exception as e:
+            print(f"ERROR in _stream: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+    async def _agenerate(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
+    ) -> ChatResult:
+        """Async version of generate."""
+        try:
+            print("DEBUG: Starting _agenerate (sync implementation)")
+            return self._generate(messages, stop, run_manager, **kwargs)
+        except Exception as e:
+            print(f"ERROR in _agenerate: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+
+def create_debug_custom_llm(
+    endpoint_url: str,
+    api_key: str,
+    auth_type: str = "Bearer",
+    headers: Optional[Dict[str, str]] = None,
+    temperature: float = 0.0,
+    max_tokens: Optional[int] = None,
+    model_name: str = "custom-model"
+) -> DebugCustomLLM:
+    """Factory function to create a debug custom LLM instance."""
+    try:
+        print(f"DEBUG: Creating custom LLM with:")
+        print(f"  endpoint_url: {endpoint_url}")
+        print(f"  api_key: {'*' * len(api_key) if api_key else 'None'}")
+        print(f"  auth_type: {auth_type}")
+        print(f"  headers: {headers}")
+        print(f"  temperature: {temperature}")
+        print(f"  max_tokens: {max_tokens}")
+        print(f"  model_name: {model_name}")
+        
+        return DebugCustomLLM(
+            endpoint_url=endpoint_url,
+            api_key=api_key,
+            auth_type=auth_type,
+            headers=headers or {},
+            temperature=temperature,
+            max_tokens=max_tokens,
+            model_name=model_name
+        )
+    except Exception as e:
+        print(f"ERROR in create_debug_custom_llm: {e}")
+        print(f"Traceback: {traceback.format_exc()}")
+        raise
