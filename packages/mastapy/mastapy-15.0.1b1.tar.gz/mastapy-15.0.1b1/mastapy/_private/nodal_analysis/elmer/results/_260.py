@@ -1,0 +1,99 @@
+"""Data1D"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
+
+from mastapy._private._internal import conversion, utility
+from mastapy._private._internal.dataclasses import extended_dataclass
+from mastapy._private._internal.exception_bridge import exception_bridge
+from mastapy._private._internal.exceptions import CastException
+from mastapy._private._internal.python_net import (
+    python_net_import,
+    pythonnet_property_get,
+)
+from mastapy._private.nodal_analysis.elmer.results import _259
+
+_DATA_1D = python_net_import("SMT.MastaAPI.NodalAnalysis.Elmer.Results", "Data1D")
+
+if TYPE_CHECKING:
+    from typing import Any, List, Type, TypeVar
+
+    Self = TypeVar("Self", bound="Data1D")
+    CastSelf = TypeVar("CastSelf", bound="Data1D._Cast_Data1D")
+
+
+__docformat__ = "restructuredtext en"
+__all__ = ("Data1D",)
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True)
+class _Cast_Data1D:
+    """Special nested class for casting Data1D to subclasses."""
+
+    __parent__: "Data1D"
+
+    @property
+    def data(self: "CastSelf") -> "_259.Data":
+        return self.__parent__._cast(_259.Data)
+
+    @property
+    def data_1d(self: "CastSelf") -> "Data1D":
+        return self.__parent__
+
+    def __getattr__(self: "CastSelf", name: str) -> "Any":
+        try:
+            return self.__getattribute__(name)
+        except AttributeError:
+            class_name = utility.camel(name)
+            raise CastException(
+                f'Detected an invalid cast. Cannot cast to type "{class_name}"'
+            ) from None
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True, eq=False)
+class Data1D(_259.Data):
+    """Data1D
+
+    This is a mastapy class.
+    """
+
+    TYPE: ClassVar["Type"] = _DATA_1D
+
+    wrapped: "Any"
+
+    def __post_init__(self: "Self") -> None:
+        """Override of the post initialisation magic method."""
+        if not hasattr(self.wrapped, "reference_count"):
+            self.wrapped.reference_count = 0
+
+        self.wrapped.reference_count += 1
+
+    @property
+    @exception_bridge
+    def data(self: "Self") -> "List[float]":
+        """List[float]
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "Data")
+
+        if temp is None:
+            return None
+
+        value = conversion.pn_to_mp_objects_in_list(temp, float)
+
+        if value is None:
+            return None
+
+        return value
+
+    @property
+    def cast_to(self: "Self") -> "_Cast_Data1D":
+        """Cast to another type.
+
+        Returns:
+            _Cast_Data1D
+        """
+        return _Cast_Data1D(self)

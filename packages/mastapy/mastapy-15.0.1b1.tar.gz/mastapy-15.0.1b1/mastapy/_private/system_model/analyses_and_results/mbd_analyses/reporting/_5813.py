@@ -1,0 +1,148 @@
+"""DynamicTorqueResultAtTime"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
+
+from mastapy._private._internal import utility
+from mastapy._private._internal.dataclasses import extended_dataclass
+from mastapy._private._internal.exception_bridge import exception_bridge
+from mastapy._private._internal.exceptions import CastException
+from mastapy._private._internal.python_net import (
+    python_net_import,
+    pythonnet_property_get,
+)
+from mastapy._private.system_model.analyses_and_results.mbd_analyses.reporting import (
+    _5810,
+)
+
+_DYNAMIC_TORQUE_RESULT_AT_TIME = python_net_import(
+    "SMT.MastaAPI.SystemModel.AnalysesAndResults.MBDAnalyses.Reporting",
+    "DynamicTorqueResultAtTime",
+)
+
+if TYPE_CHECKING:
+    from typing import Any, Type, TypeVar
+
+    Self = TypeVar("Self", bound="DynamicTorqueResultAtTime")
+    CastSelf = TypeVar(
+        "CastSelf", bound="DynamicTorqueResultAtTime._Cast_DynamicTorqueResultAtTime"
+    )
+
+
+__docformat__ = "restructuredtext en"
+__all__ = ("DynamicTorqueResultAtTime",)
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True)
+class _Cast_DynamicTorqueResultAtTime:
+    """Special nested class for casting DynamicTorqueResultAtTime to subclasses."""
+
+    __parent__: "DynamicTorqueResultAtTime"
+
+    @property
+    def abstract_measured_dynamic_response_at_time(
+        self: "CastSelf",
+    ) -> "_5810.AbstractMeasuredDynamicResponseAtTime":
+        return self.__parent__._cast(_5810.AbstractMeasuredDynamicResponseAtTime)
+
+    @property
+    def dynamic_torque_result_at_time(self: "CastSelf") -> "DynamicTorqueResultAtTime":
+        return self.__parent__
+
+    def __getattr__(self: "CastSelf", name: str) -> "Any":
+        try:
+            return self.__getattribute__(name)
+        except AttributeError:
+            class_name = utility.camel(name)
+            raise CastException(
+                f'Detected an invalid cast. Cannot cast to type "{class_name}"'
+            ) from None
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True, eq=False)
+class DynamicTorqueResultAtTime(_5810.AbstractMeasuredDynamicResponseAtTime):
+    """DynamicTorqueResultAtTime
+
+    This is a mastapy class.
+    """
+
+    TYPE: ClassVar["Type"] = _DYNAMIC_TORQUE_RESULT_AT_TIME
+
+    wrapped: "Any"
+
+    def __post_init__(self: "Self") -> None:
+        """Override of the post initialisation magic method."""
+        if not hasattr(self.wrapped, "reference_count"):
+            self.wrapped.reference_count = 0
+
+        self.wrapped.reference_count += 1
+
+    @property
+    @exception_bridge
+    def absolute_dynamic_torque(self: "Self") -> "float":
+        """float
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "AbsoluteDynamicTorque")
+
+        if temp is None:
+            return 0.0
+
+        return temp
+
+    @property
+    @exception_bridge
+    def dynamic_torque(self: "Self") -> "float":
+        """float
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "DynamicTorque")
+
+        if temp is None:
+            return 0.0
+
+        return temp
+
+    @property
+    @exception_bridge
+    def mean_torque(self: "Self") -> "float":
+        """float
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "MeanTorque")
+
+        if temp is None:
+            return 0.0
+
+        return temp
+
+    @property
+    @exception_bridge
+    def torque(self: "Self") -> "float":
+        """float
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "Torque")
+
+        if temp is None:
+            return 0.0
+
+        return temp
+
+    @property
+    def cast_to(self: "Self") -> "_Cast_DynamicTorqueResultAtTime":
+        """Cast to another type.
+
+        Returns:
+            _Cast_DynamicTorqueResultAtTime
+        """
+        return _Cast_DynamicTorqueResultAtTime(self)

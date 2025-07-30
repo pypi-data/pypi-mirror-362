@@ -1,0 +1,464 @@
+"""Coil"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
+
+from mastapy._private import _0
+from mastapy._private._internal import (
+    conversion,
+    enum_with_selected_value_runtime,
+    utility,
+)
+from mastapy._private._internal.dataclasses import extended_dataclass
+from mastapy._private._internal.exception_bridge import exception_bridge
+from mastapy._private._internal.exceptions import CastException
+from mastapy._private._internal.implicit import enum_with_selected_value
+from mastapy._private._internal.python_net import (
+    python_net_import,
+    pythonnet_method_call,
+    pythonnet_property_get,
+    pythonnet_property_set,
+)
+from mastapy._private._internal.type_enforcement import enforce_parameter_types
+from mastapy._private.electric_machines import _1377
+
+_COIL = python_net_import("SMT.MastaAPI.ElectricMachines", "Coil")
+
+if TYPE_CHECKING:
+    from typing import Any, List, Type, TypeVar
+
+    from mastapy._private._internal.typing import PathLike
+
+    Self = TypeVar("Self", bound="Coil")
+    CastSelf = TypeVar("CastSelf", bound="Coil._Cast_Coil")
+
+
+__docformat__ = "restructuredtext en"
+__all__ = ("Coil",)
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True)
+class _Cast_Coil:
+    """Special nested class for casting Coil to subclasses."""
+
+    __parent__: "Coil"
+
+    @property
+    def coil(self: "CastSelf") -> "Coil":
+        return self.__parent__
+
+    def __getattr__(self: "CastSelf", name: str) -> "Any":
+        try:
+            return self.__getattribute__(name)
+        except AttributeError:
+            class_name = utility.camel(name)
+            raise CastException(
+                f'Detected an invalid cast. Cannot cast to type "{class_name}"'
+            ) from None
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True, eq=False)
+class Coil(_0.APIBase):
+    """Coil
+
+    This is a mastapy class.
+    """
+
+    TYPE: ClassVar["Type"] = _COIL
+
+    wrapped: "Any"
+
+    def __post_init__(self: "Self") -> None:
+        """Override of the post initialisation magic method."""
+        if not hasattr(self.wrapped, "reference_count"):
+            self.wrapped.reference_count = 0
+
+        self.wrapped.reference_count += 1
+
+    @property
+    @exception_bridge
+    def coil_pitch(self: "Self") -> "float":
+        """float
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "CoilPitch")
+
+        if temp is None:
+            return 0.0
+
+        return temp
+
+    @property
+    @exception_bridge
+    def coil_pitch_angle(self: "Self") -> "float":
+        """float
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "CoilPitchAngle")
+
+        if temp is None:
+            return 0.0
+
+        return temp
+
+    @property
+    @exception_bridge
+    def in_slot(self: "Self") -> "int":
+        """int"""
+        temp = pythonnet_property_get(self.wrapped, "InSlot")
+
+        if temp is None:
+            return 0
+
+        return temp
+
+    @in_slot.setter
+    @exception_bridge
+    @enforce_parameter_types
+    def in_slot(self: "Self", value: "int") -> None:
+        pythonnet_property_set(
+            self.wrapped, "InSlot", int(value) if value is not None else 0
+        )
+
+    @property
+    @exception_bridge
+    def in_slot_layer_index(self: "Self") -> "int":
+        """int"""
+        temp = pythonnet_property_get(self.wrapped, "InSlotLayerIndex")
+
+        if temp is None:
+            return 0
+
+        return temp
+
+    @in_slot_layer_index.setter
+    @exception_bridge
+    @enforce_parameter_types
+    def in_slot_layer_index(self: "Self", value: "int") -> None:
+        pythonnet_property_set(
+            self.wrapped, "InSlotLayerIndex", int(value) if value is not None else 0
+        )
+
+    @property
+    @exception_bridge
+    def in_slot_position(
+        self: "Self",
+    ) -> "enum_with_selected_value.EnumWithSelectedValue_CoilPositionInSlot":
+        """EnumWithSelectedValue[mastapy.electric_machines.CoilPositionInSlot]"""
+        temp = pythonnet_property_get(self.wrapped, "InSlotPosition")
+
+        if temp is None:
+            return None
+
+        value = enum_with_selected_value.EnumWithSelectedValue_CoilPositionInSlot.wrapped_type()
+        return enum_with_selected_value_runtime.create(temp, value)
+
+    @in_slot_position.setter
+    @exception_bridge
+    @enforce_parameter_types
+    def in_slot_position(self: "Self", value: "_1377.CoilPositionInSlot") -> None:
+        wrapper_type = enum_with_selected_value_runtime.ENUM_WITH_SELECTED_VALUE
+        enclosed_type = enum_with_selected_value.EnumWithSelectedValue_CoilPositionInSlot.implicit_type()
+        value = conversion.mp_to_pn_enum(value, enclosed_type)
+        value = wrapper_type[enclosed_type](value)
+        pythonnet_property_set(self.wrapped, "InSlotPosition", value)
+
+    @property
+    @exception_bridge
+    def mean_length_per_turn(self: "Self") -> "float":
+        """float
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "MeanLengthPerTurn")
+
+        if temp is None:
+            return 0.0
+
+        return temp
+
+    @property
+    @exception_bridge
+    def name(self: "Self") -> "str":
+        """str
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "Name")
+
+        if temp is None:
+            return ""
+
+        return temp
+
+    @property
+    @exception_bridge
+    def out_slot(self: "Self") -> "int":
+        """int"""
+        temp = pythonnet_property_get(self.wrapped, "OutSlot")
+
+        if temp is None:
+            return 0
+
+        return temp
+
+    @out_slot.setter
+    @exception_bridge
+    @enforce_parameter_types
+    def out_slot(self: "Self", value: "int") -> None:
+        pythonnet_property_set(
+            self.wrapped, "OutSlot", int(value) if value is not None else 0
+        )
+
+    @property
+    @exception_bridge
+    def out_slot_layer_index(self: "Self") -> "int":
+        """int"""
+        temp = pythonnet_property_get(self.wrapped, "OutSlotLayerIndex")
+
+        if temp is None:
+            return 0
+
+        return temp
+
+    @out_slot_layer_index.setter
+    @exception_bridge
+    @enforce_parameter_types
+    def out_slot_layer_index(self: "Self", value: "int") -> None:
+        pythonnet_property_set(
+            self.wrapped, "OutSlotLayerIndex", int(value) if value is not None else 0
+        )
+
+    @property
+    @exception_bridge
+    def out_slot_position(
+        self: "Self",
+    ) -> "enum_with_selected_value.EnumWithSelectedValue_CoilPositionInSlot":
+        """EnumWithSelectedValue[mastapy.electric_machines.CoilPositionInSlot]"""
+        temp = pythonnet_property_get(self.wrapped, "OutSlotPosition")
+
+        if temp is None:
+            return None
+
+        value = enum_with_selected_value.EnumWithSelectedValue_CoilPositionInSlot.wrapped_type()
+        return enum_with_selected_value_runtime.create(temp, value)
+
+    @out_slot_position.setter
+    @exception_bridge
+    @enforce_parameter_types
+    def out_slot_position(self: "Self", value: "_1377.CoilPositionInSlot") -> None:
+        wrapper_type = enum_with_selected_value_runtime.ENUM_WITH_SELECTED_VALUE
+        enclosed_type = enum_with_selected_value.EnumWithSelectedValue_CoilPositionInSlot.implicit_type()
+        value = conversion.mp_to_pn_enum(value, enclosed_type)
+        value = wrapper_type[enclosed_type](value)
+        pythonnet_property_set(self.wrapped, "OutSlotPosition", value)
+
+    @property
+    @exception_bridge
+    def parallel_path(self: "Self") -> "int":
+        """int
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "ParallelPath")
+
+        if temp is None:
+            return 0
+
+        return temp
+
+    @property
+    @exception_bridge
+    def phase(self: "Self") -> "int":
+        """int"""
+        temp = pythonnet_property_get(self.wrapped, "Phase")
+
+        if temp is None:
+            return 0
+
+        return temp
+
+    @phase.setter
+    @exception_bridge
+    @enforce_parameter_types
+    def phase(self: "Self", value: "int") -> None:
+        pythonnet_property_set(
+            self.wrapped, "Phase", int(value) if value is not None else 0
+        )
+
+    @property
+    @exception_bridge
+    def throw(self: "Self") -> "int":
+        """int
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "Throw")
+
+        if temp is None:
+            return 0
+
+        return temp
+
+    @property
+    @exception_bridge
+    def report_names(self: "Self") -> "List[str]":
+        """List[str]
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "ReportNames")
+
+        if temp is None:
+            return None
+
+        value = conversion.pn_to_mp_objects_in_list(temp, str)
+
+        if value is None:
+            return None
+
+        return value
+
+    @exception_bridge
+    @enforce_parameter_types
+    def output_default_report_to(self: "Self", file_path: "PathLike") -> None:
+        """Method does not return.
+
+        Args:
+            file_path (PathLike)
+        """
+        file_path = str(file_path)
+        pythonnet_method_call(self.wrapped, "OutputDefaultReportTo", file_path)
+
+    @exception_bridge
+    def get_default_report_with_encoded_images(self: "Self") -> "str":
+        """str"""
+        method_result = pythonnet_method_call(
+            self.wrapped, "GetDefaultReportWithEncodedImages"
+        )
+        return method_result
+
+    @exception_bridge
+    @enforce_parameter_types
+    def output_active_report_to(self: "Self", file_path: "PathLike") -> None:
+        """Method does not return.
+
+        Args:
+            file_path (PathLike)
+        """
+        file_path = str(file_path)
+        pythonnet_method_call(self.wrapped, "OutputActiveReportTo", file_path)
+
+    @exception_bridge
+    @enforce_parameter_types
+    def output_active_report_as_text_to(self: "Self", file_path: "PathLike") -> None:
+        """Method does not return.
+
+        Args:
+            file_path (PathLike)
+        """
+        file_path = str(file_path)
+        pythonnet_method_call(self.wrapped, "OutputActiveReportAsTextTo", file_path)
+
+    @exception_bridge
+    def get_active_report_with_encoded_images(self: "Self") -> "str":
+        """str"""
+        method_result = pythonnet_method_call(
+            self.wrapped, "GetActiveReportWithEncodedImages"
+        )
+        return method_result
+
+    @exception_bridge
+    @enforce_parameter_types
+    def output_named_report_to(
+        self: "Self", report_name: "str", file_path: "PathLike"
+    ) -> None:
+        """Method does not return.
+
+        Args:
+            report_name (str)
+            file_path (PathLike)
+        """
+        report_name = str(report_name)
+        file_path = str(file_path)
+        pythonnet_method_call(
+            self.wrapped,
+            "OutputNamedReportTo",
+            report_name if report_name else "",
+            file_path,
+        )
+
+    @exception_bridge
+    @enforce_parameter_types
+    def output_named_report_as_masta_report(
+        self: "Self", report_name: "str", file_path: "PathLike"
+    ) -> None:
+        """Method does not return.
+
+        Args:
+            report_name (str)
+            file_path (PathLike)
+        """
+        report_name = str(report_name)
+        file_path = str(file_path)
+        pythonnet_method_call(
+            self.wrapped,
+            "OutputNamedReportAsMastaReport",
+            report_name if report_name else "",
+            file_path,
+        )
+
+    @exception_bridge
+    @enforce_parameter_types
+    def output_named_report_as_text_to(
+        self: "Self", report_name: "str", file_path: "PathLike"
+    ) -> None:
+        """Method does not return.
+
+        Args:
+            report_name (str)
+            file_path (PathLike)
+        """
+        report_name = str(report_name)
+        file_path = str(file_path)
+        pythonnet_method_call(
+            self.wrapped,
+            "OutputNamedReportAsTextTo",
+            report_name if report_name else "",
+            file_path,
+        )
+
+    @exception_bridge
+    @enforce_parameter_types
+    def get_named_report_with_encoded_images(self: "Self", report_name: "str") -> "str":
+        """str
+
+        Args:
+            report_name (str)
+        """
+        report_name = str(report_name)
+        method_result = pythonnet_method_call(
+            self.wrapped,
+            "GetNamedReportWithEncodedImages",
+            report_name if report_name else "",
+        )
+        return method_result
+
+    @property
+    def cast_to(self: "Self") -> "_Cast_Coil":
+        """Cast to another type.
+
+        Returns:
+            _Cast_Coil
+        """
+        return _Cast_Coil(self)

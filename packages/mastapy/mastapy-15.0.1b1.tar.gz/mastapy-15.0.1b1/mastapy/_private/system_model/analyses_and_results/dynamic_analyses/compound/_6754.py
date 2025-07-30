@@ -1,0 +1,402 @@
+"""ConicalGearCompoundDynamicAnalysis"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
+
+from mastapy._private._internal import conversion, utility
+from mastapy._private._internal.dataclasses import extended_dataclass
+from mastapy._private._internal.exception_bridge import exception_bridge
+from mastapy._private._internal.exceptions import CastException
+from mastapy._private._internal.python_net import (
+    python_net_import,
+    pythonnet_property_get,
+)
+from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+    _6780,
+)
+
+_CONICAL_GEAR_COMPOUND_DYNAMIC_ANALYSIS = python_net_import(
+    "SMT.MastaAPI.SystemModel.AnalysesAndResults.DynamicAnalyses.Compound",
+    "ConicalGearCompoundDynamicAnalysis",
+)
+
+if TYPE_CHECKING:
+    from typing import Any, List, Type, TypeVar
+
+    from mastapy._private.system_model.analyses_and_results import _2892
+    from mastapy._private.system_model.analyses_and_results.analysis_cases import (
+        _7885,
+        _7888,
+    )
+    from mastapy._private.system_model.analyses_and_results.dynamic_analyses import (
+        _6621,
+    )
+    from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+        _6726,
+        _6733,
+        _6736,
+        _6737,
+        _6738,
+        _6747,
+        _6784,
+        _6788,
+        _6791,
+        _6794,
+        _6801,
+        _6803,
+        _6823,
+        _6829,
+        _6832,
+        _6835,
+        _6836,
+        _6850,
+    )
+
+    Self = TypeVar("Self", bound="ConicalGearCompoundDynamicAnalysis")
+    CastSelf = TypeVar(
+        "CastSelf",
+        bound="ConicalGearCompoundDynamicAnalysis._Cast_ConicalGearCompoundDynamicAnalysis",
+    )
+
+
+__docformat__ = "restructuredtext en"
+__all__ = ("ConicalGearCompoundDynamicAnalysis",)
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True)
+class _Cast_ConicalGearCompoundDynamicAnalysis:
+    """Special nested class for casting ConicalGearCompoundDynamicAnalysis to subclasses."""
+
+    __parent__: "ConicalGearCompoundDynamicAnalysis"
+
+    @property
+    def gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6780.GearCompoundDynamicAnalysis":
+        return self.__parent__._cast(_6780.GearCompoundDynamicAnalysis)
+
+    @property
+    def mountable_component_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6801.MountableComponentCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6801,
+        )
+
+        return self.__parent__._cast(_6801.MountableComponentCompoundDynamicAnalysis)
+
+    @property
+    def component_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6747.ComponentCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6747,
+        )
+
+        return self.__parent__._cast(_6747.ComponentCompoundDynamicAnalysis)
+
+    @property
+    def part_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6803.PartCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6803,
+        )
+
+        return self.__parent__._cast(_6803.PartCompoundDynamicAnalysis)
+
+    @property
+    def part_compound_analysis(self: "CastSelf") -> "_7888.PartCompoundAnalysis":
+        from mastapy._private.system_model.analyses_and_results.analysis_cases import (
+            _7888,
+        )
+
+        return self.__parent__._cast(_7888.PartCompoundAnalysis)
+
+    @property
+    def design_entity_compound_analysis(
+        self: "CastSelf",
+    ) -> "_7885.DesignEntityCompoundAnalysis":
+        from mastapy._private.system_model.analyses_and_results.analysis_cases import (
+            _7885,
+        )
+
+        return self.__parent__._cast(_7885.DesignEntityCompoundAnalysis)
+
+    @property
+    def design_entity_analysis(self: "CastSelf") -> "_2892.DesignEntityAnalysis":
+        from mastapy._private.system_model.analyses_and_results import _2892
+
+        return self.__parent__._cast(_2892.DesignEntityAnalysis)
+
+    @property
+    def agma_gleason_conical_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6726.AGMAGleasonConicalGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6726,
+        )
+
+        return self.__parent__._cast(
+            _6726.AGMAGleasonConicalGearCompoundDynamicAnalysis
+        )
+
+    @property
+    def bevel_differential_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6733.BevelDifferentialGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6733,
+        )
+
+        return self.__parent__._cast(_6733.BevelDifferentialGearCompoundDynamicAnalysis)
+
+    @property
+    def bevel_differential_planet_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6736.BevelDifferentialPlanetGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6736,
+        )
+
+        return self.__parent__._cast(
+            _6736.BevelDifferentialPlanetGearCompoundDynamicAnalysis
+        )
+
+    @property
+    def bevel_differential_sun_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6737.BevelDifferentialSunGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6737,
+        )
+
+        return self.__parent__._cast(
+            _6737.BevelDifferentialSunGearCompoundDynamicAnalysis
+        )
+
+    @property
+    def bevel_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6738.BevelGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6738,
+        )
+
+        return self.__parent__._cast(_6738.BevelGearCompoundDynamicAnalysis)
+
+    @property
+    def hypoid_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6784.HypoidGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6784,
+        )
+
+        return self.__parent__._cast(_6784.HypoidGearCompoundDynamicAnalysis)
+
+    @property
+    def klingelnberg_cyclo_palloid_conical_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6788.KlingelnbergCycloPalloidConicalGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6788,
+        )
+
+        return self.__parent__._cast(
+            _6788.KlingelnbergCycloPalloidConicalGearCompoundDynamicAnalysis
+        )
+
+    @property
+    def klingelnberg_cyclo_palloid_hypoid_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6791.KlingelnbergCycloPalloidHypoidGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6791,
+        )
+
+        return self.__parent__._cast(
+            _6791.KlingelnbergCycloPalloidHypoidGearCompoundDynamicAnalysis
+        )
+
+    @property
+    def klingelnberg_cyclo_palloid_spiral_bevel_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6794.KlingelnbergCycloPalloidSpiralBevelGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6794,
+        )
+
+        return self.__parent__._cast(
+            _6794.KlingelnbergCycloPalloidSpiralBevelGearCompoundDynamicAnalysis
+        )
+
+    @property
+    def spiral_bevel_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6823.SpiralBevelGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6823,
+        )
+
+        return self.__parent__._cast(_6823.SpiralBevelGearCompoundDynamicAnalysis)
+
+    @property
+    def straight_bevel_diff_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6829.StraightBevelDiffGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6829,
+        )
+
+        return self.__parent__._cast(_6829.StraightBevelDiffGearCompoundDynamicAnalysis)
+
+    @property
+    def straight_bevel_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6832.StraightBevelGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6832,
+        )
+
+        return self.__parent__._cast(_6832.StraightBevelGearCompoundDynamicAnalysis)
+
+    @property
+    def straight_bevel_planet_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6835.StraightBevelPlanetGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6835,
+        )
+
+        return self.__parent__._cast(
+            _6835.StraightBevelPlanetGearCompoundDynamicAnalysis
+        )
+
+    @property
+    def straight_bevel_sun_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6836.StraightBevelSunGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6836,
+        )
+
+        return self.__parent__._cast(_6836.StraightBevelSunGearCompoundDynamicAnalysis)
+
+    @property
+    def zerol_bevel_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "_6850.ZerolBevelGearCompoundDynamicAnalysis":
+        from mastapy._private.system_model.analyses_and_results.dynamic_analyses.compound import (
+            _6850,
+        )
+
+        return self.__parent__._cast(_6850.ZerolBevelGearCompoundDynamicAnalysis)
+
+    @property
+    def conical_gear_compound_dynamic_analysis(
+        self: "CastSelf",
+    ) -> "ConicalGearCompoundDynamicAnalysis":
+        return self.__parent__
+
+    def __getattr__(self: "CastSelf", name: str) -> "Any":
+        try:
+            return self.__getattribute__(name)
+        except AttributeError:
+            class_name = utility.camel(name)
+            raise CastException(
+                f'Detected an invalid cast. Cannot cast to type "{class_name}"'
+            ) from None
+
+
+@extended_dataclass(frozen=True, slots=True, weakref_slot=True, eq=False)
+class ConicalGearCompoundDynamicAnalysis(_6780.GearCompoundDynamicAnalysis):
+    """ConicalGearCompoundDynamicAnalysis
+
+    This is a mastapy class.
+    """
+
+    TYPE: ClassVar["Type"] = _CONICAL_GEAR_COMPOUND_DYNAMIC_ANALYSIS
+
+    wrapped: "Any"
+
+    def __post_init__(self: "Self") -> None:
+        """Override of the post initialisation magic method."""
+        if not hasattr(self.wrapped, "reference_count"):
+            self.wrapped.reference_count = 0
+
+        self.wrapped.reference_count += 1
+
+    @property
+    @exception_bridge
+    def planetaries(self: "Self") -> "List[ConicalGearCompoundDynamicAnalysis]":
+        """List[mastapy.system_model.analyses_and_results.dynamic_analyses.compound.ConicalGearCompoundDynamicAnalysis]
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "Planetaries")
+
+        if temp is None:
+            return None
+
+        value = conversion.pn_to_mp_objects_in_list(temp)
+
+        if value is None:
+            return None
+
+        return value
+
+    @property
+    @exception_bridge
+    def component_analysis_cases(
+        self: "Self",
+    ) -> "List[_6621.ConicalGearDynamicAnalysis]":
+        """List[mastapy.system_model.analyses_and_results.dynamic_analyses.ConicalGearDynamicAnalysis]
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "ComponentAnalysisCases")
+
+        if temp is None:
+            return None
+
+        value = conversion.pn_to_mp_objects_in_list(temp)
+
+        if value is None:
+            return None
+
+        return value
+
+    @property
+    @exception_bridge
+    def component_analysis_cases_ready(
+        self: "Self",
+    ) -> "List[_6621.ConicalGearDynamicAnalysis]":
+        """List[mastapy.system_model.analyses_and_results.dynamic_analyses.ConicalGearDynamicAnalysis]
+
+        Note:
+            This property is readonly.
+        """
+        temp = pythonnet_property_get(self.wrapped, "ComponentAnalysisCasesReady")
+
+        if temp is None:
+            return None
+
+        value = conversion.pn_to_mp_objects_in_list(temp)
+
+        if value is None:
+            return None
+
+        return value
+
+    @property
+    def cast_to(self: "Self") -> "_Cast_ConicalGearCompoundDynamicAnalysis":
+        """Cast to another type.
+
+        Returns:
+            _Cast_ConicalGearCompoundDynamicAnalysis
+        """
+        return _Cast_ConicalGearCompoundDynamicAnalysis(self)
