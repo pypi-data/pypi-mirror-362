@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>share</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="share">
+<span id="ext-share"></span>
+<h1 class="title">share</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a><ul>
+<li><a class="reference internal" href="#automatic-pooled-storage-for-clones" id="toc-entry-2">Automatic Pooled Storage for Clones</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#commands" id="toc-entry-3">Commands</a><ul>
+<li><a class="reference internal" href="#repository-creation" id="toc-entry-4">Repository creation</a></li>
+<li><a class="reference internal" href="#repository-maintenance" id="toc-entry-5">Repository maintenance</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>share a common history between several working directories</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>The share extension introduces a new command <a class="reference external" href="hg-share.html"><tt class="docutils literal">hg share</tt></a> to create a new
+working directory. This is similar to <a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone</tt></a>, but doesn't involve
+copying or linking the storage of the repository. This allows working on
+different branches or changes in parallel without the associated cost in
+terms of disk space.</p>
+<p>Note: destructive operations or extensions like <a class="reference external" href="hg-rollback.html"><tt class="docutils literal">hg rollback</tt></a> should be
+used with care as they can result in confusing problems.</p>
+<div class="section" id="automatic-pooled-storage-for-clones">
+<h2><a class="toc-backref" href="#contents">Automatic Pooled Storage for Clones</a></h2>
+<p>When this extension is active, <a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone</tt></a> can be configured to
+automatically share/pool storage across multiple clones. This
+mode effectively converts <a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone</tt></a> to <a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone</tt></a> + <a class="reference external" href="hg-share.html"><tt class="docutils literal">hg share</tt></a>.
+The benefit of using this mode is the automatic management of
+store paths and intelligent pooling of related repositories.</p>
+<p>The following <tt class="docutils literal">share.</tt> config options influence this feature:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">share.pool</tt></dt>
+<dd>Filesystem path where shared repository data will be stored. When
+defined, <a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone</tt></a> will automatically use shared repository
+storage instead of creating a store inside each clone.</dd>
+<dt><tt class="docutils literal">share.poolnaming</tt></dt>
+<dd><p class="first">How directory names in <tt class="docutils literal">share.pool</tt> are constructed.</p>
+<p>&quot;identity&quot; means the name is derived from the first changeset in the
+repository. In this mode, different remotes share storage if their
+root/initial changeset is identical. In this mode, the local shared
+repository is an aggregate of all encountered remote repositories.</p>
+<p>&quot;remote&quot; means the name is derived from the source repository's
+path or URL. In this mode, storage is only shared if the path or URL
+requested in the <a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone</tt></a> command matches exactly to a repository
+that was cloned before.</p>
+<p class="last">The default naming mode is &quot;identity&quot;.</p>
+</dd>
+</dl>
+<div class="verbose docutils container">
+<p>Sharing requirements and configs of source repository with shares:</p>
+<p>By default creating a shared repository only enables sharing a common
+history and does not share requirements and configs between them. This
+may lead to problems in some cases, for example when you upgrade the
+storage format from one repository but does not set related configs
+in the shares.</p>
+<p>Setting <cite>format.exp-share-safe = True</cite> enables sharing configs and
+requirements. This only applies to shares which are done after enabling
+the config option.</p>
+<p>For enabling this in existing shares, enable the config option and reshare.</p>
+<p>For resharing existing shares, make sure your working directory is clean
+and there are no untracked files, delete that share and create a new share.</p>
+</div>
+</div>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="repository-creation">
+<h2><a class="toc-backref" href="#contents">Repository creation</a></h2>
+<div class="section" id="share-1">
+<h3>share</h3>
+<p>create a new shared repository:</p>
+<pre class="literal-block">
+hg share [-U] [-B] SOURCE [DEST]
+</pre>
+<p>Initialize a new repository and working directory that shares its
+history (and optionally bookmarks) with another repository.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">using rollback or extensions that destroy/modify history (mq,
+rebase, etc.) can cause considerable confusion with shared
+clones. In particular, if two shared clones are both updated to
+the same changeset, and one of them destroys that changeset
+with rollback, the other clone will suddenly stop working: all
+operations will fail with &quot;abort: working directory has unknown
+parent&quot;. The only known workaround is to use debugsetparents on
+the broken clone to reset it to a changeset that still exists.</p>
+</div>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-U</span>, <span class="option">--noupdate</span></kbd></td>
+<td>do not create a working directory</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--bookmarks</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>also share bookmarks</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--relative</span></kbd></td>
+<td>point to source using a relative path</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="repository-maintenance">
+<h2><a class="toc-backref" href="#contents">Repository maintenance</a></h2>
+<div class="section" id="unshare">
+<h3>unshare</h3>
+<p>convert a shared repository to a normal one:</p>
+<pre class="literal-block">
+hg unshare
+</pre>
+<p>Copy the store data to the repo and remove the sharedpath data.</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

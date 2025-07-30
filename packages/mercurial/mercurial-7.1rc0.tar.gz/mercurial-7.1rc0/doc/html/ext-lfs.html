@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>lfs</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="lfs">
+<span id="ext-lfs"></span>
+<h1 class="title">lfs</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a></li>
+</ul>
+</div>
+<p>lfs - large file support (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension allows large files to be tracked outside of the normal
+repository storage and stored on a centralized server, similar to the
+<tt class="docutils literal">largefiles</tt> extension.  The <tt class="docutils literal"><span class="pre">git-lfs</span></tt> protocol is used when
+communicating with the server, so existing git infrastructure can be
+harnessed.  Even though the files are stored outside of the repository,
+they are still integrity checked in the same manner as normal files.</p>
+<p>The files stored outside of the repository are downloaded on demand,
+which reduces the time to clone, and possibly the local disk usage.
+This changes fundamental workflows in a DVCS, so careful thought
+should be given before deploying it.  <a class="reference external" href="hg-convert.html"><tt class="docutils literal">hg convert</tt></a> can be used to
+convert LFS repositories to normal repositories that no longer
+require this extension, and do so without changing the commit hashes.
+This allows the extension to be disabled if the centralized workflow
+becomes burdensome.  However, the pre and post convert clones will
+not be able to communicate with each other unless the extension is
+enabled on both.</p>
+<p>To start a new repository, or to add LFS files to an existing one, just
+create an <tt class="docutils literal">.hglfs</tt> file as described below in the root directory of
+the repository.  Typically, this file should be put under version
+control, so that the settings will propagate to other repositories with
+push and pull.  During any commit, Mercurial will consult this file to
+determine if an added or modified file should be stored externally.  The
+type of storage depends on the characteristics of the file at each
+commit.  A file that is near a size threshold may switch back and forth
+between LFS and normal storage, as needed.</p>
+<p>Alternately, both normal repositories and largefile controlled
+repositories can be converted to LFS by using <a class="reference external" href="hg-convert.html"><tt class="docutils literal">hg convert</tt></a> and the
+<tt class="docutils literal">lfs.track</tt> config option described below.  The <tt class="docutils literal">.hglfs</tt> file
+should then be created and added, to control subsequent LFS selection.
+The hashes are also unchanged in this case.  The LFS and non-LFS
+repositories can be distinguished because the LFS repository will
+abort any command if this extension is disabled.</p>
+<p>Committed LFS files are held locally, until the repository is pushed.
+Prior to pushing the normal repository data, the LFS files that are
+tracked by the outgoing commits are automatically uploaded to the
+configured central server.  No LFS files are transferred on
+<a class="reference external" href="hg-pull.html"><tt class="docutils literal">hg pull</tt></a> or <a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone</tt></a>.  Instead, the files are downloaded on
+demand as they need to be read, if a cached copy cannot be found
+locally.  Both committing and downloading an LFS file will link the
+file to a usercache, to speed up future access.  See the <cite>usercache</cite>
+config setting described below.</p>
+<p>The extension reads its configuration from a versioned <tt class="docutils literal">.hglfs</tt>
+configuration file found in the root of the working directory. The
+<tt class="docutils literal">.hglfs</tt> file uses the same syntax as all other Mercurial
+configuration files. It uses a single section, <tt class="docutils literal">[track]</tt>.</p>
+<p>The <tt class="docutils literal">[track]</tt> section specifies which files are stored as LFS (or
+not). Each line is keyed by a file pattern, with a predicate value.
+The first file pattern match is used, so put more specific patterns
+first.  The available predicates are <tt class="docutils literal">all()</tt>, <tt class="docutils literal">none()</tt>, and
+<tt class="docutils literal">size()</tt>. See &quot;hg help filesets.size&quot; for the latter.</p>
+<p>Example versioned <tt class="docutils literal">.hglfs</tt> file:</p>
+<pre class="literal-block">
+[track]
+# No Makefile or python file, anywhere, will be LFS
+**Makefile = none()
+**.py = none()
+
+**.zip = all()
+**.exe = size(&quot;&gt;1MB&quot;)
+
+# Catchall for everything not matched above
+** = size(&quot;&gt;10MB&quot;)
+</pre>
+<p>Configs:</p>
+<pre class="literal-block">
+[lfs]
+# Remote endpoint. Multiple protocols are supported:
+# - http(s)://user:pass&#64;example.com/path
+#   git-lfs endpoint
+# - file:///tmp/path
+#   local filesystem, usually for testing
+# if unset, lfs will assume the remote repository also handles blob storage
+# for http(s) URLs.  Otherwise, lfs will prompt to set this when it must
+# use this value.
+# (default: unset)
+url = https://example.com/repo.git/info/lfs
+
+# Which files to track in LFS.  Path tests are &quot;**.extname&quot; for file
+# extensions, and &quot;path:under/some/directory&quot; for path prefix.  Both
+# are relative to the repository root.
+# File size can be tested with the &quot;size()&quot; fileset, and tests can be
+# joined with fileset operators.  (See &quot;hg help filesets.operators&quot;.)
+#
+# Some examples:
+# - all()                       # everything
+# - none()                      # nothing
+# - size(&quot;&gt;20MB&quot;)               # larger than 20MB
+# - !**.txt                     # anything not a *.txt file
+# - **.zip | **.tar.gz | **.7z  # some types of compressed files
+# - path:bin                    # files under &quot;bin&quot; in the project root
+# - (**.php &amp; size(&quot;&gt;2MB&quot;)) | (**.js &amp; size(&quot;&gt;5MB&quot;)) | **.tar.gz
+#     | (path:bin &amp; !path:/bin/README) | size(&quot;&gt;1GB&quot;)
+# (default: none())
+#
+# This is ignored if there is a tracked '.hglfs' file, and this setting
+# will eventually be deprecated and removed.
+track = size(&quot;&gt;10M&quot;)
+
+# how many times to retry before giving up on transferring an object
+retry = 5
+
+# the local directory to store lfs files for sharing across local clones.
+# If not set, the cache is located in an OS specific cache location.
+usercache = /path/to/global/cache
+</pre>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+</div>
+</div>
+</body>
+</html>

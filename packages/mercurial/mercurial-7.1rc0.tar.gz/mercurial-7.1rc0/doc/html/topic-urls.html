@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>URL Paths</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="url-paths">
+<span id="topic-urls"></span>
+<h1 class="title">URL Paths</h1>
+
+<p id="urls">Valid URLs are of the form:</p>
+<pre class="literal-block">
+local/filesystem/path[#revision]
+file://local/filesystem/path[#revision]
+http://[user[:pass]&#64;]host[:port]/[path][#revision]
+https://[user[:pass]&#64;]host[:port]/[path][#revision]
+ssh://[user&#64;]host[:port]/[path][#revision]
+path://pathname
+</pre>
+<p>Paths in the local filesystem can either point to Mercurial
+repositories or to bundle files (as created by <a class="reference external" href="hg-bundle.html"><tt class="docutils literal">hg bundle</tt></a> or
+<a class="reference external" href="hg-incoming.html"><tt class="docutils literal">hg incoming <span class="pre">--bundle</span></tt></a>). See also <a class="reference external" href="hg-paths.html"><tt class="docutils literal">hg help paths</tt></a>.</p>
+<p>An optional identifier after # indicates a particular branch, tag, or
+changeset to use from the remote repository. See also <a class="reference external" href="topic-revisions.html"><tt class="docutils literal">hg help
+revisions</tt></a>.</p>
+<p>Some features, such as pushing to <a class="reference external" href="http://">http://</a> and <a class="reference external" href="https://">https://</a> URLs are only
+possible if the feature is explicitly enabled on the remote Mercurial
+server.</p>
+<p>Note that the security of HTTPS URLs depends on proper configuration of
+web.cacerts.</p>
+<p>Some notes about using SSH with Mercurial:</p>
+<ul>
+<li><p class="first">SSH requires an accessible shell account on the destination machine
+and a copy of hg in the remote path or specified with remotecmd.</p>
+</li>
+<li><p class="first">path is relative to the remote user's home directory by default. Use
+an extra slash at the start of a path to specify an absolute path:</p>
+<pre class="literal-block">
+ssh://example.com//tmp/repository
+</pre>
+</li>
+<li><p class="first">Mercurial doesn't use its own compression via SSH; the right thing
+to do is to configure it in your ~/.ssh/config, e.g.:</p>
+<pre class="literal-block">
+Host *.mylocalnetwork.example.com
+  Compression no
+Host *
+  Compression yes
+</pre>
+<p>Alternatively specify &quot;ssh -C&quot; as your ssh command in your
+configuration file or with the --ssh command line option.</p>
+</li>
+</ul>
+<p>These URLs can all be stored in your configuration file with path
+aliases under the [paths] section like so:</p>
+<pre class="literal-block">
+[paths]
+alias1 = URL1
+alias2 = URL2
+...
+</pre>
+<p>You can then use the alias for any command that uses a URL (for
+example <a class="reference external" href="hg-pull.html"><tt class="docutils literal">hg pull alias1</tt></a> will be treated as <a class="reference external" href="hg-pull.html"><tt class="docutils literal">hg pull URL1</tt></a>).</p>
+<p>Two path aliases are special because they are used as defaults when
+you do not provide the URL to a command:</p>
+<dl class="docutils">
+<dt>default:</dt>
+<dd>When you create a repository with hg clone, the clone command saves
+the location of the source repository as the new repository's
+'default' path. This is then used when you omit path from push- and
+pull-like commands (including incoming and outgoing).</dd>
+<dt>default-push:</dt>
+<dd>The push command will look for a path named 'default-push', and
+prefer it over 'default' if both are defined.</dd>
+</dl>
+<p>These alias can also be use in the <cite>path://</cite> scheme:</p>
+<pre class="literal-block">
+[paths]
+alias1 = URL1
+alias2 = path://alias1
+...
+</pre>
+<p>check <a class="reference external" href="hgrc.5.html#paths"><tt class="docutils literal">hg help config.paths</tt></a> for details about the behavior of such &quot;sub-path&quot;.</p>
+</div>
+</body>
+</html>

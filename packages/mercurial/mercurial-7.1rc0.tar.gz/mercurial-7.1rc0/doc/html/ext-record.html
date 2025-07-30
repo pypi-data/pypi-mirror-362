@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>record</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="record">
+<span id="ext-record"></span>
+<h1 class="title">record</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#change-creation" id="toc-entry-3">Change creation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>commands to interactively select changes for commit/qrefresh (DEPRECATED)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>The feature provided by this extension has been moved into core Mercurial as
+<a class="reference external" href="hg-commit.html"><tt class="docutils literal">hg commit <span class="pre">--interactive</span></tt></a>.</p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="change-creation">
+<h2><a class="toc-backref" href="#contents">Change creation</a></h2>
+<div class="section" id="qrecord">
+<h3>qrecord</h3>
+<p>interactively record a new patch:</p>
+<pre class="literal-block">
+hg qrecord [OPTION]... PATCH [FILE]...
+</pre>
+<p>See <a class="reference external" href="hg.1.html#qnew"><tt class="docutils literal">hg help qnew</tt></a> &amp; <a class="reference external" href="ext-record.html"><tt class="docutils literal">hg help record</tt></a> for more information and
+usage.</p>
+</div>
+<div class="section" id="record-1">
+<h3>record</h3>
+<p>interactively select changes to commit:</p>
+<pre class="literal-block">
+hg record [OPTION]... [FILE]...
+</pre>
+<p>If a list of files is omitted, all changes reported by <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a>
+will be candidates for recording.</p>
+<p>See <a class="reference external" href="topic-dates.html"><tt class="docutils literal">hg help dates</tt></a> for a list of formats valid for -d/--date.</p>
+<p>If using the text interface (see <a class="reference external" href="hgrc.5.html"><tt class="docutils literal">hg help config</tt></a>),
+you will be prompted for whether to record changes to each
+modified file, and for files with multiple changes, for each
+change to use. For each query, the following responses are
+possible:</p>
+<pre class="literal-block">
+y - record this change
+n - skip this change
+e - edit this change manually
+
+s - skip remaining changes to this file
+f - record remaining changes to this file
+
+d - done, skip remaining changes and files
+a - record all changes to all remaining files
+q - quit, recording no changes
+
+? - display help
+</pre>
+<p>This command is not available when committing a merge.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-A</span>, <span class="option">--addremove</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>mark new/missing files as added/removed before committing</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--close-branch</span></kbd></td>
+<td>mark a branch head as closed</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--amend</span></kbd></td>
+<td>amend the parent of the working directory</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--secret</span></kbd></td>
+<td>use the secret phase for committing</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--draft</span></kbd></td>
+<td>use the draft phase for committing</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--force-close-branch</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>forcibly close branch from a non-head changeset (ADVANCED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as commit message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read commit message from file</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the specified date as commit date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-u</span>, <span class="option">--user <var>&lt;USER&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the specified user as committer</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-S</span>, <span class="option">--subrepos</span></kbd></td>
+<td>recurse into subrepositories</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-w</span>, <span class="option">--ignore-all-space</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore white space when comparing lines</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--ignore-space-change</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes in the amount of white space</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--ignore-blank-lines</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes whose lines are all blank</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-Z</span>, <span class="option">--ignore-space-at-eol</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes in whitespace at EOL</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

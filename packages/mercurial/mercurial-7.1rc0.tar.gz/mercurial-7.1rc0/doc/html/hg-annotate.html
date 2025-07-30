@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg annotate</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-annotate">
+<span id="hg-annotate-1"></span>
+<h1 class="title">hg annotate</h1>
+<h2 class="subtitle" id="show-changeset-information-by-line-for-each-file">show changeset information by line for each file</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-4">Aliases</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg annotate [-r REV] [-f] [-a] [-u] [-d] [-n] [-c] [-l] FILE...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>List changes in files, showing the revision id responsible for
+each line.</p>
+<p>This command is useful for discovering when a change was made and
+by whom.</p>
+<p>If you include --file, --user, or --date, the revision number is
+suppressed unless you also include --number.</p>
+<p>Without the -a/--text option, annotate will avoid processing files
+it detects as binary. With -a, annotate will annotate the file
+anyway, although the results will probably be neither useful
+nor desirable.</p>
+<div class="verbose docutils container">
+Use -L/--line-range FILE,M:N options to filter the output to the lines
+from M to N in FILE. This option is incompatible with --no-follow and
+cannot be combined with file pattern arguments. When combined with --rev
+the line ranges refer to the state of the file at the requested revision.</div>
+<div class="verbose docutils container">
+<p>Template:</p>
+<p>The following keywords are supported in addition to the common template
+keywords and functions. See also <a class="reference external" href="hg.1.html#templates"><tt class="docutils literal">hg help templates</tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">lines:</th><td class="field-body">List of lines with annotation data.</td>
+</tr>
+<tr class="field"><th class="field-name">path:</th><td class="field-body">String. Repository-absolute path of the specified file.</td>
+</tr>
+</tbody>
+</table>
+<p>And each entry of <tt class="docutils literal">{lines}</tt> provides the following sub-keywords in
+addition to <tt class="docutils literal">{date}</tt>, <tt class="docutils literal">{node}</tt>, <tt class="docutils literal">{rev}</tt>, <tt class="docutils literal">{user}</tt>, etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">line:</th><td class="field-body">String. Line content.</td>
+</tr>
+<tr class="field"><th class="field-name">lineno:</th><td class="field-body">Integer. Line number at that revision.</td>
+</tr>
+<tr class="field"><th class="field-name">path:</th><td class="field-body">String. Repository-absolute path of the file at that revision.</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference external" href="hg.1.html#templates.operators"><tt class="docutils literal">hg help templates.operators</tt></a> for the list expansion syntax.</p>
+</div>
+<p>Returns 0 on success.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>annotate the specified revision</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--follow</span></kbd></td>
+<td>follow copies/renames and list the filename (DEPRECATED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--no-follow</span></kbd></td>
+<td>don't follow copies and renames</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--text</span></kbd></td>
+<td>treat all files as text</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-u</span>, <span class="option">--user</span></kbd></td>
+<td>list the author (long with -v)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--file</span></kbd></td>
+<td>list the filename</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d</span>, <span class="option">--date</span></kbd></td>
+<td>list the date (short with -q)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--number</span></kbd></td>
+<td>list the revision number (default)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-c</span>, <span class="option">--changeset</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>list the changeset</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--line-number</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show line number at the first appearance</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--skip <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revset to not display (EXPERIMENTAL)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-L</span>, <span class="option">--line-range <var>&lt;FILE,RANGE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>follow line range of specified file (EXPERIMENTAL)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-w</span>, <span class="option">--ignore-all-space</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore white space when comparing lines</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--ignore-space-change</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes in the amount of white space</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--ignore-blank-lines</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes whose lines are all blank</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-Z</span>, <span class="option">--ignore-space-at-eol</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes in whitespace at EOL</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<pre class="literal-block">
+blame
+</pre>
+</div>
+</div>
+</body>
+</html>

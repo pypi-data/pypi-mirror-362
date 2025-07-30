@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>transplant</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="transplant">
+<span id="ext-transplant"></span>
+<h1 class="title">transplant</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#change-manipulation" id="toc-entry-3">Change manipulation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>command to transplant changesets from another branch</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension allows you to transplant changes to another parent revision,
+possibly in another repository. The transplant is done using 'diff' patches.</p>
+<p>Transplanted patches are recorded in .hg/transplant/transplants, as a
+map from a changeset hash to its hash in the source repository.</p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="change-manipulation">
+<h2><a class="toc-backref" href="#contents">Change manipulation</a></h2>
+<div class="section" id="transplant-1">
+<h3>transplant</h3>
+<p>transplant changesets from another branch:</p>
+<pre class="literal-block">
+hg transplant [-s REPO] [-b BRANCH [-a]] [-p REV] [-m REV] [REV]...
+</pre>
+<p>Selected changesets will be applied on top of the current working
+directory with the log of the original changeset. The changesets
+are copied and will thus appear twice in the history with different
+identities.</p>
+<p>Consider using the graft command if everything is inside the same
+repository - it will use merges and will usually give a better result.
+Use the rebase extension if the changesets are unpublished and you want
+to move them instead of copying them.</p>
+<p>If --log is specified, log messages will have a comment appended
+of the form:</p>
+<pre class="literal-block">
+(transplanted from CHANGESETHASH)
+</pre>
+<p>You can rewrite the changelog message with the --filter option.
+Its argument will be invoked with the current changelog message as
+$1 and the patch as $2.</p>
+<p>--source/-s specifies another repository to use for selecting changesets,
+just as if it temporarily had been pulled.
+If --branch/-b is specified, these revisions will be used as
+heads when deciding which changesets to transplant, just as if only
+these revisions had been pulled.
+If --all/-a is specified, all the revisions up to the heads specified
+with --branch will be transplanted.</p>
+<p>Example:</p>
+<ul>
+<li><p class="first">transplant all changes up to REV on top of your current revision:</p>
+<pre class="literal-block">
+hg transplant --branch REV --all
+</pre>
+</li>
+</ul>
+<p>You can optionally mark selected transplanted changesets as merge
+changesets. You will not be prompted to transplant any ancestors
+of a merged transplant, and you can merge descendants of them
+normally instead of transplanting them.</p>
+<p>Merge changesets may be transplanted directly by specifying the
+proper parent changeset by calling <a class="reference external" href="hg-transplant.html"><tt class="docutils literal">hg transplant <span class="pre">--parent</span></tt></a>.</p>
+<p>If no merges or revisions are provided, <a class="reference external" href="hg-transplant.html"><tt class="docutils literal">hg transplant</tt></a> will
+start an interactive changeset browser.</p>
+<p>If a changeset application fails, you can fix the merge by hand
+and then resume where you left off by calling <a class="reference external" href="hg-transplant.html"><tt class="docutils literal">hg transplant
+<span class="pre">--continue/-c</span></tt></a>.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s</span>, <span class="option">--source <var>&lt;REPO&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>transplant changesets from REPO</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--branch <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use this source changeset as head</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--all</span></kbd></td>
+<td>pull all changesets up to the --branch revisions</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-p</span>, <span class="option">--prune <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>skip over REV</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--merge <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>merge at REV</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--parent <var>&lt;REV&gt;</var></span></kbd></td>
+<td>parent to choose when transplanting merge</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--log</span></kbd></td>
+<td>append transplant info to log message</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stop</span></kbd></td>
+<td>stop interrupted transplant</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-c</span>, <span class="option">--continue</span></kbd></td>
+<td>continue last transplant session after fixing conflicts</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--filter <var>&lt;CMD&gt;</var></span></kbd></td>
+<td>filter changesets through command</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg purge</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-purge">
+<span id="hg-purge-1"></span>
+<h1 class="title">hg purge</h1>
+<h2 class="subtitle" id="removes-files-not-tracked-by-mercurial">removes files not tracked by Mercurial</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-4">Aliases</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg purge [OPTION]... [DIR]...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Delete files not known to Mercurial. This is useful to test local
+and uncommitted changes in an otherwise-clean source tree.</p>
+<p>This means that purge will delete the following by default:</p>
+<ul class="simple">
+<li>Unknown files: files marked with &quot;?&quot; by <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a></li>
+<li>Empty directories: in fact Mercurial ignores directories unless
+they contain files under source control management</li>
+</ul>
+<p>But it will leave untouched:</p>
+<ul class="simple">
+<li>Modified and unmodified tracked files</li>
+<li>Ignored files (unless -i or --all is specified)</li>
+<li>New files added to the repository (with <a class="reference external" href="hg-add.html"><tt class="docutils literal">hg add</tt></a>)</li>
+</ul>
+<p>The --files and --dirs options can be used to direct purge to delete
+only files, only directories, or both. If neither option is given,
+both will be deleted.</p>
+<p>If directories are given on the command line, only files in these
+directories are considered.</p>
+<p>Be careful with purge, as you could irreversibly delete some files
+you forgot to add to the repository. If you only want to print the
+list of files that this program would delete, use the --print
+option.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-a</span>, <span class="option">--abort-on-err</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>abort if an error occurs</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--all</span></kbd></td>
+<td>purge ignored files too</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-i</span>, <span class="option">--ignored</span></kbd></td>
+<td>purge only ignored files</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--dirs</span></kbd></td>
+<td>purge empty directories</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--files</span></kbd></td>
+<td>purge files</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-p</span>, <span class="option">--print</span></kbd></td>
+<td>print filenames instead of deleting them</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-0</span>, <span class="option">--print0</span></kbd></td>
+<td>end filenames with NUL, for use with xargs (implies -p/--print)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--confirm</span></kbd></td>
+<td>ask before permanently deleting files</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<pre class="literal-block">
+clean
+</pre>
+</div>
+</div>
+</body>
+</html>

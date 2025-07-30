@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>sparse</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="sparse">
+<span id="ext-sparse"></span>
+<h1 class="title">sparse</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a><ul>
+<li><a class="reference internal" href="#sparse-config-files" id="toc-entry-2">Sparse Config Files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#commands" id="toc-entry-3">Commands</a></li>
+</ul>
+</div>
+<p>allow sparse checkouts of the working directory (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>(This extension is not yet protected by backwards compatibility
+guarantees. Any aspect may break in future releases until this
+notice is removed.)</p>
+<p>This extension allows the working directory to only consist of a
+subset of files for the revision. This allows specific files or
+directories to be explicitly included or excluded. Many repository
+operations have performance proportional to the number of files in
+the working directory. So only realizing a subset of files in the
+working directory can improve performance.</p>
+<div class="section" id="sparse-config-files">
+<h2><a class="toc-backref" href="#contents">Sparse Config Files</a></h2>
+<p>The set of files that are part of a sparse checkout are defined by
+a sparse config file. The file defines 3 things: includes (files to
+include in the sparse checkout), excludes (files to exclude from the
+sparse checkout), and profiles (links to other config files).</p>
+<p>The file format is newline delimited. Empty lines and lines beginning
+with <tt class="docutils literal">#</tt> are ignored.</p>
+<p>Lines beginning with <tt class="docutils literal">%include `` denote another sparse config file
+to include. e.g. <span class="pre">``%include</span> tests.sparse</tt>. The filename is relative
+to the repository root.</p>
+<p>The special lines <tt class="docutils literal">[include]</tt> and <tt class="docutils literal">[exclude]</tt> denote the section
+for includes and excludes that follow, respectively. It is illegal to
+have <tt class="docutils literal">[include]</tt> after <tt class="docutils literal">[exclude]</tt>.</p>
+<p>Non-special lines resemble file patterns to be added to either includes
+or excludes. The syntax of these lines is documented by <a class="reference external" href="topic-patterns.html"><tt class="docutils literal">hg help patterns</tt></a>.
+Patterns are interpreted as <tt class="docutils literal">glob:</tt> by default and match against the
+root of the repository.</p>
+<p>Exclusion patterns take precedence over inclusion patterns. So even
+if a file is explicitly included, an <tt class="docutils literal">[exclude]</tt> entry can remove it.</p>
+<p>For example, say you have a repository with 3 directories, <tt class="docutils literal">frontend/</tt>,
+<tt class="docutils literal">backend/</tt>, and <tt class="docutils literal">tools/</tt>. <tt class="docutils literal">frontend/</tt> and <tt class="docutils literal">backend/</tt> correspond
+to different projects and it is uncommon for someone working on one
+to need the files for the other. But <tt class="docutils literal">tools/</tt> contains files shared
+between both projects. Your sparse config files may resemble:</p>
+<pre class="literal-block">
+# frontend.sparse
+frontend/**
+tools/**
+
+# backend.sparse
+backend/**
+tools/**
+</pre>
+<p>Say the backend grows in size. Or there's a directory with thousands
+of files you wish to exclude. You can modify the profile to exclude
+certain files:</p>
+<pre class="literal-block">
+[include]
+backend/**
+tools/**
+
+[exclude]
+tools/tests/**
+</pre>
+</div>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+</div>
+</div>
+</body>
+</html>

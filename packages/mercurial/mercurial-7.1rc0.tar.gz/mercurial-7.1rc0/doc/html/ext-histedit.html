@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>histedit</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="histedit">
+<span id="ext-histedit"></span>
+<h1 class="title">histedit</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a><ul>
+<li><a class="reference internal" href="#config" id="toc-entry-2">Config</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#commands" id="toc-entry-3">Commands</a><ul>
+<li><a class="reference internal" href="#change-manipulation" id="toc-entry-4">Change manipulation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>interactive history editing</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>With this extension installed, Mercurial gains one new command: histedit. Usage
+is as follows, assuming the following history:</p>
+<pre class="literal-block">
+&#64;  3[tip]   7c2fd3b9020c   2009-04-27 18:04 -0500   durin42
+|    Add delta
+|
+o  2   030b686bedc4   2009-04-27 18:04 -0500   durin42
+|    Add gamma
+|
+o  1   c561b4e977df   2009-04-27 18:04 -0500   durin42
+|    Add beta
+|
+o  0   d8d2fcd0e319   2009-04-27 18:04 -0500   durin42
+     Add alpha
+</pre>
+<p>If you were to run <tt class="docutils literal">hg histedit c561b4e977df</tt>, you would see the following
+file open in your editor:</p>
+<pre class="literal-block">
+pick c561b4e977df Add beta
+pick 030b686bedc4 Add gamma
+pick 7c2fd3b9020c Add delta
+
+# Edit history between c561b4e977df and 7c2fd3b9020c
+#
+# Commits are listed from least to most recent
+#
+# Commands:
+#  p, pick = use commit
+#  e, edit = use commit, but allow edits before making new commit
+#  f, fold = use commit, but combine it with the one above
+#  r, roll = like fold, but discard this commit's description and date
+#  d, drop = remove commit from history
+#  m, mess = edit commit message without changing commit content
+#  b, base = checkout changeset and apply further changesets from there
+#
+</pre>
+<p>In this file, lines beginning with <tt class="docutils literal">#</tt> are ignored. You must specify a rule
+for each revision in your history. For example, if you had meant to add gamma
+before beta, and then wanted to add delta in the same revision as beta, you
+would reorganize the file to look like this:</p>
+<pre class="literal-block">
+pick 030b686bedc4 Add gamma
+pick c561b4e977df Add beta
+fold 7c2fd3b9020c Add delta
+
+# Edit history between c561b4e977df and 7c2fd3b9020c
+#
+# Commits are listed from least to most recent
+#
+# Commands:
+#  p, pick = use commit
+#  e, edit = use commit, but allow edits before making new commit
+#  f, fold = use commit, but combine it with the one above
+#  r, roll = like fold, but discard this commit's description and date
+#  d, drop = remove commit from history
+#  m, mess = edit commit message without changing commit content
+#  b, base = checkout changeset and apply further changesets from there
+#
+</pre>
+<p>At which point you close the editor and <tt class="docutils literal">histedit</tt> starts working. When you
+specify a <tt class="docutils literal">fold</tt> operation, <tt class="docutils literal">histedit</tt> will open an editor when it folds
+those revisions together, offering you a chance to clean up the commit message:</p>
+<pre class="literal-block">
+Add beta
+***
+Add delta
+</pre>
+<p>Edit the commit message to your liking, then close the editor. The date used
+for the commit will be the later of the two commits' dates. For this example,
+let's assume that the commit message was changed to <tt class="docutils literal">Add beta and delta.</tt>
+After histedit has run and had a chance to remove any old or temporary
+revisions it needed, the history looks like this:</p>
+<pre class="literal-block">
+&#64;  2[tip]   989b4d060121   2009-04-27 18:04 -0500   durin42
+|    Add beta and delta.
+|
+o  1   081603921c3f   2009-04-27 18:04 -0500   durin42
+|    Add gamma
+|
+o  0   d8d2fcd0e319   2009-04-27 18:04 -0500   durin42
+     Add alpha
+</pre>
+<p>Note that <tt class="docutils literal">histedit</tt> does <em>not</em> remove any revisions (even its own temporary
+ones) until after it has completed all the editing operations, so it will
+probably perform several strip operations when it's done. For the above example,
+it had to run strip twice. Strip can be slow depending on a variety of factors,
+so you might need to be a little patient. You can choose to keep the original
+revisions by passing the <tt class="docutils literal"><span class="pre">--keep</span></tt> flag.</p>
+<p>The <tt class="docutils literal">edit</tt> operation will drop you back to a command prompt,
+allowing you to edit files freely, or even use <tt class="docutils literal">hg record</tt> to commit
+some changes as a separate commit. When you're done, any remaining
+uncommitted changes will be committed as well. When done, run <tt class="docutils literal">hg
+histedit <span class="pre">--continue</span></tt> to finish this step. If there are uncommitted
+changes, you'll be prompted for a new commit message, but the default
+commit message will be the original message for the <tt class="docutils literal">edit</tt> ed
+revision, and the date of the original commit will be preserved.</p>
+<p>The <tt class="docutils literal">message</tt> operation will give you a chance to revise a commit
+message without changing the contents. It's a shortcut for doing
+<tt class="docutils literal">edit</tt> immediately followed by <cite>hg histedit --continue`</cite>.</p>
+<p>If <tt class="docutils literal">histedit</tt> encounters a conflict when moving a revision (while
+handling <tt class="docutils literal">pick</tt> or <tt class="docutils literal">fold</tt>), it'll stop in a similar manner to
+<tt class="docutils literal">edit</tt> with the difference that it won't prompt you for a commit
+message when done. If you decide at this point that you don't like how
+much work it will be to rearrange history, or that you made a mistake,
+you can use <tt class="docutils literal">hg histedit <span class="pre">--abort</span></tt> to abandon the new changes you
+have made and return to the state before you attempted to edit your
+history.</p>
+<p>If we clone the histedit-ed example repository above and add four more
+changes, such that we have the following history:</p>
+<pre class="literal-block">
+&#64;  6[tip]   038383181893   2009-04-27 18:04 -0500   stefan
+|    Add theta
+|
+o  5   140988835471   2009-04-27 18:04 -0500   stefan
+|    Add eta
+|
+o  4   122930637314   2009-04-27 18:04 -0500   stefan
+|    Add zeta
+|
+o  3   836302820282   2009-04-27 18:04 -0500   stefan
+|    Add epsilon
+|
+o  2   989b4d060121   2009-04-27 18:04 -0500   durin42
+|    Add beta and delta.
+|
+o  1   081603921c3f   2009-04-27 18:04 -0500   durin42
+|    Add gamma
+|
+o  0   d8d2fcd0e319   2009-04-27 18:04 -0500   durin42
+     Add alpha
+</pre>
+<p>If you run <tt class="docutils literal">hg histedit <span class="pre">--outgoing</span></tt> on the clone then it is the same
+as running <tt class="docutils literal">hg histedit 836302820282</tt>. If you need plan to push to a
+repository that Mercurial does not detect to be related to the source
+repo, you can add a <tt class="docutils literal"><span class="pre">--force</span></tt> option.</p>
+<div class="section" id="config">
+<h2><a class="toc-backref" href="#contents">Config</a></h2>
+<p>Histedit rule lines are truncated to 80 characters by default. You
+can customize this behavior by setting a different length in your
+configuration file:</p>
+<pre class="literal-block">
+[histedit]
+linelen = 120      # truncate rule lines at 120 characters
+</pre>
+<p>The summary of a change can be customized as well:</p>
+<pre class="literal-block">
+[histedit]
+summary-template = '{rev} {bookmarks} {desc|firstline}'
+</pre>
+<p>The customized summary should be kept short enough that rule lines
+will fit in the configured line length. See above if that requires
+customization.</p>
+<p><tt class="docutils literal">hg histedit</tt> attempts to automatically choose an appropriate base
+revision to use. To change which base revision is used, define a
+revset in your configuration file:</p>
+<pre class="literal-block">
+[histedit]
+defaultrev = only(.) &amp; draft()
+</pre>
+<p>By default each edited revision needs to be present in histedit commands.
+To remove revision you need to use <tt class="docutils literal">drop</tt> operation. You can configure
+the drop to be implicit for missing commits by adding:</p>
+<pre class="literal-block">
+[histedit]
+dropmissing = True
+</pre>
+<p>By default, histedit will close the transaction after each action. For
+performance purposes, you can configure histedit to use a single transaction
+across the entire histedit. WARNING: This setting introduces a significant risk
+of losing the work you've done in a histedit if the histedit aborts
+unexpectedly:</p>
+<pre class="literal-block">
+[histedit]
+singletransaction = True
+</pre>
+</div>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="change-manipulation">
+<h2><a class="toc-backref" href="#contents">Change manipulation</a></h2>
+<div class="section" id="histedit-1">
+<h3>histedit</h3>
+<p>interactively edit changeset history:</p>
+<pre class="literal-block">
+hg histedit [OPTIONS] ([ANCESTOR] | --outgoing [URL])
+</pre>
+<p>This command lets you edit a linear series of changesets (up to
+and including the working directory, which should be clean).
+You can:</p>
+<ul class="simple">
+<li><cite>pick</cite> to [re]order a changeset</li>
+<li><cite>drop</cite> to omit changeset</li>
+<li><cite>mess</cite> to reword the changeset commit message</li>
+<li><cite>fold</cite> to combine it with the preceding changeset (using the later date)</li>
+<li><cite>roll</cite> like fold, but discarding this commit's description and date</li>
+<li><cite>edit</cite> to edit this changeset (preserving date)</li>
+<li><cite>base</cite> to checkout changeset and apply further changesets from there</li>
+</ul>
+<p>There are a number of ways to select the root changeset:</p>
+<ul class="simple">
+<li>Specify ANCESTOR directly</li>
+<li>Use --outgoing -- it will be the first linear changeset not
+included in destination. (See <a class="reference external" href="hgrc.5.html#paths"><tt class="docutils literal">hg help <span class="pre">config.paths.default-push</span></tt></a>)</li>
+<li>Otherwise, the value from the &quot;histedit.defaultrev&quot; config option
+is used as a revset to select the base revision when ANCESTOR is not
+specified. The first revision returned by the revset is used. By
+default, this selects the editable history that is unique to the
+ancestry of the working directory.</li>
+</ul>
+<div class="verbose docutils container">
+<p>If you use --outgoing, this command will abort if there are ambiguous
+outgoing revisions. For example, if there are multiple branches
+containing outgoing revisions.</p>
+<p>Use &quot;min(outgoing() and ::.)&quot; or similar revset specification
+instead of --outgoing to specify edit target revision exactly in
+such ambiguous situation. See <a class="reference external" href="hg.1.html#revsets"><tt class="docutils literal">hg help revsets</tt></a> for detail about
+selecting revisions.</p>
+</div>
+<div class="verbose docutils container">
+<p>Examples:</p>
+<blockquote>
+<ul>
+<li><p class="first">A number of changes have been made.
+Revision 3 is no longer needed.</p>
+<p>Start history editing from revision 3:</p>
+<pre class="literal-block">
+hg histedit -r 3
+</pre>
+<p>An editor opens, containing the list of revisions,
+with specific actions specified:</p>
+<pre class="literal-block">
+pick 5339bf82f0ca 3 Zworgle the foobar
+pick 8ef592ce7cc4 4 Bedazzle the zerlog
+pick 0a9639fcda9d 5 Morgify the cromulancy
+</pre>
+<p>Additional information about the possible actions
+to take appears below the list of revisions.</p>
+<p>To remove revision 3 from the history,
+its action (at the beginning of the relevant line)
+is changed to 'drop':</p>
+<pre class="literal-block">
+drop 5339bf82f0ca 3 Zworgle the foobar
+pick 8ef592ce7cc4 4 Bedazzle the zerlog
+pick 0a9639fcda9d 5 Morgify the cromulancy
+</pre>
+</li>
+<li><p class="first">A number of changes have been made.
+Revision 2 and 4 need to be swapped.</p>
+<p>Start history editing from revision 2:</p>
+<pre class="literal-block">
+hg histedit -r 2
+</pre>
+<p>An editor opens, containing the list of revisions,
+with specific actions specified:</p>
+<pre class="literal-block">
+pick 252a1af424ad 2 Blorb a morgwazzle
+pick 5339bf82f0ca 3 Zworgle the foobar
+pick 8ef592ce7cc4 4 Bedazzle the zerlog
+</pre>
+<p>To swap revision 2 and 4, its lines are swapped
+in the editor:</p>
+<pre class="literal-block">
+pick 8ef592ce7cc4 4 Bedazzle the zerlog
+pick 5339bf82f0ca 3 Zworgle the foobar
+pick 252a1af424ad 2 Blorb a morgwazzle
+</pre>
+</li>
+</ul>
+</blockquote>
+</div>
+<p>Returns 0 on success, 1 if user intervention is required (not only
+for intentional &quot;edit&quot; command, but also for resolving unexpected
+conflicts).</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--commands <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read history edits from the specified file</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-c</span>, <span class="option">--continue</span></kbd></td>
+<td>continue an edit already in progress</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--edit-plan</span></kbd></td>
+<td>edit remaining actions list</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-k</span>, <span class="option">--keep</span></kbd></td>
+<td>don't strip old nodes after edit is complete</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--abort</span></kbd></td>
+<td>abort an edit in progress</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o</span>, <span class="option">--outgoing</span></kbd></td>
+<td>changesets not found in destination</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>force outgoing even for unrelated repositories</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>first revision to be edited</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

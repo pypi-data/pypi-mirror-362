@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>acl</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="acl">
+<span id="ext-acl"></span>
+<h1 class="title">acl</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a><ul>
+<li><a class="reference internal" href="#branch-based-access-control" id="toc-entry-2">Branch-based Access Control</a></li>
+<li><a class="reference internal" href="#path-based-access-control" id="toc-entry-3">Path-based Access Control</a></li>
+<li><a class="reference internal" href="#bookmark-based-access-control" id="toc-entry-4">Bookmark-based Access Control</a></li>
+<li><a class="reference internal" href="#groups" id="toc-entry-5">Groups</a></li>
+<li><a class="reference internal" href="#example-configuration" id="toc-entry-6">Example Configuration</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>hooks for controlling repository access</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This hook makes it possible to allow or deny write access to given
+branches and paths of a repository when receiving incoming changesets
+via pretxnchangegroup and pretxncommit.</p>
+<p>The authorization is matched based on the local user name on the
+system where the hook runs, and not the committer of the original
+changeset (since the latter is merely informative).</p>
+<p>The acl hook is best used along with a restricted shell like hgsh,
+preventing authenticating users from doing anything other than pushing
+or pulling. The hook is not safe to use if users have interactive
+shell access, as they can then disable the hook. Nor is it safe if
+remote users share an account, because then there is no way to
+distinguish them.</p>
+<p>The order in which access checks are performed is:</p>
+<ol class="arabic simple">
+<li>Deny  list for branches (section <tt class="docutils literal">acl.deny.branches</tt>)</li>
+<li>Allow list for branches (section <tt class="docutils literal">acl.allow.branches</tt>)</li>
+<li>Deny  list for paths    (section <tt class="docutils literal">acl.deny</tt>)</li>
+<li>Allow list for paths    (section <tt class="docutils literal">acl.allow</tt>)</li>
+</ol>
+<p>The allow and deny sections take key-value pairs.</p>
+<div class="section" id="branch-based-access-control">
+<h2><a class="toc-backref" href="#contents">Branch-based Access Control</a></h2>
+<p>Use the <tt class="docutils literal">acl.deny.branches</tt> and <tt class="docutils literal">acl.allow.branches</tt> sections to
+have branch-based access control. Keys in these sections can be
+either:</p>
+<ul class="simple">
+<li>a branch name, or</li>
+<li>an asterisk, to match any branch;</li>
+</ul>
+<p>The corresponding values can be either:</p>
+<ul class="simple">
+<li>a comma-separated list containing users and groups, or</li>
+<li>an asterisk, to match anyone;</li>
+</ul>
+<p>You can add the &quot;!&quot; prefix to a user or group name to invert the sense
+of the match.</p>
+</div>
+<div class="section" id="path-based-access-control">
+<h2><a class="toc-backref" href="#contents">Path-based Access Control</a></h2>
+<p>Use the <tt class="docutils literal">acl.deny</tt> and <tt class="docutils literal">acl.allow</tt> sections to have path-based
+access control. Keys in these sections accept a subtree pattern (with
+a glob syntax by default). The corresponding values follow the same
+syntax as the other sections above.</p>
+</div>
+<div class="section" id="bookmark-based-access-control">
+<h2><a class="toc-backref" href="#contents">Bookmark-based Access Control</a></h2>
+<p>Use the <tt class="docutils literal">acl.deny.bookmarks</tt> and <tt class="docutils literal">acl.allow.bookmarks</tt> sections to
+have bookmark-based access control. Keys in these sections can be
+either:</p>
+<ul class="simple">
+<li>a bookmark name, or</li>
+<li>an asterisk, to match any bookmark;</li>
+</ul>
+<p>The corresponding values can be either:</p>
+<ul class="simple">
+<li>a comma-separated list containing users and groups, or</li>
+<li>an asterisk, to match anyone;</li>
+</ul>
+<p>You can add the &quot;!&quot; prefix to a user or group name to invert the sense
+of the match.</p>
+<p>Note: for interactions between clients and servers using Mercurial 3.6+
+a rejection will generally reject the entire push, for interactions
+involving older clients, the commit transactions will already be accepted,
+and only the bookmark movement will be rejected.</p>
+</div>
+<div class="section" id="groups">
+<h2><a class="toc-backref" href="#contents">Groups</a></h2>
+<p>Group names must be prefixed with an <tt class="docutils literal">&#64;</tt> symbol. Specifying a group
+name has the same effect as specifying all the users in that group.</p>
+<p>You can define group members in the <tt class="docutils literal">acl.groups</tt> section.
+If a group name is not defined there, and Mercurial is running under
+a Unix-like system, the list of users will be taken from the OS.
+Otherwise, an exception will be raised.</p>
+</div>
+<div class="section" id="example-configuration">
+<h2><a class="toc-backref" href="#contents">Example Configuration</a></h2>
+<pre class="literal-block">
+[hooks]
+
+# Use this if you want to check access restrictions at commit time
+pretxncommit.acl = python:hgext.acl.hook
+
+# Use this if you want to check access restrictions for pull, push,
+# bundle and serve.
+pretxnchangegroup.acl = python:hgext.acl.hook
+
+[acl]
+# Allow or deny access for incoming changes only if their source is
+# listed here, let them pass otherwise. Source is &quot;serve&quot; for all
+# remote access (http or ssh), &quot;push&quot;, &quot;pull&quot; or &quot;bundle&quot; when the
+# related commands are run locally.
+# Default: serve
+sources = serve
+
+[acl.deny.branches]
+
+# Everyone is denied to the frozen branch:
+frozen-branch = *
+
+# A bad user is denied on all branches:
+* = bad-user
+
+[acl.allow.branches]
+
+# A few users are allowed on branch-a:
+branch-a = user-1, user-2, user-3
+
+# Only one user is allowed on branch-b:
+branch-b = user-1
+
+# The super user is allowed on any branch:
+* = super-user
+
+# Everyone is allowed on branch-for-tests:
+branch-for-tests = *
+
+[acl.deny]
+# This list is checked first. If a match is found, acl.allow is not
+# checked. All users are granted access if acl.deny is not present.
+# Format for both lists: glob pattern = user, ..., &#64;group, ...
+
+# To match everyone, use an asterisk for the user:
+# my/glob/pattern = *
+
+# user6 will not have write access to any file:
+** = user6
+
+# Group &quot;hg-denied&quot; will not have write access to any file:
+** = &#64;hg-denied
+
+# Nobody will be able to change &quot;DONT-TOUCH-THIS.txt&quot;, despite
+# everyone being able to change all other files. See below.
+src/main/resources/DONT-TOUCH-THIS.txt = *
+
+[acl.allow]
+# if acl.allow is not present, all users are allowed by default
+# empty acl.allow = no users allowed
+
+# User &quot;doc_writer&quot; has write access to any file under the &quot;docs&quot;
+# folder:
+docs/** = doc_writer
+
+# User &quot;jack&quot; and group &quot;designers&quot; have write access to any file
+# under the &quot;images&quot; folder:
+images/** = jack, &#64;designers
+
+# Everyone (except for &quot;user6&quot; and &quot;&#64;hg-denied&quot; - see acl.deny above)
+# will have write access to any file under the &quot;resources&quot; folder
+# (except for 1 file. See acl.deny):
+src/main/resources/** = *
+
+.hgtags = release_engineer
+</pre>
+<div class="section" id="examples-using-the-prefix">
+<h3>Examples using the &quot;!&quot; prefix</h3>
+<p>Suppose there's a branch that only a given user (or group) should be able to
+push to, and you don't want to restrict access to any other branch that may
+be created.</p>
+<p>The &quot;!&quot; prefix allows you to prevent anyone except a given user or group to
+push changesets in a given branch or path.</p>
+<p>In the examples below, we will:
+1) Deny access to branch &quot;ring&quot; to anyone but user &quot;gollum&quot;
+2) Deny access to branch &quot;lake&quot; to anyone but members of the group &quot;hobbit&quot;
+3) Deny access to a file to anyone but user &quot;gollum&quot;</p>
+<pre class="literal-block">
+[acl.allow.branches]
+# Empty
+
+[acl.deny.branches]
+
+# 1) only 'gollum' can commit to branch 'ring';
+# 'gollum' and anyone else can still commit to any other branch.
+ring = !gollum
+
+# 2) only members of the group 'hobbit' can commit to branch 'lake';
+# 'hobbit' members and anyone else can still commit to any other branch.
+lake = !&#64;hobbit
+
+# You can also deny access based on file paths:
+
+[acl.allow]
+# Empty
+
+[acl.deny]
+# 3) only 'gollum' can change the file below;
+# 'gollum' and anyone else can still change any other file.
+/misty/mountains/cave/ring = !gollum
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

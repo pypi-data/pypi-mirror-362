@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Working with Phases</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="working-with-phases">
+<span id="topic-phases"></span>
+<h1 class="title">Working with Phases</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#what-are-phases" id="toc-entry-1">What are phases?</a></li>
+<li><a class="reference internal" href="#how-are-phases-managed" id="toc-entry-2">How are phases managed?</a></li>
+<li><a class="reference internal" href="#phases-and-servers" id="toc-entry-3">Phases and servers</a></li>
+<li><a class="reference internal" href="#examples" id="toc-entry-4">Examples</a></li>
+</ul>
+</div>
+<div class="section" id="what-are-phases">
+<span id="phases"></span><h1><a class="toc-backref" href="#contents">What are phases?</a></h1>
+<p>Phases are a system for tracking which changesets have been or should
+be shared. This helps prevent common mistakes when modifying history
+(for instance, with the mq or rebase extensions).</p>
+<p>Each changeset in a repository is in one of the following phases:</p>
+<blockquote>
+<ul class="simple">
+<li>public : changeset is visible on a public server</li>
+<li>draft : changeset is not yet published</li>
+<li>secret : changeset should not be pushed, pulled, or cloned</li>
+</ul>
+</blockquote>
+<p>These phases are ordered (public &lt; draft &lt; secret) and no changeset
+can be in a lower phase than its ancestors. For instance, if a
+changeset is public, all its ancestors are also public. Lastly,
+changeset phases should only be changed towards the public phase.</p>
+</div>
+<div class="section" id="how-are-phases-managed">
+<h1><a class="toc-backref" href="#contents">How are phases managed?</a></h1>
+<p>For the most part, phases should work transparently. By default, a
+changeset is created in the draft phase and is moved into the public
+phase when it is pushed to another repository.</p>
+<p>Once changesets become public, extensions like mq and rebase will
+refuse to operate on them to prevent creating duplicate changesets.
+Phases can also be manually manipulated with the <a class="reference external" href="hg-phase.html"><tt class="docutils literal">hg phase</tt></a> command
+if needed. See <a class="reference external" href="hg.1.html#-v"><tt class="docutils literal">hg help <span class="pre">-v</span> phase</tt></a> for examples.</p>
+<p>To make your commits secret by default, put this in your
+configuration file:</p>
+<pre class="literal-block">
+[phases]
+new-commit = secret
+</pre>
+</div>
+<div class="section" id="phases-and-servers">
+<h1><a class="toc-backref" href="#contents">Phases and servers</a></h1>
+<p>Normally, all servers are <tt class="docutils literal">publishing</tt> by default. This means:</p>
+<pre class="literal-block">
+- all draft changesets that are pulled or cloned appear in phase
+public on the client
+
+- all draft changesets that are pushed appear as public on both
+client and server
+
+- secret changesets are neither pushed, pulled, or cloned
+</pre>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Pulling a draft changeset from a publishing server does not mark it
+as public on the server side due to the read-only nature of pull.</p>
+</div>
+<p>Sometimes it may be desirable to push and pull changesets in the draft
+phase to share unfinished work. This can be done by setting a
+repository to disable publishing in its configuration file:</p>
+<pre class="literal-block">
+[phases]
+publish = False
+</pre>
+<p>See <a class="reference external" href="hgrc.5.html"><tt class="docutils literal">hg help config</tt></a> for more information on configuration files.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Servers running older versions of Mercurial are treated as
+publishing.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Changesets in secret phase are not exchanged with the server. This
+applies to their content: file names, file contents, and changeset
+metadata. For technical reasons, the identifier (e.g. d825e4025e39)
+of the secret changeset may be communicated to the server.</p>
+</div>
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="#contents">Examples</a></h1>
+<blockquote>
+<ul>
+<li><p class="first">list changesets in draft or secret phase:</p>
+<pre class="literal-block">
+hg log -r &quot;not public()&quot;
+</pre>
+</li>
+<li><p class="first">change all secret changesets to draft:</p>
+<pre class="literal-block">
+hg phase --draft &quot;secret()&quot;
+</pre>
+</li>
+<li><p class="first">forcibly move the current changeset and descendants from public to draft:</p>
+<pre class="literal-block">
+hg phase --force --draft .
+</pre>
+</li>
+<li><p class="first">show a list of changeset revisions and each corresponding phase:</p>
+<pre class="literal-block">
+hg log --template &quot;{rev} {phase}\n&quot;
+</pre>
+</li>
+<li><p class="first">resynchronize draft changesets relative to a remote repository:</p>
+<pre class="literal-block">
+hg phase -fd &quot;outgoing(URL)&quot;
+</pre>
+</li>
+</ul>
+</blockquote>
+<p>See <a class="reference external" href="hg-phase.html"><tt class="docutils literal">hg help phase</tt></a> for more information on manually manipulating phases.</p>
+</div>
+</div>
+</body>
+</html>

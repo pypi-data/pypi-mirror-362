@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>notify</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="notify">
+<span id="ext-notify"></span>
+<h1 class="title">notify</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+</ul>
+</div>
+<p>hooks for sending email push notifications</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension implements hooks to send email notifications when
+changesets are sent from or received by the local repository.</p>
+<p>First, enable the extension as explained in <a class="reference external" href="topic-extensions.html"><tt class="docutils literal">hg help extensions</tt></a>, and
+register the hook you want to run. <tt class="docutils literal">incoming</tt> and <tt class="docutils literal">changegroup</tt> hooks
+are run when changesets are received, while <tt class="docutils literal">outgoing</tt> hooks are for
+changesets sent to another repository:</p>
+<pre class="literal-block">
+[hooks]
+# one email for each incoming changeset
+incoming.notify = python:hgext.notify.hook
+# one email for all incoming changesets
+changegroup.notify = python:hgext.notify.hook
+
+# one email for all outgoing changesets
+outgoing.notify = python:hgext.notify.hook
+</pre>
+<p>This registers the hooks. To enable notification, subscribers must
+be assigned to repositories. The <tt class="docutils literal">[usersubs]</tt> section maps multiple
+repositories to a given recipient. The <tt class="docutils literal">[reposubs]</tt> section maps
+multiple recipients to a single repository:</p>
+<pre class="literal-block">
+[usersubs]
+# key is subscriber email, value is a comma-separated list of repo patterns
+user&#64;host = pattern
+
+[reposubs]
+# key is repo pattern, value is a comma-separated list of subscriber emails
+pattern = user&#64;host
+</pre>
+<p>A <tt class="docutils literal">pattern</tt> is a <tt class="docutils literal">glob</tt> matching the absolute path to a repository,
+optionally combined with a revset expression. A revset expression, if
+present, is separated from the glob by a hash. Example:</p>
+<pre class="literal-block">
+[reposubs]
+*/widgets#branch(release) = qa-team&#64;example.com
+</pre>
+<p>This sends to <tt class="docutils literal"><span class="pre">qa-team&#64;example.com</span></tt> whenever a changeset on the <tt class="docutils literal">release</tt>
+branch triggers a notification in any repository ending in <tt class="docutils literal">widgets</tt>.</p>
+<p>In order to place them under direct user management, <tt class="docutils literal">[usersubs]</tt> and
+<tt class="docutils literal">[reposubs]</tt> sections may be placed in a separate <tt class="docutils literal">hgrc</tt> file and
+incorporated by reference:</p>
+<pre class="literal-block">
+[notify]
+config = /path/to/subscriptionsfile
+</pre>
+<p>Notifications will not be sent until the <tt class="docutils literal">notify.test</tt> value is set
+to <tt class="docutils literal">False</tt>; see below.</p>
+<p>Notifications content can be tweaked with the following configuration entries:</p>
+<dl class="docutils">
+<dt>notify.test</dt>
+<dd>If <tt class="docutils literal">True</tt>, print messages to stdout instead of sending them. Default: True.</dd>
+<dt>notify.sources</dt>
+<dd><p class="first">Space-separated list of change sources. Notifications are activated only
+when a changeset's source is in this list. Sources may be:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">serve</tt>:</th><td class="field-body">changesets received via http or ssh</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">pull</tt>:</th><td class="field-body">changesets received via <tt class="docutils literal">hg pull</tt></td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">unbundle</tt>:</th><td class="field-body">changesets received via <tt class="docutils literal">hg unbundle</tt></td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">push</tt>:</th><td class="field-body">changesets sent or received via <tt class="docutils literal">hg push</tt></td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">bundle</tt>:</th><td class="field-body">changesets sent via <tt class="docutils literal">hg unbundle</tt></td>
+</tr>
+</tbody>
+</table>
+<p class="last">Default: serve.</p>
+</dd>
+<dt>notify.strip</dt>
+<dd>Number of leading slashes to strip from url paths. By default, notifications
+reference repositories with their absolute path. <tt class="docutils literal">notify.strip</tt> lets you
+turn them into relative paths. For example, <tt class="docutils literal">notify.strip=3</tt> will change
+<tt class="docutils literal">/long/path/repository</tt> into <tt class="docutils literal">repository</tt>. Default: 0.</dd>
+<dt>notify.domain</dt>
+<dd>Default email domain for sender or recipients with no explicit domain.
+It is also used for the domain part of the <tt class="docutils literal"><span class="pre">Message-Id</span></tt> when using
+<tt class="docutils literal">notify.messageidseed</tt>.</dd>
+<dt>notify.messageidseed</dt>
+<dd>Create deterministic <tt class="docutils literal"><span class="pre">Message-Id</span></tt> headers for the mails based on the seed
+and the revision identifier of the first commit in the changeset.</dd>
+<dt>notify.style</dt>
+<dd>Style file to use when formatting emails.</dd>
+<dt>notify.template</dt>
+<dd>Template to use when formatting emails.</dd>
+<dt>notify.incoming</dt>
+<dd>Template to use when run as an incoming hook, overriding <tt class="docutils literal">notify.template</tt>.</dd>
+<dt>notify.outgoing</dt>
+<dd>Template to use when run as an outgoing hook, overriding <tt class="docutils literal">notify.template</tt>.</dd>
+<dt>notify.changegroup</dt>
+<dd>Template to use when running as a changegroup hook, overriding
+<tt class="docutils literal">notify.template</tt>.</dd>
+<dt>notify.maxdiff</dt>
+<dd>Maximum number of diff lines to include in notification email. Set to 0
+to disable the diff, or -1 to include all of it. Default: 300.</dd>
+<dt>notify.maxdiffstat</dt>
+<dd>Maximum number of diffstat lines to include in notification email. Set to -1
+to include all of it. Default: -1.</dd>
+<dt>notify.maxsubject</dt>
+<dd>Maximum number of characters in email's subject line. Default: 67.</dd>
+<dt>notify.diffstat</dt>
+<dd>Set to True to include a diffstat before diff content. Default: True.</dd>
+<dt>notify.showfunc</dt>
+<dd>If set, override <tt class="docutils literal">diff.showfunc</tt> for the diff content. Default: None.</dd>
+<dt>notify.merge</dt>
+<dd>If True, send notifications for merge changesets. Default: True.</dd>
+<dt>notify.mbox</dt>
+<dd>If set, append mails to this mbox file instead of sending. Default: None.</dd>
+<dt>notify.fromauthor</dt>
+<dd>If set, use the committer of the first changeset in a changegroup for
+the &quot;From&quot; field of the notification mail. If not set, take the user
+from the pushing repo.  Default: False.</dd>
+<dt>notify.reply-to-predecessor (EXPERIMENTAL)</dt>
+<dd><p class="first">If set and the changeset has a predecessor in the repository, try to thread
+the notification mail with the predecessor. This adds the &quot;In-Reply-To&quot; header
+to the notification mail with a reference to the predecessor with the smallest
+revision number. Mail threads can still be torn, especially when changesets
+are folded.</p>
+<p class="last">This option must  be used in combination with <tt class="docutils literal">notify.messageidseed</tt>.</p>
+</dd>
+</dl>
+<p>If set, the following entries will also be used to customize the
+notifications:</p>
+<dl class="docutils">
+<dt>email.from</dt>
+<dd>Email <tt class="docutils literal">From</tt> address to use if none can be found in the generated
+email content.</dd>
+<dt>web.baseurl</dt>
+<dd>Root repository URL to combine with repository paths when making
+references. See also <tt class="docutils literal">notify.strip</tt>.</dd>
+</dl>
+</div>
+</div>
+</body>
+</html>

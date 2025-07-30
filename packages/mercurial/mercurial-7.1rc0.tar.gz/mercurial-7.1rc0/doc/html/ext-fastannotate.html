@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>fastannotate</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="fastannotate">
+<span id="ext-fastannotate"></span>
+<h1 class="title">fastannotate</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a></li>
+</ul>
+</div>
+<p>yet another annotate implementation that might be faster (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>The fastannotate extension provides a 'fastannotate' command that makes
+use of the linelog data structure as a cache layer and is expected to
+be faster than the vanilla 'annotate' if the cache is present.</p>
+<p>In most cases, fastannotate requires a setup that mainbranch is some pointer
+that always moves forward, to be most efficient.</p>
+<p>Using fastannotate together with linkrevcache would speed up building the
+annotate cache greatly. Run &quot;debugbuildlinkrevcache&quot; before
+&quot;debugbuildannotatecache&quot;.</p>
+<pre class="literal-block">
+[fastannotate]
+# specify the main branch head. the internal linelog will only contain
+# the linear (ignoring p2) &quot;mainbranch&quot;. since linelog cannot move
+# backwards without a rebuild, this should be something that always moves
+# forward, usually it is &quot;master&quot; or &quot;&#64;&quot;.
+mainbranch = master
+
+# fastannotate supports different modes to expose its feature.
+# a list of combination:
+# - fastannotate: expose the feature via the &quot;fastannotate&quot; command which
+#   deals with everything in a most efficient way, and provides extra
+#   features like --deleted etc.
+# - fctx: replace fctx.annotate implementation. note:
+#     a. it is less efficient than the &quot;fastannotate&quot; command
+#     b. it will make it practically impossible to access the old (disk
+#        side-effect free) annotate implementation
+#     c. it implies &quot;hgweb&quot;.
+# - hgweb: replace hgweb's annotate implementation. conflict with &quot;fctx&quot;.
+# (default: fastannotate)
+modes = fastannotate
+
+# default format when no format flags are used (default: number)
+defaultformat = changeset, user, date
+
+# serve the annotate cache via wire protocol (default: False)
+# tip: the .hg/fastannotate directory is portable - can be rsynced
+server = True
+
+# build annotate cache on demand for every client request (default: True)
+# disabling it could make server response faster, useful when there is a
+# cronjob building the cache.
+serverbuildondemand = True
+
+# update local annotate cache from remote on demand
+client = False
+
+# path to use when connecting to the remote server (default: default)
+remotepath = default
+
+# minimal length of the history of a file required to fetch linelog from
+# the server. (default: 10)
+clientfetchthreshold = 10
+
+# for &quot;fctx&quot; mode, always follow renames regardless of command line option.
+# this is a BC with the original command but will reduced the space needed
+# for annotate cache, and is useful for client-server setup since the
+# server will only provide annotate cache with default options (i.e. with
+# follow). do not affect &quot;fastannotate&quot; mode. (default: True)
+forcefollow = True
+
+# for &quot;fctx&quot; mode, always treat file as text files, to skip the &quot;isbinary&quot;
+# check. this is consistent with the &quot;fastannotate&quot; command and could help
+# to avoid a file fetch if remotefilelog is used. (default: True)
+forcetext = True
+
+# use unfiltered repo for better performance.
+unfilteredrepo = True
+
+# sacrifice correctness in some corner cases for performance. it does not
+# affect the correctness of the annotate cache being built. the option
+# is experimental and may disappear in the future (default: False)
+perfhack = True
+</pre>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+</div>
+</div>
+</body>
+</html>

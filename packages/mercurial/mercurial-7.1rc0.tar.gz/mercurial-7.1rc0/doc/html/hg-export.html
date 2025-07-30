@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg export</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-export">
+<span id="hg-export-1"></span>
+<h1 class="title">hg export</h1>
+<h2 class="subtitle" id="dump-the-header-and-diffs-for-one-or-more-changesets">dump the header and diffs for one or more changesets</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg export [OPTION]... [-o OUTFILESPEC] [-r] [REV]...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Print the changeset header and diffs for one or more revisions.
+If no revision is given, the parent of the working directory is used.</p>
+<p>The information shown in the changeset header is: author, date,
+branch name (if non-default), changeset hash, parent(s) and commit
+comment.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference external" href="hg-export.html"><tt class="docutils literal">hg export</tt></a> may generate unexpected diff output for merge
+changesets, as it will compare the merge changeset against its
+first parent only.</p>
+</div>
+<p>Output may be to a file, in which case the name of the file is
+given using a template string. See <a class="reference external" href="hg.1.html#templates"><tt class="docutils literal">hg help templates</tt></a>. In addition
+to the common template keywords, the following formatting rules are
+supported:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">%%</tt>:</th><td class="field-body">literal &quot;%&quot; character</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">%H</tt>:</th><td class="field-body">changeset hash (40 hexadecimal digits)</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">%N</tt>:</th><td class="field-body">number of patches being generated</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">%R</tt>:</th><td class="field-body">changeset revision number</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">%b</tt>:</th><td class="field-body">basename of the exporting repository</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">%h</tt>:</th><td class="field-body">short-form changeset hash (12 hexadecimal digits)</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">%m</tt>:</th><td class="field-body">first line of the commit message (only alphanumeric characters)</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">%n</tt>:</th><td class="field-body">zero-padded sequence number, starting at 1</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">%r</tt>:</th><td class="field-body">zero-padded changeset revision number</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">\</tt>:</th><td class="field-body">literal &quot;&quot; character</td>
+</tr>
+</tbody>
+</table>
+<p>Without the -a/--text option, export will avoid generating diffs
+of files it detects as binary. With -a, export will generate a
+diff anyway, probably with undesirable results.</p>
+<p>With -B/--bookmark changesets reachable by the given bookmark are
+selected.</p>
+<p>Use the -g/--git option to generate diffs in the git extended diff
+format. See <a class="reference external" href="topic-diffs.html"><tt class="docutils literal">hg help diffs</tt></a> for more information.</p>
+<p>With the --switch-parent option, the diff will be against the
+second parent. It can be useful to review a merge.</p>
+<div class="verbose docutils container">
+<p>Template:</p>
+<p>The following keywords are supported in addition to the common template
+keywords and functions. See also <a class="reference external" href="hg.1.html#templates"><tt class="docutils literal">hg help templates</tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">diff:</th><td class="field-body">String. Diff content.</td>
+</tr>
+<tr class="field"><th class="field-name">parents:</th><td class="field-body">List of strings. Parent nodes of the changeset.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<ul>
+<li><p class="first">use export and import to transplant a bugfix to the current
+branch:</p>
+<pre class="literal-block">
+hg export -r 9353 | hg import -
+</pre>
+</li>
+<li><p class="first">export all the changesets between two revisions to a file with
+rename information:</p>
+<pre class="literal-block">
+hg export --git -r 123:150 &gt; changes.txt
+</pre>
+</li>
+<li><p class="first">split outgoing changes into a series of patches with
+descriptive names:</p>
+<pre class="literal-block">
+hg export -r &quot;outgoing()&quot; -o &quot;%n-%m.patch&quot;
+</pre>
+</li>
+</ul>
+</div>
+<p>Returns 0 on success.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--bookmark <var>&lt;BOOKMARK&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>export changes only reachable by given bookmark</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-o</span>, <span class="option">--output <var>&lt;FORMAT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>print output to file with formatted name</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--switch-parent</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>diff against the second parent</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revisions to export</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--text</span></kbd></td>
+<td>treat all files as text</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--git</span></kbd></td>
+<td>use git extended diff format (DEFAULT: diff.git)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--binary</span></kbd></td>
+<td>generate binary diffs in git mode (default)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--nodates</span></kbd></td>
+<td>omit dates from diff headers</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Using Mercurial from scripts and automation</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="using-mercurial-from-scripts-and-automation">
+<span id="topic-scripting"></span>
+<h1 class="title">Using Mercurial from scripts and automation</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#choosing-an-interface" id="toc-entry-1">Choosing an Interface</a></li>
+<li><a class="reference internal" href="#environment-variables" id="toc-entry-2">Environment Variables</a></li>
+<li><a class="reference internal" href="#command-line-flags" id="toc-entry-3">Command-line Flags</a></li>
+<li><a class="reference internal" href="#consuming-command-output" id="toc-entry-4">Consuming Command Output</a><ul>
+<li><a class="reference internal" href="#parsing-raw-command-output" id="toc-entry-5">Parsing Raw Command Output</a></li>
+<li><a class="reference internal" href="#using-templates-to-control-output" id="toc-entry-6">Using Templates to Control Output</a></li>
+<li><a class="reference internal" href="#command-server-output" id="toc-entry-7">Command Server Output</a></li>
+<li><a class="reference internal" href="#output-verbosity" id="toc-entry-8">Output Verbosity</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-topics" id="toc-entry-9">Other Topics</a></li>
+</ul>
+</div>
+<p id="scripting">It is common for machines (as opposed to humans) to consume Mercurial.
+This help topic describes some of the considerations for interfacing
+machines with Mercurial.</p>
+<div class="section" id="choosing-an-interface">
+<h1><a class="toc-backref" href="#contents">Choosing an Interface</a></h1>
+<p>Machines have a choice of several methods to interface with Mercurial.
+These include:</p>
+<ul class="simple">
+<li>Executing the <tt class="docutils literal">hg</tt> process</li>
+<li>Querying a HTTP server</li>
+<li>Calling out to a command server</li>
+</ul>
+<p>Executing <tt class="docutils literal">hg</tt> processes is very similar to how humans interact with
+Mercurial in the shell. It should already be familiar to you.</p>
+<p><a class="reference external" href="hg-serve.html"><tt class="docutils literal">hg serve</tt></a> can be used to start a server. By default, this will start
+a &quot;hgweb&quot; HTTP server. This HTTP server has support for machine-readable
+output, such as JSON. For more, see <a class="reference external" href="topic-hgweb.html"><tt class="docutils literal">hg help hgweb</tt></a>.</p>
+<p><a class="reference external" href="hg-serve.html"><tt class="docutils literal">hg serve</tt></a> can also start a &quot;command server.&quot; Clients can connect
+to this server and issue Mercurial commands over a special protocol.
+For more details on the command server, including links to client
+libraries, see <a class="reference external" href="https://www.mercurial-scm.org/wiki/CommandServer">https://www.mercurial-scm.org/wiki/CommandServer</a>.</p>
+<p><a class="reference external" href="hg-serve.html"><tt class="docutils literal">hg serve</tt></a> based interfaces (the hgweb and command servers) have the
+advantage over simple <tt class="docutils literal">hg</tt> process invocations in that they are
+likely more efficient. This is because there is significant overhead
+to spawn new Python processes.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If you need to invoke several <tt class="docutils literal">hg</tt> processes in short order and/or
+performance is important to you, use of a server-based interface
+is highly recommended.</p>
+</div>
+</div>
+<div class="section" id="environment-variables">
+<h1><a class="toc-backref" href="#contents">Environment Variables</a></h1>
+<p>As documented in <a class="reference external" href="topic-environment.html"><tt class="docutils literal">hg help environment</tt></a>, various environment variables
+influence the operation of Mercurial. The following are particularly
+relevant for machines consuming Mercurial:</p>
+<dl class="docutils">
+<dt>HGPLAIN</dt>
+<dd><p class="first">If not set, Mercurial's output could be influenced by configuration
+settings that impact its encoding, verbose mode, localization, etc.</p>
+<p class="last">It is highly recommended for machines to set this variable when
+invoking <tt class="docutils literal">hg</tt> processes.</p>
+</dd>
+<dt>HGENCODING</dt>
+<dd><p class="first">If not set, the locale used by Mercurial will be detected from the
+environment. If the determined locale does not support display of
+certain characters, Mercurial may render these character sequences
+incorrectly (often by using &quot;?&quot; as a placeholder for invalid
+characters in the current locale).</p>
+<p class="last">Explicitly setting this environment variable is a good practice to
+guarantee consistent results. &quot;utf-8&quot; is a good choice on UNIX-like
+environments.</p>
+</dd>
+<dt>HGRCPATH</dt>
+<dd><p class="first">If not set, Mercurial will inherit config options from config files
+using the process described in <a class="reference external" href="hgrc.5.html"><tt class="docutils literal">hg help config</tt></a>. This includes
+inheriting user or system-wide config files.</p>
+<p class="last">When utmost control over the Mercurial configuration is desired, the
+value of <tt class="docutils literal">HGRCPATH</tt> can be set to an explicit file with known good
+configs. In rare cases, the value can be set to an empty file or the
+null device (often <tt class="docutils literal">/dev/null</tt>) to bypass loading of any user or
+system config files. Note that these approaches can have unintended
+consequences, as the user and system config files often define things
+like the username and extensions that may be required to interface
+with a repository.</p>
+</dd>
+<dt>HGRCSKIPREPO</dt>
+<dd><p class="first">When set, the .hg/hgrc from repositories are not read.</p>
+<p class="last">Note that not reading the repository's configuration can have
+unintended consequences, as the repository config files can define
+things like extensions that are required for access to the
+repository.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="command-line-flags">
+<h1><a class="toc-backref" href="#contents">Command-line Flags</a></h1>
+<p>Mercurial's default command-line parser is designed for humans, and is not
+robust against malicious input. For instance, you can start a debugger by
+passing <tt class="docutils literal"><span class="pre">--debugger</span></tt> as an option value:</p>
+<pre class="literal-block">
+$ REV=--debugger sh -c 'hg log -r &quot;$REV&quot;'
+</pre>
+<p>This happens because several command-line flags need to be scanned without
+using a concrete command table, which may be modified while loading repository
+settings and extensions.</p>
+<p>Since Mercurial 4.4.2, the parsing of such flags may be restricted by setting
+<tt class="docutils literal"><span class="pre">HGPLAIN=+strictflags</span></tt>. When this feature is enabled, all early options
+(e.g. <tt class="docutils literal"><span class="pre">-R/--repository</span></tt>, <tt class="docutils literal"><span class="pre">--cwd</span></tt>, <tt class="docutils literal"><span class="pre">--config</span></tt>) must be specified first
+amongst the other global options, and cannot be injected to an arbitrary
+location:</p>
+<pre class="literal-block">
+$ HGPLAIN=+strictflags hg -R &quot;$REPO&quot; log -r &quot;$REV&quot;
+</pre>
+<p>In earlier Mercurial versions where <tt class="docutils literal">+strictflags</tt> isn't available, you
+can mitigate the issue by concatenating an option value with its flag:</p>
+<pre class="literal-block">
+$ hg log -r&quot;$REV&quot; --keyword=&quot;$KEYWORD&quot;
+</pre>
+</div>
+<div class="section" id="consuming-command-output">
+<h1><a class="toc-backref" href="#contents">Consuming Command Output</a></h1>
+<p>It is common for machines to need to parse the output of Mercurial
+commands for relevant data. This section describes the various
+techniques for doing so.</p>
+<div class="section" id="parsing-raw-command-output">
+<h2><a class="toc-backref" href="#contents">Parsing Raw Command Output</a></h2>
+<p>Likely the simplest and most effective solution for consuming command
+output is to simply invoke <tt class="docutils literal">hg</tt> commands as you would as a user and
+parse their output.</p>
+<p>The output of many commands can easily be parsed with tools like
+<tt class="docutils literal">grep</tt>, <tt class="docutils literal">sed</tt>, and <tt class="docutils literal">awk</tt>.</p>
+<p>A potential downside with parsing command output is that the output
+of commands can change when Mercurial is upgraded. While Mercurial
+does generally strive for strong backwards compatibility, command
+output does occasionally change. Having tests for your automated
+interactions with <tt class="docutils literal">hg</tt> commands is generally recommended, but is
+even more important when raw command output parsing is involved.</p>
+</div>
+<div class="section" id="using-templates-to-control-output">
+<h2><a class="toc-backref" href="#contents">Using Templates to Control Output</a></h2>
+<p>Many <tt class="docutils literal">hg</tt> commands support templatized output via the
+<tt class="docutils literal"><span class="pre">-T/--template</span></tt> argument. For more, see <a class="reference external" href="hg.1.html#templates"><tt class="docutils literal">hg help templates</tt></a>.</p>
+<p>Templates are useful for explicitly controlling output so that
+you get exactly the data you want formatted how you want it. For
+example, <tt class="docutils literal">log <span class="pre">-T</span> <span class="pre">{node}\n</span></tt> can be used to print a newline
+delimited list of changeset nodes instead of a human-tailored
+output containing authors, dates, descriptions, etc.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If parsing raw command output is too complicated, consider
+using templates to make your life easier.</p>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">-T/--template</span></tt> argument allows specifying pre-defined styles.
+Mercurial ships with the machine-readable styles <tt class="docutils literal">cbor</tt>, <tt class="docutils literal">json</tt>,
+and <tt class="docutils literal">xml</tt>, which provide CBOR, JSON, and XML output, respectively.
+These are useful for producing output that is machine readable as-is.</p>
+<p>(Mercurial 5.0 is required for CBOR style.)</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p>The <tt class="docutils literal">json</tt> and <tt class="docutils literal">xml</tt> styles are considered experimental. While
+they may be attractive to use for easily obtaining machine-readable
+output, their behavior may change in subsequent versions.</p>
+<p class="last">These styles may also exhibit unexpected results when dealing with
+certain encodings. Mercurial treats things like filenames as a
+series of bytes and normalizing certain byte sequences to JSON
+or XML with certain encoding settings can lead to surprises.</p>
+</div>
+</div>
+<div class="section" id="command-server-output">
+<h2><a class="toc-backref" href="#contents">Command Server Output</a></h2>
+<p>If using the command server to interact with Mercurial, you are likely
+using an existing library/API that abstracts implementation details of
+the command server. If so, this interface layer may perform parsing for
+you, saving you the work of implementing it yourself.</p>
+</div>
+<div class="section" id="output-verbosity">
+<h2><a class="toc-backref" href="#contents">Output Verbosity</a></h2>
+<p>Commands often have varying output verbosity, even when machine
+readable styles are being used (e.g. <tt class="docutils literal"><span class="pre">-T</span> json</tt>). Adding
+<tt class="docutils literal"><span class="pre">-v/--verbose</span></tt> and <tt class="docutils literal"><span class="pre">--debug</span></tt> to the command's arguments can
+increase the amount of data exposed by Mercurial.</p>
+<p>An alternate way to get the data you need is by explicitly specifying
+a template.</p>
+</div>
+</div>
+<div class="section" id="other-topics">
+<h1><a class="toc-backref" href="#contents">Other Topics</a></h1>
+<dl class="docutils">
+<dt>revsets</dt>
+<dd><p class="first">Revisions sets is a functional query language for selecting a set
+of revisions. Think of it as SQL for Mercurial repositories. Revsets
+are useful for querying repositories for specific data.</p>
+<p class="last">See <a class="reference external" href="hg.1.html#revsets"><tt class="docutils literal">hg help revsets</tt></a> for more.</p>
+</dd>
+<dt>share extension</dt>
+<dd><p class="first">The <tt class="docutils literal">share</tt> extension provides functionality for sharing
+repository data across several working copies. It can even
+automatically &quot;pool&quot; storage for logically related repositories when
+cloning.</p>
+<p>Configuring the <tt class="docutils literal">share</tt> extension can lead to significant resource
+utilization reduction, particularly around disk space and the
+network. This is especially true for continuous integration (CI)
+environments.</p>
+<p class="last">See <a class="reference external" href="hg.1.html#-e"><tt class="docutils literal">hg help <span class="pre">-e</span> share</tt></a> for more.</p>
+</dd>
+</dl>
+</div>
+</div>
+</body>
+</html>

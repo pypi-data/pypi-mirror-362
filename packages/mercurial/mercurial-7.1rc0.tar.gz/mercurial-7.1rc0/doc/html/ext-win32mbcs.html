@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>win32mbcs</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="win32mbcs">
+<span id="ext-win32mbcs"></span>
+<h1 class="title">win32mbcs</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+</ul>
+</div>
+<p>allow the use of MBCS paths with problematic encodings</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Some MBCS encodings are not good for some path operations (i.e.
+splitting path, case conversion, etc.) with its encoded bytes. We call
+such a encoding (i.e. shift_jis and big5) as &quot;problematic encoding&quot;.
+This extension can be used to fix the issue with those encodings by
+wrapping some functions to convert to Unicode string before path
+operation.</p>
+<p>This extension is useful for:</p>
+<ul class="simple">
+<li>Japanese Windows users using shift_jis encoding.</li>
+<li>Chinese Windows users using big5 encoding.</li>
+<li>All users who use a repository with one of problematic encodings on
+case-insensitive file system.</li>
+</ul>
+<p>This extension is not needed for:</p>
+<ul class="simple">
+<li>Any user who use only ASCII chars in path.</li>
+<li>Any user who do not use any of problematic encodings.</li>
+</ul>
+<p>Note that there are some limitations on using this extension:</p>
+<ul class="simple">
+<li>You should use single encoding in one repository.</li>
+<li>If the repository path ends with 0x5c, .hg/hgrc cannot be read.</li>
+<li>win32mbcs is not compatible with fixutf8 extension.</li>
+</ul>
+<p>By default, win32mbcs uses encoding.encoding decided by Mercurial.
+You can specify the encoding by config option:</p>
+<pre class="literal-block">
+[win32mbcs]
+encoding = sjis
+</pre>
+<p>It is useful for the users who want to commit with UTF-8 log message.</p>
+</div>
+</div>
+</body>
+</html>

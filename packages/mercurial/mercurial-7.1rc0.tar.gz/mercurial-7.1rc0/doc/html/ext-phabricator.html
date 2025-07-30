@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>phabricator</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="phabricator">
+<span id="ext-phabricator"></span>
+<h1 class="title">phabricator</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#change-import-export" id="toc-entry-3">Change import/export</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>simple Phabricator integration (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension provides a <tt class="docutils literal">phabsend</tt> command which sends a stack of
+changesets to Phabricator, and a <tt class="docutils literal">phabread</tt> command which prints a stack of
+revisions in a format suitable for <a class="reference external" href="hg-import.html"><tt class="docutils literal">hg import</tt></a>, and a <tt class="docutils literal">phabupdate</tt> command
+to update statuses in batch.</p>
+<p>A &quot;phabstatus&quot; view for <a class="reference external" href="hg-show.html"><tt class="docutils literal">hg show</tt></a> is also provided; it displays status
+information of Phabricator differentials associated with unfinished
+changesets.</p>
+<p>By default, Phabricator requires <tt class="docutils literal">Test Plan</tt> which might prevent some
+changeset from being sent. The requirement could be disabled by changing
+<tt class="docutils literal"><span class="pre">differential.require-test-plan-field</span></tt> config server side.</p>
+<p>Config:</p>
+<pre class="literal-block">
+[phabricator]
+# Phabricator URL
+url = https://phab.example.com/
+
+# Repo callsign. If a repo has a URL https://$HOST/diffusion/FOO, then its
+# callsign is &quot;FOO&quot;.
+callsign = FOO
+
+# curl command to use. If not set (default), use builtin HTTP library to
+# communicate. If set, use the specified curl command. This could be useful
+# if you need to specify advanced options that is not easily supported by
+# the internal library.
+curlcmd = curl --connect-timeout 2 --retry 3 --silent
+
+# retry failed command N time (default 0). Useful when using the extension
+# over flakly connection.
+#
+# We wait `retry.interval` between each retry, in seconds.
+# (default 1 second).
+retry = 3
+retry.interval = 10
+
+# the retry option can combine well with the http.timeout one.
+#
+# For example to give up on http request after 20 seconds:
+[http]
+timeout=20
+
+[auth]
+example.schemes = https
+example.prefix = phab.example.com
+
+# API token. Get it from https://$HOST/conduit/login/
+example.phabtoken = cli-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</pre>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="change-import-export">
+<h2><a class="toc-backref" href="#contents">Change import/export</a></h2>
+<div class="section" id="phabimport">
+<h3>phabimport</h3>
+<p>import patches from Phabricator for the specified Differential Revisions:</p>
+<pre class="literal-block">
+hg phabimport DREVSPEC... [OPTIONS]
+</pre>
+<p>The patches are read and applied starting at the parent of the working
+directory.</p>
+<p>See <tt class="docutils literal">hg help phabread</tt> for how to specify DREVSPEC.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--stack</span></kbd></td>
+<td>import dependencies as well</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--test-vcr <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Path to a vcr file. If nonexistent, will record a new vcr transcript, otherwise will mock all http requests using the specified vcr file. (ADVANCED)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="phabread">
+<h3>phabread</h3>
+<p>print patches from Phabricator suitable for importing:</p>
+<pre class="literal-block">
+hg phabread DREVSPEC... [OPTIONS]
+</pre>
+<p>DREVSPEC could be a Differential Revision identity, like <tt class="docutils literal">D123</tt>, or just
+the number <tt class="docutils literal">123</tt>. It could also have common operators like <tt class="docutils literal">+</tt>, <tt class="docutils literal">-</tt>,
+<tt class="docutils literal">&amp;</tt>, <tt class="docutils literal">(</tt>, <tt class="docutils literal">)</tt> for complex queries. Prefix <tt class="docutils literal">:</tt> could be used to
+select a stack.  If multiple DREVSPEC values are given, the result is the
+union of each individually evaluated value.  No attempt is currently made
+to reorder the values to run from parent to child.</p>
+<p><tt class="docutils literal">abandoned</tt>, <tt class="docutils literal">accepted</tt>, <tt class="docutils literal">closed</tt>, <tt class="docutils literal">needsreview</tt>, <tt class="docutils literal">needsrevision</tt>
+could be used to filter patches by status. For performance reason, they
+only represent a subset of non-status selections and cannot be used alone.</p>
+<p>For example, <tt class="docutils literal"><span class="pre">:D6+8-(2+D4)</span></tt> selects a stack up to D6, plus D8 and exclude
+D2 and D4. <tt class="docutils literal">:D9 &amp; needsreview</tt> selects &quot;Needs Review&quot; revisions in a
+stack up to D9.</p>
+<p>If --stack is given, follow dependencies information and read all patches.
+It is equivalent to the <tt class="docutils literal">:</tt> operator.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--stack</span></kbd></td>
+<td>read dependencies</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--test-vcr <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Path to a vcr file. If nonexistent, will record a new vcr transcript, otherwise will mock all http requests using the specified vcr file. (ADVANCED)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="phabsend">
+<h3>phabsend</h3>
+<p>upload changesets to Phabricator:</p>
+<pre class="literal-block">
+hg phabsend REV [OPTIONS]
+</pre>
+<p>If there are multiple revisions specified, they will be send as a stack
+with a linear dependencies relationship using the order specified by the
+revset.</p>
+<p>For the first time uploading changesets, local tags will be created to
+maintain the association. After the first time, phabsend will check
+obsstore and tags information so it can figure out whether to update an
+existing Differential Revision, or create a new one.</p>
+<p>If --amend is set, update commit messages so they have the
+<tt class="docutils literal">Differential Revision</tt> URL, remove related tags. This is similar to what
+arcanist will do, and is more desired in author-push workflows. Otherwise,
+use local tags to record the <tt class="docutils literal">Differential Revision</tt> association.</p>
+<p>The --confirm option lets you confirm changesets before sending them. You
+can also add following to your configuration file to make it default
+behaviour:</p>
+<pre class="literal-block">
+[phabsend]
+confirm = true
+</pre>
+<p>By default, a separate review will be created for each commit that is
+selected, and will have the same parent/child relationship in Phabricator.
+If <tt class="docutils literal"><span class="pre">--fold</span></tt> is set, multiple commits are rolled up into a single review
+as if diffed from the parent of the first revision to the last.  The commit
+messages are concatenated in the summary field on Phabricator.</p>
+<p>phabsend will check obsstore and the above association to decide whether to
+update an existing Differential Revision, or create a new one.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revisions to send</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--amend</span></kbd></td>
+<td>update commit messages (default: True)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--reviewer <var>&lt;VALUE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify reviewers</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--blocker <var>&lt;VALUE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify blocking reviewers</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--comment <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add a comment to Revisions with new/updated Diffs</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--confirm</span></kbd></td>
+<td>ask for confirmation before sending</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--fold</span></kbd></td>
+<td>combine the revisions into one review</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--test-vcr <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Path to a vcr file. If nonexistent, will record a new vcr transcript, otherwise will mock all http requests using the specified vcr file. (ADVANCED)</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+<div class="section" id="phabupdate">
+<h3>phabupdate</h3>
+<p>update Differential Revision in batch:</p>
+<pre class="literal-block">
+hg phabupdate [DREVSPEC...| -r REV...] [OPTIONS]
+</pre>
+<p>DREVSPEC selects revisions. See <a class="reference external" href="hg.1.html#phabread"><tt class="docutils literal">hg help phabread</tt></a> for its usage.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--accept</span></kbd></td>
+<td>accept revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--reject</span></kbd></td>
+<td>reject revisions</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--request-review</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>request review on revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--abandon</span></kbd></td>
+<td>abandon revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--reclaim</span></kbd></td>
+<td>reclaim revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--close</span></kbd></td>
+<td>close revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--reopen</span></kbd></td>
+<td>reopen revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--plan-changes</span></kbd></td>
+<td>plan changes for revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--resign</span></kbd></td>
+<td>resign as a reviewer from revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--commandeer</span></kbd></td>
+<td>commandeer revisions</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--comment <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>comment on the last revision</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>local revision to update</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--test-vcr <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Path to a vcr file. If nonexistent, will record a new vcr transcript, otherwise will mock all http requests using the specified vcr file. (ADVANCED)</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

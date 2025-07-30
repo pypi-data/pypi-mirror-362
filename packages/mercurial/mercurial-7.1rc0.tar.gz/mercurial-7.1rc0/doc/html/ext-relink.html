@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>relink</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="relink">
+<span id="ext-relink"></span>
+<h1 class="title">relink</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#commands" id="toc-entry-1">Commands</a><ul>
+<li><a class="reference internal" href="#repository-maintenance" id="toc-entry-2">Repository maintenance</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>recreates hardlinks between repository clones</p>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="repository-maintenance">
+<h2><a class="toc-backref" href="#contents">Repository maintenance</a></h2>
+<div class="section" id="relink-1">
+<h3>relink</h3>
+<p>recreate hardlinks between two repositories:</p>
+<pre class="literal-block">
+hg relink [ORIGIN]
+</pre>
+<p>When repositories are cloned locally, their data files will be
+hardlinked so that they only use the space of a single repository.</p>
+<p>Unfortunately, subsequent pulls into either repository will break
+hardlinks for any files touched by the new changesets, even if
+both repositories end up pulling the same changes.</p>
+<p>Similarly, passing --rev to &quot;hg clone&quot; will fail to use any
+hardlinks, falling back to a complete copy of the source
+repository.</p>
+<p>This command lets you recreate those hardlinks and reclaim that
+wasted space.</p>
+<p>This repository will be relinked to share space with ORIGIN, which
+must be on the same local disk. If ORIGIN is omitted, looks for
+&quot;default-relink&quot;, then &quot;default&quot;, in [paths].</p>
+<p>Do not attempt any read operations on this repository while the
+command is running. (Both repositories will be locked against
+writes.)</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

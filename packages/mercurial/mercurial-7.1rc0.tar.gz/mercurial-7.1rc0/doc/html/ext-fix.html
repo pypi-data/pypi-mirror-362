@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>fix</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="fix">
+<span id="ext-fix"></span>
+<h1 class="title">fix</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#file-content-management" id="toc-entry-3">File content management</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>rewrite file content in changesets or working copy (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Provides a command that runs configured tools on the contents of modified files,
+writing back any fixes to the working copy or replacing changesets.</p>
+<p>Fixer tools are run in the repository's root directory. This allows them to read
+configuration files from the working copy, or even write to the working copy.
+The working copy is not updated to match the revision being fixed. In fact,
+several revisions may be fixed in parallel. Writes to the working copy are not
+amended into the revision being fixed; fixer tools MUST always read content to
+be fixed from stdin, and write fixed file content back to stdout.</p>
+<p>Here is an example configuration that causes <a class="reference external" href="hg-fix.html"><tt class="docutils literal">hg fix</tt></a> to apply automatic
+formatting fixes to modified lines in C++ code:</p>
+<pre class="literal-block">
+[fix]
+clang-format:command=clang-format --assume-filename={rootpath}
+clang-format:linerange=--lines={first}:{last}
+clang-format:pattern=set:**.cpp or **.hpp
+</pre>
+<p>The :command suboption forms the first part of the shell command that will be
+used to fix a file. The content of the file is passed on standard input, and the
+fixed file content is expected on standard output. Any output on standard error
+will be displayed as a warning. If the exit status is not zero, the file will
+not be affected. A placeholder warning is displayed if there is a non-zero exit
+status but no standard error output. Some values may be substituted into the
+command:</p>
+<pre class="literal-block">
+{rootpath}  The path of the file being fixed, relative to the repo root
+{basename}  The name of the file being fixed, without the directory path
+</pre>
+<p>If the :linerange suboption is set, the tool will only be run if there are
+changed lines in a file. The value of this suboption is appended to the shell
+command once for every range of changed lines in the file. Some values may be
+substituted into the command:</p>
+<pre class="literal-block">
+{first}   The 1-based line number of the first line in the modified range
+{last}    The 1-based line number of the last line in the modified range
+</pre>
+<p>Deleted sections of a file will be ignored by :linerange, because there is no
+corresponding line range in the version being fixed.</p>
+<p>By default, tools that set :linerange will only be executed if there is at least
+one changed line range. This is meant to prevent accidents like running a code
+formatter in such a way that it unexpectedly reformats the whole file. If such a
+tool needs to operate on unchanged files, it should set the :skipclean suboption
+to false.</p>
+<p>The :pattern suboption determines which files will be passed through each
+configured tool. See <a class="reference external" href="topic-patterns.html"><tt class="docutils literal">hg help patterns</tt></a> for possible values. However, all
+patterns are relative to the repo root, even if that text says they are relative
+to the current working directory. If there are file arguments to <a class="reference external" href="hg-fix.html"><tt class="docutils literal">hg fix</tt></a>, the
+intersection of these patterns is used.</p>
+<p>There is also a configurable limit for the maximum size of file that will be
+processed by <a class="reference external" href="hg-fix.html"><tt class="docutils literal">hg fix</tt></a>:</p>
+<pre class="literal-block">
+[fix]
+maxfilesize = 2MB
+</pre>
+<p>Normally, execution of configured tools will continue after a failure (indicated
+by a non-zero exit status). It can also be configured to abort after the first
+such failure, so that no files will be affected if any tool fails. This abort
+will also cause <a class="reference external" href="hg-fix.html"><tt class="docutils literal">hg fix</tt></a> to exit with a non-zero status:</p>
+<pre class="literal-block">
+[fix]
+failure = abort
+</pre>
+<p>When multiple tools are configured to affect a file, they execute in an order
+defined by the :priority suboption. The priority suboption has a default value
+of zero for each tool. Tools are executed in order of descending priority. The
+execution order of tools with equal priority is unspecified. For example, you
+could use the 'sort' and 'head' utilities to keep only the 10 smallest numbers
+in a text file by ensuring that 'sort' runs before 'head':</p>
+<pre class="literal-block">
+[fix]
+sort:command = sort -n
+head:command = head -n 10
+sort:pattern = numbers.txt
+head:pattern = numbers.txt
+sort:priority = 2
+head:priority = 1
+</pre>
+<p>To account for changes made by each tool, the line numbers used for incremental
+formatting are recomputed before executing the next tool. So, each tool may see
+different values for the arguments added by the :linerange suboption.</p>
+<p>Each fixer tool is allowed to return some metadata in addition to the fixed file
+content. The metadata must be placed before the file content on stdout,
+separated from the file content by a zero byte. The metadata is parsed as a JSON
+value (so, it should be UTF-8 encoded and contain no zero bytes). A fixer tool
+is expected to produce this metadata encoding if and only if the :metadata
+suboption is true:</p>
+<pre class="literal-block">
+[fix]
+tool:command = tool --prepend-json-metadata
+tool:metadata = true
+</pre>
+<p>The metadata values are passed to hooks, which can be used to print summaries or
+perform other post-fixing work. The supported hooks are:</p>
+<pre class="literal-block">
+&quot;postfixfile&quot;
+  Run once for each file in each revision where any fixer tools made changes
+  to the file content. Provides &quot;$HG_REV&quot; and &quot;$HG_PATH&quot; to identify the file,
+  and &quot;$HG_METADATA&quot; with a map of fixer names to metadata values from fixer
+  tools that affected the file. Fixer tools that didn't affect the file have a
+  value of None. Only fixer tools that executed are present in the metadata.
+
+&quot;postfix&quot;
+  Run once after all files and revisions have been handled. Provides
+  &quot;$HG_REPLACEMENTS&quot; with information about what revisions were created and
+  made obsolete. Provides a boolean &quot;$HG_WDIRWRITTEN&quot; to indicate whether any
+  files in the working copy were updated. Provides a list &quot;$HG_METADATA&quot;
+  mapping fixer tool names to lists of metadata values returned from
+  executions that modified a file. This aggregates the same metadata
+  previously passed to the &quot;postfixfile&quot; hook.
+</pre>
+<p>You can specify a list of directories to search the tool command in using the
+<cite>fix.extra-bin-paths</cite> configuration.</p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="file-content-management">
+<h2><a class="toc-backref" href="#contents">File content management</a></h2>
+<div class="section" id="fix-1">
+<h3>fix</h3>
+<p>rewrite file content in changesets or working directory:</p>
+<pre class="literal-block">
+hg fix [OPTION]... [FILE]...
+</pre>
+<p>Runs any configured tools to fix the content of files. (See
+<a class="reference external" href="hg.1.html#-e"><tt class="docutils literal">hg help <span class="pre">-e</span> fix</tt></a> for details about configuring tools.) Only affects files
+with changes, unless file arguments are provided. Only affects changed lines
+of files, unless the --whole flag is used. Some tools may always affect the
+whole file regardless of --whole.</p>
+<p>If --working-dir is used, files with uncommitted changes in the working copy
+will be fixed. Note that no backup are made.</p>
+<p>If revisions are specified with --source, those revisions and their
+descendants will be checked, and they may be replaced with new revisions
+that have fixed file content. By automatically including the descendants,
+no merging, rebasing, or evolution will be required. If an ancestor of the
+working copy is included, then the working copy itself will also be fixed,
+and the working copy will be updated to the fixed parent.</p>
+<p>When determining what lines of each file to fix at each revision, the whole
+set of revisions being fixed is considered, so that fixes to earlier
+revisions are not forgotten in later ones. The --base flag can be used to
+override this default behavior, though it is not usually desirable to do so.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--all</span></kbd></td>
+<td>fix all non-public non-obsolete revisions</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--base <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revisions to diff against (overrides automatic selection, and applies to every revision being fixed)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revisions to fix (ADVANCED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s</span>, <span class="option">--source <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>fix the specified revisions and their descendants</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-w</span>, <span class="option">--working-dir</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>fix the working directory</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--whole</span></kbd></td>
+<td>always fix every line of a file</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

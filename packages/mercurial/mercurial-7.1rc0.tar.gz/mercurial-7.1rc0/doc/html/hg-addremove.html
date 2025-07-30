@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg addremove</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-addremove">
+<span id="hg-addremove-1"></span>
+<h1 class="title">hg addremove</h1>
+<h2 class="subtitle" id="add-all-new-files-delete-all-missing-files">add all new files, delete all missing files</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg addremove [OPTION]... [FILE]...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Add all new files and remove all missing files from the
+repository.</p>
+<p>Unless names are given, new files are ignored if they match any of
+the patterns in <tt class="docutils literal">.hgignore</tt>. As with add, these changes take
+effect at the next commit.</p>
+<p>Use the -s/--similarity option to detect renamed files. This
+option takes a percentage between 0 (disabled) and 100 (files must
+be identical) as its parameter. With a parameter greater than 0,
+this compares every removed file with every added file and records
+those similar enough as renames. Detecting renamed files this way
+can be expensive. After using this option, <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status <span class="pre">-C</span></tt></a> can be
+used to check which files were identified as moved or renamed. If
+not specified, -s/--similarity defaults to 100 and only renames of
+identical files are detected.</p>
+<div class="verbose docutils container">
+<p>Examples:</p>
+<blockquote>
+<ul>
+<li><p class="first">A number of files (bar.c and foo.c) are new,
+while foobar.c has been removed (without using <a class="reference external" href="hg-remove.html"><tt class="docutils literal">hg remove</tt></a>)
+from the repository:</p>
+<pre class="literal-block">
+$ ls
+bar.c foo.c
+$ hg status
+! foobar.c
+? bar.c
+? foo.c
+$ hg addremove
+adding bar.c
+adding foo.c
+removing foobar.c
+$ hg status
+A bar.c
+A foo.c
+R foobar.c
+</pre>
+</li>
+<li><p class="first">A file foobar.c was moved to foo.c without using <a class="reference external" href="hg-rename.html"><tt class="docutils literal">hg rename</tt></a>.
+Afterwards, it was edited slightly:</p>
+<pre class="literal-block">
+$ ls
+foo.c
+$ hg status
+! foobar.c
+? foo.c
+$ hg addremove --similarity 90
+removing foobar.c
+adding foo.c
+recording removal of foobar.c as rename to foo.c (94% similar)
+$ hg status -C
+A foo.c
+  foobar.c
+R foobar.c
+</pre>
+</li>
+</ul>
+</blockquote>
+</div>
+<p>Returns 0 if all files are successfully added.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s</span>, <span class="option">--similarity <var>&lt;SIMILARITY&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>guess renamed files by similarity (0&lt;=s&lt;=100)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-S</span>, <span class="option">--subrepos</span></kbd></td>
+<td>recurse into subrepositories</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
+<td>do not perform actions, just print output</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

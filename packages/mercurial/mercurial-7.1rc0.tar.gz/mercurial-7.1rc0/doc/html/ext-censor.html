@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>censor</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="censor">
+<span id="ext-censor"></span>
+<h1 class="title">censor</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#repository-maintenance" id="toc-entry-3">Repository maintenance</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>erase file content at a given revision</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>The censor command instructs Mercurial to erase all content of a file at a given
+revision <em>without updating the changeset hash.</em> This allows existing history to
+remain valid while preventing future clones/pulls from receiving the erased
+data.</p>
+<p>Typical uses for censor are due to security or legal requirements, including:</p>
+<pre class="literal-block">
+* Passwords, private keys, cryptographic material
+* Licensed data/code/libraries for which the license has expired
+* Personally Identifiable Information or other private data
+</pre>
+<p>Censored nodes can interrupt mercurial's typical operation whenever the excised
+data needs to be materialized. Some commands, like <tt class="docutils literal">hg cat</tt>/<tt class="docutils literal">hg revert</tt>,
+simply fail when asked to produce censored data. Others, like <tt class="docutils literal">hg verify</tt> and
+<tt class="docutils literal">hg update</tt>, must be capable of tolerating censored data to continue to
+function in a meaningful way. Such commands only tolerate censored file
+As having a censored version in a checkout is impractical. The current head
+revisions of the repository are checked. If the revision to be censored is in
+any of them the command will abort. You can configure this behavior using the
+following option:</p>
+<blockquote>
+<dl class="docutils">
+<dt><cite>censor.policy</cite></dt>
+<dd><span class="config-doc">censor.policy</span></dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="repository-maintenance">
+<h2><a class="toc-backref" href="#contents">Repository maintenance</a></h2>
+<div class="section" id="censor-1">
+<h3>censor</h3>
+<pre class="literal-block">
+hg censor -r REV [-t TEXT] [FILE]
+</pre>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>censor file from specified revision</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--check-heads</span></kbd></td>
+<td>check that repository heads are not affected (default: True)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-t</span>, <span class="option">--tombstone <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>replacement tombstone data</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>factotum</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="factotum">
+<span id="ext-factotum"></span>
+<h1 class="title">factotum</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+</ul>
+</div>
+<p>http authentication with factotum</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension allows the factotum(4) facility on Plan 9 from Bell Labs
+platforms to provide authentication information for HTTP access. Configuration
+entries specified in the auth section as well as authentication information
+provided in the repository URL are fully supported. If no prefix is specified,
+a value of &quot;*&quot; will be assumed.</p>
+<p>By default, keys are specified as:</p>
+<pre class="literal-block">
+proto=pass service=hg prefix=&lt;prefix&gt; user=&lt;username&gt; !password=&lt;password&gt;
+</pre>
+<p>If the factotum extension is unable to read the required key, one will be
+requested interactively.</p>
+<p>A configuration section is available to customize runtime behavior. By
+default, these entries are:</p>
+<pre class="literal-block">
+[factotum]
+executable = /bin/auth/factotum
+mountpoint = /mnt/factotum
+service = hg
+</pre>
+<p>The executable entry defines the full path to the factotum binary. The
+mountpoint entry defines the path to the factotum file service. Lastly, the
+service entry controls the service name used when reading keys.</p>
+</div>
+</div>
+</body>
+</html>

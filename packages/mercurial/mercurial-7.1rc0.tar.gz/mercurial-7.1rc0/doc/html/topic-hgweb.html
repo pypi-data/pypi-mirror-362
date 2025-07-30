@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Configuring hgweb</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="configuring-hgweb">
+<span id="topic-hgweb"></span>
+<h1 class="title">Configuring hgweb</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#urls-and-common-arguments" id="toc-entry-1">URLs and Common Arguments</a></li>
+<li><a class="reference internal" href="#commands-and-urls" id="toc-entry-2">Commands and URLs</a><ul>
+<li><a class="reference internal" href="#annotate-revision-path" id="toc-entry-3">/annotate/{revision}/{path}</a></li>
+<li><a class="reference internal" href="#archive-revision-format-path" id="toc-entry-4">/archive/{revision}.{format}[/{path}]</a></li>
+<li><a class="reference internal" href="#bookmarks" id="toc-entry-5">/bookmarks</a></li>
+<li><a class="reference internal" href="#branches" id="toc-entry-6">/branches</a></li>
+<li><a class="reference internal" href="#changelog-revision" id="toc-entry-7">/changelog[/{revision}]</a></li>
+<li><a class="reference internal" href="#changeset-revision" id="toc-entry-8">/changeset[/{revision}]</a></li>
+<li><a class="reference internal" href="#comparison-revision-path" id="toc-entry-9">/comparison/{revision}/{path}</a></li>
+<li><a class="reference internal" href="#diff-revision-path" id="toc-entry-10">/diff/{revision}/{path}</a></li>
+<li><a class="reference internal" href="#file-revision-path" id="toc-entry-11">/file/{revision}[/{path}]</a></li>
+<li><a class="reference internal" href="#diff-revision-path-1" id="toc-entry-12">/diff/{revision}/{path}</a></li>
+<li><a class="reference internal" href="#filelog-revision-path" id="toc-entry-13">/filelog/{revision}/{path}</a></li>
+<li><a class="reference internal" href="#graph-revision" id="toc-entry-14">/graph[/{revision}]</a></li>
+<li><a class="reference internal" href="#help-topic" id="toc-entry-15">/help[/{topic}]</a></li>
+<li><a class="reference internal" href="#log-revision-path" id="toc-entry-16">/log[/{revision}[/{path}]]</a></li>
+<li><a class="reference internal" href="#manifest-revision-path" id="toc-entry-17">/manifest[/{revision}[/{path}]]</a></li>
+<li><a class="reference internal" href="#changeset-revision-1" id="toc-entry-18">/changeset[/{revision}]</a></li>
+<li><a class="reference internal" href="#shortlog" id="toc-entry-19">/shortlog</a></li>
+<li><a class="reference internal" href="#summary" id="toc-entry-20">/summary</a></li>
+<li><a class="reference internal" href="#tags" id="toc-entry-21">/tags</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p id="hgweb">Mercurial's internal web server, hgweb, can serve either a single
+repository, or a tree of repositories. In the second case, repository
+paths and global options can be defined using a dedicated
+configuration file common to <a class="reference external" href="hg-serve.html"><tt class="docutils literal">hg serve</tt></a>, <tt class="docutils literal">hgweb.wsgi</tt>,
+<tt class="docutils literal">hgweb.cgi</tt> and <tt class="docutils literal">hgweb.fcgi</tt>.</p>
+<p>This file uses the same syntax as other Mercurial configuration files
+but recognizes only the following sections:</p>
+<blockquote>
+<ul class="simple">
+<li>web</li>
+<li>paths</li>
+<li>collections</li>
+</ul>
+</blockquote>
+<p>The <tt class="docutils literal">web</tt> options are thoroughly described in <a class="reference external" href="hgrc.5.html"><tt class="docutils literal">hg help config</tt></a>.</p>
+<p>The <tt class="docutils literal">paths</tt> section maps URL paths to paths of repositories in the
+filesystem. hgweb will not expose the filesystem directly - only
+Mercurial repositories can be published and only according to the
+configuration.</p>
+<p>The left hand side is the path in the URL. Note that hgweb reserves
+subpaths like <tt class="docutils literal">rev</tt> or <tt class="docutils literal">file</tt>, try using different names for
+nested repositories to avoid confusing effects.</p>
+<p>The right hand side is the path in the filesystem. If the specified
+path ends with <tt class="docutils literal">*</tt> or <tt class="docutils literal">**</tt> the filesystem will be searched
+recursively for repositories below that point.
+With <tt class="docutils literal">*</tt> it will not recurse into the repositories it finds (except for
+<tt class="docutils literal">.hg/patches</tt>).
+With <tt class="docutils literal">**</tt> it will also search inside repository working directories
+and possibly find subrepositories.</p>
+<p>In this example:</p>
+<pre class="literal-block">
+[paths]
+/projects/a = /srv/tmprepos/a
+/projects/b = c:/repos/b
+/ = /srv/repos/*
+/user/bob = /home/bob/repos/**
+</pre>
+<ul class="simple">
+<li>The first two entries make two repositories in different directories
+appear under the same directory in the web interface</li>
+<li>The third entry will publish every Mercurial repository found in
+<tt class="docutils literal">/srv/repos/</tt>, for instance the repository <tt class="docutils literal">/srv/repos/quux/</tt>
+will appear as <tt class="docutils literal"><span class="pre">http://server/quux/</span></tt></li>
+<li>The fourth entry will publish both <tt class="docutils literal"><span class="pre">http://server/user/bob/quux/</span></tt>
+and <tt class="docutils literal"><span class="pre">http://server/user/bob/quux/testsubrepo/</span></tt></li>
+</ul>
+<p>The <tt class="docutils literal">collections</tt> section is deprecated and has been superseded by
+<tt class="docutils literal">paths</tt>.</p>
+<div class="section" id="urls-and-common-arguments">
+<h1><a class="toc-backref" href="#contents">URLs and Common Arguments</a></h1>
+<p>URLs under each repository have the form <tt class="docutils literal"><span class="pre">/{command}[/{arguments}]</span></tt>
+where <tt class="docutils literal">{command}</tt> represents the name of a command or handler and
+<tt class="docutils literal">{arguments}</tt> represents any number of additional URL parameters
+to that command.</p>
+<p>The web server has a default style associated with it. Styles map to
+a collection of named templates. Each template is used to render a
+specific piece of data, such as a changeset or diff.</p>
+<p>The style for the current request can be overridden two ways. First,
+if <tt class="docutils literal">{command}</tt> contains a hyphen (<tt class="docutils literal">-</tt>), the text before the hyphen
+defines the style. For example, <tt class="docutils literal"><span class="pre">/atom-log</span></tt> will render the <tt class="docutils literal">log</tt>
+command handler with the <tt class="docutils literal">atom</tt> style. The second way to set the
+style is with the <tt class="docutils literal">style</tt> query string argument. For example,
+<tt class="docutils literal"><span class="pre">/log?style=atom</span></tt>. The hyphenated URL parameter is preferred.</p>
+<p>Not all templates are available for all styles. Attempting to use
+a style that doesn't have all templates defined may result in an error
+rendering the page.</p>
+<p>Many commands take a <tt class="docutils literal">{revision}</tt> URL parameter. This defines the
+changeset to operate on. This is commonly specified as the short,
+12 digit hexadecimal abbreviation for the full 40 character unique
+revision identifier. However, any value described by
+<a class="reference external" href="topic-revisions.html"><tt class="docutils literal">hg help revisions</tt></a> typically works.</p>
+</div>
+<div class="section" id="commands-and-urls">
+<h1><a class="toc-backref" href="#contents">Commands and URLs</a></h1>
+<p>The following web commands and their URLs are available:</p>
+<div class="section" id="annotate-revision-path">
+<h2><a class="toc-backref" href="#contents">/annotate/{revision}/{path}</a></h2>
+<p>Show changeset information for each line in a file.</p>
+<p>The <tt class="docutils literal">ignorews</tt>, <tt class="docutils literal">ignorewsamount</tt>, <tt class="docutils literal">ignorewseol</tt>, and
+<tt class="docutils literal">ignoreblanklines</tt> query string arguments have the same meaning as
+their <tt class="docutils literal">[annotate]</tt> config equivalents. It uses the hgrc boolean
+parsing logic to interpret the value. e.g. <tt class="docutils literal">0</tt> and <tt class="docutils literal">false</tt> are
+false and <tt class="docutils literal">1</tt> and <tt class="docutils literal">true</tt> are true. If not defined, the server
+default settings are used.</p>
+<p>The <tt class="docutils literal">fileannotate</tt> template is rendered.</p>
+</div>
+<div class="section" id="archive-revision-format-path">
+<h2><a class="toc-backref" href="#contents">/archive/{revision}.{format}[/{path}]</a></h2>
+<p>Obtain an archive of repository content.</p>
+<p>The content and type of the archive is defined by a URL path parameter.
+<tt class="docutils literal">format</tt> is the file extension of the archive type to be generated. e.g.
+<tt class="docutils literal">zip</tt> or <tt class="docutils literal">tar.bz2</tt>. Not all archive types may be allowed by your
+server configuration.</p>
+<p>The optional <tt class="docutils literal">path</tt> URL parameter controls content to include in the
+archive. If omitted, every file in the specified revision is present in the
+archive. If included, only the specified file or contents of the specified
+directory will be included in the archive.</p>
+<p>No template is used for this handler. Raw, binary content is generated.</p>
+</div>
+<div class="section" id="bookmarks">
+<h2><a class="toc-backref" href="#contents">/bookmarks</a></h2>
+<p>Show information about bookmarks.</p>
+<p>No arguments are accepted.</p>
+<p>The <tt class="docutils literal">bookmarks</tt> template is rendered.</p>
+</div>
+<div class="section" id="branches">
+<h2><a class="toc-backref" href="#contents">/branches</a></h2>
+<p>Show information about branches.</p>
+<p>All known branches are contained in the output, even closed branches.</p>
+<p>No arguments are accepted.</p>
+<p>The <tt class="docutils literal">branches</tt> template is rendered.</p>
+</div>
+<div class="section" id="changelog-revision">
+<h2><a class="toc-backref" href="#contents">/changelog[/{revision}]</a></h2>
+<p>Show information about multiple changesets.</p>
+<p>If the optional <tt class="docutils literal">revision</tt> URL argument is absent, information about
+all changesets starting at <tt class="docutils literal">tip</tt> will be rendered. If the <tt class="docutils literal">revision</tt>
+argument is present, changesets will be shown starting from the specified
+revision.</p>
+<p>If <tt class="docutils literal">revision</tt> is absent, the <tt class="docutils literal">rev</tt> query string argument may be
+defined. This will perform a search for changesets.</p>
+<p>The argument for <tt class="docutils literal">rev</tt> can be a single revision, a revision set,
+or a literal keyword to search for in changeset data (equivalent to
+<a class="reference external" href="hg-log.html"><tt class="docutils literal">hg log <span class="pre">-k</span></tt></a>).</p>
+<p>The <tt class="docutils literal">revcount</tt> query string argument defines the maximum numbers of
+changesets to render.</p>
+<p>For non-searches, the <tt class="docutils literal">changelog</tt> template will be rendered.</p>
+</div>
+<div class="section" id="changeset-revision">
+<h2><a class="toc-backref" href="#contents">/changeset[/{revision}]</a></h2>
+<p>Show information about a single changeset.</p>
+<p>A URL path argument is the changeset identifier to show. See <tt class="docutils literal">hg help
+revisions</tt> for possible values. If not defined, the <tt class="docutils literal">tip</tt> changeset
+will be shown.</p>
+<p>The <tt class="docutils literal">changeset</tt> template is rendered. Contents of the <tt class="docutils literal">changesettag</tt>,
+<tt class="docutils literal">changesetbookmark</tt>, <tt class="docutils literal">filenodelink</tt>, <tt class="docutils literal">filenolink</tt>, and the many
+templates related to diffs may all be used to produce the output.</p>
+</div>
+<div class="section" id="comparison-revision-path">
+<h2><a class="toc-backref" href="#contents">/comparison/{revision}/{path}</a></h2>
+<p>Show a comparison between the old and new versions of a file from changes
+made on a particular revision.</p>
+<p>This is similar to the <tt class="docutils literal">diff</tt> handler. However, this form features
+a split or side-by-side diff rather than a unified diff.</p>
+<p>The <tt class="docutils literal">context</tt> query string argument can be used to control the lines of
+context in the diff.</p>
+<p>The <tt class="docutils literal">filecomparison</tt> template is rendered.</p>
+</div>
+<div class="section" id="diff-revision-path">
+<h2><a class="toc-backref" href="#contents">/diff/{revision}/{path}</a></h2>
+<p>Show how a file changed in a particular commit.</p>
+<p>The <tt class="docutils literal">filediff</tt> template is rendered.</p>
+<p>This handler is registered under both the <tt class="docutils literal">/diff</tt> and <tt class="docutils literal">/filediff</tt>
+paths. <tt class="docutils literal">/diff</tt> is used in modern code.</p>
+</div>
+<div class="section" id="file-revision-path">
+<h2><a class="toc-backref" href="#contents">/file/{revision}[/{path}]</a></h2>
+<p>Show information about a directory or file in the repository.</p>
+<p>Info about the <tt class="docutils literal">path</tt> given as a URL parameter will be rendered.</p>
+<p>If <tt class="docutils literal">path</tt> is a directory, information about the entries in that
+directory will be rendered. This form is equivalent to the <tt class="docutils literal">manifest</tt>
+handler.</p>
+<p>If <tt class="docutils literal">path</tt> is a file, information about that file will be shown via
+the <tt class="docutils literal">filerevision</tt> template.</p>
+<p>If <tt class="docutils literal">path</tt> is not defined, information about the root directory will
+be rendered.</p>
+</div>
+<div class="section" id="diff-revision-path-1">
+<h2><a class="toc-backref" href="#contents">/diff/{revision}/{path}</a></h2>
+<p>Show how a file changed in a particular commit.</p>
+<p>The <tt class="docutils literal">filediff</tt> template is rendered.</p>
+<p>This handler is registered under both the <tt class="docutils literal">/diff</tt> and <tt class="docutils literal">/filediff</tt>
+paths. <tt class="docutils literal">/diff</tt> is used in modern code.</p>
+</div>
+<div class="section" id="filelog-revision-path">
+<h2><a class="toc-backref" href="#contents">/filelog/{revision}/{path}</a></h2>
+<p>Show information about the history of a file in the repository.</p>
+<p>The <tt class="docutils literal">revcount</tt> query string argument can be defined to control the
+maximum number of entries to show.</p>
+<p>The <tt class="docutils literal">filelog</tt> template will be rendered.</p>
+</div>
+<div class="section" id="graph-revision">
+<h2><a class="toc-backref" href="#contents">/graph[/{revision}]</a></h2>
+<p>Show information about the graphical topology of the repository.</p>
+<p>Information rendered by this handler can be used to create visual
+representations of repository topology.</p>
+<p>The <tt class="docutils literal">revision</tt> URL parameter controls the starting changeset. If it's
+absent, the default is <tt class="docutils literal">tip</tt>.</p>
+<p>The <tt class="docutils literal">revcount</tt> query string argument can define the number of changesets
+to show information for.</p>
+<p>The <tt class="docutils literal">graphtop</tt> query string argument can specify the starting changeset
+for producing <tt class="docutils literal">jsdata</tt> variable that is used for rendering graph in
+JavaScript. By default it has the same value as <tt class="docutils literal">revision</tt>.</p>
+<p>This handler will render the <tt class="docutils literal">graph</tt> template.</p>
+</div>
+<div class="section" id="help-topic">
+<h2><a class="toc-backref" href="#contents">/help[/{topic}]</a></h2>
+<p>Render help documentation.</p>
+<p>This web command is roughly equivalent to <a class="reference external" href="hg-help.html"><tt class="docutils literal">hg help</tt></a>. If a <tt class="docutils literal">topic</tt>
+is defined, that help topic will be rendered. If not, an index of
+available help topics will be rendered.</p>
+<p>The <tt class="docutils literal">help</tt> template will be rendered when requesting help for a topic.
+<tt class="docutils literal">helptopics</tt> will be rendered for the index of help topics.</p>
+</div>
+<div class="section" id="log-revision-path">
+<h2><a class="toc-backref" href="#contents">/log[/{revision}[/{path}]]</a></h2>
+<p>Show repository or file history.</p>
+<p>For URLs of the form <tt class="docutils literal"><span class="pre">/log/{revision}</span></tt>, a list of changesets starting at
+the specified changeset identifier is shown. If <tt class="docutils literal">{revision}</tt> is not
+defined, the default is <tt class="docutils literal">tip</tt>. This form is equivalent to the
+<tt class="docutils literal">changelog</tt> handler.</p>
+<p>For URLs of the form <tt class="docutils literal"><span class="pre">/log/{revision}/{file}</span></tt>, the history for a specific
+file will be shown. This form is equivalent to the <tt class="docutils literal">filelog</tt> handler.</p>
+</div>
+<div class="section" id="manifest-revision-path">
+<h2><a class="toc-backref" href="#contents">/manifest[/{revision}[/{path}]]</a></h2>
+<p>Show information about a directory.</p>
+<p>If the URL path arguments are omitted, information about the root
+directory for the <tt class="docutils literal">tip</tt> changeset will be shown.</p>
+<p>Because this handler can only show information for directories, it
+is recommended to use the <tt class="docutils literal">file</tt> handler instead, as it can handle both
+directories and files.</p>
+<p>The <tt class="docutils literal">manifest</tt> template will be rendered for this handler.</p>
+</div>
+<div class="section" id="changeset-revision-1">
+<h2><a class="toc-backref" href="#contents">/changeset[/{revision}]</a></h2>
+<p>Show information about a single changeset.</p>
+<p>A URL path argument is the changeset identifier to show. See <tt class="docutils literal">hg help
+revisions</tt> for possible values. If not defined, the <tt class="docutils literal">tip</tt> changeset
+will be shown.</p>
+<p>The <tt class="docutils literal">changeset</tt> template is rendered. Contents of the <tt class="docutils literal">changesettag</tt>,
+<tt class="docutils literal">changesetbookmark</tt>, <tt class="docutils literal">filenodelink</tt>, <tt class="docutils literal">filenolink</tt>, and the many
+templates related to diffs may all be used to produce the output.</p>
+</div>
+<div class="section" id="shortlog">
+<h2><a class="toc-backref" href="#contents">/shortlog</a></h2>
+<p>Show basic information about a set of changesets.</p>
+<p>This accepts the same parameters as the <tt class="docutils literal">changelog</tt> handler. The only
+difference is the <tt class="docutils literal">shortlog</tt> template will be rendered instead of the
+<tt class="docutils literal">changelog</tt> template.</p>
+</div>
+<div class="section" id="summary">
+<h2><a class="toc-backref" href="#contents">/summary</a></h2>
+<p>Show a summary of repository state.</p>
+<p>Information about the latest changesets, bookmarks, tags, and branches
+is captured by this handler.</p>
+<p>The <tt class="docutils literal">summary</tt> template is rendered.</p>
+</div>
+<div class="section" id="tags">
+<h2><a class="toc-backref" href="#contents">/tags</a></h2>
+<p>Show information about tags.</p>
+<p>No arguments are accepted.</p>
+<p>The <tt class="docutils literal">tags</tt> template is rendered.</p>
+</div>
+</div>
+</div>
+</body>
+</html>

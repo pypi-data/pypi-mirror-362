@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>largefiles</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="largefiles">
+<span id="ext-largefiles"></span>
+<h1 class="title">largefiles</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#uncategorized-commands" id="toc-entry-3">Uncategorized commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>track large binary files</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Large binary files tend to be not very compressible, not very
+diffable, and not at all mergeable. Such files are not handled
+efficiently by Mercurial's storage format (revlog), which is based on
+compressed binary deltas; storing large binary files as regular
+Mercurial files wastes bandwidth and disk space and increases
+Mercurial's memory usage. The largefiles extension addresses these
+problems by adding a centralized client-server layer on top of
+Mercurial: largefiles live in a <em>central store</em> out on the network
+somewhere, and you only fetch the revisions that you need when you
+need them.</p>
+<p>largefiles works by maintaining a &quot;standin file&quot; in .hglf/ for each
+largefile. The standins are small (41 bytes: an SHA-1 hash plus
+newline) and are tracked by Mercurial. Largefile revisions are
+identified by the SHA-1 hash of their contents, which is written to
+the standin. largefiles uses that revision ID to get/put largefile
+revisions from/to the central store. This saves both disk space and
+bandwidth, since you don't need to retrieve all historical revisions
+of large files when you clone or pull.</p>
+<p>To start a new repository or add new large binary files, just add
+--large to your <a class="reference external" href="hg-add.html"><tt class="docutils literal">hg add</tt></a> command. For example:</p>
+<pre class="literal-block">
+$ dd if=/dev/urandom of=randomdata count=2000
+$ hg add --large randomdata
+$ hg commit -m &quot;add randomdata as a largefile&quot;
+</pre>
+<p>When you push a changeset that adds/modifies largefiles to a remote
+repository, its largefile revisions will be uploaded along with it.
+Note that the remote Mercurial must also have the largefiles extension
+enabled for this to work.</p>
+<p>When you pull a changeset that affects largefiles from a remote
+repository, the largefiles for the changeset will by default not be
+pulled down. However, when you update to such a revision, any
+largefiles needed by that revision are downloaded and cached (if
+they have never been downloaded before). One way to pull largefiles
+when pulling is thus to use --update, which will update your working
+copy to the latest pulled revision (and thereby downloading any new
+largefiles).</p>
+<p>If you want to pull largefiles you don't need for update yet, then
+you can use pull with the <cite>--lfrev</cite> option or the <a class="reference external" href="hg-lfpull.html"><tt class="docutils literal">hg lfpull</tt></a> command.</p>
+<p>If you know you are pulling from a non-default location and want to
+download all the largefiles that correspond to the new changesets at
+the same time, then you can pull with <cite>--lfrev &quot;pulled()&quot;</cite>.</p>
+<p>If you just want to ensure that you will have the largefiles needed to
+merge or rebase with new heads that you are pulling, then you can pull
+with <cite>--lfrev &quot;head(pulled())&quot;</cite> flag to pre-emptively download any largefiles
+that are new in the heads you are pulling.</p>
+<p>Keep in mind that network access may now be required to update to
+changesets that you have not previously updated to. The nature of the
+largefiles extension means that updating is no longer guaranteed to
+be a local-only operation.</p>
+<p>If you already have large files tracked by Mercurial without the
+largefiles extension, you will need to convert your repository in
+order to benefit from largefiles. This is done with the
+<a class="reference external" href="hg-lfconvert.html"><tt class="docutils literal">hg lfconvert</tt></a> command:</p>
+<pre class="literal-block">
+$ hg lfconvert --size 10 oldrepo newrepo
+</pre>
+<p>In repositories that already have largefiles in them, any new file
+over 10MB will automatically be added as a largefile. To change this
+threshold, set <tt class="docutils literal">largefiles.minsize</tt> in your Mercurial config file
+to the minimum size in megabytes to track as a largefile, or use the
+--lfsize option to the add command (also in megabytes):</p>
+<pre class="literal-block">
+[largefiles]
+minsize = 2
+
+$ hg add --lfsize 2
+</pre>
+<p>The <tt class="docutils literal">largefiles.patterns</tt> config option allows you to specify a list
+of filename patterns (see <a class="reference external" href="topic-patterns.html"><tt class="docutils literal">hg help patterns</tt></a>) that should always be
+tracked as largefiles:</p>
+<pre class="literal-block">
+[largefiles]
+patterns =
+  *.jpg
+  re:.*\.(png|bmp)$
+  library.zip
+  content/audio/*
+</pre>
+<p>Files that match one of these patterns will be added as largefiles
+regardless of their size.</p>
+<p>The <tt class="docutils literal">largefiles.minsize</tt> and <tt class="docutils literal">largefiles.patterns</tt> config options
+will be ignored for any repositories not already containing a
+largefile. To add the first largefile to a repository, you must
+explicitly do so with the --large flag passed to the <a class="reference external" href="hg-add.html"><tt class="docutils literal">hg add</tt></a>
+command.</p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="uncategorized-commands">
+<h2><a class="toc-backref" href="#contents">Uncategorized commands</a></h2>
+<div class="section" id="lfconvert">
+<h3>lfconvert</h3>
+<p>convert a normal repository to a largefiles repository:</p>
+<pre class="literal-block">
+hg lfconvert SOURCE DEST [FILE ...]
+</pre>
+<p>Convert repository SOURCE to a new repository DEST, identical to
+SOURCE except that certain files will be converted as largefiles:
+specifically, any file that matches any PATTERN <em>or</em> whose size is
+above the minimum size threshold is converted as a largefile. The
+size used to determine whether or not to track a file as a
+largefile is the size of the first version of the file. The
+minimum size can be specified either with --size or in
+configuration as <tt class="docutils literal">largefiles.size</tt>.</p>
+<p>After running this command you will need to make sure that
+largefiles is enabled anywhere you intend to push the new
+repository.</p>
+<p>Use --to-normal to convert largefiles back to normal files; after
+this, the DEST repository can be used without largefiles at all.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s</span>, <span class="option">--size <var>&lt;SIZE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>minimum size (MB) for files to be converted as largefiles</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--to-normal</span></kbd></td>
+<td>convert from a largefiles repo to a normal repo</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="lfpull">
+<h3>lfpull</h3>
+<p>pull largefiles for the specified revisions from the specified source:</p>
+<pre class="literal-block">
+hg lfpull -r REV... [-e CMD] [--remotecmd CMD] [SOURCE]
+</pre>
+<p>Pull largefiles that are referenced from local changesets but missing
+locally, pulling from a remote repository to the local cache.</p>
+<p>If SOURCE is omitted, the 'default' path will be used.
+See <a class="reference external" href="topic-urls.html"><tt class="docutils literal">hg help urls</tt></a> for more information.</p>
+<div class="verbose docutils container">
+<p>Some examples:</p>
+<ul>
+<li><p class="first">pull largefiles for all branch heads:</p>
+<pre class="literal-block">
+hg lfpull -r &quot;head() and not closed()&quot;
+</pre>
+</li>
+<li><p class="first">pull largefiles on the default branch:</p>
+<pre class="literal-block">
+hg lfpull -r &quot;branch(default)&quot;
+</pre>
+</li>
+</ul>
+</div>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;VALUE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>pull largefiles for these revisions</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

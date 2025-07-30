@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>eol</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="eol">
+<span id="ext-eol"></span>
+<h1 class="title">eol</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+</ul>
+</div>
+<p>automatically manage newlines in repository files</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension allows you to manage the type of line endings (CRLF or
+LF) that are used in the repository and in the local working
+directory. That way you can get CRLF line endings on Windows and LF on
+Unix/Mac, thereby letting everybody use their OS native line endings.</p>
+<p>The extension reads its configuration from a versioned <tt class="docutils literal">.hgeol</tt>
+configuration file found in the root of the working directory. The
+<tt class="docutils literal">.hgeol</tt> file use the same syntax as all other Mercurial
+configuration files. It uses two sections, <tt class="docutils literal">[patterns]</tt> and
+<tt class="docutils literal">[repository]</tt>.</p>
+<p>The <tt class="docutils literal">[patterns]</tt> section specifies how line endings should be
+converted between the working directory and the repository. The format is
+specified by a file pattern. The first match is used, so put more
+specific patterns first. The available line endings are <tt class="docutils literal">LF</tt>,
+<tt class="docutils literal">CRLF</tt>, and <tt class="docutils literal">BIN</tt>.</p>
+<p>Files with the declared format of <tt class="docutils literal">CRLF</tt> or <tt class="docutils literal">LF</tt> are always
+checked out and stored in the repository in that format and files
+declared to be binary (<tt class="docutils literal">BIN</tt>) are left unchanged. Additionally,
+<tt class="docutils literal">native</tt> is an alias for checking out in the platform's default line
+ending: <tt class="docutils literal">LF</tt> on Unix (including Mac OS X) and <tt class="docutils literal">CRLF</tt> on
+Windows. Note that <tt class="docutils literal">BIN</tt> (do nothing to line endings) is Mercurial's
+default behavior; it is only needed if you need to override a later,
+more general pattern.</p>
+<p>The optional <tt class="docutils literal">[repository]</tt> section specifies the line endings to
+use for files stored in the repository. It has a single setting,
+<tt class="docutils literal">native</tt>, which determines the storage line endings for files
+declared as <tt class="docutils literal">native</tt> in the <tt class="docutils literal">[patterns]</tt> section. It can be set to
+<tt class="docutils literal">LF</tt> or <tt class="docutils literal">CRLF</tt>. The default is <tt class="docutils literal">LF</tt>. For example, this means
+that on Windows, files configured as <tt class="docutils literal">native</tt> (<tt class="docutils literal">CRLF</tt> by default)
+will be converted to <tt class="docutils literal">LF</tt> when stored in the repository. Files
+declared as <tt class="docutils literal">LF</tt>, <tt class="docutils literal">CRLF</tt>, or <tt class="docutils literal">BIN</tt> in the <tt class="docutils literal">[patterns]</tt> section
+are always stored as-is in the repository.</p>
+<p>Example versioned <tt class="docutils literal">.hgeol</tt> file:</p>
+<pre class="literal-block">
+[patterns]
+**.py = native
+**.vcproj = CRLF
+**.txt = native
+Makefile = LF
+**.jpg = BIN
+
+[repository]
+native = LF
+</pre>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The rules will first apply when files are touched in the working
+directory, e.g. by updating to null and back to tip to touch all files.</p>
+</div>
+<p>The extension uses an optional <tt class="docutils literal">[eol]</tt> section read from both the
+normal Mercurial configuration files and the <tt class="docutils literal">.hgeol</tt> file, with the
+latter overriding the former. You can use that section to control the
+overall behavior. There are three settings:</p>
+<ul class="simple">
+<li><tt class="docutils literal">eol.native</tt> (default <tt class="docutils literal">os.linesep</tt>) can be set to <tt class="docutils literal">LF</tt> or
+<tt class="docutils literal">CRLF</tt> to override the default interpretation of <tt class="docutils literal">native</tt> for
+checkout. This can be used with <a class="reference external" href="hg-archive.html"><tt class="docutils literal">hg archive</tt></a> on Unix, say, to
+generate an archive where files have line endings for Windows.</li>
+<li><tt class="docutils literal"><span class="pre">eol.only-consistent</span></tt> (default True) can be set to False to make
+the extension convert files with inconsistent EOLs. Inconsistent
+means that there is both <tt class="docutils literal">CRLF</tt> and <tt class="docutils literal">LF</tt> present in the file.
+Such files are normally not touched under the assumption that they
+have mixed EOLs on purpose.</li>
+<li><tt class="docutils literal"><span class="pre">eol.fix-trailing-newline</span></tt> (default False) can be set to True to
+ensure that converted files end with a EOL character (either <tt class="docutils literal">\n</tt>
+or <tt class="docutils literal">\r\n</tt> as per the configured patterns).</li>
+</ul>
+<p>The extension provides <tt class="docutils literal">cleverencode:</tt> and <tt class="docutils literal">cleverdecode:</tt> filters
+like the deprecated win32text extension does. This means that you can
+disable win32text and enable eol and your filters will still work. You
+only need to these filters until you have prepared a <tt class="docutils literal">.hgeol</tt> file.</p>
+<p>The <tt class="docutils literal">win32text.forbid*</tt> hooks provided by the win32text extension
+have been unified into a single hook named <tt class="docutils literal">eol.checkheadshook</tt>. The
+hook will lookup the expected line endings from the <tt class="docutils literal">.hgeol</tt> file,
+which means you must migrate to a <tt class="docutils literal">.hgeol</tt> file first before using
+the hook. <tt class="docutils literal">eol.checkheadshook</tt> only checks heads, intermediate
+invalid revisions will be pushed. To forbid them completely, use the
+<tt class="docutils literal">eol.checkallhook</tt> hook. These hooks are best used as
+<tt class="docutils literal">pretxnchangegroup</tt> hooks.</p>
+<p>See <a class="reference external" href="topic-patterns.html"><tt class="docutils literal">hg help patterns</tt></a> for more information about the glob patterns
+used.</p>
+</div>
+</div>
+</body>
+</html>

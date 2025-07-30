@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Safely rewriting history (EXPERIMENTAL)</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="safely-rewriting-history-experimental">
+<span id="topic-evolution"></span>
+<h1 class="title">Safely rewriting history (EXPERIMENTAL)</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#current-feature-status" id="toc-entry-1">Current feature status</a></li>
+<li><a class="reference internal" href="#instability" id="toc-entry-2">Instability</a></li>
+</ul>
+</div>
+<p id="evolution">Obsolescence markers make it possible to mark changesets that have been
+deleted or superseded in a new version of the changeset.</p>
+<p>Unlike the previous way of handling such changes, by stripping the old
+changesets from the repository, obsolescence markers can be propagated
+between repositories. This allows for a safe and simple way of exchanging
+mutable history and altering it after the fact. Changeset phases are
+respected, such that only draft and secret changesets can be altered (see
+<a class="reference external" href="topic-phases.html"><tt class="docutils literal">hg help phases</tt></a> for details).</p>
+<p>Obsolescence is tracked using &quot;obsolescence markers&quot;, a piece of metadata
+tracking which changesets have been made obsolete, potential successors for
+a given changeset, the moment the changeset was marked as obsolete, and the
+user who performed the rewriting operation. The markers are stored
+separately from standard changeset data can be exchanged without any of the
+precursor changesets, preventing unnecessary exchange of obsolescence data.</p>
+<p>The complete set of obsolescence markers describes a history of changeset
+modifications that is orthogonal to the repository history of file
+modifications. This changeset history allows for detection and automatic
+resolution of edge cases arising from multiple users rewriting the same part
+of history concurrently.</p>
+<div class="section" id="current-feature-status">
+<h1><a class="toc-backref" href="#contents">Current feature status</a></h1>
+<p>This feature is still in development.</p>
+</div>
+<div class="section" id="instability">
+<h1><a class="toc-backref" href="#contents">Instability</a></h1>
+<p>Rewriting changesets might introduce instability.</p>
+<p>There are two main kinds of instability: orphaning and diverging.</p>
+<p>Orphans are changesets left behind when their ancestors are rewritten.
+Divergence has two variants:</p>
+<ul class="simple">
+<li>Content-divergence occurs when independent rewrites of the same changesets
+lead to different results.</li>
+<li>Phase-divergence occurs when the old (obsolete) version of a changeset
+becomes public.</li>
+</ul>
+<p>It is possible to prevent local creation of orphans by using the following config:</p>
+<pre class="literal-block">
+[experimental]
+evolution.createmarkers = true
+evolution.exchange = true
+</pre>
+<p>You can also enable that option explicitly:</p>
+<pre class="literal-block">
+[experimental]
+evolution.createmarkers = true
+evolution.exchange = true
+evolution.allowunstable = true
+</pre>
+</div>
+</div>
+</body>
+</html>

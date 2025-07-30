@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Glossary</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="glossary">
+<span id="topic-glossary"></span>
+<h1 class="title">Glossary</h1>
+
+<dl class="docutils" id="glossary-1">
+<dt>Ancestor</dt>
+<dd>Any changeset that can be reached by an unbroken chain of parent
+changesets from a given changeset. More precisely, the ancestors
+of a changeset can be defined by two properties: a parent of a
+changeset is an ancestor, and a parent of an ancestor is an
+ancestor. See also: 'Descendant'.</dd>
+<dt>Bookmark</dt>
+<dd><p class="first">Bookmarks are pointers to certain commits that move when
+committing. They are similar to tags in that it is possible to use
+bookmark names in all places where Mercurial expects a changeset
+ID, e.g., with <a class="reference external" href="hg-update.html"><tt class="docutils literal">hg update</tt></a>. Unlike tags, bookmarks move along
+when you make a commit.</p>
+<p class="last">Bookmarks can be renamed, copied and deleted. Bookmarks are local,
+unless they are explicitly pushed or pulled between repositories.
+Pushing and pulling bookmarks allow you to collaborate with others
+on a branch without creating a named branch.</p>
+</dd>
+<dt>Branch</dt>
+<dd><p class="first">(Noun) A child changeset that has been created from a parent that
+is not a head. These are known as topological branches, see
+'Branch, topological'. If a topological branch is named, it becomes
+a named branch. If a topological branch is not named, it becomes
+an anonymous branch. See 'Branch, anonymous' and 'Branch, named'.</p>
+<p>Branches may be created when changes are pulled from or pushed to
+a remote repository, since new heads may be created by these
+operations. Note that the term branch can also be used informally
+to describe a development process in which certain development is
+done independently of other development. This is sometimes done
+explicitly with a named branch, but it can also be done locally,
+using bookmarks or clones and anonymous branches.</p>
+<p>Example: &quot;The experimental branch.&quot;</p>
+<p>(Verb) The action of creating a child changeset which results in
+its parent having more than one child.</p>
+<p class="last">Example: &quot;I'm going to branch at X.&quot;</p>
+</dd>
+<dt>Branch, anonymous</dt>
+<dd>Every time a new child changeset is created from a parent that is not
+a head and the name of the branch is not changed, a new anonymous
+branch is created.</dd>
+<dt>Branch, closed</dt>
+<dd>A named branch whose branch heads have all been closed.</dd>
+<dt>Branch, default</dt>
+<dd>The branch assigned to a changeset when no name has previously been
+assigned.</dd>
+<dt>Branch head</dt>
+<dd>See 'Head, branch'.</dd>
+<dt>Branch, inactive</dt>
+<dd><p class="first">If a named branch has no topological heads, it is considered to be
+inactive. As an example, a feature branch becomes inactive when it
+is merged into the default branch. The <a class="reference external" href="hg-branches.html"><tt class="docutils literal">hg branches</tt></a> command
+shows inactive branches by default, though they can be hidden with
+<a class="reference external" href="hg-branches.html"><tt class="docutils literal">hg branches <span class="pre">--active</span></tt></a>.</p>
+<p class="last">NOTE: this concept is deprecated because it is too implicit.
+Branches should now be explicitly closed using <a class="reference external" href="hg-commit.html"><tt class="docutils literal">hg commit
+<span class="pre">--close-branch</span></tt></a> when they are no longer needed.</p>
+</dd>
+<dt>Branch, named</dt>
+<dd><p class="first">A collection of changesets which have the same branch name. By
+default, children of a changeset in a named branch belong to the
+same named branch. A child can be explicitly assigned to a
+different branch. See <a class="reference external" href="hg-branch.html"><tt class="docutils literal">hg help branch</tt></a>, <a class="reference external" href="hg-branches.html"><tt class="docutils literal">hg help branches</tt></a> and
+<a class="reference external" href="hg-commit.html"><tt class="docutils literal">hg commit <span class="pre">--close-branch</span></tt></a> for more information on managing
+branches.</p>
+<p class="last">Named branches can be thought of as a kind of namespace, dividing
+the collection of changesets that comprise the repository into a
+collection of disjoint subsets. A named branch is not necessarily
+a topological branch. If a new named branch is created from the
+head of another named branch, or the default branch, but no
+further changesets are added to that previous branch, then that
+previous branch will be a branch in name only.</p>
+</dd>
+<dt>Branch tip</dt>
+<dd>See 'Tip, branch'.</dd>
+<dt>Branch, topological</dt>
+<dd>Every time a new child changeset is created from a parent that is
+not a head, a new topological branch is created. If a topological
+branch is named, it becomes a named branch. If a topological
+branch is not named, it becomes an anonymous branch of the
+current, possibly default, branch.</dd>
+<dt>Changelog</dt>
+<dd>A record of the changesets in the order in which they were added
+to the repository. This includes details such as changeset id,
+author, commit message, date, and list of changed files.</dd>
+<dt>Changeset</dt>
+<dd>A snapshot of the state of the repository used to record a change.</dd>
+<dt>Changeset, child</dt>
+<dd>The converse of parent changeset: if P is a parent of C, then C is
+a child of P. There is no limit to the number of children that a
+changeset may have.</dd>
+<dt>Changeset id</dt>
+<dd>A SHA-1 hash that uniquely identifies a changeset. It may be
+represented as either a &quot;long&quot; 40 hexadecimal digit string, or a
+&quot;short&quot; 12 hexadecimal digit string.</dd>
+<dt>Changeset, merge</dt>
+<dd>A changeset with two parents. This occurs when a merge is
+committed.</dd>
+<dt>Changeset, parent</dt>
+<dd>A revision upon which a child changeset is based. Specifically, a
+parent changeset of a changeset C is a changeset whose node
+immediately precedes C in the DAG. Changesets have at most two
+parents.</dd>
+<dt>Checkout</dt>
+<dd><p class="first">(Noun) The working directory being updated to a specific
+revision. This use should probably be avoided where possible, as
+changeset is much more appropriate than checkout in this context.</p>
+<p>Example: &quot;I'm using checkout X.&quot;</p>
+<p>(Verb) Updating the working directory to a specific changeset. See
+<a class="reference external" href="hg-update.html"><tt class="docutils literal">hg help update</tt></a>.</p>
+<p class="last">Example: &quot;I'm going to check out changeset X.&quot;</p>
+</dd>
+<dt>Child changeset</dt>
+<dd>See 'Changeset, child'.</dd>
+<dt>Close changeset</dt>
+<dd>See 'Head, closed branch'.</dd>
+<dt>Closed branch</dt>
+<dd>See 'Branch, closed'.</dd>
+<dt>Clone</dt>
+<dd><p class="first">(Noun) An entire or partial copy of a repository. The partial
+clone must be in the form of a revision and its ancestors.</p>
+<p>Example: &quot;Is your clone up to date?&quot;</p>
+<p>(Verb) The process of creating a clone, using <a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone</tt></a>.</p>
+<p class="last">Example: &quot;I'm going to clone the repository.&quot;</p>
+</dd>
+<dt>Closed branch head</dt>
+<dd>See 'Head, closed branch'.</dd>
+<dt>Commit</dt>
+<dd><p class="first">(Noun) A synonym for changeset.</p>
+<p>Example: &quot;Is the bug fixed in your recent commit?&quot;</p>
+<p>(Verb) The act of recording changes to a repository. When files
+are committed in a working directory, Mercurial finds the
+differences between the committed files and their parent
+changeset, creating a new changeset in the repository.</p>
+<p class="last">Example: &quot;You should commit those changes now.&quot;</p>
+</dd>
+<dt>Cset</dt>
+<dd>A common abbreviation of the term changeset.</dd>
+<dt>DAG</dt>
+<dd>The repository of changesets of a distributed version control
+system (DVCS) can be described as a directed acyclic graph (DAG),
+consisting of nodes and edges, where nodes correspond to
+changesets and edges imply a parent -&gt; child relation. This graph
+can be visualized by graphical tools such as <a class="reference external" href="hg-log.html"><tt class="docutils literal">hg log <span class="pre">--graph</span></tt></a>. In
+Mercurial, the DAG is limited by the requirement for children to
+have at most two parents.</dd>
+<dt>Deprecated</dt>
+<dd>Feature removed from documentation, but not scheduled for removal.</dd>
+<dt>Default branch</dt>
+<dd>See 'Branch, default'.</dd>
+<dt>Descendant</dt>
+<dd>Any changeset that can be reached by a chain of child changesets
+from a given changeset. More precisely, the descendants of a
+changeset can be defined by two properties: the child of a
+changeset is a descendant, and the child of a descendant is a
+descendant. See also: 'Ancestor'.</dd>
+<dt>Diff</dt>
+<dd><p class="first">(Noun) The difference between the contents and attributes of files
+in two changesets or a changeset and the current working
+directory. The difference is usually represented in a standard
+form called a &quot;diff&quot; or &quot;patch&quot;. The &quot;git diff&quot; format is used
+when the changes include copies, renames, or changes to file
+attributes, none of which can be represented/handled by classic
+&quot;diff&quot; and &quot;patch&quot;.</p>
+<p>Example: &quot;Did you see my correction in the diff?&quot;</p>
+<p>(Verb) Diffing two changesets is the action of creating a diff or
+patch.</p>
+<p class="last">Example: &quot;If you diff with changeset X, you will see what I mean.&quot;</p>
+</dd>
+<dt>Directory, working</dt>
+<dd>The working directory represents the state of the files tracked by
+Mercurial, that will be recorded in the next commit. The working
+directory initially corresponds to the snapshot at an existing
+changeset, known as the parent of the working directory. See
+'Parent, working directory'. The state may be modified by changes
+to the files introduced manually or by a merge. The repository
+metadata exists in the .hg directory inside the working directory.</dd>
+<dt>Draft</dt>
+<dd>Changesets in the draft phase have not been shared with publishing
+repositories and may thus be safely changed by history-modifying
+extensions. See <a class="reference external" href="topic-phases.html"><tt class="docutils literal">hg help phases</tt></a>.</dd>
+<dt>Experimental</dt>
+<dd>Feature that may change or be removed at a later date.</dd>
+<dt>Graph</dt>
+<dd>See DAG and <a class="reference external" href="hg-log.html"><tt class="docutils literal">hg log <span class="pre">--graph</span></tt></a>.</dd>
+<dt>Head</dt>
+<dd><p class="first">The term 'head' may be used to refer to both a branch head or a
+repository head, depending on the context. See 'Head, branch' and
+'Head, repository' for specific definitions.</p>
+<p class="last">Heads are where development generally takes place and are the
+usual targets for update and merge operations.</p>
+</dd>
+<dt>Head, branch</dt>
+<dd>A changeset with no descendants on the same named branch.</dd>
+<dt>Head, closed branch</dt>
+<dd><p class="first">A changeset that marks a head as no longer interesting. The closed
+head is no longer listed by <a class="reference external" href="hg-heads.html"><tt class="docutils literal">hg heads</tt></a>. A branch is considered
+closed when all its heads are closed and consequently is not
+listed by <a class="reference external" href="hg-branches.html"><tt class="docutils literal">hg branches</tt></a>.</p>
+<p class="last">Closed heads can be re-opened by committing new changeset as the
+child of the changeset that marks a head as closed.</p>
+</dd>
+<dt>Head, repository</dt>
+<dd>A topological head which has not been closed.</dd>
+<dt>Head, topological</dt>
+<dd>A changeset with no children in the repository.</dd>
+<dt>History, immutable</dt>
+<dd>Once committed, changesets cannot be altered.  Extensions which
+appear to change history actually create new changesets that
+replace existing ones, and then destroy the old changesets. Doing
+so in public repositories can result in old changesets being
+reintroduced to the repository.</dd>
+<dt>History, rewriting</dt>
+<dd>The changesets in a repository are immutable. However, extensions
+to Mercurial can be used to alter the repository, usually in such
+a way as to preserve changeset contents.</dd>
+<dt>Immutable history</dt>
+<dd>See 'History, immutable'.</dd>
+<dt>Merge changeset</dt>
+<dd>See 'Changeset, merge'.</dd>
+<dt>Manifest</dt>
+<dd>Each changeset has a manifest, which is the list of files that are
+tracked by the changeset.</dd>
+<dt>Merge</dt>
+<dd>Used to bring together divergent branches of work. When you update
+to a changeset and then merge another changeset, you bring the
+history of the latter changeset into your working directory. Once
+conflicts are resolved (and marked), this merge may be committed
+as a merge changeset, bringing two branches together in the DAG.</dd>
+<dt>Named branch</dt>
+<dd>See 'Branch, named'.</dd>
+<dt>Null changeset</dt>
+<dd>The empty changeset. It is the parent state of newly-initialized
+repositories and repositories with no checked out revision. It is
+thus the parent of root changesets and the effective ancestor when
+merging unrelated changesets. Can be specified by the alias 'null'
+or by the changeset ID '000000000000'.</dd>
+<dt>Parent</dt>
+<dd>See 'Changeset, parent'.</dd>
+<dt>Parent changeset</dt>
+<dd>See 'Changeset, parent'.</dd>
+<dt>Parent, working directory</dt>
+<dd>The working directory parent reflects a virtual revision which is
+the child of the changeset (or two changesets with an uncommitted
+merge) shown by <a class="reference external" href="hg-parents.html"><tt class="docutils literal">hg parents</tt></a>. This is changed with
+<a class="reference external" href="hg-update.html"><tt class="docutils literal">hg update</tt></a>. Other commands to see the working directory parent
+are <a class="reference external" href="hg-summary.html"><tt class="docutils literal">hg summary</tt></a> and <a class="reference external" href="hg-id.html"><tt class="docutils literal">hg id</tt></a>. Can be specified by the alias &quot;.&quot;.</dd>
+<dt>Patch</dt>
+<dd><p class="first">(Noun) The product of a diff operation.</p>
+<p>Example: &quot;I've sent you my patch.&quot;</p>
+<p>(Verb) The process of using a patch file to transform one
+changeset into another.</p>
+<p class="last">Example: &quot;You will need to patch that revision.&quot;</p>
+</dd>
+<dt>Phase</dt>
+<dd>A per-changeset state tracking how the changeset has been or
+should be shared. See <a class="reference external" href="topic-phases.html"><tt class="docutils literal">hg help phases</tt></a>.</dd>
+<dt>Public</dt>
+<dd>Changesets in the public phase have been shared with publishing
+repositories and are therefore considered immutable. See <a class="reference external" href="topic-phases.html"><tt class="docutils literal">hg help
+phases</tt></a>.</dd>
+<dt>Pull</dt>
+<dd>An operation in which changesets in a remote repository which are
+not in the local repository are brought into the local
+repository. Note that this operation without special arguments
+only updates the repository, it does not update the files in the
+working directory. See <a class="reference external" href="hg-pull.html"><tt class="docutils literal">hg help pull</tt></a>.</dd>
+<dt>Push</dt>
+<dd>An operation in which changesets in a local repository which are
+not in a remote repository are sent to the remote repository. Note
+that this operation only adds changesets which have been committed
+locally to the remote repository. Uncommitted changes are not
+sent. See <a class="reference external" href="hg-push.html"><tt class="docutils literal">hg help push</tt></a>.</dd>
+<dt>Repository</dt>
+<dd>The metadata describing all recorded states of a collection of
+files. Each recorded state is represented by a changeset. A
+repository is usually (but not always) found in the <tt class="docutils literal">.hg</tt>
+subdirectory of a working directory. Any recorded state can be
+recreated by &quot;updating&quot; a working directory to a specific
+changeset.</dd>
+<dt>Repository head</dt>
+<dd>See 'Head, repository'.</dd>
+<dt>Revision</dt>
+<dd>A state of the repository at some point in time. Earlier revisions
+can be updated to by using <a class="reference external" href="hg-update.html"><tt class="docutils literal">hg update</tt></a>.  See also 'Revision
+number'; See also 'Changeset'.</dd>
+<dt>Revision number</dt>
+<dd>This integer uniquely identifies a changeset in a specific
+repository. It represents the order in which changesets were added
+to a repository, starting with revision number 0. Note that the
+revision number may be different in each clone of a repository. To
+identify changesets uniquely between different clones, see
+'Changeset id'.</dd>
+<dt>Revlog</dt>
+<dd>History storage mechanism used by Mercurial. It is a form of delta
+encoding, with occasional full revision of data followed by delta
+of each successive revision. It includes data and an index
+pointing to the data.</dd>
+<dt>Rewriting history</dt>
+<dd>See 'History, rewriting'.</dd>
+<dt>Root</dt>
+<dd>A changeset that has only the null changeset as its parent. Most
+repositories have only a single root changeset.</dd>
+<dt>Secret</dt>
+<dd>Changesets in the secret phase may not be shared via push, pull,
+or clone. See <a class="reference external" href="topic-phases.html"><tt class="docutils literal">hg help phases</tt></a>.</dd>
+<dt>Tag</dt>
+<dd>An alternative name given to a changeset. Tags can be used in all
+places where Mercurial expects a changeset ID, e.g., with
+<a class="reference external" href="hg-update.html"><tt class="docutils literal">hg update</tt></a>. The creation of a tag is stored in the history and
+will thus automatically be shared with other using push and pull.</dd>
+<dt>Tip</dt>
+<dd>The changeset with the highest revision number. It is the changeset
+most recently added in a repository.</dd>
+<dt>Tip, branch</dt>
+<dd>The head of a given branch with the highest revision number. When
+a branch name is used as a revision identifier, it refers to the
+branch tip. See also 'Branch, head'. Note that because revision
+numbers may be different in different repository clones, the
+branch tip may be different in different cloned repositories.</dd>
+<dt>Update</dt>
+<dd><p class="first">(Noun) Another synonym of changeset.</p>
+<p>Example: &quot;I've pushed an update.&quot;</p>
+<p>(Verb) This term is usually used to describe updating the state of
+the working directory to that of a specific changeset. See
+<a class="reference external" href="hg-update.html"><tt class="docutils literal">hg help update</tt></a>.</p>
+<p class="last">Example: &quot;You should update.&quot;</p>
+</dd>
+<dt>Working directory</dt>
+<dd>See 'Directory, working'.</dd>
+<dt>Working directory parent</dt>
+<dd>See 'Parent, working directory'.</dd>
+</dl>
+</div>
+</body>
+</html>

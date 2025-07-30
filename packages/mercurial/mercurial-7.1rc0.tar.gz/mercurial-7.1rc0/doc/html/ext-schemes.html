@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>schemes</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="schemes">
+<span id="ext-schemes"></span>
+<h1 class="title">schemes</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a></li>
+</ul>
+</div>
+<p>extend schemes with shortcuts to repository swarms</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension allows you to specify shortcuts for parent URLs with a
+lot of repositories to act like a scheme, for example:</p>
+<pre class="literal-block">
+[schemes]
+py = http://code.python.org/hg/
+</pre>
+<p>After that you can use it like:</p>
+<pre class="literal-block">
+hg clone py://trunk/
+</pre>
+<p>Additionally there is support for some more complex schemas, for
+example used by Google Code:</p>
+<pre class="literal-block">
+[schemes]
+gcode = http://{1}.googlecode.com/hg/
+</pre>
+<p>The syntax is taken from Mercurial templates, and you have unlimited
+number of variables, starting with <tt class="docutils literal">{1}</tt> and continuing with
+<tt class="docutils literal">{2}</tt>, <tt class="docutils literal">{3}</tt> and so on. This variables will receive parts of URL
+supplied, split by <tt class="docutils literal">/</tt>. Anything not specified as <tt class="docutils literal">{part}</tt> will be
+just appended to an URL.</p>
+<p>For convenience, the extension adds these schemes by default:</p>
+<pre class="literal-block">
+[schemes]
+py = http://hg.python.org/
+bb = https://bitbucket.org/
+bb+ssh = ssh://hg&#64;bitbucket.org/
+gcode = https://{1}.googlecode.com/hg/
+kiln = https://{1}.kilnhg.com/Repo/
+</pre>
+<p>You can override a predefined scheme by defining a new scheme with the
+same name.</p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+</div>
+</div>
+</body>
+</html>

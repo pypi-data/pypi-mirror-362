@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg backout</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-backout">
+<span id="hg-backout-1"></span>
+<h1 class="title">hg backout</h1>
+<h2 class="subtitle" id="reverse-effect-of-earlier-changeset">reverse effect of earlier changeset</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg backout [OPTION]... [-r] REV
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Prepare a new changeset with the effect of REV undone in the
+current working directory. If no conflicts were encountered,
+it will be committed immediately.</p>
+<p>If REV is the parent of the working directory, then this new changeset
+is committed automatically (unless --no-commit is specified).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference external" href="hg-backout.html"><tt class="docutils literal">hg backout</tt></a> cannot be used to fix either an unwanted or
+incorrect merge.</p>
+</div>
+<div class="verbose docutils container">
+<p>Examples:</p>
+<ul>
+<li><p class="first">Reverse the effect of the parent of the working directory.
+This backout will be committed immediately:</p>
+<pre class="literal-block">
+hg backout -r .
+</pre>
+</li>
+<li><p class="first">Reverse the effect of previous bad revision 23:</p>
+<pre class="literal-block">
+hg backout -r 23
+</pre>
+</li>
+<li><p class="first">Reverse the effect of previous bad revision 23 and
+leave changes uncommitted:</p>
+<pre class="literal-block">
+hg backout -r 23 --no-commit
+hg commit -m &quot;Backout revision 23&quot;
+</pre>
+</li>
+</ul>
+<p>By default, the pending changeset will have one parent,
+maintaining a linear history. With --merge, the pending
+changeset will instead have two parents: the old parent of the
+working directory and a new child of REV that simply undoes REV.</p>
+<p>Before version 1.7, the behavior without --merge was equivalent
+to specifying --merge followed by <a class="reference external" href="hg-update.html"><tt class="docutils literal">hg update <span class="pre">--clean</span> .</tt></a> to
+cancel the merge and leave the child of REV as a head to be
+merged separately.</p>
+</div>
+<p>See <a class="reference external" href="topic-dates.html"><tt class="docutils literal">hg help dates</tt></a> for a list of formats valid for -d/--date.</p>
+<p>See <a class="reference external" href="hg-revert.html"><tt class="docutils literal">hg help revert</tt></a> for a way to restore files to the state
+of another revision.</p>
+<p>Returns 0 on success, 1 if nothing to backout or there are unresolved
+files.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--merge</span></kbd></td>
+<td>merge with old dirstate parent after backout</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--commit</span></kbd></td>
+<td>commit if no conflicts were encountered (DEPRECATED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--no-commit</span></kbd></td>
+<td>do not commit</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--parent <var>&lt;REV&gt;</var></span></kbd></td>
+<td>parent to choose when backing out merge (DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revision to backout</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-t</span>, <span class="option">--tool <var>&lt;TOOL&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify merge tool</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as commit message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read commit message from file</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the specified date as commit date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-u</span>, <span class="option">--user <var>&lt;USER&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the specified user as committer</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

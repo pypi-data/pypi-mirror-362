@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg archive</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-archive">
+<span id="hg-archive-1"></span>
+<h1 class="title">hg archive</h1>
+<h2 class="subtitle" id="create-an-unversioned-archive-of-a-repository-revision">create an unversioned archive of a repository revision</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg archive [OPTION]... DEST
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>By default, the revision used is the parent of the working
+directory; use -r/--rev to specify a different revision.</p>
+<p>The archive type is automatically detected based on file
+extension (to override, use -t/--type).</p>
+<div class="verbose docutils container">
+<p>Examples:</p>
+<ul>
+<li><p class="first">create a zip file containing the 1.0 release:</p>
+<pre class="literal-block">
+hg archive -r 1.0 project-1.0.zip
+</pre>
+</li>
+<li><p class="first">create a tarball excluding .hg files:</p>
+<pre class="literal-block">
+hg archive project.tar.gz -X &quot;.hg*&quot;
+</pre>
+</li>
+</ul>
+</div>
+<p>Valid types are:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">files</tt>:</th><td class="field-body">a directory full of files (default)</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">tar</tt>:</th><td class="field-body">tar archive, uncompressed</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">tbz2</tt>:</th><td class="field-body">tar archive, compressed using bzip2</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">tgz</tt>:</th><td class="field-body">tar archive, compressed using gzip</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">txz</tt>:</th><td class="field-body">tar archive, compressed using lzma (only in Python 3)</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">uzip</tt>:</th><td class="field-body">zip archive, uncompressed</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">zip</tt>:</th><td class="field-body">zip archive, compressed using deflate</td>
+</tr>
+</tbody>
+</table>
+<p>The exact name of the destination archive or directory is given
+using a format string; see <a class="reference external" href="hg-export.html"><tt class="docutils literal">hg help export</tt></a> for details.</p>
+<p>Each member added to an archive file has a directory prefix
+prepended. Use -p/--prefix to specify a format string for the
+prefix. The default is the basename of the archive, with suffixes
+removed.</p>
+<p>Returns 0 on success.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--no-decode</span></kbd></td>
+<td>do not pass files through decoders</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-p</span>, <span class="option">--prefix <var>&lt;PREFIX&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>directory prefix for files in archive</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revision to distribute</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-t</span>, <span class="option">--type <var>&lt;TYPE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>type of distribution to create</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-S</span>, <span class="option">--subrepos</span></kbd></td>
+<td>recurse into subrepositories</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

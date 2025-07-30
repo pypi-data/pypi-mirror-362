@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg outgoing</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-outgoing">
+<span id="hg-outgoing-1"></span>
+<h1 class="title">hg outgoing</h1>
+<h2 class="subtitle" id="show-changesets-not-found-in-the-destination">show changesets not found in the destination</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-4">Aliases</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg outgoing [-M] [-p] [-n] [-f] [-r REV]... [DEST]...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Show changesets not found in the specified destination repository
+or the default push location. These are the changesets that would
+be pushed if a push was requested.</p>
+<p>See pull for details of valid destination formats.</p>
+<div class="verbose docutils container">
+<p>With -B/--bookmarks, the result of bookmark comparison between
+local and remote repositories is displayed. With -v/--verbose,
+status is also displayed for each bookmark like below:</p>
+<pre class="literal-block">
+BM1               01234567890a added
+BM2                            deleted
+BM3               234567890abc advanced
+BM4               34567890abcd diverged
+BM5               4567890abcde changed
+</pre>
+<p>The action taken when pushing depends on the
+status of each bookmark:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">added</tt>:</th><td class="field-body">push with <tt class="docutils literal"><span class="pre">-B</span></tt> will create it</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">deleted</tt>:</th><td class="field-body">push with <tt class="docutils literal"><span class="pre">-B</span></tt> will delete it</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">advanced</tt>:</th><td class="field-body">push will update it</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">diverged</tt>:</th><td class="field-body">push with <tt class="docutils literal"><span class="pre">-B</span></tt> will update it</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">changed</tt>:</th><td class="field-body">push with <tt class="docutils literal"><span class="pre">-B</span></tt> will update it</td>
+</tr>
+</tbody>
+</table>
+<p>From the point of view of pushing behavior, bookmarks
+existing only in the remote repository are treated as
+<tt class="docutils literal">deleted</tt>, even if it is in fact added remotely.</p>
+</div>
+<p>Returns 0 if there are outgoing changes, 1 otherwise.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>run even when the destination is unrelated</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>a changeset intended to be included in the destination</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--newest-first</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show newest record first</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--bookmarks</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>compare bookmarks</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--branch <var>&lt;BRANCH[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>a specific branch you would like to push</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-p</span>, <span class="option">--patch</span></kbd></td>
+<td>show patch</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--git</span></kbd></td>
+<td>use git extended diff format</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--limit <var>&lt;NUM&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>limit number of changes displayed</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-M</span>, <span class="option">--no-merges</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>do not show merges</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stat</span></kbd></td>
+<td>output diffstat-style summary of changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-G</span>, <span class="option">--graph</span></kbd></td>
+<td>show the revision DAG</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--style <var>&lt;STYLE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display using template map file (DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-S</span>, <span class="option">--subrepos</span></kbd></td>
+<td>recurse into subrepositories</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<pre class="literal-block">
+out
+</pre>
+</div>
+</div>
+</body>
+</html>

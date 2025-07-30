@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg identify</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-identify">
+<span id="hg-identify-1"></span>
+<h1 class="title">hg identify</h1>
+<h2 class="subtitle" id="identify-the-working-directory-or-specified-revision">identify the working directory or specified revision</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-4">Aliases</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg identify [-nibtB] [-r REV] [SOURCE]
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Print a summary identifying the repository state at REV using one or
+two parent hash identifiers, followed by a &quot;+&quot; if the working
+directory has uncommitted changes, the branch name (if not default),
+a list of tags, and a list of bookmarks.</p>
+<p>When REV is not given, print a summary of the current state of the
+repository including the working directory. Specify -r. to get information
+of the working directory parent without scanning uncommitted changes.</p>
+<p>Specifying a path to a repository root or Mercurial bundle will
+cause lookup to operate on that repository/bundle.</p>
+<div class="verbose docutils container">
+<p>Template:</p>
+<p>The following keywords are supported in addition to the common template
+keywords and functions. See also <a class="reference external" href="hg.1.html#templates"><tt class="docutils literal">hg help templates</tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">dirty:</th><td class="field-body">String. Character <tt class="docutils literal">+</tt> denoting if the working directory has
+uncommitted changes.</td>
+</tr>
+<tr class="field"><th class="field-name">id:</th><td class="field-body">String. One or two nodes, optionally followed by <tt class="docutils literal">+</tt>.</td>
+</tr>
+<tr class="field"><th class="field-name">parents:</th><td class="field-body">List of strings. Parent nodes of the changeset.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<ul>
+<li><p class="first">generate a build identifier for the working directory:</p>
+<pre class="literal-block">
+hg id --id &gt; build-id.dat
+</pre>
+</li>
+<li><p class="first">find the revision corresponding to a tag:</p>
+<pre class="literal-block">
+hg id -n -r 1.3
+</pre>
+</li>
+<li><p class="first">check the most recent revision of a remote repository:</p>
+<pre class="literal-block">
+hg id -r tip https://www.mercurial-scm.org/repo/hg/
+</pre>
+</li>
+</ul>
+</div>
+<p>See <a class="reference external" href="hg-log.html"><tt class="docutils literal">hg log</tt></a> for generating more information about specific revisions,
+including full hash identifiers.</p>
+<p>Returns 0 if successful.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>identify the specified revision</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--num</span></kbd></td>
+<td>show local revision number</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-i</span>, <span class="option">--id</span></kbd></td>
+<td>show global revision id</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-b</span>, <span class="option">--branch</span></kbd></td>
+<td>show branch</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-t</span>, <span class="option">--tags</span></kbd></td>
+<td>show tags</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--bookmarks</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show bookmarks</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<pre class="literal-block">
+id
+</pre>
+</div>
+</div>
+</body>
+</html>

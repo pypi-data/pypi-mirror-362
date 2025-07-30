@@ -1,0 +1,310 @@
+.TH HG LOG  "" "" ""
+.SH NAME
+hg log \- show revision history of entire repository or files
+.\" Man page generated from reStructuredText.
+.
+.SH SYNOPSIS
+.sp
+.nf
+.ft C
+hg log [OPTION]... [FILE]
+.ft P
+.fi
+.SH DESCRIPTION
+.sp
+Print the revision history of the specified files or the entire
+project.
+.sp
+If no revision range is specified, the default is \fBtip:0\fP unless
+\-\-follow is set.
+.sp
+File history is shown without following rename or copy history of
+files. Use \-f/\-\-follow with a filename to follow history across
+renames and copies. \-\-follow without a filename will only show
+ancestors of the starting revisions. The starting revisions can be
+specified by \-r/\-\-rev, which default to the working directory parent.
+.sp
+By default this command prints revision number and changeset id,
+tags, non\-trivial parents, user, date and time, and a summary for
+each commit. When the \-v/\-\-verbose switch is used, the list of
+changed files and full commit message are shown.
+.sp
+With \-\-graph the revisions are shown as an ASCII art DAG with the most
+recent changeset at the top.
+\(aqo\(aq is a changeset, \(aq@\(aq is a working directory parent, \(aq%\(aq is a changeset
+involved in an unresolved merge conflict, \(aq_\(aq closes a branch,
+\(aqx\(aq is obsolete, \(aq*\(aq is unstable, and \(aq+\(aq represents a fork where the
+changeset from the lines below is a parent of the \(aqo\(aq merge on the same
+line.
+Paths in the DAG are represented with \(aq|\(aq, \(aq/\(aq and so forth. \(aq:\(aq in place
+of a \(aq|\(aq indicates one or more revisions in a path are omitted.
+.sp
+Use \-L/\-\-line\-range FILE,M:N options to follow the history of lines
+from M to N in FILE. With \-p/\-\-patch only diff hunks affecting
+specified line range will be shown. This option requires \-\-follow;
+it can be specified multiple times. Currently, this option is not
+compatible with \-\-graph. This option is experimental.
+.IP Note
+.
+\%\fBhg log \-\-patch\fP\: may generate unexpected diff output for merge
+changesets, as it will only compare the merge changeset against
+its first parent. Also, only files different from BOTH parents
+will appear in files:.
+.RE
+.IP Note
+.
+For performance reasons, \%\fBhg log FILE\fP\: may omit duplicate changes
+made on branches and will not show removals or mode changes. To
+see all such changes, use the \-\-removed switch.
+.RE
+.IP Note
+.
+The history resulting from \-L/\-\-line\-range options depends on diff
+options; for instance if white\-spaces are ignored, respective changes
+with only white\-spaces in specified line range will not be listed.
+.RE
+.sp
+Some examples:
+.INDENT 0.0
+.IP \(bu 2
+.
+changesets with full descriptions and file lists:
+.sp
+.nf
+.ft C
+hg log \-v
+.ft P
+.fi
+.IP \(bu 2
+.
+changesets ancestral to the working directory:
+.sp
+.nf
+.ft C
+hg log \-f
+.ft P
+.fi
+.IP \(bu 2
+.
+last 10 commits on the current branch:
+.sp
+.nf
+.ft C
+hg log \-l 10 \-b .
+.ft P
+.fi
+.IP \(bu 2
+.
+changesets showing all modifications of a file, including removals:
+.sp
+.nf
+.ft C
+hg log \-\-removed file.c
+.ft P
+.fi
+.IP \(bu 2
+.
+all changesets that touch a directory, with diffs, excluding merges:
+.sp
+.nf
+.ft C
+hg log \-Mp lib/
+.ft P
+.fi
+.IP \(bu 2
+.
+all revision numbers that match a keyword:
+.sp
+.nf
+.ft C
+hg log \-k bug \-\-template "{rev}\en"
+.ft P
+.fi
+.IP \(bu 2
+.
+the full hash identifier of the working directory parent:
+.sp
+.nf
+.ft C
+hg log \-r . \-\-template "{node}\en"
+.ft P
+.fi
+.IP \(bu 2
+.
+list available log templates:
+.sp
+.nf
+.ft C
+hg log \-T list
+.ft P
+.fi
+.IP \(bu 2
+.
+check if a given changeset is included in a tagged release:
+.sp
+.nf
+.ft C
+hg log \-r "a21ccf and ancestor(1.9)"
+.ft P
+.fi
+.IP \(bu 2
+.
+find all changesets by some user in a date range:
+.sp
+.nf
+.ft C
+hg log \-k alice \-d "may 2008 to jul 2008"
+.ft P
+.fi
+.IP \(bu 2
+.
+summary of all changesets after the last tag:
+.sp
+.nf
+.ft C
+hg log \-r "last(tagged())::" \-\-template "{desc|firstline}\en"
+.ft P
+.fi
+.IP \(bu 2
+.
+changesets touching lines 13 to 23 for file.c:
+.sp
+.nf
+.ft C
+hg log \-L file.c,13:23
+.ft P
+.fi
+.IP \(bu 2
+.
+changesets touching lines 13 to 23 for file.c and lines 2 to 6 of
+main.c with patch:
+.sp
+.nf
+.ft C
+hg log \-L file.c,13:23 \-L main.c,2:6 \-p
+.ft P
+.fi
+.UNINDENT
+.sp
+See \%\fBhg help dates\fP\: for a list of formats valid for \-d/\-\-date.
+.sp
+See \%\fBhg help revisions\fP\: for more about specifying and ordering
+revisions.
+.sp
+See \%\fBhg help templates\fP\: for more about pre\-packaged styles and
+specifying custom templates. The default template used by the log
+command can be customized via the \fBcommand\-templates.log\fP configuration
+setting.
+.sp
+Returns 0 on success.
+.SH OPTIONS
+.INDENT 0.0
+.TP
+.B \-f,  \-\-follow
+.
+follow changeset history, or file history across copies and renames
+.TP
+.B \-\-follow\-first
+.
+only follow the first parent of merge changesets (DEPRECATED)
+.TP
+.BI \-d,  \-\-date \ <DATE>
+.
+show revisions matching date spec
+.TP
+.B \-C,  \-\-copies
+.
+show copied files
+.TP
+.BI \-k,  \-\-keyword \ <TEXT[+]>
+.
+do case\-insensitive search for a given text
+.TP
+.BI \-r,  \-\-rev \ <REV[+]>
+.
+revisions to select or follow from
+.TP
+.BI \-L,  \-\-line\-range \ <FILE,RANGE[+]>
+.
+follow line range of specified file (EXPERIMENTAL)
+.TP
+.B \-\-removed
+.
+include revisions where files were removed
+.TP
+.B \-m,  \-\-only\-merges
+.
+show only merges (DEPRECATED) (use \-r "merge()" instead)
+.TP
+.BI \-u,  \-\-user \ <USER[+]>
+.
+revisions committed by user
+.TP
+.BI \-\-only\-branch \ <BRANCH[+]>
+.
+show only changesets within the given named branch (DEPRECATED)
+.TP
+.BI \-b,  \-\-branch \ <BRANCH[+]>
+.
+show changesets within the given named branch
+.TP
+.BI \-B,  \-\-bookmark \ <BOOKMARK[+]>
+.
+show changesets within the given bookmark
+.TP
+.BI \-P,  \-\-prune \ <REV[+]>
+.
+do not display revision or any of its ancestors
+.TP
+.B \-p,  \-\-patch
+.
+show patch
+.TP
+.B \-g,  \-\-git
+.
+use git extended diff format
+.TP
+.BI \-l,  \-\-limit \ <NUM>
+.
+limit number of changes displayed
+.TP
+.B \-M,  \-\-no\-merges
+.
+do not show merges
+.TP
+.B \-\-stat
+.
+output diffstat\-style summary of changes
+.TP
+.B \-G,  \-\-graph
+.
+show the revision DAG
+.TP
+.BI \-\-style \ <STYLE>
+.
+display using template map file (DEPRECATED)
+.TP
+.BI \-T,  \-\-template \ <TEMPLATE>
+.
+display with template
+.TP
+.BI \-I,  \-\-include \ <PATTERN[+]>
+.
+include names matching the given patterns
+.TP
+.BI \-X,  \-\-exclude \ <PATTERN[+]>
+.
+exclude names matching the given patterns
+.UNINDENT
+.sp
+[+] marked option can be specified multiple times
+.SH ALIASES
+.sp
+.nf
+.ft C
+history
+.ft P
+.fi
+.\" Generated by docutils manpage writer.
+.\" 
+.
