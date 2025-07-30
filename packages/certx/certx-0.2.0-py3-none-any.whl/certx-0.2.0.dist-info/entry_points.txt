@@ -1,0 +1,17 @@
+[certx.database.migration_backend]
+sqlalchemy = certx.db.sqlalchemy.migration
+
+[certx.provider.key.gm]
+default = certx.provider.key.gm:DefaultSmKeyProvider
+openssl = certx.provider.x509.openssl:OpensslGmKeyProvider
+
+[certx.provider.x509.gm]
+default = certx.provider.x509.gm:DefaultCertificateProvider
+openssl = certx.provider.x509.openssl:OpensslGMCertificateProvider
+
+[console_scripts]
+certx-dbsync = certx.cmd.dbsync:main
+certx-server = certx.server:start
+
+[oslo.config.opts]
+certx = certx.conf.opts:list_opts
