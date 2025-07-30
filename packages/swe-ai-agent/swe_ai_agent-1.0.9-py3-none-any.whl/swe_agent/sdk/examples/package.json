@@ -1,0 +1,131 @@
+{
+  "name": "swe-agent-vscode",
+  "displayName": "SWE Agent",
+  "description": "Integrate SWE Agent into VS Code for intelligent code assistance",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:swe-agent.executeTask",
+    "onCommand:swe-agent.fixCode",
+    "onCommand:swe-agent.analyzeCode",
+    "onCommand:swe-agent.showStatus"
+  ],
+  "main": "./vscode_extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "swe-agent.executeTask",
+        "title": "Execute Task",
+        "category": "SWE Agent"
+      },
+      {
+        "command": "swe-agent.fixCode",
+        "title": "Fix Code",
+        "category": "SWE Agent"
+      },
+      {
+        "command": "swe-agent.analyzeCode",
+        "title": "Analyze Code",
+        "category": "SWE Agent"
+      },
+      {
+        "command": "swe-agent.showStatus",
+        "title": "Show Status",
+        "category": "SWE Agent"
+      },
+      {
+        "command": "swe-agent.fixThis",
+        "title": "SWE Agent: Fix This"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "swe-agent.fixThis",
+          "group": "1_modification"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "swe-agent.executeTask",
+          "when": "true"
+        },
+        {
+          "command": "swe-agent.fixCode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "swe-agent.analyzeCode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "swe-agent.showStatus",
+          "when": "true"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "swe-agent.executeTask",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s"
+      },
+      {
+        "command": "swe-agent.fixCode",
+        "key": "ctrl+shift+f",
+        "mac": "cmd+shift+f"
+      },
+      {
+        "command": "swe-agent.analyzeCode",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      }
+    ],
+    "configuration": {
+      "title": "SWE Agent",
+      "properties": {
+        "swe-agent.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Path to Python executable"
+        },
+        "swe-agent.sdkPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to SWE Agent SDK"
+        },
+        "swe-agent.timeout": {
+          "type": "number",
+          "default": 300,
+          "description": "Task timeout in seconds"
+        },
+        "swe-agent.usePlanner": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use planner agent for complex tasks"
+        },
+        "swe-agent.logLevel": {
+          "type": "string",
+          "default": "INFO",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR"],
+          "description": "Logging level"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node ./test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4"
+  }
+}
