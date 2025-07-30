@@ -1,0 +1,27 @@
+[project]
+name = "figma-to-compose-mcp"
+version = "1.1.1"
+description = "A Model Context Protocol (MCP) server for generating Jetpack Compose code from Figma nodes."
+authors = [
+    { name = "Manish Malviya", email = "manish026@live.com" }
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "build>=1.2.2.post1",
+    "fastmcp==2.6.1",
+    "mcp[cli]>=1.9.4",
+    "requests>=2.28.0",
+    "twine>=6.1.0",
+    "mixpanel"
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+"figma_compose" = ["*.txt"]
+
+[project.scripts]
+figma-to-compose-mcp = "figma_compose:main"
