@@ -1,0 +1,145 @@
+Metadata-Version: 2.4
+Name: gel
+Version: 4.0.0b1
+Summary: Official Gel Python Driver
+Author: Gel Contributors
+Author-email: "Gel Data Inc." <hello@geldata.com>
+License: Apache License, Version 2.0
+Project-URL: homepage, https://www.geldata.com
+Project-URL: source, https://github.com/geldata/gel-python
+Project-URL: documentation, https://docs.geldata.com/reference/clients/python
+Project-URL: issues, https://github.com/geldata/gel-python/issues
+Keywords: gel,edgedb,database,postgres
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Database :: Front-Ends
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10.0
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: certifi>=2021.5.30; platform_system == "Windows"
+Requires-Dist: pydantic<3.0.0,>=2.11.5
+Requires-Dist: typing-extensions>=4.14.0
+Requires-Dist: typing-inspection>=0.4.1
+Provides-Extra: test
+Requires-Dist: mypy>=1.17.0; extra == "test"
+Requires-Dist: pytest>=3.6.0; extra == "test"
+Requires-Dist: pyright>=1.1.400; extra == "test"
+Requires-Dist: ruff>=0.12.0; extra == "test"
+Requires-Dist: uvloop>=0.15.1; platform_system != "Windows" and extra == "test"
+Requires-Dist: fastapi; extra == "test"
+Requires-Dist: pyjwt; extra == "test"
+Requires-Dist: httpx; extra == "test"
+Provides-Extra: sqltest
+Requires-Dist: SQLAlchemy>=2.0.0; extra == "sqltest"
+Requires-Dist: sqlmodel>=0.0.22; extra == "sqltest"
+Requires-Dist: Django~=5.1.3; extra == "sqltest"
+Requires-Dist: psycopg2-binary>=2.9.10; extra == "sqltest"
+Provides-Extra: doc
+Requires-Dist: sphinx~=4.2.0; extra == "doc"
+Requires-Dist: sphinxcontrib-asyncio~=0.3.0; extra == "doc"
+Requires-Dist: sphinx_rtd_theme~=1.0.0; extra == "doc"
+Provides-Extra: ai
+Requires-Dist: httpx>=0.27.0; extra == "ai"
+Requires-Dist: httpx-sse~=0.4.0; extra == "ai"
+Provides-Extra: auth
+Requires-Dist: httpx>=0.27.0; extra == "auth"
+Provides-Extra: fastapi
+Requires-Dist: fastapi; extra == "fastapi"
+Requires-Dist: pyjwt; extra == "fastapi"
+Dynamic: license-file
+
+The Python driver for Gel
+=========================
+
+.. image:: https://github.com/geldata/gel-python/workflows/Tests/badge.svg?event=push&branch=master
+    :target: https://github.com/geldata/gel-python/actions
+
+.. image:: https://img.shields.io/pypi/v/gel.svg
+    :target: https://pypi.python.org/pypi/gel
+
+.. image:: https://img.shields.io/badge/join-github%20discussions-green
+    :target: https://github.com/geldata/gel/discussions
+
+
+**gel-python** is the official Gel driver for Python.
+It provides both blocking IO and asyncio implementations.
+
+The library requires Python 3.9 or later.
+
+
+Documentation
+-------------
+
+The project documentation can be found
+`here <https://docs.geldata.com/reference/clients/python#gel-python-intro>`_.
+
+
+Installation
+------------
+
+The library is available on PyPI.  Use ``pip`` to install it::
+
+    $ pip install gel
+
+
+Basic Usage
+-----------
+
+.. code-block:: python
+
+    import datetime
+    import gel
+
+    def main():
+        client = gel.create_client()
+        # Create a User object type
+        client.execute('''
+            CREATE TYPE User {
+                CREATE REQUIRED PROPERTY name -> str;
+                CREATE PROPERTY dob -> cal::local_date;
+            }
+        ''')
+
+        # Insert a new User object
+        client.query('''
+            INSERT User {
+                name := <str>$name,
+                dob := <cal::local_date>$dob
+            }
+        ''', name='Bob', dob=datetime.date(1984, 3, 1))
+
+        # Select User objects.
+        user_set = client.query(
+            'SELECT User {name, dob} FILTER .name = <str>$name', name='Bob')
+        # *user_set* now contains
+        # Set{Object{name := 'Bob', dob := datetime.date(1984, 3, 1)}}
+
+        # Close the client.
+        client.close()
+
+    if __name__ == '__main__':
+        main()
+
+Development
+-----------
+
+Instructions for installing Gel and gel-python locally can be found at
+`docs.geldata.com/resources/guides/contributing/code <https://docs.geldata.com/resources/guides/contributing/code>`_.
+
+To run the test suite, run ``$ python setup.py test``.
+
+License
+-------
+
+gel-python is developed and distributed under the Apache 2.0 license.
