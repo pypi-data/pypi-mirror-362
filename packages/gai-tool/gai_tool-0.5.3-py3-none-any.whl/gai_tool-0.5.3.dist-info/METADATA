@@ -1,0 +1,223 @@
+Metadata-Version: 2.3
+Name: gai-tool
+Version: 0.5.3
+Summary: AI-Powered Automation Tool for Git 🚀
+Author: Daniel Ratmiroff
+Author-email: danielratmiroff@pm.me
+Requires-Python: >=3.12,<4.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: appdirs (>=1.4.4,<2.0.0)
+Requires-Dist: build (>=1.2.2.post1,<2.0.0)
+Requires-Dist: codecov (>=2.1.13,<3.0.0)
+Requires-Dist: colorama (>=0.4.6,<0.5.0)
+Requires-Dist: groq (>=0.18.0,<0.19.0)
+Requires-Dist: huggingface-hub (>=0.29.1,<0.30.0)
+Requires-Dist: langchain-community (>=0.3.18,<0.4.0)
+Requires-Dist: langchain-core (>=0.3.37,<0.4.0)
+Requires-Dist: langchain-google-genai (>=2.0.10,<3.0.0)
+Requires-Dist: langchain-ollama (>=0.2.3,<0.3.0)
+Requires-Dist: ollama (>=0.4.7,<0.5.0)
+Requires-Dist: pick (>=2.4.0,<3.0.0)
+Requires-Dist: pygithub (>=2.6.1,<3.0.0)
+Requires-Dist: pytest (>=8.3.4,<9.0.0)
+Requires-Dist: pytest-cov (>=4.1.0,<5.0.0)
+Requires-Dist: python-gitlab (>=5.6.0,<6.0.0)
+Requires-Dist: requests (>=2.32.3,<3.0.0)
+Requires-Dist: rich (>=13.9.4,<14.0.0)
+Requires-Dist: tokenizers (>=0.21.0,<0.22.0)
+Requires-Dist: twine (>=6.1.0,<7.0.0)
+Requires-Dist: wheel (>=0.45.1,<0.46.0)
+Requires-Dist: zipp (>=3.21.0,<4.0.0)
+Project-URL: documentation, https://github.com/Danielratmiroff/gai#readme
+Project-URL: homepage, https://github.com/Danielratmiroff/gai
+Project-URL: issues, https://github.com/Danielratmiroff/gai/issues
+Project-URL: repository, https://github.com/Danielratmiroff/gai
+Description-Content-Type: text/markdown
+
+![codecov](https://codecov.io/gh/Danielratmiroff/gai/branch/master/graph/badge.svg)
+[![PyPI version](https://badge.fury.io/py/gai-tool.svg)](https://badge.fury.io/py/gai-tool)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+# Gai is a CLI Automation Tool for Git 🚀
+
+command-line application that automates git commit messages and merge requests using AI.
+
+![Demo](resources/video_demo.gif)
+
+## ✨ Features
+
+- Generate commit messages based on code diffs.
+- Create merge requests with AI-generated titles and descriptions.
+- Works with both GitHub and GitLab.
+
+## 📦 Installation
+
+Install gai-tool via pip:
+
+```bash
+pip install gai-tool
+```
+
+## 🚀 Getting Started
+
+1. **Set API Tokens as Environment Variables**:
+
+   ```bash
+   # Ensure you have your AI interface and GitHub/GitLab API tokens set:
+   export HUGGINGFACE_API_TOKEN='your_hf_api_token'    # If you want to use Hugging Face's API
+   export GITHUB_TOKEN='your_github_token'             # If using GitHub
+   export GITLAB_TOKEN='your_gitlab_token'             # If using GitLab
+   ```
+
+Supported interfaces:
+
+- Groq (GROQ_API_KEY)
+- Hugging Face (HUGGINGFACE_API_TOKEN)
+- Gemini (GEMINI_API_KEY or GOOGLE_API_KEY) -- Gemini takes precedence when both are set.
+- Ollama (OLLAMA_API_KEY)
+
+2. **Navigate to your git repository**:
+
+   ```bash
+   cd /path/to/your/git/repo
+   ```
+
+3. **Start Using gai-tool**:
+
+   ```bash
+   # Generate an AI-powered commit message:
+   gai commit -a
+   ```
+
+## ⚙️ Configuration
+
+Configuration file is located at `~/.config/gai/config.yaml`. Customize settings like the AI interface, temperature, and target branch.
+
+You can also initialize a local configuration file in your project directory:
+
+```bash
+gai init
+```
+
+This will create a `.gai.yaml` file in your current directory with your current settings. Local configuration takes precedence over global configuration.
+
+Example configuration:
+
+```yaml
+interface: huggingface
+temperature: 0.7
+target_branch: master
+```
+
+### Customizing AI Behavior
+
+You can customize the AI's behavior by editing the `your-project-name/.gai/gai-rules.md` file, which is created when you run `gai init`. These rules are injected into the AI's system prompt.
+
+For a detailed guide, see [Customizing AI Behavior with Rules](./docs/customizing-ai-rules.md).
+
+## 📖 Usage
+
+gai-tool provides two main commands: `commit` and `merge`.
+
+### 📝 Commit Messages
+
+Generate an commit message:
+
+```bash
+gai commit
+```
+
+Options:
+
+- `-a`, `--all`: Stage all changes before committing.
+- `-t`, `--temperature`: Override the temperature specified in the config.
+- `-i`, `--interface`: Specify and override the AI client API to use (`groq` or `huggingface`).
+
+**Example**:
+
+```bash
+# Simply
+gai commit -a
+# Or
+gai commit -a -i huggingface
+```
+
+### 🔀 Merge Requests
+
+Create a merge request:
+
+```bash
+gai merge
+```
+
+Options:
+
+- `[remote]`: Specify the remote git repository (default is `origin`).
+- `--push`, `-p`: Push changes to remote before creating a merge request.
+- `--target-branch`, `-tb`: Specify the target branch for the merge request (default is `master`).
+- `-t`, `--temperature`: Override the temperature specified in the config.
+- `-i`, `--interface`: Specify and override the AI client API to use (`groq` or `huggingface`).
+
+**Example**:
+
+```bash
+# Simply
+gai merge -p
+# Or
+gai merge origin --push --target-branch develop -interface groq
+```
+
+## 🛠 Build Instructions
+
+Build gai-tool from source:
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/Danielratmiroff/gai.git
+   ```
+
+2. **Navigate to the Project Directory**:
+
+   ```bash
+   cd gai
+   ```
+
+3. **Create a Virtual Environment (Optional but Recommended)**:
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use venv\Scripts\activate
+   ```
+
+4. **Install Build Tools and Dependencies**:
+
+   ```bash
+   pip install build
+   pip install -r requirements.txt
+   ```
+
+5. **Build the Package**:
+
+   ```bash
+   python -m build
+   ```
+
+   This will generate distribution files in the `dist/` directory.
+
+6. **Install the Built Package**:
+
+   ```bash
+   pip install dist/gai_tool-<VERSION>-py3-none-any.whl
+   ```
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+## 📄 License
+
+MIT License - [LICENSE](LICENSE).
+
