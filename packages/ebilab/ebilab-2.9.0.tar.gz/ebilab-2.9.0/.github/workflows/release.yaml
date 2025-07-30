@@ -1,0 +1,21 @@
+on:
+  release:
+    types:
+      - created
+
+permissions:
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - run: pip install setuptools wheel twine
+    - run: python setup.py sdist bdist_wheel
+    - uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: dist/
