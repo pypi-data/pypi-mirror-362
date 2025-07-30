@@ -1,0 +1,204 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "laser-measles"
+version = "0.7.1-dev0"
+
+dependencies = [
+  "laser-core>=0.5.1",
+  "diskcache>=5.6.3",
+  "appdirs>=1.4.4",
+  "pydantic>=2.11.5",
+  "pycountry>=24.6.1",
+  "requests>=2.32.3",
+  "alive-progress>=3.2.0",
+  "sciris>=3.2.1",
+  "polars>=1.30.0",
+  "pyarrow>=20.0.0",
+  "rastertoolkit>=0.3.11",
+  "typer>=0.12.0",
+  "patito>=0.8.3",
+]
+
+requires-python = ">= 3.10"
+
+authors = [
+  {name = "Christopher Lorton"},
+  {name = "Jonathan Bloedow"},
+  {name = "Katherine Rosenfeld"},
+  {name = "Kevin McCarthy"},
+]
+maintainers = [
+  {name = "Christopher Lorton"}
+]
+description = "Spatial models of measles implemented with the LASER toolkit."
+readme = "README.rst"
+license = "MIT"
+keywords = ["measles", "spatial", "modeling", "laser"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: Unix",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://example.com"
+Documentation = "https://laser-measles.readthedocs.io/en/latest/"
+Repository = "https://github.com/InstituteforDiseaseModeling/laser-measles.git"
+Issues = "https://github.com/InstituteforDiseaseModeling/laser-measles/issues"
+Changelog = "https://github.com/InstituteforDiseaseModeling/laser-measles/blob/master/CHANGELOG.md"
+
+[project.scripts]
+laser-measles = "laser_measles.cli:app"
+
+[tool.ruff]
+extend-exclude = ["static", "ci/templates", "docs/tutorials/not_ready/*", "docs/tutorials/convert_tutorials.py", "docs/tutorials/tut_*.py"]
+line-length = 140
+src = ["src", "tests"]
+target-version = "py312"
+
+[tool.ruff.lint.per-file-ignores]
+"ci/*" = ["S", "PLC0415"]
+
+[tool.ruff.lint]
+ignore = [
+    "RUF001", # ruff-specific rules ambiguous-unicode-character-string
+    "S101", # flake8-bandit assert
+    "S308", # flake8-bandit suspicious-mark-safe-usage
+    "S603", # flake8-bandit subprocess-without-shell-equals-true
+    "S607", # flake8-bandit start-process-with-partial-path
+    "E501", # pycodestyle line-too-long
+]
+select = [
+    "B", # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "DTZ", # flake8-datetimez
+    "E", # pycodestyle errors
+    "EXE", # flake8-executable
+    "F", # pyflakes
+    "I", # isort
+    "INT", # flake8-gettext
+    "PIE", # flake8-pie
+    "PLC", # pylint convention
+    "PLE", # pylint errors
+    "PT", # flake8-pytest-style
+    "PTH", # flake8-use-pathlib
+    "RSE", # flake8-raise
+    "RUF", # ruff-specific rules
+    "S", # flake8-bandit
+    "UP", # pyupgrade
+    "W", # pycodestyle warnings
+]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+
+[tool.ruff.lint.isort]
+forced-separate = ["conftest"]
+force-single-line = true
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.bumpversion]
+current_version = "0.7.1-dev0"
+parse = """(?x)
+    (?P<major>0|[1-9]\\d*)\\.
+    (?P<minor>0|[1-9]\\d*)\\.
+    (?P<patch>0|[1-9]\\d*)
+    (?:
+        -                             # dash separator for pre-release section
+        (?P<pre_l>[a-zA-Z-]+)         # pre-release label
+        (?P<pre_n>0|[1-9]\\d*)        # pre-release version number
+    )?                                # pre-release section is optional
+"""
+serialize = [
+    "{major}.{minor}.{patch}-{pre_l}{pre_n}",
+    "{major}.{minor}.{patch}",
+]
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+commit_args = ""
+
+[tool.bumpversion.parts.pre_l]
+values = ["dev", "rc", "final"]
+optional_value = "final"
+
+[[tool.bumpversion.files]]
+filename = "setup.py"
+search = 'version="{current_version}"'
+replace = 'version="{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "docs/conf.py"
+search = 'version = release = "{current_version}"'
+replace = 'version = release = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "src/laser_measles/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = ".cookiecutterrc"
+search = 'version: "{current_version}"'
+replace = 'version: "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "pytest",
+    "pytest-order>=1.1.1",
+    "pyright",
+    "mypy"
+]
+docs = [
+    "sphinx-autodoc-typehints>=3.0.1",
+    "sphinxcontrib-napoleon>=0.7",
+]
+examples = [
+    "jupytext>=1.17.2",
+    "notebook>=7.4.3",
+    "seaborn>=0.13.2",
+    "ipykernel>=6.0.0",
+    "optuna>=4.4.0"
+]
+full = [
+    "ruff",
+    "pytest",
+    "pytest-order>=1.1.1",
+    "pyright",
+    "mypy",
+    "jupytext>=1.17.2",
+    "notebook>=7.4.3",
+    "seaborn>=0.13.2",
+    "ipykernel>=6.0.0",
+]
