@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="ir.ui.view" id="carrier_view_form">
+            <field name="model">carrier</field>
+            <field name="inherit" ref="carrier.carrier_view_form"/>
+            <field name="name">carrier_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="credential_view_form">
+            <field name="model">carrier.credential.dhl_de</field>
+            <field name="type">form</field>
+            <field name="name">dhl_de_credential_form</field>
+        </record>
+        <record model="ir.ui.view" id="credential_view_tree">
+            <field name="model">carrier.credential.dhl_de</field>
+            <field name="type">tree</field>
+            <field name="name">dhl_de_credential_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_dhl_de_credential_form">
+            <field name="name">DHL DE Credentials</field>
+            <field name="res_model">carrier.credential.dhl_de</field>
+        </record>
+        <record model="ir.action.act_window.view"
+            id="act_dhl_de_credential_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="credential_view_tree"/>
+            <field name="act_window" ref="act_dhl_de_credential_form"/>
+        </record>
+        <record model="ir.action.act_window.view"
+            id="act_dhl_de_credential_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="credential_view_form"/>
+            <field name="act_window" ref="act_dhl_de_credential_form"/>
+        </record>
+
+        <menuitem 
+            parent="carrier.menu_configuration"
+            action="act_dhl_de_credential_form"
+            sequence="18"
+           id="menu_dhl_de_credential_form"/>
+
+        <!-- Global rules -->
+	<record model="ir.rule.group" id="rule_group_carrier_credential_dhl_de_companies">
+            <field name="name">User in companies</field>
+            <field name="model" search="[('model', '=', 'carrier.credential.dhl_de')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_carrier_credential_dhl_de_companies">
+            <field name="domain"
+                eval="[('company', 'in', Eval('companies', []))]"
+                pyson="1"/>
+            <field name="rule_group" ref="rule_group_carrier_credential_dhl_de_companies"/>
+        </record>
+
+	<record model="ir.model.access" id="access_carrier_credential">
+            <field name="model"
+                search="[('model', '=', 'carrier.credential.dhl_de')]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access"
+            id="access_carrier_credential_carrier_admin">
+            <field name="model"
+                search="[('model', '=', 'carrier.credential.dhl_de')]"/>
+            <field name="group" ref="carrier.group_carrier_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+    </data>
+</tryton>
