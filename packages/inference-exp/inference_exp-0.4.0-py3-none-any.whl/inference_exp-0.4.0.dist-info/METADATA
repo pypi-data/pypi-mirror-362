@@ -1,0 +1,220 @@
+Metadata-Version: 2.4
+Name: inference-exp
+Version: 0.4.0
+Summary: Experimental vresion of inference package which is supposed to evolve into inference 1.0
+Requires-Python: <3.13,>=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: torch<3.0.0,>=2.0.0
+Requires-Dist: torchvision
+Requires-Dist: opencv-python>=4.8.1.78
+Requires-Dist: requests<3.0.0,>=2.32.0
+Requires-Dist: supervision>=0.26.0
+Requires-Dist: backoff~=2.2.0
+Requires-Dist: transformers<5.0.0,>=4.50.0
+Requires-Dist: timm<2.0.0,>=1.0.0
+Requires-Dist: accelerate<2.0.0,>=1.0.0
+Requires-Dist: einops<1.0.0,>=0.7.0
+Requires-Dist: peft<0.16.0,>=0.11.1
+Requires-Dist: num2words~=0.5.14
+Requires-Dist: bitsandbytes<0.47.0,>=0.42.0; sys_platform != "darwin"
+Requires-Dist: pyvips<3.0.0,>=2.2.3
+Requires-Dist: rf-clip==1.1
+Requires-Dist: python-doctr[torch]<=0.11.0,>=0.10.0
+Requires-Dist: packaging>=24.0.0
+Requires-Dist: rich<15.0.0,>=13.0.0
+Requires-Dist: pydantic<3.0.0,>=2.0.0
+Requires-Dist: filelock<4.0.0,>=3.12.0
+Provides-Extra: torch-cpu
+Requires-Dist: torch<3.0.0,>=2.0.0; extra == "torch-cpu"
+Requires-Dist: torchvision; extra == "torch-cpu"
+Provides-Extra: torch-cu118
+Requires-Dist: torch<3.0.0,>=2.0.0; extra == "torch-cu118"
+Requires-Dist: torchvision; extra == "torch-cu118"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; extra == "torch-cu118"
+Provides-Extra: torch-cu124
+Requires-Dist: torch<3.0.0,>=2.0.0; extra == "torch-cu124"
+Requires-Dist: torchvision; extra == "torch-cu124"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; extra == "torch-cu124"
+Provides-Extra: torch-cu126
+Requires-Dist: torch<3.0.0,>=2.0.0; extra == "torch-cu126"
+Requires-Dist: torchvision; extra == "torch-cu126"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; extra == "torch-cu126"
+Provides-Extra: torch-cu128
+Requires-Dist: torch<3.0.0,>=2.0.0; extra == "torch-cu128"
+Requires-Dist: torchvision; extra == "torch-cu128"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; extra == "torch-cu128"
+Provides-Extra: torch-jp6-cu126
+Requires-Dist: numpy<2.0.0; extra == "torch-jp6-cu126"
+Requires-Dist: torch<3.0.0,>=2.0.0; extra == "torch-jp6-cu126"
+Requires-Dist: torchvision; extra == "torch-jp6-cu126"
+Requires-Dist: flash-attn==2.7.4.post1; extra == "torch-jp6-cu126"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; extra == "torch-jp6-cu126"
+Provides-Extra: onnx-cpu
+Requires-Dist: onnxruntime<1.23.0,>=1.15.1; extra == "onnx-cpu"
+Provides-Extra: onnx-cu118
+Requires-Dist: onnxruntime-gpu<1.23.0,>=1.15.1; platform_system != "darwin" and extra == "onnx-cu118"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; platform_system != "darwin" and extra == "onnx-cu118"
+Provides-Extra: onnx-cu12
+Requires-Dist: onnxruntime-gpu<1.23.0,>=1.17.0; platform_system != "darwin" and extra == "onnx-cu12"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; platform_system != "darwin" and extra == "onnx-cu12"
+Provides-Extra: onnx-jp6-cu126
+Requires-Dist: numpy<2.0.0; extra == "onnx-jp6-cu126"
+Requires-Dist: onnxruntime-gpu<1.24.0,>=1.17.0; platform_system != "darwin" and extra == "onnx-jp6-cu126"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; platform_system != "darwin" and extra == "onnx-jp6-cu126"
+Provides-Extra: mediapipe
+Requires-Dist: mediapipe<0.11,>=0.9; extra == "mediapipe"
+Provides-Extra: grounding-dino
+Requires-Dist: rf_groundingdino==0.2.0; extra == "grounding-dino"
+Provides-Extra: flash-attn
+Requires-Dist: flash-attn==2.7.4.post1; extra == "flash-attn"
+Provides-Extra: trt10
+Requires-Dist: tensorrt<11.0.0,>=10.0.0; (platform_system == "Linux" or platform_system == "Windows") and extra == "trt10"
+Requires-Dist: tensorrt-cu12<11.0.0,>=10.0.0; (platform_system == "Linux" or platform_system == "Windows") and extra == "trt10"
+Requires-Dist: tensorrt-lean<11.0.0,>=10.0.0; (platform_system == "Linux" or platform_system == "Windows") and extra == "trt10"
+Requires-Dist: tensorrt-lean-cu12<11.0.0,>=10.0.0; (platform_system == "Linux" or platform_system == "Windows") and extra == "trt10"
+Requires-Dist: pycuda<2026.0.0,>=2025.0.0; extra == "trt10"
+Provides-Extra: test
+Requires-Dist: pytest>=8.0.0; extra == "test"
+Requires-Dist: pytest-xdist>=3.0.0; extra == "test"
+Requires-Dist: requests-mock>=1.12.1; extra == "test"
+
+# Experimental version of inference
+
+## 🚀 Introducing `inference-exp` - the evolution of `inference`
+
+At Roboflow, we’re taking a bold step toward a new generation of `inference` — designed to be faster, 
+more reliable, and more user-friendly. With this vision in mind, we’re building a new library called `inference-exp`.
+
+This is an early-stage project, and we’re sharing initial versions to gather valuable community feedback. 
+Your input will help us shape and steer this initiative in the right direction.
+
+We’re excited to have you join us on this journey — let’s build something great together! 🤝
+
+> [!CAUTION]
+> The `inference-exp` package **is an experimental preview** of upcoming inference capabilities.
+> **🔧 What this means:**
+> * Features may change, break, or be removed without notice.
+> * We **do not guarantee backward compatibility** between releases.
+> * We are publishing this to PyPI only **for preview and feedback purposes.**
+> * Although `inference-exp` is located in the `inference` codebase, it is not included in any production build and
+> its lifecycle is completely independent of the official `inference` package releases.
+> 
+> ❗ **We strongly advise against** using `inference-exp` in production systems or building integrations on top of it.
+> For production use and official model deployment, please **continue to use the stable `inference` package.**
+
+## 📜 Principles and Assumptions
+
+* We define a **model** as weights trained on a dataset, which can be exported or compiled into multiple equivalent 
+**model packages**, each optimized for specific environments (e.g., speed, flexibility).
+
+* The new inference library is **multi-backend**, able to run model packages in different formats 
+depending on the installed dependencies - with the scope of supported models dependent on the choice of package 
+*extras* made during installation
+
+* We aim to keep the **extra dependencies minimal** while covering as broad a range of models as possible.
+
+* By default, we include **PyTorch** and **Hugging Face Transformers**; optional extras are available for 
+**TensorRT (TRT)** and **ONNX** backends, with a runtime preference order: TRT → Torch → ONNX. We wish new models
+are mostly based on Torch.
+
+* Backend selection happens **dynamically at runtime**, based on model metadata and environment checks, 
+but can be fully overridden by the user when needed.
+
+## ⚡ Installation
+
+> [!TIP]
+> We recommend using `uv` to install `inference-exp`. To install the tool, follow 
+> [official guide](https://docs.astral.sh/uv/getting-started/installation/) or use the snippet below:
+> ```bash
+> curl -LsSf https://astral.sh/uv/install.sh | sh
+> ```
+
+
+To install `inference-exp` **with TRT and ONNX** on GPU server with base CUDA libraries available run the following 
+command:
+
+```bash
+uv pip install "inference-exp[torch-cu128,onnx-cu12,trt10]" "tensorrt==10.12.0.36"
+```
+> [!TIP]
+> To avoid clashes with external packages, `pyproject.toml` defines quite loose restrictions for the dependent packages.
+> Some packages, like `tensorrt` are good to be kept under more strict control (as some TRT engines will only work 
+> when there is an exact match of environment that runs the model with the one that compiled it) - that's why we 
+> recommend fixing `tensorrt` version to the one we currently use to compile TRT artefacts.
+> 
+> Additionally, library defines set of `torch-*` extras which, thanks to `uv` deliver extra packages indexes adjusted 
+> for specific CUDA version: `torch-cu118`, `torch-cu124`, `torch-cu126`, `torch-cu128`, `torch-jp6-cu126`.
+
+For CPU installations, we recommend the following commands:
+```bash
+# to install with ONNX backend
+uv pip install "inference-exp[onnx-cpu]"
+# or - to install only base dependencies
+uv pip install inference-exp
+```
+
+> [!NOTE] 
+> Using `uv pip install ...` or `pip install`, it is possible to get non-reproducible builds (as `pyproject.toml` 
+> defines quite loose restrictions for the dependent packages). If you care about strict control of dependencies - 
+> follow the installation method based on `uv.lock` which is demonstrated in official [docker builds](./dockerfiles) 
+> of the library.
+
+## 📖 Basic Usage
+```python
+from inference_exp import AutoModel
+import cv2
+import supervision as sv
+
+# loads model from Roboflow API (loading from local dir also available)
+model = AutoModel.from_pretrained("yolov8n-640")  
+image = cv2.imread("<path-to-your-image>")
+predictions = model(image)[0]
+
+# integration with supervision
+annotator = sv.BoxAnnotator()
+annotated = annotator.annotate(image.copy(), predictions.to_supervision())
+```
+
+## 🔌 Extra Dependencies
+
+### Backends
+| Backend | Extras                                                                        | Description                                                                                                                                                                                                                                                                                                                   |
+|---------|-------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| PyTorch | `torch-cu118`, `torch-cu124`, `torch-cu126`, `torch-cu128`, `torch-jp6-cu126` | Provide specific variants of `torch` to match installed CUDA version, only works with `uv` which is capable of reading extra indexes from `pyproject.toml`, when using with `pip`, use `--extra-index-url`. By default, CPU version of `torch` is installed with the library. Torch backend is a default one for the library. |
+| ONNX    | `onnx-cpu`, `onnx-cu118`, `onnx-cu12`, `onnx-jp6-cu126`                       | Provide specific variants of `onnxruntime`. only works with `uv` which is capable of reading extra indexes from `pyproject.toml`, when using with `pip`, use `--extra-index-url`. This extras is not installed by default and is not required, but enables wide variety of models trained on Roboflow Platform.               |
+| TRT     | `trt10`                                                                       | Provide specific variants of `tensorrt`, only works on GPU servers. Jetson installations should fall back to pre-compiled package shipped with Jetpack.                                                                                                                                                                       |
+
+
+### Additional models / capabilities
+| Extras           | Description                                                                                        |
+|------------------|----------------------------------------------------------------------------------------------------|
+| `mediapipe`      | Enables MediaPipe models, including Face Detector                                                  |
+| `grounding-dino` | Enables Grounding Dino model                                                                       |
+| `flash-attn`     | *EXPERIMENTAL:* Installs `flash-attn` for faster LLMs/VLMs - usually requires extensive compilation |
+| `test`           | Test dependencies                                                                                  |
+
+
+## 🧠 Models
+
+> [!IMPORTANT] 
+> If you see a bug in model implementation or loading mechanism - create 
+> [new issue](https://github.com/roboflow/inference/issues/) tagging it with `inference-exp-bug`.
+> 
+> Additionally, We are working hard to extend pool of supported models - suggestions on new models to be added 
+> appreciated 🤝
+
+
+Below there is a table showcasing models that are supported, with the hints regarding extra dependencies that 
+are required.
+
+| Architecture       | Task Type               | Supported variants |
+|--------------------|-------------------------|--------------------|
+| RFDetr             | `object-detection`      | TRT, Torch         |
+| YOLO v8            | `object-detection`      | ONNX, TRT          |
+| YOLO v8            | `instance-segmentation` | ONNX, TRT          |
+| YOLO v9            | `object-detection`      | ONNX, TRT          |
+| YOLO v10           | `object-detection`      | ONNX, TRT          |
+| YOLO v11           | `object-detection`      | ONNX, TRT          |
+| YOLO v11           | `instance-segmentation` | ONNX, TRT          |
+| Perception Encoder | `embedding`             | Torch              |
