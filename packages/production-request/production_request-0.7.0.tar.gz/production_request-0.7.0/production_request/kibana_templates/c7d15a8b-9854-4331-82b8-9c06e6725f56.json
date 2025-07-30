@@ -1,0 +1,108 @@
+{
+  "title": "{{title}}",
+  "type": "histogram",
+  "params": {
+    "type": "histogram",
+    "grid": {
+      "categoryLines": true,
+      "style": {
+        "color": "#eee"
+      }
+    },
+    "categoryAxes": [
+      {
+        "id": "CategoryAxis-1",
+        "type": "category",
+        "position": "bottom",
+        "show": true,
+        "style": {},
+        "scale": {
+          "type": "linear"
+        },
+        "labels": {
+          "show": true,
+          "truncate": 100,
+          "rotate": 75,
+          "filter": false
+        },
+        "title": {}
+      }
+    ],
+    "valueAxes": [
+      {
+        "id": "ValueAxis-2",
+        "name": "LeftAxis-1",
+        "type": "value",
+        "position": "left",
+        "show": true,
+        "style": {},
+        "scale": {
+          "type": "linear",
+          "mode": "normal"
+        },
+        "labels": {
+          "show": true,
+          "rotate": 0,
+          "filter": false,
+          "truncate": 100
+        },
+        "title": {
+          "text": "Количество"
+        }
+      }
+    ],
+    "seriesParams": [
+      {
+        "show": "true",
+        "type": "histogram",
+        "mode": "stacked",
+        "data": {
+          "label": "Количество",
+          "id": "1"
+        },
+        "valueAxis": "ValueAxis-2",
+        "drawLinesBetweenPoints": true,
+        "showCircles": true
+      }
+    ],
+    "addTooltip": true,
+    "addLegend": true,
+    "legendPosition": "right",
+    "times": [],
+    "addTimeMarker": false
+  },
+  "aggs": [
+    {
+      "id": "1",
+      "enabled": true,
+      "type": "sum",
+      "schema": "metric",
+      "params": {
+        "field": "total",
+        "customLabel": "Количество"
+      }
+    },
+    {
+      "id": "2",
+      "enabled": true,
+      "type": "date_histogram",
+      "schema": "segment",
+      "params": {
+        "field": "@timestamp",
+        "timeRange": {
+          "from": "now/d",
+          "to": "now/d",
+          "mode": "quick"
+        },
+        "useNormalizedEsInterval": true,
+        "interval": "h",
+        "time_zone": "Europe/Moscow",
+        "drop_partials": false,
+        "customInterval": "2h",
+        "min_doc_count": 1,
+        "extended_bounds": {},
+        "customLabel": "Временная отметка"
+      }
+    }
+  ]
+}
