@@ -1,0 +1,65 @@
+%define luarocks_pkg_name lua-cjson
+%define luarocks_pkg_version 2.1.0.11-1
+%{?!luadist:%define luadist(-) lua}
+Source1: lua-cjson-2.1.0.11-1.rockspec
+%define luarocks_rockspec_file %{SOURCE1}
+Name: lua-cjson
+Version: 2.1.0.11
+Release: 1%{?autorelease}
+Summary: A fast JSON encoding/parsing module
+Url: http://www.kyne.com.au/~mark/software/lua-cjson.php
+License: MIT
+Source0: lua-cjson-2.1.0.11-1.tar.gz
+BuildRequires: lua-rpm-macros
+BuildRequires: luarocks-macros
+Requires(postun): alternatives
+Requires(post): alternatives
+Provides: %{luadist %{luarocks_pkg_name} = %{luarocks_pkg_version}}
+%global __luarocks_requires %{_bindir}/true
+%global __luarocks_provides %{_bindir}/true
+Requires: %{luadist lua >= 5.1}
+%if %{defined luarocks_buildrequires}
+BuildRequires: %{luarocks_buildrequires}
+%endif
+Provides: luadist(%{luarocks_pkg_name}) = %{luarocks_pkg_version}
+
+%description
+        The Lua CJSON module provides JSON support for Lua. It features:
+        - Fast, standards compliant encoding/parsing routines
+        - Full support for JSON with UTF-8, including decoding surrogate pairs
+        - Optional run-time support for common exceptions to the JSON specification
+          (infinity, NaN,..)
+        - No dependencies on other libraries
+
+%prep
+%autosetup -p1 -n %{luarocks_pkg_prefix}
+%luarocks_prep
+
+%build
+%{?custom_build}
+%if %{defined luarocks_pkg_build}
+%luarocks_pkg_build %{lua_version}
+%else
+%luarocks_build_luaver %{lua_version}
+%endif
+
+%install
+%{?custom_install}
+%if %{defined luarocks_pkg_install}
+%luarocks_pkg_install %{lua_version}
+%else
+%luarocks_install_luaver %{lua_version}
+%endif
+
+%check
+%if %{with check}
+%{?luarocks_check}
+%endif
+%post %{?lua_scriplets}
+%add_lua_binary json2lua -p 25 -b %{_bindir}
+%add_lua_binary lua2json -p 25 -b %{_bindir}
+%postun %{?lua_scriplets}
+%drop_lua_binary json2lua
+%drop_lua_binary lua2json
+
+%files %{?lua_files}
