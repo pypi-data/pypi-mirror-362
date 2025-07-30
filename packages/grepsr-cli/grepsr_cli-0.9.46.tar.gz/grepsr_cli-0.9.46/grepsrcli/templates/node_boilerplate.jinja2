@@ -1,0 +1,62 @@
+{% include './top_comment.jinja2' with context %}
+
+const path = require('path');
+{% if '@vortex-ts-sdk/http-crawler' in packages_to_install -%}
+const { HttpCrawler, pq } = require('@vortex-ts-sdk/http-crawler');
+const { VtxLogger } = require('@vortex-ts-sdk/vtx-logger');
+const {
+    isTestEnvironment,
+    sleep,
+    getPodParams,
+    isScalar,
+    jsonDecode,
+} = require('@vortex-ts-sdk/core');
+{%- endif %}
+{% if '@vortex-ts-sdk/cache-handler' in packages_to_install -%}
+const { CacheHandler } = require('@vortex-ts-sdk/cache-handler')
+{%- endif %}
+{% if 'p-queue@6.6.2' in packages_to_install -%}
+const { default: PQueue } = require('p-queue')
+{%- endif %}
+{% if '@vortex-ts-sdk/cache-handler' in packages_to_install -%}
+const cache = new CacheHandler(path.parse(__dirname).name)
+{%- endif %}
+
+const baseURL = '{{base_url}}'
+const domainURL = '{{domain_url}}'
+const HANDLER = new HttpCrawler();
+
+const MAIN_PAGE_NAME = path.parse(__dirname).name
+
+HANDLER.dataSet.setPageName(MAIN_PAGE_NAME + '_%s', [new Date().toISOString().split('T')[0]]);
+HANDLER.dataSet.setColHeaders({{col_headers | default('[]')}});
+
+async function newSession() {
+    HANDLER.request.resetRequestConfig()
+    HANDLER.request.setHeaders('Accept-Encoding', 'gzip, deflate');
+    HANDLER.request.setHeaders('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+    HANDLER.request.setHeaders('Accept-Language', 'en-US,en;q=0.5');
+    HANDLER.request.setHeaders('Connection', 'keep-alive');
+    HANDLER.request.setHeaders('Upgrade-Insecure-Requests', '1');
+    HANDLER.request.setHeaders('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36');
+    await HANDLER.request.enableProxy();
+}
+
+async function main() {
+    VtxLogger.info("Starting the crawler");
+    await newSession();
+
+    {% if 'p-queue@6.6.2' in packages_to_install -%}
+    const concurrency = 5
+    const queue = new PQueue({ concurrency: concurrency })
+    queue.add(() => HANDLER.loadDocument(baseURL))
+    await queue.onIdle()
+    {%- else -%}
+    await HANDLER.loadDocument(baseURL);
+    {%- endif %}
+
+    const arr = HANDLER.dataSet.getEmptyRow();
+    await HANDLER.dataSet.addRow(arr);
+}
+
+void main();
