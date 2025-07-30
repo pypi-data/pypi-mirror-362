@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://bars-open.ru/schema/wsfactory"
+           xmlns="http://bars-open.ru/schema/wsfactory"
+           xmlns:wsf="http://bars-open.ru/schema/wsfactory"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+  <xs:element name="WSConfig">
+    <xs:complexType>
+      <xs:sequence>
+
+        <xs:element name="System" type="SystemConfigType"
+                    minOccurs="0" maxOccurs="1"/>
+
+        <xs:element name="Protocols" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Protocol" type="ProtocolType"
+                          minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="ApiRegistry" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Api" type="ApiType"
+                          minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="Services" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Service" type="ServiceType"
+                          minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="SecurityProfile" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Modules" minOccurs="1" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Module" type="SecurityModuleType"
+                                minOccurs="1" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Security" type="SecurityType"
+                          minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="Applications" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Application" type="ApplicationType"
+                          minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:sequence>
+
+      <!-- system-wide settings -->
+      <xs:attribute name="ApplicationClass" type="xs:string" use="optional" default="spyne.application.Application"/>
+      <xs:attribute name="WsgiClass" type="xs:string" use="optional" default="spyne.server.django.DjangoApplication"/>
+      <xs:attribute name="ServiceClass" type="xs:string" use="optional" default="spyne.service.ServiceBase"/>
+      <xs:attribute name="ApiHandler" type="xs:string" use="optional" default="wsfactory.views.api_handler"/>
+    </xs:complexType>
+
+    <!-- keys -->
+    <xs:key name="ProtocolKey">
+      <xs:selector xpath="wsf:Protocols/wsf:Protocol"/>
+      <xs:field xpath="@code"/>
+    </xs:key>
+    <xs:keyref name="ProtocolKeyRef" refer="ProtocolKey">
+      <xs:selector xpath="wsf:Applications/wsf:Application/wsf:InProtocol|wsf:Applications/wsf:Application/wsf:OutProtocol"/>
+      <xs:field xpath="@code"/>
+    </xs:keyref>
+
+    <xs:key name="ApiKey">
+      <xs:selector xpath="wsf:ApiRegistry/wsf:Api"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+    <xs:keyref name="ApiKeyRef" refer="ApiKey">
+      <xs:selector xpath="wsf:Services/wsf:Service/wsf:Api"/>
+      <xs:field xpath="@id"/>
+    </xs:keyref>
+
+    <xs:key name="ServiceKey">
+      <xs:selector xpath="wsf:Services/wsf:Service"/>
+      <xs:field xpath="@code"/>
+    </xs:key>
+    <xs:keyref name="ServiceKeyRef" refer="ServiceKey">
+      <xs:selector xpath="wsf:Applications/wsf:Application"/>
+      <xs:field xpath="@service"/>
+    </xs:keyref>
+
+    <xs:key name="SecurityModuleKey">
+      <xs:selector xpath="wsf:SecurityProfile/wsf:Modules/wsf:Module"/>
+      <xs:field xpath="@code"/>
+    </xs:key>
+    <xs:keyref name="SecurityModuleKeyRef" refer="SecurityModuleKey">
+      <xs:selector xpath="wsf:SecurityProfile/wsf:Security"/>
+      <xs:field xpath="@module"/>
+    </xs:keyref>
+
+    <xs:key name="SecurityKey">
+      <xs:selector xpath="wsf:SecurityProfile/wsf:Security"/>
+      <xs:field xpath="@code"/>
+    </xs:key>
+    <xs:keyref name="SecurityKeyRef" refer="SecurityKey">
+      <xs:selector xpath="wsf:Applications/wsf:Application/wsf:InProtocol|wsf:Applications/wsf:Application/wsf:OutProtocol"/>
+      <xs:field xpath="@security"/>
+    </xs:keyref>
+
+  </xs:element>
+
+  <!--  Types-->
+  <xs:complexType name="ProtocolType">
+    <xs:sequence>
+      <xs:element name="Param" type="ParamDeclarationType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:token" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="module" type="xs:string" use="required"/>
+    <xs:attribute name="direction" type="DirectionType" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ApiType">
+    <xs:attribute name="code" type="xs:token" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="module" type="xs:string" use="required"/>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ServiceType">
+    <xs:sequence>
+      <xs:element name="Api" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:token" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SecurityModuleType">
+    <xs:sequence>
+      <xs:element name="Param" type="ParamDeclarationType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="path" type="xs:string" use="required"/>
+    <xs:attribute name="code" type="xs:token" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SecurityType">
+    <xs:sequence>
+      <xs:element name="Param" type="ParamType" minOccurs="0"
+                  maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="module" type="xs:string" use="required"/>
+    <xs:attribute name="code" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ApplicationType">
+    <xs:sequence>
+      <xs:element name="InProtocol" type="ServiceProtocolDirectionType"
+                  minOccurs="1" maxOccurs="1"/>
+      <xs:element name="OutProtocol" type="ServiceProtocolDirectionType"
+                  minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="service" type="xs:token" use="required"/>
+    <xs:attribute name="name" type="xs:token" use="required"/>
+    <xs:attribute name="tns" type="xs:string" use="optional"/>
+    <xs:attribute name="url" type="xs:string" use="optional"/>
+    <xs:attribute name="max_content_length" type="xs:integer" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="ParamType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="key" type="xs:token" use="required"/>
+        <xs:attribute name="valueType" type="ValueType" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="ParamDeclarationType">
+    <xs:simpleContent>
+      <xs:extension base="ParamType">
+        <xs:attribute name="name" type="xs:string" use="optional"/>
+        <xs:attribute name="required" type="xs:boolean" use="optional" default="false"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="ValueType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="unicode"/>
+      <xs:enumeration value="string"/>
+      <xs:enumeration value="int"/>
+      <xs:enumeration value="float"/>
+      <xs:enumeration value="bool"/>
+      <xs:enumeration value="password"/>
+      <xs:enumeration value="text"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="ServiceProtocolDirectionType">
+    <xs:sequence>
+      <xs:element name="Param" type="ParamType" minOccurs="0"
+                  maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="code" use="required" type="xs:string"/>
+    <xs:attribute name="security" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:simpleType name="DirectionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BOTH"/>
+      <xs:enumeration value="IN"/>
+      <xs:enumeration value="OUT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="SystemConfigType">
+    <xs:sequence>
+      <xs:element name="Param" type="ParamType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
