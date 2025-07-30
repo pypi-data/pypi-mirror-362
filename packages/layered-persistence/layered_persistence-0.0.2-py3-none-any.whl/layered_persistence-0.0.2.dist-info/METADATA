@@ -1,0 +1,96 @@
+Metadata-Version: 2.4
+Name: layered-persistence
+Version: 0.0.2
+Summary: Persistence
+Project-URL: Homepage, https://github.com/ceil-python/persistence
+Author-email: Sergey Shkatula <sergey@ceil.dev>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: layers,persistence,storage
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+
+# layered-persistence
+
+[![PyPI version](https://img.shields.io/pypi/v/layered-persistence.svg)](https://pypi.org/project/layered-persistence/) [![License](https://img.shields.io/github/license/ceil-python/persistence)](https://github.com/ceil-python/persistence/blob/main/LICENSE)
+
+**Flexible, multi-layer key-value persistence library for Python and MicroPython. In-memory, file, and HTTP storage, with simple pluggable API.**
+
+---
+
+## Features
+
+- Persistent key-value storage with multiple, cascading "layers"
+- Storage backends: RAM, JSON file, remote HTTP
+- Supports async and sync use
+- Lightweight, only core Python dependencies
+- Optional HTTP server for networked persistence
+
+---
+
+## Installation
+
+```sh
+pip install layered-persistence
+```
+
+or
+
+```sh
+python -m pip install layered-persistence
+```
+
+or
+
+```sh
+python3 -m pip install layered-persistence
+```
+
+---
+
+## Quickstart
+
+```python
+from layered_persistence import LayeredPersistence, RuntimeLayer, FileLayer
+
+# Use both in-memory (fast) and file (persistent) layers
+store = LayeredPersistence(layers=[
+    RuntimeLayer(),
+    FileLayer(directory="./data")
+])
+
+# Store and retrieve a value
+await store.set('foo', {'bar': 123})
+val = await store.get('foo')
+await store.set('foo', {'bar': val["value"]["bar"]+1})
+print(val)  # {'value': {'bar': 123}}
+```
+
+---
+
+## Layers
+
+- **`RuntimeLayer`** — Fastest, memory only, cleared on reboot.
+- **`FileLayer`** — Stores each key as `./directory/key.json`.
+- **`HttpLayer`** — For network/remote server persistence (see docs).
+
+Layers can be stacked; reads backfill for speed, writes cascade for durability.
+
+---
+
+## HTTP Server
+
+Expose your store as a simple HTTP API:
+
+```python
+from layered_persistence import serve_via_http, LayeredPersistence, RuntimeLayer
+
+store = LayeredPersistence([RuntimeLayer()])
+serve_via_http(store, port=8080)
+```
+
+---
+
+## License
+
+MIT
