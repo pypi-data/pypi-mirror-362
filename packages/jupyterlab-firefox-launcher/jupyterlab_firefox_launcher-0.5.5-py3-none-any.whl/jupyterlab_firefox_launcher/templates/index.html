@@ -1,0 +1,229 @@
+<!--
+    Derived from jupyter-remote-desktop-proxy, adapted for Firefox via Xpra
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Firefox Browser via Xpra</title>
+
+    <meta charset="utf-8" />
+
+    <!-- Always force latest IE rendering engine (even in intranet) &
+                Chrome Frame. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <script>
+      // CRITICAL: Force disable WebSocket globally before any other scripts load
+      (function() {
+        // Store original WebSocket for debugging
+        var OriginalWebSocket = window.WebSocket;
+        
+        // Override WebSocket constructor to prevent connections
+        window.WebSocket = function(url, protocols) {
+          console.log('WebSocket connection blocked in template:', url);
+          // Throw an error to make Xpra fall back to HTTP
+          throw new Error('WebSocket disabled - using HTTP-only mode');
+        };
+        
+        // Also disable on prototype
+        if (OriginalWebSocket && OriginalWebSocket.prototype) {
+          delete OriginalWebSocket.prototype.constructor;
+        }
+        
+        // Remove from global scope
+        delete window.WebSocket;
+        
+        console.log('WebSocket globally disabled in template');
+      })();
+    </script>
+
+    <style>
+      /**
+      Colors from https://github.com/jupyter/design/blob/main/brandguide/brand_guide.pdf
+      **/
+      html {
+        --jupyter-main-brand-color: #f37626;
+        --jupyter-dark-grey: #4d4d4d;
+        --jupyter-medium-dark-grey: #616161;
+        --jupyter-medium-grey: #757575;
+        --jupyter-grey: #9e9e9e;
+
+        --topbar-height: 32px;
+
+        /* Use Jupyter Brand fonts */
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--jupyter-medium-dark-grey);
+        margin: 0;
+        padding: 0;
+      }
+
+      #top-bar {
+        background-color: var(--jupyter-dark-grey);
+        color: white;
+        border-bottom: 1px white;
+        display: flex;
+        align-items: center;
+        height: var(--topbar-height);
+        padding: 0;
+      }
+
+      #logo {
+        padding: 0 24px;
+      }
+
+      #logo img {
+        height: 24px;
+      }
+
+      #menu {
+        display: flex;
+        font-weight: bold;
+        margin-left: auto;
+        font-size: 12px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      #menu li {
+        border-right: 1px var(--jupyter-grey) solid;
+        padding: 12px 0px;
+      }
+
+      #menu li:last-child {
+        border-right: 0;
+      }
+
+      #menu a {
+        color: white;
+        text-decoration: none;
+        padding: 12px 8px;
+      }
+
+      #menu a:hover,
+      #menu a.active {
+        background-color: var(--jupyter-medium-grey);
+      }
+
+      li#status-container {
+        padding-right: 8px;
+      }
+
+      #status-label {
+        font-weight: normal;
+      }
+
+      #screen {
+        flex: 1;
+        /* fill remaining space */
+        overflow: hidden;
+      }
+
+      #screen iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        color: white;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="top-bar">
+      <div id="logo">
+        Firefox Browser
+      </div>
+      <ul id="menu">
+        <li id="status-container">
+          <span id="status-label">Status:</span>
+          <span id="status">Loading...</span>
+        </li>
+        {% if hub_control_panel_url %}
+        <li>
+          <a href="{{ hub_control_panel_url }}">Hub Control Panel</a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+    <div id="screen">
+      <div class="loading" id="loading">
+        Starting Firefox browser via Xpra...
+      </div>
+      <div id="firefox-container"></div>
+    </div>
+
+    <script>
+      // Create Firefox session and load iframe dynamically with WebSocket prevention
+      async function startFirefoxSession() {
+        try {
+          const response = await fetch('{{ base_url }}firefox/session', {
+            method: 'POST',
+            credentials: 'same-origin'
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to start session');
+          }
+          
+          const data = await response.json();
+          
+          // Create iframe with simple URL - rely on server-side WebSocket blocking
+          const iframe = document.createElement('iframe');
+          iframe.id = 'firefox-frame';
+          iframe.src = `{{ base_url }}proxy/firefox/${data.session_id}/`;
+          iframe.title = "Firefox Browser via Xpra HTML5 (HTTP-only)";
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          iframe.style.border = 'none';
+          
+          // Additional WebSocket blocking for iframe content
+          iframe.onload = function() {
+            try {
+              // Try to disable WebSocket in iframe if accessible
+              if (iframe.contentWindow && iframe.contentWindow.WebSocket) {
+                iframe.contentWindow.WebSocket = function(url, protocols) {
+                  console.log('Iframe WebSocket connection blocked:', url);
+                  throw new Error('WebSocket disabled in iframe - using HTTP-only mode');
+                };
+                delete iframe.contentWindow.WebSocket;
+                console.log('WebSocket disabled in iframe content');
+              }
+            } catch (e) {
+              // Ignore cross-origin errors - this is expected and means security is working
+              console.log('Could not access iframe content (cross-origin security)');
+            }
+            
+            // Hide loading and show iframe
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('status').textContent = 'Ready';
+          };
+          
+          document.getElementById('firefox-container').appendChild(iframe);
+          
+        } catch (error) {
+          document.getElementById('loading').innerHTML = 
+            `Error starting Firefox session: ${error.message}<br><a href="{{ base_url }}firefox/" target="_blank" style="color: #f37626;">Try alternative interface</a>`;
+          document.getElementById('status').textContent = 'Failed';
+          console.error('Firefox session error:', error);
+        }
+      }
+      
+      // Start the session when page loads
+      startFirefoxSession();
+    </script>
+  </body>
+</html>
