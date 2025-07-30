@@ -1,0 +1,129 @@
+# APM for FastAPI – Watchlog Integration
+
+🎯 Lightweight and production-safe Application Performance Monitoring (APM) middleware for FastAPI apps, built for [Watchlog](https://watchlog.io).
+
+Tracks route execution time, status codes, memory usage, and errors — and sends them periodically to your Watchlog agent in aggregated form.
+
+---
+
+## 🚀 Features
+
+- 🔧 Automatic tracking of all FastAPI routes
+- 📊 Aggregation of metrics by path pattern and method (e.g., `/user/{id}`)
+- ⚠️ Optional error tracking
+- 🌐 Sends metrics to Watchlog agent over HTTP
+- 🧠 Captures memory usage (`heapUsed`, `heapTotal`)
+- 💡 Safe-by-default (never crashes your app)
+- 🔄 Handles dynamic routes with correct pattern detection
+
+---
+
+## 📦 Installation
+
+```bash
+pip install fastapi_watchlog_apm
+```
+
+---
+
+## ⚙️ Usage
+
+Here’s a complete example:
+
+```python
+from fastapi import FastAPI
+from fastapi_watchlog_apm import WatchlogAPMMiddleware, apm_exception_handler, start
+
+app = FastAPI()
+
+# Register error handler (optional)
+apm_exception_handler(app, service="my-fastapi-service")
+
+# Define routes
+@app.get("/user/{user_id}")
+async def get_user(user_id: int):
+    return {"user": user_id}
+
+@app.get("/fail")
+async def fail():
+    raise Exception("error")
+
+# Wrap the app with APM middleware (must be after routes)
+app = WatchlogAPMMiddleware(app, service="my-fastapi-service")
+
+# Start background sender
+start()
+```
+
+---
+
+## 🛠️ Service Name
+
+You can define your service name like this:
+
+```python
+WatchlogAPMMiddleware(app, service="my-fastapi-service")
+apm_exception_handler(app, service="my-fastapi-service")
+```
+
+Or set it in environment variables:
+
+```bash
+export WATCHLOG_APM_SERVICE=users-api
+```
+
+Fallbacks to `APP_NAME` or defaults to `fastapi-app`.
+
+---
+
+## 📤 What gets sent
+
+Example payload every 10 seconds:
+
+```json
+{
+  "collected_at": "2025-05-18T12:00:00Z",
+  "platformName": "fastapi",
+  "metrics": [
+    {
+      "type": "aggregated_request",
+      "service": "users-api",
+      "path": "/user/{user_id}",
+      "method": "GET",
+      "request_count": 3,
+      "error_count": 1,
+      "avg_duration": 9.2,
+      "max_duration": 13.4,
+      "avg_memory": {
+        "heapUsed": 13930496,
+        "heapTotal": 13930496
+      }
+    }
+  ]
+}
+```
+
+---
+
+## 📁 Recommended `.gitignore`
+
+```gitignore
+/storage/logs/apm-buffer.json
+/storage/framework/cache/watchlog-apm.lock
+```
+
+---
+
+## ✅ Notes
+
+- Uses `scope['route'].path` to extract route pattern like `/user/{user_id}`
+- You must wrap your app **after defining routes**
+- Error tracking is optional but recommended
+- Metrics are batched in memory/file and flushed every 10 seconds
+
+---
+
+## 📝 License
+
+MIT © Mohammadreza  
+Built for [Watchlog.io](https://watchlog.io)
