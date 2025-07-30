@@ -1,0 +1,106 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+
+[project]
+name = "yai-nexus-agentkit"
+version = "0.3.3"
+description = "A FastAPI-first AI agent toolkit with AG-UI protocol support for building modern streaming AI applications."
+authors = [
+    { name="YAI-Nexus", email="contact@yai-nexus.com" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Framework :: FastAPI",
+]
+dependencies = [
+    "pydantic>=2.0",
+    "langchain",
+    "langchain-core",
+    "langgraph>=0.5.2,<0.6.0",
+    "yai-nexus-configuration>=0.1.1",
+    # Logging - modern structured logging
+    "loguru>=0.7.0",
+    "python-dotenv",  # 环境变量管理
+    # Web framework - core to our FastAPI/AG-UI positioning
+    "fastapi",
+    "uvicorn",
+    "ag-ui-protocol",  # AG-UI 标准事件模型
+    "sse-starlette",   # FastAPI 的 SSE 传输支持
+    # Persistence - core functionality
+    "tortoise-orm",    # ORM for database operations
+    "aerich",          # Database migrations for Tortoise
+    # Langgraph Checkpoint Backends
+    "langgraph-checkpoint-postgres",
+    "psycopg[binary]", # Force binary version of psycopg
+    "asyncpg", # Tortoise ORM backend
+]
+
+[project.urls]
+Homepage = "https://github.com/yai-nexus/yai-nexus-agentkit"
+Repository = "https://github.com/yai-nexus/yai-nexus-agentkit"
+
+
+[project.optional-dependencies]
+# LLM Providers
+openai = ["langchain-openai>=0.1.0"]
+zhipu = ["langchain-community", "zhipuai"]
+anthropic = ["langchain-anthropic"]
+tongyi = ["langchain-community", "dashscope"]
+doubao = ["langchain-openai>=0.1.0"]
+
+# Additional Persistence Backends
+redis = ["redis"]
+
+# Web extensions (core web functionality now in default dependencies)
+fastapi = [
+    "aiohttp",  # For advanced HTTP client needs
+    "httpx",    # Modern HTTP client
+    "dependency-injector",
+]
+
+# Development and Quality Tools
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pre-commit",
+    "ruff",
+    "black",
+    "aerich",
+]
+
+# Extended persistence backends bundle
+persistence = [
+    "yai-nexus-agentkit[redis]"
+]
+
+# A bundle for convenience
+all = [
+    "yai-nexus-agentkit[openai]",
+    "yai-nexus-agentkit[zhipu]",
+    "yai-nexus-agentkit[anthropic]",
+    "yai-nexus-agentkit[tongyi]",
+    "yai-nexus-agentkit[doubao]",
+    "yai-nexus-agentkit[fastapi]",
+    "yai-nexus-agentkit[dev]",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".", "src"
+]
