@@ -1,0 +1,96 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cursor-notebook-mcp"
+version = "0.3.1"
+authors = [
+  { name="Jim Beno", email="jim@jimbeno.net" },
+]
+description = "Model Context Protocol (MCP) implementation for Jupyter notebooks to overcome limitation with Cursor"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+keywords = ["jupyter", "notebook", "mcp", "cursor", "ai", "agent", "nbformat", "ipynb"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Jupyter",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+    "Typing :: Typed"
+]
+dependencies = [
+    "mcp>=0.1.0",
+    "nbformat>=5.0",
+    "nbconvert>=6.0",
+    "ipython",
+    "jupyter_core",
+    "paramiko>=2.8.0",
+    "fastmcp>=2.7.0,<2.11",
+    "uvicorn>=0.20.0",
+    "starlette>=0.25.0"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.18",
+    "pytest-cov",
+    "pytest-timeout>=2.0.0",
+    "coveralls",
+]
+dev = [
+    "cursor-notebook-mcp[test]"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/jbeno/cursor-notebook-mcp"
+"Bug Tracker" = "https://github.com/jbeno/cursor-notebook-mcp/issues"
+"Source" = "https://github.com/jbeno/cursor-notebook-mcp"
+
+[project.scripts]
+cursor-notebook-mcp = "cursor_notebook_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cursor_notebook_mcp"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=cursor_notebook_mcp --cov-report=term-missing -m 'not slow'"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+timeout = 60
+
+[tool.coverage.run]
+source = ["cursor_notebook_mcp"]
+omit = [
+    "*/__main__.py",
+    "tests/*",
+    "cursor_notebook_mcp/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "except ImportError:",
+    "@(abc\\.)?abstractmethod",
+    "pass",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
