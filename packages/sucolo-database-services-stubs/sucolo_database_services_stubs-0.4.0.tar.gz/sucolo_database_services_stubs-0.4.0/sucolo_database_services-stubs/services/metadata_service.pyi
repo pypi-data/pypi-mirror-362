@@ -1,0 +1,16 @@
+from sucolo_database_services.services.base_service import (
+    BaseService
+)
+from sucolo_database_services.services.base_service import (
+    BaseServiceDependencies
+)
+
+
+class MetadataService(BaseService):
+    def __init__(
+        self, base_service_dependencies: BaseServiceDependencies
+    ) -> None: ...
+    def get_cities(self) -> list[str]: ...
+    def city_data_exists(self, city: str) -> bool: ...
+    def get_amenities(self, city: str) -> list[str]: ...
+    def get_district_attributes(self, city: str) -> list[str]: ...
