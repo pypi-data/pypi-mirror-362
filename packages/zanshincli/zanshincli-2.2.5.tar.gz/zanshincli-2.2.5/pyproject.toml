@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "zanshincli"
+version = "2.2.5"
+description = "Python command line utility to the Tenchi Security Zanshin API v1"
+license = "Apache Software License"
+readme = "README.md"
+authors = ["Tenchi Security <contact@tenchisecurity.com>"]
+homepage = "https://github.com/tenchi-security/zanshin-cli"
+packages = [{include = "src"}, {include = "zanshincli"}]
+
+classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Development Status :: 5 - Production/Stable",
+        "Natural Language :: English",
+        "Environment :: Other Environment",
+        "Intended Audience :: Developers",
+        "Intended Audience :: System Administrators",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+        "Topic :: Security"
+    ]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+prettytable = "3.5.0"
+boto3 = ">=1.26.8"
+boto3-type-annotations = ">=0.3.1"
+typer = "0.7.0"
+poetry-plugin-export = "^1.8.0"
+urllib3 = "^1.26.20"
+zanshinsdk = "2.1.8"
+
+[tool.poetry.group.dev.dependencies]
+moto = {version = "4.0.8", extras = ["organizations", "sts", "s3"]}
+pytest = "7.2.0"
+coverage = {version = "^7.1.0", platform = "linux"}
+pre-commit = "^4.0.0"
+pandoc = "^2.3.1"
+
+[tool.poetry.scripts]
+zanshin = "zanshincli.main:main_app"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
