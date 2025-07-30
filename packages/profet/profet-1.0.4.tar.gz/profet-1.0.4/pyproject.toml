@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "profet/_version.py"
+
+[tool.black]
+target-version = ['py36', 'py37', 'py38', 'py39']
+line-length = 80
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | build
+    | dist
+    | examples
+  )/
+  | _version\.py
+)
+'''
+
+[tool.mypy]
+ignore_missing_imports = true
+implicit_optional = true
+follow_imports = "skip"
+
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
