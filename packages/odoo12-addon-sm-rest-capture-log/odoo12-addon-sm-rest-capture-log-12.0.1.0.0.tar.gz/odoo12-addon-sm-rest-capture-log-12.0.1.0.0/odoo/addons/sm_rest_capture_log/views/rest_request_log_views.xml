@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Tree View -->
+        <record id="view_rest_request_log_tree" model="ir.ui.view">
+            <field name="name">rest.request.log.tree</field>
+            <field name="model">rest.request.log</field>
+            <field name="arch" type="xml">
+                <tree string="REST Request Logs" default_order="request_datetime desc">
+                    <field name="request_datetime"/>
+                    <field name="http_method"/>
+                    <field name="display_name"/>
+                    <field name="service_name"/>
+                    <field name="endpoint_name"/>
+                    <field name="response_status_code"/>
+                    <field name="processing_status"/>
+                    <field name="migrated_to_odoo17"/>
+                    <field name="client_ip"/>
+                    <field name="response_time_ms"/>
+                </tree>
+            </field>
+        </record>
+        
+        <!-- Form View -->
+        <record id="view_rest_request_log_form" model="ir.ui.view">
+            <field name="name">rest.request.log.form</field>
+            <field name="model">rest.request.log</field>
+            <field name="arch" type="xml">
+                <form string="REST Request Log">
+                    <header>
+                        <button name="mark_as_migrated" string="Mark as Migrated" type="object" 
+                                class="btn-primary" attrs="{'invisible': [('migrated_to_odoo17', '=', True)]}"/>
+                        <field name="processing_status" widget="statusbar" statusbar_visible="pending,processed,replayed"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="get_replay_data" icon="fa-refresh">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_text">Get Replay Data</span>
+                                </div>
+                            </button>
+                        </div>
+                        
+                        <group>
+                            <group name="request_info">
+                                <field name="request_datetime"/>
+                                <field name="request_id"/>
+                                <field name="http_method"/>
+                                <field name="service_name"/>
+                                <field name="endpoint_name"/>
+                                <field name="method_name"/>
+                            </group>
+                            <group name="client_info">
+                                <field name="client_ip"/>
+                                <field name="response_status_code"/>
+                                <field name="response_time_ms"/>
+                                <field name="migrated_to_odoo17"/>
+                            </group>
+                        </group>
+                        
+                        <notebook>
+                            <page string="Request Details">
+                                <group>
+                                    <field name="request_url" widget="url"/>
+                                    <field name="user_agent"/>
+                                </group>
+                                <group string="Request Headers">
+                                    <field name="request_headers" widget="text" nolabel="1"/>
+                                </group>
+                                <group string="Query Parameters">
+                                    <field name="query_params" widget="text" nolabel="1"/>
+                                </group>
+                                <group string="Method Parameters">
+                                    <field name="method_params" widget="text" nolabel="1"/>
+                                </group>
+                                <group string="Request Body">
+                                    <field name="request_body" widget="text" nolabel="1"/>
+                                </group>
+                            </page>
+                            
+                            <page string="Response Details">
+                                <group string="Response Headers">
+                                    <field name="response_headers" widget="text" nolabel="1"/>
+                                </group>
+                                <group string="Response Body">
+                                    <field name="response_body" widget="text" nolabel="1"/>
+                                </group>
+                                <group string="Error Information" attrs="{'invisible': [('processing_status', '!=', 'error')]}">
+                                    <field name="error_message" widget="text" nolabel="1"/>
+                                </group>
+                            </page>
+                            
+                            <page string="Migration">
+                                <group>
+                                    <field name="migration_notes" widget="text"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Search View -->
+        <record id="view_rest_request_log_search" model="ir.ui.view">
+            <field name="name">rest.request.log.search</field>
+            <field name="model">rest.request.log</field>
+            <field name="arch" type="xml">
+                <search string="REST Request Logs">
+                    <field name="display_name"/>
+                    <field name="http_method"/>
+                    <field name="service_name"/>
+                    <field name="endpoint_name"/>
+                    <field name="client_ip"/>
+                    <field name="request_url"/>
+                    
+                    <filter string="GET Requests" name="filter_get" domain="[('http_method', '=', 'GET')]"/>
+                    <filter string="POST Requests" name="filter_post" domain="[('http_method', '=', 'POST')]"/>
+                    <filter string="PUT Requests" name="filter_put" domain="[('http_method', '=', 'PUT')]"/>
+                    <filter string="DELETE Requests" name="filter_delete" domain="[('http_method', '=', 'DELETE')]"/>
+                    
+                    <separator/>
+                    <filter string="Pending" name="filter_pending" domain="[('processing_status', '=', 'pending')]"/>
+                    <filter string="Processed" name="filter_processed" domain="[('processing_status', '=', 'processed')]"/>
+                    <filter string="Errors" name="filter_error" domain="[('processing_status', '=', 'error')]"/>
+                    <filter string="Migrated" name="filter_migrated" domain="[('migrated_to_odoo17', '=', True)]"/>
+                    <filter string="Not Migrated" name="filter_not_migrated" domain="[('migrated_to_odoo17', '=', False)]"/>
+                    
+                    <separator/>
+                    <filter string="Today" name="filter_today" domain="[('request_datetime', '>=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                    <filter string="Last 7 Days" name="filter_week" domain="[('request_datetime', '>=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                    
+                    <group expand="0" string="Group By">
+                        <filter string="HTTP Method" name="group_method" context="{'group_by': 'http_method'}"/>
+                        <filter string="Service" name="group_service" context="{'group_by': 'service_name'}"/>
+                        <filter string="Endpoint" name="group_endpoint" context="{'group_by': 'endpoint_name'}"/>
+                        <filter string="Status" name="group_status" context="{'group_by': 'processing_status'}"/>
+                        <filter string="Date" name="group_date" context="{'group_by': 'request_datetime:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <!-- Action -->
+        <record id="action_rest_request_log" model="ir.actions.act_window">
+            <field name="name">REST Request Logs</field>
+            <field name="res_model">rest.request.log</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_rest_request_log_tree"/>
+            <field name="search_view_id" ref="view_rest_request_log_search"/>
+            <field name="context">{'search_default_filter_today': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No REST requests logged yet!
+                </p>
+                <p>
+                    This module captures all REST API requests made through base_rest
+                    for migration purposes from Odoo 12 to Odoo 17.
+                </p>
+            </field>
+        </record>
+        
+        <!-- Menu -->
+        <menuitem id="menu_rest_capture_log_root" name="REST Capture Log" sequence="100"/>
+        <menuitem id="menu_rest_request_logs" name="Request Logs" parent="menu_rest_capture_log_root" 
+                  action="action_rest_request_log" sequence="10"/>
+        
+    </data>
+</odoo>

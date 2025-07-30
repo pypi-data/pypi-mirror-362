@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View for Replay Configuration -->
+    <record id="rest_replay_config_view_form" model="ir.ui.view">
+        <field name="name">rest.replay.config.form</field>
+        <field name="model">rest.replay.config</field>
+        <field name="arch" type="xml">
+            <form string="Replay Configuration">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="target_url" widget="url" placeholder="e.g. https://my-odoo-instance.com"/>
+                        <field name="auth_header" placeholder="e.g. Bearer your-secret-token"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Add any relevant notes here..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View for Replay Configuration -->
+    <record id="rest_replay_config_view_tree" model="ir.ui.view">
+        <field name="name">rest.replay.config.tree</field>
+        <field name="model">rest.replay.config</field>
+        <field name="arch" type="xml">
+            <tree string="Replay Configurations">
+                <field name="name"/>
+                <field name="target_url"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Window Action for Replay Configuration -->
+    <record id="action_rest_replay_config" model="ir.actions.act_window">
+        <field name="name">Replay Configurations</field>
+        <field name="res_model">rest.replay.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new configuration to connect to your Odoo 17 instance.
+            </p><p>
+                This configuration will be used to replay the captured REST requests.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item for Replay Configuration -->
+    <menuitem
+        id="menu_rest_replay_config"
+        name="Replay Configuration"
+        parent="menu_rest_capture_log_root"
+        action="action_rest_replay_config"
+        sequence="20"/>
+
+</odoo> 
