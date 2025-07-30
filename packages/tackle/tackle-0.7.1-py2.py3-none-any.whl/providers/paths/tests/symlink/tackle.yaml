@@ -1,0 +1,42 @@
+
+sym:
+  ->: symlink
+  src: src.yaml
+  dst: dst.yaml
+  overwrite: true
+
+chmod_:
+  ->: chmod
+  path: dst.yaml
+#  https://github.com/commx/ruamel-yaml/blob/master/constructor.py#L1186
+#  Coercion to int via octalint... Awesome...
+  mode: "0o644"
+
+read:
+  ->: yaml
+  path: dst.yaml
+
+path:
+  ->: path_join
+  paths:
+    - somedir
+    - src.yaml
+
+read_dir:
+  ->: yaml
+  path: "{{ path }}"
+
+sym2:
+  ->: symlink
+  src: "{{ path }}"
+  dst: dst.yaml
+  overwrite: true
+
+read_dir2:
+  ->: yaml
+  path: "{{ path }}"
+
+
+
+#rm:
+#  ->: remove

@@ -1,0 +1,24 @@
+
+alist:
+  - foo
+  - bar
+
+#expanded:
+#  ->: block
+#  items:
+#    - this
+#    - "{{stuff}}"
+
+macro->:
+  - this
+  - ->: "{{alist}}"
+  - foo:
+      ->: literal bar
+
+expanded:
+  ->: block
+  items:
+    - this
+    - ->: "{{alist}}"
+    - foo:
+        ->: literal bar

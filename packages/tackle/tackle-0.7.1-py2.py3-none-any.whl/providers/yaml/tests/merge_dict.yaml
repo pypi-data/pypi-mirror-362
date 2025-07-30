@@ -1,0 +1,36 @@
+foo: bar
+
+stuff:
+  things:
+    dog: food
+  tangs:
+    dog: penny
+
+include:
+  ->: yaml
+  path: output.yaml
+  contents: "{{ merge_dict }}"
+  merge_dict:
+    stuff:
+      things:
+        cats: scratch
+
+envs:
+  ->: var
+  input:
+    - dev
+    - prod
+    - stage
+
+map:
+  dev: null
+  stage: null
+  prod: null
+
+merger:
+  ->: yaml
+  path: output.yaml
+  loop: "{{ merge_dict.envs }}"
+  contents: "{{ merge_dict }}"
+  merge_dict:
+    "{{ merge_dict.item }}": "{{ merge_dict.index }}"

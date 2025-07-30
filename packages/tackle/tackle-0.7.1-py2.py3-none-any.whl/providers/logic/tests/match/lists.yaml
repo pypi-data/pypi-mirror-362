@@ -1,0 +1,13 @@
+region: r1
+
+vms:
+  ->: match region
+  case:
+    r0:
+      - ip: 123
+        name: foo
+    r1:
+      - ip: 456
+        name: bar
+
+check->: assert "{{vms[0].ip}}" 456
