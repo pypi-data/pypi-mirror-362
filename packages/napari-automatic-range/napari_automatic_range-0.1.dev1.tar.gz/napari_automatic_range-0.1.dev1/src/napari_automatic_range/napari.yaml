@@ -1,0 +1,42 @@
+name: napari-automatic-range
+display_name: Automatic Range
+# use 'hidden' to remove plugin from napari hub search results
+visibility: public
+# see https://napari.org/stable/plugins/technical_references/manifest.html#fields for valid categories
+# categories: []
+contributions:
+  commands:
+    - id: napari-automatic-range.get_reader
+      python_name: napari_automatic_range._reader:napari_get_reader
+      title: Open data with Automatic Range
+    - id: napari-automatic-range.write_multiple
+      python_name: napari_automatic_range._writer:write_multiple
+      title: Save multi-layer data with Automatic Range
+    - id: napari-automatic-range.write_single_image
+      python_name: napari_automatic_range._writer:write_single_image
+      title: Save image data with Automatic Range
+    - id: napari-automatic-range.make_sample_data
+      python_name: napari_automatic_range._sample_data:make_sample_data
+      title: Load sample data from Automatic Range
+      python_name: napari_automatic_range:show_hello_message
+    - id: napari-automatic-range.automatic_range_widget
+      python_name: napari_automatic_range:AutomaticRangeWidget
+      title: Automatic Range Widget
+  readers:
+    - command: napari-automatic-range.get_reader
+      accepts_directories: false
+      filename_patterns: ['*.npy']
+  writers:
+    - command: napari-automatic-range.write_multiple
+      layer_types: ['image*','labels*']
+      filename_extensions: []
+    - command: napari-automatic-range.write_single_image
+      layer_types: ['image']
+      filename_extensions: ['.npy']
+  sample_data:
+    - command: napari-automatic-range.make_sample_data
+      display_name: Automatic Range
+      key: unique_id.1
+  widgets:
+    - command: napari-automatic-range.automatic_range_widget
+      display_name: Automatic Range
