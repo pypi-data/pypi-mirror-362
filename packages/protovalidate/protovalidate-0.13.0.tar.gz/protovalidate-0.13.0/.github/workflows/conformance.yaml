@@ -1,0 +1,35 @@
+name: Conformance
+on:
+  pull_request:
+  push:
+    tags:
+      - 'v*.*.*'
+    branches:
+      - 'main'
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: Conformance Testing
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+      - uses: astral-sh/setup-uv@v6
+      - name: Install Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+      - name: Test conformance
+        run: make conformance
