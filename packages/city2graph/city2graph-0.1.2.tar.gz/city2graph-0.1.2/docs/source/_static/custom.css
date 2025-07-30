@@ -1,0 +1,570 @@
+/* Custom CSS for city2graph documentation */
+
+/* Typography improvements */
+:root {
+    --main-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    --code-font: monospace;
+    --city-primary: #0066cc; /* Changed to a more vibrant blue from #3498db */
+    --city-secondary: #2ecc71;
+    --city-tertiary: #9b59b6;
+    --city-accent: #e74c3c;
+    --city-light: #ecf0f1;
+    --city-dark: #2c3e50;
+}
+
+body {
+    font-family: var(--main-font);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: normal;
+    line-height: 1.5;
+    font-size: 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--main-font);
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    color: var(--city-dark);
+    letter-spacing: normal;
+}
+
+h1 {
+    font-size: 2.5em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 0.3em;
+    position: relative;
+}
+
+h2 {
+    font-size: 1.8em;
+}
+
+h3 {
+    font-size: 1.4em;
+}
+
+p, ul, ol {
+    line-height: 1.7;
+    margin-bottom: 1.2em;
+    hyphens: auto;
+}
+
+a {
+    color: var(--city-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+    font-weight: 500; /* Added to make links more prominent */
+}
+
+a:hover {
+    color: #0077ee; /* Brighter blue on hover */
+    border-bottom-color: currentColor;
+    text-decoration: none;
+}
+
+/* Code block styling - light grey background for light theme, dark grey for dark theme */
+
+/* Light theme code blocks with light grey background */
+pre {
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 0;
+    color: #333333;
+    font-family: var(--code-font);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 1.5em 0;
+    overflow-x: auto;
+    padding: 12px 14px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Light theme: darker code, lighter comments (higher contrast with comments) */
+.highlight .n { color: #222222; } /* Name - very dark grey */
+.highlight .p { color: #222222; } /* Punctuation - very dark grey */
+.highlight .o { color: #222222; } /* Operator - very dark grey */
+.highlight .c1, .highlight .c, .highlight .cm, .highlight .cp, .highlight .cs {
+    color: #999999;
+    font-style: italic;
+} /* Comments in light grey */
+.highlight .s1, .highlight .s2 { color: #888888; } /* Strings in light grey */
+.highlight .mi, .highlight .mf { color: #666666; } /* Numbers in medium grey */
+.highlight .k, .highlight .kc, .highlight .kd, .highlight .kn {
+    color: #333333;
+    font-weight: bold;
+} /* Keywords in dark grey */
+.highlight .nb { color: #555555; } /* Built-in in medium-dark grey */
+.highlight .bp { color: #555555; } /* Self in medium-dark grey */
+
+/* Inline code styling */
+code {
+    font-family: var(--code-font);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+    font-size: 90%;
+    padding: 2px 4px;
+    color: #e83e8c;
+}
+
+/* Dark theme code blocks - remove border and border-radius */
+html[data-theme="dark"] pre {
+    background-color: #252525;
+    border: none;
+    border-radius: 0;
+    color: #e6e6e6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark theme: lighter code, darker comments (opposite of light theme) */
+html[data-theme="dark"] .highlight .n { color: #dddddd; } /* Name - very light grey */
+html[data-theme="dark"] .highlight .p { color: #dddddd; } /* Punctuation - very light grey */
+html[data-theme="dark"] .highlight .o { color: #dddddd; } /* Operator - very light grey */
+html[data-theme="dark"] .highlight .c1,
+html[data-theme="dark"] .highlight .c,
+html[data-theme="dark"] .highlight .cm,
+html[data-theme="dark"] .highlight .cp,
+html[data-theme="dark"] .highlight .cs {
+    color: #666666;
+    font-style: italic;
+} /* Comments in darker grey */
+html[data-theme="dark"] .highlight .s1,
+html[data-theme="dark"] .highlight .s2 {
+    color: #777777;
+} /* Strings in medium-dark grey */
+
+/* Add line number styling */
+.highlight .linenos {
+    color: #999;
+    margin-right: 0.5em;
+    user-select: none;
+}
+
+/* Add a copy button style like PyTorch's */
+.copybutton {
+    cursor: pointer;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 24px;
+    height: 24px;
+    background-color: transparent;
+    border: none;
+    color: #999;
+    border-radius: 3px;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out, background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.highlight:hover .copybutton {
+    opacity: 1;
+}
+
+.copybutton:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #666;
+}
+
+html[data-theme="dark"] .copybutton {
+    color: #ccc;
+}
+
+html[data-theme="dark"] .copybutton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Style the code block container to position copy button correctly */
+div.highlight {
+    position: relative;
+}
+
+/* Light/dark mode logo display */
+.only-light {
+    display: block;
+}
+
+.only-dark {
+    display: none;
+}
+
+html[data-theme="dark"] .only-light {
+    display: none;
+}
+
+html[data-theme="dark"] .only-dark {
+    display: block;
+}
+
+html[data-theme="dark"] {
+    --city-dark: #f1f2f6;
+    --city-light: #2c3e50;
+    --city-code-bg: #282c34;
+    --city-code-border: #3d4352;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6 {
+    color: var(--city-dark);
+}
+
+html[data-theme="dark"] h1 {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] code {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #fd79a8;
+}
+
+/* Enhanced warning and note styling */
+div.admonition {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin: 30px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+div.admonition:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Warning styling */
+div.admonition.warning {
+    border-left: 5px solid #f39c12;
+    background: linear-gradient(to right, rgba(243, 156, 18, 0.08), rgba(243, 156, 18, 0.01));
+}
+
+div.admonition.warning::before {
+    content: "⚠️";
+    font-size: 1.8em;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+}
+
+div.admonition.warning p {
+    margin-bottom: 0;
+    color: #7d5a1c;
+    position: relative;
+    z-index: 2;
+}
+
+div.admonition.warning strong {
+    color: #e67e22;
+    font-weight: 600;
+    border-bottom: 2px dotted rgba(230, 126, 34, 0.3);
+    padding-bottom: 2px;
+}
+
+/* Note styling - in blue */
+div.admonition.note {
+    border-left: 5px solid var(--city-primary);
+    background: linear-gradient(to right, rgba(0, 102, 204, 0.08), rgba(0, 102, 204, 0.01));
+}
+
+div.admonition.note::before {
+    content: "💡";
+    font-size: 1.8em;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+}
+
+div.admonition.note p {
+    margin-bottom: 0;
+    color: #2c6c96;
+    position: relative;
+    z-index: 2;
+}
+
+div.admonition.note strong {
+    color: var(--city-primary);
+    font-weight: 600;
+    border-bottom: 2px dotted rgba(52, 152, 219, 0.3);
+    padding-bottom: 2px;
+}
+
+/* Override default admonition styling to apply our custom styles */
+.admonition {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.admonition-title {
+    display: none !important;
+}
+
+.admonition > .admonition-title + div {
+    padding: 0 !important;
+}
+
+/* Dark mode styling */
+html[data-theme="dark"] div.admonition {
+    background-color: rgba(20, 30, 40, 0.7);
+    border-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme="dark"] div.admonition.warning {
+    background: linear-gradient(to right, rgba(243, 156, 18, 0.12), rgba(243, 156, 18, 0.01));
+}
+
+html[data-theme="dark"] div.admonition.warning p {
+    color: #ffc107;
+}
+
+html[data-theme="dark"] div.admonition.warning strong {
+    color: #f39c12;
+    border-bottom-color: rgba(243, 156, 18, 0.4);
+}
+
+html[data-theme="dark"] div.admonition.note {
+    background: linear-gradient(to right, rgba(52, 152, 219, 0.12), rgba(52, 152, 219, 0.01));
+}
+
+html[data-theme="dark"] div.admonition.note p {
+    color: #3498db;
+}
+
+html[data-theme="dark"] div.admonition.note strong {
+    color: #74b9ff;
+    border-bottom-color: rgba(116, 185, 255, 0.4);
+}
+
+html[data-theme="dark"] .admonition.note .admonition-title {
+    color: #4da6ff; /* Brighter blue for dark mode */
+}
+
+/* Table improvements */
+table.docutils {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 25px 0;
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+table.docutils th {
+    background: linear-gradient(120deg, var(--city-primary), var(--city-primary) 60%, #005cb8);
+    color: white;
+    padding: 12px 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.05em;
+}
+
+table.docutils td {
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: background-color 0.15s ease;
+}
+
+table.docutils tr:last-child td {
+    border-bottom: none;
+}
+
+table.docutils tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.015);
+}
+
+table.docutils tr:hover td {
+    background-color: rgba(52, 152, 219, 0.03);
+}
+
+html[data-theme="dark"] table.docutils {
+    border-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="dark"] table.docutils th {
+    background: linear-gradient(120deg, #2980b9, #3498db);
+}
+
+html[data-theme="dark"] table.docutils td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme="dark"] table.docutils tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+html[data-theme="dark"] table.docutils tr:hover td {
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* Admonitions styling */
+.admonition {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    margin: 25px 0;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.admonition::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.admonition.note::before {
+    background-color: var(--city-primary);
+}
+
+.admonition.warning::before {
+    background-color: #e67e22;
+}
+
+.admonition.important::before {
+    background-color: var(--city-tertiary);
+}
+
+.admonition.tip::before {
+    background-color: var(--city-secondary);
+}
+
+.admonition-title {
+    padding: 14px 20px;
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1em;
+    position: relative;
+    padding-left: 20px;
+    background-color: rgba(0, 0, 0, 0.02);
+    display: flex;
+    align-items: center;
+}
+
+.admonition-title::before {
+    margin-right: 10px;
+    opacity: 0.8;
+}
+
+.admonition.note .admonition-title::before {
+    content: "💡";
+}
+
+.admonition.warning .admonition-title::before {
+    content: "⚠️";
+}
+
+.admonition.important .admonition-title::before {
+    content: "❗";
+}
+
+.admonition.tip .admonition-title::before {
+    content: "💪";
+}
+
+.admonition-title + div {
+    padding: 15px 20px;
+}
+
+.admonition.note .admonition-title {
+    color: var(--city-primary);
+}
+
+.admonition.warning .admonition-title {
+    color: #e67e22;
+}
+
+.admonition.important .admonition-title {
+    color: var(--city-tertiary);
+}
+
+.admonition.tip .admonition-title {
+    color: var(--city-secondary);
+}
+
+html[data-theme="dark"] .admonition {
+    border-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="dark"] .admonition-title {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Navigation improvements */
+.wy-nav-side {
+    background-color: var(--city-dark);
+}
+
+.wy-menu-vertical a {
+    padding: 12px 18px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.wy-menu-vertical a:hover {
+    background-color: rgba(52, 152, 219, 0.08);
+    border-left-color: var(--city-primary);
+}
+
+/* Improve paragraph spacing in documentation */
+.section p {
+    margin-bottom: 1em;
+    text-align: justify;
+}
+
+/* Improve readability of text */
+.section {
+    max-width: 60em;
+    margin: 0 auto;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    h3 {
+        font-size: 1.2em;
+    }
+
+    table.docutils th, table.docutils td {
+        padding: 8px 12px;
+    }
+
+    dl.class, dl.function, dl.method, dl.attribute {
+        padding: 15px;
+    }
+}
