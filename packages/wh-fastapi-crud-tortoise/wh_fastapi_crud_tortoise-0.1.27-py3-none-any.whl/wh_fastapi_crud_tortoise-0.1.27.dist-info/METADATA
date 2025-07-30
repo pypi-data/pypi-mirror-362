@@ -1,0 +1,146 @@
+Metadata-Version: 2.2
+Name: wh_fastapi_crud_tortoise
+Version: 0.1.27
+Summary: A CRUD library for Tortoise ORM
+Home-page: https://github.com/kanbang/fastapi-crud-pro
+Author: kanbang
+Author-email: kanbang@163.com
+Project-URL: Bug Reports, https://github.com/kanbang/fastapi-crud-pro/issues
+Project-URL: Source, https://github.com/kanbang/fastapi-crud-pro
+Keywords: crud,tortoise-orm,sqlalchemy,database
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: tortoise-orm>=0.20.1
+Requires-Dist: pydantic>=2.7.1
+Requires-Dist: openpyxl>=3.1.5
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# CRUD Tortoise ORM Extension
+
+## Project Overview
+This project is an extension that implements CRUD operations based on Tortoise ORM, providing a simple and efficient way to manage database records.
+
+## Installation Instructions
+
+Install the `wh-fastapi-crud-tortoise` package:
+   ```bash
+   pip install wh-fastapi-crud-tortoise
+   ```
+
+## Usage
+Here is a basic example of how to use the CRUD extension:
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime, date
+from typing import Optional, Union
+
+from datetime import datetime
+from tortoise import fields
+from src import CrudModel, TortoiseCRUDRouter, resp_success, resp_fail
+from tortoise.contrib.fastapi import register_tortoise
+
+
+class DummyModel(CrudModel):
+    """Record Table"""
+
+    name = fields.CharField(max_length=255, null=False)
+    age = fields.IntField()
+    salary = fields.FloatField()
+    is_active = fields.BooleanField(default=True)
+    birthdate = fields.DateField()
+    created_at = fields.DatetimeField()
+    notes = fields.TextField()
+    json_data = fields.JSONField(null=True, default=None)
+
+    class Meta:
+        table = "dummy"
+
+
+ID_TYPE = str
+
+
+class DummyCreateDTO(BaseModel):
+    name: str
+    age: int
+    salary: float
+    is_active: bool
+    birthdate: date
+    created_at: datetime
+    notes: str
+    json_data: Optional[object] = None
+
+
+class DummyDTO(BaseModel):
+    id: Optional[ID_TYPE] = None
+    name: Optional[str] = None
+    age: Optional[int] = None
+    salary: Optional[float] = None
+    is_active: Optional[bool] = None
+    birthdate: Optional[date] = None
+    created_at: Optional[datetime] = None
+    notes: Optional[str] = None
+    json_data: Optional[object] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+dummy_router = TortoiseCRUDRouter(
+    schema=DummyDTO, create_schema=DummyCreateDTO, db_model=DummyModel, prefix="dummy"
+)
+
+
+@dummy_router.post("/custom_router")
+async def test(para1: int, para2: str):
+    return resp_success(data="test custom router")
+
+
+app = FastAPI(title="FastapiCrudPro")
+register_tortoise(
+    app,
+    db_url="sqlite://tortoise.sqlite3",
+    modules={"models": ["demo"]},
+    generate_schemas=True,
+    add_exception_handlers=True,
+)
+
+app.include_router(dummy_router)
+
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app="demo:app", host="127.0.0.1", port=8010, reload=True)
+```
+
+## API Documentation
+To view the API documentation, open your browser and navigate to `http://127.0.0.1:8010/docs`.
+
+<img alt="dummy" src="https://raw.githubusercontent.com/kanbang/fastapi-crud-pro/master/doc/dummy.png">
+
+## License
+This project is licensed under the MIT License.
