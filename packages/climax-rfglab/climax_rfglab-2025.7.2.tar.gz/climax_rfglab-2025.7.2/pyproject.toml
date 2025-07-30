@@ -1,0 +1,51 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "climax.climax_rs"
+
+[project]
+name = "climax-rfglab"
+dynamic = ["version"]
+
+authors = [
+  { name="Rodrigo Fernandez-Gonzalez", email="rodrigo.fernandez.gonzalez@utoronto.ca" },
+]
+description = "climax is a Command Line IMAge eXplorer"
+license = "GPL-3.0-or-later"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers=[
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "numpy==2.2.1",
+  "matplotlib==3.10.0",
+  "rich-pixels",
+  "scikit-image==0.25.0",
+  "textual==1.0.0",
+  "textual_fspicker==0.4.1",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "climax.version.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["climax", "climax.*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.tcss", "*.png"]
+
+[project.scripts]
+climax = "climax.climax:main"
+
+[project.urls]
+"Homepage" = "https://bitbucket.com/rfg_lab/climax"
+"Bug Tracker" = "https://bitbucket.com/rfg_lab/climax/issues"

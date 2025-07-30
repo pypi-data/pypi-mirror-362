@@ -1,0 +1,18 @@
+[package]
+name = "climax_rs"
+version = "2025.7.2"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "climax_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+numpy = "0.25.0"
+pyo3 = { version = "0.25.0", features = ["extension-module"] }
+rayon = "1.10.0"
+
+[profile.release]
+lto = true         # Link-time optimization.
+codegen-units = 1  # Slower compilation but faster code. 
