@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling",
+"hatch-vcs"
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "lhagrid"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = []
+authors = [
+  { name = "Alexander Puck Neuwirth", email = "alexander@neuwirth-informatik.de" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "pandas",
+]
+
+[project.urls]
+Documentation = "https://github.com/Alexander Puck Neuwirth/lhagrid#readme"
+Issues = "https://github.com/Alexander Puck Neuwirth/lhagrid/issues"
+Source = "https://github.com/Alexander Puck Neuwirth/lhagrid"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/lhagrid tests}"
+
+[tool.coverage.run]
+source_pkgs = ["lhagrid", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/lhagrid/__about__.py",
+]
+
+[tool.coverage.paths]
+lhagrid = ["src/lhagrid", "*/lhagrid/src/lhagrid"]
+tests = ["tests", "*/lhagrid/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/lhagrid/_version.py"
+
+[tool.hatch.version]
+source = "vcs"
+  
