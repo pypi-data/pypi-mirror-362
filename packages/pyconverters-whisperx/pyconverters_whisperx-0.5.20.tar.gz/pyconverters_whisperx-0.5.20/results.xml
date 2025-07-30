@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="6" time="0.415" timestamp="2024-04-10T09:41:01.850876" hostname="OLI-OMEN"><testcase classname="bumpversion" name="FLAKE8" time="0.046" /><testcase classname="src.pyconverters_whisperx.__init__" name="FLAKE8" time="0.021" /><testcase classname="src.pyconverters_whisperx.whisperx" name="FLAKE8" time="0.058" /><testcase classname="tests.test_whisperx" name="FLAKE8" time="0.028"><failure message="/media/olivier/ssd1T/dev/kairntech/pyconverters_whisperx/tests/test_whisperx.py:4:1: F401 'pytest' imported but unused&#10;">/media/olivier/ssd1T/dev/kairntech/pyconverters_whisperx/tests/test_whisperx.py:4:1: F401 'pytest' imported but unused
+</failure></testcase><testcase classname="tests.test_whisperx" name="test_whisperx" time="0.000" /><testcase classname="tests.test_whisperx" name="test_whisperx_yaml" time="0.001"><failure message="AttributeError: 'NoneType' object has no attribute 'endswith'">def test_whisperx_yaml():
+        model = WhisperXConverter.get_model()
+        model_class = model.construct().__class__
+        assert model_class == WhisperXParameters
+        converter = WhisperXConverter()
+        parameters = WhisperXParameters()
+        testdir = Path(__file__).parent
+        source = Path(testdir, "data/test.yaml")
+        with source.open("rb") as fin:
+&gt;           docs: List[Document] = converter.convert(
+                UploadFile(source.name, fin), parameters
+            )
+
+tests/test_whisperx.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.tox/report/lib/python3.8/site-packages/pyconverters_whisperx/whisperx.py:87: in convert
+    client = get_client(params.whisperx_url)
+.tox/report/lib/python3.8/site-packages/pyconverters_whisperx/whisperx.py:127: in get_client
+    client = WhisperXClient(base_url)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;pyconverters_whisperx.whisperx.WhisperXClient object at 0x7f56ea284610&gt;, base_url = None
+
+    def __init__(self, base_url):
+&gt;       self.base_url = base_url[0:-1] if base_url.endswith("/") else base_url
+E       AttributeError: 'NoneType' object has no attribute 'endswith'
+
+.tox/report/lib/python3.8/site-packages/pyconverters_whisperx/whisperx.py:137: AttributeError</failure></testcase></testsuite></testsuites>
