@@ -1,0 +1,113 @@
+Metadata-Version: 2.4
+Name: eidosui
+Version: 0.8.0
+Summary: A modern, Tailwind CSS-based UI library for air development
+Project-URL: Homepage, https://github.com/isaac-flath/EidosUI
+Project-URL: Repository, https://github.com/isaac-flath/EidosUI
+Project-URL: Issues, https://github.com/isaac-flath/EidosUI/issues
+Project-URL: Documentation, https://github.com/isaac-flath/EidosUI#readme
+Author: Isaac Flath
+License-Expression: MIT
+License-File: LICENSE
+Keywords: air,components,css,fastapi,tailwind,ui,web
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Requires-Dist: air>=0.12
+Requires-Dist: fastapi[standard]
+Requires-Dist: uvicorn
+Provides-Extra: dev
+Requires-Dist: black; extra == 'dev'
+Requires-Dist: isort; extra == 'dev'
+Requires-Dist: mypy; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: ruff; extra == 'dev'
+Provides-Extra: markdown
+Requires-Dist: markdown>=3.4; extra == 'markdown'
+Description-Content-Type: text/markdown
+
+# EidosUI
+
+Modern UI library for Python web frameworks. Built on Air and Tailwind CSS.
+
+> [!CAUTION]
+> This library is in alpha, and may have semi-frequent breaking changes.  I'd love for you to try it an contribute feedback or PRs!
+
+## Installation
+
+```bash
+pip install eidosui
+```
+
+## Quick Start
+
+```python
+from eidos import *
+import air
+
+app = air.Air()
+
+@app.get("/")
+def home():
+    return Html(
+        Head(
+            Title("My App"),
+            *EidosHeaders()  # Required CSS/JS
+        ),
+        Body(
+            H1("Welcome"),
+            P("Build modern web apps with Python."),
+            DataTable.from_lists(
+                [["Alice", "30"], ["Bob", "25"]], 
+                headers=["Name", "Age"]
+            )
+        )
+    )
+
+app.run()
+```
+
+## Features
+
+- **Styled HTML tags** - Pre-styled versions of all HTML elements
+- **Components** - DataTable, NavBar, and more  
+- **Themes** - Light/dark themes via CSS variables
+- **Type hints** - Full type annotations
+- **Air integration** - Works seamlessly with Air framework
+
+## Plugins
+
+### Markdown
+
+```bash
+pip install "eidosui[markdown]"
+```
+
+```python
+from eidos.plugins.markdown import Markdown, MarkdownCSS
+
+Head(
+    *EidosHeaders(),
+    MarkdownCSS()  # Add markdown styles
+)
+
+Body(
+    Markdown("# Hello\n\nSupports **GitHub Flavored Markdown**")
+)
+```
+
+## Documentation
+
+Full documentation: https://eidosui.readthedocs.io
+
+## License
+
+MIT
