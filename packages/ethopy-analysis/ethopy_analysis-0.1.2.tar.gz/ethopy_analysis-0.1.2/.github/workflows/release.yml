@@ -1,0 +1,145 @@
+name: Release and Publish to PyPI
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v1.0.0, v1.2.3, etc.
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write          # Required for creating releases
+      id-token: write         # Required for PyPI trusted publishing (optional)
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for setuptools_scm to work properly
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine setuptools_scm
+
+    - name: Verify version from tag
+      run: |
+        echo "Tag: ${{ github.ref_name }}"
+        echo "Expected version: ${GITHUB_REF_NAME#v}"
+        python -c "import setuptools_scm; print(f'Computed version: {setuptools_scm.get_version()}')"
+
+    - name: Build package
+      run: |
+        python -m build
+
+    - name: Check distribution files
+      run: |
+        ls -la dist/
+        twine check dist/*
+
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        twine upload dist/*
+
+    - name: Extract changelog section
+      id: changelog
+      run: |
+        VERSION=${GITHUB_REF_NAME#v}
+        
+        # Extract changelog section for this version
+        if [ -f CHANGELOG.md ]; then
+          # Extract the section between [VERSION] and the next [VERSION] or end of file
+          CHANGELOG_SECTION=$(awk "/^## \[$VERSION\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
+          
+          if [ -n "$CHANGELOG_SECTION" ]; then
+            echo "Found changelog section for version $VERSION"
+            # Use a delimiter to handle multiline output properly
+            echo "changelog_content<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGELOG_SECTION" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "has_changelog=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changelog section found for version $VERSION"
+            echo "has_changelog=false" >> $GITHUB_OUTPUT
+            echo "changelog_content=See commit history for changes." >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "No CHANGELOG.md found"
+          echo "has_changelog=false" >> $GITHUB_OUTPUT
+          echo "changelog_content=See commit history for changes." >> $GITHUB_OUTPUT
+        fi
+
+    - name: Get previous tag for comparison
+      id: previous_tag
+      run: |
+        # Get the previous tag for comparison (handle case where there's no previous tag)
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ github.ref_name }}^ 2>/dev/null || echo "")
+        if [ -n "$PREVIOUS_TAG" ]; then
+          echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          echo "Previous tag: $PREVIOUS_TAG"
+        else
+          echo "previous_tag=" >> $GITHUB_OUTPUT
+          echo "No previous tag found (this might be the first release)"
+        fi
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        body: |
+          ## Changes in ${{ github.ref_name }}
+          
+          ${{ steps.changelog.outputs.changelog_content }}
+          
+          ## Installation
+          
+          ```bash
+          pip install ethopy-analysis==${{ github.ref_name }}
+          ```
+          
+          ## Links
+          
+          - 📚 [Documentation](https://ef-lab.github.io/ethopy_analysis)
+          - 🐛 [Report Issues](https://github.com/ef-lab/ethopy_analysis/issues)
+          - 📋 [Full Changelog](https://github.com/ef-lab/ethopy_analysis/blob/main/CHANGELOG.md)
+          
+          ${{ steps.previous_tag.outputs.previous_tag && format('**Comparison**: https://github.com/{0}/compare/{1}...{2}', github.repository, steps.previous_tag.outputs.previous_tag, github.ref_name) || '**First Release** 🎉' }}
+        draft: false
+        prerelease: ${{ contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') }}
+        files: |
+          dist/*.tar.gz
+          dist/*.whl
+        generate_release_notes: true
+
+  test-install:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Wait for PyPI to update
+      run: sleep 60
+
+    - name: Test installation from PyPI
+      run: |
+        pip install ethopy-analysis==${{ github.ref_name }}
+        python -c "import ethopy_analysis; print(f'Successfully installed version: {ethopy_analysis.__version__}')"
+
+    - name: Test CLI
+      run: |
+        ethopy-analysis --help
+        ethopy-analysis --version
