@@ -1,0 +1,1 @@
+from logcatter.log import Log
