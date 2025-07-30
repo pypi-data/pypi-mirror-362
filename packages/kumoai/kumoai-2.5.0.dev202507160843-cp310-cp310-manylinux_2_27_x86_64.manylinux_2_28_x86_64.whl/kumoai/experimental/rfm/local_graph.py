@@ -1,0 +1,682 @@
+import io
+import warnings
+from collections import defaultdict
+from importlib.util import find_spec
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
+
+import pandas as pd
+from kumoapi.graph import ColumnKey, ColumnKeyGroup, GraphDefinition
+from kumoapi.table import TableDefinition
+from kumoapi.typing import Stype
+from typing_extensions import Self
+
+from kumoai import in_notebook
+from kumoai.experimental.rfm import LocalTable
+from kumoai.graph import Edge
+
+if TYPE_CHECKING:
+    import graphviz
+
+
+class LocalGraph:
+    r"""A graph of :class:`LocalTable` objects, akin to relationships between
+    tables in a relational database.
+
+    Creating a graph is the final step of data definition; after a
+    :class:`LocalGraph` is created, you can use it to initialize the
+    Kumo Relational Foundation Model (:class:`KumoRFM`).
+
+    .. code-block:: python
+
+        import pandas as pd
+        import kumoai.experimental.rfm as rfm
+
+        # Load data frames into memory:
+        df1 = pd.DataFrame(...)
+        df2 = pd.DataFrame(...)
+        df3 = pd.DataFrame(...)
+
+        # Define tables from data frames:
+        table1 = rfm.LocalTable(name="table1", data=df1)
+        table2 = rfm.LocalTable(name="table2", data=df2)
+        table3 = rfm.LocalTable(name="table3", data=df3)
+
+        # Create a graph from a dictionary of tables:
+        graph = rfm.LocalGraph({
+            "table1": table1,
+            "table2": table2,
+            "table3": table3,
+        })
+
+        # Infer table metadata:
+        graph.infer_metadata()
+
+        # Infer links/edges:
+        graph.infer_links()
+
+        # Inspect table metadata:
+        for table in graph.tables.values():
+            table.print_metadata()
+
+        # Visualize graph (if graphviz is installed):
+        graph.visualize()
+
+        # Add/Remove edges between tables:
+        graph.link(src_table="table1", fkey="id1", dst_table="table2")
+        graph.unlink(src_table="table1", fkey="id1", dst_table="table2")
+
+        # Validate graph:
+        graph.validate()
+    """
+
+    # Constructors ############################################################
+
+    def __init__(
+        self,
+        tables: List[LocalTable],
+        edges: Optional[List[Edge]] = None,
+    ) -> None:
+
+        if len(tables) == 0:
+            raise ValueError("At least one table needs to be passed")
+
+        if len(tables) != len(set([table.name for table in tables])):
+            seen = set()
+            duplicates = set()
+            for table in tables:
+                if table.name in seen:
+                    duplicates.add(table.name)
+                seen.add(table.name)
+            raise ValueError(f"Table names must be unique within a graph. "
+                             f"Found duplicated tables {duplicates}")
+
+        if len(tables) > 15:
+            raise ValueError(f"Cannot create a graph with more than 15 tables "
+                             f"(got {len(tables)}). Please create a feature "
+                             f"request at "
+                             "'https://github.com/kumo-ai/kumo-rfm' if you "
+                             f"must go beyond this for your use-case.")
+
+        self._tables: Dict[str, LocalTable] = {}
+        self._edges: List[Edge] = []
+
+        for table in tables:
+            self._tables[table.name] = table
+
+        for edge in (edges or []):
+            self.link(Edge._cast(edge))
+
+    @classmethod
+    def from_data(
+        cls,
+        df_dict: Dict[str, pd.DataFrame],
+        edges: Optional[List[Edge]] = None,
+        infer_metadata: bool = True,
+        verbose: bool = True,
+    ) -> Self:
+        r"""Creates a :class:`LocalGraph` from a dictionary of
+        :class:`pandas.DataFrame` objects.
+
+        Automatically infers table metadata and links.
+
+        .. code-block:: python
+
+            import pandas as pd
+            import kumoai.experimental.rfm as rfm
+
+            # Load data frames into memory:
+            df1 = pd.DataFrame(...)
+            df2 = pd.DataFrame(...)
+            df3 = pd.DataFrame(...)
+
+            # Create a graph from a dictionary of data frames:
+            graph = rfm.LocalGraph.from_data({
+                "table1": df1,
+                "table2": df2,
+                "table3": df3,
+            })
+
+            # Inspect table metadata:
+            for table in graph.tables.values():
+                table.print_metadata()
+
+            # Visualize graph (if graphviz is installed):
+            graph.visualize()
+
+        Args:
+            df_dict: A dictionary of data frames, where the keys are the names
+                of the tables and the values hold table data.
+            infer_metadata: Whether to infer metadata for all tables in the
+                graph.
+            edges: An optional list of :class:`~kumoai.graph.Edge` objects to
+                add to the graph. If not provided, edges will be automatically
+                inferred from the data.
+            verbose: Whether to print verbose output.
+
+        Note:
+            This method will automatically infer metadata and links for the
+            graph.
+
+        Example:
+            >>> import kumoai.experimental.rfm as rfm
+            >>> df1 = pd.DataFrame(...)
+            >>> df2 = pd.DataFrame(...)
+            >>> df3 = pd.DataFrame(...)
+            >>> graph = rfm.LocalGraph.from_data(data={
+            ...     "table1": df1,
+            ...     "table2": df2,
+            ...     "table3": df3,
+            ... })
+            ... graph.validate()
+        """
+        tables = [LocalTable(df, name) for name, df in df_dict.items()]
+
+        graph = cls(tables, edges=edges or [])
+
+        if infer_metadata:
+            graph.infer_metadata(verbose)
+
+            if edges is None:
+                graph.infer_links(verbose)
+
+        return graph
+
+    # Tables ##############################################################
+
+    def has_table(self, name: str) -> bool:
+        r"""Returns ``True`` if the graph has a table with name ``name``;
+        ``False`` otherwise.
+        """
+        return name in self.tables
+
+    def table(self, name: str) -> LocalTable:
+        r"""Returns the table with name ``name`` in the graph.
+
+        Raises:
+            KeyError: If ``name`` is not present in the graph.
+        """
+        if not self.has_table(name):
+            raise KeyError(f"Table '{name}' not found in graph")
+        return self.tables[name]
+
+    @property
+    def tables(self) -> Dict[str, LocalTable]:
+        r"""Returns the dictionary of table objects."""
+        return self._tables
+
+    @property
+    def metadata(self) -> pd.DataFrame:
+        r"""Returns a :class:`pandas.DataFrame` object containing metadata
+        information about the tables in this graph.
+
+        The returned dataframe has columns ``name``, ``primary_key``, and
+        ``time_column``, which provide an aggregate view of the properties of
+        the tables of this graph.
+
+        Example:
+            >>> import kumoai.experimental.rfm as rfm
+            >>> graph = rfm.LocalGraph(tables=...).infer_metadata()
+            >>> graph.metadata
+                name  primary_key time_column
+            0   users     user_id           -
+        """
+        tables = list(self.tables.values())
+
+        return pd.DataFrame({
+            'name':
+            pd.Series(dtype=str, data=[t.name for t in tables]),
+            'primary_key':
+            pd.Series(dtype=str, data=[t._primary_key or '-' for t in tables]),
+            'time_column':
+            pd.Series(dtype=str, data=[t._time_column or '-' for t in tables]),
+        })
+
+    def print_metadata(self) -> None:
+        r"""Prints the :meth:`~LocalGraph.metadata` of the graph."""
+        if in_notebook():
+            from IPython.display import Markdown, display
+            display(Markdown('### 🗂️ Graph Metadata'))
+            df = self.metadata
+            try:
+                display(df.style.hide(axis='index'))
+            except Exception:
+                display(df.style.hide_index())
+        else:
+            print("🗂️ Graph Metadata:")
+            print(self.metadata.to_string(index=False))
+
+    def infer_metadata(self, verbose: bool = True) -> Self:
+        r"""Infers metadata for all tables in the graph.
+
+        Args:
+            verbose: Whether to print verbose output.
+
+        Note:
+            For more information, please see
+            :meth:`kumoai.experimental.rfm.LocalTable.infer_metadata`.
+        """
+        for table in self.tables.values():
+            table.infer_metadata(verbose=False)
+
+        if verbose:
+            self.print_metadata()
+
+        return self
+
+    # Edges ###################################################################
+
+    @property
+    def edges(self) -> List[Edge]:
+        r"""Returns the edges of the graph."""
+        return self._edges
+
+    def print_links(self) -> None:
+        r"""Prints the :meth:`~LocalGraph.edges` of the graph."""
+        edges = [(edge.dst_table, self[edge.dst_table]._primary_key,
+                  edge.src_table, edge.fkey) for edge in self.edges]
+        edges = sorted(edges)
+
+        if in_notebook():
+            from IPython.display import Markdown, display
+            display(Markdown('### 🕸️ Graph Links (FK ↔️ PK)'))
+            display(
+                Markdown('\n'.join([
+                    f'- `{edge[2]}.{edge[3]}` ↔️ `{edge[0]}.{edge[1]}`'
+                    for edge in edges
+                ])))
+        else:
+            print("🕸️ Graph Links (FK ↔️ PK):")
+            print('\n'.join([
+                f'• {edge[2]}.{edge[3]} ↔️ {edge[0]}.{edge[1]}'
+                for edge in edges
+            ]))
+
+    def link(
+        self,
+        *args: Optional[Union[str, Edge]],
+        **kwargs: str,
+    ) -> Self:
+        r"""Links two tables (``src_table`` and ``dst_table``) from the foreign
+        key ``fkey`` in the source table to the primary key in the destination
+        table.
+
+        The link is treated as bidirectional.
+
+        Args:
+            *args: Any arguments to construct an :class:`~kumoai.graph.Edge`,
+                or an :class:`~kumoai.graph.Edge` object itself.
+            **kwargs: Any keyword arguments to construct an
+                :class:`~kumoai.graph.Edge`.
+
+        Raises:
+            ValueError: if the edge is already present in the graph, if the
+                source table does not exist in the graph, if the destination
+                table does not exist in the graph, if the source key does not
+                exist in the source table.
+        """
+        edge = Edge._cast(*args, **kwargs)
+
+        if edge is None:
+            raise ValueError("Could not parse edge")
+
+        if edge in self.edges:
+            raise ValueError(f"{edge} already exists in the graph")
+
+        src_table, fkey, dst_table = edge
+
+        if not self.has_table(src_table):
+            raise ValueError(f"Source table '{src_table}' does not exist in "
+                             f"the graph.")
+
+        if not self.has_table(dst_table):
+            raise ValueError(f"Destination table '{dst_table}' does not exist "
+                             f"in the graph.")
+
+        if not self.table(src_table).has_column(fkey):
+            raise ValueError(f"Source key '{fkey}' does not exist as a column "
+                             f"in source table '{src_table}'")
+
+        self._edges.append(edge)
+
+        return self
+
+    def unlink(self, *args: Optional[Union[str, Edge]], **kwargs: str) -> Self:
+        r"""Removes an :class:`~kumoai.graph.Edge` from the graph.
+
+        Args:
+            *args: Any arguments to construct an :class:`~kumoai.graph.Edge`,
+                or an :class:`~kumoai.graph.Edge` object itself.
+            **kwargs: Any keyword arguments to construct an
+                :class:`~kumoai.graph.Edge`.
+
+        Raises:
+            ValueError: if the edge is not present in the graph.
+        """
+        edge = Edge._cast(*args, **kwargs)
+
+        if edge is None:
+            raise ValueError("Could not parse edge")
+
+        if edge not in self.edges:
+            raise ValueError(f"{edge} is not present in the graph")
+
+        self._edges.remove(edge)
+
+        return self
+
+    def infer_links(self, verbose: bool = True) -> Self:
+        r"""Infers links for the tables and adds them as edges to the graph.
+
+        Args:
+            verbose: Whether to print verbose output.
+
+        Note:
+            This function expects graph edges to be undefined upfront.
+        """
+        if len(self.edges) > 0:
+            warnings.warn("Cannot infer links if graph edges already exist")
+            return self
+
+        # A list of primary key candidates (+score) for every column:
+        candidate_dict: dict[
+            tuple[str, str],
+            list[tuple[str, float]],
+        ] = defaultdict(list)
+
+        for dst_table in self.tables.values():
+            dst_key = dst_table.primary_key
+
+            if dst_key is None:
+                continue
+
+            assert dst_key.dtype is not None
+            dst_number = dst_key.dtype.is_int() or dst_key.dtype.is_float()
+            dst_string = dst_key.dtype.is_string()
+
+            for src_table in self.tables.values():
+                for src_key in src_table.columns:
+                    if src_key == src_table.primary_key:
+                        continue  # Cannot link to primary key.
+
+                    src_number = (src_key.dtype.is_int()
+                                  or src_key.dtype.is_float())
+                    src_string = src_key.dtype.is_string()
+
+                    if src_number != dst_number or src_string != dst_string:
+                        continue  # Non-compatible data types.
+
+                    score = 0.0
+
+                    # Name similarity:
+                    if src_key.name == dst_key.name:
+                        score += 7.0
+                    elif src_key.name.endswith(dst_key.name):
+                        score += 4.0
+                    elif src_key.name.endswith(  # e.g., user.id -> user_id
+                            f'{dst_table.name}_{dst_key.name}'):
+                        score += 4.0
+                    elif src_key.name.endswith(  # e.g., users.id -> user_id
+                            f'{dst_table.name[:-1]}_{dst_key.name}'):
+                        score += 4.0
+
+                    # For non-exact matching, at least one additional
+                    # requirement needs to be met.
+
+                    # Exact data type compatibility:
+                    if src_key.stype == Stype.ID:
+                        score += 2.0
+
+                    if src_key.dtype == dst_key.dtype:
+                        score += 1.0
+
+                    # Cardinality ratio:
+                    if len(src_table._data) > len(dst_table._data):
+                        score += 1.0
+
+                    if score < 5.0:
+                        continue
+
+                    candidate_dict[(
+                        src_table.name,
+                        src_key.name,
+                    )].append((
+                        dst_table.name,
+                        score,
+                    ))
+
+        for (src_table_name, src_key_name), scores in candidate_dict.items():
+            scores.sort(key=lambda x: x[-1], reverse=True)
+
+            if len(scores) > 1 and scores[0][1] == scores[1][1]:
+                continue  # Cannot uniquely infer link.
+
+            dst_table_name = scores[0][0]
+            self.link(Edge(src_table_name, src_key_name, dst_table_name))
+
+        if verbose:
+            self.print_links()
+
+        return self
+
+    # Metadata ################################################################
+
+    def validate(self) -> Self:
+        r"""Validates the graph to ensure that all relevant metadata is
+        specified for its tables and edges.
+
+        Concretely, validation ensures that edges properly link foreign keys to
+        primary keys between valid tables.
+        It additionally ensures that primary and foreign keys between tables
+        in an :class:`~kumoai.graph.Edge` are of the same data type.
+
+        Raises:
+            ValueError: if validation fails.
+        """
+        for edge in self.edges:
+            src_table, fkey, dst_table = edge
+
+            src_key = self[src_table][fkey]
+            dst_key = self[dst_table].primary_key
+
+            # Check that the destination table defines a primary key:
+            if dst_key is None:
+                raise ValueError(f"Edge {edge} is invalid since table "
+                                 f"'{dst_table}' does not have a primary key")
+
+            # Ensure that foreign key is not a primary key:
+            src_pkey = self[src_table].primary_key
+            if src_pkey is not None and src_pkey.name == fkey:
+                raise ValueError(f"Cannot treat the primary key of table "
+                                 f"'{src_table}' as a foreign key")
+
+            # Check that fkey/pkey have valid and consistent data types:
+            assert src_key.dtype is not None
+            src_number = src_key.dtype.is_int() or src_key.dtype.is_float()
+            src_string = src_key.dtype.is_string()
+            assert dst_key.dtype is not None
+            dst_number = dst_key.dtype.is_int() or dst_key.dtype.is_float()
+            dst_string = dst_key.dtype.is_string()
+
+            if not src_number and not src_string:
+                raise ValueError(f"{edge} is invalid as foreign key must be a "
+                                 f"number or string (got '{src_key.dtype}'")
+
+            if src_number != dst_number or src_string != dst_string:
+                raise ValueError(f"{edge} is invalid as foreign key "
+                                 f"'{fkey}' and primary key '{dst_key.name}' "
+                                 f"have incompatible data types (got "
+                                 f"fkey.dtype '{dst_key.dtype}' and "
+                                 f"pkey.dtype '{src_key.dtype}')")
+
+        return self
+
+    # Visualization ###########################################################
+
+    def visualize(
+        self,
+        path: Optional[Union[str, io.BytesIO]] = None,
+        show_columns: bool = True,
+        return_graph: bool = False,
+    ) -> Optional['graphviz.Graph']:
+        r"""Visualizes the tables and edges in this graph using the
+        :class:`graphviz` library.
+
+        Args:
+            path: A path to write the produced image to. If ``None``, the image
+                will not be written to disk.
+            show_columns: Whether to show all columns of every table in the
+                graph. If ``False``, will only show the primary key, foreign
+                key(s), and time column of each table.
+            return_graph: Whether to return the :class:`graphviz` graph.
+
+        Returns:
+            A ``graphviz.Graph`` instance representing the visualized graph.
+        """
+        def has_graphviz_executables() -> bool:
+            import graphviz
+            try:
+                graphviz.Digraph().pipe()
+            except graphviz.backend.ExecutableNotFound:
+                return False
+
+            return True
+
+        # Check basic dependency:
+        if not find_spec('graphviz'):
+            raise ModuleNotFoundError("The 'graphviz' package is required for "
+                                      "visualization")
+        elif not has_graphviz_executables():
+            raise RuntimeError("Could not visualize graph as 'graphviz' "
+                               "executables are not installed. These "
+                               "dependencies are required in addition to the "
+                               "'graphviz' Python package. Please install "
+                               "them as described at "
+                               "https://graphviz.org/download/.")
+        else:
+            import graphviz
+
+        format: Optional[str] = None
+        if isinstance(path, str):
+            format = path.split('.')[-1]
+        elif isinstance(path, io.BytesIO):
+            format = 'svg'
+        graph = graphviz.Graph(format=format)
+
+        def left_align(keys: List[str]) -> str:
+            if len(keys) == 0:
+                return ""
+            return '\\l'.join(keys) + '\\l'
+
+        fkeys_dict: Dict[str, List[str]] = defaultdict(list)
+        for src_table_name, fkey_name, _ in self.edges:
+            fkeys_dict[src_table_name].append(fkey_name)
+
+        for table_name, table in self.tables.items():
+            keys = []
+            if primary_key := table.primary_key:
+                keys += [f'{primary_key.name}: PK ({primary_key.dtype})']
+            keys += [
+                f'{fkey_name}: FK ({self[table_name][fkey_name].dtype})'
+                for fkey_name in fkeys_dict[table_name]
+            ]
+            if time_column := table.time_column:
+                keys += [f'{time_column.name}: Time ({time_column.dtype})']
+            key_repr = left_align(keys)
+
+            columns = []
+            if show_columns:
+                columns += [
+                    f'{column.name}: {column.stype} ({column.dtype})'
+                    for column in table.columns
+                    if column.name not in fkeys_dict[table_name]
+                    and column.name != table._primary_key
+                    and column.name != table._time_column
+                ]
+            column_repr = left_align(columns)
+
+            if len(keys) > 0 and len(columns) > 0:
+                label = f'{{{table_name}|{key_repr}|{column_repr}}}'
+            elif len(keys) > 0:
+                label = f'{{{table_name}|{key_repr}}}'
+            elif len(columns) > 0:
+                label = f'{{{table_name}|{column_repr}}}'
+            else:
+                label = f'{{{table_name}}}'
+
+            graph.node(table_name, shape='record', label=label)
+
+        for src_table_name, fkey_name, dst_table_name in self.edges:
+            if self[dst_table_name]._primary_key is None:
+                continue  # Invalid edge.
+
+            pkey_name = self[dst_table_name]._primary_key
+
+            if fkey_name != pkey_name:
+                label = f' {fkey_name}\n< >\n{pkey_name} '
+            else:
+                label = f' {fkey_name} '
+
+            graph.edge(
+                src_table_name,
+                dst_table_name,
+                label=label,
+                headlabel='1',
+                taillabel='*',
+                minlen='2',
+                fontsize='11pt',
+                labeldistance='1.5',
+            )
+
+        if isinstance(path, str):
+            path = '.'.join(path.split('.')[:-1])
+            graph.render(path, cleanup=True)
+        elif isinstance(path, io.BytesIO):
+            path.write(graph.pipe())
+        elif in_notebook():
+            from IPython.display import display
+            display(graph)
+        else:
+            try:
+                graph.view(cleanup=True)
+            except Exception as e:
+                warnings.warn(f"Could not visualize graph due to an "
+                              f"unexpected error in 'graphviz'. Error: {e}")
+
+        return graph if return_graph else None
+
+    # Helpers #################################################################
+
+    def _to_api_graph_definition(self) -> GraphDefinition:
+        tables: Dict[str, TableDefinition] = {}
+        col_groups: List[ColumnKeyGroup] = []
+        for t_name, table in self.tables.items():
+            tables[t_name] = table._to_api_table_definition()
+            if table.primary_key is None:
+                continue
+            keys = [ColumnKey(t_name, table.primary_key.name)]
+            for edge in self.edges:
+                if edge.dst_table == t_name:
+                    keys.append(ColumnKey(edge.src_table, edge.fkey))
+            keys = sorted(list(set(keys)),
+                          key=lambda x: f'{x.table_name}.{x.col_name}')
+            if len(keys) > 1:
+                col_groups.append(ColumnKeyGroup(keys))
+        return GraphDefinition(tables, col_groups)
+
+    # Class properties ########################################################
+
+    def __hash__(self) -> int:
+        return hash((tuple(self.edges), tuple(sorted(self.tables.keys()))))
+
+    def __contains__(self, name: str) -> bool:
+        return self.has_table(name)
+
+    def __getitem__(self, name: str) -> LocalTable:
+        return self.table(name)
+
+    def __repr__(self) -> str:
+        table_names = str(list(self.tables.keys())).replace("'", "")
+        return (f'{self.__class__.__name__}(\n'
+                f'  tables={table_names},\n'
+                f'  edges={self.edges},\n'
+                f')')
