@@ -1,0 +1,134 @@
+Metadata-Version: 2.4
+Name: sdypy-EMA
+Version: 0.29.1
+Summary: Experimental and operational modal analysis.
+Project-URL: homepage, https://github.com/sdypy/sdypy-EMA
+Project-URL: documentation, https://sdypy-EMA.readthedocs.io/en/latest/index.html
+Project-URL: source, https://github.com/sdypy/sdypy-EMA
+Author-email: "Janko Slavič et al." <janko.slavic@fs.uni-lj.si>
+Maintainer-email: "Janko Slavič et al." <janko.slavic@fs.uni-lj.si>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: EMA,Experimental Modal Analysis,OMA,Structural Dynamics
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.10
+Requires-Dist: matplotlib>=3.3.1
+Requires-Dist: numpy>=1.14.3
+Requires-Dist: pyuff>=2.1
+Requires-Dist: scipy>=1.1.0
+Requires-Dist: tqdm>=4.23.4
+Provides-Extra: dev
+Requires-Dist: build; extra == 'dev'
+Requires-Dist: pylump; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: sphinx; extra == 'dev'
+Requires-Dist: sphinx-copybutton>=0.5.2; extra == 'dev'
+Requires-Dist: sphinx-rtd-theme; extra == 'dev'
+Requires-Dist: twine; extra == 'dev'
+Requires-Dist: wheel; extra == 'dev'
+Description-Content-Type: text/x-rst
+
+|pytest| |Docs Status| |DOI|
+
+
+sdypy-EMA
+=========
+
+Experimental and operational modal analysis
+
+This project is successor of the `pyEMA`_ project. pyEMA is no longer developed after version 0.26.
+
+Basic usage
+-----------
+
+Import ``EMA`` module:
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from sdypy import EMA
+
+
+Make an instance of ``Model`` class:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+   a = EMA.Model(
+       frf_matrix,
+       frequency_array,
+       lower=50,
+       upper=10000,
+       pol_order_high=60
+       )
+
+Compute poles:
+~~~~~~~~~~~~~~
+
+.. code:: python
+
+   a.get_poles()
+
+Determine correct poles:
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The stable poles can be determined in two ways: 
+
+1. Display **stability chart**
+
+.. code:: python
+    
+    a.select_poles()
+
+The stability chart displayes calculated poles and the user can hand-pick the stable ones.
+
+2. If the approximate values of natural frequencies are already known, it is not necessary to display the stability chart:
+
+.. code:: python
+
+    approx_nat_freq = [314, 864]     
+    a.select_closest_poles(approx_nat_freq)
+
+After the stable poles are selected, the natural frequencies and damping coefficients can now be accessed:
+
+.. code:: python
+
+   a.nat_freq # natrual frequencies
+   a.nat_xi # damping coefficients
+
+Reconstruction:
+~~~~~~~~~~~~~~~
+
+There are two types of reconstruction possible: 
+
+1. Reconstruction using **own** poles (the default option):
+
+.. code:: python
+
+    H, A = a.get_constants(whose_poles='own')
+
+where **H** is reconstructed FRF matrix and **A** is a matrix of modal constants.
+
+2. Reconstruction on **c** using poles from **a**:
+
+.. code:: python
+
+    c = EMA.Model(frf_matrix, frequency_array, lower=50, upper=10000, pol_order_high=60)
+
+    H, A = c.get_constants(whose_poles=a)
+
+.. |Docs Status| image:: https://readthedocs.org/projects/sdypy-ema/badge/
+   :target: https://sdypy-ema.readthedocs.io/
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4016671.svg?
+   :target: https://doi.org/10.5281/zenodo.4016671
+.. |pytest| image:: https://github.com/sdypy/sdypy-EMA/actions/workflows/python-package.yml/badge.svg
+    :target: https://github.com/sdypy/sdypa-EMA/actions
+
+
+.. _sdypy: https://github.com/sdypy/sdypy
+
+.. _pyEMA: https://github.com/ladisk/pyEMA
