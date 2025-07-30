@@ -1,0 +1,43 @@
+"""Root of the exceptions module."""
+
+from mastapy._private._internal.exceptions import (
+    AnalysisException,
+    ApiAccessException,
+    AssemblyLoadError,
+    CastException,
+    InvalidatedPropertyException,
+    LicensingException,
+    MastaInitException,
+    MastaPropertyException,
+    MastaPropertyTypeException,
+    MastapyException,
+    MastapyImportException,
+    MastapyVersionException,
+    MatrixException,
+    ReadOnlyPropertyException,
+    ScriptingNotLicensedException,
+    TypeCheckException,
+    UnavailableMethodError,
+    VectorException,
+)
+
+__all__ = (
+    "MastapyException",
+    "MastaInitException",
+    "MastaPropertyException",
+    "MastaPropertyTypeException",
+    "CastException",
+    "MastapyImportException",
+    "MastapyVersionException",
+    "ApiAccessException",
+    "InvalidatedPropertyException",
+    "ReadOnlyPropertyException",
+    "LicensingException",
+    "ScriptingNotLicensedException",
+    "AnalysisException",
+    "VectorException",
+    "MatrixException",
+    "TypeCheckException",
+    "AssemblyLoadError",
+    "UnavailableMethodError",
+)
