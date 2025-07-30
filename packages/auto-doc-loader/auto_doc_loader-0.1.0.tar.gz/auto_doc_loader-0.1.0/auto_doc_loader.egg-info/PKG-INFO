@@ -1,0 +1,69 @@
+Metadata-Version: 2.4
+Name: auto_doc_loader
+Version: 0.1.0
+Summary: AutoLoader for structured and unstructured documents using LangChain
+Home-page: https://github.com/Mahemaran/auto_loader
+Author: Maran M
+Author-email: Maran M <mahemaran99@gmail.com>
+License: Apache 2.0
+Project-URL: Homepage, https://github.com/Mahemaran/auto_loader
+Project-URL: Repository, https://github.com/Mahemaran/auto_loader
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: langchain
+Requires-Dist: langchain-unstructured
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# AutoLoader
+
+**AutoLoader** is a Python utility that automatically loads and processes both **structured** and **unstructured** documents using the [LangChain](https://www.langchain.com/) framework.
+
+It supports:
+- **Structured files**: CSV, Excel (`.csv`, `.xlsx`, `.xls`)
+- **Unstructured files**: PDFs, Word docs, PowerPoints, Emails, and more
+
+---
+
+## 📦 Features
+
+- ✅ Load files from a **single file or a directory**
+- ✅ Automatically detects file type
+- ✅ Converts rows to `langchain.schema.Document` objects
+- ✅ Extracts metadata (source file, sheet name)
+- ✅ Logs file loading progress and errors
+- ✅ Supports LangChain-compatible document structure
+
+---
+
+## 🛠 Installation
+
+```bash
+pip install pandas langchain langchain-unstructured
+
+```
+## 🚀 Usage
+```
+from autoloader import AutoLoader
+
+# Load from a single file or directory
+loader = AutoLoader(path="./data")
+
+# Process all supported files
+documents = loader.load()
+
+# Join and format documents into a single string
+structured_docs = "\n\n".join(
+    f"[Source: {doc.metadata.get('source', 'unknown')}]\n{doc.page_content}"
+    for doc in documents
+)
+
+# Print the first 1000 characters
+print(structured_docs[:1000])
+ 
