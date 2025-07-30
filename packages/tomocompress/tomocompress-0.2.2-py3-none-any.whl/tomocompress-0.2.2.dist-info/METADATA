@@ -1,0 +1,113 @@
+Metadata-Version: 2.1
+Name: tomocompress
+Version: 0.2.2
+Summary: A pipeline to benchmark various compressors on image data
+License: BSD-3-Clause
+Author: SDM team, Alba,
+Author-email: nsoler@cells.es
+Requires-Python: >=3.12,<4.0
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Requires-Dist: argparse (>=1.4.0,<2.0.0)
+Requires-Dist: blosc2 (>=2.7.1,<3.0.0)
+Requires-Dist: blosc2-grok (>=0.3.3,<0.4.0)
+Requires-Dist: h5py (>=3.12.1,<4.0.0)
+Requires-Dist: hdf5plugin (>=4.4.0,<5.0.0)
+Requires-Dist: jupyter (>=1.0.0,<2.0.0)
+Requires-Dist: numpy (>=2.0,<3.0)
+Requires-Dist: pillow (>=10.4.0,<11.0.0)
+Requires-Dist: timeit-decorator (>=2.0.0,<3.0.0)
+Requires-Dist: tqdm (>=4.67.1,<5.0.0)
+Description-Content-Type: text/markdown
+
+# TomocompressJPEG2K
+
+Simple-to-use compression tools for HDF5 files (developed with Python 3.12).
+
+Right now the main CLI executable is **tomocompress**: a wrapper for the blosc2 grok jpeg 2K to compress tomography raw NeXus/HDF5 in a lossy fashion.
+
+## Install tomocompress
+```bash
+
+# Optionally, create a dedicated conda env
+conda create -n tomocompress python=3.12
+conda  
+
+# Install the latest wheel from the dist folder
+pip install sdm.compress<current_version>.whl
+
+# it installs a command-line tool called tomocompress
+```
+
+## Run tomocompress 
+
+```bash
+# Activate your conda env if needed
+conda activate tomocompress
+
+# Run it!
+tomocompress myfile.h5
+
+# More options
+tomocompress --help
+
+# Result
+A file called compressed_grok_myfile.h5 next to the input hdf5 file.
+
+# Examples
+
+## If your dataset is not called 'data' but 'something' in your hdf5 arborescence
+tomocompress myfile.h5 -d something
+
+## Specify more than one dataset to compress (comma-separated)
+## note: the program will look for these dataset names in the HDF5 arborescence
+## so that you don't have to enter their full path
+tomocompress myfile.h5 -d "data,dark,flat"
+
+## Specify a target compression ratio of 10 (default 4)
+tomocompress myfile.h5 -c 10
+```
+## Output file
+By default, a compressed file bearing a suffic is created in the same directory as the original file.
+You can change this behaviour by specifying either a path to a directory or a full file path 
+```bash
+tomocompress myfile.h5 -o /some/other/path/compressed.h5
+
+# only specifying a directory, a suffix will be appended to the name of the original file
+tomocompress myfile.h5 -o /some/other/path
+
+```
+
+
+
+## Programmatic usage:
+
+```python
+from tomocompress.compressor import Blosc2GrokCompressor
+
+# Input HDF5 tomo file to compress
+input_tomo_file = sys.argv[1]
+
+# The dataset name you want to compress inside the input HDF5 file (default:data)
+# If not specified, it will try to find automatically a dataset called "data" in the file arborescence
+dataset_names = "data,dark,flat"
+
+# Desired compression ratio
+CR = 20               # desired compression ratio
+
+# This will write the compressed file in the same directory as the original one
+grok_compressor =  Blosc2GrokCompressor(input_hdf5=input_tomo_file, compression_ratio=CR, dataset_names=dataset_names, output_file_path="/some/path")
+grok_compressor.compress()
+
+```
+
+## Authors and acknowledgment
+Nicolas Soler (SDM) Alba Synchrotron
+
+## License
+See LICENSE.rst
+
+## Project status
+stable
+
