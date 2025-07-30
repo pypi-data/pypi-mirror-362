@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: 2024 DB Systel GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
+[tool.poetry]
+name = "compliance-assistant"
+version = "1.1.2"
+description = "Toolset that helps with creating and interacting with SBOMs, enriching with licensing and copyright information, and checking for Open Source license compliance"
+repository = "https://github.com/OpenRailAssociation/compliance-assistant"
+authors = ["Max Mehl <max.mehl@deutschebahn.com>"]
+readme = "README.md"
+keywords = [
+  "sbom",
+  "compliance",
+  "clearlydefined",
+  "cyclonedx",
+  "spdx",
+  "license",
+  "copyright",
+  "flict",
+  "compatibility",
+]
+license = "Apache-2.0"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "License :: OSI Approved :: Apache Software License",
+  "Topic :: Software Development",
+]
+packages = [{ include = "complassist" }]
+
+[tool.poetry.scripts]
+compliance-assistant = 'complassist.main:main'
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.32.3"
+flict = "^1.2.14"
+docker = "^7.1.0"
+license-expression = "^30.3.0"
+purl-tools = "^0.2.0"
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.10.0"
+pylint = "^3.2.3"
+black = "^25.0.0"
+isort = "^6.0.0"
+bump-my-version = "^1.1.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# FORMATTING settings
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 100
+
+# MYPY settings
+[tool.mypy]
+files = ["complassist/*.py"]
+disable_error_code = ["import-untyped"]
+
+# Bump-My-Version
+[tool.bumpversion]
+commit = true
+tag = true
+allow_dirty = false
+tag_name = "v{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+regex = true
+search = "^version = \"{current_version}\""
+replace = "version = \"{new_version}\""
