@@ -1,0 +1,52 @@
+Metadata-Version: 2.1
+Name: jrcf
+Version: 0.5.0
+Summary: AWS's Java Random Cut Forest
+Keywords: rcf,random-cut-forest,anomaly-detection
+Author-Email: Dowon <ks2515@naver.com>
+License: Apache-2.0
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Java
+Classifier: Programming Language :: Python :: 3 :: Only
+Project-URL: Repository, https://github.com/Bing-su/jrcf
+Requires-Python: >=3.10
+Requires-Dist: jpype1
+Requires-Dist: numpy>=1.21
+Description-Content-Type: text/markdown
+
+# JRCF
+
+Java Random Cut Forest
+
+https://github.com/aws/random-cut-forest-by-aws 저장소의 `python_rcf_wrapper`를 참고하여 파이썬에서 실행할 수 있도록 구성한 Random Cut Forest 알고리즘입니다.
+
+## Requirements
+
+- Java 11 or later
+
+## Installation
+
+```sh
+pip install jrcf
+```
+
+## Usage
+
+```python
+import numpy as np
+from tqdm.auto import tqdm
+
+from jrcf.rcf import RandomCutForestModel
+
+dim = 5
+forest = RandomCutForestModel(dimensions=dim)
+TEST_DATA = np.random.normal(size=(100000, dim))
+
+for point in tqdm(TEST_DATA):
+    score = forest.score(point)
+    forest.update(point)
+
+pp = [999] * dim
+print(forest.score(pp))
+```
