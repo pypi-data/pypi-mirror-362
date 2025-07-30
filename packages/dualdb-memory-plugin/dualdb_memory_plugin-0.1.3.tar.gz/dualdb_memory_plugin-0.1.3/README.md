@@ -1,0 +1,101 @@
+# dualdb-memory-plugin
+[![PyPI](https://img.shields.io/pypi/v/dualdb-memory-plugin.svg)](https://pypi.org/project/dualdb-memory-plugin/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Build Status](https://github.com/YZXY6151/dualdb-memory-plugin/actions/workflows/python-test.yml/badge.svg)](https://github.com/YZXY6151/dualdb-memory-plugin/actions)
+
+
+
+轻量级 AI 对话记忆轮回插件，模拟短期→长期记忆演化，支持 JSON / SQLite 两种存储后端，摘要函数可插拔，零依赖或可扩展至 OpenAI / 本地模型。
+
+---
+
+## 特性
+
+- 🧠 **人类记忆模拟**：短期消息累积 (`active`) → 达到阈值/关键词/定时触发 → 摘要浓缩后写入长期存储 (`archive`) → 清空短期，继续新一轮  
+- 🔌 **可插拔摘要引擎**：提供默认 Stub，实现 `BaseSummarizer` 接口；可替换为 OpenAI、T5、小模型或自研接口  
+- 💾 **双后端存储**：`JsonStore`（纯文件） 和 `SQLiteStore`（数据库文件） 任意切换  
+- ⚙️ **极简依赖**：仅 Python 标准库 + `sqlite3`；如需 OpenAI 摘要，额外安装 `openai` 包  
+- 🔄 **自动轮回管理**：封装在 `DualDBManager`，一行代码接管 append/get_context/清空  
+
+---
+
+## 安装
+
+从源代码根目录安装（开发模式）：
+
+```bash
+pip install -e .
+若不安装，也可直接在项目根执行示例脚本，Python 会将当前目录加入路径。
+
+快速开始
+1. JSON 存储示例
+
+from dualdb_memory.manager import DualDBManager
+from dualdb_memory.summarizer_stub import StubSummarizer
+
+mgr = DualDBManager(
+    storage_type="json",
+    active_path="data/active.json",
+    archive_path="data/archive.json",
+    summarizer=StubSummarizer(),
+    threshold=3,
+    keywords=["重要", "紧急"],
+    time_delta=60  # 每 60 秒自动轮回
+)
+
+mgr.append("user", "你好，你是谁？")
+mgr.append("assistant", "我是演示用的记忆插件。")
+# ...继续 append 若干条，达到阈值或触发条件后会自动生成摘要写入 archive.json
+
+context = mgr.get_context()  # 返回 archive + active 的所有条目
+print(context)
+2. SQLite 存储示例
+
+from dualdb_memory.manager import DualDBManager
+from dualdb_memory.summarizer_stub import StubSummarizer
+
+mgr = DualDBManager(
+    storage_type="sqlite",
+    active_path="data/active.db",
+    archive_path="data/archive.db",
+    summarizer=StubSummarizer(),
+    threshold=5
+)
+
+# 同样使用 mgr.append() 和 mgr.get_context()
+目录结构
+
+dualdb-memory-plugin/
+├── dualdb_memory/
+│   ├── memory.py
+│   ├── store_json.py
+│   ├── store_sqlite.py
+│   ├── summarizer_base.py
+│   ├── summarizer_stub.py
+│   └── manager.py
+├── examples/
+│   ├── demo_basic.py
+│   └── demo_openai.py
+├── tests/
+│   └── test_memory.py
+├── README.md
+├── setup.py
+└── .gitignore
+与常见方案对比
+维度	LangChain / MemoryGPT	DualDBMemory Plugin
+依赖	多（pydantic、chroma、openai 等）	极简（标准库 + sqlite3；可选 openai）
+存储方式	向量数据库、框架内置状态	JSON / SQLite 文件，易查看、易维护
+摘要逻辑	框架内联或自定义复杂，难以脱离 API	简单接口 BaseSummarizer，任意模型实现
+记忆轮回触发	多靠手动或滑窗	阈值 / 关键词 / 时间 多条件自动触发
+模块化	高度耦合，难拆分	高内聚低耦合，Store/Summarizer/Manager 可独立使用
+学习成本	较高，需要大量配置	低，上手即用
+
+❗ 本项目为实验性原型，仅供参考与学习，目前无长期维护计划。
+
+...
+🎉 如果对本项目有任何疑问或建议，欢迎在 GitHub 提交 Issue，或自行 Fork 后改进！
+
+
+
+PS: 本项目由新手开发，仅为试验性质的最基础原型，功能可能不够完善、存在未覆盖的边缘情况，也不保证在所有场景中的稳定性和高效性。如果有 
+    什么问题，方便的话还请随时联系指教我，email:yzxy6151@gmail.com
