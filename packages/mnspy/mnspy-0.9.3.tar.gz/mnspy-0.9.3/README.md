@@ -1,0 +1,68 @@
+# mnspy
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://badge.fury.io/py/mnspy.svg)](https://badge.fury.io/py/mnspy)
+
+`mnspy` es una biblioteca de Python desarrollada con fines didácticos para facilitar la enseñanza y el aprendizaje de métodos numéricos y simulación a estudiantes de ingeniería.
+
+La biblioteca implementa algoritmos numéricos fundamentales utilizando un enfoque orientado a objetos, lo que permite una comprensión más clara de los conceptos teóricos y su aplicación práctica. Además, incluye herramientas de visualización para interpretar mejor los resultados.
+
+## Características Principales
+
+- **Enfoque Orientado a Objetos**: Cada método numérico es una clase, facilitando su uso y comprensión.
+- **Visualización Integrada**: Métodos de graficación incorporados que utilizan `matplotlib` para visualizar los procesos y resultados.
+- **Código Didáctico**: El código fuente está documentado exhaustivamente para ser una referencia de aprendizaje.
+- **Amplia Cobertura**: Abarca desde la búsqueda de raíces hasta la solución de Ecuaciones Diferenciales Parciales con métodos avanzados como MEF y MVF.
+
+## Instalación
+
+Puedes instalar `mnspy` a través de pip:
+
+```bash
+pip install mnspy
+```
+
+## Módulos Disponibles
+
+La biblioteca se organiza en los siguientes módulos:
+
+- **`raíces`**: Métodos para encontrar raíces de ecuaciones no lineales (Bisección, Newton-Raphson, Secante, etc.).
+- **`ecuaciones_algebraicas_lineales`**: Algoritmos para resolver sistemas de ecuaciones lineales (Gauss, Gauss-Jordan, Descomposición LU, etc.).
+- **`interpolación`**: Técnicas de interpolación polinómica (Newton, Lagrange) y por Trazadores (Splines).
+- **`integrales`**: Métodos para la integración numérica (Trapecio, Simpson, Romberg, Gauss-Legendre).
+- **`derivada`**: Cálculo numérico de derivadas usando diferencias finitas y extrapolación de Richardson.
+- **`ecuaciones_diferenciales_ordinarias` (EDOs)**: Solucionadores para problemas de valor inicial (Euler, Heun, Runge-Kutta).
+- **`ecuaciones_diferenciales_parciales` (EDPs)**: Solucionadores para EDPs, organizados en:
+    - **`mdf` (Método de Diferencias Finitas)**: Para problemas en mallas rectangulares.
+    - **`mef` (Método de Elementos Finitos)**: Para análisis estructural de resortes, barras, vigas, armaduras, marcos y problemas 2D con elementos triangulares (CST).
+    - **`mvf` (Método de Volúmenes Finitos)**: Para problemas de transporte (convección-difusión) basados en la conservación.
+
+## Ejemplo de Uso
+
+Aquí un ejemplo rápido para encontrar una raíz usando el método de Newton-Raphson:
+
+```python
+import numpy as np
+from mnspy import NewtonRaphson
+
+# Definimos la función y su derivada
+def f(x):
+    return x**2 - 2
+
+def df(x):
+    return 2 * x
+
+# Creamos una instancia del método
+nr = NewtonRaphson(f, df=df, x=1, tol=4, tipo_error='n')
+
+# Mostramos la solución y la tabla de iteraciones
+print(nr.solucion())
+print(nr.generar_tabla())
+
+# Graficamos el proceso
+nr.graficar()
+```
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT.
