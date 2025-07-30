@@ -1,0 +1,11 @@
+######################################################################################################
+#                                 Auto-generated Metaflow stub file                                  #
+# MF version: 2.16.1                                                                                 #
+# Generated on 2025-07-15T19:29:42.984704                                                            #
+######################################################################################################
+
+from __future__ import annotations
+
+
+from . import exit_hook_decorator as exit_hook_decorator
+
