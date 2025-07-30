@@ -1,0 +1,90 @@
+################################################################################
+# Configuration des parametres pouvant etre passe par l'invite de commande
+# Les parametres alimente directement la configuration charge par l'application
+################################################################################
+title: "Devopstestor parameters"
+parameters:
+  log_level:
+    type: str
+    help: log level (debug, warning or info)
+    config_name: 'core::global_log_level'
+  list_testcase:
+    type: store_true
+    help: List testscases and exit
+    config_name: 'testcase::list_only'
+  show_config:
+    type: store_true
+    help: montre la configuration chargee
+    config_name: 'core::show_config'
+  filtre_testcase:
+    type: str
+    help: Filter testcase by regex python
+    config_name: 'testcase::filtre_regex'
+  filtre_steps:
+    type: str
+    help: Filter step by regex on title
+    config_name: 'testcase::filtre_steps'
+  skip_deploy:
+    type: store_true
+    help: Skip the deployement
+    config_name: 'testcase::skip_deploy'
+  skip_verifiers:
+    type: store_true
+    help: Skip the verification by verifiers
+    config_name: 'testcase::skip_verifiers'
+  parallelize:
+    type: store_true
+    help: Activate testcase parallelize
+    config_name: 'machine::parallelize'
+  max_process:
+    type: int
+    help: Specify max parallelize process
+    config_name: 'machine::max_process'
+  preserve_machine:
+    type: store_true
+    help: Preserve machine after running (default False)
+    config_name: 'machine::preserve_machine'
+  resume_machine:
+    type: store_true
+    help: re-use machine already started
+    config_name: 'machine::resume_machine'
+  testcase_basepath:
+    type: str_list
+    help: List of testcases root dir path
+    config_name: 'testcase::base_path'
+  machine_proxy:
+    type: str
+    help: configure machine with a proxy (ex https://toto:123)
+    config_name: 'machine::proxy'
+  disabled_sources_accessor:
+    type: str_list
+    help: List of disabled sources accessor
+    config_name: 'source_manager::disabled_sources'
+  force_source_cleanup:
+    type: store_true
+    help: rollback files in preserve_machine mode
+    config_name: 'source_manager::force_source_cleanup'
+  disable_source_cleanup:
+    type: store_true
+    help: disable source_cleanup
+    config_name: 'source_manager::disable_source_cleanup'
+  other_conf_dirs:
+    type: str_list
+    help: List of other config file dir
+    config_name: 'core::other_conf_dirs'
+  html_report_path:
+    type: str
+    help: Path of the directory where create the render
+    config_name: 'report::html_report_path'
+  elk_report_path:
+    type: str
+    help: Path of the directory where create elk log file
+    config_name: 'report::elk_report_path'
+  report_context:
+    type: str_json
+    help: Context to pass at the report renderer
+    config_name: 'report::report_context'
+  machine_preset:
+    type: str
+    help: Define the preset to use
+    config_name: 'machine::preset_name'

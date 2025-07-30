@@ -1,0 +1,35 @@
+################################################################################
+# Configuration des source (volumes) acessibles par les machines
+################################################################################
+force_source_cleanup: False
+disable_source_cleanup: False
+
+# Liste des noms de source a desactiver
+disabled_sources: []
+sources:
+  # # Nom de la source
+  # sample_source:
+  #   # Type de source (cf. src/sources)
+  #   accessor_type: DirlinkSourceAccessor
+  #   # Activer / désactiver l'écriture sur le volume
+  #   readonly: False
+  #   # Uniquement si DirlinkSourceAccessor en ecriture
+  #   # Permet la réinitialisation des fichiers dans le volume apres excecution des tests.
+  #   # Une sauvegarde est alors préalablement créée (tgz) en début d'éxécution
+  #   rollback_oncleanup: False # Valeur par défaut
+
+  # Montage des verifiers du noyeau sur les machines (obligatoire)
+  devopstestor_verifiers:
+    accessor_type: DirlinkSourceAccessor
+    readonly: True
+    path:
+      local: "$(this::lib_path)/testconf/verifiers"
+      machine: /srv/verifiers/generic/
+  # Montage des verifiers utilisateur sur les machines
+  client_verifiers:
+    accessor_type: DirlinkSourceAccessor
+    readonly: True
+    path:
+      local: "$(this::client_path)/testconf/verifiers"
+      machine: /srv/verifiers/custom/
+
