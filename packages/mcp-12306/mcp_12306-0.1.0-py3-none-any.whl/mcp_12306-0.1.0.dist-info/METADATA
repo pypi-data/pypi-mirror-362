@@ -1,0 +1,131 @@
+Metadata-Version: 2.4
+Name: mcp_12306
+Version: 0.1.0
+Summary: A simple MCP server to query ticket information in 12306.
+Author: Zheng Chenguang
+Maintainer-email: Zheng Chenguang <zhengchenguang315@gmail.com>
+Keywords: mcp,llm,automation,web,12306
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: anyio
+Requires-Dist: click
+Requires-Dist: httpx
+Requires-Dist: mcp
+Requires-Dist: build>=1.2.2.post1
+Requires-Dist: mcp[cli]>=1.9.2
+Requires-Dist: twine>=6.1.0
+Requires-Dist: redis
+
+---
+
+# mcp_12306
+
+## 项目简介
+
+`mcp_12306` 是一个基于 MCP（Model Context Protocol）协议的 12306 火车票查询服务端项目。  
+它支持通过自然语言或 API 查询中国铁路 12306 的余票信息、车站代码等，并支持 Redis 缓存加速查询。
+
+---
+
+## 主要功能
+
+- **火车票余票查询**  
+  支持指定出发站、到达站、出发日期、乘客类型（成人/学生）等参数，查询 12306 实时余票信息。
+
+- **车站代码/名称查询**  
+  可根据车站中文名查询对应的 12306 车站代码，或反查车站名称。
+
+- **Redis 缓存支持**  
+  查询结果可自动缓存到 Redis，提升高频查询性能。
+
+- **MCP 工具集成**  
+  以工具（tool）的形式对外暴露接口，便于 LLM/自动化系统集成。
+
+- **命令行参数灵活**  
+  支持自定义服务端口、传输方式（stdio/sse）、是否启用 Redis 等。
+
+---
+
+## 安装与运行
+
+### 1. 安装依赖
+
+建议使用 Python 3.10 及以上版本。
+
+```bash
+pip install -r requirements.txt
+```
+
+如遇网络问题，建议加国内镜像源：
+
+```bash
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+### 2. 启动 Redis（可选）
+
+如需启用 Redis 缓存，需先启动本地 Redis 服务（默认端口 6379）。
+
+```bash
+# Linux
+redis-server
+
+# Windows（需提前安装 Redis for Windows 或 Memurai）
+redis-server.exe
+```
+
+### 3. 启动服务
+
+```bash
+python -m mcp_12306 --port 8000 --transport stdio -redis 6379
+```
+
+- `--port`：服务监听端口，默认 8000
+- `--transport`：传输方式，支持 `stdio` 或 `sse`
+- `-redis`：Redis 端口，填 0 或不填则不启用 Redis
+
+---
+
+## 主要接口/工具
+
+- `query_tickets`：查询火车票信息  
+  - 参数：`from_station`（出发站），`to_station`（到达站），`train_date`（出发日期），`purpose_codes`（乘客类型）
+- `get_station_code`：获取车站代码  
+  - 参数：`station_name`（车站中文名）
+- `get_station_name`：获取车站名称  
+  - 参数：`station_code`（车站代码）
+
+---
+
+## 项目结构
+
+```
+mcp_12306/
+├── __init__.py
+├── __main__.py
+├── mcp_12306_server.py
+├── query_12306.py
+├── config_manager.py
+├── requirements.txt
+├── README.md
+└── pyproject.toml
+```
+
+---
+
+## 后续工作计划
+
+- [ ] 支持更多 12306 查询接口（如车次详情、时刻表等）
+- [ ] 增强异常处理与日志记录
+- [ ] 提供 Web UI 或 API 文档
+- [ ] 支持 Docker 一键部署
+- [ ] 国际化与多语言支持
+- [ ] 增加自动化测试用例
+
+---
+
+## 贡献与反馈
+  
+如有疑问可联系维护者：zhengchenguang315@gmail.com
+
+---
