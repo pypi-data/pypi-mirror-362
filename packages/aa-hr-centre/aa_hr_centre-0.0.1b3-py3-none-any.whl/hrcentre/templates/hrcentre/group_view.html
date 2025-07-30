@@ -1,0 +1,209 @@
+{% extends "hrcentre/base.html" %}
+{% load i18n %}
+{% load hrcentretags %}
+
+{% block hrcentre_page_header %}<h1 class="page-header text-center">{{ group_name }}</h1>{% endblock hrcentre_page_header %}
+
+
+{% block extra_css %}
+    {% include "bundles/datatables-css-bs5.html" %}
+{% endblock extra_css %}
+
+{% block hrcentre_content %}
+    <div class="row">
+        <div class="col-12 px-4">
+            <div class="card mt-2">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" id="member-list-tab" data-bs-toggle="tab" data-bs-target="#member-list-panel" type="button" role="tab" aria-controls="member-list-panel" aria-selected="true">
+                                {% translate "Members" %}
+                            </button>
+                        </li>
+                        {% for check in checks %}
+                            <li class="nav-item">
+                                <button class="nav-link" id="check-{{ check.pk }}-tab" data-bs-toggle="tab" data-bs-target="#check-{{ check.pk }}-panel" type="button" role="tab" aria-controls="check-{{ check.pk }}-panel" aria-selected="false">
+                                    {{ check.name|safe }}
+                                </button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="member-list-panel" role="tabpanel" aria-labelledby="member-list-tab" tabindex="0">
+                            <div class="table-responsive">
+                                <table class="table table-aa w-100" id="members-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">{% translate "Main" %}</th>
+                                            <th scope="col">{% translate "Number of characters" %}</th>
+                                            <th scope="col">{% translate "Characters" %}</th>
+                                            <th scope="col">{% translate "Last Login (ET)" %}</th>
+                                            <th scope="col">{% translate "Labels" %}</th>
+                                            {% for label in labels %}
+                                                <th scope="col">{{ label }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for main in mains %}
+                                            <tr>
+                                                <td>
+                                                    <img src="{{ main.character.portrait_url_32 }}" class="rounded me-2">
+                                                    <span>{{ main.character.character_name }}</span>
+                                                    <a class="btn text-info" href="{% url "hrcentre:user_view" main.character.character_ownership.user.id %}">
+                                                        <i class="fa-solid fa-up-right-from-square"></i>
+                                                    </a>
+                                                </td>
+                                                <td>{{ main.number_of_chars }}</td>
+                                                <td>
+                                                    {% for char in main.character.character_ownership.user.chars %}
+                                                        <span class="badge {% if char.character|ct_is_active %}text-bg-primary{% else %}text-bg-danger{% endif %}" data-bs-toggle="tooltip" data-bs-title="Last login (ET): {{ char.last_login|date:"Y/m/d H:i" }}">{{ char.character.character_name }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    <span class="badge {% if main.is_updating %}text-bg-primary{% else %}text-bg-danger{% endif %}" data-bs-toggle="tooltip" data-bs-title="Oldest update between all chars: {% if main.oldest_last_update %}{{ main.oldest_last_update|date:"Y/m/d H:i" }}{% else %}Never{% endif %}">
+                                                        {% if main.last_login %}
+                                                            {{ main.last_login|date:"Y/m/d H:i" }}
+                                                        {% else %}
+                                                            {% translate "Unknown" %}
+                                                        {% endif %}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {% for userlabel in main.character.character_ownership.user.hr_labels.all %}
+                                                        <span class="badge {{ userlabel.label.bs_class }}">{{ userlabel.label.name }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                {% for label in labels %}
+                                                    <td>{% if main|hr_has_label:label %}{% translate "Yes" %}{% else %}{% translate "No" %}{% endif %}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% for check, filter_data in checks.items %}
+                            <div class="tab-pane fade" id="check-{{ check.pk }}-panel" role="tabpanel" aria-labelledby="check-{{ check.pk }}-tab" tabindex="0">
+                                {{ check.description|safe }}
+                                <div class="table-responsive">
+                                    <table class="table table-aa w-100" id="check-table-{{ check.pk }}">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">{% translate "Main" %}</th>
+                                                {% for filter in check.filters.all %}
+                                                    <th scope="col">{{ filter }}</th>
+                                                    <th scope="col">I should be hidden</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for main in mains %}
+                                                <tr>
+                                                    <td>
+                                                        <img src="{{ main.character.portrait_url_32 }}" class="rounded me-2">
+                                                        <span>{{ main.character.character_name }}</span>
+                                                        <a class="btn text-info" href="{% url "hrcentre:user_view" main.character.character_ownership.user.id %}">
+                                                            <i class="fa-solid fa-up-right-from-square"></i>
+                                                        </a>
+                                                    </td>
+                                                    {% for filter in check.filters.all %}
+                                                    {% sf_check filter main.character.character_ownership.user filter_data as check_result %}
+                                                        <td>
+                                                            <span class="badge {% if check_result.check %}text-bg-success{% else %}text-bg-danger{% endif %}" data-bs-toggle="tooltip" data-bs-title="{{ check_result.message|default:"None" }}">
+                                                                {% if check_result.check %}
+                                                                    <i class="fa-solid fa-check-circle"></i>
+                                                                    <p class="d-none">{% translate "Yes" %}</p>
+                                                                {% else %}
+                                                                    <i class="fa-solid fa-times-circle"></i>
+                                                                    <p class="d-none">{% translate "No" %}</p>
+                                                                {% endif %}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            {% if check_result.check %}
+                                                                {% translate "Yes" %}
+                                                            {% else %}
+                                                                {% translate "No" %}
+                                                            {% endif %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 mt-3">
+            <div class="d-flex flex-row-reverse">
+                <a href="{% url 'hrcentre:index' %}" class="btn btn-info">{% translate "Back" %}</a>
+            </div>
+        </div>
+    </div>
+{% endblock hrcentre_content %}
+
+{% block extra_javascript %}
+    {% include "bundles/datatables-js-bs5.html" %}
+    {% include "bundles/filterdropdown-js.html" %}
+{% endblock extra_javascript %}
+
+{% block extra_script %}
+    let label_columns = [{% for label in labels %}{{ 4|add:forloop.counter }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    $(document).ready(function() {
+        $('[data-bs-toggle="tooltip"]').tooltip();
+        $('#members-table').DataTable({
+            "pageLength": 50,
+            columnDefs: [
+                {
+                    targets: label_columns,
+                    visible: false
+                }
+            ],
+            filterDropDown: {
+                bootstrap: true,
+                bootstrap_version: 5,
+                columns: [
+                    {% for label in labels %}
+                    {
+                        "idx": {{ 4|add:forloop.counter }},
+                        "title": "{{ label }}",
+                    },
+                    {% endfor %}
+                ]
+            }
+        });
+        {% for check in checks %}
+        let result_columns{{ check.pk }} = [{% for filter in check.filters.all %}{% widthratio forloop.counter 1 2 %}{% if not forloop.last %},{% endif %}{% endfor %}];
+        $('#check-table-{{ check.pk }}').DataTable({
+            "pageLength": 50,
+            columnDefs: [
+                {
+                    targets: result_columns{{ check.pk }},
+                    visible: false
+                }
+            ],
+            filterDropDown: {
+                bootstrap: true,
+                bootstrap_version: 5,
+                columns: [
+                    {% for filter in check.filters.all %}
+                    {% widthratio forloop.counter0 1 2 as column_i%}
+                    {
+                        "idx": {{ 2|add:column_i }},
+                        "title": "{{ filter.filter_object.name }}",
+                        "autoSize": false
+                    },
+                    {% endfor %}
+                ]
+            }
+        });
+        {% endfor %}
+    });
+{% endblock extra_script %}
