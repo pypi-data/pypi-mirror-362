@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2025 OpenSynergy Indonesia
+     Copyright 2025 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl-3.0.html) -->
+<odoo>
+    <record id="print_document_type_view_search" model="ir.ui.view">
+        <field name="name">print_document_type - search</field>
+        <field name="model">print_document_type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="id" />
+                <field name="name" />
+                <field name="code" />
+                <group name="dom_active">
+                    <filter
+                        name="dom_active"
+                        string="Active"
+                        domain="[('active','=',True)]"
+                    />
+                    <filter
+                        name="dom_inactive"
+                        string="Archived"
+                        domain="[('active','=',False)]"
+                    />
+                    <separator />
+                </group>
+                <group name="group2">
+                    <filter
+                        name="grp_model"
+                        string="Model"
+                        context="{'group_by':'model_id'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="print_document_type_view_list" model="ir.ui.view">
+        <field name="name">print_document_type - list</field>
+        <field name="model">print_document_type</field>
+        <field name="arch" type="xml">
+            <list>
+                <header>
+                    <button
+                        name="action_reset_code"
+                        type="object"
+                        string="Reset code"
+                        confirm="Reset code. Are you sure?"
+                    />
+                    <button
+                        name="action_generate_code"
+                        type="object"
+                        string="Generate code"
+                        confirm="Generate code. Are you sure?"
+                    />
+                </header>
+                <field name="id" optional="hide" />
+                <field name="code" />
+                <field name="name" />
+                <field name="model_id" />
+                <field name="activity_ids" widget="list_activity" optional="show" />
+                <field name="active" widget="boolean_toggle" />
+            </list>
+        </field>
+    </record>
+
+    <record id="print_document_type_view_form" model="ir.ui.view">
+        <field name="name">print_document_type - form</field>
+        <field name="model">print_document_type</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="action_generate_code"
+                        string="Generate Code"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                </header>
+                <sheet>
+                    <div name="div_smart_buttons" class="oe_button_box" />
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        invisible="active == True"
+                    />
+                    <group name="group_1" colspan="4" col="2">
+                        <field name="name" />
+                        <field name="code" />
+                        <field name="active" widget="boolean_toggle" />
+                    </group>
+                    <group name="group_2" colspan="4" col="2">
+                        <field name="model_id" />
+                        <field name="model" />
+                    </group>
+                    <notebook>
+                        <page name="report" string="Reports">
+                            <field
+                                name="report_ids"
+                                colspan="4"
+                                nolabel="1"
+                                widget="many2many"
+                            />
+                        </page>
+                        <page name="note" string="Note">
+                            <field name="note" colspan="4" nolabel="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="print_document_type_action" model="ir.actions.act_window">
+        <field name="name">Print Document Types</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">print_document_type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="print_document_type_menu"
+        name="Print Document Types"
+        parent="base.reporting_menuitem"
+        action="print_document_type_action"
+        sequence="100"
+    />
+</odoo>
