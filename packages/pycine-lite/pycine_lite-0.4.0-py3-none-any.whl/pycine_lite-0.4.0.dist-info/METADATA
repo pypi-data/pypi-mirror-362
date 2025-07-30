@@ -1,0 +1,56 @@
+Metadata-Version: 2.4
+Name: pycine-lite
+Version: 0.4.0
+Summary: Handle .cine files created by Vision Research Phantom® cameras
+Author-email: Ben Hagen <ben@ottomatic.io>, "Takeshi (Kesh) Ikuma" <tikuma@lsuhsc.edu>
+License: LGPL-3.0 License
+Project-URL: Repository, https://github.com/tikuma-lsuhsc/pycine-lite
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Dynamic: license-file
+
+# pycine-lite
+
+[![PyPI](https://img.shields.io/pypi/v/pycine-lite)](https://pypi.org/project/pycine-lite/)
+![PyPI - Status](https://img.shields.io/pypi/status/pycine-lite)
+![PyPI - Version](https://img.shields.io/pypi/pyversions/pycine-lite)
+![License](https://img.shields.io/github/license/tikuma-lsuhsc/pycine-lite)
+
+Reading Vision Research .cine files in Python
+
+This package is a feature-stripped version of [`pycine`](https://github.com/ottomatic-io/pycine)
+to minimize the package dependencies. Specifically, the `cli` and `color` submodules 
+have been removed from the `pycine` package.
+
+## Installation
+
+```
+pip install -U pycine-lite
+```
+
+## Example usage
+
+### Read `n`-frames from from `frm0`
+
+```python
+raw_images, setup, bpp = read_frames(cine_file, start_frame=frm0, count=n)
+```
+
+### Iteratively read frames
+
+Suppose you want to run `process_frame()` function on every frame.
+
+```python
+
+header = read_header(cine_file)
+
+n = 0
+for frm in frame_reader(cinefile, header, start_frame=frm0, count=n):
+
+    process_frame(frm)
+```
