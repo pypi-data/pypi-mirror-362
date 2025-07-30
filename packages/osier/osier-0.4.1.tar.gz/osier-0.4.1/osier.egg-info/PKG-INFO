@@ -1,0 +1,168 @@
+Metadata-Version: 2.4
+Name: osier
+Version: 0.4.1
+Summary: osier: A justice oriented energy system optimization tool
+Author-email: Sam Dotson <samgdotson@gmail.com>
+Maintainer-email: Sam Dotson <samgdotson@gmail.com>
+License: BSD 3-Clause License
+        
+        Copyright (c) 2022-2025, Advanced Reactors and Fuel Cycles
+        All rights reserved.
+        
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+        
+        1. Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+        
+        2. Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+        
+        3. Neither the name of the copyright holder nor the names of its
+           contributors may be used to endorse or promote products derived from
+           this software without specific prior written permission.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+        AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+        IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+        FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+        DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+        SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+        CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+        OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+        
+Project-URL: Homepage, https://osier.readthedocs.io
+Project-URL: Repository, https://github.com/arfc/osier
+Project-URL: Issues, https://github.com/arfc/osier/issues
+Keywords: energy systems,optimization,multi-objective,justice,multi-criteria decision
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Environment :: Console
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: pytest
+Requires-Dist: pytest-cov
+Requires-Dist: dill
+Requires-Dist: openpyxl
+Requires-Dist: nrelpy
+Requires-Dist: unyt
+Requires-Dist: pymoo
+Requires-Dist: pyentrp
+Requires-Dist: deap
+Requires-Dist: pyomo
+Requires-Dist: toml
+Provides-Extra: doc
+Requires-Dist: sphinx>=5.1; extra == "doc"
+Requires-Dist: sphinx-autobuild; extra == "doc"
+Requires-Dist: myst-parser; extra == "doc"
+Requires-Dist: sphinx_design; extra == "doc"
+Requires-Dist: sphinx-autodoc-typehints; extra == "doc"
+Requires-Dist: numpydoc; extra == "doc"
+Requires-Dist: pydata_sphinx_theme; extra == "doc"
+Requires-Dist: nbsphinx; extra == "doc"
+Requires-Dist: pandoc; extra == "doc"
+Requires-Dist: nbsphinx-link; extra == "doc"
+Dynamic: license-file
+
+# osier
+/ˈōZHər/ <br>
+Open source multi-objective energy system framework
+
+[![status](https://joss.theoj.org/papers/183a04edba2d4952fa1e30c419a844b3/status.svg)](https://joss.theoj.org/papers/183a04edba2d4952fa1e30c419a844b3)
+[![Build Status](https://github.com/arfc/osier/actions/workflows/CI.yml/badge.svg)](https://github.com/arfc/osier/actions/workflows/CI.yml)
+[![Documentation Status](https://readthedocs.org/projects/osier/badge/?version=latest)](https://osier.readthedocs.io/en/latest/?badge=latest)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/samgdotson/osier/env-instructions?labpath=docs%2Fsource%2Fexamples)
+
+
+## Installation
+
+### Method 1: PyPI
+
+`osier` is available through [PyPI](https://pypi.org/project/osier/). It may be installed with 
+```bash
+python -m pip install osier
+``` 
+or by cloning this repository and building from source:
+
+```bash
+git clone git@github.com:arfc/osier.git  # requires ssh-keys
+# or
+git clone https://github.com/arfc/osier.git
+cd osier
+# for a basic installation
+pip install .
+# (Windows/Linux) to also install the documentation dependencies
+pip install .[doc]
+# (MacOS)
+pip install .'[doc]'
+```
+
+### Method 2: Conda/Mamba Environment
+
+Although `osier` is not yet available on `conda-forge`, you may have a more consistent experience by installing
+`osier` via a `conda` environment.
+
+```bash
+git clone git@github.com:arfc/osier.git  # requires ssh-keys
+mamba env create  # mamba and conda are interchangeable, here
+mamba activate osier-env
+```
+
+
+## Documentation
+The documentation for `osier` can be viewed [here](https://osier.readthedocs.io/en/latest/). 
+You can also build the docs locally with:
+
+```bash
+cd osier/docs
+make html
+cd build/html
+# to serve the documentation
+python -m http.server
+```
+
+```{note}
+Users attempting a local install need to make sure that they have `pandoc` installed.
+Please visit [`pandoc`'s documentation](https://pandoc.org/installing.html) for 
+instructions.
+```
+
+## Examples
+
+The examples can be found in the `docs/source/examples/` directory. Alternatively, 
+users can run the notebooks and experiment with `osier` through the Binder app.
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/samgdotson/osier/env-instructions?labpath=docs%2Fsource%2Fexamples)
+
+
+## Tests
+`osier`'s tests can be run by executing `pytest` in the top-level directory 
+of `osier`.
+
+```{note}
+The test package assumes the user has `coin-or-cbc` installed as the default solver. For Windows machines,
+this may require some additional steps to install the solver. [Here](https://stackoverflow.com/questions/58868054/how-to-install-coincbc-using-conda-in-windows) is a helpful place to start.
+```
+
+
+## Contributing
+
+Contributions to `osier` are welcome. For details on how to make bug reports, pull requests, and other information, check the [contributing page](docs/source/contrib.md).
+
+
+## Credits
+Some of the documentation infrastructure was inspired by and borrowed from the [`watts` documentation](https://watts.readthedocs.io/en/latest/index.html).
