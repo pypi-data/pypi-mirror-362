@@ -1,0 +1,219 @@
+Metadata-Version: 2.4
+Name: ont-pybasecall-client-lib
+Version: 7.9.8
+Summary: Python bindings for the BasecallClient library.
+Home-page: http://www.nanoporetech.com
+Author: Oxford Nanopore Technologies plc
+Author-email: unknown@unknown.com
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: Other/Proprietary License
+Classifier: Natural Language :: English
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: C++
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Requires-Dist: numpy<2.0.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: summary
+
+ont-pybasecall-client-lib
+=========================
+
+``ont-pybasecall-client-lib`` provides python bindings for connecting to
+a Dorado basecall server. It allows you to interact with the server to
+do anything you could normally do using the ont_basecall_client.
+This includes:
+
+- Basecalling
+- Barcoding / demultiplexing
+- Alignment
+
+For example::
+
+  >>> from pybasecall_client_lib.pyclient import PyBasecallClient
+  >>> client = PyBasecallClient(
+      "127.0.0.1:5555",
+      "dna_r9.4.1_450bps_fast",
+      align_ref="/path/to/index.mmi",
+      bed_file="/path/to/targets.bed"
+  )
+  >>> client.connect()
+
+Getting started
+===============
+
+``ont-pybasecall-client-lib`` is available on PyPI and may be installed via pip::
+
+   pip install ont-pybasecall-client-lib
+
+``ont-pybasecall-client-lib`` requires an instance of the Dorado basecall
+server is running. ont-dorado-server may be obtained from the
+`Oxford Nanopore Community
+<https://community.nanoporetech.com/downloads>`_
+
+The version of ``ont-pybasecall-client-lib`` should exactly match the
+version of ont-dorado-server being used. You can find your ont-dorado-server version
+like this::
+
+  $ <location of dorado_basecall_server>/dorado_basecall_server --version
+
+For example, this Dorado basecall server is version 7.1.1::
+
+  $ ./ont-dorado-server/bin/dorado_basecall_server --version
+  : Dorado Basecall Service Software, (C) Oxford Nanopore Technologies,  Limited. Version 7.1.1+effbaf8, client-server API version 16.0.0
+
+Install a specific version of ``ont-pybasecall-client-lib`` like this::
+
+  pip install ont-pybasecall-client-lib==<version>
+
+Dependencies
+------------
+
+``ont-pybasecall-client-lib`` requires ``numpy`` in order to run. In order to use
+included helper functions for reading data from fast5 and/or pod5 files it is also
+necessary to manually install ``ont-fast5-api`` and/or ``pod5``::
+
+  pip install ont-fast5-api pod5
+
+Documentation and help
+----------------------
+
+Information on the methods available may be viewed through Python's
+help command:::
+
+  >>> from pybasecall_client_lib import pyclient
+  >>> help(pyclient)
+  >>> from pybasecall_client_lib import client_lib
+  >>> help(client_lib)
+
+Interface / Examples
+====================
+
+``ont-pybasecall-client-lib`` comprises three Python modules:
+
+#. **pyclient** A user-friendly wrapper around **client_lib**. This
+   is what you should use to interact with a Dorado basecall server.
+#. **client_lib** A compiled library which provides direct Python
+   bindings to Dorado's C++ BasecallClient API.
+#. **helper_functions** A set of functions for running a Dorado basecall
+   server and loading reads from fast5 and/or pod5 files.
+
+Starting a basecall server
+--------------------------
+
+There must be a Dorado basecall server running in order to communicate
+with it. On most Oxford Nanopore devices a basecall server is always
+running on port 5555. On other devices, or if you want to run a
+separate basecall server, you must start one yourself::
+
+  from pybasecall_client_lib import helper_functions
+
+  # A basecall server requires:
+  #  * A location to put log files (on your PC)
+  #  * An initial config file to load
+  #  * A port to run on
+  server_args = ["--log_path", "/home/myuser/basecall_server_logs",
+                 "--config", "dna_r9.4.1_450bps_fast.cfg",
+                 "--port", 5556]
+  # The second argument is the directory where the
+  # dorado_basecall_server executable is found. Update this as
+  # appropriate.
+  helper_functions.run_server(server_args, "/home/myuser/ont-dorado/bin")
+
+See the the DOCUMENTATION.md file in the ont-dorado-server archive
+for more information on server arguments.
+
+Basecall and align using ``PyBasecallClient``
+---------------------------------------------
+
+::
+
+  from pybasecall_client_lib.pyclient import PyBasecallClient
+
+  client = PyBasecallClient(
+      "127.0.0.1:5555",
+      "dna_r9.4.1_450bps_fast",
+      align_ref = "/path/to/align_ref.fasta",
+      bed_file = "/path/to/bed_file.bed"
+  )
+  client.connect()
+
+It is also possible to start the ``PyBasecallClient`` using a dorado model set, e.g::
+
+  from pybasecall_client_lib.pyclient import PyBasecallClient
+
+  client = PyBasecallClient(
+      "127.0.0.1:5555",
+      "dna_r10.4.1_e8.2_400bps_hac@v4.3.0|dna_r10.4.1_e8.2_400bps_hac@v4.3.0_5mC_5hmC@v1|",
+  )
+  client.connect()
+
+Note that the helper_functions module requires that ``ont-fast5-api`` and/or ``pod5``
+is installed.::
+
+  from pybasecall_client_lib.helper_functions import basecall_with_pybasecall_client
+
+  # Using the client generated in the previous example
+  called_reads = basecall_with_pybasecall_client(
+      caller,
+      "/path/to/input_folder"
+  )
+
+  for read in called_reads:
+      read_id = read['metadata']['read_id']
+      alignment_genome = read['metadata']['alignment_genome']
+      sequence = read['datasets']['sequence']
+      print(f"{read_id} sequence length is {len(sequence)}"
+            f"alignment_genome is {alignment_genome}")
+
+
+Basecall and get states, moves and modbases using ``BasecallClient``
+--------------------------------------------------------------------
+In order to retrieve the ``movement`` dataset, the ``move_enabled``
+option must be set to ``True``.
+NOTE: You shouldn't turn on ``move_enabled`` if you don't need it,
+because it generates a LOT of extra output data so it can hurt performance.
+::
+
+  options = {'priority': PyBasecallClient.high_priority,
+            'client_name': "test_client",
+            'move_enabled': True }
+
+  client = PyBasecallClient(port_path, 'dna_r9.4.1_e8.1_modbases_5mc_cg_fast')
+  result = client.set_params(options)
+  result = client.connect()
+
+  called_reads = basecall_with_pybasecall_client(client, input_path)
+
+  for read in called_reads:
+      base_mod_context = read['metadata']['base_mod_context']
+      base_mod_alphabet = read['metadata']['base_mod_alphabet']
+
+      sequence = read['datasets']['sequence']
+      movement = read['datasets']['movement']
+      base_mod_probs = read['datasets']['base_mod_probs']
+
+      print(f"{read_id} sequence length is {len(sequence)}, "
+            f"base_mod_context is {base_mod_context}, base_mod_alphabet is {base_mod_alphabet}, "
+            f"movement size is {movement.shape}, base_mod_probs size is {base_mod_probs.shape}")
+
+Glossary of Terms:
+==================
+
+**Dorado** - Oxford Nanopore Technologies' production basecaller, which
+translates electrical signals measured from nanopores into DNA or RNA
+bases.
+
+**Fast5** - an implementation of the HDF5 file format, with specific data
+schemas for Oxford Nanopore Technologies sequencing data.
+
+**Pod5** - a file format for storing nanopore dna data in an easily
+accessible way.
