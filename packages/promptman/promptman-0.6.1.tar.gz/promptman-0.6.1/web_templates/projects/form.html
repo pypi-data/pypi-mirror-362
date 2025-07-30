@@ -1,0 +1,387 @@
+{% extends "layouts/base.html" %}
+
+{% block main_content %}
+<!-- Enhanced Page Header -->
+{% set breadcrumbs = [
+    {"name": t('nav.projects'), "url": "/projects", "icon": "fas fa-folder-open"},
+    {"name": t('projects.create') if action == 'create' else t('projects.edit'), "icon": "fas fa-" + ('plus' if action == 'create' else 'edit')}
+] %}
+{% set header_title = t('projects.create_new') if action == 'create' else t('projects.edit') %}
+{% set header_subtitle = t('projects.create_desc') if action == 'create' else t('projects.edit_desc') %}
+{% set header_icon = "fas fa-" + ('plus' if action == 'create' else 'edit') %}
+{% include "components/page_header.html" %}
+
+<div class="max-w-4xl mx-auto">
+    <div class="space-y-6">
+
+        <!-- Form -->
+        <div class="bg-white shadow rounded-lg">
+            <form method="POST" action="{{ '/projects/new' if action == 'create' else '/projects/' + (project_id|string if project_id else '0') + '/edit' }}" class="space-y-6">
+                <div class="px-4 py-5 sm:p-6">
+                    {% if error %}
+                        <div class="mb-6 rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">{{ t('status.error') }}</h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        <p>{{ error }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Basic Information -->
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                {{ t('projects.basic_info') }}
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="md:col-span-2">
+                                    <label for="name" class="block text-sm font-medium text-gray-700">
+                                        {{ t('projects.name') }} <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="mt-1">
+                                        <input type="text" name="name" id="name" required
+                                               value="{{ name or '' }}"
+                                               class="form-input"
+                                               placeholder="{{ t('projects.name_placeholder') }}">
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        {{ t('projects.name_help') }}
+                                    </p>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label for="title" class="block text-sm font-medium text-gray-700">
+                                        {{ t('projects.title') }} <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="mt-1">
+                                        <input type="text" name="title" id="title" required
+                                               value="{{ title or '' }}"
+                                               class="form-input"
+                                               placeholder="{{ t('projects.title_placeholder') }}">
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        {{ t('projects.title_help') }}
+                                    </p>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label for="description" class="block text-sm font-medium text-gray-700">
+                                        {{ t('projects.description') }}
+                                    </label>
+                                    <div class="mt-1">
+                                        <textarea name="description" id="description" rows="4"
+                                                  class="form-textarea"
+                                                  placeholder="{{ t('projects.description_placeholder') }}">{{ description or '' }}</textarea>
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        {{ t('projects.description_help') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project Configuration -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                <i class="fas fa-cog mr-2 text-purple-500"></i>
+                                {{ t('projects.configuration') }}
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="project_type" class="block text-sm font-medium text-gray-700">
+                                        {{ t('projects.type') }} <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="mt-1">
+                                        <select name="project_type" id="project_type" required class="form-select">
+                                            <option value="">{{ t('projects.type_select') }}</option>
+                                            <option value="general" {% if project_type == 'general' %}selected{% endif %}>
+                                                {{ t('projects.type_general') }} - {{ t('projects.type_general_desc') }}
+                                            </option>
+                                            <option value="sequenced" {% if project_type == 'sequenced' %}selected{% endif %}>
+                                                {{ t('projects.type_sequenced') }} - {{ t('projects.type_sequenced_desc') }}
+                                            </option>
+                                            <option value="llm_comparison" {% if project_type == 'llm_comparison' %}selected{% endif %}>
+                                                {{ t('projects.type_llm_comparison') }} - {{ t('projects.type_llm_comparison_desc') }}
+                                            </option>
+                                            <option value="developer" {% if project_type == 'developer' %}selected{% endif %}>
+                                                {{ t('projects.type_developer') }} - {{ t('projects.type_developer_desc') }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        {{ t('projects.type_help') }}
+                                    </p>
+                                </div>
+
+                                {% if is_multi_tenant_mode %}
+                                <div>
+                                    <label for="visibility" class="block text-sm font-medium text-gray-700">
+                                        {{ t('projects.visibility') }} <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="mt-1">
+                                        <select name="visibility" id="visibility" required class="form-select">
+                                            <option value="private" {% if visibility == 'private' %}selected{% endif %}>
+                                                {{ t('projects.visibility_private') }} - {{ t('projects.visibility_private_desc') }}
+                                            </option>
+                                            <option value="public" {% if visibility == 'public' %}selected{% endif %}>
+                                                {{ t('projects.visibility_public') }} - {{ t('projects.visibility_public_desc') }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        {{ t('projects.visibility_help') }}
+                                    </p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Sharing Options -->
+                        {% if is_multi_tenant_mode %}
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                <i class="fas fa-share-alt mr-2 text-green-500"></i>
+                                {{ t('projects.sharing') }}
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        <input id="shared_with_tenant" name="shared_with_tenant" type="checkbox" 
+                                               {% if shared_with_tenant %}checked{% endif %}
+                                               class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <label for="shared_with_tenant" class="font-medium text-gray-700">
+                                            {{ t('projects.share_with_tenant') }}
+                                        </label>
+                                        <p class="text-gray-500">
+                                            {{ t('projects.share_with_tenant_desc') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h4 class="text-sm font-medium text-yellow-800">
+                                                {{ t('projects.sharing_notice') }}
+                                            </h4>
+                                            <p class="mt-1 text-sm text-yellow-700">
+                                                {{ t('projects.sharing_notice_desc') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Advanced Options -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                <i class="fas fa-sliders-h mr-2 text-gray-500"></i>
+                                {{ t('projects.advanced_options') }}
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <!-- Project Type Specific Options -->
+                                <div id="sequenced-options" class="hidden space-y-4">
+                                    <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-list-ol text-blue-400"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h4 class="text-sm font-medium text-blue-800">
+                                                    {{ t('projects.sequenced_info') }}
+                                                </h4>
+                                                <p class="mt-1 text-sm text-blue-700">
+                                                    {{ t('projects.sequenced_info_desc') }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="llm-comparison-options" class="hidden space-y-4">
+                                    <div class="bg-purple-50 border border-purple-200 rounded-md p-4">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-balance-scale text-purple-400"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h4 class="text-sm font-medium text-purple-800">
+                                                    {{ t('projects.llm_comparison_info') }}
+                                                </h4>
+                                                <p class="mt-1 text-sm text-purple-700">
+                                                    {{ t('projects.llm_comparison_info_desc') }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="developer-options" class="hidden space-y-4">
+                                    <div class="bg-green-50 border border-green-200 rounded-md p-4">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-code text-green-400"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h4 class="text-sm font-medium text-green-800">
+                                                    {{ t('projects.developer_info') }}
+                                                </h4>
+                                                <p class="mt-1 text-sm text-green-700">
+                                                    {{ t('projects.developer_info_desc') }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
+                    <button type="submit" class="btn-primary sm:ml-3">
+                        <i class="fas fa-save mr-2"></i>
+                        {{ t('projects.save') if action == 'create' else t('projects.update') }}
+                    </button>
+                    <a href="{{ '/projects/' + (project_id|string) if action == 'edit' else '/projects' }}" 
+                       class="btn-secondary mt-3 sm:mt-0">
+                        <i class="fas fa-times mr-2"></i>
+                        {{ t('common.cancel') }}
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Section -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                    <i class="fas fa-question-circle mr-2 text-blue-500"></i>
+                    {{ t('projects.help_title') }}
+                </h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900 mb-2">{{ t('projects.help_project_types') }}</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li><strong>{{ t('projects.type_general') }}:</strong> {{ t('projects.help_general') }}</li>
+                            <li><strong>{{ t('projects.type_sequenced') }}:</strong> {{ t('projects.help_sequenced') }}</li>
+                            <li><strong>{{ t('projects.type_llm_comparison') }}:</strong> {{ t('projects.help_llm_comparison') }}</li>
+                            <li><strong>{{ t('projects.type_developer') }}:</strong> {{ t('projects.help_developer') }}</li>
+                        </ul>
+                    </div>
+                    
+                    {% if is_multi_tenant_mode %}
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900 mb-2">{{ t('projects.help_visibility') }}</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li><strong>{{ t('projects.visibility_private') }}:</strong> {{ t('projects.help_private') }}</li>
+                            <li><strong>{{ t('projects.visibility_public') }}:</strong> {{ t('projects.help_public') }}</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900 mb-2">{{ t('projects.help_best_practices') }}</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• {{ t('projects.help_bp_1') }}</li>
+                            <li>• {{ t('projects.help_bp_2') }}</li>
+                            <li>• {{ t('projects.help_bp_3') }}</li>
+                            <li>• {{ t('projects.help_bp_4') }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show/hide project type specific options
+document.getElementById('project_type').addEventListener('change', function() {
+    const selectedType = this.value;
+    const options = ['sequenced-options', 'llm-comparison-options', 'developer-options'];
+    
+    // Hide all options
+    options.forEach(optionId => {
+        document.getElementById(optionId).classList.add('hidden');
+    });
+    
+    // Show relevant options
+    if (selectedType === 'sequenced') {
+        document.getElementById('sequenced-options').classList.remove('hidden');
+    } else if (selectedType === 'llm_comparison') {
+        document.getElementById('llm-comparison-options').classList.remove('hidden');
+    } else if (selectedType === 'developer') {
+        document.getElementById('developer-options').classList.remove('hidden');
+    }
+});
+
+// Trigger change event on page load to show relevant options
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('project_type').dispatchEvent(new Event('change'));
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const title = document.getElementById('title').value.trim();
+    const projectType = document.getElementById('project_type').value;
+    
+    if (!name) {
+        e.preventDefault();
+        showToast('{{ t("projects.name_required") }}', 'error');
+        document.getElementById('name').focus();
+        return;
+    }
+    
+    if (!title) {
+        e.preventDefault();
+        showToast('{{ t("projects.title_required") }}', 'error');
+        document.getElementById('title').focus();
+        return;
+    }
+    
+    if (!projectType) {
+        e.preventDefault();
+        showToast('{{ t("projects.type_required") }}', 'error');
+        document.getElementById('project_type').focus();
+        return;
+    }
+});
+
+// Auto-generate name from title if name is empty
+document.getElementById('title').addEventListener('input', function() {
+    const nameField = document.getElementById('name');
+    if (!nameField.value.trim()) {
+        // Convert title to valid name format
+        const title = this.value.trim();
+        const name = title.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '_')
+            .substring(0, 50);
+        nameField.value = name;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ project.title }} - {{ t('projects.prompts') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Project Header -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <a href="/projects/{{ project.id }}" class="text-gray-400 hover:text-gray-600 mr-4">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div class="bg-blue-100 rounded-lg p-3 mr-4">
+                        <i class="fas fa-file-text text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ project.title }} - {{ t('projects.prompts') }}</h1>
+                        <p class="text-sm text-gray-600">{{ prompts|length }} {{ t('projects.prompts') }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/prompts/new?project_id={{ project.id }}" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        {{ t('projects.add_prompt') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prompts List -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-medium text-gray-900">
+                    <i class="fas fa-list mr-2 text-blue-600"></i>
+                    {{ t('projects.project_prompts') }}
+                </h2>
+                {% if project.project_type == 'sequenced' %}
+                    <span class="text-sm text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        {{ t('projects.sequenced_order_info') }}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="p-6">
+            {% if prompts %}
+                <div class="space-y-4">
+                    {% for prompt in prompts %}
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center">
+                                        {% if project.project_type == 'sequenced' and prompt.sequence_order %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-3">
+                                                #{{ prompt.sequence_order }}
+                                            </span>
+                                        {% endif %}
+                                        <h3 class="text-lg font-medium text-gray-900">{{ prompt.title }}</h3>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-600 mt-1">{{ prompt.content[:150] }}{% if prompt.content|length > 150 %}...{% endif %}</p>
+                                    
+                                    <div class="flex items-center mt-2 space-x-4">
+                                        {% if prompt.category %}
+                                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                                <i class="fas fa-tag mr-1"></i>
+                                                {{ prompt.category }}
+                                            </span>
+                                        {% endif %}
+                                        {% if prompt.tags %}
+                                            <span class="text-xs text-gray-500">
+                                                <i class="fas fa-tags mr-1"></i>
+                                                {{ prompt.tags }}
+                                            </span>
+                                        {% endif %}
+                                        <span class="text-xs text-gray-500">
+                                            {{ t('projects.added') }} {{ prompt.added_to_project_at }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-2 ml-4">
+                                    <a href="/prompts/{{ prompt.id }}/execute" 
+                                       class="text-gray-400 hover:text-green-600"
+                                       title="{{ t('common.execute') }}">
+                                        <i class="fas fa-play"></i>
+                                    </a>
+                                    <a href="/prompts/{{ prompt.id }}/edit" 
+                                       class="text-gray-400 hover:text-blue-600"
+                                       title="{{ t('common.edit') }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="text-gray-400 hover:text-red-600"
+                                            title="{{ t('common.remove') }}"
+                                            onclick="removeFromProject({{ project.id }}, {{ prompt.id }})">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-file-text text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ t('projects.no_prompts_yet') }}</h3>
+                    <p class="text-gray-500 mb-4">{{ t('projects.add_prompts_help') }}</p>
+                    <a href="/prompts/new?project_id={{ project.id }}" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        {{ t('projects.add_first_prompt') }}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function removeFromProject(projectId, promptId) {
+    if (confirm('{{ t("projects.confirm_remove_prompt") }}')) {
+        fetch(`/projects/${projectId}/prompts/${promptId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('{{ t("common.error_occurred") }}');
+        });
+    }
+}
+</script>
+{% endblock %}

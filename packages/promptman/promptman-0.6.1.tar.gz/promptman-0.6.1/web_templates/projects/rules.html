@@ -1,0 +1,275 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ project.title }} - {{ t('projects.rules') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Project Header -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <a href="/projects/{{ project.id }}" class="text-gray-400 hover:text-gray-600 mr-4">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div class="bg-purple-100 rounded-lg p-3 mr-4">
+                        <i class="fas fa-rules text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ project.title }} - {{ t('projects.rules') }}</h1>
+                        <p class="text-sm text-gray-600">{{ rules|length }} {{ t('projects.rules') }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="showAssignRuleModal()" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        {{ t('projects.assign_rule') }}
+                    </button>
+                    <a href="/rules/new?project_id={{ project.id }}" class="btn-secondary">
+                        <i class="fas fa-plus mr-2"></i>
+                        {{ t('projects.new_rule') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules List -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+                <i class="fas fa-list mr-2 text-purple-600"></i>
+                {{ t('projects.project_rules') }}
+            </h2>
+        </div>
+        
+        <div class="p-6">
+            {% if rules %}
+                <div class="space-y-4">
+                    {% for rule in rules %}
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center">
+                                        <h3 class="text-lg font-medium text-gray-900">{{ rule.title }}</h3>
+                                        {% if rule.rule_set_name %}
+                                            <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                {{ rule.rule_set_name }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-600 mt-1">{{ rule.content[:150] }}{% if rule.content|length > 150 %}...{% endif %}</p>
+                                    
+                                    <div class="flex items-center mt-2 space-x-4">
+                                        {% if rule.category %}
+                                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                                <i class="fas fa-tag mr-1"></i>
+                                                {{ rule.category }}
+                                            </span>
+                                        {% endif %}
+                                        {% if rule.tags %}
+                                            <span class="text-xs text-gray-500">
+                                                <i class="fas fa-tags mr-1"></i>
+                                                {{ rule.tags }}
+                                            </span>
+                                        {% endif %}
+                                        <span class="text-xs text-gray-500">
+                                            {{ t('projects.assigned') }} {{ rule.assigned_at }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-2 ml-4">
+                                    <button class="text-gray-400 hover:text-purple-600"
+                                            title="{{ t('common.preview') }}"
+                                            onclick="showRulePreview({{ rule.id }}, '{{ rule.title }}', `{{ rule.content|replace('`', '\\`')|replace('\n', '\\n') }}`)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="/rules/{{ rule.id }}/edit" 
+                                       class="text-gray-400 hover:text-blue-600"
+                                       title="{{ t('common.edit') }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="text-gray-400 hover:text-red-600"
+                                            title="{{ t('common.remove') }}"
+                                            onclick="removeFromProject({{ project.id }}, {{ rule.id }})">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-rules text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ t('projects.no_rules_yet') }}</h3>
+                    <p class="text-gray-500 mb-4">{{ t('projects.add_rules_help') }}</p>
+                    <a href="/rules/new?project_id={{ project.id }}" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        {{ t('projects.add_first_rule') }}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Rule Preview Modal -->
+<div id="rule-preview-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeRulePreview()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="rule-modal-title">
+                        <i class="fas fa-eye mr-2 text-purple-500"></i>
+                        {{ t('rules.preview') }}
+                    </h3>
+                    <button onclick="closeRulePreview()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <h4 id="rule-preview-title" class="text-md font-medium text-gray-900 mb-2"></h4>
+                    <div class="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                        <pre id="rule-preview-content" class="whitespace-pre-wrap text-sm text-gray-700"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button onclick="closeRulePreview()" class="btn-secondary">{{ t('common.close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Rule Modal -->
+<div id="assign-rule-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeAssignRuleModal()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <i class="fas fa-plus mr-2 text-green-500"></i>
+                        {{ t('projects.assign_rule') }}
+                    </h3>
+                    <button onclick="closeAssignRuleModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 mb-4">{{ t('projects.select_rule_to_assign') }}</p>
+                    <div id="available-rules-list" class="space-y-2 max-h-96 overflow-y-auto">
+                        <!-- Rules will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button onclick="closeAssignRuleModal()" class="btn-secondary">{{ t('common.cancel') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showRulePreview(id, title, content) {
+    document.getElementById('rule-preview-title').textContent = title;
+    document.getElementById('rule-preview-content').textContent = content;
+    document.getElementById('rule-preview-modal').classList.remove('hidden');
+}
+
+function closeRulePreview() {
+    document.getElementById('rule-preview-modal').classList.add('hidden');
+}
+
+function removeFromProject(projectId, ruleId) {
+    if (confirm('{{ t("projects.confirm_remove_rule") }}')) {
+        fetch(`/api/projects/${projectId}/rules/${ruleId}/unassign`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('{{ t("common.error_occurred") }}');
+        });
+    }
+}
+
+function showAssignRuleModal() {
+    // Load available rules
+    fetch(`/api/projects/{{ project.id }}/rules/available`)
+        .then(response => response.json())
+        .then(data => {
+            const rulesList = document.getElementById('available-rules-list');
+            rulesList.innerHTML = '';
+            
+            if (data.rules && data.rules.length > 0) {
+                data.rules.forEach(rule => {
+                    const ruleDiv = document.createElement('div');
+                    ruleDiv.className = 'border border-gray-200 rounded-lg p-3 hover:bg-gray-50 cursor-pointer';
+                    ruleDiv.onclick = () => assignRule(rule.id);
+                    ruleDiv.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">${rule.title || rule.name}</h4>
+                                <p class="text-sm text-gray-600 mt-1">${(rule.content || '').substring(0, 100)}${(rule.content || '').length > 100 ? '...' : ''}</p>
+                                ${rule.category ? `<span class="inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">${rule.category}</span>` : ''}
+                            </div>
+                            <button class="text-green-600 hover:text-green-800 ml-2">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    `;
+                    rulesList.appendChild(ruleDiv);
+                });
+            } else {
+                rulesList.innerHTML = '<p class="text-gray-500 text-center py-4">{{ t("projects.no_available_rules") }}</p>';
+            }
+            
+            document.getElementById('assign-rule-modal').classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('{{ t("common.error_occurred") }}');
+        });
+}
+
+function assignRule(ruleId) {
+    fetch(`/api/projects/{{ project.id }}/rules/${ruleId}/assign`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeAssignRuleModal();
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('{{ t("common.error_occurred") }}');
+    });
+}
+
+function closeAssignRuleModal() {
+    document.getElementById('assign-rule-modal').classList.add('hidden');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,429 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ project.title }} - Developer Toolkit{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Project Header -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="bg-green-100 rounded-lg p-3 mr-4">
+                        <i class="fas fa-code text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ project.title }}</h1>
+                        <p class="text-sm text-gray-600">{{ t('projects.type_developer') }} • {{ project.name }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    {% if can_edit %}
+                        <button onclick="openToolbox({{ project.id }})" 
+                                class="btn-primary">
+                            <i class="fas fa-toolbox mr-2"></i>
+                            Open Toolbox
+                        </button>
+                        <button onclick="setupWorkflow({{ project.id }})" 
+                                class="btn-secondary">
+                            <i class="fas fa-cog mr-2"></i>
+                            Configure
+                        </button>
+                        <a href="/projects/{{ project.id }}/edit" class="btn-secondary">
+                            <i class="fas fa-edit mr-2"></i>
+                            {{ t('common.edit') }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        {% if project.description %}
+        <div class="px-6 py-4">
+            <p class="text-gray-700">{{ project.description }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Developer Categories -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">
+                        <i class="fas fa-layer-group mr-2 text-green-600"></i>
+                        Development Categories
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Code Review -->
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openCategory('code-review')">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-search-plus text-blue-600 mr-3"></i>
+                                    <h3 class="font-medium text-gray-900">Code Review</h3>
+                                </div>
+                                <span class="text-sm text-gray-500">3 tools</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Review code quality, security, and best practices</p>
+                        </div>
+
+                        <!-- Bug Fixing -->
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openCategory('bug-fixing')">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-bug text-red-600 mr-3"></i>
+                                    <h3 class="font-medium text-gray-900">Bug Fixing</h3>
+                                </div>
+                                <span class="text-sm text-gray-500">5 tools</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Debug issues and implement fixes</p>
+                        </div>
+
+                        <!-- Documentation -->
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openCategory('documentation')">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-file-alt text-yellow-600 mr-3"></i>
+                                    <h3 class="font-medium text-gray-900">Documentation</h3>
+                                </div>
+                                <span class="text-sm text-gray-500">4 tools</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Generate docs, comments, and guides</p>
+                        </div>
+
+                        <!-- Testing -->
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openCategory('testing')">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-vial text-purple-600 mr-3"></i>
+                                    <h3 class="font-medium text-gray-900">Testing</h3>
+                                </div>
+                                <span class="text-sm text-gray-500">6 tools</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Unit tests, integration tests, and QA</p>
+                        </div>
+
+                        <!-- Refactoring -->
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openCategory('refactoring')">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-recycle text-teal-600 mr-3"></i>
+                                    <h3 class="font-medium text-gray-900">Refactoring</h3>
+                                </div>
+                                <span class="text-sm text-gray-500">4 tools</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Improve code structure and maintainability</p>
+                        </div>
+
+                        <!-- Architecture -->
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openCategory('architecture')">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-sitemap text-indigo-600 mr-3"></i>
+                                    <h3 class="font-medium text-gray-900">Architecture</h3>
+                                </div>
+                                <span class="text-sm text-gray-500">3 tools</span>
+                            </div>
+                            <p class="text-sm text-gray-600">System design and architectural decisions</p>
+                        </div>
+
+                        <!-- Debugging -->
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openCategory('debugging')">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-microscope text-orange-600 mr-3"></i>
+                                    <h3 class="font-medium text-gray-900">Debugging</h3>
+                                </div>
+                                <span class="text-sm text-gray-500">5 tools</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Identify and resolve runtime issues</p>
+                        </div>
+
+                        <!-- Performance -->
+                        <div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openCategory('performance')">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-tachometer-alt text-pink-600 mr-3"></i>
+                                    <h3 class="font-medium text-gray-900">Performance</h3>
+                                </div>
+                                <span class="text-sm text-gray-500">4 tools</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Optimize speed, memory, and efficiency</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Tools -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-medium text-gray-900">
+                            <i class="fas fa-history mr-2 text-gray-600"></i>
+                            Recently Used Tools
+                        </h2>
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View All
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    {% if recent_prompts %}
+                        <div class="space-y-3">
+                            {% for prompt in recent_prompts %}
+                                <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-code text-blue-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="font-medium text-gray-900">{{ prompt.title }}</h3>
+                                        <p class="text-sm text-gray-600">{{ prompt.category or 'General' }} • Used 2h ago</p>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-tools text-4xl text-gray-300 mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No Tools Added Yet</h3>
+                            <p class="text-gray-500 mb-4">Add development prompts and rules to build your toolkit.</p>
+                            <a href="/prompts/new?project_id={{ project.id }}" class="btn-primary">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add First Tool
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Workflow Stats -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">
+                        <i class="fas fa-chart-bar mr-2 text-green-600"></i>
+                        Workflow Stats
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Total Tools</span>
+                            <span class="font-medium text-gray-900">{{ project_stats.prompt_count + project_stats.rule_count or 0 }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Categories</span>
+                            <span class="font-medium text-gray-900">8</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Team Size</span>
+                            <span class="font-medium text-gray-900">{{ project_stats.member_count or 1 }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Usage This Week</span>
+                            <span class="font-medium text-green-600">47 times</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Tools -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">
+                        <i class="fas fa-bolt mr-2 text-yellow-600"></i>
+                        Quick Tools
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <button class="w-full btn-secondary justify-start">
+                            <i class="fas fa-search-plus mr-2"></i>
+                            Code Review
+                        </button>
+                        <button class="w-full btn-secondary justify-start">
+                            <i class="fas fa-bug mr-2"></i>
+                            Bug Analysis
+                        </button>
+                        <button class="w-full btn-secondary justify-start">
+                            <i class="fas fa-vial mr-2"></i>
+                            Generate Tests
+                        </button>
+                        <button class="w-full btn-secondary justify-start">
+                            <i class="fas fa-file-alt mr-2"></i>
+                            Write Docs
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Activity -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">
+                        <i class="fas fa-users mr-2 text-blue-600"></i>
+                        Team Activity
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <div class="flex items-center text-sm">
+                            <div class="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                            <span class="text-gray-900">Sarah used Code Review tool</span>
+                            <span class="text-gray-500 ml-auto">5m ago</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+                            <span class="text-gray-900">Mike added Bug Fix prompt</span>
+                            <span class="text-gray-500 ml-auto">1h ago</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <div class="w-2 h-2 bg-purple-400 rounded-full mr-3"></div>
+                            <span class="text-gray-900">Alex ran Test Generator</span>
+                            <span class="text-gray-500 ml-auto">3h ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Developer Toolbox Modal -->
+<div id="toolboxModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-auto">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-medium text-gray-900">Developer Toolbox</h3>
+                <button onclick="closeToolbox()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Tool categories will be loaded here -->
+                    <div class="p-4 border border-gray-200 rounded-lg text-center">
+                        <i class="fas fa-spinner fa-spin text-gray-400 text-2xl mb-2"></i>
+                        <p class="text-gray-500">Loading tools...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Setup Workflow Modal -->
+<div id="workflowModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Configure Developer Workflow</h3>
+            </div>
+            <form id="workflowForm" class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Workflow Type</label>
+                        <select name="workflow_type" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                            <option value="general">General Development</option>
+                            <option value="frontend">Frontend Development</option>
+                            <option value="backend">Backend Development</option>
+                            <option value="full_stack">Full Stack Development</option>
+                            <option value="devops">DevOps & Infrastructure</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Team Size</label>
+                        <input type="number" name="team_size" class="w-full border border-gray-300 rounded-md px-3 py-2" 
+                               value="1" min="1" max="50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Coding Standards (comma-separated)</label>
+                        <input type="text" name="coding_standards" class="w-full border border-gray-300 rounded-md px-3 py-2" 
+                               value="PEP8,ESLint,Prettier" placeholder="PEP8,ESLint,Prettier">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Review Requirements (comma-separated)</label>
+                        <input type="text" name="review_requirements" class="w-full border border-gray-300 rounded-md px-3 py-2" 
+                               value="Code Review,Testing,Documentation" placeholder="Code Review,Testing,Documentation">
+                    </div>
+                </div>
+                <div class="flex items-center justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeWorkflowModal()" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Configuration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openToolbox(projectId) {
+    document.getElementById('toolboxModal').classList.remove('hidden');
+    // Load developer tools via API
+    loadDeveloperTools(projectId);
+}
+
+function closeToolbox() {
+    document.getElementById('toolboxModal').classList.add('hidden');
+}
+
+function setupWorkflow(projectId) {
+    document.getElementById('workflowModal').classList.remove('hidden');
+}
+
+function closeWorkflowModal() {
+    document.getElementById('workflowModal').classList.add('hidden');
+}
+
+function openCategory(category) {
+    // In a real implementation, this would filter tools by category
+    console.log('Opening category:', category);
+    openToolbox({{ project.id }});
+}
+
+function loadDeveloperTools(projectId) {
+    fetch(`/projects/${projectId}/developer-tools`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update toolbox modal with actual tools
+            console.log('Developer tools loaded:', data);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading tools:', error);
+    });
+}
+
+document.getElementById('workflowForm').onsubmit = function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch(`/projects/{{ project.id }}/setup-developer-workflow`, {
+        method: 'POST',
+        body: formData
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Workflow configured successfully!');
+            location.reload();
+        } else {
+            alert('Configuration failed: ' + data.error);
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Configuration failed');
+    });
+    
+    closeWorkflowModal();
+};
+</script>
+{% endblock %}

@@ -1,0 +1,286 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ project.title }} - {{ t('projects.members') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Project Header -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <a href="/projects/{{ project.id }}" class="text-gray-400 hover:text-gray-600 mr-4">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div class="bg-green-100 rounded-lg p-3 mr-4">
+                        <i class="fas fa-users text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ project.title }} - {{ t('projects.members') }}</h1>
+                        <p class="text-sm text-gray-600">{{ members|length }} {{ t('projects.team_members') }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="openInviteModal()" class="btn-primary">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        {{ t('projects.invite_member') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Members List -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+                <i class="fas fa-list mr-2 text-green-600"></i>
+                {{ t('projects.team_members') }}
+            </h2>
+        </div>
+        
+        <div class="p-6">
+            {% if members %}
+                <div class="space-y-4">
+                    {% for member in members %}
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                            <i class="fas fa-user text-gray-600"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-lg font-medium text-gray-900">{{ member.user_name or member.user_id }}</h3>
+                                        <p class="text-sm text-gray-600">{{ member.user_id }}</p>
+                                        <p class="text-xs text-gray-500">{{ t('projects.joined') }} {{ member.added_at }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                        {% if member.role == 'owner' %}bg-blue-100 text-blue-800
+                                        {% elif member.role == 'member' %}bg-green-100 text-green-800
+                                        {% else %}bg-gray-100 text-gray-800
+                                        {% endif %}">
+                                        {% if member.role == 'owner' %}<i class="fas fa-crown mr-1"></i>{% endif %}
+                                        {{ t('projects.role_' + member.role) }}
+                                    </span>
+                                    
+                                    {% if member.role != 'owner' %}
+                                        <div class="relative">
+                                            <button class="text-gray-400 hover:text-gray-600" onclick="toggleMemberMenu({{ loop.index }})">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <div id="member-menu-{{ loop.index }}" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                                                <div class="py-1">
+                                                    <button onclick="changeRole({{ project.id }}, '{{ member.user_id }}', 'member')" 
+                                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                                        <i class="fas fa-user mr-2"></i>
+                                                        {{ t('projects.make_member') }}
+                                                    </button>
+                                                    <button onclick="changeRole({{ project.id }}, '{{ member.user_id }}', 'viewer')" 
+                                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                                        <i class="fas fa-eye mr-2"></i>
+                                                        {{ t('projects.make_viewer') }}
+                                                    </button>
+                                                    <hr class="my-1">
+                                                    <button onclick="transferOwnership({{ project.id }}, '{{ member.user_id }}')" 
+                                                            class="block px-4 py-2 text-sm text-orange-700 hover:bg-orange-50 w-full text-left">
+                                                        <i class="fas fa-crown mr-2"></i>
+                                                        {{ t('projects.transfer_ownership') }}
+                                                    </button>
+                                                    <hr class="my-1">
+                                                    <button onclick="removeMember({{ project.id }}, '{{ member.user_id }}')" 
+                                                            class="block px-4 py-2 text-sm text-red-700 hover:bg-red-50 w-full text-left">
+                                                        <i class="fas fa-trash mr-2"></i>
+                                                        {{ t('projects.remove_member') }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ t('projects.no_members_yet') }}</h3>
+                    <p class="text-gray-500 mb-4">{{ t('projects.invite_members_help') }}</p>
+                    <button onclick="openInviteModal()" class="btn-primary">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        {{ t('projects.invite_first_member') }}
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Invite Member Modal -->
+<div id="invite-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeInviteModal()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <i class="fas fa-user-plus mr-2 text-green-500"></i>
+                        {{ t('projects.invite_member') }}
+                    </h3>
+                    <button onclick="closeInviteModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="invite-form" onsubmit="inviteMember(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('projects.user_email') }}</label>
+                        <input type="email" name="email" required 
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               placeholder="{{ t('projects.enter_email') }}">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('projects.role') }}</label>
+                        <select name="role" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <option value="member">{{ t('projects.role_member') }}</option>
+                            <option value="viewer">{{ t('projects.role_viewer') }}</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('projects.invite_message') }} ({{ t('common.optional') }})</label>
+                        <textarea name="message" rows="3" 
+                                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                  placeholder="{{ t('projects.invite_message_placeholder') }}"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="submit" form="invite-form" class="btn-primary ml-3">
+                    {{ t('projects.send_invite') }}
+                </button>
+                <button onclick="closeInviteModal()" class="btn-secondary">
+                    {{ t('common.cancel') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openInviteModal() {
+    document.getElementById('invite-modal').classList.remove('hidden');
+}
+
+function closeInviteModal() {
+    document.getElementById('invite-modal').classList.add('hidden');
+    document.getElementById('invite-form').reset();
+}
+
+function toggleMemberMenu(index) {
+    const menu = document.getElementById(`member-menu-${index}`);
+    menu.classList.toggle('hidden');
+}
+
+function inviteMember(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    fetch(`/projects/{{ project.id }}/invite`, {
+        method: 'POST',
+        body: formData
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('{{ t("projects.invite_sent") }}');
+            closeInviteModal();
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('{{ t("common.error_occurred") }}');
+    });
+}
+
+function changeRole(projectId, userId, newRole) {
+    if (confirm('{{ t("projects.confirm_role_change") }}')) {
+        fetch(`/projects/${projectId}/members/${userId}/role`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ role: newRole })
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('{{ t("common.error_occurred") }}');
+        });
+    }
+}
+
+function removeMember(projectId, userId) {
+    if (confirm('{{ t("projects.confirm_remove_member") }}')) {
+        fetch(`/projects/${projectId}/members/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('{{ t("common.error_occurred") }}');
+        });
+    }
+}
+
+function transferOwnership(projectId, newOwnerId) {
+    const confirmed = confirm('{{ t("projects.confirm_ownership_transfer") }}\n\n{{ t("projects.ownership_transfer_warning") }}');
+    
+    if (confirmed) {
+        // Create a form to send the POST request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/api/projects/${projectId}/transfer-ownership`;
+        
+        const userIdInput = document.createElement('input');
+        userIdInput.type = 'hidden';
+        userIdInput.name = 'new_owner_user_id';
+        userIdInput.value = newOwnerId;
+        
+        form.appendChild(userIdInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('[onclick*="toggleMemberMenu"]')) {
+        document.querySelectorAll('[id^="member-menu-"]').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,629 @@
+{% extends "layouts/base.html" %}
+
+{% block main_content %}
+<!-- Enhanced Page Header -->
+{% set breadcrumbs = [
+    {"name": t('nav.projects'), "url": "/projects", "icon": "fas fa-folder-open"},
+    {"name": project.title, "icon": "fas fa-folder"}
+] %}
+{% set header_title = project.title %}
+{% set header_subtitle = project.name + " (" + t('projects.type_' + project.project_type) + ")" %}
+{% set header_icon = "fas fa-folder" %}
+{% set header_actions = [] %}
+
+{% if can_edit %}
+    {% set header_actions = header_actions + [
+        {
+            "type": "button",
+            "text": t('common.edit'),
+            "url": "/projects/" + project.id|string + "/edit",
+            "icon": "fas fa-edit",
+            "style": "secondary"
+        }
+    ] %}
+{% endif %}
+
+{% if project.project_type == 'sequenced' %}
+    {% set header_actions = header_actions + [
+        {
+            "type": "button",
+            "text": t('projects.execute_sequence'),
+            "url": "/projects/" + project.id|string + "/execute",
+            "icon": "fas fa-play",
+            "style": "primary"
+        }
+    ] %}
+{% elif project.project_type == 'llm_comparison' %}
+    {% set header_actions = header_actions + [
+        {
+            "type": "button",
+            "text": t('projects.run_comparison'),
+            "url": "/projects/" + project.id|string + "/compare",
+            "icon": "fas fa-balance-scale",
+            "style": "primary"
+        }
+    ] %}
+{% endif %}
+
+{% set header_actions = header_actions + [
+    {
+        "type": "dropdown",
+        "text": t('common.actions'),
+        "icon": "fas fa-ellipsis-v",
+        "style": "secondary",
+        "items": [
+            {"text": t('projects.add_prompts'), "url": "/projects/" + project.id|string + "/prompts/add", "icon": "fas fa-file-text"},
+            {"text": t('projects.add_rules'), "url": "/projects/" + project.id|string + "/rules/add", "icon": "fas fa-rules"},
+            {"text": t('projects.manage_members'), "url": "/projects/" + project.id|string + "/members", "icon": "fas fa-users"},
+            {"text": t('projects.version_history'), "url": "/projects/" + project.id|string + "/versions", "icon": "fas fa-history"},
+            {"text": t('common.export'), "url": "/projects/" + project.id|string + "/export", "icon": "fas fa-download"}
+        ]
+    }
+] %}
+
+{% include "components/page_header.html" %}
+
+<div class="space-y-6">
+    <!-- Project Overview Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-file-text text-2xl text-blue-400"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ t('projects.prompts') }}</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ project_stats.prompt_count or 0 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/projects/{{ project.id }}/prompts" class="text-sm text-blue-600 hover:text-blue-900">
+                        {{ t('projects.view_all') }} →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-rules text-2xl text-purple-400"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ t('projects.rules') }}</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ project_stats.rule_count or 0 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/projects/{{ project.id }}/rules" class="text-sm text-purple-600 hover:text-purple-900">
+                        {{ t('projects.view_all') }} →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-users text-2xl text-green-400"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ t('projects.members') }}</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ project_stats.member_count or 1 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/projects/{{ project.id }}/members" class="text-sm text-green-600 hover:text-green-900">
+                        {{ t('projects.manage') }} →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-code-branch text-2xl text-gray-400"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">{{ t('projects.version') }}</dt>
+                            <dd class="text-lg font-medium text-gray-900">v{{ project.version or 1 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/projects/{{ project.id }}/versions" class="text-sm text-gray-600 hover:text-gray-900">
+                        {{ t('projects.history') }} →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token Cost Information -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                <i class="fas fa-coins mr-2 text-yellow-500"></i>
+                {{ t('projects.token_analysis') }}
+            </h3>
+            
+            <div id="token-cost-panel" class="space-y-4">
+                <div class="flex items-center justify-center py-8">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500">{{ t('projects.calculating_tokens') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Tags -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    <i class="fas fa-tags mr-2 text-indigo-500"></i>
+                    {{ t('projects.tags') }}
+                </h3>
+                {% if can_edit %}
+                <button onclick="showTagsModal()" class="text-sm text-indigo-600 hover:text-indigo-900">
+                    {{ t('common.edit') }}
+                </button>
+                {% endif %}
+            </div>
+            
+            <div id="tags-panel" class="space-y-4">
+                <div class="flex items-center justify-center py-8">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500">{{ t('projects.loading_tags') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Information -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                {{ t('projects.project_info') }}
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <dl class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">{{ t('projects.description') }}</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {{ project.description or t('projects.no_description') }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">{{ t('projects.type') }}</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if project.project_type == 'general' %}bg-gray-100 text-gray-800
+                                    {% elif project.project_type == 'sequenced' %}bg-blue-100 text-blue-800
+                                    {% elif project.project_type == 'llm_comparison' %}bg-purple-100 text-purple-800
+                                    {% elif project.project_type == 'developer' %}bg-green-100 text-green-800
+                                    {% endif %}">
+                                    {% if project.project_type == 'general' %}<i class="fas fa-folder mr-1"></i>
+                                    {% elif project.project_type == 'sequenced' %}<i class="fas fa-list-ol mr-1"></i>
+                                    {% elif project.project_type == 'llm_comparison' %}<i class="fas fa-balance-scale mr-1"></i>
+                                    {% elif project.project_type == 'developer' %}<i class="fas fa-code mr-1"></i>
+                                    {% endif %}
+                                    {{ t('projects.type_' + project.project_type) }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">{{ t('projects.created') }}</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ project.created_at }}</dd>
+                        </div>
+                    </dl>
+                </div>
+                <div>
+                    <dl class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">{{ t('projects.visibility') }}</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if project.visibility == 'public' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-globe mr-1"></i>
+                                        {{ t('projects.public') }}
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        <i class="fas fa-lock mr-1"></i>
+                                        {{ t('projects.private') }}
+                                    </span>
+                                {% endif %}
+                                {% if project.shared_with_tenant %}
+                                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i class="fas fa-share-alt mr-1"></i>
+                                        {{ t('projects.shared_tenant') }}
+                                    </span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">{{ t('projects.owner') }}</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ project.owner_name or project.user_id }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">{{ t('projects.last_updated') }}</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ project.updated_at }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Prompts -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <i class="fas fa-file-text mr-2 text-blue-500"></i>
+                        {{ t('projects.recent_prompts') }}
+                    </h3>
+                    <a href="/projects/{{ project.id }}/prompts" class="text-sm text-blue-600 hover:text-blue-900">
+                        {{ t('projects.view_all') }} →
+                    </a>
+                </div>
+                
+                {% if recent_prompts %}
+                    <ul class="space-y-3">
+                        {% for prompt in recent_prompts %}
+                            <li class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="flex items-center">
+                                        <h4 class="text-sm font-medium text-gray-900 truncate">{{ prompt.title }}</h4>
+                                        {% if project.project_type == 'sequenced' and prompt.sequence_order %}
+                                            <span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                #{{ prompt.sequence_order }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">{{ t('projects.added') }} {{ prompt.added_to_project_at }}</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <a href="/prompts/{{ prompt.id }}/execute" 
+                                       class="text-gray-400 hover:text-green-600"
+                                       title="{{ t('common.execute') }}">
+                                        <i class="fas fa-play"></i>
+                                    </a>
+                                    <a href="/prompts/{{ prompt.id }}/edit" 
+                                       class="text-gray-400 hover:text-blue-600"
+                                       title="{{ t('common.edit') }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center py-6">
+                        <i class="fas fa-file-text text-3xl text-gray-300 mb-2"></i>
+                        <p class="text-sm text-gray-500">{{ t('projects.no_prompts_yet') }}</p>
+                        <a href="/projects/{{ project.id }}/prompts/add" class="mt-2 inline-flex items-center text-sm text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-plus mr-1"></i>
+                            {{ t('projects.add_first_prompt') }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Rules -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <i class="fas fa-rules mr-2 text-purple-500"></i>
+                        {{ t('projects.recent_rules') }}
+                    </h3>
+                    <a href="/projects/{{ project.id }}/rules" class="text-sm text-purple-600 hover:text-purple-900">
+                        {{ t('projects.view_all') }} →
+                    </a>
+                </div>
+                
+                {% if recent_rules %}
+                    <ul class="space-y-3">
+                        {% for rule in recent_rules %}
+                            <li class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="flex items-center">
+                                        <h4 class="text-sm font-medium text-gray-900 truncate">{{ rule.title }}</h4>
+                                        {% if rule.rule_set_name %}
+                                            <span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                                {{ rule.rule_set_name }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">{{ t('projects.added') }} {{ rule.added_to_project_at }}</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="text-gray-400 hover:text-purple-600"
+                                            title="{{ t('common.preview') }}"
+                                            onclick="showRulePreview({{ rule.id }}, '{{ rule.title }}', `{{ rule.content|replace('`', '\\`')|replace('\n', '\\n') }}`)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="/rules/{{ rule.id }}/edit" 
+                                       class="text-gray-400 hover:text-blue-600"
+                                       title="{{ t('common.edit') }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center py-6">
+                        <i class="fas fa-rules text-3xl text-gray-300 mb-2"></i>
+                        <p class="text-sm text-gray-500">{{ t('projects.no_rules_yet') }}</p>
+                        <a href="/projects/{{ project.id }}/rules/add" class="mt-2 inline-flex items-center text-sm text-purple-600 hover:text-purple-900">
+                            <i class="fas fa-plus mr-1"></i>
+                            {{ t('projects.add_first_rule') }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Members -->
+    {% if project_stats.member_count > 1 or can_manage %}
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    <i class="fas fa-users mr-2 text-green-500"></i>
+                    {{ t('projects.team_members') }}
+                </h3>
+                {% if can_manage %}
+                    <a href="/projects/{{ project.id }}/members" class="text-sm text-green-600 hover:text-green-900">
+                        {{ t('projects.manage_members') }} →
+                    </a>
+                {% endif %}
+            </div>
+            
+            {% if members %}
+                <div class="space-y-3">
+                    {% for member in members[:5] %}
+                        <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <i class="fas fa-user text-gray-600 text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">{{ member.user_name or member.user_id }}</p>
+                                    <p class="text-xs text-gray-500">{{ t('projects.joined') }} {{ member.added_at }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if member.role == 'owner' %}bg-blue-100 text-blue-800
+                                    {% elif member.role == 'member' %}bg-green-100 text-green-800
+                                    {% else %}bg-gray-100 text-gray-800
+                                    {% endif %}">
+                                    {% if member.role == 'owner' %}<i class="fas fa-crown mr-1"></i>{% endif %}
+                                    {{ t('projects.role_' + member.role) }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% if project_stats.member_count > 5 %}
+                        <div class="text-center py-2">
+                            <a href="/projects/{{ project.id }}/members" class="text-sm text-gray-600 hover:text-gray-900">
+                                {{ t('projects.view_all_members', count=project_stats.member_count - 5) }} →
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Rule Preview Modal -->
+<div id="rule-preview-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeRulePreview()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="rule-modal-title">
+                        <i class="fas fa-eye mr-2 text-purple-500"></i>
+                        {{ t('rules.preview') }}
+                    </h3>
+                    <button onclick="closeRulePreview()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <h4 id="rule-preview-title" class="text-md font-medium text-gray-900 mb-2"></h4>
+                    <div class="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                        <pre id="rule-preview-content" class="whitespace-pre-wrap text-sm text-gray-700"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button onclick="closeRulePreview()" class="btn-secondary">{{ t('common.close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showRulePreview(id, title, content) {
+    document.getElementById('rule-preview-title').textContent = title;
+    document.getElementById('rule-preview-content').textContent = content;
+    document.getElementById('rule-preview-modal').classList.remove('hidden');
+}
+
+function closeRulePreview() {
+    document.getElementById('rule-preview-modal').classList.add('hidden');
+}
+
+// Load token cost information
+function loadTokenCost() {
+    fetch(`/api/projects/{{ project.id }}/token-cost`)
+        .then(response => response.json())
+        .then(data => {
+            const panel = document.getElementById('token-cost-panel');
+            if (data.success && data.total_tokens > 0) {
+                panel.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-text text-blue-500 text-xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-blue-900">{{ t('projects.prompt_tokens') }}</p>
+                                    <p class="text-2xl font-bold text-blue-700">${data.prompt_tokens.toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-rules text-purple-500 text-xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-purple-900">{{ t('projects.rule_tokens') }}</p>
+                                    <p class="text-2xl font-bold text-purple-700">${data.rule_tokens.toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-coins text-yellow-500 text-xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-yellow-900">{{ t('projects.estimated_cost') }}</p>
+                                    <p class="text-2xl font-bold text-yellow-700">$${data.total_cost.toFixed(4)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">{{ t('projects.total_tokens') }}</p>
+                                <p class="text-lg text-gray-700">${data.total_tokens.toLocaleString()} {{ t('projects.tokens') }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">{{ t('projects.cost_per_1k') }}: $${data.cost_per_1k_tokens}</p>
+                                <p class="text-sm text-gray-500">{{ t('projects.estimation_note') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                panel.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-info-circle text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500">{{ t('projects.no_tokens_calculated') }}</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const panel = document.getElementById('token-cost-panel');
+            panel.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-400 mb-2"></i>
+                    <p class="text-sm text-red-500">{{ t('projects.error_loading_tokens') }}</p>
+                </div>
+            `;
+        });
+}
+
+// Load tags information
+function loadTags() {
+    fetch(`/api/projects/{{ project.id }}/tags`)
+        .then(response => response.json())
+        .then(data => {
+            const panel = document.getElementById('tags-panel');
+            let content = '';
+            
+            if (data.project_tags && data.project_tags.length > 0) {
+                content += `
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">{{ t('projects.project_tags') }}</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${data.project_tags.map(tag => `
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                                    <i class="fas fa-tag mr-1"></i>${tag}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (data.aggregate_tags && data.aggregate_tags.length > 0) {
+                content += `
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">{{ t('projects.aggregate_tags') }}</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${data.aggregate_tags.map(tag => `
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                                    <i class="fas fa-tags mr-1"></i>${tag}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (!content) {
+                content = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-tags text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500">{{ t('projects.no_tags_yet') }}</p>
+                    </div>
+                `;
+            }
+            
+            panel.innerHTML = content;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const panel = document.getElementById('tags-panel');
+            panel.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-400 mb-2"></i>
+                    <p class="text-sm text-red-500">{{ t('projects.error_loading_tags') }}</p>
+                </div>
+            `;
+        });
+}
+
+// Load data when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadTokenCost();
+    loadTags();
+});
+</script>
+{% endblock %}
