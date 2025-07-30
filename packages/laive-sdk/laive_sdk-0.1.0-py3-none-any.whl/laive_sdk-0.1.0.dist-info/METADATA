@@ -1,0 +1,196 @@
+Metadata-Version: 2.4
+Name: laive-sdk
+Version: 0.1.0
+Summary: Python SDK for the Laive RAG API
+Home-page: https://github.com/laiveai/Python-SDK
+Author: Laive
+Author-email: Laive <contact@laive.ai>
+License: MIT
+Project-URL: Homepage, https://github.com/laive/Python-SDK
+Project-URL: Documentation, https://github.com/laive/Python-SDK#readme
+Project-URL: Repository, https://github.com/laive/Python-SDK.git
+Project-URL: Bug Reports, https://github.com/laive/Python-SDK/issues
+Keywords: laive,rag,retrieval,augmented,generation,ai,nlp,sdk
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Text Processing :: Linguistic
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.25.0
+Requires-Dist: rich>=10.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=6.0; extra == "dev"
+Requires-Dist: black>=21.0; extra == "dev"
+Requires-Dist: flake8>=3.8; extra == "dev"
+Requires-Dist: mypy>=0.900; extra == "dev"
+Provides-Extra: notebooks
+Requires-Dist: jupyter>=1.0.0; extra == "notebooks"
+Requires-Dist: ipykernel>=6.0.0; extra == "notebooks"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# Laive Python SDK
+
+[![PyPI version](https://badge.fury.io/py/laive-sdk.svg)](https://badge.fury.io/py/laive-sdk)
+[![Python Support](https://img.shields.io/pypi/pyversions/laive-sdk.svg)](https://pypi.org/project/laive-sdk/)
+[![Laive](https://img.shields.io/badge/laive-beta-blue)](https://beta.laive.ai)
+
+The Laive Python SDK provides a simple and convenient way to interact with the Laive RAG (Retrieval-Augmented Generation) API. This library allows you to easily upload documents, create vaults, and perform intelligent queries on your document collections.
+
+
+## Ressources 
+
+- [laive Platform](https://beta.laive.ai)
+- [laive Python SDK](https://github.com/laiveai/Python-SDK)
+- [laive Python SDK Cookbooks](https://github.com/laiveai/Python-SDK/tree/main/notebooks)
+- [laive API Documentation](https://docs.laive.ai)
+- [laive API Reference](https://docs.laive.ai/api)
+
+> This SDK is still in beta. Please report any issues or feedback to [contact@laive.ai](mailto:contact@laive.ai) or open an issue on [GitHub](https://github.com/laiveai/Python-SDK/issues)
+
+
+## Installation
+
+```bash
+# Install via pip
+pip install laive-sdk
+
+# Or install from source
+git clone https://github.com/laive/Python-SDK.git
+cd Python-SDK
+pip install -e .
+```
+
+## Quick Start
+
+```python
+import os
+from laive import LaiveClient
+
+# Initialize the client with your API key
+client = LaiveClient(api_key=os.getenv("LAIVE_API_KEY"))
+
+# Query a vault
+results = client.query(
+    query="What is the best way to implement RAG?",
+    vault_id=123,
+    top_k=5
+)
+
+print(f"Found {len(results.sources)} relevant documents")
+```
+
+## Authentication
+
+Set your API key as an environment variable:
+
+```bash
+export LAIVE_API_KEY="your_api_key_here"
+```
+
+Or pass it directly when creating the client:
+
+```python
+client = LaiveClient(api_key="your_api_key_here")
+```
+
+## API Reference
+
+### Client Initialization
+
+```python
+from laive import LaiveClient
+
+client = LaiveClient(
+    api_key="your_api_key",
+)
+```
+
+### Query Documents
+
+Retrieve relevant documents from a vault based on a search query.
+
+```python
+response = client.query(
+    query="What is retrieval augmented generation?",
+    vault_id=123,  # Optional, if not provided searches across all accessible vaults
+    top_k=4  # Optional, defaults to 4
+)
+
+# Access results
+for source in response.sources:
+    print(f"Document: {source['source_name']}")
+    print(f"Content: {source['page_content'][:100]}...")
+    print(f"Relevance score: {source['score']}")
+```
+
+### Upload Files
+
+Upload one or more files to a vault.
+
+```python
+response = client.upload_files(
+    files=["path/to/document1.pdf", "path/to/document2.docx"],
+    source_names=["Document 1", "Document 2"],
+    vault_id=123,
+    source_urls=["https://example.com/doc1", "https://example.com/doc2"]  # Optional
+)
+
+print(f"Started processing {response.files_processed} files")
+print(f"Task IDs: {response.task_ids}")
+```
+
+### Check Task Status
+
+Check the status of a file processing task.
+
+```python
+task_status = client.get_task_status(task_id="task_id_from_upload_response")
+print(f"Task state: {task_status['state']}")
+print(f"Status: {task_status['status']}")
+```
+
+## Jupyter Notebooks
+
+Check out the [`notebooks/`](notebooks/) directory for interactive Jupyter notebooks:
+
+- **📓 `notebooks/simple_query_example.ipynb`** - Simple querying example in notebook format
+- **📚 `notebooks/vault_management_workflow.ipynb`** - Complete vault management workflow
+
+## Development
+
+### Installing from Source
+
+```bash
+git clone https://github.com/laive/Python-SDK.git
+cd Python-SDK
+pip install -e .
+```
+
+### Running Notebooks
+
+```bash
+# Copy environment template
+cp .env.example .env
+# Edit .env with your API key
+
+# Install Jupyter and run notebooks
+pip install jupyter
+export LAIVE_API_KEY="your_api_key_here"
+cd notebooks
+jupyter notebook
+```
