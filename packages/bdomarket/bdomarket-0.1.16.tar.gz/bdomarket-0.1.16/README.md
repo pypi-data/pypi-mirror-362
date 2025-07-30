@@ -1,0 +1,447 @@
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<a id="readme-top"></a>
+<!--
+*** Thanks for checking out the Best-README-Template. If you have a suggestion
+*** that would make this better, please fork the repo and create a pull request
+*** or simply open an issue with the tag "enhancement".
+*** Don't forget to give the project a star!
+*** Thanks again! Now go create something AMAZING! :D
+-->
+
+
+
+<!-- PROJECT SHIELDS -->
+<!--
+*** I'm using markdown "reference style" links for readability.
+*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** See the bottom of this document for the declaration of the reference variables
+*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![project_license][license-shield]][license-url]
+<!-- [![LinkedIn][linkedin-shield]][linkedin-url] -->
+
+
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/Fizzor96/bdomarket">
+    <img src="https://github.com/Fizzor96/bdomarket/blob/master/images/logo.png" alt="Logo" width="800" height="380">
+  </a>
+
+
+<h3 align="center">bdomarket</h3>
+
+  <p align="center">
+    API client for BDO market data
+    <br />
+    <!-- <a href="https://github.com/Fizzor96/bdomarket"><strong>Explore the docs »</strong></a> -->
+    <!-- <br /> -->
+    <br />
+    <a href="https://pypi.org/project/bdomarket/">PyPI</a>
+    &middot;
+    <a href="https://github.com/Fizzor96/bdomarket/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    &middot;
+    <a href="https://github.com/Fizzor96/bdomarket/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
+
+
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+This code is a simple and well-structured API client for BDO market data, built for convenience. It enables developers to access market information, price history, and shop data from Arsha.io in a standardized way.
+
+## Features
+
+- **Market Data Access**: Retrieve real-time and historical data from the BDO Central Market, including waitlists, hotlists, item lists, sublists, search results, bidding info, and price info.
+- **Boss Timers**: Easily fetch and display world boss spawn times for different servers and regions.
+- **Item Management**: Query single or multiple items by ID, dump large ranges of item data, and work with item objects that support conversion to dictionaries and icon downloading.
+- **API Response Handling**: All API calls return a standardized `ApiResponse` object, making it easy to access content, status codes, and success flags, as well as to deserialize responses into Python objects.
+- **Data Export**: Save any API response directly to a file in JSON format for later analysis or debugging.
+- **Timestamp Conversion**: Convert Unix timestamps from API responses into human-readable date and time strings.
+- **Multi-Region and Multi-Language Support**: Easily switch between different BDO regions (EU, NA, etc.) and supported languages.
+- **Convenient Utilities**: Download item icons, print readable representations of items, and more.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+### Built With
+
+[![Python][Python.com]][Python-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- GETTING STARTED -->
+## Getting Started
+
+A Python API client for accessing the [Arsha.io Black Desert Online Market API](https://www.postman.com/bdomarket/arsha-io-bdo-market-api/overview).
+
+Easily retrieve market data, hotlist items, price history, bidding info, and more.
+
+### Prerequisites
+
+Python installed on your system.
+* Python >= 3.8
+
+### Installation
+   ```sh
+   pip install bdomarket
+   ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+```python
+import bdomarket
+
+# -------------------------------
+# 1. Initialize Market Interface
+# -------------------------------
+# Set up the market object for the EU region, API version 2, and English language.
+market = bdomarket.Market(
+    bdomarket.AvailableRegions.EU,
+    bdomarket.AvailableApiVersions.V2,
+    bdomarket.SupportedLanguages.English
+)
+
+# -------------------------------
+# 2. Boss Timer Functionality
+# -------------------------------
+# Fetch and display world boss spawn times for the EU server.
+boss_timer = bdomarket.timers.Boss(bdomarket.timers.Server.EU).Scrape()
+print("Boss Timer (Python object):")
+print(boss_timer.GetTimer())
+print("\nBoss Timer (JSON):")
+print(boss_timer.GetTimerJSON())
+
+# -------------------------------
+# 3. Market Wait List
+# -------------------------------
+# Retrieve the current market waitlist and save it to a file.
+waitlist_response = market.GetWorldMarketWaitList()
+print("\nMarket Wait List (content):")
+print(waitlist_response.content)
+waitlist_response.SaveToFile("responses/waitlist/get.json")
+
+# Deserialize waitlist to Python objects and print each item.
+print("\nDeserialized Wait List Items:")
+for item in waitlist_response.Deserialize():
+    print(item)
+
+# -------------------------------
+# 4. Item Queries
+# -------------------------------
+# Fetch information for multiple items by their IDs and save to file.
+item_ids = ["3", "9505", "14870"]
+items_response = market.GetItem(item_ids)
+items_response.SaveToFile("responses/items/get.json")
+print("\nFetched Items:")
+print(items_response.content)
+
+# Dump a range of items (IDs 0 to 250) to a file.
+market.ItemDatabaseDump(0, 250).SaveToFile("responses/itemdump/dump.json")
+
+# -------------------------------
+# 5. Market Lists and SubLists
+# -------------------------------
+# Get and save various market lists.
+market.GetWorldMarketList("1", "1").SaveToFile("responses/list/get.json")
+market.GetWorldMarketSubList(["735008", "731109"]).SaveToFile("responses/sublist/get.json")
+market.GetWorldMarketSearchList(["735008", "731109"]).SaveToFile("responses/searchlist/get.json")
+
+# -------------------------------
+# 6. Bidding and Price Info
+# -------------------------------
+# Fetch and save bidding and price information for specific items.
+# NOTE: Timestamp Conversion Utility is used to convert Unix timestamps to human-readable format.
+market.GetBiddingInfo(["735008", "731109"], ["19", "20"]).SaveToFile("responses/bidding/get.json")
+market.GetMarketPriceInfo(["735008", "731109"], ["19", "20"]).SaveToFile("responses/priceinfo/get.json")
+
+# -------------------------------
+# 7. Pearl Items and Market Info
+# -------------------------------
+# Retrieve and save pearl shop items and overall market info.
+market.GetPearlItems().SaveToFile("responses/pearlitems/get.json")
+market.GetMarket().SaveToFile("responses/market/get.json")
+
+# -------------------------------
+# 8. Timestamp Conversion Utility
+# -------------------------------
+# Convert a Unix timestamp (in ms) to a human-readable format.
+timestamp = 1745193600000
+print("\nConverted Timestamp:")
+print(bdomarket.ConvertTimestamp(timestamp))
+
+# -------------------------------
+# 9. Item Object Usage
+# -------------------------------
+# Create an Item object, print its details, and download its icon.
+item = bdomarket.item.Item()
+print("\nItem Object:")
+print(item)
+print("Item as dict:", item.to_dict())
+
+# Download the item's icon by ID (absolute path) and by name (relative path).
+item.GetIcon(r"D:\bdomarket\icons", False, bdomarket.item.ItemProp.ID)
+item.GetIcon("icons", True, bdomarket.item.ItemProp.NAME)
+
+```
+
+<!-- _For more examples, please refer to the [Documentation](https://example.com)_ -->
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ROADMAP -->
+## Roadmap
+
+- [x] Market Data Access  
+    - [x] Retrieve real-time market data  
+    - [x] Retrieve historical market data  
+    - [x] Get waitlists, hotlists, item lists, sublists, and search results  
+- [x] Boss Timers  
+    - [x] Fetch world boss spawn times for all supported servers and regions  
+- [x] Item Management  
+    - [x] Query single or multiple items by ID  
+    - [x] Dump large ranges of item data  
+    - [x] Item object conversion to dictionary  
+    - [x] Download item icons  
+    - [ ] Searching items by name or ID in DBdump?
+- [x] API Response Handling  
+    - [x] Standardized ApiResponse object for all API calls  
+    - [x] Deserialize responses into Python objects  
+- [x] Data Export  
+    - [x] Save API responses to JSON files  
+- [x] Timestamp Conversion  
+    - [x] Convert Unix timestamps to human-readable format  
+- [x] Multi-Region and Multi-Language Support  
+    - [x] Switch between BDO regions  
+    - [x] Switch between supported languages  
+- [x] Utilities  
+    - [x] Print readable representations of items  
+    - [x] Additional helper functions  
+- [ ] Error Handling & Robustness  
+    - [ ] Graceful handling of network/API errors  
+    - [ ] Retry logic for failed requests  
+    - [ ] Logging for debugging and monitoring  
+- [ ] Documentation  
+    - [ ] Comprehensive API documentation  
+    - [ ] Usage examples and tutorials  
+    - [ ] Docstrings for all public classes and methods  
+- [ ] Testing  
+    - [ ] Unit tests for core functionality  
+    - [ ] Integration tests for API endpoints  
+- [ ] Search & Filtering  
+    - [ ] Search items by name or partial match  
+    - [ ] Filter market data by category, price, etc.  
+- [ ] Performance Improvements  
+    - [ ] Caching of frequent API responses  
+    - [ ] Async support for faster data retrieval  
+- [ ] CLI Tool  
+    - [ ] Command-line interface for quick queries and downloads  
+- [ ] Webhook/Notification Support  
+    - [ ] Notify users of market changes or boss
+
+See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTRIBUTING -->
+<!-- ## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
+
+### Example:
+
+```python
+market.GetBiddingInfo(["735008", "731109"], ["19", "20"]).SaveToFile("responses/bidding/get.json")
+```
+
+Outputs:
+
+```json
+{
+  "success": true,
+  "statuscode": 200,
+  "message": "No message provided",
+  "content": [
+    {
+      "name": "Blackstar Shuriken",
+      "id": 735008,
+      "sid": 19,
+      "orders": [
+        {
+          "price": 14500000000,
+          "sellers": 1,
+          "buyers": 0
+        },
+        {
+          "price": 15500000000,
+          "sellers": 1,
+          "buyers": 0
+        },
+        {
+          "price": 14900000000,
+          "sellers": 4,
+          "buyers": 0
+        },
+        {
+          "price": 14700000000,
+          "sellers": 0,
+          "buyers": 0
+        }
+      ]
+    },
+    {
+      "name": "Blackstar Sura Katana",
+      "id": 731109,
+      "sid": 20,
+      "orders": [
+        {
+          "price": 72500000000,
+          "sellers": 1,
+          "buyers": 0
+        },
+        {
+          "price": 73500000000,
+          "sellers": 1,
+          "buyers": 0
+        },
+        {
+          "price": 73000000000,
+          "sellers": 1,
+          "buyers": 0
+        },
+        {
+          "price": 70500000000,
+          "sellers": 0,
+          "buyers": 0
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Top contributors:
+
+<a href="https://github.com/Fizzor96/bdomarket/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Fizzor96/bdomarket" alt="contrib.rocks image" />
+</a>
+
+
+
+<!-- LICENSE -->
+## License
+
+Distributed under the **GNU General Public License v3.0**.  
+See `LICENSE` for more information.
+
+This project is **copyleft**: you may copy, distribute, and modify it under the terms of the GPL, but derivative works must also be open source under the same license.
+
+[Learn more about GPL-3.0 »](https://www.gnu.org/licenses/gpl-3.0.html)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+<!-- Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com -->
+
+Project Link: [https://github.com/Fizzor96/bdomarket](https://github.com/Fizzor96/bdomarket)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+<!-- ## Acknowledgments
+
+* []()
+* []()
+* []()
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/Fizzor96/bdomarket.svg?style=for-the-badge
+[contributors-url]: https://github.com/Fizzor96/bdomarket/graphs/contributors
+
+[forks-shield]: https://img.shields.io/github/forks/Fizzor96/bdomarket.svg?style=for-the-badge
+[forks-url]: https://github.com/Fizzor96/bdomarket/network/members
+
+[stars-shield]: https://img.shields.io/github/stars/Fizzor96/bdomarket.svg?style=for-the-badge
+[stars-url]: https://github.com/Fizzor96/bdomarket/stargazers
+
+[issues-shield]: https://img.shields.io/github/issues/Fizzor96/bdomarket.svg?style=for-the-badge
+[issues-url]: https://github.com/Fizzor96/bdomarket/issues
+
+[license-shield]: https://img.shields.io/github/license/Fizzor96/bdomarket.svg?style=for-the-badge
+[license-url]: https://github.com/Fizzor96/bdomarket/blob/master/LICENSE
+
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/linkedin_username
+
+[product-screenshot]: images/screenshot.png
+[Python-url]: https://www.python.org/
+[Python.com]: https://img.shields.io/badge/python-0769AD?style=for-the-badge&logo=python&logoColor=white
