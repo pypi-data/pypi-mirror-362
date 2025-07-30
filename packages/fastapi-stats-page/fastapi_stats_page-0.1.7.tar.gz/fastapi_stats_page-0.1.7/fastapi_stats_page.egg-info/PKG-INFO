@@ -1,0 +1,56 @@
+Metadata-Version: 2.4
+Name: fastapi-stats-page
+Version: 0.1.7
+Summary: FastAPI visitor statistics with middleware and stats page
+Author: Jackson Rodger
+Classifier: Programming Language :: Python :: 3
+Classifier: Framework :: FastAPI
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi
+Requires-Dist: jinja2
+Requires-Dist: uvicorn
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# fastapi-stats-page
+
+# usage
+```
+from fastapi import FastAPI
+from fastapi_stats_page import StatsRouter, TrackVisitsMiddleware
+
+app = FastAPI()
+
+app.include_router(StatsRouter(title="Statistics of website").router)
+
+app.add_middleware(TrackVisitsMiddleware)
+
+@app.get("/")
+async def homepage():
+    return "hello world"
+```
+this will save visitors ip and user agens to a list
+
+you can also save visitors to a file by doing this
+```
+from fastapi import FastAPI
+from fastapi_stats_page import StatsRouter, TrackVisitsMiddleware
+
+app = FastAPI()
+
+app.include_router(StatsRouter(title="Statistics of website", get_from="users.txt").router)
+
+app.add_middleware(TrackVisitsMiddleware, save_to="users.txt")
+
+@app.get("/")
+async def homepage():
+    return "hello world"
+```
