@@ -1,0 +1,58 @@
+[project]
+name = "gemini-wt"
+dynamic = ["version"]
+description = "Manage parallel Gemini CLI instances"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["cyclopts>=3.0.0", "rich>=13.0.0"]
+keywords = ["gemini", "git", "ai"]
+authors = [{ name = "Daniel Ratmiroff" }]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+]
+
+[project.scripts]
+gemini-wt = "gemini_wt.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/Danielratmiroff/gemini-wt"
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning>=0.7.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+style = "pep440"
+bump = true
+fallback-version = "0.0.0"
+format = "{base}"
+
+[dependency-groups]
+dev = ["pre-commit>=4.2.0", "pyright>=1.1.402"]
+
+
+[tool.pyright]
+include = ["gemini_wt"]
+exclude = ["**/node_modules", "**/__pycache__", ".venv", ".git", "dist"]
+pythonVersion = "3.10"
+pythonPlatform = "Darwin"
+typeCheckingMode = "basic"
+reportMissingImports = true
+reportMissingTypeStubs = false
+useLibraryCodeForTypes = true
+venvPath = "."
+venv = ".venv"
+
+[tool.ruff.lint]
+extend-select = ["I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "I001", "RUF013"]
+# allow imports not at the top of the file
+"src/fastmcp/__init__.py" = ["E402"]
