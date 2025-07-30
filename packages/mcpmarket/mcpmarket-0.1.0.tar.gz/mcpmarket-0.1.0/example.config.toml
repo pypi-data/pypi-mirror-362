@@ -1,0 +1,102 @@
+# Agentrix 示例配置文件
+# 将此文件复制到 ~/.agentrix/config.toml 并根据需要修改
+
+[registry]
+# 注册表 URL
+url = "https://registry.agentrix.dev"
+
+# 注册表 API 密钥 (可选)
+# api_key = "your-registry-api-key"
+
+# 缓存生存时间 (秒)
+cache_ttl = 3600
+
+# 请求超时 (秒)
+timeout = 30
+
+# 本地缓存目录
+local_cache_dir = "~/.agentrix/cache"
+
+[proxy]
+# 代理服务器主机
+host = "127.0.0.1"
+
+# 代理服务器端口
+port = 8080
+
+# 代理端点路径
+path = "/mcp"
+
+# 启用认证
+enable_auth = false
+
+# 有效的 API 密钥列表 (当 enable_auth = true 时)
+# api_keys = ["key1", "key2"]
+
+# CORS 允许的源
+# cors_origins = ["http://localhost:3000"]
+
+# 最大并发连接数
+max_connections = 100
+
+# 连接超时 (秒)
+timeout = 300
+
+[logging]
+# 日志级别: DEBUG, INFO, WARNING, ERROR, CRITICAL
+level = "INFO"
+
+# 日志格式
+format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# 日志文件路径 (可选)
+log_file = "~/.agentrix/logs/agentrix.log"
+
+# 最大日志文件大小 (字节)
+max_file_size = 10485760  # 10MB
+
+# 保留的备份文件数量
+backup_count = 5
+
+# 启用控制台日志
+console_enabled = true
+
+# 启用彩色输出
+colorize = true
+
+# 数据目录
+data_dir = "~/.agentrix"
+
+# 服务器目录
+servers_dir = "~/.agentrix/servers"
+
+# 开发模式
+dev_mode = false
+
+# 调试模式
+debug = false
+
+# 客户端配置
+[clients.cursor]
+type = "cursor"
+config_path = "~/.cursor/mcp.json"
+transport = "stdio"
+supports_env_vars = true
+config_format = "json"
+server_key = "mcpServers"
+
+[clients.claude]
+type = "claude"
+config_path = "~/Library/Application Support/Claude/claude_desktop_config.json"
+transport = "stdio"
+supports_env_vars = true
+config_format = "json"
+server_key = "mcpServers"
+
+[clients.vscode]
+type = "vscode"
+config_path = "~/.vscode/settings.json"
+transport = "stdio"
+supports_env_vars = true
+config_format = "json"
+server_key = "mcp.servers" 
