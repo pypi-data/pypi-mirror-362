@@ -1,0 +1,29 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="rer.block.iframembed">
+
+  <!-- Set overrides folder for Just-a-Bunch-Of-Templates product -->
+  <include package="z3c.jbot" file="meta.zcml" />
+  <browser:jbot
+      directory="overrides"
+      layer="rer.block.iframembed.interfaces.IRerBlockIframembedLayer"
+      />
+
+  <!-- Publish static files -->
+  <plone:static
+      name="rer.block.iframembed"
+      type="plone"
+      directory="static"
+      />
+
+   <browser:page
+      class=".controlpanel.RerBlockIframembedSettings"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      layer="rer.block.iframembed.interfaces.IRerBlockIframembedLayer"
+      name="rer-block-iframembed-settings"
+      permission="cmf.ManagePortal"
+    />
+
+</configure>
