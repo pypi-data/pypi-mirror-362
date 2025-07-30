@@ -1,0 +1,187 @@
+Metadata-Version: 2.1
+Name: postprocessing_seismo_lib
+Version: 0.1.6
+Summary: A library for building and parsing Seismology API message bodies.
+Home-page: UNKNOWN
+Author: Ryan Tam
+Author-email: rwtam@caltech.edu
+License: UNKNOWN
+Project-URL: Documentation, https://pypi-postprocessing-seismic-data.readthedocs.io/en/latest/
+Project-URL: Source, https://scsngit.gps.caltech.edu/services
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# postprocessing_seismo_lib
+
+`postprocessing_seismo_lib` is a lightweight Python library for building and parsing structured API messages, especially for use with nested JSON structures used in event-based data systems. Currently, the library works on building out the Response format for seismology associator outputs, or extracting the body out of its Response format.
+
+## Features
+
+- Extract the `body` section from a structured JSON file using `extract_body_from_file`
+- Create request for a body object using `wrap_data`, with provided associator or pickfilter files. 
+- Validates if input and output formats are to specification using `wrap_data`
+
+## Use cases of this library
+1.	Individual users
+2.	Pipeline scripts
+
+
+## Example Scenarios 
+
+### Extraction of body
+
+The below function allows for extracting out the body from an output response file:
+
+```
+from postprocessing_seismo_lib import extract_body_from_file
+
+body_data = extract_body_from_file("output_response_association.json")
+body_data = extract_body_from_file("output_response_pickfilter.json")
+
+where as an example, output_response_association.json is:
+
+{
+  "status": 404,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "id": "78604159",
+    "format": "none.noeventsfound",
+    "data": []
+  }
+}
+```
+
+### Creation of the request for a body object
+
+The below function creates the request from the body object, which can be extracted from the above function. All four variables listed below need to be specified:
+
+```
+from postprocessing_seismo_lib import wrap_data
+
+#creating the request for the associator input
+wrap_data(
+    input_file_path='[xxxx_file_containing_filtered_picks].json',
+    output_file_path='output_associator.json',
+    evid='[Name of choice]',
+    module='associator'
+)
+
+#creating the request for the pickfilter input
+wrap_data(
+    input_file_path='[xxxx_file_containing_picks].json',
+    output_file_path='output_pickfilter.json',
+    evid='[Name of choice]',
+    module='pickfilter'
+)
+```
+
+The request format will be different across each module. Currently, the module takes in 'associator' and 'pickfilter' but this will be expanded in future updates. 
+
+Specifically, this function reads a list of pick dictionaries from a JSON file specified by `input_file_path`, validates them against a schema, wraps the data into a module-specific JSON structure, validates the output, and writes it to a new file specified by `output_file_path`. Any errors are logged to a file named `wrap_data_errors.log`.
+
+As an example, our input_file_path='[xxxx_file_containing_picks].json' might look like this (as a list of dictionaries):
+
+```
+[
+    {
+        "Amplitude": {
+            "Amplitude": 1039.6302490234,
+            "SNR": 11.074
+        },
+        "Filter": [
+            {
+                "HighPass": 1.0,
+                "Type": "HighPass"
+            }
+        ],
+        "Onset": "emergent",
+        "Phase": "S",
+        "Picker": "deep-learning",
+        "Polarity": "no-result",
+        "Quality": [
+            {
+                "Standard": "PhaseNet",
+                "Value": 0.851
+            },
+            {
+                "Standard": "hypoinverse",
+                "Value": 2
+            }
+        ],
+        "Site": {
+            "Channel": "HHE",
+            "Location": "",
+            "Network": "CI",
+            "Station": "WOR"
+        },
+        "Source": {
+            "AgencyID": "CI",
+            "Author": "hypoPN"
+        },
+        "Time": "2025-04-22T21:51:15.148Z",
+        "Type": "Pick"
+    },
+    {
+        ...
+    }
+]
+```
+
+and its output would be the necessary format to POST into the associator API endpoint:
+
+```
+{
+  "RetrieveParameters": {
+    "pickFile": "Ryan_testingAgainPicks_picks.json",
+    "pickDataStr": [
+      {
+        "Amplitude": {
+          "Amplitude": 1039.6302490234,
+          "SNR": 11.074
+        },
+        "Filter": [
+          {
+            "HighPass": 1.0,
+            "Type": "HighPass"
+          }
+        ],
+        "Onset": "emergent",
+        "Phase": "S",
+        "Picker": "deep-learning",
+        "Polarity": "no-result",
+        "Quality": [
+          {
+            "Standard": "PhaseNet",
+            "Value": 0.851
+          },
+          {
+            "Standard": "hypoinverse",
+            "Value": 2
+          }
+        ],
+        "Site": {
+          "Channel": "HHE",
+          "Location": "",
+          "Network": "CI",
+          "Station": "WOR"
+        },
+        "Source": {
+          "AgencyID": "CI",
+          "Author": "hypoPN"
+        },
+        "Time": "2025-04-22T21:51:15.148Z",
+        "Type": "Pick"
+      },
+      ...
+    ]
+  }
+}
+```
+
+
