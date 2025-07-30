@@ -1,0 +1,10 @@
+// this rule grants members of the "pcsc" group access to any pcsc card
+// see https://blog.apdu.fr/posts/2023/11/pcsc-lite-and-polkit/
+polkit.addRule(function(action, subject) {
+    switch (action.id) {
+        case "org.debian.pcsc-lite.access_card":
+        case "org.debian.pcsc-lite.access_pcsc":
+            if (subject.isInGroup("pcsc")) return polkit.Result.YES;
+            break;
+    }
+});

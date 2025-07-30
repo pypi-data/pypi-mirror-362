@@ -1,0 +1,24 @@
+image: fedora/latest
+packages:
+- pcsc-lite-devel
+- python3-devel
+- swig
+- uv
+sources:
+- https://git.sr.ht/~axr10/openpgpcard-x25519-agent
+tasks:
+- sync: |
+    cd openpgpcard-x25519-agent
+    uv python install
+    uv sync
+- lint: |
+    cd openpgpcard-x25519-agent
+    uv run ruff check
+    uv run ruff format --diff
+- test: |
+    cd openpgpcard-x25519-agent
+    uv run pytest --cov
+triggers:
+- action: email
+  condition: always
+  to: dev@arcemtene.com
