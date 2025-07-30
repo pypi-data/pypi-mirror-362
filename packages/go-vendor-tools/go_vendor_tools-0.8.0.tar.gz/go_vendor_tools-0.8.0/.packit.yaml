@@ -1,0 +1,83 @@
+# Copyright (C) 2024 Maxwell G <maxwell@gtmx.me>
+# SPDX-License-Identifier: MIT
+
+upstream_package_name: go-vendor-tools
+srpm_build_deps:
+  - golang-bin
+  - git-core
+  - pipx
+  - rpmdevtools
+  - /usr/bin/unshare
+packages:
+  # Main package
+  go-vendor-tools:
+    specfile_path: go-vendor-tools.spec
+    actions:
+      fix-spec-file:
+        - "./contrib/main-archive.sh go-vendor-tools.spec"
+      create-archive:
+        - "./contrib/main-archive.sh go-vendor-tools.spec"
+        - "sh -c 'ls go-vendor-tools-*.tar.gz'"
+    release_suffix: ""
+    osh_diff_scan_after_copr_build: false
+  # Integration packages
+  autorestic:
+    specfile_path: autorestic.spec
+    paths:
+      - ./tests/integration/autorestic
+    actions:
+      fix-spec-file: []
+      create-archive:
+        - bash -x ../../../contrib/integration-archive.sh
+      post-upstream-clone:
+        - bash -x ../../../contrib/wait-for-copr.sh
+    osh_diff_scan_after_copr_build: false
+  fzf:
+    specfile_path: fzf.spec
+    paths:
+      - ./tests/integration/fzf
+    actions:
+      fix-spec-file: []
+      create-archive:
+        - bash -x ../../../contrib/integration-archive.sh
+      post-upstream-clone:
+        - bash -x ../../../contrib/wait-for-copr.sh
+    osh_diff_scan_after_copr_build: false
+jobs:
+  - job: copr_build
+    packages:
+      - go-vendor-tools
+      - autorestic
+      - fzf
+    targets:
+      fedora-all-x86_64:
+        # Extra dependencies (trivy, python-zstarfile) not packaged in Fedora
+        additional_repos:
+          - "copr://@go-sig/go-vendor-tools-dev"
+      epel-9-x86_64:
+        # Extra dependencies (trivy, python-zstarfile) not packaged in Fedora
+        additional_repos:
+          - "copr://@go-sig/go-vendor-tools-dev"
+      epel-10-x86_64:
+        # Extra dependencies (trivy, python-zstarfile) not packaged in Fedora
+        additional_repos:
+          - "copr://@go-sig/go-vendor-tools-dev"
+          - https://dl.fedoraproject.org/pub/epel/testing/10/Everything/$basearch
+    trigger: pull_request
+
+  - job: copr_build
+    packages:
+      - go-vendor-tools
+      - autorestic
+      - fzf
+    targets:
+      - fedora-all-x86_64
+      - fedora-all-x86_64
+      - epel-10-aarch64
+      - epel-10-x86_64
+      - epel-9-aarch64
+      - epel-9-x86_64
+    owner: "@go-sig"
+    project: go-vendor-tools-dev
+    trigger: commit
+    branch: main

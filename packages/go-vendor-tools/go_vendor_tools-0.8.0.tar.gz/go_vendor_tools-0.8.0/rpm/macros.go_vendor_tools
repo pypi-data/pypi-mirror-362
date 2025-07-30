@@ -1,0 +1,60 @@
+# Copyright (C) 2024 Maxwell G <maxwell@gtmx.me>
+# SPDX-License-Identifier: MIT
+
+# Path to the go_vendor_licenses helper script
+%__go_vendor_license go_vendor_license
+
+# Generate requirements needed for the selected backend
+%go_vendor_license_buildrequires(c:d:D:) %{shrink:
+    %{__go_vendor_license}
+    %{-c:--config %{-c*}}
+    %{-d:--detector %{-d*}}
+    %{-D:--detector-config %{-D*}}
+    generate_buildrequires
+    %{expr:0%{?go_vendor_license_check_disable} ? "--no-check" : ""}
+}
+
+# NOTE(gotmax23): This is parameterized on purpose. We may add options to have
+# multiple license filelists for different subpackages in the future.
+%go_vendor_license_filelist() licenses.list
+
+# Options:
+#   -c : Specify path to go_vendor_license configuration
+#   -n : Specify package name. Defaults to %{NAME}.
+#   -d : Choose a specific license detector backend.
+#        Currently supported: "askalono", "trivy"
+#   -D : Specify detector settings as KEY=VALUE pairs.
+#        See the go_vendor_license docs for supported options.
+#        Separate KEY=VALUE pairs with ";" to pass multiple options.
+# TODO(gotmax23): Consider adding support for --ignore-* options (the short flags),
+# but we want to discourage packagers from disabling license checks.
+%go_vendor_license_install(c:n:d:D:) %{shrink:
+    %{__go_vendor_license}
+    %{-c:--config %{-c*}}
+    %{-d:--detector %{-d*}}
+    %{-D:--detector-config %{-D*}}
+    install
+    --destdir %{buildroot}
+    --install-directory %{_defaultlicensedir}/%{?-n*}%{!?-n:%{NAME}}
+    --filelist %{go_vendor_license_filelist}
+}
+
+# Compatibility with shescape that's not available on EL 9.
+# TODO: The compatibility version doesn't properly escape single quotes within
+# the output.
+%__gvt_shescape_backup() %{?shescape:%{shescape:%{*}}}%{!?shescape:'%{*}'}
+
+# Ensure the license expression matches what the go_vendor_licenses tool expects
+%_go_vendor_license_check(c:d:D:) %{shrink:
+    %{__go_vendor_license}
+    %{-c:--config %{-c*}}
+    %{-d:--detector %{-d*}}
+    %{-D:--detector-config %{-D*}}
+    report all
+    --verify %{expr:
+        "%{*}" ? 
+        "%{__gvt_shescape_backup %{*}}" :
+        "%{__gvt_shescape_backup %{LICENSE}}"
+    }
+}
+%go_vendor_license_check(c:d:D:) %{expand:%[ 0%{?go_vendor_license_check_disable} ? "" : "%%_go_vendor_license_check %**" ]}
