@@ -1,0 +1,188 @@
+Metadata-Version: 2.4
+Name: python-pgsql-parser
+Version: 0.1.3
+Summary: Advanced PostgreSQL SQL parser for extracting database schema metadata
+Home-page: https://github.com/yourusername/python-pgsql-parser
+Author: Sunny Liu
+Author-email: Sunny Liu <sunnyliu2@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/devsunny/python-pgsql-parser
+Project-URL: Documentation, https://github.com/devsunny/python-pgsql-parser/blob/main/docs/index.md
+Project-URL: Source, https://github.com/devsunny/python-pgsql-parser
+Project-URL: Tracker, https://github.com/devsunny/python-pgsql-parser/issues
+Keywords: sql,parser,postgresql,ddl,metadata,schema,analysis
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Database
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# PostgreSQL SQL Parser
+
+[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI Version](https://img.shields.io/pypi/v/python-pgsql-parser.svg)](https://pypi.org/project/python-pgsql-parser/)
+
+A high-performance PostgreSQL SQL parser for extracting comprehensive database schema metadata from DDL scripts.
+
+## Features
+
+- **Complete SQL Parsing**: Tokenizes and parses PostgreSQL DDL statements
+- **Schema Metadata Extraction**:
+  - Database, schema, and table names
+  - Table types (regular, temporary, view, materialized view)
+  - Column definitions with data types, lengths, precision, and constraints
+  - Primary keys, foreign keys, indexes, and constraints
+- **Advanced SQL Support**:
+  - Quoted identifiers
+  - ANSI SQL and PostgreSQL-specific syntax
+  - CREATE/ALTER TABLE statements
+  - View and materialized view definitions
+- **Powerful API**:
+  - Parse entire scripts or individual statements
+  - Retrieve tables by qualified name
+  - Iterate through parsed statements
+- **Well-Tested**: Comprehensive test suite with 95%+ coverage
+
+## Installation
+
+```bash
+pip install python-pgsql-parser
+```
+
+## Quick Start
+
+```python
+from pgsql_parser import SQLParser
+
+# Initialize parser
+parser = SQLParser()
+
+# Parse SQL script
+sql_script = """
+CREATE TABLE public.users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(255) UNIQUE
+);
+
+CREATE VIEW user_emails AS
+SELECT id, email FROM public.users;
+"""
+
+parser.parse_script(sql_script)
+
+# Get all tables
+tables = parser.get_tables()
+for table in tables:
+    print(f"Table: {table.schema}.{table.name} ({table.table_type})")
+
+# Get specific table
+users_table = parser.get_table("users", schema="public")
+if users_table:
+    print(f"\nColumns in users table:")
+    for col_name, column in users_table.columns.items():
+        print(f"- {col_name}: {column.data_type}")
+```
+
+## Documentation
+
+### Core Classes
+
+- `SQLParser`: Main parser class
+- `Table`: Represents a table/view definition
+- `Column`: Contains column metadata
+- `PrimaryKey`, `ForeignKey`, `Constraint`: Schema constraint objects
+
+### Key Methods
+
+- `parse_script(sql_script)`: Parse entire SQL script
+- `parse_statement(sql)`: Parse single SQL statement
+- `get_tables()`: Get all parsed tables/views
+- `get_table(name, schema, database)`: Get specific table by qualified name
+- `statement_generator(sql_script)`: Iterate through SQL statements
+
+## Usage Examples
+
+### Extract Table Metadata
+
+```python
+table = parser.get_table("users", "public")
+
+print(f"Table: {table.schema}.{table.name}")
+print(f"Type: {table.table_type}")
+print(f"Columns: {len(table.columns)}")
+print(f"Primary Key: {table.primary_key.columns if table.primary_key else None}")
+
+print("\nColumn Details:")
+for name, column in table.columns.items():
+    print(f"- {name}: {column.data_type}, " +
+          f"Nullable: {column.nullable}, " +
+          f"Primary Key: {column.is_primary}")
+```
+
+### Handle ALTER TABLE Statements
+
+```python
+sql = """
+ALTER TABLE users 
+ADD COLUMN last_login TIMESTAMP,
+ADD CONSTRAINT fk_country 
+    FOREIGN KEY (country_id) REFERENCES countries(id);
+"""
+
+parser.parse_statement(sql)
+table = parser.get_table("users")
+print(f"New column: {table.columns['last_login'].data_type}")
+print(f"New foreign key: {table.foreign_keys[-1].ref_table}")
+```
+
+### Process Large Scripts
+
+```python
+with open("schema.sql", "r") as f:
+    sql_script = f.read()
+
+for statement in parser.statement_generator(sql_script):
+    parser.parse_statement(statement)
+    
+    # Process tables incrementally
+    new_tables = parser.get_tables()
+    for table in new_tables:
+        save_to_database(table)
+```
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a pull request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For issues and feature requests, please [open an issue](https://github.com/yourusername/python-pgsql-parser/issues).
