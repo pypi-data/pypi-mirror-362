@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "Installing development dependencies..."
+
+sudo uv pip install wheel --upgrade --system
+sudo uv pip install -r requirements-dev.txt --system
+
+pre-commit install
