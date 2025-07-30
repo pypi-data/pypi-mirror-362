@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "{{project_name}}"
+version = "0.1.0"
+description = "{{description}}"
+authors = ["{{author}} <{{email}}>"]
+readme = "README.md"
+packages = [
+    {include = "{{project_name}}/core"},
+    {include = "{{project_name}}/models"},
+    {include = "{{project_name}}/client"}
+    ]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+httpx = "^0.28.1"
+pydantic = "^2.11.7"
+python-dotenv = "^1.1.1"
+tenacity = "^9.1.2"
+email-validator = "^2.2.0"
+unidecode = "^1.4.0"
+sqlalchemy = "^2.0.41"
+loguru = "^0.7.3"
+lru-cache = "^0.2.3"
+pydantic-settings = "^2.10.1"
+psycopg2-binary = "^2.9.10"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+flake8 = "^7.3.0"
+isort = "^6.0.1"
+pytest = "^8.4.1"
+pytest-mock = "^3.14.1"
+pytest-asyncio = "^1.0.0"
+pre-commit = "^4.2.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pyjwt = "^2.10.1"
+
+[tool.poetry.group.api]
+optional = false
+
+[tool.poetry.group.api.dependencies]
+fastapi = {extras = ["standard"], version = "^0.116.1"}
+uvicorn = "^0.35.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
