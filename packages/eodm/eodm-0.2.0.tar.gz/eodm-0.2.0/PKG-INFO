@@ -1,0 +1,91 @@
+Metadata-Version: 2.3
+Name: eodm
+Version: 0.2.0
+Summary: Library and extensible CLI application for ETL (extract, transform, load) operations on EO data.
+Author: Nikola Jankovic
+Author-email: jankovic.gd@gmail.com
+Requires-Python: >=3.10,<4.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: fsspec (>=2024.3.1,<2025.0.0)
+Requires-Dist: geojson-pydantic (>=1.1.2,<2.0.0)
+Requires-Dist: httpx (>=0.27.0,<0.28.0)
+Requires-Dist: lxml (>=5.3.0,<6.0.0)
+Requires-Dist: owslib (>=0.34.1,<0.35.0)
+Requires-Dist: pystac (>=1.10.0,<2.0.0)
+Requires-Dist: pystac-client (>=0.7.7,<0.8.0)
+Requires-Dist: python-dateutil (>=2.9.0.post0,<3.0.0)
+Requires-Dist: python-dotenv (>=1.0.1,<2.0.0)
+Requires-Dist: python-json-logger (>=3.3.0,<4.0.0)
+Requires-Dist: rasterio (>=1.4.3,<2.0.0)
+Requires-Dist: rio-stac (>=0.10.1,<0.11.0)
+Requires-Dist: s3fs (>=2024.3.1,<2025.0.0)
+Requires-Dist: typer (>=0.12.3,<0.13.0)
+Description-Content-Type: text/markdown
+
+# eodm - EO Data Mover
+
+![build](https://github.com/geopython/eodm/actions/workflows/main.yml/badge.svg)
+
+Library and extensible CLI application for ETL (extract, transform, load) operations on EO data.
+
+## Concept
+
+Below are the main ideas on how to use the application. Note the shell piping operator,
+the intended use case is such that output of one command is piped into the next. With this
+a clear interface is required between the commands. For this purpose the
+[STAC](https://stacspec.org/en) Item is chosen.
+
+```shell
+eodm extract stac-api items https://earth-search.aws.element84.com/v1 sentinel-2-l2a --bbox 49.1,18.1,49.2,18.2 --datetime-interval 2023-06-01/2023-06-30 \
+| eodm transform metadata band-subset red,green,blue,nir \
+| eodm load stac-catalog items s3://my-bucket/catalog.json \
+| eodm load stac-api items https://stac2.hub-dev.eox.at/
+```
+
+```shell
+eodm extract stac-catalog items s3://my-bucket/catalog.json \
+| eodm load stac-api items https://stac2.hub-dev.eox.at/
+```
+
+There are also library functions which are thin wrappers around popular libraries,
+with some custom implementations for certain sources.
+
+## Current support
+
+### Extract
+
+| extract features | CLI | lib |
+|---|---|---|
+| stac-api items | ✅ | ✅ |
+| stac-api collection(s) | ✅ | ❌ |
+| stac-catalog items | ✅ | ✅ |
+| stac-catalog collection(s) | ✅ | ❌ |
+| OData | ❌ | ✅ |
+| Opensearch | ❌ | ✅ |
+| OGCAPI - Records | ❌ | ✅ |
+
+### Transform
+
+| transform features | CLI | lib |
+|---|---|---|
+| subset bands | ✅ | ❌ |
+| clean metadata | ✅ | ❌ |
+
+### Load
+
+| extract features | CLI | lib |
+|---|---|---|
+| stac-api items | ✅ | ✅ |
+| stac-api collection(s) | ✅ | ❌ |
+| stac-catalog items | ✅ | ✅ |
+| stac-catalog collection(s) | ✅ | ❌ |
+
+### Plugins
+
+There is support for writing plugins for extract and load from and to custom endpoints as
+well as transformers. Refer to the docs for more information.
+
