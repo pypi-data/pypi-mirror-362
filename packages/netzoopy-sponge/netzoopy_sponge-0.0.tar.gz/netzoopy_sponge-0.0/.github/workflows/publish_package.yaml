@@ -1,0 +1,75 @@
+name: SPONGE GHCR package
+
+on:
+  workflow_run:
+    workflows:
+    - SPONGE PyPI upload
+    types:
+    - completed
+
+env:
+  IMAGE_NAME: netzoopy_sponge
+  VERSION_FILE: version.txt
+
+jobs:
+  push:
+    name: Push package to GHCR
+
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build image
+      run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+
+    - name: Check basic functionality
+      run: docker run $IMAGE_NAME --help
+
+    - name: Download the artifact with the version
+      uses: dawidd6/action-download-artifact@v9
+      with:
+        name: version
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        workflow: test_testpypi_install.yaml
+        workflow_conclusion: success
+
+    - name: Check the downloaded file
+      run: |
+        ls -lah
+        cat $VERSION_FILE
+
+    - name: Log in to registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Push images
+      run: |
+        IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+
+        # This changes all uppercase characters to lowercase
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+        VERSION=$(cat $VERSION_FILE)
+
+        # This strips the "v" prefix from the tag name
+        [[ $VERSION =~ v[0-9]+.[0-9]+.[0-9]+ ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+        # Show the derived image ID and version
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
+
+        # Push the with the version tag
+        docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+        docker push $IMAGE_ID:$VERSION
+
+        # Push with the latest tag
+        docker tag $IMAGE_NAME $IMAGE_ID:latest
+        docker push $IMAGE_ID:latest
