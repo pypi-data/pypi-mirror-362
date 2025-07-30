@@ -1,0 +1,107 @@
+Metadata-Version: 2.4
+Name: circuit-rs
+Version: 0.3.3
+Classifier: Programming Language :: Rust
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Dist: numpy>=1.24.4
+License-File: LICENSE
+Summary: A library for doing efficient operations on neural circuits
+Author: Ian Quah<itq@uw.edu>
+Author-email: Ian Quah <itq@uw.edu>
+License: MIT
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+
+# rusted_circuits
+
+Exposing useful operations to manipulate the neural circuits that can be derived from [Flywire](https://flywire.ai/), a project which maps out the Drosophila brain.
+
+In my research, I found myself repeatedly needing to find a minimal circuit (connectivity-wise) that contains the smallest subcircuit containing all paths between a set of source and sink neurons (nodes, whatever). The python code I used was too slow, even considering various biological priors (e.g. I think it's possible to traverse from most neurons to almost any other within 5 jumps, and if you can't then it's probably not possible).
+
+Written in Rust, exposed in Python.
+
+# Design
+
+We support two main "modes", where the user passes in edge information as a list of tuples `[(pre_1, post_1, pre_1, post_2, ...)]` and as a `np.ndarray` of 2 dimensions. Under the hood, both use the same code, but there is a shim layer as rust doesn't have function overloads.
+
+# Functions
+
+```
+isolate_subcircuit(
+    edge_list: list[tuple[int, int]]
+    sources: set[int],
+    sinks: set[int],
+    max_depth: int,
+    max_paths: int,
+    nid_to_cidx_map: dict[int,int] | None
+)
+isolate_subcircuit_np(
+    edge_array: np.ndarray[u64, u64]
+    sources: set[int],
+    sinks: set[int],
+    max_depth: int,
+    max_paths: int,
+    nid_to_cidx_map: dict[int,int] | None
+  
+)
+  
+map_neuron_ids_to_cmat_idxs(
+  edge_list: list[tuple[int, int]],
+)
+map_neuron_ids_to_cmat_idxs_np(
+  edge_array: np.ndarray[u64, u64],
+)
+
+
+adjacency_map_from_edge_list(
+  edge_list=list[tuple[int, int]],
+  nid_to_cidx_map=dict[int, int] | None
+)
+
+adjacency_map_from_edge_list_np(
+  edge_array=np.ndarray[u64, u64],
+  nid_to_cidx_map=dict[int, int] | None
+)
+
+```
+
+# Example
+
+## Smallest Subcircuit
+
+Here is a simple working example, where we have a linear path from source `(1)` to sink `(5)`
+
+```python
+
+edge_list = np.asarray([(1, 2), (2, 3), (3, 4), (4, 5)])
+sources = {1}
+sinks = {5}
+max_depth = 10
+max_paths = 100
+
+# The nid_to_cidx_map is optional, and if it is not specified, we derive the mapping of the neuron-id-to-connectivity-matrix-index.
+nid_to_cidx_map = {1: 10, 2: 20, 3: 30, 4: 40, 5: 50}
+
+# Expected: all nodes on the path from source to sink
+expected = {10, 20, 30, 40, 50}
+actual_np = isolate_subcircuit_np_edgelist(edge_list, sources, sinks, max_depth, max_paths, nid_to_cidx_map)
+
+# -OR-, from a list
+actual_list = isolate_subcircuit(edge_list.tolist(), sources, sinks, max_depth, max_paths, nid_to_cidx_map)
+```
+
+# Maintainers
+
+1. Add whatever code using `git add ...`
+
+2. Add a commit message e.g. `git commit -m '...'`
+
+Note: replace `VERSION_NUMBER` below by an actual version number e.g. v0.1.0
+
+3. `git tag $VERSION_NUMBER`
+
+4. Modify `Cargo.toml`, the `version` to be the same (not strictly necessary, but it's just nicer).
+
+5. `git push origin $VERSION_NUMBER`
+
