@@ -1,0 +1,56 @@
+# Metadata for publishing agesafetch as a wheel on PyPI using Maturin.
+#
+# Maturin does not strictly require a pyproject.toml for building wheels
+# (only for sdists), but this file is
+#   a) the only way of specifying some PyPI-specific metadata and
+#   b) must be present anyway for the project to be installable from Git
+#      or a directory (which is also why it cannot just be in `deploy/`).
+#
+# See: https://www.maturin.rs/
+#
+# SPDX-FileCopyrightText: Benedikt Vollmerhaus <benedikt@vollmerhaus.org>
+# SPDX-License-Identifier: MIT
+
+[build-system]
+requires = ["maturin>=1.8,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "agesafetch"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Topic :: System :: Hardware",
+    "Topic :: System :: Monitoring",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+dynamic = ["version", "description", "license", "authors", "keywords"]
+
+[project.urls]
+Repository = "https://gitlab.com/BVollmerhaus/agesafetch"
+Changelog = "https://gitlab.com/BVollmerhaus/agesafetch/-/blob/master/CHANGELOG.md"
+Issues = "https://gitlab.com/BVollmerhaus/agesafetch/-/issues"
+
+[project.scripts]
+agesafetch = "agesafetch:run_py"
+
+[tool.maturin]
+features = ["python-bindings"]
+manifest-path = "agesafetch/Cargo.toml"
+python-source = "agesafetch/python"
+
+include = [
+    { path = "LICENSE", format = "sdist" }
+]

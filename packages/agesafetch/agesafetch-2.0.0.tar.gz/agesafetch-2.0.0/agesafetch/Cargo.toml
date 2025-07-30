@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Benedikt Vollmerhaus <benedikt@vollmerhaus.org>
+# SPDX-License-Identifier: MIT
+
+[package]
+name = "agesafetch"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+license.workspace = true
+rust-version = "1.85.0"
+description = "A tool for obtaining your firmware's embedded AGESA version on Linux."
+keywords = [
+    "agesa",
+    "amd",
+    "firmware",
+    "memory",
+]
+categories = [
+    "command-line-utilities",
+    "hardware-support",
+]
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+caps = "0.5.5"
+clap = { version = "4.5.41", features = ["derive"] }
+colored = "3.0.0"
+indoc = "2.0.6"
+linux-memutils = { version = "2.0.0", path = "../linux-memutils" }
+
+pyo3 = { version = "0.25.1", optional = true }
+
+[features]
+# https://doc.rust-lang.org/cargo/reference/features.html#dependency-features
+python-bindings = ["pyo3/extension-module"]

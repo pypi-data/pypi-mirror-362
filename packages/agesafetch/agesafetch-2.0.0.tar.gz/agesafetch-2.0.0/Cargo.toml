@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: Benedikt Vollmerhaus <benedikt@vollmerhaus.org>
+# SPDX-License-Identifier: MIT
+
+[workspace]
+members = ["agesafetch", "linux-memutils"]
+resolver = "3"
+
+[workspace.package]
+version = "2.0.0"
+edition = "2024"
+authors = ["Benedikt Vollmerhaus <benedikt@vollmerhaus.org>"]
+repository = "https://gitlab.com/BVollmerhaus/agesafetch"
+license = "MIT"
+
+[profile.release]
+# https://doc.rust-lang.org/cargo/reference/profiles.html#lto
+lto = "fat"
+# https://doc.rust-lang.org/cargo/reference/profiles.html#codegen-units
+codegen-units = 1
+# https://doc.rust-lang.org/cargo/reference/profiles.html#panic
+panic = "abort"
+
+[profile.bench]
+debug = true
