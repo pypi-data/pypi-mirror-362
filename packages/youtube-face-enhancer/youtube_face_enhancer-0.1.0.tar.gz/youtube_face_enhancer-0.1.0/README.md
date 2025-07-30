@@ -1,0 +1,54 @@
+# YouTube Face Enhancer / Extractor
+
+This tool enhances face images for YouTube thumbnails by removing the background, smoothing skin, boosting vibrance, sharpening, and adding a customizable glow.
+
+## Installation
+
+```
+pip install youtube-face-enhancer
+```
+
+## Usage
+
+Enhance a face image for YouTube thumbnails:
+
+```
+youtube-face-enhancer -i INPUT_FILE [options] OUTPUT_FILE
+```
+
+### Example
+
+```
+youtube-face-enhancer -i 01.png -b 1.1 -c 10 -s 1.15 --glow_color yellow 01-enhanced.png
+```
+
+### Options
+
+- `-i`, `--input` (required): Input image path
+- `-b`, `--brightness`: Brightness/contrast alpha (default: 1.08)
+- `-c`, `--contrast`: Brightness/contrast beta (default: 8)
+- `-s`, `--saturation`: Saturation multiplier (default: 1.10)
+- `--smooth_d`: Bilateral filter diameter (default: 7)
+- `--smooth_sigma_color`: Bilateral filter sigmaColor (default: 60)
+- `--smooth_sigma_space`: Bilateral filter sigmaSpace (default: 60)
+- `--sharpen`: Sharpening strength (default: 1.7)
+- `--glow_size`: Glow dilation kernel size (default: 25)
+- `--glow_blur`: Glow blur sigma (default: 16)
+- `--glow_color`: Glow color (hex or name, default: #FFFFFF)
+- `OUTPUT_FILE` (required): Output image path (always last argument)
+
+### Help
+
+See all options:
+
+```
+youtube-face-enhancer --help
+```
+
+## Development
+
+To install for development:
+
+```
+uv pip install -e .
+```
