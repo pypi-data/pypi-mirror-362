@@ -1,0 +1,321 @@
+#!python
+#
+#
+import sys
+import io
+
+from os import system
+import pytangtv.pymask.controls
+from math import *
+import getopt
+
+
+try:
+    from Tkinter import *
+except:
+    from tkinter import *
+try:
+    from PIL import Image, ImageTk, ImageDraw
+    from PIL import ImageChops
+except:
+    import Image
+    import ImageTk
+    import ImageDraw
+    import ImageChops
+
+try:
+    from tkFileDialog import askopenfilename
+except:
+    from tkinter.filedialog import askopenfilename
+
+from pytangtv.check4updates import check4updates
+
+try:
+    from PIL.Image import ANTIALIAS
+except:
+    from PIL.Image import LANCZOS as ANTIALIAS
+
+spawned = False
+w = 0
+h = 0
+s = 1.0
+
+
+options = ['width=', 'height=', 'scale=', 'spawn']
+optlist, args = getopt.getopt(sys.argv[1:], 'ult:w:h:s:', options)
+optdict = {}
+sys.stderr.write("\n")
+for o in optlist:
+    optdict.update({o[0]: o[1]})
+if '-w' in optdict:
+    w = int(optdict['-w'])
+if '--width' in optdict:
+    w = int(optdict['--width'])
+if '-s' in optdict:
+    s = int(optdict['-s'])
+if '--scale' in optdict:
+    s = int(optdict['--scale'])
+if '-h' in optdict:
+    h = int(optdict['-h'])
+if '--height' in optdict:
+    h = int(optdict['--height'])
+if '--spawn' in optdict:
+    spawned = True
+
+#
+# an image viewer
+
+
+class UI(Frame):
+
+    def __init__(self, master, im, s=1.0):
+        Frame.__init__(self, master)
+        self.pack(side=RIGHT, fill=BOTH, expand=TRUE)
+        self.window = master
+        self.parent = master
+        self.image = im
+        self.dimage = im
+        self.buimage = im
+        self.W, self.H = self.image.size
+        self.S = s
+        self.bitmap = ImageTk.PhotoImage(im)
+        self.canvas = Canvas(self, width=self.W,
+                             height=self.H, bd=0, highlightthickness=0)
+        self.canvas.bind("<Button-1>", self.idraw)
+        self.canvas.bind("<B1-Motion>", self.idraw)
+        self.canvas.bind("<Button-2>", self.remdraw)
+        self.canvas.bind("<B3-Motion>", self.drawrev)
+        self.canvas.bind("<Button-3>", self.drawrev)
+        self.canvas.bind("<ButtonRelease>", self.rfidraw)
+        self.canvas.bind("+", self.incdrawsize)
+        self.canvas.bind("-", self.decdrawsize)
+        self.canvas.bind("q", self.saveandquit)
+        self.canvas.focus_set()
+        self.canvas.create_image(0, 0, anchor=NW, image=self.bitmap)
+        self.canvas.pack()
+        self.bgimage = None
+        self.bubgimage = None
+        self.im = im
+        self.hstep = 5
+        self.hpos = 0
+        self.dz = 4
+        self.vstep = 5
+        self.vpos = 0
+        self.rstep = 1
+        self.spawned = spawned
+        self.rot = 0
+        self.bl = 1
+        self.wdraw = []
+        self.bdraw = []
+
+    def saveandquit(self, event):
+        size = self.image.size
+        self.image = Image.new('L', (self.W, self.H))
+        self.bgimage = self.image
+        self.wdraw = self.wdraw + self.bdraw
+        self.bdraw = []
+        self.refresh()
+        widget = event.widget
+        x0 = widget.winfo_rootx()
+        y0 = widget.winfo_rooty()
+        x1 = x0 + widget.winfo_width()
+        y1 = y0 + widget.winfo_height()
+        self.canvas.update_idletasks()
+        #system('xwd -nobdrs -id %d | convert xwd:- pmask.tiff' % (widget.winfo_id(),))
+        self.ouim.save("pmask.tiff")
+        sys.exit()
+
+    def incdrawsize(self, event):
+        self.dz = self.dz + 1
+        W = self.W/2-self.dz-10
+        H = self.H/2-self.dz-10
+        self.refresh()
+        self.canvas.create_oval(
+            W, H, W+self.dz, H+self.dz, outline="white", fill="white")
+        W = self.W/2+10
+        H = self.H/2+10
+        self.canvas.create_oval(
+            W, H, W+self.dz, H+self.dz, outline="black", fill="black")
+
+    def decdrawsize(self, event):
+        self.dz = self.dz - 1
+        if self.dz < 1:
+            self.dz = 1
+        W = self.W/2-self.dz-10
+        H = self.H/2-self.dz-10
+        self.refresh()
+        self.canvas.create_oval(
+            W, H, W+self.dz, H+self.dz, outline="white", fill="white")
+        W = self.W/2+10
+        H = self.H/2+10
+        self.canvas.create_oval(
+            W, H, W+self.dz, H+self.dz, outline="black", fill="black")
+
+    def rfidraw(self, event):
+        cx = event.x
+        cy = event.y
+        self.refresh()
+
+    def idraw(self, event):
+        cx = event.x-self.dz/2
+        cy = event.y-self.dz/2
+        self.wdraw.append((cx, cy, self.dz))
+        self.canvas.create_oval(
+            cx, cy, cx+self.dz, cy+self.dz, outline="white", fill="white")
+        # self.refresh()
+
+    def drawrev(self, event):
+        cx = event.x-self.dz/2
+        cy = event.y-self.dz/2
+        self.bdraw.append((cx, cy, self.dz))
+        self.canvas.create_oval(
+            cx, cy, cx+self.dz, cy+self.dz, outline="black", fill="black")
+        # self.refresh()
+
+    def remdraw(self, event):
+        self.wdraw = []
+        self.bdraw = []
+        self.refresh()
+
+    def reset(self):
+        self.hpos = 0
+        self.vpos = 0
+        self.rot = 0
+        self.image = self.buimage
+        self.bgimage = self.bubgimage
+        self.refresh()
+
+    def rightstep(self):
+        self.hstep = int(self.xstepentry.get())
+        self.hpos = self.hpos + self.hstep
+        self.refresh()
+
+    def leftstep(self):
+        self.hstep = int(self.xstepentry.get())
+        self.hpos = self.hpos - self.hstep
+        self.refresh()
+
+    def downstep(self):
+        self.vstep = int(self.ystepentry.get())
+        self.vpos = self.vpos + self.vstep
+        self.refresh()
+
+    def upstep(self):
+        self.vstep = int(self.ystepentry.get())
+        self.vpos = self.vpos - self.vstep
+        self.refresh()
+
+    def rotr(self):
+        self.rstep = float(self.rstepentry.get())
+        self.rot = self.rot - self.rstep
+        self.refresh()
+
+    def rotl(self):
+        self.rstep = float(self.rstepentry.get())
+        self.rot = self.rot + self.rstep
+        self.refresh()
+
+    def iwrite(self):
+        self.refresh()
+        self.simage.save('pyalign.tiff')
+
+    def refresh(self):
+        im1 = ImageChops.offset(self.image.rotate(self.rot), xoffset=int(
+            self.hpos*self.S), yoffset=int(self.vpos*self.S))
+        wsize = self.image.size[0]
+        hsize = self.image.size[1]
+        im1 = im1.resize((wsize, hsize), ANTIALIAS)
+        dimage = im1
+
+        if self.bgimage != None:
+            im2 = self.bgimage
+            if self.bl == -1:
+                dimage = im2
+            elif self.bl == 0:
+                dimage = im1
+            elif self.bl == 1:
+                dimage = ImageChops.add(im1, im2)
+            elif self.bl == 2:
+                dimage = ImageChops.difference(im1, im2)
+            elif self.bl == 3:
+                dimage = ImageChops.darker(im1, im2)
+            elif self.bl == 4:
+                dimage = ImageChops.lighter(im1, im2)
+            elif self.bl == 5:
+                dimage = ImageChops.logical_and(
+                    im1.convert("1"), im2.convert("1"))
+            elif self.bl == 6:
+                dimage = ImageChops.logical_or(
+                    im1.convert("1"), im2.convert("1"))
+            elif self.bl == 7:
+                dimage = ImageChops.logical_xor(
+                    im1.convert("1"), im2.convert("1"))
+            elif self.bl == 8:
+                dimage = ImageChops.multiply(im1, im2)
+
+        self.bitmap = ImageTk.PhotoImage(dimage)
+        self.simage = dimage
+        self.canvas.create_image(0, 0, anchor=NW, image=self.bitmap)
+        self.ouim = Image.new('L', (self.W, self.H))
+        self.draw = ImageDraw.Draw(self.ouim)
+        for m in self.wdraw:
+            self.canvas.create_oval(
+                m[0], m[1], m[0]+m[2], m[1]+m[2], outline="white", fill="white")
+            self.draw.ellipse((m[0], m[1], m[0]+m[2], m[1]+m[2]), fill=255)
+        for m in self.bdraw:
+            self.canvas.create_oval(
+                m[0], m[1], m[0]+m[2], m[1]+m[2], outline="black", fill="black")
+            self.draw.ellipse((m[0], m[1], m[0]+m[2], m[1]+m[2]), fill=255)
+
+#
+# script interface
+
+
+if __name__ == "__main__":
+
+    import sys
+
+    try:
+        from importlib import metadata
+        _version = metadata.version('PyTangtv')
+    except:
+        _version = 'Version unknown'
+    check4updates('https://pypi.org/pypi/pytangtv/json',thisver=_version)
+
+    root = Tk()
+
+    if len(args) == 0:
+        filename = askopenfilename(filetypes=[("tiff", "*.tiff"),
+                                              ("png", "*.png"),
+                                              ("allfiles", "*")])
+
+    else:
+        filename = args[0]
+
+    root.title(filename)
+
+    #mymenu = menu.mymenu(root)
+    frame = Frame(root)
+    frame.pack(expand=FALSE, fill=BOTH)
+    if s != 1.0:
+        im = Image.open(filename).convert('L')
+        w, h = im.size
+        w = w * s
+        h = h * s
+        im = Image.open(filename).convert('L').resize((w, h), ANTIALIAS)
+    elif w != 0:
+        im = Image.open(filename).convert('L').resize((w, h), ANTIALIAS)
+    else:
+        im = Image.open(filename).convert('L')
+
+    ui = UI(frame, im, s)
+    #mymenu.addui(ui)
+    if len(args) > 1:
+        ui.bgimage = Image.open(args[1]).convert(
+            'L').resize((ui.W, ui.H), ANTIALIAS)
+        ui.bubgimage = ui.bgimage
+    # controls.controls(frame,ui)
+
+    ui.refresh()
+
+    root.mainloop()
