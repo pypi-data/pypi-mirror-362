@@ -1,0 +1,38 @@
+[project]
+name = "mcp-server-aibtcdev"
+version = "1.0.0"
+description = "MCP server for aibtcdev-backend API integration"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "Apache-2.0"
+dependencies = [
+    "fastmcp>=2.7.0",
+    "httpx>=0.26.1",
+    "pydantic>=2.10.6",
+    "typing-extensions>=4.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "ipdb>=0.13.13",
+    "isort>=6.0.1",
+    "mypy>=1.9.0",
+    "pre-commit>=4.1.0",
+    "pyright>=1.1.389",
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.8.0",
+]
+
+[project.scripts]
+mcp-server-aibtcdev = "mcp_server_aibtcdev.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+asyncio_mode = "auto"
