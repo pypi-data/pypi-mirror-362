@@ -1,0 +1,192 @@
+Metadata-Version: 2.4
+Name: dm-aioaiagent
+Version: 0.5.2
+Summary: This is my custom aioaiagent client
+Home-page: https://pypi.org/project/dm-aioaiagent
+Author: dimka4621
+Author-email: mismartconfig@gmail.com
+Project-URL: GitHub, https://github.com/MykhLibs/dm-aioaiagent
+Keywords: dm aioaiagent
+Classifier: Programming Language :: Python :: 3.8
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: dm-logger~=0.6.2
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: pydantic<3.0.0,>=2.9.2
+Requires-Dist: langchain~=0.3.0
+Requires-Dist: langchain-core~=0.3.5
+Requires-Dist: langchain-community~=0.3.0
+Requires-Dist: langchain-openai~=0.3.0
+Requires-Dist: langchain-anthropic~=0.3.0
+Requires-Dist: langgraph~=0.2.23
+Requires-Dist: langsmith~=0.1.144
+Requires-Dist: grandalf>=0.8
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# DM-aioaiagent
+
+## Urls
+
+* [PyPI](https://pypi.org/project/dm-aioaiagent)
+* [GitHub](https://github.com/MykhLibs/dm-aioaiagent)
+
+### * Package contains both `asynchronous` and `synchronous` clients
+
+## Usage
+
+Analogue to `DMAioAIAgent` is the synchronous client `DMAIAgent`.
+
+### Windows Setup
+
+```python
+import asyncio
+import sys
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+```
+
+### Api Key Setup
+
+You can set your OpenAI API key in the environment variable `OPENAI_API_KEY` or pass it as an argument to the agent.
+
+**Use load_dotenv to load the `.env` file.**
+
+```python
+from dotenv import load_dotenv
+load_dotenv()
+```
+
+### Use agent *with* inner memory and run *single* message
+
+By default, agent use inner memory to store the conversation history.
+
+(You can set *max count messages in memory* by `max_memory_messages` init argument)
+
+```python
+import asyncio
+from dm_aioaiagent import DMAioAIAgent
+
+
+async def main():
+    # define a system message
+    system_message = "Your custom system message with role, backstory and goal"
+
+    # (optional) define a list of tools, if you want to use them
+    tools = [...]
+
+    # define a openai model, default is "gpt-4o-mini"
+    model_name = "gpt-4o"
+
+    # create an agent
+    ai_agent = DMAioAIAgent(system_message, tools, model=model_name)
+    # if you don't want to see the input and output messages from agent
+    # you can set `input_output_logging=False` init argument
+
+    # call an agent
+    answer = await ai_agent.run("Hello!")
+
+    # call an agent
+    answer = await ai_agent.run("I want to know the weather in Kyiv")
+
+    # get full conversation history
+    conversation_history = ai_agent.memory_messages
+
+    # clear conversation history
+    ai_agent.clear_memory_messages()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Use agent *without* inner memory and run *multiple* messages
+
+If you want to control the memory of the agent, you can disable it by setting `is_memory_enabled=False`
+
+```python
+import asyncio
+from dm_aioaiagent import DMAioAIAgent
+
+
+async def main():
+    # define a system message
+    system_message = "Your custom system message with role, backstory and goal"
+
+    # (optional) define a list of tools, if you want to use them
+    tools = [...]
+
+    # define a openai model, default is "gpt-4o-mini"
+    model_name = "gpt-4o"
+
+    # create an agent
+    ai_agent = DMAioAIAgent(system_message, tools, model=model_name,
+                            is_memory_enabled=False)
+    # if you don't want to see the input and output messages from agent
+    # you can set input_output_logging=False
+
+    # define the conversation message(s)
+    messages = [
+        {"role": "user", "content": "Hello!"}
+    ]
+
+    # call an agent
+    new_messages = await ai_agent.run_messages(messages)
+
+    # add new_messages to messages
+    messages.extend(new_messages)
+
+    # define the next conversation message
+    messages.append(
+        {"role": "user", "content": "I want to know the weather in Kyiv"}
+    )
+
+    # call an agent
+    new_messages = await ai_agent.run_messages(messages)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Image vision
+
+```python
+from dm_aioaiagent import DMAIAgent, OpenAIImageMessageContent
+
+
+def main():
+    # create an agent
+    ai_agent = DMAIAgent(agent_name="image_vision", model="gpt-4o")
+
+    # create an image message content
+    # NOTE: text argument is optional
+    img_content = OpenAIImageMessageContent(image_url="https://your.domain/image",
+                                            text="Hello, what is shown in the photo?")
+
+    # define the conversation messages
+    messages = [
+        {"role": "user", "content": "Hello!"},
+        {"role": "user", "content": img_content},
+    ]
+
+    # call an agent
+    new_messages = ai_agent.run_messages(messages)
+    answer = new_messages[-1].content
+
+
+if __name__ == "__main__":
+    main()
+```
