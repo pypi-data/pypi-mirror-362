@@ -1,0 +1,40 @@
+Metadata-Version: 2.4
+Name: frenet-system-creator
+Version: 0.2.0
+Summary: Utilities for converting between Cartesian and Frenet frames
+Author-email: Delvin Yang <jyang512@connect.hkust-gz.edu.cn>
+License: MIT
+Project-URL: Homepage, https://github.com/DelvinYang/
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: scipy
+Dynamic: license-file
+
+# Frenet System Creator
+
+Utilities for converting between Cartesian and Frenet frames. The package
+provides a simple `FrenetSystem` class for projecting points onto a path
+and performing coordinate conversions.
+
+## Installation
+
+```bash
+pip install frenet-system-creator
+```
+
+## Usage
+
+```python
+from frenet_system_creator import FrenetSystem
+
+path = [(0, 0), (1, 1), (2, 0)]
+fs = FrenetSystem(path)
+
+# Convert Cartesian to [d, s]
+ds, _ = fs.cartesian2ds_frame((1.5, 1.0))
+
+# Convert back to Cartesian
+xy = fs.ds_frame2cartesian(ds)
+```
