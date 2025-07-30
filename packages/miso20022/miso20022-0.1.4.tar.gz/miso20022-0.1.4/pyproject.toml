@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+    "miso20022",
+    "miso20022.bah",
+    "miso20022.common",
+    "miso20022.pacs"
+]
+include-package-data = true
+
+[project]
+name = "miso20022"
+version = "0.1.4"
+description = "ISO 20022 Message Generator for US Payment Rails"
+readme = "PKG_README.md"
+authors = [
+    {name = "Sai Vatsavai", email = "sai.vatsavai@mbanq.com"},
+    {name = "Vamsi Krishna", email = "vamsi.krishna@mbanq.com"},
+    {name = "Mbanq", email = "developers@mbanq.com"}
+]
+license = "Apache-2.0"
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["iso20022", "financial", "messaging", "banking", "fedwire", "us payment rails", "fednow"]
+dependencies = [
+    "xmlschema>=1.9.0",
+    "python-dotenv>=0.19.0",
+    "xmltodict>=0.13.0",
+    "lxml>=4.9.0",
+    "setuptools~=58.0.4"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Mbanq/iso20022"
+"Bug Tracker" = "https://github.com/Mbanq/iso20022/issues"
+
+[project.scripts]
+miso20022 = "miso20022.cli:main"
+
+[project.optional-dependencies]
+webapp = [
+    "flask",
+    "xmltodict"
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py37", "py38", "py39", "py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
