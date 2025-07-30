@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ohlcv-to-orderbook"
+dynamic = ["version"]
+description = "Convert OHLCV data to order book data and vice versa"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Luca Forni", email = "obseries@outlook.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.20.0",
+    "pyarrow>=5.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "black",
+    "isort",
+    "mypy",
+    "pandas-stubs",
+]
+
+[project.scripts]
+ohlcv-to-orderbook = "ohlcv_to_orderbook.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/obseries/ohlcv-to-orderbook"
+Repository = "https://github.com/obseries/ohlcv-to-orderbook"
+Issues = "https://github.com/obseries/ohlcv-to-orderbook/issues"
+
+[tool.setuptools_scm]
+write_to = "ohlcv_to_orderbook/_version.py"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ohlcv_to_orderbook*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
