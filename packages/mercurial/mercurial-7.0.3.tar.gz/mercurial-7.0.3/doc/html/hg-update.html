@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg update</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-update">
+<span id="hg-update-1"></span>
+<h1 class="title">hg update</h1>
+<h2 class="subtitle" id="update-working-directory-or-switch-revisions">update working directory (or switch revisions)</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-4">Aliases</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg update [-C|-c|-m] [-d DATE] [[-r] REV]
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Update the repository's working directory to the specified
+changeset. If no changeset is specified, update to the tip of the
+current named branch and move the active bookmark (see <a class="reference external" href="hg-bookmarks.html"><tt class="docutils literal">hg help
+bookmarks</tt></a>).</p>
+<p>Update sets the working directory's parent revision to the specified
+changeset (see <a class="reference external" href="hg-parents.html"><tt class="docutils literal">hg help parents</tt></a>).</p>
+<p>If the changeset is not a descendant or ancestor of the working
+directory's parent and there are uncommitted changes, the update is
+aborted. With the -c/--check option, the working directory is checked
+for uncommitted changes; if none are found, the working directory is
+updated to the specified changeset.</p>
+<div class="verbose docutils container">
+<p>The -C/--clean, -c/--check, and -m/--merge options control what
+happens if the working directory contains uncommitted changes.
+At most of one of them can be specified.</p>
+<ol class="arabic simple">
+<li>If no option is specified, and if
+the requested changeset is an ancestor or descendant of
+the working directory's parent, the uncommitted changes
+are merged into the requested changeset and the merged
+result is left uncommitted. If the requested changeset is
+not an ancestor or descendant (that is, it is on another
+branch), the update is aborted and the uncommitted changes
+are preserved.</li>
+<li>With the -m/--merge option, the update is allowed even if the
+requested changeset is not an ancestor or descendant of
+the working directory's parent.</li>
+<li>With the -c/--check option, the update is aborted and the
+uncommitted changes are preserved.</li>
+<li>With the -C/--clean option, uncommitted changes are discarded and
+the working directory is updated to the requested changeset.</li>
+</ol>
+</div>
+<p>To cancel an uncommitted merge (and lose your changes), use
+<a class="reference external" href="hg-merge.html"><tt class="docutils literal">hg merge <span class="pre">--abort</span></tt></a>.</p>
+<p>Use null as the changeset to remove the working directory (like
+<a class="reference external" href="hg-clone.html"><tt class="docutils literal">hg clone <span class="pre">-U</span></tt></a>).</p>
+<p>If you want to revert just one file to an older revision, use
+<a class="reference external" href="hg-revert.html"><tt class="docutils literal">hg revert <span class="pre">[-r</span> REV] NAME</tt></a>.</p>
+<p>See <a class="reference external" href="topic-dates.html"><tt class="docutils literal">hg help dates</tt></a> for a list of formats valid for -d/--date.</p>
+<p>Returns 0 on success, 1 if there are unresolved files.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-C</span>, <span class="option">--clean</span></kbd></td>
+<td>discard uncommitted changes (no backup)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-c</span>, <span class="option">--check</span></kbd></td>
+<td>require clean working directory</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-m</span>, <span class="option">--merge</span></kbd></td>
+<td>merge uncommitted changes</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>tipmost revision matching date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revision</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-t</span>, <span class="option">--tool <var>&lt;TOOL&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify merge tool</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<pre class="literal-block">
+up, checkout, co
+</pre>
+</div>
+</div>
+</body>
+</html>

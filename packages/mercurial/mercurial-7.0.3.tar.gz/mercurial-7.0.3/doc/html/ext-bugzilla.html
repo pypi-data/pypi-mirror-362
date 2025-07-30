@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>bugzilla</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="bugzilla">
+<span id="ext-bugzilla"></span>
+<h1 class="title">bugzilla</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+</ul>
+</div>
+<p>hooks for integrating with the Bugzilla bug tracker</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This hook extension adds comments on bugs in Bugzilla when changesets
+that refer to bugs by Bugzilla ID are seen. The comment is formatted using
+the Mercurial template mechanism.</p>
+<p>The bug references can optionally include an update for Bugzilla of the
+hours spent working on the bug. Bugs can also be marked fixed.</p>
+<p>Four basic modes of access to Bugzilla are provided:</p>
+<ol class="arabic simple">
+<li>Access via the Bugzilla REST-API. Requires bugzilla 5.0 or later.</li>
+<li>Access via the Bugzilla XMLRPC interface. Requires Bugzilla 3.4 or later.</li>
+<li>Check data via the Bugzilla XMLRPC interface and submit bug change
+via email to Bugzilla email interface. Requires Bugzilla 3.4 or later.</li>
+<li>Writing directly to the Bugzilla database. Only Bugzilla installations
+using MySQL are supported. Requires Python MySQLdb.</li>
+</ol>
+<p>Writing directly to the database is susceptible to schema changes, and
+relies on a Bugzilla contrib script to send out bug change
+notification emails. This script runs as the user running Mercurial,
+must be run on the host with the Bugzilla install, and requires
+permission to read Bugzilla configuration details and the necessary
+MySQL user and password to have full access rights to the Bugzilla
+database. For these reasons this access mode is now considered
+deprecated, and will not be updated for new Bugzilla versions going
+forward. Only adding comments is supported in this access mode.</p>
+<p>Access via XMLRPC needs a Bugzilla username and password to be specified
+in the configuration. Comments are added under that username. Since the
+configuration must be readable by all Mercurial users, it is recommended
+that the rights of that user are restricted in Bugzilla to the minimum
+necessary to add comments. Marking bugs fixed requires Bugzilla 4.0 and later.</p>
+<p>Access via XMLRPC/email uses XMLRPC to query Bugzilla, but sends
+email to the Bugzilla email interface to submit comments to bugs.
+The From: address in the email is set to the email address of the Mercurial
+user, so the comment appears to come from the Mercurial user. In the event
+that the Mercurial user email is not recognized by Bugzilla as a Bugzilla
+user, the email associated with the Bugzilla username used to log into
+Bugzilla is used instead as the source of the comment. Marking bugs fixed
+works on all supported Bugzilla versions.</p>
+<p>Access via the REST-API needs either a Bugzilla username and password
+or an apikey specified in the configuration. Comments are made under
+the given username or the user associated with the apikey in Bugzilla.</p>
+<p>Configuration items common to all access modes:</p>
+<dl class="docutils">
+<dt>bugzilla.version</dt>
+<dd><p class="first">The access type to use. Values recognized are:</p>
+<table class="last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">restapi</tt>:</th><td class="field-body">Bugzilla REST-API, Bugzilla 5.0 and later.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">xmlrpc</tt>:</th><td class="field-body">Bugzilla XMLRPC interface.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">xmlrpc+email</tt>:</th><td class="field-body">Bugzilla XMLRPC and email interfaces.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">3.0</tt>:</th><td class="field-body">MySQL access, Bugzilla 3.0 and later.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">2.18</tt>:</th><td class="field-body">MySQL access, Bugzilla 2.18 and up to but not
+including 3.0.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">2.16</tt>:</th><td class="field-body">MySQL access, Bugzilla 2.16 and up to but not
+including 2.18.</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>bugzilla.regexp</dt>
+<dd>Regular expression to match bug IDs for update in changeset commit message.
+It must contain one &quot;()&quot; named group <tt class="docutils literal">&lt;ids&gt;</tt> containing the bug
+IDs separated by non-digit characters. It may also contain
+a named group <tt class="docutils literal">&lt;hours&gt;</tt> with a floating-point number giving the
+hours worked on the bug. If no named groups are present, the first
+&quot;()&quot; group is assumed to contain the bug IDs, and work time is not
+updated. The default expression matches <tt class="docutils literal">Bug 1234</tt>, <tt class="docutils literal">Bug no. 1234</tt>,
+<tt class="docutils literal">Bug number 1234</tt>, <tt class="docutils literal">Bugs 1234,5678</tt>, <tt class="docutils literal">Bug 1234 and 5678</tt> and
+variations thereof, followed by an hours number prefixed by <tt class="docutils literal">h</tt> or
+<tt class="docutils literal">hours</tt>, e.g. <tt class="docutils literal">hours 1.5</tt>. Matching is case insensitive.</dd>
+<dt>bugzilla.fixregexp</dt>
+<dd>Regular expression to match bug IDs for marking fixed in changeset
+commit message. This must contain a &quot;()&quot; named group <tt class="docutils literal">&lt;ids&gt;` containing
+the bug IDs separated by <span class="pre">non-digit</span> characters. It may also contain
+a named group <span class="pre">``&lt;hours&gt;</span></tt> with a floating-point number giving the
+hours worked on the bug. If no named groups are present, the first
+&quot;()&quot; group is assumed to contain the bug IDs, and work time is not
+updated. The default expression matches <tt class="docutils literal">Fixes 1234</tt>, <tt class="docutils literal">Fixes bug 1234</tt>,
+<tt class="docutils literal">Fixes bugs 1234,5678</tt>, <tt class="docutils literal">Fixes 1234 and 5678</tt> and
+variations thereof, followed by an hours number prefixed by <tt class="docutils literal">h</tt> or
+<tt class="docutils literal">hours</tt>, e.g. <tt class="docutils literal">hours 1.5</tt>. Matching is case insensitive.</dd>
+<dt>bugzilla.fixstatus</dt>
+<dd>The status to set a bug to when marking fixed. Default <tt class="docutils literal">RESOLVED</tt>.</dd>
+<dt>bugzilla.fixresolution</dt>
+<dd>The resolution to set a bug to when marking fixed. Default <tt class="docutils literal">FIXED</tt>.</dd>
+<dt>bugzilla.style</dt>
+<dd>The style file to use when formatting comments.</dd>
+<dt>bugzilla.template</dt>
+<dd><p class="first">Template to use when formatting comments. Overrides style if
+specified. In addition to the usual Mercurial keywords, the
+extension specifies:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">{bug}</tt>:</th><td class="field-body">The Bugzilla bug ID.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">{root}</tt>:</th><td class="field-body">The full pathname of the Mercurial repository.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">{webroot}</tt>:</th><td class="field-body">Stripped pathname of the Mercurial repository.</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">{hgweb}</tt>:</th><td class="field-body">Base URL for browsing Mercurial repositories.</td>
+</tr>
+</tbody>
+</table>
+<p class="last">Default <tt class="docutils literal">changeset {node|short} in repo {root} refers to bug
+<span class="pre">{bug}.\ndetails:\n\t{desc|tabindent}</span></tt></p>
+</dd>
+<dt>bugzilla.strip</dt>
+<dd>The number of path separator characters to strip from the front of
+the Mercurial repository path (<tt class="docutils literal">{root}</tt> in templates) to produce
+<tt class="docutils literal">{webroot}</tt>. For example, a repository with <tt class="docutils literal">{root}</tt>
+<tt class="docutils literal"><span class="pre">/var/local/my-project</span></tt> with a strip of 2 gives a value for
+<tt class="docutils literal">{webroot}</tt> of <tt class="docutils literal"><span class="pre">my-project</span></tt>. Default 0.</dd>
+<dt>web.baseurl</dt>
+<dd>Base URL for browsing Mercurial repositories. Referenced from
+templates as <tt class="docutils literal">{hgweb}</tt>.</dd>
+</dl>
+<p>Configuration items common to XMLRPC+email and MySQL access modes:</p>
+<dl class="docutils">
+<dt>bugzilla.usermap</dt>
+<dd><p class="first">Path of file containing Mercurial committer email to Bugzilla user email
+mappings. If specified, the file should contain one mapping per
+line:</p>
+<pre class="literal-block">
+committer = Bugzilla user
+</pre>
+<p class="last">See also the <tt class="docutils literal">[usermap]</tt> section.</p>
+</dd>
+</dl>
+<p>The <tt class="docutils literal">[usermap]</tt> section is used to specify mappings of Mercurial
+committer email to Bugzilla user email. See also <tt class="docutils literal">bugzilla.usermap</tt>.
+Contains entries of the form <tt class="docutils literal">committer = Bugzilla user</tt>.</p>
+<p>XMLRPC and REST-API access mode configuration:</p>
+<dl class="docutils">
+<dt>bugzilla.bzurl</dt>
+<dd>The base URL for the Bugzilla installation.
+Default <tt class="docutils literal"><span class="pre">http://localhost/bugzilla</span></tt>.</dd>
+<dt>bugzilla.user</dt>
+<dd>The username to use to log into Bugzilla via XMLRPC. Default
+<tt class="docutils literal">bugs</tt>.</dd>
+<dt>bugzilla.password</dt>
+<dd>The password for Bugzilla login.</dd>
+</dl>
+<p>REST-API access mode uses the options listed above as well as:</p>
+<dl class="docutils">
+<dt>bugzilla.apikey</dt>
+<dd>An apikey generated on the Bugzilla instance for api access.
+Using an apikey removes the need to store the user and password
+options.</dd>
+</dl>
+<p>XMLRPC+email access mode uses the XMLRPC access mode configuration items,
+and also:</p>
+<dl class="docutils">
+<dt>bugzilla.bzemail</dt>
+<dd>The Bugzilla email address.</dd>
+</dl>
+<p>In addition, the Mercurial email settings must be configured. See the
+documentation in hgrc(5), sections <tt class="docutils literal">[email]</tt> and <tt class="docutils literal">[smtp]</tt>.</p>
+<p>MySQL access mode configuration:</p>
+<dl class="docutils">
+<dt>bugzilla.host</dt>
+<dd>Hostname of the MySQL server holding the Bugzilla database.
+Default <tt class="docutils literal">localhost</tt>.</dd>
+<dt>bugzilla.db</dt>
+<dd>Name of the Bugzilla database in MySQL. Default <tt class="docutils literal">bugs</tt>.</dd>
+<dt>bugzilla.user</dt>
+<dd>Username to use to access MySQL server. Default <tt class="docutils literal">bugs</tt>.</dd>
+<dt>bugzilla.password</dt>
+<dd>Password to use to access MySQL server.</dd>
+<dt>bugzilla.timeout</dt>
+<dd>Database connection timeout (seconds). Default 5.</dd>
+<dt>bugzilla.bzuser</dt>
+<dd>Fallback Bugzilla user name to record comments with, if changeset
+committer cannot be found as a Bugzilla user.</dd>
+<dt>bugzilla.bzdir</dt>
+<dd>Bugzilla install directory. Used by default notify. Default
+<tt class="docutils literal">/var/www/html/bugzilla</tt>.</dd>
+<dt>bugzilla.notify</dt>
+<dd>The command to run to get Bugzilla to send bug change notification
+emails. Substitutes from a map with 3 keys, <tt class="docutils literal">bzdir</tt>, <tt class="docutils literal">id</tt> (bug
+id) and <tt class="docutils literal">user</tt> (committer bugzilla email). Default depends on
+version; from 2.18 it is &quot;cd %(bzdir)s &amp;&amp; perl -T
+contrib/sendbugmail.pl %(id)s %(user)s&quot;.</dd>
+</dl>
+<p>Activating the extension:</p>
+<pre class="literal-block">
+[extensions]
+bugzilla =
+
+[hooks]
+# run bugzilla hook on every change pulled or pushed in here
+incoming.bugzilla = python:hgext.bugzilla.hook
+</pre>
+<p>Example configurations:</p>
+<p>XMLRPC example configuration. This uses the Bugzilla at
+<tt class="docutils literal"><span class="pre">http://my-project.org/bugzilla</span></tt>, logging in as user
+<tt class="docutils literal"><span class="pre">bugmail&#64;my-project.org</span></tt> with password <tt class="docutils literal">plugh</tt>. It is used with a
+collection of Mercurial repositories in <tt class="docutils literal">/var/local/hg/repos/</tt>,
+with a web interface at <tt class="docutils literal"><span class="pre">http://my-project.org/hg</span></tt>.</p>
+<pre class="literal-block">
+[bugzilla]
+bzurl=http://my-project.org/bugzilla
+user=bugmail&#64;my-project.org
+password=plugh
+version=xmlrpc
+template=Changeset {node|short} in {root|basename}.
+         {hgweb}/{webroot}/rev/{node|short}\n
+         {desc}\n
+strip=5
+
+[web]
+baseurl=http://my-project.org/hg
+</pre>
+<p>XMLRPC+email example configuration. This uses the Bugzilla at
+<tt class="docutils literal"><span class="pre">http://my-project.org/bugzilla</span></tt>, logging in as user
+<tt class="docutils literal"><span class="pre">bugmail&#64;my-project.org</span></tt> with password <tt class="docutils literal">plugh</tt>. It is used with a
+collection of Mercurial repositories in <tt class="docutils literal">/var/local/hg/repos/</tt>,
+with a web interface at <tt class="docutils literal"><span class="pre">http://my-project.org/hg</span></tt>. Bug comments
+are sent to the Bugzilla email address
+<tt class="docutils literal"><span class="pre">bugzilla&#64;my-project.org</span></tt>.</p>
+<pre class="literal-block">
+[bugzilla]
+bzurl=http://my-project.org/bugzilla
+user=bugmail&#64;my-project.org
+password=plugh
+version=xmlrpc+email
+bzemail=bugzilla&#64;my-project.org
+template=Changeset {node|short} in {root|basename}.
+         {hgweb}/{webroot}/rev/{node|short}\n
+         {desc}\n
+strip=5
+
+[web]
+baseurl=http://my-project.org/hg
+
+[usermap]
+user&#64;emaildomain.com=user.name&#64;bugzilladomain.com
+</pre>
+<p>MySQL example configuration. This has a local Bugzilla 3.2 installation
+in <tt class="docutils literal"><span class="pre">/opt/bugzilla-3.2</span></tt>. The MySQL database is on <tt class="docutils literal">localhost</tt>,
+the Bugzilla database name is <tt class="docutils literal">bugs</tt> and MySQL is
+accessed with MySQL username <tt class="docutils literal">bugs</tt> password <tt class="docutils literal">XYZZY</tt>. It is used
+with a collection of Mercurial repositories in <tt class="docutils literal">/var/local/hg/repos/</tt>,
+with a web interface at <tt class="docutils literal"><span class="pre">http://my-project.org/hg</span></tt>.</p>
+<pre class="literal-block">
+[bugzilla]
+host=localhost
+password=XYZZY
+version=3.0
+bzuser=unknown&#64;domain.com
+bzdir=/opt/bugzilla-3.2
+template=Changeset {node|short} in {root|basename}.
+         {hgweb}/{webroot}/rev/{node|short}\n
+         {desc}\n
+strip=5
+
+[web]
+baseurl=http://my-project.org/hg
+
+[usermap]
+user&#64;emaildomain.com=user.name&#64;bugzilladomain.com
+</pre>
+<p>All the above add a comment to the Bugzilla bug record of the form:</p>
+<pre class="literal-block">
+Changeset 3b16791d6642 in repository-name.
+http://my-project.org/hg/repository-name/rev/3b16791d6642
+
+Changeset commit comment. Bug 1234.
+</pre>
+</div>
+</div>
+</body>
+</html>

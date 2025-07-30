@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg clone</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-clone">
+<span id="hg-clone-1"></span>
+<h1 class="title">hg clone</h1>
+<h2 class="subtitle" id="make-a-copy-of-an-existing-repository">make a copy of an existing repository</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg clone [OPTION]... SOURCE [DEST]
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Create a copy of an existing repository in a new directory.</p>
+<p>If no destination directory name is specified, it defaults to the
+basename of the source.</p>
+<p>The location of the source is added to the new repository's
+<tt class="docutils literal">.hg/hgrc</tt> file, as the default to be used for future pulls.</p>
+<p>Only local paths and <tt class="docutils literal"><span class="pre">ssh://</span></tt> URLs are supported as
+destinations. For <tt class="docutils literal"><span class="pre">ssh://</span></tt> destinations, no working directory or
+<tt class="docutils literal">.hg/hgrc</tt> will be created on the remote side.</p>
+<p>If the source repository has a bookmark called '&#64;' set, that
+revision will be checked out in the new repository by default.</p>
+<p>To check out a particular version, use -u/--update, or
+-U/--noupdate to create a clone with no working directory.</p>
+<p>To pull only a subset of changesets, specify one or more revisions
+identifiers with -r/--rev or branches with -b/--branch. The
+resulting clone will contain only the specified changesets and
+their ancestors. These options (or 'clone src#rev dest') imply
+--pull, even for local source repositories.</p>
+<p>In normal clone mode, the remote normalizes repository data into a common
+exchange format and the receiving end translates this data into its local
+storage format. --stream activates a different clone mode that essentially
+copies repository files from the remote with minimal data processing. This
+significantly reduces the CPU cost of a clone both remotely and locally.
+However, it often increases the transferred data size by 30-40%. This can
+result in substantially faster clones where I/O throughput is plentiful,
+especially for larger repositories. A side-effect of --stream clones is
+that storage settings and requirements on the remote are applied locally:
+a modern client may inherit legacy or inefficient storage used by the
+remote or a legacy Mercurial client may not be able to clone from a
+modern Mercurial remote.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Specifying a tag will include the tagged changeset but not the
+changeset containing the tag.</p>
+</div>
+<div class="verbose docutils container">
+<p>For efficiency, hardlinks are used for cloning whenever the
+source and destination are on the same filesystem (note this
+applies only to the repository data, not to the working
+directory). Some filesystems, such as AFS, implement hardlinking
+incorrectly, but do not report errors. In these cases, use the
+--pull option to avoid hardlinking.</p>
+<p>Mercurial will update the working directory to the first applicable
+revision from this list:</p>
+<ol class="loweralpha simple">
+<li>null if -U or the source repository has no changesets</li>
+<li>if -u . and the source repository is local, the first parent of
+the source repository's working directory</li>
+<li>the changeset specified with -u (if a branch name, this means the
+latest head of that branch)</li>
+<li>the changeset specified with -r</li>
+<li>the tipmost head specified with -b</li>
+<li>the tipmost head specified with the url#branch source syntax</li>
+<li>the revision marked with the '&#64;' bookmark, if present</li>
+<li>the tipmost head of the default branch</li>
+<li>tip</li>
+</ol>
+<p>When cloning from servers that support it, Mercurial may fetch
+pre-generated data from a server-advertised URL or inline from the
+same stream. When this is done, hooks operating on incoming changesets
+and changegroups may fire more than once, once for each pre-generated
+bundle and as well as for any additional remaining data. In addition,
+if an error occurs, the repository may be rolled back to a partial
+clone. This behavior may change in future releases.
+See <a class="reference external" href="hg.1.html#-e"><tt class="docutils literal">hg help <span class="pre">-e</span> clonebundles</tt></a> for more.</p>
+<p>Examples:</p>
+<ul>
+<li><p class="first">clone a remote repository to a new directory named hg/:</p>
+<pre class="literal-block">
+hg clone https://www.mercurial-scm.org/repo/hg/
+</pre>
+</li>
+<li><p class="first">create a lightweight local clone:</p>
+<pre class="literal-block">
+hg clone project/ project-feature/
+</pre>
+</li>
+<li><p class="first">clone from an absolute path on an ssh server (note double-slash):</p>
+<pre class="literal-block">
+hg clone ssh://user&#64;server//home/projects/alpha/
+</pre>
+</li>
+<li><p class="first">do a streaming clone while checking out a specified version:</p>
+<pre class="literal-block">
+hg clone --stream http://server/repo -u 1.5
+</pre>
+</li>
+<li><p class="first">create a repository without changesets after a particular revision:</p>
+<pre class="literal-block">
+hg clone -r 04e544 experimental/ good/
+</pre>
+</li>
+<li><p class="first">clone (and track) a particular named branch:</p>
+<pre class="literal-block">
+hg clone https://www.mercurial-scm.org/repo/hg/#stable
+</pre>
+</li>
+</ul>
+</div>
+<p>See <a class="reference external" href="topic-urls.html"><tt class="docutils literal">hg help urls</tt></a> for details on specifying URLs.</p>
+<p>Returns 0 on success.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-U</span>, <span class="option">--noupdate</span></kbd></td>
+<td>the clone will include an empty working directory (only a repository)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-u</span>, <span class="option">--updaterev <var>&lt;REV&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revision, tag, or branch to check out</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>do not clone everything, but include this changeset and its ancestors</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--branch <var>&lt;BRANCH[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>do not clone everything, but include this branch's changesets and their ancestors</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--pull</span></kbd></td>
+<td>use pull protocol to copy metadata</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--uncompressed</span></kbd></td>
+<td>an alias to --stream (DEPRECATED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stream</span></kbd></td>
+<td>clone with minimal data processing</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

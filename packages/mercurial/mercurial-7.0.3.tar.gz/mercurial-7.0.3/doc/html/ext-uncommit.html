@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>uncommit</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="uncommit">
+<span id="ext-uncommit"></span>
+<h1 class="title">uncommit</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#change-manipulation" id="toc-entry-3">Change manipulation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>uncommit part or all of a local changeset (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This command undoes the effect of a local commit, returning the affected
+files to their uncommitted state. This means that files modified, added or
+removed in the changeset will be left unchanged, and so will remain modified,
+added and removed in the working directory.</p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="change-manipulation">
+<h2><a class="toc-backref" href="#contents">Change manipulation</a></h2>
+<div class="section" id="unamend">
+<h3>unamend</h3>
+<p>undo the most recent amend operation on a current changeset:</p>
+<pre class="literal-block">
+hg unamend
+</pre>
+<p>This command will roll back to the previous version of a changeset,
+leaving working directory in state in which it was before running
+<cite>hg amend</cite> (e.g. files modified as part of an amend will be
+marked as modified <cite>hg status</cite>)</p>
+</div>
+<div class="section" id="uncommit-1">
+<h3>uncommit</h3>
+<p>uncommit part or all of a local changeset:</p>
+<pre class="literal-block">
+hg uncommit [OPTION]... [FILE]...
+</pre>
+<p>This command undoes the effect of a local commit, returning the affected
+files to their uncommitted state. This means that files modified or
+deleted in the changeset will be left unchanged, and so will remain
+modified in the working directory.</p>
+<p>If no files are specified, the commit will be pruned, unless --keep is
+given.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--keep</span></kbd></td>
+<td>allow an empty commit after uncommitting</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--allow-dirty-working-copy</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>allow uncommit with outstanding changes</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--note <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>store a note on uncommit</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as commit message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read commit message from file</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the specified date as commit date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-u</span>, <span class="option">--user <var>&lt;USER&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the specified user as committer</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-D</span>, <span class="option">--currentdate</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the current date as commit date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-U</span>, <span class="option">--currentuser</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the current user as committer</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

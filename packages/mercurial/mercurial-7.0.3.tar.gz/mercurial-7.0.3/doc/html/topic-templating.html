@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Template Usage</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="template-usage">
+<span id="topic-templating"></span>
+<h1 class="title">Template Usage</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#keywords" id="toc-entry-1">Keywords</a></li>
+<li><a class="reference internal" href="#filters" id="toc-entry-2">Filters</a></li>
+<li><a class="reference internal" href="#functions" id="toc-entry-3">Functions</a></li>
+<li><a class="reference internal" href="#operators" id="toc-entry-4">Operators</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-5">Aliases</a></li>
+<li><a class="reference internal" href="#examples" id="toc-entry-6">Examples</a></li>
+</ul>
+</div>
+<p id="style"><span id="template"></span><span id="templates"></span><span id="templating"></span>Mercurial allows you to customize output of commands through
+templates. You can either pass in a template or select an existing
+template-style from the command line, via the --template option.</p>
+<p>You can customize output for any &quot;log-like&quot; command: log,
+outgoing, incoming, tip, parents, and heads.</p>
+<p>Some built-in styles are packaged with Mercurial. These can be listed
+with <a class="reference external" href="hg-log.html"><tt class="docutils literal">hg log <span class="pre">--template</span> list</tt></a>. Example usage:</p>
+<pre class="literal-block">
+$ hg log -r1.0::1.1 --template changelog
+</pre>
+<p>A template is a piece of text, with markup to invoke variable
+expansion:</p>
+<pre class="literal-block">
+$ hg log -r1 --template &quot;{node}\n&quot;
+b56ce7b07c52de7d5fd79fb89701ea538af65746
+</pre>
+<div class="section" id="keywords">
+<h1><a class="toc-backref" href="#contents">Keywords</a></h1>
+<p>Strings in curly braces are called keywords. The availability of
+keywords depends on the exact context of the templater. These
+keywords are usually available for templating a log-like command:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">_fast_rank:</th><td class="field-body"><p class="first">the rank of a changeset if cached</p>
+<p>The rank of a revision is the size of the sub-graph it defines as a head.
+Equivalently, the rank of a revision <cite>r</cite> is the size of the set
+<cite>ancestors(r)</cite>, <cite>r</cite> included.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">activebookmark:</th><td class="field-body"><p class="first">String. The active bookmark, if it is associated with the changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">author:</th><td class="field-body"><p class="first">Alias for <tt class="docutils literal">{user}</tt></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">bisect:</th><td class="field-body"><p class="first">String. The changeset bisection status.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">bookmarks:</th><td class="field-body"><p class="first">List of strings. Any bookmarks associated with the
+changeset. Also sets 'active', the name of the active bookmark.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">branch:</th><td class="field-body"><p class="first">String. The name of the branch on which the changeset was
+committed.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">changessincelatesttag:</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body"><p class="first">Integer. All ancestors not in the latest tag.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">children:</th><td class="field-body"><p class="first">List of strings. The children of the changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">date:</th><td class="field-body"><p class="first">Date information. The date when the changeset was committed.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">desc:</th><td class="field-body"><p class="first">String. The text of the changeset description.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">diffstat:</th><td class="field-body"><p class="first">String. Statistics of changes with the following format:
+&quot;modified files: +added/-removed lines&quot;</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">extras:</th><td class="field-body"><p class="first">List of dicts with key, value entries of the 'extras'
+field of this changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">file_adds:</th><td class="field-body"><p class="first">List of strings. Files added by this changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">file_copies:</th><td class="field-body"><p class="first">List of strings. Files copied in this changeset with
+their sources.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">file_copies_switch:</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body"><p class="first">List of strings. Like &quot;file_copies&quot; but displayed
+only if the --copied switch is set.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">file_dels:</th><td class="field-body"><p class="first">List of strings. Files removed by this changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">file_mods:</th><td class="field-body"><p class="first">List of strings. Files modified by this changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">files:</th><td class="field-body"><p class="first">List of strings. All files modified, added, or removed by this
+changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">graphnode:</th><td class="field-body"><p class="first">String. The character representing the changeset node in an ASCII
+revision graph.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">graphwidth:</th><td class="field-body"><p class="first">Integer. The width of the graph drawn by 'log --graph' or zero.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">index:</th><td class="field-body"><p class="first">Integer. The current iteration of the loop. (0 indexed)</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">latesttag:</th><td class="field-body"><p class="first">List of strings. The global tags on the most recent globally
+tagged ancestor of this changeset.  If no such tags exist, the list
+consists of the single string &quot;null&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">latesttagdistance:</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body"><p class="first">Integer. Longest path to the latest tag.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">namespaces:</th><td class="field-body"><p class="first">Dict of lists. Names attached to this changeset per
+namespace.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">negrev:</th><td class="field-body"><p class="first">Integer. The repository-local changeset negative revision number,
+which counts in the opposite direction.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">node:</th><td class="field-body"><p class="first">String. The changeset identification hash, as a 40 hexadecimal
+digit string.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">onelinesummary:</th><td class="field-body"><p class="first">String. A one-line summary for the ctx (not including trailing newline).
+The default template be overridden in command-templates.oneline-summary.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">p1:</th><td class="field-body"><p class="first">Changeset. The changeset's first parent. <tt class="docutils literal">{p1.rev}</tt> for the revision
+number, and <tt class="docutils literal">{p1.node}</tt> for the identification hash.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">p2:</th><td class="field-body"><p class="first">Changeset. The changeset's second parent. <tt class="docutils literal">{p2.rev}</tt> for the revision
+number, and <tt class="docutils literal">{p2.node}</tt> for the identification hash.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">parents:</th><td class="field-body"><p class="first">List of strings. The parents of the changeset in &quot;rev:node&quot;
+format. If the changeset has only one &quot;natural&quot; parent (the predecessor
+revision) nothing is shown.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">peerurls:</th><td class="field-body"><p class="first">A dictionary of repository locations defined in the [paths] section
+of your configuration file.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">phase:</th><td class="field-body"><p class="first">String. The changeset phase name.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">reporoot:</th><td class="field-body"><p class="first">String. The root directory of the current repository.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">rev:</th><td class="field-body"><p class="first">Integer. The repository-local changeset revision number.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">subrepos:</th><td class="field-body"><p class="first">List of strings. Updated subrepositories in the changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">tags:</th><td class="field-body"><p class="first">List of strings. Any tags associated with the changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">termwidth:</th><td class="field-body"><p class="first">Integer. The width of the current terminal.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">user:</th><td class="field-body"><p class="first">String. The unmodified author of the changeset.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">verbosity:</th><td class="field-body"><p class="first last">String. The current output verbosity in 'debug', 'quiet', 'verbose',
+or ''.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The &quot;date&quot; keyword does not produce human-readable output. If you
+want to use a date in your output, you can use a filter to process
+it. Filters are functions which return a string based on the input
+variable. Be sure to use the stringify filter first when you're
+applying a string-input filter to a list-like input variable.
+You can also use a chain of filters to get the desired output:</p>
+<pre class="literal-block">
+$ hg tip --template &quot;{date|isodate}\n&quot;
+2008-08-21 18:22 +0000
+</pre>
+</div>
+<div class="section" id="filters">
+<h1><a class="toc-backref" href="#contents">Filters</a></h1>
+<p>List of filters:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">addbreaks:</th><td class="field-body"><p class="first">Any text. Add an XHTML &quot;&lt;br /&gt;&quot; tag before the end of
+every line except the last.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">age:</th><td class="field-body"><p class="first">Date. Returns a human-readable date/time difference between the
+given date/time and the current date/time.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">basename:</th><td class="field-body"><p class="first">Any text. Treats the text as a path, and returns the last
+component of the path after splitting by the path separator.
+For example, &quot;foo/bar/baz&quot; becomes &quot;baz&quot; and &quot;foo/bar//&quot; becomes &quot;&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">cbor:</th><td class="field-body"><p class="first">Any object. Serializes the object to CBOR bytes.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">commondir:</th><td class="field-body"><p class="first">List of text. Treats each list item as file name with /
+as path separator and returns the longest common directory
+prefix shared by all list items.
+Returns the empty string if no common prefix exists.</p>
+<p>The list items are not normalized, i.e. &quot;foo/../bar&quot; is handled as
+file &quot;bar&quot; in the directory &quot;foo/..&quot;. Leading slashes are ignored.</p>
+<p>For example, [&quot;foo/bar/baz&quot;, &quot;foo/baz/bar&quot;] becomes &quot;foo&quot; and
+[&quot;foo/bar&quot;, &quot;baz&quot;] becomes &quot;&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">count:</th><td class="field-body"><p class="first">List or text. Returns the length as an integer.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">dirname:</th><td class="field-body"><p class="first">Any text. Treats the text as a path, and strips the last
+component of the path after splitting by the path separator.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">domain:</th><td class="field-body"><p class="first">Any text. Finds the first string that looks like an email
+address, and extracts just the domain component. Example: <tt class="docutils literal">User
+&lt;user&#64;example.com&gt;</tt> becomes <tt class="docutils literal">example.com</tt>.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">email:</th><td class="field-body"><p class="first">Any text. Extracts the first string that looks like an email
+address. Example: <tt class="docutils literal">User &lt;user&#64;example.com&gt;</tt> becomes
+<tt class="docutils literal">user&#64;example.com</tt>.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">emailuser:</th><td class="field-body"><p class="first">Any text. Returns the user portion of an email address.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">escape:</th><td class="field-body"><p class="first">Any text. Replaces the special XML/XHTML characters &quot;&amp;&quot;, &quot;&lt;&quot;
+and &quot;&gt;&quot; with XML entities, and filters out NUL characters.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">fill68:</th><td class="field-body"><p class="first">Any text. Wraps the text to fit in 68 columns.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">fill76:</th><td class="field-body"><p class="first">Any text. Wraps the text to fit in 76 columns.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">firstline:</th><td class="field-body"><p class="first">Any text. Returns the first line of text.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">hex:</th><td class="field-body"><p class="first">Any text. Convert a binary Mercurial node identifier into
+its long hexadecimal representation.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">hgdate:</th><td class="field-body"><p class="first">Date. Returns the date as a pair of numbers: &quot;1157407993
+25200&quot; (Unix timestamp, timezone offset).</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">isodate:</th><td class="field-body"><p class="first">Date. Returns the date in ISO 8601 format: &quot;2009-08-18 13:00
++0200&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">isodatesec:</th><td class="field-body"><p class="first">Date. Returns the date in ISO 8601 format, including
+seconds: &quot;2009-08-18 13:00:13 +0200&quot;. See also the rfc3339date
+filter.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">json:</th><td class="field-body"><p class="first">Any object. Serializes the object to a JSON formatted text.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">lower:</th><td class="field-body"><p class="first">Any text. Converts the text to lowercase.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">nonempty:</th><td class="field-body"><p class="first">Any text. Returns '(none)' if the string is empty.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">obfuscate:</th><td class="field-body"><p class="first">Any text. Returns the input text rendered as a sequence of
+XML entities.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">person:</th><td class="field-body"><p class="first">Any text. Returns the name before an email address,
+interpreting it as per RFC 5322.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">reverse:</th><td class="field-body"><p class="first">List. Reverses the order of list items.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">revescape:</th><td class="field-body"><p class="first">Any text. Escapes all &quot;special&quot; characters, except &#64;.
+Forward slashes are escaped twice to prevent web servers from prematurely
+unescaping them. For example, &quot;&#64;foo bar/baz&quot; becomes &quot;&#64;foo%20bar%252Fbaz&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">rfc3339date:</th><td class="field-body"><p class="first">Date. Returns a date using the Internet date format
+specified in RFC 3339: &quot;2009-08-18T13:00:13+02:00&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">rfc822date:</th><td class="field-body"><p class="first">Date. Returns a date using the same format used in email
+headers: &quot;Tue, 18 Aug 2009 13:00:13 +0200&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">short:</th><td class="field-body"><p class="first">Changeset hash. Returns the short form of a changeset hash,
+i.e. a 12 hexadecimal digit string.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">shortbisect:</th><td class="field-body"><p class="first">Any text. Treats <cite>label</cite> as a bisection status, and
+returns a single-character representing the status (G: good, B: bad,
+S: skipped, U: untested, I: ignored). Returns single space if <cite>text</cite>
+is not a valid bisection status.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">shortdate:</th><td class="field-body"><p class="first">Date. Returns a date like &quot;2006-09-18&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">slashpath:</th><td class="field-body"><p class="first">Any text. Replaces the native path separator with slash.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">splitlines:</th><td class="field-body"><p class="first">Any text. Split text into a list of lines.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">stringify:</th><td class="field-body"><p class="first">Any type. Turns the value into text by converting values into
+text and concatenating them.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">stripdir:</th><td class="field-body"><p class="first">Treat the text as path and strip a directory level, if
+possible. For example, &quot;foo&quot; and &quot;foo/bar&quot; becomes &quot;foo&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">tabindent:</th><td class="field-body"><p class="first">Any text. Returns the text, with every non-empty line
+except the first starting with a tab character.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">upper:</th><td class="field-body"><p class="first">Any text. Converts the text to uppercase.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">urlescape:</th><td class="field-body"><p class="first">Any text. Escapes all &quot;special&quot; characters. For example,
+&quot;foo bar&quot; becomes &quot;foo%20bar&quot;.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">user:</th><td class="field-body"><p class="first">Any text. Returns a short representation of a user name or email
+address.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">utf8:</th><td class="field-body"><p class="first last">Any text. Converts from the local character encoding to UTF-8.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note that a filter is nothing more than a function call, i.e.
+<tt class="docutils literal">expr|filter</tt> is equivalent to <tt class="docutils literal">filter(expr)</tt>.</p>
+</div>
+<div class="section" id="functions">
+<h1><a class="toc-backref" href="#contents">Functions</a></h1>
+<p>In addition to filters, there are some basic built-in functions:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">config(section, name[, default]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Returns the requested hgrc config option as a string.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">configbool(section, name[, default]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Returns the requested hgrc config option as a boolean.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">configint(section, name[, default]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Returns the requested hgrc config option as an integer.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">date(date[, fmt]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Format a date. The format string uses the Python strftime format.
+The default is a Unix date format, including the timezone:
+&quot;Mon Sep 04 15:13:13 2006 0700&quot;.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">dict([[key=]value...]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Construct a dict from key-value pairs. A key may be omitted if
+a value expression can provide an unambiguous name.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">diff([includepattern [, excludepattern]]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Show a diff, optionally
+specifying files to include or exclude.</td>
+</tr>
+<tr class="field"><th class="field-name">files(pattern):</th><td class="field-body">All files of the current changeset matching the pattern. See
+<a class="reference external" href="topic-patterns.html"><tt class="docutils literal">hg help patterns</tt></a>.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">fill(text[, width[, initialident[, hangindent]]]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Fill many
+paragraphs with optional indentation. See the &quot;fill&quot; filter.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">filter(iterable[, expr]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Remove empty elements from a list or a dict. If expr specified, it's
+applied to each element to test emptiness.</td>
+</tr>
+<tr class="field"><th class="field-name">get(dict, key):</th><td class="field-body">Get an attribute/key from an object. Some keywords
+are complex types. This function allows you to obtain the value of an
+attribute on these types.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">if(expr, then[, else]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Conditionally execute based on the result of
+an expression.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">ifcontains(needle, haystack, then[, else]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Conditionally execute based
+on whether the item &quot;needle&quot; is in &quot;haystack&quot;.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">ifeq(expr1, expr2, then[, else]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Conditionally execute based on
+whether 2 items are equivalent.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">indent(text, indentchars[, firstline]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Indents all non-empty lines
+with the characters given in the indentchars string. An optional
+third parameter will override the indent for the first line only
+if present.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">join(list, sep):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Join items in a list with a delimiter.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">label(label, expr):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Apply a label to generated content. Content with a label
+applied can result in additional post-processing, such as
+automatic colorization. In order to receive effects, labels must
+have a dot, such as <cite>log.secret</cite> or <cite>branch.active</cite>.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">latesttag([pattern]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">The global tags matching the given pattern on the
+most recent globally tagged ancestor of this changeset.
+If no such tags exist, the &quot;{tag}&quot; template resolves to
+the string &quot;null&quot;. See <a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a> for the pattern
+syntax.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">localdate(date[, tz]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Converts a date to the specified timezone.
+The default is local date.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">mailmap(author):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Return the author, updated according to the value
+set in the .mailmap file</td>
+</tr>
+<tr class="field"><th class="field-name">max(iterable):</th><td class="field-body">Return the max of an iterable</td>
+</tr>
+<tr class="field"><th class="field-name">min(iterable):</th><td class="field-body">Return the min of an iterable</td>
+</tr>
+<tr class="field"><th class="field-name">mod(a, b):</th><td class="field-body">Calculate a mod b such that a / b + a mod b == a</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">pad(text, width[, fillchar=' '[, left=False[, truncate=False]]]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Pad text with a
+fill character.</td>
+</tr>
+<tr class="field"><th class="field-name">relpath(path):</th><td class="field-body">Convert a repository-absolute path into a filesystem path relative to
+the current working directory.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">revset(query[, formatargs...]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Execute a revision set query. See
+<a class="reference external" href="hg.1.html#revset"><tt class="docutils literal">hg help revset</tt></a>.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">rstdoc(text, style):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Format reStructuredText.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">search(pattern, text):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Look for the first text matching the regular expression pattern.
+Groups are accessible as <tt class="docutils literal">{1}</tt>, <tt class="docutils literal">{2}</tt>, ... in %-mapped template.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">separate(sep, args...):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Add a separator between non-empty arguments.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">shortest(node, minlength=4):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Obtain the shortest representation of
+a node.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">startswith(pattern, text):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Returns the value from the &quot;text&quot; argument
+if it begins with the content from the &quot;pattern&quot; argument.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">strip(text[, chars]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Strip characters from a string. By default,
+strips all leading and trailing whitespace.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">sub(pattern, replacement, expression):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Perform text substitution
+using regular expressions.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">subsetparents(rev, revset):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Look up parents of the rev in the sub graph given by the revset.</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">word(number, text[, separator]):</th></tr>
+<tr class="field"><td>&nbsp;</td><td class="field-body">Return the nth word from a string.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="operators">
+<h1><a class="toc-backref" href="#contents">Operators</a></h1>
+<p>We provide a limited set of infix arithmetic operations on integers:</p>
+<pre class="literal-block">
++ for addition
+- for subtraction
+* for multiplication
+/ for floor division (division rounded to integer nearest -infinity)
+</pre>
+<p>Division fulfills the law x = x / y + mod(x, y).</p>
+<p>Also, for any expression that returns a list, there is a list operator:</p>
+<pre class="literal-block">
+expr % &quot;{template}&quot;
+</pre>
+<p>As seen in the above example, <tt class="docutils literal">{template}</tt> is interpreted as a template.
+To prevent it from being interpreted, you can use an escape character <tt class="docutils literal">\{</tt>
+or a raw string prefix, <tt class="docutils literal"><span class="pre">r'...'</span></tt>.</p>
+<p>The dot operator can be used as a shorthand for accessing a sub item:</p>
+<ul class="simple">
+<li><tt class="docutils literal">expr.member</tt> is roughly equivalent to <tt class="docutils literal">expr % '{member}'</tt> if <tt class="docutils literal">expr</tt>
+returns a non-list/dict. The returned value is not stringified.</li>
+<li><tt class="docutils literal">dict.key</tt> is identical to <tt class="docutils literal">get(dict, 'key')</tt>.</li>
+</ul>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<p>New keywords and functions can be defined in the <tt class="docutils literal">templatealias</tt> section of
+a Mercurial configuration file:</p>
+<pre class="literal-block">
+&lt;alias&gt; = &lt;definition&gt;
+</pre>
+<p>Arguments of the form <cite>a1</cite>, <cite>a2</cite>, etc. are substituted from the alias into
+the definition.</p>
+<p>For example,</p>
+<pre class="literal-block">
+[templatealias]
+r = rev
+rn = &quot;{r}:{node|short}&quot;
+leftpad(s, w) = pad(s, w, ' ', True)
+</pre>
+<p>defines two symbol aliases, <tt class="docutils literal">r</tt> and <tt class="docutils literal">rn</tt>, and a function alias
+<tt class="docutils literal">leftpad()</tt>.</p>
+<p>It's also possible to specify complete template strings, using the
+<tt class="docutils literal">templates</tt> section. The syntax used is the general template string syntax.</p>
+<p>For example,</p>
+<pre class="literal-block">
+[templates]
+nodedate = &quot;{node|short}: {date(date, &quot;%Y-%m-%d&quot;)}\n&quot;
+</pre>
+<p>defines a template, <tt class="docutils literal">nodedate</tt>, which can be called like:</p>
+<pre class="literal-block">
+$ hg log -r . -Tnodedate
+</pre>
+<p>A template defined in <tt class="docutils literal">templates</tt> section can also be referenced from
+another template:</p>
+<pre class="literal-block">
+$ hg log -r . -T &quot;{rev} {nodedate}&quot;
+</pre>
+<p>but be aware that the keywords cannot be overridden by templates. For example,
+a template defined as <tt class="docutils literal">templates.rev</tt> cannot be referenced as <tt class="docutils literal">{rev}</tt>.</p>
+<p>A template defined in <tt class="docutils literal">templates</tt> section may have sub templates which
+are inserted before/after/between items:</p>
+<pre class="literal-block">
+[templates]
+myjson = ' {dict(rev, node|short)|json}'
+myjson:docheader = '\{\n'
+myjson:docfooter = '\n}\n'
+myjson:separator = ',\n'
+</pre>
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="#contents">Examples</a></h1>
+<p>Some sample command line templates:</p>
+<ul>
+<li><p class="first">Format lists, e.g. files:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;files:\n{files % '  {file}\n'}&quot;
+</pre>
+</li>
+<li><p class="first">Join the list of files with a &quot;, &quot;:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;files: {join(files, ', ')}\n&quot;
+</pre>
+</li>
+<li><p class="first">Join the list of files ending with &quot;.py&quot; with a &quot;, &quot;:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;pythonfiles: {join(files('**.py'), ', ')}\n&quot;
+</pre>
+</li>
+<li><p class="first">Separate non-empty arguments by a &quot; &quot;:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;{separate(' ', node, bookmarks, tags}\n&quot;
+</pre>
+</li>
+<li><p class="first">Modify each line of a commit description:</p>
+<pre class="literal-block">
+$ hg log --template &quot;{splitlines(desc) % '**** {line}\n'}&quot;
+</pre>
+</li>
+<li><p class="first">Format date:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;{date(date, '%Y')}\n&quot;
+</pre>
+</li>
+<li><p class="first">Display date in UTC:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;{localdate(date, 'UTC')|date}\n&quot;
+</pre>
+</li>
+<li><p class="first">Output the description set to a fill-width of 30:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;{fill(desc, 30)}&quot;
+</pre>
+</li>
+<li><p class="first">Use a conditional to test for the default branch:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;{ifeq(branch, 'default', 'on the main branch',
+'on branch {branch}')}\n&quot;
+</pre>
+</li>
+<li><p class="first">Append a newline if not empty:</p>
+<pre class="literal-block">
+$ hg tip --template &quot;{if(author, '{author}\n')}&quot;
+</pre>
+</li>
+<li><p class="first">Label the output for use with the color extension:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;{label('changeset.{phase}', node|short)}\n&quot;
+</pre>
+</li>
+<li><p class="first">Invert the firstline filter, i.e. everything but the first line:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;{sub(r'^.*\n?\n?', '', desc)}\n&quot;
+</pre>
+</li>
+<li><p class="first">Display the contents of the 'extra' field, one per line:</p>
+<pre class="literal-block">
+$ hg log -r 0 --template &quot;{join(extras, '\n')}\n&quot;
+</pre>
+</li>
+<li><p class="first">Mark the active bookmark with '*':</p>
+<pre class="literal-block">
+$ hg log --template &quot;{bookmarks % '{bookmark}{ifeq(bookmark, active, '*')} '}\n&quot;
+</pre>
+</li>
+<li><p class="first">Find the previous release candidate tag, the distance and changes since the tag:</p>
+<pre class="literal-block">
+$ hg log -r . --template &quot;{latesttag('re:^.*-rc$') % '{tag}, {changes}, {distance}'}\n&quot;
+</pre>
+</li>
+<li><p class="first">Mark the working copy parent with '&#64;':</p>
+<pre class="literal-block">
+$ hg log --template &quot;{ifcontains(rev, revset('.'), '&#64;')}\n&quot;
+</pre>
+</li>
+<li><p class="first">Show details of parent revisions:</p>
+<pre class="literal-block">
+$ hg log --template &quot;{revset('parents(%d)', rev) % '{desc|firstline}\n'}&quot;
+</pre>
+</li>
+<li><p class="first">Show only commit descriptions that start with &quot;template&quot;:</p>
+<pre class="literal-block">
+$ hg log --template &quot;{startswith('template', firstline(desc))}\n&quot;
+</pre>
+</li>
+<li><p class="first">Print the first word of each line of a commit message:</p>
+<pre class="literal-block">
+$ hg log --template &quot;{word(0, desc)}\n&quot;
+</pre>
+</li>
+</ul>
+</div>
+</div>
+</body>
+</html>

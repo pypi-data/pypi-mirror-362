@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg pull</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-pull">
+<span id="hg-pull-1"></span>
+<h1 class="title">hg pull</h1>
+<h2 class="subtitle" id="pull-changes-from-the-specified-source">pull changes from the specified source</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg pull [-u] [-f] [-r REV]... [-e CMD] [--remotecmd CMD] [SOURCE]...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Pull changes from a remote repository to a local one.</p>
+<p>This finds all changes from the repository at the specified path
+or URL and adds them to a local repository (the current one unless
+-R is specified). By default, this does not update the copy of the
+project in the working directory.</p>
+<p>When cloning from servers that support it, Mercurial may fetch
+pre-generated data. When this is done, hooks operating on incoming
+changesets and changegroups may fire more than once, once for each
+pre-generated bundle and as well as for any additional remaining
+data. See <a class="reference external" href="hg.1.html#-e"><tt class="docutils literal">hg help <span class="pre">-e</span> clonebundles</tt></a> for more.</p>
+<p>Use <a class="reference external" href="hg-incoming.html"><tt class="docutils literal">hg incoming</tt></a> if you want to see what would have been added
+by a pull at the time you issued this command. If you then decide
+to add those changes to the repository, you should use <a class="reference external" href="hg-pull.html"><tt class="docutils literal">hg pull
+<span class="pre">-r</span> X</tt></a> where <tt class="docutils literal">X</tt> is the last changeset listed by <a class="reference external" href="hg-incoming.html"><tt class="docutils literal">hg incoming</tt></a>.</p>
+<p>If SOURCE is omitted, the 'default' path will be used.
+See <a class="reference external" href="topic-urls.html"><tt class="docutils literal">hg help urls</tt></a> for more information.</p>
+<p>If multiple sources are specified, they will be pulled sequentially as if
+the command was run multiple time. If --update is specify and the command
+will stop at the first failed --update.</p>
+<p>Specifying bookmark as <tt class="docutils literal">.</tt> is equivalent to specifying the active
+bookmark's name.</p>
+<div class="verbose docutils container">
+One can use the <cite>--remote-hidden</cite> flag to pull changesets
+hidden on the remote. This flag is &quot;best effort&quot;, and will only
+work if the server supports the feature and is configured to
+allow the user to access hidden changesets. This option is
+experimental and backwards compatibility is not garanteed.</div>
+<p>Returns 0 on success, 1 if an update had unresolved files.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-u</span>, <span class="option">--update</span></kbd></td>
+<td>update to new branch head if new descendants were pulled</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>run even when remote repository is unrelated</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--confirm</span></kbd></td>
+<td>confirm pull before applying changes</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>a remote changeset intended to be added</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--bookmark <var>&lt;BOOKMARK[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>bookmark to pull</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--branch <var>&lt;BRANCH[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>a specific branch you would like to pull</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remote-hidden</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include changesets hidden on the remote (EXPERIMENTAL)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

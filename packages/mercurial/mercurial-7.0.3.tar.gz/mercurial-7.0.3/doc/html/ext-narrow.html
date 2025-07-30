@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>narrow</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="narrow">
+<span id="ext-narrow"></span>
+<h1 class="title">narrow</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#commands" id="toc-entry-1">Commands</a><ul>
+<li><a class="reference internal" href="#repository-maintenance" id="toc-entry-2">Repository maintenance</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>create clones which fetch history data for subset of files (EXPERIMENTAL)</p>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="repository-maintenance">
+<h2><a class="toc-backref" href="#contents">Repository maintenance</a></h2>
+<div class="section" id="tracked">
+<h3>tracked</h3>
+<p>show or change the current narrowspec:</p>
+<pre class="literal-block">
+hg tracked [OPTIONS]... [REMOTE]
+</pre>
+<p>With no argument, shows the current narrowspec entries, one per line. Each
+line will be prefixed with 'I' or 'X' for included or excluded patterns,
+respectively.</p>
+<p>The narrowspec is comprised of expressions to match remote files and/or
+directories that should be pulled into your client.
+The narrowspec has <em>include</em> and <em>exclude</em> expressions, with excludes always
+trumping includes: that is, if a file matches an exclude expression, it will
+be excluded even if it also matches an include expression.
+Excluding files that were never included has no effect.</p>
+<p>Each included or excluded entry is in the format described by
+'hg help patterns'.</p>
+<p>The options allow you to add or remove included and excluded expressions.</p>
+<p>If --clear is specified, then all previous includes and excludes are DROPPED
+and replaced by the new ones specified to --addinclude and --addexclude.
+If --clear is specified without any further options, the narrowspec will be
+empty and will not match any files.</p>
+<p>If --auto-remove-includes is specified, then those includes that don't match
+any files modified by currently visible local commits (those not shared by
+the remote) will be added to the set of explicitly specified includes to
+remove.</p>
+<p>--import-rules accepts a path to a file containing rules, allowing you to
+add --addinclude, --addexclude rules in bulk. Like the other include and
+exclude switches, the changes are applied immediately.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--addinclude <var>&lt;VALUE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>new paths to include</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--removeinclude <var>&lt;VALUE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>old paths to no longer include</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--auto-remove-includes</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>automatically choose unused includes to remove</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--addexclude <var>&lt;VALUE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>new paths to exclude</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--import-rules <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>import narrowspecs from a file</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--removeexclude <var>&lt;VALUE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>old paths to no longer exclude</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--clear</span></kbd></td>
+<td>whether to replace the existing narrowspec</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--force-delete-local-changes</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>forces deletion of local changes when narrowing</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--backup</span></kbd></td>
+<td>back up local changes when narrowing (default: True)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--update-working-copy</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>update working copy when the store has changed</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Rust in Mercurial</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="rust-in-mercurial">
+<span id="topic-rust"></span>
+<h1 class="title">Rust in Mercurial</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#word-of-caution" id="toc-entry-1">Word of Caution</a></li>
+<li><a class="reference internal" href="#compatibility" id="toc-entry-2">Compatibility</a></li>
+<li><a class="reference internal" href="#features" id="toc-entry-3">Features</a></li>
+<li><a class="reference internal" href="#checking-for-rust" id="toc-entry-4">Checking for Rust</a></li>
+<li><a class="reference internal" href="#installing" id="toc-entry-5">Installing</a><ul>
+<li><a class="reference internal" href="#using-pip" id="toc-entry-6">Using pip</a></li>
+<li><a class="reference internal" href="#using-pipx" id="toc-entry-7">Using pipx</a></li>
+<li><a class="reference internal" href="#from-your-distribution" id="toc-entry-8">From your distribution</a></li>
+<li><a class="reference internal" href="#from-source" id="toc-entry-9">From source</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#msrv" id="toc-entry-10">MSRV</a></li>
+<li><a class="reference internal" href="#rhg-1" id="toc-entry-11">rhg</a></li>
+<li><a class="reference internal" href="#contributing" id="toc-entry-12">Contributing</a></li>
+</ul>
+</div>
+<p id="rhg"><span id="rustext"></span><span id="rust"></span>Mercurial can be augmented with Rust extensions for speeding up certain
+operations.</p>
+<div class="section" id="word-of-caution">
+<h1><a class="toc-backref" href="#contents">Word of Caution</a></h1>
+<p>Using the Rust extension might result in the use of various repository formats
+that are not supported by non-Rust mercurial. When using a Mercurial
+without Rust support on the same repositories, you might need to downgrade your
+repository formats and/or activate cripplingly slow paths for compatibility.
+For details, see:</p>
+<blockquote>
+<ul class="simple">
+<li><a class="reference external" href="hgrc.5.html#format"><tt class="docutils literal">hg help <span class="pre">config.format.use-persistent-nodemap</span></tt></a></li>
+<li><a class="reference external" href="hgrc.5.html#format"><tt class="docutils literal">hg help <span class="pre">config.format.use-dirstate-v2</span></tt></a></li>
+</ul>
+</blockquote>
+<p>In addition, while the tests are run with the Rust code, there might be
+subtle undetected divergences from the historical non-Rust code. So keep
+your eyes open and report any oddity. Rust is not considered a first class
+citizen to the project yet.</p>
+</div>
+<div class="section" id="compatibility">
+<h1><a class="toc-backref" href="#contents">Compatibility</a></h1>
+<p>Though the Rust extensions are only tested by the project under Linux, users of
+MacOS, FreeBSD and other UNIX-likes have been using the Rust extensions. Your
+mileage may vary, but by all means do give us feedback or signal your interest
+for better support.</p>
+<p>For compatibility with non-Rust version of Mercurial check the previous &quot;Word of
+Caution&quot; section.</p>
+<p>No Rust extensions are available for Windows at this time.</p>
+</div>
+<div class="section" id="features">
+<h1><a class="toc-backref" href="#contents">Features</a></h1>
+<p>The following operations are sped up when using Rust:</p>
+<blockquote>
+<ul class="simple">
+<li>discovery of differences between repositories (pull/push)</li>
+<li>nodemap (see <a class="reference external" href="hgrc.5.html#format"><tt class="docutils literal">hg help <span class="pre">config.format.use-persistent-nodemap</span></tt></a>)</li>
+<li>all commands using the dirstate (status, commit, diff, add, update, etc.)</li>
+<li>dirstate-v2 (see <a class="reference external" href="hgrc.5.html#format"><tt class="docutils literal">hg help <span class="pre">config.format.use-dirstate-v2</span></tt></a>)</li>
+<li>iteration over ancestors in a graph</li>
+</ul>
+</blockquote>
+<p>More features are in the works, and improvements on the above listed are still
+in progress. For more experimental work see the &quot;rhg&quot; section.</p>
+</div>
+<div class="section" id="checking-for-rust">
+<h1><a class="toc-backref" href="#contents">Checking for Rust</a></h1>
+<p>You may already have the Rust extensions depending on how you install
+Mercurial:</p>
+<pre class="literal-block">
+$ hg debuginstall | grep -i rust
+checking Rust extensions (installed)
+checking module policy (rust+c-allow)
+</pre>
+<p>If those lines don't even exist, you're using an old version of <cite>hg</cite> which does
+not have any Rust extensions yet.</p>
+</div>
+<div class="section" id="installing">
+<h1><a class="toc-backref" href="#contents">Installing</a></h1>
+<p>You will need <cite>cargo</cite> to be in your <cite>$PATH</cite>. See the &quot;MSRV&quot; section for which
+version to use.</p>
+<div class="section" id="using-pip">
+<h2><a class="toc-backref" href="#contents">Using pip</a></h2>
+<p>Users of <cite>pip</cite> can install the Rust extensions with the following commands:</p>
+<pre class="literal-block">
+$ pip cache remove mercurial
+$ pip install mercurial -v \
+      --config-settings --global-option=--rust \
+      --no-binary mercurial --force
+</pre>
+<p><cite>pip cache remove</cite> and <cite>--no-binary</cite> are there to tell pip to not use the
+pre-compiled wheels that are missing rust support. This might take a couple
+of minutes because you're compiling everything.</p>
+<p>See the &quot;Checking for Rust&quot; section to see if the install succeeded.</p>
+</div>
+<div class="section" id="using-pipx">
+<h2><a class="toc-backref" href="#contents">Using pipx</a></h2>
+<p>Using pipx is an efficient way to get an isolated installation of mercurial
+available for a user or globally.</p>
+<blockquote>
+<dl class="docutils">
+<dt>$ pipx install mercurial </dt>
+<dd>--pip-args '--no-cache-dir --config-settings --global-option=--rust --no-binary=mercurial'</dd>
+</dl>
+</blockquote>
+<p>You can then add extensions to that install using</p>
+<blockquote>
+$ pipx inject mercurial hg-foo</blockquote>
+</div>
+<div class="section" id="from-your-distribution">
+<h2><a class="toc-backref" href="#contents">From your distribution</a></h2>
+<p>Some distributions are shipping Mercurial with Rust extensions enabled and
+pre-compiled (meaning you won't have to install <cite>cargo</cite>), or allow you to
+specify an install flag. Check with your specific distribution for how to do
+that, or ask their team to add support for hg+Rust!</p>
+</div>
+<div class="section" id="from-source">
+<h2><a class="toc-backref" href="#contents">From source</a></h2>
+<p>Please refer to the <cite>rust/README.rst</cite> file in the Mercurial repository for
+instructions on how to install from source.</p>
+</div>
+</div>
+<div class="section" id="msrv">
+<h1><a class="toc-backref" href="#contents">MSRV</a></h1>
+<p>The minimum supported Rust version is defined in <cite>rust/clippy.toml</cite>.
+The project's policy is to keep it at or below the version from Debian testing,
+to make the distributions' job easier.</p>
+</div>
+<div class="section" id="rhg-1">
+<h1><a class="toc-backref" href="#contents">rhg</a></h1>
+<p>There exists an experimental pure-Rust version of Mercurial called <cite>rhg</cite> with a
+fallback mechanism for unsupported invocations. It allows for much faster
+execution of certain commands while adding no discernable overhead for the rest.</p>
+<p>The only way of trying it out is by building it from source. Please refer to
+<cite>rust/README.rst</cite> in the Mercurial repository.</p>
+<p>See <cite>hg help config.rhg</cite> for configuration options.</p>
+</div>
+<div class="section" id="contributing">
+<h1><a class="toc-backref" href="#contents">Contributing</a></h1>
+<p>If you would like to help the Rust endeavor, please refer to <cite>rust/README.rst</cite>
+in the Mercurial repository.</p>
+</div>
+</div>
+</body>
+</html>

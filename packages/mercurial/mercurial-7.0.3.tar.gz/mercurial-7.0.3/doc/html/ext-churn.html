@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>churn</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="churn">
+<span id="ext-churn"></span>
+<h1 class="title">churn</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#commands" id="toc-entry-1">Commands</a><ul>
+<li><a class="reference internal" href="#repository-maintenance" id="toc-entry-2">Repository maintenance</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>command to display statistics about repository history</p>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="repository-maintenance">
+<h2><a class="toc-backref" href="#contents">Repository maintenance</a></h2>
+<div class="section" id="churn-1">
+<h3>churn</h3>
+<p>histogram of changes to the repository:</p>
+<pre class="literal-block">
+hg churn [-d DATE] [-r REV] [--aliases FILE] [FILE]
+</pre>
+<p>This command will display a histogram representing the number
+of changed lines or revisions, grouped according to the given
+template. The default template will group changes by author.
+The --dateformat option may be used to group the results by
+date instead.</p>
+<p>Statistics are based on the number of changed lines, or
+alternatively the number of matching revisions if the
+--changesets option is specified.</p>
+<p>Examples:</p>
+<pre class="literal-block">
+# display count of changed lines for every committer
+hg churn -T &quot;{author|email}&quot;
+
+# display daily activity graph
+hg churn -f &quot;%H&quot; -s -c
+
+# display activity of developers by month
+hg churn -f &quot;%Y-%m&quot; -s -c
+
+# display count of lines changed in every year
+hg churn -f &quot;%Y&quot; -s
+
+# display count of lines changed in a time range
+hg churn -d &quot;2020-04 to 2020-09&quot;
+</pre>
+<p>It is possible to map alternate email addresses to a main address
+by providing a file using the following format:</p>
+<pre class="literal-block">
+&lt;alias email&gt; = &lt;actual email&gt;
+</pre>
+<p>Such a file may be specified with the --aliases option, otherwise
+a .hgchurn file will be looked for in the working directory root.
+Aliases will be split from the rightmost &quot;=&quot;.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>count rate for the specified revision or revset</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>count rate for revisions matching date spec</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-t</span>, <span class="option">--oldtemplate <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>template to group changesets (DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>template to group changesets (default: {author|email})</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-f</span>, <span class="option">--dateformat <var>&lt;FORMAT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>strftime-compatible format for grouping by date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-c</span>, <span class="option">--changesets</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>count rate by number of changesets</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--sort</span></kbd></td>
+<td>sort by key (default: sort by count)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--diffstat</span></kbd></td>
+<td>display added/removed lines separately</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--aliases <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>file with email aliases</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

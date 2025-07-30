@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>remotefilelog</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="remotefilelog">
+<span id="ext-remotefilelog"></span>
+<h1 class="title">remotefilelog</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#repository-maintenance" id="toc-entry-3">Repository maintenance</a></li>
+<li><a class="reference internal" href="#uncategorized-commands" id="toc-entry-4">Uncategorized commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>remotefilelog causes Mercurial to lazilly fetch file contents (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension is HIGHLY EXPERIMENTAL. There are NO BACKWARDS COMPATIBILITY
+GUARANTEES. This means that repositories created with this extension may
+only be usable with the exact version of this extension/Mercurial that was
+used. The extension attempts to enforce this in order to prevent repository
+corruption.</p>
+<p>remotefilelog works by fetching file contents lazily and storing them
+in a cache on the client rather than in revlogs. This allows enormous
+histories to be transferred only partially, making them easier to
+operate on.</p>
+<p>Configs:</p>
+<blockquote>
+<p><tt class="docutils literal">packs.maxchainlen</tt> specifies the maximum delta chain length in pack files</p>
+<p><tt class="docutils literal">packs.maxpacksize</tt> specifies the maximum pack file size</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">packs.maxpackfilecount</tt> specifies the maximum number of packs in the</dt>
+<dd>shared cache (trees only for now)</dd>
+</dl>
+<p><tt class="docutils literal">remotefilelog.backgroundprefetch</tt> runs prefetch in background when True</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">remotefilelog.bgprefetchrevs</tt> specifies revisions to fetch on commit and</dt>
+<dd>update, and on other commands that use them. Different from pullprefetch.</dd>
+</dl>
+<p><tt class="docutils literal">remotefilelog.gcrepack</tt> does garbage collection during repack when True</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">remotefilelog.nodettl</tt> specifies maximum TTL of a node in seconds before</dt>
+<dd>it is garbage collected</dd>
+</dl>
+<p><tt class="docutils literal">remotefilelog.repackonhggc</tt> runs repack on hg gc when True</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">remotefilelog.prefetchdays</tt> specifies the maximum age of a commit in</dt>
+<dd>days after which it is no longer prefetched.</dd>
+<dt><tt class="docutils literal">remotefilelog.prefetchdelay</tt> specifies delay between background</dt>
+<dd>prefetches in seconds after operations that change the working copy parent</dd>
+<dt><tt class="docutils literal">remotefilelog.data.gencountlimit</tt> constraints the minimum number of data</dt>
+<dd>pack files required to be considered part of a generation. In particular,
+minimum number of packs files &gt; gencountlimit.</dd>
+<dt><tt class="docutils literal">remotefilelog.data.generations</tt> list for specifying the lower bound of</dt>
+<dd>each generation of the data pack files. For example, list ['100MB','1MB']
+or ['1MB', '100MB'] will lead to three generations: [0, 1MB), [
+1MB, 100MB) and [100MB, infinity).</dd>
+<dt><tt class="docutils literal">remotefilelog.data.maxrepackpacks</tt> the maximum number of pack files to</dt>
+<dd>include in an incremental data repack.</dd>
+<dt><tt class="docutils literal">remotefilelog.data.repackmaxpacksize</tt> the maximum size of a pack file for</dt>
+<dd>it to be considered for an incremental data repack.</dd>
+<dt><tt class="docutils literal">remotefilelog.data.repacksizelimit</tt> the maximum total size of pack files</dt>
+<dd>to include in an incremental data repack.</dd>
+<dt><tt class="docutils literal">remotefilelog.history.gencountlimit</tt> constraints the minimum number of</dt>
+<dd>history pack files required to be considered part of a generation. In
+particular, minimum number of packs files &gt; gencountlimit.</dd>
+<dt><tt class="docutils literal">remotefilelog.history.generations</tt> list for specifying the lower bound of</dt>
+<dd>each generation of the history pack files. For example, list [
+'100MB', '1MB'] or ['1MB', '100MB'] will lead to three generations: [
+0, 1MB), [1MB, 100MB) and [100MB, infinity).</dd>
+<dt><tt class="docutils literal">remotefilelog.history.maxrepackpacks</tt> the maximum number of pack files to</dt>
+<dd>include in an incremental history repack.</dd>
+<dt><tt class="docutils literal">remotefilelog.history.repackmaxpacksize</tt> the maximum size of a pack file</dt>
+<dd>for it to be considered for an incremental history repack.</dd>
+<dt><tt class="docutils literal">remotefilelog.history.repacksizelimit</tt> the maximum total size of pack</dt>
+<dd>files to include in an incremental history repack.</dd>
+<dt><tt class="docutils literal">remotefilelog.backgroundrepack</tt> automatically consolidate packs in the</dt>
+<dd>background</dd>
+</dl>
+<p><tt class="docutils literal">remotefilelog.cachepath</tt> path to cache</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">remotefilelog.cachegroup</tt> if set, make cache directory sgid to this</dt>
+<dd>group</dd>
+</dl>
+<p><tt class="docutils literal">remotefilelog.cacheprocess</tt> binary to invoke for fetching file data</p>
+<p><tt class="docutils literal">remotefilelog.debug</tt> turn on remotefilelog-specific debug output</p>
+<p><tt class="docutils literal">remotefilelog.excludepattern</tt> pattern of files to exclude from pulls</p>
+<p><tt class="docutils literal">remotefilelog.includepattern</tt> pattern of files to include in pulls</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">remotefilelog.fetchwarning</tt>: message to print when too many</dt>
+<dd>single-file fetches occur</dd>
+</dl>
+<p><tt class="docutils literal">remotefilelog.getfilesstep</tt> number of files to request in a single RPC</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">remotefilelog.getfilestype</tt> if set to 'threaded' use threads to fetch</dt>
+<dd>files, otherwise use optimistic fetching</dd>
+<dt><tt class="docutils literal">remotefilelog.pullprefetch</tt> revset for selecting files that should be</dt>
+<dd>eagerly downloaded rather than lazily</dd>
+<dt><tt class="docutils literal">remotefilelog.reponame</tt> name of the repo. If set, used to partition</dt>
+<dd>data from other repos in a shared store.</dd>
+</dl>
+<p><tt class="docutils literal">remotefilelog.server</tt> if true, enable server-side functionality</p>
+<p><tt class="docutils literal">remotefilelog.servercachepath</tt> path for caching blobs on the server</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">remotefilelog.serverexpiration</tt> number of days to keep cached server</dt>
+<dd>blobs</dd>
+<dt><tt class="docutils literal">remotefilelog.validatecache</tt> if set, check cache entries for corruption</dt>
+<dd>before returning blobs</dd>
+<dt><tt class="docutils literal">remotefilelog.validatecachelog</tt> if set, check cache entries for</dt>
+<dd>corruption before returning metadata</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="repository-maintenance">
+<h2><a class="toc-backref" href="#contents">Repository maintenance</a></h2>
+<div class="section" id="prefetch">
+<h3>prefetch</h3>
+<p>prefetch file revisions from the server:</p>
+<pre class="literal-block">
+hg prefetch [OPTIONS] [FILE...]
+</pre>
+<p>Prefetchs file revisions for the specified revs and stores them in the
+local remotefilelog cache.  If no rev is specified, the default rev is
+used which is the union of dot, draft, pullprefetch and bgprefetchrev.
+File names or patterns can be used to limit which files are downloaded.</p>
+<p>Return 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>prefetch the specified revisions</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--repack</span></kbd></td>
+<td>run repack after prefetch</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--base <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>rev that is assumed to already be local</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+<div class="section" id="uncategorized-commands">
+<h2><a class="toc-backref" href="#contents">Uncategorized commands</a></h2>
+<div class="section" id="gc">
+<h3>gc</h3>
+<p>garbage collect the client and server filelog caches:</p>
+<pre class="literal-block">
+hg gc [REPO...]
+</pre>
+<p>garbage collect the client and server filelog caches</p>
+</div>
+<div class="section" id="repack">
+<h3>repack</h3>
+<pre class="literal-block">
+hg repack [OPTIONS]
+</pre>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--background</span></kbd></td>
+<td>run in a background process</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--incremental</span></kbd></td>
+<td>do an incremental repack</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--packsonly</span></kbd></td>
+<td>only repack packs (skip loose objects)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="verifyremotefilelog">
+<h3>verifyremotefilelog</h3>
+<pre class="literal-block">
+hg verifyremotefilelogs &lt;directory&gt;
+</pre>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--decompress</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>decompress the filelogs first</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

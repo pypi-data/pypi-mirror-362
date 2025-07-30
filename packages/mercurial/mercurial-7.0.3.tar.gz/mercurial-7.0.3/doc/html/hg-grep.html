@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg grep</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-grep">
+<span id="hg-grep-1"></span>
+<h1 class="title">hg grep</h1>
+<h2 class="subtitle" id="search-for-a-pattern-in-specified-files">search for a pattern in specified files</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg grep [--diff] [OPTION]... PATTERN [FILE]...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Search the working directory or revision history for a regular
+expression in the specified files for the entire repository.</p>
+<p>By default, grep searches the repository files in the working
+directory and prints the files where it finds a match. To specify
+historical revisions instead of the working directory, use the
+--rev flag.</p>
+<p>To search instead historical revision differences that contains a
+change in match status (&quot;-&quot; for a match that becomes a non-match,
+or &quot;+&quot; for a non-match that becomes a match), use the --diff flag.</p>
+<p>PATTERN can be any Python (roughly Perl-compatible) regular
+expression.</p>
+<p>If no FILEs are specified and the --rev flag isn't supplied, all
+files in the working directory are searched. When using the --rev
+flag and specifying FILEs, use the --follow argument to also
+follow the specified FILEs across renames and copies.</p>
+<div class="verbose docutils container">
+<p>Template:</p>
+<p>The following keywords are supported in addition to the common template
+keywords and functions. See also <a class="reference external" href="hg.1.html#templates"><tt class="docutils literal">hg help templates</tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">change:</th><td class="field-body">String. Character denoting insertion <tt class="docutils literal">+</tt> or removal <tt class="docutils literal">-</tt>.
+Available if <tt class="docutils literal"><span class="pre">--diff</span></tt> is specified.</td>
+</tr>
+<tr class="field"><th class="field-name">lineno:</th><td class="field-body">Integer. Line number of the match.</td>
+</tr>
+<tr class="field"><th class="field-name">path:</th><td class="field-body">String. Repository-absolute path of the file.</td>
+</tr>
+<tr class="field"><th class="field-name">texts:</th><td class="field-body">List of text chunks.</td>
+</tr>
+</tbody>
+</table>
+<p>And each entry of <tt class="docutils literal">{texts}</tt> provides the following sub-keywords.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">matched:</th><td class="field-body">Boolean. True if the chunk matches the specified pattern.</td>
+</tr>
+<tr class="field"><th class="field-name">text:</th><td class="field-body">String. Chunk content.</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference external" href="hg.1.html#templates.operators"><tt class="docutils literal">hg help templates.operators</tt></a> for the list expansion syntax.</p>
+</div>
+<p>Returns 0 if a match is found, 1 otherwise.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-0</span>, <span class="option">--print0</span></kbd></td>
+<td>end fields with NUL</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--all</span></kbd></td>
+<td>an alias to --diff (DEPRECATED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--diff</span></kbd></td>
+<td>search revision differences for when the pattern was added or removed</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--text</span></kbd></td>
+<td>treat all files as text</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--follow</span></kbd></td>
+<td>follow changeset history, or file history across copies and renames</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-i</span>, <span class="option">--ignore-case</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore case when matching</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--files-with-matches</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>print only filenames and revisions that match</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--line-number</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>print matching line numbers</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>search files changed within revision range</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--all-files</span></kbd></td>
+<td>include all files in the changeset while grepping (DEPRECATED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-u</span>, <span class="option">--user</span></kbd></td>
+<td>list the author (long with -v)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d</span>, <span class="option">--date</span></kbd></td>
+<td>list the date (short with -q)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

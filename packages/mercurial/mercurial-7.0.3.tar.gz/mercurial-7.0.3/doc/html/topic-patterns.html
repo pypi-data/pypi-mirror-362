@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>File Name Patterns</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="file-name-patterns">
+<span id="topic-patterns"></span>
+<h1 class="title">File Name Patterns</h1>
+
+<p id="patterns">Mercurial accepts several notations for identifying one or more files
+at a time.</p>
+<p>By default, Mercurial treats filenames verbatim without pattern
+matching, relative to the current working directory. Note that your
+system shell might perform pattern matching of its own before passing
+filenames into Mercurial.</p>
+<p>Alternate pattern notations must be specified explicitly.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Patterns specified in <tt class="docutils literal">.hgignore</tt> are not rooted.
+Please see <a class="reference external" href="topic-hgignore.html"><tt class="docutils literal">hg help hgignore</tt></a> for details.</p>
+</div>
+<p>To use a plain path name without any pattern matching, start it with
+<tt class="docutils literal">path:</tt>. These path names must completely match starting at the
+current repository root, and when the path points to a directory, it is matched
+recursively. To match all files in a directory non-recursively (not including
+any files in subdirectories), <tt class="docutils literal">rootfilesin:</tt> can be used, specifying an
+absolute path (relative to the repository root). To match a single file exactly,
+relative to the repository root, you can use <tt class="docutils literal">filepath:</tt>.</p>
+<p>To use an extended glob, start a name with <tt class="docutils literal">glob:</tt>. Globs are rooted
+at the current directory; a glob such as <tt class="docutils literal">*.c</tt> will only match files
+in the current directory ending with <tt class="docutils literal">.c</tt>. <tt class="docutils literal">rootglob:</tt> can be used
+instead of <tt class="docutils literal">glob:</tt> for a glob that is rooted at the root of the
+repository.</p>
+<p>The supported glob syntax extensions are <tt class="docutils literal">**</tt> to match any string
+across path separators and <tt class="docutils literal">{a,b}</tt> to mean &quot;a or b&quot;.</p>
+<p>To use a Perl/Python regular expression, start a name with <tt class="docutils literal">re:</tt>.
+Regexp pattern matching is anchored at the root of the repository.</p>
+<p>To read name patterns from a file, use <tt class="docutils literal">listfile:</tt> or <tt class="docutils literal">listfile0:</tt>.
+The latter expects null delimited patterns while the former expects line
+feeds. Each string read from the file is itself treated as a file
+pattern.</p>
+<p>To read a set of patterns from a file, use <tt class="docutils literal">include:</tt> or <tt class="docutils literal">subinclude:</tt>.
+<tt class="docutils literal">include:</tt> will use all the patterns from the given file and treat them as if
+they had been passed in manually.  <tt class="docutils literal">subinclude:</tt> will only apply the patterns
+against files that are under the subinclude file's directory. See <a class="reference external" href="topic-hgignore.html"><tt class="docutils literal">hg help
+hgignore</tt></a> for details on the format of these files.</p>
+<p>All patterns, except for <tt class="docutils literal">glob:</tt> specified in command line (not for
+<tt class="docutils literal"><span class="pre">-I</span></tt> or <tt class="docutils literal"><span class="pre">-X</span></tt> options), can match also against directories: files
+under matched directories are treated as matched.
+For <tt class="docutils literal"><span class="pre">-I</span></tt> and <tt class="docutils literal"><span class="pre">-X</span></tt> options, <tt class="docutils literal">glob:</tt> will match directories recursively.</p>
+<p>Plain examples:</p>
+<pre class="literal-block">
+path:foo/bar                  a name bar in a directory named foo in the root
+                              of the repository
+path:some/path                a file or directory named &quot;some/path&quot;
+filepath:some/path/to/a/file  exactly a single file named
+                              &quot;some/path/to/a/file&quot;, relative to the root
+                              of the repository
+rootfilesin:foo/bar           the files in a directory called foo/bar, but
+                              not any files in its subdirectories and not
+                              a file bar in directory foo
+</pre>
+<p>Glob examples:</p>
+<pre class="literal-block">
+glob:*.c       any name ending in &quot;.c&quot; in the current directory
+*.c            any name ending in &quot;.c&quot; in the current directory
+**.c           any name ending in &quot;.c&quot; in any subdirectory of the
+               current directory including itself.
+foo/*          any file in directory foo
+foo/**         any file in directory foo plus all its subdirectories,
+               recursively
+foo/*.c        any name ending in &quot;.c&quot; in the directory foo
+foo/**.c       any name ending in &quot;.c&quot; in any subdirectory of foo
+               including itself.
+rootglob:*.c   any name ending in &quot;.c&quot; in the root of the repository
+</pre>
+<p>Regexp examples:</p>
+<pre class="literal-block">
+re:.*\.c$      any name ending in &quot;.c&quot;, anywhere in the repository
+</pre>
+<p>File examples:</p>
+<pre class="literal-block">
+listfile:list.txt  read list from list.txt with one file pattern per line
+listfile0:list.txt read list from list.txt with null byte delimiters
+</pre>
+<p>See also <a class="reference external" href="topic-filesets.html"><tt class="docutils literal">hg help filesets</tt></a>.</p>
+<p>Include examples:</p>
+<pre class="literal-block">
+include:path/to/mypatternfile    reads patterns to be applied to all paths
+subinclude:path/to/subignorefile reads patterns specifically for paths in the
+                                 subdirectory
+</pre>
+</div>
+</body>
+</html>

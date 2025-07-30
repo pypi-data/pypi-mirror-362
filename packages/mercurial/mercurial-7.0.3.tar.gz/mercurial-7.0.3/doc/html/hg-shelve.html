@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg shelve</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-shelve">
+<span id="hg-shelve-1"></span>
+<h1 class="title">hg shelve</h1>
+<h2 class="subtitle" id="save-and-set-aside-changes-from-the-working-directory">save and set aside changes from the working directory</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg shelve [OPTION]... [FILE]...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Shelving takes files that &quot;hg status&quot; reports as not clean, saves
+the modifications to a bundle (a shelved change), and reverts the
+files so that their state in the working directory becomes clean.</p>
+<p>To restore these changes to the working directory, using &quot;hg
+unshelve&quot;; this will work even if you switch to a different
+commit.</p>
+<p>When no files are specified, &quot;hg shelve&quot; saves all not-clean
+files. If specific files or directories are named, only changes to
+those files are shelved.</p>
+<p>In bare shelve (when no files are specified, without interactive,
+include and exclude option), shelving remembers information if the
+working directory was on newly created branch, in other words working
+directory was on different branch than its first parent. In this
+situation unshelving restores branch information to the working directory.</p>
+<p>Each shelved change has a name that makes it easier to find later.
+The name of a shelved change defaults to being based on the active
+bookmark, or if there is no active bookmark, the current named
+branch.  To specify a different name, use <tt class="docutils literal"><span class="pre">--name</span></tt>.</p>
+<p>To see a list of existing shelved changes, use the <tt class="docutils literal"><span class="pre">--list</span></tt>
+option. For each shelved change, this will print its name, age,
+and description; use <tt class="docutils literal"><span class="pre">--patch</span></tt> or <tt class="docutils literal"><span class="pre">--stat</span></tt> for more details.</p>
+<p>To delete specific shelved changes, use <tt class="docutils literal"><span class="pre">--delete</span></tt>. To delete
+all shelved changes, use <tt class="docutils literal"><span class="pre">--cleanup</span></tt>.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-A</span>, <span class="option">--addremove</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>mark new/missing files as added/removed before shelving</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-u</span>, <span class="option">--unknown</span></kbd></td>
+<td>store unknown files in the shelve</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--cleanup</span></kbd></td>
+<td>delete all shelved changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+<td>shelve with the specified commit date</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d</span>, <span class="option">--delete</span></kbd></td>
+<td>delete the named shelved change(s)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-k</span>, <span class="option">--keep</span></kbd></td>
+<td>shelve, but keep changes in the working directory</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-l</span>, <span class="option">--list</span></kbd></td>
+<td>list current shelves</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as shelve message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--name <var>&lt;NAME&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use the given name for the shelved commit</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-p</span>, <span class="option">--patch</span></kbd></td>
+<td>output patches for changes (provide the names of the shelved changes as positional arguments)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-i</span>, <span class="option">--interactive</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>interactive mode</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stat</span></kbd></td>
+<td>output diffstat-style summary of changes (provide the names of the shelved changes as positional arguments)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Specifying Revisions</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="specifying-revisions">
+<span id="topic-revisions"></span>
+<h1 class="title">Specifying Revisions</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#specifying-single-revisions" id="toc-entry-1">Specifying single revisions</a></li>
+<li><a class="reference internal" href="#specifying-multiple-revisions" id="toc-entry-2">Specifying multiple revisions</a></li>
+<li><a class="reference internal" href="#operators" id="toc-entry-3">Operators</a></li>
+<li><a class="reference internal" href="#patterns" id="toc-entry-4">Patterns</a></li>
+<li><a class="reference internal" href="#predicates" id="toc-entry-5">Predicates</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-6">Aliases</a></li>
+<li><a class="reference internal" href="#equivalents" id="toc-entry-7">Equivalents</a></li>
+<li><a class="reference internal" href="#examples" id="toc-entry-8">Examples</a></li>
+</ul>
+</div>
+<p id="mrevs"><span id="multirevs"></span><span id="revset"></span><span id="revsets"></span><span id="revs"></span><span id="revisions"></span>Mercurial supports several ways to specify revisions.</p>
+<div class="section" id="specifying-single-revisions">
+<h1><a class="toc-backref" href="#contents">Specifying single revisions</a></h1>
+<p>A plain integer is treated as a revision number. Negative integers are
+treated as sequential offsets from the tip, with -1 denoting the tip,
+-2 denoting the revision prior to the tip, and so forth.</p>
+<p>A 40-digit hexadecimal string is treated as a unique revision identifier.
+A hexadecimal string less than 40 characters long is treated as a
+unique revision identifier and is referred to as a short-form
+identifier. A short-form identifier is only valid if it is the prefix
+of exactly one full-length identifier.</p>
+<p>Any other string is treated as a bookmark, tag, or branch name. A
+bookmark is a movable pointer to a revision. A tag is a permanent name
+associated with a revision. A branch name denotes the tipmost open branch head
+of that branch - or if they are all closed, the tipmost closed head of the
+branch. Bookmark, tag, and branch names must not contain the &quot;:&quot; character.</p>
+<p>The reserved name &quot;tip&quot; always identifies the most recent revision.</p>
+<p>The reserved name &quot;null&quot; indicates the null revision. This is the
+revision of an empty repository, and the parent of revision 0.</p>
+<p>The reserved name &quot;.&quot; indicates the working directory parent. If no
+working directory is checked out, it is equivalent to null. If an
+uncommitted merge is in progress, &quot;.&quot; is the revision of the first
+parent.</p>
+<p>Finally, commands that expect a single revision (like <tt class="docutils literal">hg update</tt>) also
+accept revsets (see below for details). When given a revset, they use the
+last revision of the revset. A few commands accept two single revisions
+(like <tt class="docutils literal">hg diff</tt>). When given a revset, they use the first and the last
+revisions of the revset.</p>
+</div>
+<div class="section" id="specifying-multiple-revisions">
+<h1><a class="toc-backref" href="#contents">Specifying multiple revisions</a></h1>
+<p>Mercurial supports a functional language for selecting a set of
+revisions. Expressions in this language are called revsets.</p>
+<p>The language supports a number of predicates which are joined by infix
+operators. Parenthesis can be used for grouping.</p>
+<p>Identifiers such as branch names may need quoting with single or
+double quotes if they contain characters like <tt class="docutils literal">-</tt> or if they match
+one of the predefined predicates.</p>
+<p>Special characters can be used in quoted identifiers by escaping them,
+e.g., <tt class="docutils literal">\n</tt> is interpreted as a newline. To prevent them from being
+interpreted, strings can be prefixed with <tt class="docutils literal">r</tt>, e.g. <tt class="docutils literal"><span class="pre">r'...'</span></tt>.</p>
+</div>
+<div class="section" id="operators">
+<h1><a class="toc-backref" href="#contents">Operators</a></h1>
+<p>There is a single prefix operator:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">not x</tt></dt>
+<dd>Changesets not in x. Short form is <tt class="docutils literal">! x</tt>.</dd>
+</dl>
+<p>These are the supported infix operators:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">x::y</span></tt></dt>
+<dd><p class="first">A DAG range, meaning all changesets that are descendants of x and
+ancestors of y, including x and y themselves. If the first endpoint
+is left out, this is equivalent to <tt class="docutils literal">ancestors(y)</tt>, if the second
+is left out it is equivalent to <tt class="docutils literal">descendants(x)</tt>.</p>
+<p class="last">An alternative syntax is <tt class="docutils literal"><span class="pre">x..y</span></tt>.</p>
+</dd>
+<dt><tt class="docutils literal">x:y</tt></dt>
+<dd>All changesets with revision numbers between x and y, both
+inclusive. Either endpoint can be left out, they default to 0 and
+tip.</dd>
+<dt><tt class="docutils literal">x and y</tt></dt>
+<dd>The intersection of changesets in x and y. Short form is <tt class="docutils literal">x &amp; y</tt>.</dd>
+<dt><tt class="docutils literal">x or y</tt></dt>
+<dd>The union of changesets in x and y. There are two alternative short
+forms: <tt class="docutils literal">x | y</tt> and <tt class="docutils literal">x + y</tt>.</dd>
+<dt><tt class="docutils literal">x - y</tt></dt>
+<dd>Changesets in x but not in y.</dd>
+<dt><tt class="docutils literal">x % y</tt></dt>
+<dd>Changesets that are ancestors of x but not ancestors of y (i.e. ::x - ::y).
+This is shorthand notation for <tt class="docutils literal">only(x, y)</tt> (see below). The second
+argument is optional and, if left out, is equivalent to <tt class="docutils literal">only(x)</tt>.</dd>
+<dt><tt class="docutils literal">x^n</tt></dt>
+<dd>The nth parent of x, n == 0, 1, or 2.
+For n == 0, x; for n == 1, the first parent of each changeset in x;
+for n == 2, the second parent of changeset in x.</dd>
+<dt><tt class="docutils literal">x~n</tt></dt>
+<dd>The nth first ancestor of x; <tt class="docutils literal">x~0</tt> is x; <tt class="docutils literal">x~3</tt> is <tt class="docutils literal"><span class="pre">x^^^</span></tt>.
+For n &lt; 0, the nth unambiguous descendent of x.</dd>
+<dt><tt class="docutils literal">x ## y</tt></dt>
+<dd><p class="first">Concatenate strings and identifiers into one string.</p>
+<p>All other prefix, infix and postfix operators have lower priority than
+<tt class="docutils literal">##</tt>. For example, <tt class="docutils literal">a1 ## a2~2</tt> is equivalent to <tt class="docutils literal">(a1 ## <span class="pre">a2)~2</span></tt>.</p>
+<p>For example:</p>
+<pre class="literal-block">
+[revsetalias]
+issue(a1) = grep(r'\bissue[ :]?' ## a1 ## r'\b|\bbug\(' ## a1 ## r'\)')
+</pre>
+<p class="last"><tt class="docutils literal">issue(1234)</tt> is equivalent to
+<tt class="docutils literal"><span class="pre">grep(r'\bissue[</span> <span class="pre">:]?1234\b|\bbug\(1234\)')</span></tt>
+in this case. This matches against all of &quot;issue 1234&quot;, &quot;issue:1234&quot;,
+&quot;issue1234&quot; and &quot;bug(1234)&quot;.</p>
+</dd>
+</dl>
+<p>There is a single postfix operator:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">x^</tt></dt>
+<dd>Equivalent to <tt class="docutils literal">x^1</tt>, the first parent of each changeset in x.</dd>
+</dl>
+</div>
+<div class="section" id="patterns">
+<h1><a class="toc-backref" href="#contents">Patterns</a></h1>
+<p>Where noted, predicates that perform string matching can accept a pattern
+string. The pattern may be either a literal, or a regular expression. If the
+pattern starts with <tt class="docutils literal">re:</tt>, the remainder of the pattern is treated as a
+regular expression. Otherwise, it is treated as a literal. To match a pattern
+that actually starts with <tt class="docutils literal">re:</tt>, use the prefix <tt class="docutils literal">literal:</tt>.</p>
+<p>Matching is case-sensitive, unless otherwise noted.  To perform a case-
+insensitive match on a case-sensitive predicate, use a regular expression,
+prefixed with <tt class="docutils literal"><span class="pre">(?i)</span></tt>.</p>
+<p>For example, <tt class="docutils literal"><span class="pre">tag(r're:(?i)release')</span></tt> matches &quot;release&quot; or &quot;RELEASE&quot;
+or &quot;Release&quot;, etc.</p>
+</div>
+<div class="section" id="predicates">
+<h1><a class="toc-backref" href="#contents">Predicates</a></h1>
+<p>The following predicates are supported:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">adds(pattern)</tt></dt>
+<dd><p class="first">Changesets that add a file matching pattern.</p>
+<p class="last">The pattern without explicit kind like <tt class="docutils literal">glob:</tt> is expected to be
+relative to the current directory and match against a file or a
+directory.</p>
+</dd>
+<dt><tt class="docutils literal">all()</tt></dt>
+<dd>All changesets, the same as <tt class="docutils literal">0:tip</tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">ancestor(*changeset)</span></tt></dt>
+<dd><p class="first">A greatest common ancestor of the changesets.</p>
+<p class="last">Accepts 0 or more changesets.
+Will return empty list when passed no args.
+Greatest common ancestor of a single changeset is that changeset.</p>
+</dd>
+<dt><tt class="docutils literal">ancestors(set[, depth])</tt></dt>
+<dd><p class="first">Changesets that are ancestors of changesets in set, including the
+given changesets themselves.</p>
+<p class="last">If depth is specified, the result only includes changesets up to
+the specified generation.</p>
+</dd>
+<dt><tt class="docutils literal">author(string)</tt></dt>
+<dd>Alias for <tt class="docutils literal">user(string)</tt>.</dd>
+<dt><tt class="docutils literal">bisect(string)</tt></dt>
+<dd><p class="first">Changesets marked in the specified bisect status:</p>
+<ul class="last simple">
+<li><tt class="docutils literal">good</tt>, <tt class="docutils literal">bad</tt>, <tt class="docutils literal">skip</tt>: csets explicitly marked as good/bad/skip</li>
+<li><tt class="docutils literal">goods</tt>, <tt class="docutils literal">bads</tt>      : csets topologically good/bad</li>
+<li><tt class="docutils literal">range</tt>              : csets taking part in the bisection</li>
+<li><tt class="docutils literal">pruned</tt>             : csets that are goods, bads or skipped</li>
+<li><tt class="docutils literal">untested</tt>           : csets whose fate is yet unknown</li>
+<li><tt class="docutils literal">ignored</tt>            : csets ignored due to DAG topology</li>
+<li><tt class="docutils literal">current</tt>            : the cset currently being bisected</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">bookmark([name])</span></tt></dt>
+<dd><p class="first">The named bookmark or all bookmarks.</p>
+<p class="last">Pattern matching is supported for <cite>name</cite>. See <a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a>.</p>
+</dd>
+<dt><tt class="docutils literal">branch(string or set)</tt></dt>
+<dd><p class="first">All changesets belonging to the given branch or the branches of the given
+changesets.</p>
+<p class="last">Pattern matching is supported for <cite>string</cite>. See
+<a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a>.</p>
+</dd>
+<dt><tt class="docutils literal">branchpoint()</tt></dt>
+<dd>Changesets with more than one child.</dd>
+<dt><tt class="docutils literal">bundle()</tt></dt>
+<dd><p class="first">Changesets in the bundle.</p>
+<p class="last">Bundle must be specified by the -R option.</p>
+</dd>
+<dt><tt class="docutils literal">children(set)</tt></dt>
+<dd>Child changesets of changesets in set.</dd>
+<dt><tt class="docutils literal">closed()</tt></dt>
+<dd>Changeset is closed.</dd>
+<dt><tt class="docutils literal">commonancestors(set)</tt></dt>
+<dd>Changesets that are ancestors of every changeset in set.</dd>
+<dt><tt class="docutils literal">conflictlocal()</tt></dt>
+<dd><p class="first">The local side of the merge, if currently in an unresolved merge.</p>
+<p class="last">&quot;merge&quot; here includes merge conflicts from e.g. 'hg rebase' or 'hg graft'.</p>
+</dd>
+<dt><tt class="docutils literal">conflictother()</tt></dt>
+<dd><p class="first">The other side of the merge, if currently in an unresolved merge.</p>
+<p class="last">&quot;merge&quot; here includes merge conflicts from e.g. 'hg rebase' or 'hg graft'.</p>
+</dd>
+<dt><tt class="docutils literal">contains(pattern)</tt></dt>
+<dd><p class="first">The revision's manifest contains a file matching pattern (but might not
+modify it). See <a class="reference external" href="topic-patterns.html"><tt class="docutils literal">hg help patterns</tt></a> for information about file patterns.</p>
+<p class="last">The pattern without explicit kind like <tt class="docutils literal">glob:</tt> is expected to be
+relative to the current directory and match against a file exactly
+for efficiency.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">converted([id])</span></tt></dt>
+<dd>Changesets converted from the given identifier in the old repository if
+present, or all converted changesets if no identifier is specified.</dd>
+<dt><tt class="docutils literal">date(interval)</tt></dt>
+<dd>Changesets within the interval, see <a class="reference external" href="topic-dates.html"><tt class="docutils literal">hg help dates</tt></a>.</dd>
+<dt><tt class="docutils literal">desc(string)</tt></dt>
+<dd><p class="first">Search commit message for string. The match is case-insensitive.</p>
+<p class="last">Pattern matching is supported for <cite>string</cite>. See
+<a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a>.</p>
+</dd>
+<dt><tt class="docutils literal">descendants(set[, depth])</tt></dt>
+<dd><p class="first">Changesets which are descendants of changesets in set, including the
+given changesets themselves.</p>
+<p class="last">If depth is specified, the result only includes changesets up to
+the specified generation.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">destination([set])</span></tt></dt>
+<dd>Changesets that were created by a graft, transplant or rebase operation,
+with the given revisions specified as the source.  Omitting the optional set
+is the same as passing all().</dd>
+<dt><tt class="docutils literal">diffcontains(pattern)</tt></dt>
+<dd><p class="first">Search revision differences for when the pattern was added or removed.</p>
+<p class="last">The pattern may be a substring literal or a regular expression. See
+<a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a>.</p>
+</dd>
+<dt><tt class="docutils literal">draft()</tt></dt>
+<dd>Changeset in draft phase.</dd>
+<dt><tt class="docutils literal">expectsize(set[, size])</tt></dt>
+<dd><p class="first">Return the given revset if size matches the revset size.
+Abort if the revset doesn't expect given size.
+size can either be an integer range or an integer.</p>
+<p class="last">For example, <tt class="docutils literal">expectsize(0:1, 3:5)</tt> will abort as revset size is 2 and
+2 is not between 3 and 5 inclusive.</p>
+</dd>
+<dt><tt class="docutils literal">extra(label, [value])</tt></dt>
+<dd><p class="first">Changesets with the given label in the extra metadata, with the given
+optional value.</p>
+<p class="last">Pattern matching is supported for <cite>value</cite>. See
+<a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a>.</p>
+</dd>
+<dt><tt class="docutils literal">file(pattern)</tt></dt>
+<dd><p class="first">Changesets affecting files matched by pattern.</p>
+<p>For a faster but less accurate result, consider using <tt class="docutils literal">filelog()</tt>
+instead.</p>
+<p class="last">This predicate uses <tt class="docutils literal">glob:</tt> as the default kind of pattern.</p>
+</dd>
+<dt><tt class="docutils literal">filelog(pattern)</tt></dt>
+<dd><p class="first">Changesets connected to the specified filelog.</p>
+<p>For performance reasons, visits only revisions mentioned in the file-level
+filelog, rather than filtering through all changesets (much faster, but
+doesn't include deletes or duplicate changes). For a slower, more accurate
+result, use <tt class="docutils literal">file()</tt>.</p>
+<p class="last">The pattern without explicit kind like <tt class="docutils literal">glob:</tt> is expected to be
+relative to the current directory and match against a file exactly
+for efficiency.</p>
+</dd>
+<dt><tt class="docutils literal">first(set, [n])</tt></dt>
+<dd>An alias for limit().</dd>
+<dt><tt class="docutils literal"><span class="pre">follow([file[,</span> <span class="pre">startrev]])</span></tt></dt>
+<dd>An alias for <tt class="docutils literal">::.</tt> (ancestors of the working directory's first parent).
+If file pattern is specified, the histories of files matching given
+pattern in the revision given by startrev are followed, including copies.</dd>
+<dt><tt class="docutils literal">followlines(file, fromline:toline[, <span class="pre">startrev=.,</span> descend=False])</tt></dt>
+<dd><p class="first">Changesets modifying <cite>file</cite> in line range ('fromline', 'toline').</p>
+<p>Line range corresponds to 'file' content at 'startrev' and should hence be
+consistent with file size. If startrev is not specified, working directory's
+parent is used.</p>
+<p class="last">By default, ancestors of 'startrev' are returned. If 'descend' is True,
+descendants of 'startrev' are returned though renames are (currently) not
+followed in this direction.</p>
+</dd>
+<dt><tt class="docutils literal">grep(regex)</tt></dt>
+<dd>Like <tt class="docutils literal">keyword(string)</tt> but accepts a regex. Use <tt class="docutils literal"><span class="pre">grep(r'...')</span></tt>
+to ensure special escape characters are handled correctly. Unlike
+<tt class="docutils literal">keyword(string)</tt>, the match is case-sensitive.</dd>
+<dt><tt class="docutils literal">head()</tt></dt>
+<dd>Changeset is a named branch head.</dd>
+<dt><tt class="docutils literal">heads(set)</tt></dt>
+<dd>Members of set with no children in set.</dd>
+<dt><tt class="docutils literal">hidden()</tt></dt>
+<dd>Hidden changesets.</dd>
+<dt><tt class="docutils literal">id(string)</tt></dt>
+<dd>Revision non-ambiguously specified by the given hex string prefix.</dd>
+<dt><tt class="docutils literal">keyword(string)</tt></dt>
+<dd><p class="first">Search commit message, user name, and names of changed files for
+string. The match is case-insensitive.</p>
+<p class="last">For a regular expression or case sensitive search of these fields, use
+<tt class="docutils literal">grep(regex)</tt>.</p>
+</dd>
+<dt><tt class="docutils literal">last(set, [n])</tt></dt>
+<dd>Last n members of set, defaulting to 1.</dd>
+<dt><tt class="docutils literal">limit(set[, n[, <span class="pre">offset]])</span></tt></dt>
+<dd>First n members of set, defaulting to 1, starting from offset.</dd>
+<dt><tt class="docutils literal">matching(revision [, field])</tt></dt>
+<dd><p class="first">Changesets in which a given set of fields match the set of fields in the
+selected revision or set.</p>
+<p>To match more than one field pass the list of fields to match separated
+by spaces (e.g. <tt class="docutils literal">author description</tt>).</p>
+<p>Valid fields are most regular revision fields and some special fields.</p>
+<p>Regular revision fields are <tt class="docutils literal">description</tt>, <tt class="docutils literal">author</tt>, <tt class="docutils literal">branch</tt>,
+<tt class="docutils literal">date</tt>, <tt class="docutils literal">files</tt>, <tt class="docutils literal">phase</tt>, <tt class="docutils literal">parents</tt>, <tt class="docutils literal">substate</tt>, <tt class="docutils literal">user</tt>
+and <tt class="docutils literal">diff</tt>.
+Note that <tt class="docutils literal">author</tt> and <tt class="docutils literal">user</tt> are synonyms. <tt class="docutils literal">diff</tt> refers to the
+contents of the revision. Two revisions matching their <tt class="docutils literal">diff</tt> will
+also match their <tt class="docutils literal">files</tt>.</p>
+<p>Special fields are <tt class="docutils literal">summary</tt> and <tt class="docutils literal">metadata</tt>:
+<tt class="docutils literal">summary</tt> matches the first line of the description.
+<tt class="docutils literal">metadata</tt> is equivalent to matching <tt class="docutils literal">description user date</tt>
+(i.e. it matches the main metadata fields).</p>
+<p class="last"><tt class="docutils literal">metadata</tt> is the default field which is used when no fields are
+specified. You can match more than one field at a time.</p>
+</dd>
+<dt><tt class="docutils literal">max(set)</tt></dt>
+<dd>Changeset with highest revision number in set.</dd>
+<dt><tt class="docutils literal">merge()</tt></dt>
+<dd>Changeset is a merge changeset.</dd>
+<dt><tt class="docutils literal">min(set)</tt></dt>
+<dd>Changeset with lowest revision number in set.</dd>
+<dt><tt class="docutils literal">modifies(pattern)</tt></dt>
+<dd><p class="first">Changesets modifying files matched by pattern.</p>
+<p class="last">The pattern without explicit kind like <tt class="docutils literal">glob:</tt> is expected to be
+relative to the current directory and match against a file or a
+directory.</p>
+</dd>
+<dt><tt class="docutils literal">named(namespace)</tt></dt>
+<dd><p class="first">The changesets in a given namespace.</p>
+<p class="last">Pattern matching is supported for <cite>namespace</cite>. See
+<a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a>.</p>
+</dd>
+<dt><tt class="docutils literal">nodefromfile(path)</tt></dt>
+<dd><p class="first">Read a list of nodes from the file at <cite>path</cite>.</p>
+<p>This applies <cite>id(LINE)</cite> to each line of the file.</p>
+<p class="last">This is useful when the amount of nodes you need to specify gets too large
+for the command line.</p>
+</dd>
+<dt><tt class="docutils literal">none()</tt></dt>
+<dd>No changesets.</dd>
+<dt><tt class="docutils literal">only(set, [set])</tt></dt>
+<dd>Changesets that are ancestors of the first set that are not ancestors
+of any other head in the repo. If a second set is specified, the result
+is ancestors of the first set that are not ancestors of the second set
+(i.e. ::&lt;set1&gt; - ::&lt;set2&gt;).</dd>
+<dt><tt class="docutils literal"><span class="pre">origin([set])</span></tt></dt>
+<dd>Changesets that were specified as a source for the grafts, transplants or
+rebases that created the given revisions.  Omitting the optional set is the
+same as passing all().  If a changeset created by these operations is itself
+specified as a source for one of these operations, only the source changeset
+for the first operation is selected.</dd>
+<dt><tt class="docutils literal"><span class="pre">outgoing([path])</span></tt></dt>
+<dd><p class="first">Changesets not found in the specified destination repository, or the
+default push location.</p>
+<p class="last">If the location resolve to multiple repositories, the union of all
+outgoing changeset will be used.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">p1([set])</span></tt></dt>
+<dd>First parent of changesets in set, or the working directory.</dd>
+<dt><tt class="docutils literal"><span class="pre">p2([set])</span></tt></dt>
+<dd>Second parent of changesets in set, or the working directory.</dd>
+<dt><tt class="docutils literal"><span class="pre">parents([set])</span></tt></dt>
+<dd>The set of all parents for all changesets in set, or the working directory.</dd>
+<dt><tt class="docutils literal">present(set)</tt></dt>
+<dd><p class="first">An empty set, if any revision in set isn't found; otherwise,
+all revisions in set.</p>
+<p class="last">If any of specified revisions is not present in the local repository,
+the query is normally aborted. But this predicate allows the query
+to continue even in such cases.</p>
+</dd>
+<dt><tt class="docutils literal">public()</tt></dt>
+<dd>Changeset in public phase.</dd>
+<dt><tt class="docutils literal"><span class="pre">remote([id</span> <span class="pre">[,path]])</span></tt></dt>
+<dd>Local revision that corresponds to the given identifier in a
+remote repository, if present. Here, the '.' identifier is a
+synonym for the current local branch.</dd>
+<dt><tt class="docutils literal">removes(pattern)</tt></dt>
+<dd><p class="first">Changesets which remove files matching pattern.</p>
+<p class="last">The pattern without explicit kind like <tt class="docutils literal">glob:</tt> is expected to be
+relative to the current directory and match against a file or a
+directory.</p>
+</dd>
+<dt><tt class="docutils literal">rev(number)</tt></dt>
+<dd>Revision with the given numeric identifier.</dd>
+<dt><tt class="docutils literal">reverse(set)</tt></dt>
+<dd>Reverse order of set.</dd>
+<dt><tt class="docutils literal">revset(set)</tt></dt>
+<dd><p class="first">Strictly interpret the content as a revset.</p>
+<p class="last">The content of this special predicate will be strictly interpreted as a
+revset. For example, <tt class="docutils literal">revset(id(0))</tt> will be interpreted as &quot;id(0)&quot;
+without possible ambiguity with a &quot;id(0)&quot; bookmark or tag.</p>
+</dd>
+<dt><tt class="docutils literal">roots(set)</tt></dt>
+<dd>Changesets in set with no parent changeset in set.</dd>
+<dt><tt class="docutils literal">secret()</tt></dt>
+<dd>Changeset in secret phase.</dd>
+<dt><tt class="docutils literal">sort(set[, <span class="pre">[-]key...</span> [, <span class="pre">...]])</span></tt></dt>
+<dd><p class="first">Sort set by keys. The default sort order is ascending, specify a key
+as <tt class="docutils literal"><span class="pre">-key</span></tt> to sort in descending order.</p>
+<p>The keys can be:</p>
+<ul class="simple">
+<li><tt class="docutils literal">rev</tt> for the revision number,</li>
+<li><tt class="docutils literal">branch</tt> for the branch name,</li>
+<li><tt class="docutils literal">desc</tt> for the commit message (description),</li>
+<li><tt class="docutils literal">user</tt> for user name (<tt class="docutils literal">author</tt> can be used as an alias),</li>
+<li><tt class="docutils literal">date</tt> for the commit date</li>
+<li><tt class="docutils literal">topo</tt> for a reverse topographical sort</li>
+<li><tt class="docutils literal">node</tt> the nodeid of the revision</li>
+<li><tt class="docutils literal">random</tt> randomly shuffle revisions</li>
+</ul>
+<p>The <tt class="docutils literal">topo</tt> sort order cannot be combined with other sort keys. This sort
+takes one optional argument, <tt class="docutils literal">topo.firstbranch</tt>, which takes a revset that
+specifies what topographical branches to prioritize in the sort.</p>
+<p class="last">The <tt class="docutils literal">random</tt> sort takes one optional <tt class="docutils literal">random.seed</tt> argument to control
+the pseudo-randomness of the result.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">subrepo([pattern])</span></tt></dt>
+<dd>Changesets that add, modify or remove the given subrepo.  If no subrepo
+pattern is named, any subrepo changes are returned.</dd>
+<dt><tt class="docutils literal"><span class="pre">tag([name])</span></tt></dt>
+<dd><p class="first">The specified tag by name, or all tagged revisions if no name is given.</p>
+<p class="last">Pattern matching is supported for <cite>name</cite>. See
+<a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a>.</p>
+</dd>
+<dt><tt class="docutils literal">user(string)</tt></dt>
+<dd><p class="first">User name contains string. The match is case-insensitive.</p>
+<p class="last">Pattern matching is supported for <cite>string</cite>. See
+<a class="reference external" href="hg.1.html#revisions.patterns"><tt class="docutils literal">hg help revisions.patterns</tt></a>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<p>New predicates (known as &quot;aliases&quot;) can be defined, using any combination of
+existing predicates or other aliases. An alias definition looks like:</p>
+<pre class="literal-block">
+&lt;alias&gt; = &lt;definition&gt;
+</pre>
+<p>in the <tt class="docutils literal">revsetalias</tt> section of a Mercurial configuration file. Arguments
+of the form <cite>a1</cite>, <cite>a2</cite>, etc. are substituted from the alias into the
+definition.</p>
+<p>For example,</p>
+<pre class="literal-block">
+[revsetalias]
+h = heads()
+d(s) = sort(s, date)
+rs(s, k) = reverse(sort(s, k))
+</pre>
+<p>defines three aliases, <tt class="docutils literal">h</tt>, <tt class="docutils literal">d</tt>, and <tt class="docutils literal">rs</tt>. <tt class="docutils literal">rs(0:tip, author)</tt> is
+exactly equivalent to <tt class="docutils literal">reverse(sort(0:tip, author))</tt>.</p>
+</div>
+<div class="section" id="equivalents">
+<h1><a class="toc-backref" href="#contents">Equivalents</a></h1>
+<p>Command line equivalents for <a class="reference external" href="hg-log.html"><tt class="docutils literal">hg log</tt></a>:</p>
+<pre class="literal-block">
+-f    -&gt;  ::.
+-d x  -&gt;  date(x)
+-k x  -&gt;  keyword(x)
+-m    -&gt;  merge()
+-u x  -&gt;  user(x)
+-b x  -&gt;  branch(x)
+-P x  -&gt;  !::x
+-l x  -&gt;  limit(expr, x)
+</pre>
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="#contents">Examples</a></h1>
+<p>Some sample queries:</p>
+<ul>
+<li><p class="first">Changesets on the default branch:</p>
+<pre class="literal-block">
+hg log -r &quot;branch(default)&quot;
+</pre>
+</li>
+<li><p class="first">Changesets on the default branch since tag 1.5 (excluding merges):</p>
+<pre class="literal-block">
+hg log -r &quot;branch(default) and 1.5:: and not merge()&quot;
+</pre>
+</li>
+<li><p class="first">Open branch heads:</p>
+<pre class="literal-block">
+hg log -r &quot;head() and not closed()&quot;
+</pre>
+</li>
+<li><p class="first">Changesets between tags 1.3 and 1.5 mentioning &quot;bug&quot; that affect
+<tt class="docutils literal">hgext/*</tt>:</p>
+<pre class="literal-block">
+hg log -r &quot;1.3::1.5 and keyword(bug) and file('hgext/*')&quot;
+</pre>
+</li>
+<li><p class="first">Changesets committed in May 2008, sorted by user:</p>
+<pre class="literal-block">
+hg log -r &quot;sort(date('May 2008'), user)&quot;
+</pre>
+</li>
+<li><p class="first">Changesets mentioning &quot;bug&quot; or &quot;issue&quot; that are not in a tagged
+release:</p>
+<pre class="literal-block">
+hg log -r &quot;(keyword(bug) or keyword(issue)) and not ancestors(tag())&quot;
+</pre>
+</li>
+<li><p class="first">Update to the commit that bookmark &#64; is pointing to, without activating the
+bookmark (this works because the last revision of the revset is used):</p>
+<pre class="literal-block">
+hg update :&#64;
+</pre>
+</li>
+<li><p class="first">Show diff between tags 1.3 and 1.5 (this works because the first and the
+last revisions of the revset are used):</p>
+<pre class="literal-block">
+hg diff -r 1.3::1.5
+</pre>
+</li>
+</ul>
+</div>
+</div>
+</body>
+</html>

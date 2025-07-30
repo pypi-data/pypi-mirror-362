@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Pager Support</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="pager-support">
+<span id="topic-pager"></span>
+<h1 class="title">Pager Support</h1>
+
+<p id="pager">Some Mercurial commands can produce a lot of output, and Mercurial will
+attempt to use a pager to make those commands more pleasant.</p>
+<p>To set the pager that should be used, set the application variable:</p>
+<pre class="literal-block">
+[pager]
+pager = less -FRX
+</pre>
+<p>If no pager is set in the user or repository configuration, Mercurial uses the
+environment variable $PAGER. If $PAGER is not set, pager.pager from the default
+or system configuration is used. If none of these are set, a default pager will
+be used, typically <cite>less</cite> on Unix and <cite>more</cite> on Windows.</p>
+<div class="windows docutils container">
+On Windows, <cite>more</cite> is not color aware, so using it effectively disables color.
+MSYS and Cygwin shells provide <cite>less</cite> as a pager, which can be configured to
+support ANSI color codes.  See <a class="reference external" href="hgrc.5.html#color"><tt class="docutils literal">hg help config.color.pagermode</tt></a> to configure
+the color mode when invoking a pager.</div>
+<p>You can disable the pager for certain commands by adding them to the
+pager.ignore list:</p>
+<pre class="literal-block">
+[pager]
+ignore = version, help, update
+</pre>
+<p>To ignore global commands like <a class="reference external" href="hg-version.html"><tt class="docutils literal">hg version</tt></a> or <a class="reference external" href="hg-help.html"><tt class="docutils literal">hg help</tt></a>, you have
+to specify them in your user configuration file.</p>
+<p>To control whether the pager is used at all for an individual command,
+you can use --pager=&lt;value&gt;:</p>
+<blockquote>
+<ul class="simple">
+<li>use as needed: <cite>auto</cite>.</li>
+<li>require the pager: <cite>yes</cite> or <cite>on</cite>.</li>
+<li>suppress the pager: <cite>no</cite> or <cite>off</cite> (any unrecognized value
+will also work).</li>
+</ul>
+</blockquote>
+<p>To globally turn off all attempts to use a pager, set:</p>
+<pre class="literal-block">
+[ui]
+paginate = never
+</pre>
+<p>which will prevent the pager from running.</p>
+</div>
+</body>
+</html>

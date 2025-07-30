@@ -1,0 +1,1064 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>mq</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="mq">
+<span id="ext-mq"></span>
+<h1 class="title">mq</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#repository-creation" id="toc-entry-3">Repository creation</a></li>
+<li><a class="reference internal" href="#change-creation" id="toc-entry-4">Change creation</a></li>
+<li><a class="reference internal" href="#change-manipulation" id="toc-entry-5">Change manipulation</a></li>
+<li><a class="reference internal" href="#change-organization" id="toc-entry-6">Change organization</a></li>
+<li><a class="reference internal" href="#file-content-management" id="toc-entry-7">File content management</a></li>
+<li><a class="reference internal" href="#change-import-export" id="toc-entry-8">Change import/export</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>manage a stack of patches</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension lets you work with a stack of patches in a Mercurial
+repository. It manages two stacks of patches - all known patches, and
+applied patches (subset of known patches).</p>
+<p>Known patches are represented as patch files in the .hg/patches
+directory. Applied patches are both patch files and changesets.</p>
+<p>Common tasks (use <a class="reference external" href="hg.1.html#COMMAND"><tt class="docutils literal">hg help COMMAND</tt></a> for more details):</p>
+<pre class="literal-block">
+create new patch                          qnew
+import existing patch                     qimport
+
+print patch series                        qseries
+print applied patches                     qapplied
+
+add known patch to applied stack          qpush
+remove patch from applied stack           qpop
+refresh contents of top applied patch     qrefresh
+</pre>
+<p>By default, mq will automatically use git patches when required to
+avoid losing file mode changes, copy records, binary files or empty
+files creations or deletions. This behavior can be configured with:</p>
+<pre class="literal-block">
+[mq]
+git = auto/keep/yes/no
+</pre>
+<p>If set to 'keep', mq will obey the [diff] section configuration while
+preserving existing git patches upon qrefresh. If set to 'yes' or
+'no', mq will override the [diff] section and always generate git or
+regular patches, possibly losing data in the second case.</p>
+<p>It may be desirable for mq changesets to be kept in the secret phase (see
+<a class="reference external" href="topic-phases.html"><tt class="docutils literal">hg help phases</tt></a>), which can be enabled with the following setting:</p>
+<pre class="literal-block">
+[mq]
+secret = True
+</pre>
+<p>You will by default be managing a patch queue named &quot;patches&quot;. You can
+create other, independent patch queues with the <a class="reference external" href="hg-qqueue.html"><tt class="docutils literal">hg qqueue</tt></a> command.</p>
+<p>If the working directory contains uncommitted files, qpush, qpop and
+qgoto abort immediately. If -f/--force is used, the changes are
+discarded. Setting:</p>
+<pre class="literal-block">
+[mq]
+keepchanges = True
+</pre>
+<p>make them behave as if --keep-changes were passed, and non-conflicting
+local changes will be tolerated and preserved. If incompatible options
+such as -f/--force or --exact are passed, this setting is ignored.</p>
+<p>This extension used to provide a strip command. This command now lives
+in the strip extension.</p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="repository-creation">
+<h2><a class="toc-backref" href="#contents">Repository creation</a></h2>
+<div class="section" id="qclone">
+<h3>qclone</h3>
+<p>clone main and patch repository at same time:</p>
+<pre class="literal-block">
+hg qclone [OPTION]... SOURCE [DEST]
+</pre>
+<p>If source is local, destination will have no patches applied. If
+source is remote, this command can not check if patches are
+applied in source, so cannot guarantee that patches are not
+applied in destination. If you clone remote repository, be sure
+before that it has no patches applied.</p>
+<p>Source patch repository is looked for in &lt;src&gt;/.hg/patches by
+default. Use -p &lt;url&gt; to change.</p>
+<p>The patch directory must be a nested Mercurial repository, as
+would be created by <a class="reference external" href="hg-init.html"><tt class="docutils literal">hg init <span class="pre">--mq</span></tt></a>.</p>
+<p>Return 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--pull</span></kbd></td>
+<td>use pull protocol to copy metadata</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-U</span>, <span class="option">--noupdate</span></kbd></td>
+<td>do not update the new working directories</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--uncompressed</span></kbd></td>
+<td>use uncompressed transfer (fast over LAN)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-p</span>, <span class="option">--patches <var>&lt;REPO&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>location of source patch repository</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qinit">
+<h3>qinit</h3>
+<p>init a new queue repository (DEPRECATED):</p>
+<pre class="literal-block">
+hg qinit [-c]
+</pre>
+<p>The queue repository is unversioned by default. If
+-c/--create-repo is specified, qinit will create a separate nested
+repository for patches (qinit -c may also be run later to convert
+an unversioned patch repository into a versioned one). You can use
+qcommit to commit changes to this queue repository.</p>
+<p>This command is deprecated. Without -c, it's implied by other relevant
+commands. With -c, use <a class="reference external" href="hg-init.html"><tt class="docutils literal">hg init <span class="pre">--mq</span></tt></a> instead.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-c</span>, <span class="option">--create-repo</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>create queue repository</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="change-creation">
+<h2><a class="toc-backref" href="#contents">Change creation</a></h2>
+<div class="section" id="qcommit">
+<h3>qcommit</h3>
+<p>commit changes in the queue repository (DEPRECATED):</p>
+<pre class="literal-block">
+hg qcommit [OPTION]... [FILE]...
+</pre>
+<p>This command is deprecated; use <a class="reference external" href="hg-commit.html"><tt class="docutils literal">hg commit <span class="pre">--mq</span></tt></a> instead.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-A</span>, <span class="option">--addremove</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>mark new/missing files as added/removed before committing</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--close-branch</span></kbd></td>
+<td>mark a branch head as closed</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--amend</span></kbd></td>
+<td>amend the parent of the working directory</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--secret</span></kbd></td>
+<td>use the secret phase for committing</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--draft</span></kbd></td>
+<td>use the draft phase for committing</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--force-close-branch</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>forcibly close branch from a non-head changeset (ADVANCED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-i</span>, <span class="option">--interactive</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use interactive mode</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as commit message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read commit message from file</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the specified date as commit date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-u</span>, <span class="option">--user <var>&lt;USER&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>record the specified user as committer</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-S</span>, <span class="option">--subrepos</span></kbd></td>
+<td>recurse into subrepositories</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+<!--  -->
+<blockquote>
+aliases: qci</blockquote>
+</div>
+<div class="section" id="qnew">
+<h3>qnew</h3>
+<p>create a new patch:</p>
+<pre class="literal-block">
+hg qnew [-e] [-m TEXT] [-l FILE] PATCH [FILE]...
+</pre>
+<p>qnew creates a new patch on top of the currently-applied patch (if
+any). The patch will be initialized with any outstanding changes
+in the working directory. You may also use -I/--include,
+-X/--exclude, and/or a list of files after the patch name to add
+only changes to matching files to the new patch, leaving the rest
+as uncommitted modifications.</p>
+<p>-u/--user and -d/--date can be used to set the (given) user and
+date, respectively. -U/--currentuser and -D/--currentdate set user
+to current user and date to current date.</p>
+<p>-e/--edit, -m/--message or -l/--logfile set the patch header as
+well as the commit message. If none is specified, the header is
+empty and the commit message is '[mq]: PATCH'.</p>
+<p>Use the -g/--git option to keep the patch in the git extended diff
+format. Read the diffs help topic for more information on why this
+is important for preserving permission changes and copy/rename
+information.</p>
+<p>Returns 0 on successful creation of a new patch.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>import uncommitted changes (DEPRECATED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--git</span></kbd></td>
+<td>use git extended diff format</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-U</span>, <span class="option">--currentuser</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add &quot;From: &lt;current user&gt;&quot; to patch</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-u</span>, <span class="option">--user <var>&lt;USER&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add &quot;From: &lt;USER&gt;&quot; to patch</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-D</span>, <span class="option">--currentdate</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add &quot;Date: &lt;current date&gt;&quot; to patch</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add &quot;Date: &lt;DATE&gt;&quot; to patch</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as commit message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read commit message from file</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+<div class="section" id="qrefresh">
+<h3>qrefresh</h3>
+<p>update the current patch:</p>
+<pre class="literal-block">
+hg qrefresh [-I] [-X] [-e] [-m TEXT] [-l FILE] [-s] [FILE]...
+</pre>
+<p>If any file patterns are provided, the refreshed patch will
+contain only the modifications that match those patterns; the
+remaining modifications will remain in the working directory.</p>
+<p>If -s/--short is specified, files currently included in the patch
+will be refreshed just like matched files and remain in the patch.</p>
+<p>If -e/--edit is specified, Mercurial will start your configured editor for
+you to enter a message. In case qrefresh fails, you will find a backup of
+your message in <tt class="docutils literal"><span class="pre">.hg/last-message.txt</span></tt>.</p>
+<p>hg add/remove/copy/rename work as usual, though you might want to
+use git-style patches (-g/--git or [diff] git=1) to track copies
+and renames. See the diffs help topic for more information on the
+git diff format.</p>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--git</span></kbd></td>
+<td>use git extended diff format</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--short</span></kbd></td>
+<td>refresh only files already in the patch and specified files</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-U</span>, <span class="option">--currentuser</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add/update author field in patch with current user</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-u</span>, <span class="option">--user <var>&lt;USER&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add/update author field in patch with given user</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-D</span>, <span class="option">--currentdate</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add/update date field in patch with current date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>add/update date field in patch with given date</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as commit message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read commit message from file</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+<div class="section" id="change-manipulation">
+<h2><a class="toc-backref" href="#contents">Change manipulation</a></h2>
+<div class="section" id="qfold">
+<h3>qfold</h3>
+<p>fold the named patches into the current patch:</p>
+<pre class="literal-block">
+hg qfold [-e] [-k] [-m TEXT] [-l FILE] PATCH...
+</pre>
+<p>Patches must not yet be applied. Each patch will be successively
+applied to the current patch in the order given. If all the
+patches apply successfully, the current patch will be refreshed
+with the new cumulative patch, and the folded patches will be
+deleted. With -k/--keep, the folded patch files will not be
+removed afterwards.</p>
+<p>The header for each folded patch will be concatenated with the
+current patch header, separated by a line of <tt class="docutils literal">* * *</tt>.</p>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-k</span>, <span class="option">--keep</span></kbd></td>
+<td>keep folded patch files</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as commit message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read commit message from file</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="change-organization">
+<h2><a class="toc-backref" href="#contents">Change organization</a></h2>
+<div class="section" id="qapplied">
+<h3>qapplied</h3>
+<p>print the patches already applied:</p>
+<pre class="literal-block">
+hg qapplied [-1] [-s] [PATCH]
+</pre>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-1</span>, <span class="option">--last</span></kbd></td>
+<td>show only the preceding applied patch</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--summary</span></kbd></td>
+<td>print first line of patch header</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qdelete">
+<h3>qdelete</h3>
+<p>remove patches from queue:</p>
+<pre class="literal-block">
+hg qdelete [-k] [PATCH]...
+</pre>
+<p>The patches must not be applied, and at least one patch is required. Exact
+patch identifiers must be given. With -k/--keep, the patch files are
+preserved in the patch directory.</p>
+<p>To stop managing a patch and move it into permanent history,
+use the <a class="reference external" href="hg-qfinish.html"><tt class="docutils literal">hg qfinish</tt></a> command.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-k</span>, <span class="option">--keep</span></kbd></td>
+<td>keep patch file</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>stop managing a revision (DEPRECATED)</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+<!--  -->
+<blockquote>
+aliases: qremove qrm</blockquote>
+</div>
+<div class="section" id="qfinish">
+<h3>qfinish</h3>
+<p>move applied patches into repository history:</p>
+<pre class="literal-block">
+hg qfinish [-a] [REV]...
+</pre>
+<p>Finishes the specified revisions (corresponding to applied
+patches) by moving them out of mq control into regular repository
+history.</p>
+<p>Accepts a revision range or the -a/--applied option. If --applied
+is specified, all applied mq revisions are removed from mq
+control. Otherwise, the given revisions must be at the base of the
+stack of applied patches.</p>
+<p>This can be especially useful if your changes have been applied to
+an upstream repository, or if you are about to push your changes
+to upstream.</p>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--applied</span></kbd></td>
+<td>finish all applied changesets</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qgoto">
+<h3>qgoto</h3>
+<p>push or pop patches until named patch is at top of stack:</p>
+<pre class="literal-block">
+hg qgoto [OPTION]... PATCH
+</pre>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--keep-changes</span></kbd></td>
+<td>tolerate non-conflicting local changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>overwrite any local changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--no-backup</span></kbd></td>
+<td>do not save backup copies of files</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qguard">
+<h3>qguard</h3>
+<p>set or print guards for a patch:</p>
+<pre class="literal-block">
+hg qguard [-l] [-n] [PATCH] [-- [+GUARD]... [-GUARD]...]
+</pre>
+<p>Guards control whether a patch can be pushed. A patch with no
+guards is always pushed. A patch with a positive guard (&quot;+foo&quot;) is
+pushed only if the <a class="reference external" href="hg-qselect.html"><tt class="docutils literal">hg qselect</tt></a> command has activated it. A patch with
+a negative guard (&quot;-foo&quot;) is never pushed if the <a class="reference external" href="hg-qselect.html"><tt class="docutils literal">hg qselect</tt></a> command
+has activated it.</p>
+<p>With no arguments, print the currently active guards.
+With arguments, set guards for the named patch.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Specifying negative guards now requires '--'.</p>
+</div>
+<p>To set guards on another patch:</p>
+<pre class="literal-block">
+hg qguard other.patch -- +2.6.17 -stable
+</pre>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-l</span>, <span class="option">--list</span></kbd></td>
+<td>list all patches and guards</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--none</span></kbd></td>
+<td>drop all guards</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qheader">
+<h3>qheader</h3>
+<p>print the header of the topmost or specified patch:</p>
+<pre class="literal-block">
+hg qheader [PATCH]
+</pre>
+<p>Returns 0 on success.</p>
+</div>
+<div class="section" id="qnext">
+<h3>qnext</h3>
+<p>print the name of the next pushable patch:</p>
+<pre class="literal-block">
+hg qnext [-s]
+</pre>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--summary</span></kbd></td>
+<td>print first line of patch header</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qpop">
+<h3>qpop</h3>
+<p>pop the current patch off the stack:</p>
+<pre class="literal-block">
+hg qpop [-a] [-f] [PATCH | INDEX]
+</pre>
+<p>Without argument, pops off the top of the patch stack. If given a
+patch name, keeps popping off patches until the named patch is at
+the top of the stack.</p>
+<p>By default, abort if the working directory contains uncommitted
+changes. With --keep-changes, abort only if the uncommitted files
+overlap with patched files. With -f/--force, backup and discard
+changes made to such files.</p>
+<p>Return 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--all</span></kbd></td>
+<td>pop all patches</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--name <var>&lt;NAME&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>queue name to pop (DEPRECATED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--keep-changes</span></kbd></td>
+<td>tolerate non-conflicting local changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>forget any local changes to patched files</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--no-backup</span></kbd></td>
+<td>do not save backup copies of files</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qprev">
+<h3>qprev</h3>
+<p>print the name of the preceding applied patch:</p>
+<pre class="literal-block">
+hg qprev [-s]
+</pre>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--summary</span></kbd></td>
+<td>print first line of patch header</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qpush">
+<h3>qpush</h3>
+<p>push the next patch onto the stack:</p>
+<pre class="literal-block">
+hg qpush [-f] [-l] [-a] [--move] [PATCH | INDEX]
+</pre>
+<p>By default, abort if the working directory contains uncommitted
+changes. With --keep-changes, abort only if the uncommitted files
+overlap with patched files. With -f/--force, backup and patch over
+uncommitted changes.</p>
+<p>Return 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--keep-changes</span></kbd></td>
+<td>tolerate non-conflicting local changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>apply on top of local changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--exact</span></kbd></td>
+<td>apply the target patch to its recorded parent</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-l</span>, <span class="option">--list</span></kbd></td>
+<td>list patch name in commit text</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--all</span></kbd></td>
+<td>apply all patches</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-m</span>, <span class="option">--merge</span></kbd></td>
+<td>merge from another queue (DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--name <var>&lt;NAME&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>merge queue name (DEPRECATED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--move</span></kbd></td>
+<td>reorder patch series and apply only the patch</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--no-backup</span></kbd></td>
+<td>do not save backup copies of files</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qqueue">
+<h3>qqueue</h3>
+<p>manage multiple patch queues:</p>
+<pre class="literal-block">
+hg qqueue [OPTION] [QUEUE]
+</pre>
+<p>Supports switching between different patch queues, as well as creating
+new patch queues and deleting existing ones.</p>
+<p>Omitting a queue name or specifying -l/--list will show you the registered
+queues - by default the &quot;normal&quot; patches queue is registered. The currently
+active queue will be marked with &quot;(active)&quot;. Specifying --active will print
+only the name of the active queue.</p>
+<p>To create a new queue, use -c/--create. The queue is automatically made
+active, except in the case where there are applied patches from the
+currently active queue in the repository. Then the queue will only be
+created and switching will fail.</p>
+<p>To delete an existing queue, use --delete. You cannot delete the currently
+active queue.</p>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-l</span>, <span class="option">--list</span></kbd></td>
+<td>list all available queues</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--active</span></kbd></td>
+<td>print name of active queue</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-c</span>, <span class="option">--create</span></kbd></td>
+<td>create new queue</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--rename</span></kbd></td>
+<td>rename active queue</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--delete</span></kbd></td>
+<td>delete reference to queue</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--purge</span></kbd></td>
+<td>delete queue, and remove patch dir</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qrename">
+<h3>qrename</h3>
+<p>rename a patch:</p>
+<pre class="literal-block">
+hg qrename PATCH1 [PATCH2]
+</pre>
+<p>With one argument, renames the current patch to PATCH1.
+With two arguments, renames PATCH1 to PATCH2.</p>
+<p>Returns 0 on success.</p>
+<!--  -->
+<blockquote>
+aliases: qmv</blockquote>
+</div>
+<div class="section" id="qrestore">
+<h3>qrestore</h3>
+<p>restore the queue state saved by a revision (DEPRECATED):</p>
+<pre class="literal-block">
+hg qrestore [-d] [-u] REV
+</pre>
+<p>This command is deprecated, use <a class="reference external" href="hg-rebase.html"><tt class="docutils literal">hg rebase</tt></a> instead.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-d</span>, <span class="option">--delete</span></kbd></td>
+<td>delete save entry</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-u</span>, <span class="option">--update</span></kbd></td>
+<td>update queue working directory</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qsave">
+<h3>qsave</h3>
+<p>save current queue state (DEPRECATED):</p>
+<pre class="literal-block">
+hg qsave [-m TEXT] [-l FILE] [-c] [-n NAME] [-e] [-f]
+</pre>
+<p>This command is deprecated, use <a class="reference external" href="hg-rebase.html"><tt class="docutils literal">hg rebase</tt></a> instead.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-c</span>, <span class="option">--copy</span></kbd></td>
+<td>copy patch directory</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--name <var>&lt;NAME&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>copy directory name</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--empty</span></kbd></td>
+<td>clear queue status file</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>force copy</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as commit message</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read commit message from file</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qselect">
+<h3>qselect</h3>
+<p>set or print guarded patches to push:</p>
+<pre class="literal-block">
+hg qselect [OPTION]... [GUARD]...
+</pre>
+<p>Use the <a class="reference external" href="hg-qguard.html"><tt class="docutils literal">hg qguard</tt></a> command to set or print guards on patch, then use
+qselect to tell mq which guards to use. A patch will be pushed if
+it has no guards or any positive guards match the currently
+selected guard, but will not be pushed if any negative guards
+match the current guard. For example:</p>
+<pre class="literal-block">
+qguard foo.patch -- -stable    (negative guard)
+qguard bar.patch    +stable    (positive guard)
+qselect stable
+</pre>
+<p>This activates the &quot;stable&quot; guard. mq will skip foo.patch (because
+it has a negative match) but push bar.patch (because it has a
+positive match).</p>
+<p>With no arguments, prints the currently active guards.
+With one argument, sets the active guard.</p>
+<p>Use -n/--none to deactivate guards (no other arguments needed).
+When no guards are active, patches with positive guards are
+skipped and patches with negative guards are pushed.</p>
+<p>qselect can change the guards on applied patches. It does not pop
+guarded patches by default. Use --pop to pop back to the last
+applied patch that is not guarded. Use --reapply (which implies
+--pop) to push back to the current patch afterwards, but skip
+guarded patches.</p>
+<p>Use -s/--series to print a list of all guards in the series file
+(no other arguments needed). Use -v for more information.</p>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--none</span></kbd></td>
+<td>disable all guards</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--series</span></kbd></td>
+<td>list all guards in series file</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--pop</span></kbd></td>
+<td>pop to before first guarded applied patch</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--reapply</span></kbd></td>
+<td>pop, then reapply patches</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qseries">
+<h3>qseries</h3>
+<p>print the entire series file:</p>
+<pre class="literal-block">
+hg qseries [-ms]
+</pre>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-m</span>, <span class="option">--missing</span></kbd></td>
+<td>print patches not in series</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--summary</span></kbd></td>
+<td>print first line of patch header</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qtop">
+<h3>qtop</h3>
+<p>print the name of the current patch:</p>
+<pre class="literal-block">
+hg qtop [-s]
+</pre>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--summary</span></kbd></td>
+<td>print first line of patch header</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="qunapplied">
+<h3>qunapplied</h3>
+<p>print the patches not yet applied:</p>
+<pre class="literal-block">
+hg qunapplied [-1] [-s] [PATCH]
+</pre>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-1</span>, <span class="option">--first</span></kbd></td>
+<td>show only the first patch</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s</span>, <span class="option">--summary</span></kbd></td>
+<td>print first line of patch header</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="file-content-management">
+<h2><a class="toc-backref" href="#contents">File content management</a></h2>
+<div class="section" id="qdiff">
+<h3>qdiff</h3>
+<p>diff of the current patch and subsequent modifications:</p>
+<pre class="literal-block">
+hg qdiff [OPTION]... [FILE]...
+</pre>
+<p>Shows a diff which includes the current patch as well as any
+changes which have been made in the working directory since the
+last refresh (thus showing what the current patch would become
+after a qrefresh).</p>
+<p>Use <a class="reference external" href="hg-diff.html"><tt class="docutils literal">hg diff</tt></a> if you only want to see the changes made since the
+last qrefresh, or <a class="reference external" href="hg-export.html"><tt class="docutils literal">hg export qtip</tt></a> if you want to see changes
+made by the current patch without including changes made since the
+qrefresh.</p>
+<p>Returns 0 on success.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--text</span></kbd></td>
+<td>treat all files as text</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--git</span></kbd></td>
+<td>use git extended diff format (DEFAULT: diff.git)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--binary</span></kbd></td>
+<td>generate binary diffs in git mode (default)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--nodates</span></kbd></td>
+<td>omit dates from diff headers</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--noprefix</span></kbd></td>
+<td>omit a/ and b/ prefixes from filenames</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-p</span>, <span class="option">--show-function</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show which function each change is in (DEFAULT: diff.showfunc)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--reverse</span></kbd></td>
+<td>produce a diff that undoes the changes</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-w</span>, <span class="option">--ignore-all-space</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore white space when comparing lines</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--ignore-space-change</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes in the amount of white space</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--ignore-blank-lines</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes whose lines are all blank</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-Z</span>, <span class="option">--ignore-space-at-eol</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>ignore changes in whitespace at EOL</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-U</span>, <span class="option">--unified <var>&lt;NUM&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>number of lines of context to show</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stat</span></kbd></td>
+<td>output diffstat-style summary of changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--root <var>&lt;DIR&gt;</var></span></kbd></td>
+<td>produce diffs relative to subdirectory</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+<div class="section" id="change-import-export">
+<h2><a class="toc-backref" href="#contents">Change import/export</a></h2>
+<div class="section" id="qimport">
+<h3>qimport</h3>
+<p>import a patch or existing changeset:</p>
+<pre class="literal-block">
+hg qimport [-e] [-n NAME] [-f] [-g] [-P] [-r REV]... [FILE]...
+</pre>
+<p>The patch is inserted into the series after the last applied
+patch. If no patches have been applied, qimport prepends the patch
+to the series.</p>
+<p>The patch will have the same name as its source file unless you
+give it a new one with -n/--name.</p>
+<p>You can register an existing patch inside the patch directory with
+the -e/--existing flag.</p>
+<p>With -f/--force, an existing patch of the same name will be
+overwritten.</p>
+<p>An existing changeset may be placed under mq control with -r/--rev
+(e.g. qimport --rev . -n patch will place the current revision
+under mq control). With -g/--git, patches imported with --rev will
+use the git diff format. See the diffs help topic for information
+on why this is important for preserving rename/copy information
+and permission changes. Use <a class="reference external" href="hg-qfinish.html"><tt class="docutils literal">hg qfinish</tt></a> to remove changesets
+from mq control.</p>
+<p>To import a patch from standard input, pass - as the patch file.
+When importing from standard input, a patch name must be specified
+using the --name flag.</p>
+<p>To import an existing patch while renaming it:</p>
+<pre class="literal-block">
+hg qimport -e existing-patch -n new-name
+</pre>
+<p>Returns 0 if import succeeded.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--existing</span></kbd></td>
+<td>import file in patch directory</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--name <var>&lt;NAME&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>name of patch file</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>overwrite existing files</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>place existing revisions under mq control</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--git</span></kbd></td>
+<td>use git extended diff format</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-P</span>, <span class="option">--push</span></kbd></td>
+<td>qpush after importing</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>fsmonitor</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="fsmonitor">
+<span id="ext-fsmonitor"></span>
+<h1 class="title">fsmonitor</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+</ul>
+</div>
+<p>Faster status operations with the Watchman file monitor (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Integrates the file-watching program Watchman with Mercurial to produce faster
+status results.</p>
+<p>On a particular Linux system, for a real-world repository with over 400,000
+files hosted on ext4, vanilla <cite>hg status</cite> takes 1.3 seconds. On the same
+system, with fsmonitor it takes about 0.3 seconds.</p>
+<p>fsmonitor requires no configuration -- it will tell Watchman about your
+repository as necessary. You'll need to install Watchman from
+<a class="reference external" href="https://facebook.github.io/watchman/">https://facebook.github.io/watchman/</a> and make sure it is in your PATH.</p>
+<p>fsmonitor is incompatible with the largefiles and eol extensions, and
+will disable itself if any of those are active.</p>
+<p>The following configuration options exist:</p>
+<pre class="literal-block">
+[fsmonitor]
+mode = {off, on, paranoid}
+</pre>
+<p>When <cite>mode = off</cite>, fsmonitor will disable itself (similar to not loading the
+extension at all). When <cite>mode = on</cite>, fsmonitor will be enabled (the default).
+When <cite>mode = paranoid</cite>, fsmonitor will query both Watchman and the filesystem,
+and ensure that the results are consistent.</p>
+<pre class="literal-block">
+[fsmonitor]
+timeout = (float)
+</pre>
+<p>A value, in seconds, that determines how long fsmonitor will wait for Watchman
+to return results. Defaults to <cite>2.0</cite>.</p>
+<pre class="literal-block">
+[fsmonitor]
+blacklistusers = (list of userids)
+</pre>
+<p>A list of usernames for which fsmonitor will disable itself altogether.</p>
+<pre class="literal-block">
+[fsmonitor]
+walk_on_invalidate = (boolean)
+</pre>
+<p>Whether or not to walk the whole repo ourselves when our cached state has been
+invalidated, for example when Watchman has been restarted or .hgignore rules
+have been changed. Walking the repo in that case can result in competing for
+I/O with Watchman. For large repos it is recommended to set this value to
+false. You may wish to set this to true if you have a very fast filesystem
+that can outpace the IPC overhead of getting the result data for the full repo
+from Watchman. Defaults to false.</p>
+<pre class="literal-block">
+[fsmonitor]
+warn_when_unused = (boolean)
+</pre>
+<p>Whether to print a warning during certain operations when fsmonitor would be
+beneficial to performance but isn't enabled.</p>
+<pre class="literal-block">
+[fsmonitor]
+warn_update_file_count = (integer)
+# or when mercurial is built with rust support
+warn_update_file_count_rust = (integer)
+</pre>
+<p>If <tt class="docutils literal">warn_when_unused</tt> is set and fsmonitor isn't enabled, a warning will
+be printed during working directory updates if this many files will be
+created.</p>
+</div>
+</div>
+</body>
+</html>

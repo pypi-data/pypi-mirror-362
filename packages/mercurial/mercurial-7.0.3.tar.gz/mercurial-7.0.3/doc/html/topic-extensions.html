@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Using Additional Features</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="using-additional-features">
+<span id="topic-extensions"></span>
+<h1 class="title">Using Additional Features</h1>
+
+<p id="extensions">Mercurial has the ability to add new features through the use of
+extensions. Extensions may add new commands, add options to
+existing commands, change the default behavior of commands, or
+implement hooks.</p>
+<p>To enable the &quot;foo&quot; extension, either shipped with Mercurial or in the
+Python search path, create an entry for it in your configuration file,
+like this:</p>
+<pre class="literal-block">
+[extensions]
+foo =
+</pre>
+<p>You may also specify the full path to an extension:</p>
+<pre class="literal-block">
+[extensions]
+myfeature = ~/.hgext/myfeature.py
+</pre>
+<p>See <a class="reference external" href="hgrc.5.html"><tt class="docutils literal">hg help config</tt></a> for more information on configuration files.</p>
+<p>Extensions are not loaded by default for a variety of reasons:
+they can increase startup overhead; they may be meant for advanced
+usage only; they may provide potentially dangerous abilities (such
+as letting you destroy or modify history); they might not be ready
+for prime time; or they may alter some usual behaviors of stock
+Mercurial. It is thus up to the user to activate extensions as
+needed.</p>
+<p>To explicitly disable an extension enabled in a configuration file of
+broader scope, prepend its path with !:</p>
+<pre class="literal-block">
+[extensions]
+# disabling extension bar residing in /path/to/extension/bar.py
+bar = !/path/to/extension/bar.py
+# ditto, but no path was supplied for extension baz
+baz = !
+</pre>
+<p>disabled extensions:</p>
+<blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">acl:</th><td class="field-body">hooks for controlling repository access</td>
+</tr>
+<tr class="field"><th class="field-name">blackbox:</th><td class="field-body">log repository events to a blackbox for debugging</td>
+</tr>
+<tr class="field"><th class="field-name">bugzilla:</th><td class="field-body">hooks for integrating with the Bugzilla bug tracker</td>
+</tr>
+<tr class="field"><th class="field-name">censor:</th><td class="field-body">erase file content at a given revision</td>
+</tr>
+<tr class="field"><th class="field-name">churn:</th><td class="field-body">command to display statistics about repository history</td>
+</tr>
+<tr class="field"><th class="field-name">clonebundles:</th><td class="field-body">advertise pre-generated bundles to seed clones</td>
+</tr>
+<tr class="field"><th class="field-name">closehead:</th><td class="field-body">close arbitrary heads without checking them out first</td>
+</tr>
+<tr class="field"><th class="field-name">convert:</th><td class="field-body">import revisions from foreign VCS repositories into Mercurial</td>
+</tr>
+<tr class="field"><th class="field-name">eol:</th><td class="field-body">automatically manage newlines in repository files</td>
+</tr>
+<tr class="field"><th class="field-name">extdiff:</th><td class="field-body">command to allow external programs to compare revisions</td>
+</tr>
+<tr class="field"><th class="field-name">factotum:</th><td class="field-body">http authentication with factotum</td>
+</tr>
+<tr class="field"><th class="field-name">fastexport:</th><td class="field-body">export repositories as git fast-import stream</td>
+</tr>
+<tr class="field"><th class="field-name">githelp:</th><td class="field-body">try mapping git commands to Mercurial commands</td>
+</tr>
+<tr class="field"><th class="field-name">gpg:</th><td class="field-body">commands to sign and verify changesets</td>
+</tr>
+<tr class="field"><th class="field-name">hgk:</th><td class="field-body">browse the repository in a graphical way</td>
+</tr>
+<tr class="field"><th class="field-name">highlight:</th><td class="field-body">syntax highlighting for hgweb (requires Pygments)</td>
+</tr>
+<tr class="field"><th class="field-name">histedit:</th><td class="field-body">interactive history editing</td>
+</tr>
+<tr class="field"><th class="field-name">keyword:</th><td class="field-body">expand keywords in tracked files</td>
+</tr>
+<tr class="field"><th class="field-name">largefiles:</th><td class="field-body">track large binary files</td>
+</tr>
+<tr class="field"><th class="field-name">mq:</th><td class="field-body">manage a stack of patches</td>
+</tr>
+<tr class="field"><th class="field-name">notify:</th><td class="field-body">hooks for sending email push notifications</td>
+</tr>
+<tr class="field"><th class="field-name">patchbomb:</th><td class="field-body">command to send changesets as (a series of) patch emails</td>
+</tr>
+<tr class="field"><th class="field-name">rebase:</th><td class="field-body">command to move sets of revisions to a different ancestor</td>
+</tr>
+<tr class="field"><th class="field-name">relink:</th><td class="field-body">recreates hardlinks between repository clones</td>
+</tr>
+<tr class="field"><th class="field-name">schemes:</th><td class="field-body">extend schemes with shortcuts to repository swarms</td>
+</tr>
+<tr class="field"><th class="field-name">share:</th><td class="field-body">share a common history between several working directories</td>
+</tr>
+<tr class="field"><th class="field-name">transplant:</th><td class="field-body">command to transplant changesets from another branch</td>
+</tr>
+<tr class="field"><th class="field-name">win32mbcs:</th><td class="field-body">allow the use of MBCS paths with problematic encodings</td>
+</tr>
+<tr class="field"><th class="field-name">zeroconf:</th><td class="field-body">discover and advertise repositories on the local network</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+</div>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>rebase</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="rebase">
+<span id="ext-rebase"></span>
+<h1 class="title">rebase</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#change-manipulation" id="toc-entry-3">Change manipulation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>command to move sets of revisions to a different ancestor</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension lets you rebase changesets in an existing Mercurial
+repository.</p>
+<p>For more information:
+<a class="reference external" href="https://mercurial-scm.org/wiki/RebaseExtension">https://mercurial-scm.org/wiki/RebaseExtension</a></p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="change-manipulation">
+<h2><a class="toc-backref" href="#contents">Change manipulation</a></h2>
+<div class="section" id="rebase-1">
+<h3>rebase</h3>
+<p>move changeset (and descendants) to a different branch:</p>
+<pre class="literal-block">
+hg rebase [[-s REV]... | [-b REV]... | [-r REV]...] [-d REV] [OPTION]...
+</pre>
+<p>Rebase uses repeated merging to graft changesets from one part of
+history (the source) onto another (the destination). This can be
+useful for linearizing <em>local</em> changes relative to a master
+development tree.</p>
+<p>Published commits cannot be rebased (see <a class="reference external" href="topic-phases.html"><tt class="docutils literal">hg help phases</tt></a>).
+To copy commits, see <a class="reference external" href="hg-graft.html"><tt class="docutils literal">hg help graft</tt></a>.</p>
+<p>If you don't specify a destination changeset (<tt class="docutils literal"><span class="pre">-d/--dest</span></tt>), rebase
+will use the same logic as <a class="reference external" href="hg-merge.html"><tt class="docutils literal">hg merge</tt></a> to pick a destination.  if
+the current branch contains exactly one other head, the other head
+is merged with by default.  Otherwise, an explicit revision with
+which to merge with must be provided.  (destination changeset is not
+modified by rebasing, but new changesets are added as its
+descendants.)</p>
+<p>Here are the ways to select changesets:</p>
+<blockquote>
+<ol class="arabic simple">
+<li>Explicitly select them using <tt class="docutils literal"><span class="pre">--rev</span></tt>.</li>
+<li>Use <tt class="docutils literal"><span class="pre">--source</span></tt> to select a root changeset and include all of its
+descendants.</li>
+<li>Use <tt class="docutils literal"><span class="pre">--base</span></tt> to select a changeset; rebase will find ancestors
+and their descendants which are not also ancestors of the destination.</li>
+<li>If you do not specify any of <tt class="docutils literal"><span class="pre">--rev</span></tt>, <tt class="docutils literal"><span class="pre">--source</span></tt>, or <tt class="docutils literal"><span class="pre">--base</span></tt>,
+rebase will use <tt class="docutils literal"><span class="pre">--base</span> .</tt> as above.</li>
+</ol>
+</blockquote>
+<p>If <tt class="docutils literal"><span class="pre">--source</span></tt> or <tt class="docutils literal"><span class="pre">--rev</span></tt> is used, special names <tt class="docutils literal">SRC</tt> and <tt class="docutils literal">ALLSRC</tt>
+can be used in <tt class="docutils literal"><span class="pre">--dest</span></tt>. Destination would be calculated per source
+revision with <tt class="docutils literal">SRC</tt> substituted by that single source revision and
+<tt class="docutils literal">ALLSRC</tt> substituted by all source revisions.</p>
+<p>Rebase will destroy original changesets unless you use <tt class="docutils literal"><span class="pre">--keep</span></tt>.
+It will also move your bookmarks (even if you do).</p>
+<p>Some changesets may be dropped if they do not contribute changes
+(e.g. merges from the destination branch).</p>
+<p>Unlike <tt class="docutils literal">merge</tt>, rebase will do nothing if you are at the branch tip of
+a named branch with two heads. You will need to explicitly specify source
+and/or destination.</p>
+<p>If you need to use a tool to automate merge/conflict decisions, you
+can specify one with <tt class="docutils literal"><span class="pre">--tool</span></tt>, see <a class="reference external" href="topic-merge-tools.html"><tt class="docutils literal">hg help <span class="pre">merge-tools</span></tt></a>.
+As a caveat: the tool will not be used to mediate when a file was
+deleted, there is no hook presently available for this.</p>
+<p>If a rebase is interrupted to manually resolve a conflict, it can be
+continued with --continue/-c, aborted with --abort/-a, or stopped with
+--stop.</p>
+<div class="verbose docutils container">
+<p>Examples:</p>
+<ul>
+<li><p class="first">move &quot;local changes&quot; (current commit back to branching point)
+to the current branch tip after a pull:</p>
+<pre class="literal-block">
+hg rebase
+</pre>
+</li>
+<li><p class="first">move a single changeset to the stable branch:</p>
+<pre class="literal-block">
+hg rebase -r 5f493448 -d stable
+</pre>
+</li>
+<li><p class="first">splice a commit and all its descendants onto another part of history:</p>
+<pre class="literal-block">
+hg rebase --source c0c3 --dest 4cf9
+</pre>
+</li>
+<li><p class="first">rebase everything on a branch marked by a bookmark onto the
+default branch:</p>
+<pre class="literal-block">
+hg rebase --base myfeature --dest default
+</pre>
+</li>
+<li><p class="first">collapse a sequence of changes into a single commit:</p>
+<pre class="literal-block">
+hg rebase --collapse -r 1520:1525 -d .
+</pre>
+</li>
+<li><p class="first">move a named branch while preserving its name:</p>
+<pre class="literal-block">
+hg rebase -r &quot;branch(featureX)&quot; -d 1.3 --keepbranches
+</pre>
+</li>
+<li><p class="first">stabilize orphaned changesets so history looks linear:</p>
+<pre class="literal-block">
+hg rebase -r 'orphan()-obsolete()' -d 'first(max((successors(max(roots(ALLSRC) &amp; ::SRC)^)-obsolete())::) + max(::((roots(ALLSRC) &amp; ::SRC)^)-obsolete()))'
+</pre>
+</li>
+</ul>
+</div>
+<p>Configuration Options:</p>
+<p>You can make rebase require a destination if you set the following config
+option:</p>
+<pre class="literal-block">
+[commands]
+rebase.requiredest = True
+</pre>
+<p>By default, rebase will close the transaction after each commit. For
+performance purposes, you can configure rebase to use a single transaction
+across the entire rebase. WARNING: This setting introduces a significant
+risk of losing the work you've done in a rebase if the rebase aborts
+unexpectedly:</p>
+<pre class="literal-block">
+[rebase]
+singletransaction = True
+</pre>
+<p>By default, rebase writes to the working copy, but you can configure it to
+run in-memory for better performance. When the rebase is not moving the
+parent(s) of the working copy (AKA the &quot;currently checked out changesets&quot;),
+this may also allow it to run even if the working copy is dirty:</p>
+<pre class="literal-block">
+[rebase]
+experimental.inmemory = True
+</pre>
+<p>Return Values:</p>
+<p>Returns 0 on success, 1 if nothing to rebase or there are
+unresolved conflicts.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-s</span>, <span class="option">--source <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>rebase the specified changesets and their descendants</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--base <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>rebase everything from branching point of specified changeset</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>rebase these revisions</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--dest <var>&lt;REV&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>rebase onto the specified changeset</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--collapse</span></kbd></td>
+<td>collapse the rebased changesets</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--message <var>&lt;TEXT&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>use text as collapse commit message</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--edit</span></kbd></td>
+<td>invoke editor on commit messages</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--logfile <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>read collapse commit message from file</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-k</span>, <span class="option">--keep</span></kbd></td>
+<td>keep original changesets</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--keepbranches</span></kbd></td>
+<td>keep original branch names</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-D</span>, <span class="option">--detach</span></kbd></td>
+<td>(DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-i</span>, <span class="option">--interactive</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>(DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-t</span>, <span class="option">--tool <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify merge tool</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stop</span></kbd></td>
+<td>stop interrupted rebase</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-c</span>, <span class="option">--continue</span></kbd></td>
+<td>continue an interrupted rebase</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a</span>, <span class="option">--abort</span></kbd></td>
+<td>abort an interrupted rebase</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--auto-orphans <var>&lt;VALUE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>automatically rebase orphan revisions in the specified revset (EXPERIMENTAL)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
+<td>do not perform actions, just print output</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--confirm</span></kbd></td>
+<td>ask before applying actions</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

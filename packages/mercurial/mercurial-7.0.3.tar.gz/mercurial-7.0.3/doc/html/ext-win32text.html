@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>win32text</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="win32text">
+<span id="ext-win32text"></span>
+<h1 class="title">win32text</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+</ul>
+</div>
+<p>perform automatic newline conversion (DEPRECATED)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<dl class="docutils">
+<dt>Deprecation: The win32text extension requires each user to configure</dt>
+<dd><p class="first">the extension again and again for each clone since the configuration
+is not copied when cloning.</p>
+<p class="last">We have therefore made the <tt class="docutils literal">eol</tt> as an alternative. The <tt class="docutils literal">eol</tt>
+uses a version controlled file for its configuration and each clone
+will therefore use the right settings from the start.</p>
+</dd>
+</dl>
+<p>To perform automatic newline conversion, use:</p>
+<pre class="literal-block">
+[extensions]
+win32text =
+[encode]
+** = cleverencode:
+# or ** = macencode:
+
+[decode]
+** = cleverdecode:
+# or ** = macdecode:
+</pre>
+<p>If not doing conversion, to make sure you do not commit CRLF/CR by accident:</p>
+<pre class="literal-block">
+[hooks]
+pretxncommit.crlf = python:hgext.win32text.forbidcrlf
+# or pretxncommit.cr = python:hgext.win32text.forbidcr
+</pre>
+<p>To do the same check on a server to prevent CRLF/CR from being
+pushed or pulled:</p>
+<pre class="literal-block">
+[hooks]
+pretxnchangegroup.crlf = python:hgext.win32text.forbidcrlf
+# or pretxnchangegroup.cr = python:hgext.win32text.forbidcr
+</pre>
+</div>
+</div>
+</body>
+</html>

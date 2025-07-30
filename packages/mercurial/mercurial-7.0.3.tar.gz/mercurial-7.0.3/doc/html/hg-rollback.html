@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg rollback</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-rollback">
+<span id="hg-rollback-1"></span>
+<h1 class="title">hg rollback</h1>
+<h2 class="subtitle" id="roll-back-the-last-transaction-dangerous-deprecated">roll back the last transaction (DANGEROUS) (DEPRECATED)</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg rollback
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Please use <a class="reference external" href="hg-commit.html"><tt class="docutils literal">hg commit <span class="pre">--amend</span></tt></a> instead of rollback to correct
+mistakes in the last commit.</p>
+<p>This command should be used with care. There is only one level of
+rollback, and there is no way to undo a rollback. It will also
+restore the dirstate at the time of the last transaction, losing
+any dirstate changes since that time. This command does not alter
+the working directory.</p>
+<p>Transactions are used to encapsulate the effects of all commands
+that create new changesets or propagate existing changesets into a
+repository.</p>
+<div class="verbose docutils container">
+<p>For example, the following commands are transactional, and their
+effects can be rolled back:</p>
+<ul class="simple">
+<li>commit</li>
+<li>import</li>
+<li>pull</li>
+<li>push (with this repository as the destination)</li>
+<li>unbundle</li>
+</ul>
+<p>To avoid permanent data loss, rollback will refuse to rollback a
+commit transaction if it isn't checked out. Use --force to
+override this protection.</p>
+<p>The rollback command can be entirely disabled by setting the
+<tt class="docutils literal">ui.rollback</tt> configuration setting to false. If you're here
+because you want to use rollback and it's disabled, you can
+re-enable the command by setting <tt class="docutils literal">ui.rollback</tt> to true.</p>
+</div>
+<p>This command is not intended for use on public repositories. Once
+changes are visible for pull by other users, rolling a transaction
+back locally is ineffective (someone else may already have pulled
+the changes). Furthermore, a race is possible with readers of the
+repository; for example an in-progress pull from the repository
+may fail if a rollback is performed.</p>
+<p>Returns 0 on success, 1 if no rollback data is available.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
+<td>do not perform actions, just print output</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>ignore safety measures</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Merge Tools</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="merge-tools">
+<span id="topic-merge-tools"></span>
+<h1 class="title">Merge Tools</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#available-merge-tools" id="toc-entry-1">Available merge tools</a></li>
+<li><a class="reference internal" href="#choosing-a-merge-tool" id="toc-entry-2">Choosing a merge tool</a></li>
+</ul>
+</div>
+<p id="mergetool"><span id="mergetools"></span><span id="merge-tools-1"></span>To merge files Mercurial uses merge tools.</p>
+<p>A merge tool combines two different versions of a file into a merged
+file. Merge tools are given the two files and the greatest common
+ancestor of the two file versions, so they can determine the changes
+made on both branches.</p>
+<p>Merge tools are used both for <a class="reference external" href="hg-resolve.html"><tt class="docutils literal">hg resolve</tt></a>, <a class="reference external" href="hg-merge.html"><tt class="docutils literal">hg merge</tt></a>, <a class="reference external" href="hg-update.html"><tt class="docutils literal">hg update</tt></a>,
+<a class="reference external" href="hg-backout.html"><tt class="docutils literal">hg backout</tt></a> and in several extensions.</p>
+<p>Usually, the merge tool tries to automatically reconcile the files by
+combining all non-overlapping changes that occurred separately in
+the two different evolutions of the same initial base file. Furthermore, some
+interactive merge programs make it easier to manually resolve
+conflicting merges, either in a graphical way, or by inserting some
+conflict markers. Mercurial does not include any interactive merge
+programs but relies on external tools for that.</p>
+<div class="section" id="available-merge-tools">
+<h1><a class="toc-backref" href="#contents">Available merge tools</a></h1>
+<p>External merge tools and their properties are configured in the
+merge-tools configuration section - see hgrc(5) - but they can often just
+be named by their executable.</p>
+<p>A merge tool is generally usable if its executable can be found on the
+system and if it can handle the merge. The executable is found if it
+is an absolute or relative executable path or the name of an
+application in the executable search path. The tool is assumed to be
+able to handle the merge if it can handle symlinks if the file is a
+symlink, if it can handle binary files if the file is binary, and if a
+GUI is available if the tool requires a GUI.</p>
+<p>There are some internal merge tools which can be used. The internal
+merge tools are:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">:dump</tt></dt>
+<dd><p class="first">Creates three versions of the files to merge, containing the
+contents of local, other and base. These files can then be used to
+perform a merge manually. If the file to be merged is named
+<tt class="docutils literal">a.txt</tt>, these files will accordingly be named <tt class="docutils literal">a.txt.local</tt>,
+<tt class="docutils literal">a.txt.other</tt> and <tt class="docutils literal">a.txt.base</tt> and they will be placed in the
+same directory as <tt class="docutils literal">a.txt</tt>.</p>
+<p>This implies premerge. Therefore, files aren't dumped, if premerge
+runs successfully. Use :forcedump to forcibly write files out.</p>
+<p class="last">(actual capabilities: binary, symlink)</p>
+</dd>
+<dt><tt class="docutils literal">:fail</tt></dt>
+<dd><p class="first">Rather than attempting to merge files that were modified on both
+branches, it marks them as unresolved. The resolve command must be
+used to resolve these conflicts.</p>
+<p class="last">(actual capabilities: binary, symlink)</p>
+</dd>
+<dt><tt class="docutils literal">:forcedump</tt></dt>
+<dd><p class="first">Creates three versions of the files as same as :dump, but omits premerge.</p>
+<p class="last">(actual capabilities: binary, symlink)</p>
+</dd>
+<dt><tt class="docutils literal">:local</tt></dt>
+<dd><p class="first">Uses the local <cite>p1()</cite> version of files as the merged version.</p>
+<p class="last">(actual capabilities: binary, symlink)</p>
+</dd>
+<dt><tt class="docutils literal">:merge</tt></dt>
+<dd>Uses the internal non-interactive simple merge algorithm for merging
+files. It will fail if there are any conflicts and leave markers in
+the partially merged file. Markers will have two sections, one for each side
+of merge.</dd>
+<dt><tt class="docutils literal"><span class="pre">:merge-local</span></tt></dt>
+<dd>Like :merge, but resolve all conflicts non-interactively in favor
+of the local <cite>p1()</cite> changes.</dd>
+<dt><tt class="docutils literal"><span class="pre">:merge-other</span></tt></dt>
+<dd>Like :merge, but resolve all conflicts non-interactively in favor
+of the other <cite>p2()</cite> changes.</dd>
+<dt><tt class="docutils literal">:merge3</tt></dt>
+<dd>Uses the internal non-interactive simple merge algorithm for merging
+files. It will fail if there are any conflicts and leave markers in
+the partially merged file. Marker will have three sections, one from each
+side of the merge and one for the base content.</dd>
+<dt><tt class="docutils literal">:mergediff</tt></dt>
+<dd>Uses the internal non-interactive simple merge algorithm for merging
+files. It will fail if there are any conflicts and leave markers in
+the partially merged file. The marker will have two sections, one with the
+content from one side of the merge, and one with a diff from the base
+content to the content on the other side. (experimental)</dd>
+<dt><tt class="docutils literal">:other</tt></dt>
+<dd><p class="first">Uses the other <cite>p2()</cite> version of files as the merged version.</p>
+<p class="last">(actual capabilities: binary, symlink)</p>
+</dd>
+<dt><tt class="docutils literal">:prompt</tt></dt>
+<dd><p class="first">Asks the user which of the local <cite>p1()</cite> or the other <cite>p2()</cite> version to
+keep as the merged version.</p>
+<p class="last">(actual capabilities: binary, symlink)</p>
+</dd>
+<dt><tt class="docutils literal">:tagmerge</tt></dt>
+<dd>Uses the internal tag merge algorithm (experimental).</dd>
+<dt><tt class="docutils literal">:union</tt></dt>
+<dd>Uses the internal non-interactive simple merge algorithm for merging
+files. It will use both local and other sides for conflict regions by
+adding local on top of other.
+No markers are inserted.</dd>
+<dt><tt class="docutils literal"><span class="pre">:union-other-first</span></tt></dt>
+<dd>Like :union, but add other on top of local.</dd>
+</dl>
+<p>Internal tools are always available and do not require a GUI but will
+by default not handle symlinks or binary files. See next section for
+detail about &quot;actual capabilities&quot; described above.</p>
+</div>
+<div class="section" id="choosing-a-merge-tool">
+<h1><a class="toc-backref" href="#contents">Choosing a merge tool</a></h1>
+<p>Mercurial uses these rules when deciding which merge tool to use:</p>
+<ol class="arabic simple">
+<li>If a tool has been specified with the --tool option to merge or resolve, it
+is used.  If it is the name of a tool in the merge-tools configuration, its
+configuration is used. Otherwise the specified tool must be executable by
+the shell.</li>
+<li>If the <tt class="docutils literal">HGMERGE</tt> environment variable is present, its value is used and
+must be executable by the shell.</li>
+<li>If the filename of the file to be merged matches any of the patterns in the
+merge-patterns configuration section, the first usable merge tool
+corresponding to a matching pattern is used.</li>
+<li>If ui.merge is set it will be considered next. If the value is not the name
+of a configured tool, the specified value is used and must be executable by
+the shell. Otherwise the named tool is used if it is usable.</li>
+<li>If any usable merge tools are present in the merge-tools configuration
+section, the one with the highest priority is used.</li>
+<li>If a program named <tt class="docutils literal">hgmerge</tt> can be found on the system, it is used - but
+it will by default not be used for symlinks and binary files.</li>
+<li>If the file to be merged is not binary and is not a symlink, then
+internal <tt class="docutils literal">:merge</tt> is used.</li>
+<li>Otherwise, <tt class="docutils literal">:prompt</tt> is used.</li>
+</ol>
+<p>For historical reason, Mercurial treats merge tools as below while
+examining rules above.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="47%" />
+<col width="19%" />
+<col width="22%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">step</th>
+<th class="head">specified via</th>
+<th class="head">binary</th>
+<th class="head">symlink</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><ol class="first last arabic simple">
+<li></li>
+</ol>
+</td>
+<td>--tool</td>
+<td>o/o</td>
+<td>o/o</td>
+</tr>
+<tr><td><ol class="first last arabic simple" start="2">
+<li></li>
+</ol>
+</td>
+<td>HGMERGE</td>
+<td>o/o</td>
+<td>o/o</td>
+</tr>
+<tr><td><ol class="first last arabic simple" start="3">
+<li></li>
+</ol>
+</td>
+<td>merge-patterns</td>
+<td>o/o(*)</td>
+<td>x/?(*)</td>
+</tr>
+<tr><td><ol class="first last arabic simple" start="4">
+<li></li>
+</ol>
+</td>
+<td>ui.merge</td>
+<td>x/?(*)</td>
+<td>x/?(*)</td>
+</tr>
+</tbody>
+</table>
+<p>Each capability column indicates Mercurial behavior for
+internal/external merge tools at examining each rule.</p>
+<ul class="simple">
+<li>&quot;o&quot;: &quot;assume that a tool has capability&quot;</li>
+<li>&quot;x&quot;: &quot;assume that a tool does not have capability&quot;</li>
+<li>&quot;?&quot;: &quot;check actual capability of a tool&quot;</li>
+</ul>
+<p>If <tt class="docutils literal"><span class="pre">merge.strict-capability-check</span></tt> configuration is true, Mercurial
+checks capabilities of merge tools strictly in (*) cases above (= each
+capability column becomes &quot;?/?&quot;). It is false by default for backward
+compatibility.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">After selecting a merge program, Mercurial will by default attempt
+to merge the files using a simple merge algorithm first. Only if it doesn't
+succeed because of conflicting changes will Mercurial actually execute the
+merge program. Whether to use the simple merge algorithm first can be
+controlled by the premerge setting of the merge tool. Premerge is enabled by
+default unless the file is binary or a symlink.</p>
+</div>
+<p>See the merge-tools and ui sections of hgrc(5) for details on the
+configuration of merge tools.</p>
+</div>
+</div>
+</body>
+</html>

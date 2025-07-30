@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Specifying File Sets</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="specifying-file-sets">
+<span id="topic-filesets"></span>
+<h1 class="title">Specifying File Sets</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#operators" id="toc-entry-1">Operators</a></li>
+<li><a class="reference internal" href="#predicates" id="toc-entry-2">Predicates</a></li>
+<li><a class="reference internal" href="#examples" id="toc-entry-3">Examples</a></li>
+</ul>
+</div>
+<p id="fileset"><span id="filesets"></span>Mercurial supports a functional language for selecting a set of
+files.</p>
+<p>Like other file patterns, this pattern type is indicated by a prefix,
+'set:'. The language supports a number of predicates which are joined
+by infix operators. Parenthesis can be used for grouping.</p>
+<p>Identifiers such as filenames or patterns must be quoted with single
+or double quotes if they contain characters outside of
+<tt class="docutils literal"><span class="pre">[.*{}[]?/\_a-zA-Z0-9\x80-\xff]</span></tt> or if they match one of the
+predefined predicates. This generally applies to file patterns other
+than globs and arguments for predicates. Pattern prefixes such as
+<tt class="docutils literal">path:</tt> may be specified without quoting.</p>
+<p>Special characters can be used in quoted identifiers by escaping them,
+e.g., <tt class="docutils literal">\n</tt> is interpreted as a newline. To prevent them from being
+interpreted, strings can be prefixed with <tt class="docutils literal">r</tt>, e.g. <tt class="docutils literal"><span class="pre">r'...'</span></tt>.</p>
+<p>See also <a class="reference external" href="topic-patterns.html"><tt class="docutils literal">hg help patterns</tt></a>.</p>
+<div class="section" id="operators">
+<h1><a class="toc-backref" href="#contents">Operators</a></h1>
+<p>There is a single prefix operator:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">not x</tt></dt>
+<dd>Files not in x. Short form is <tt class="docutils literal">! x</tt>.</dd>
+</dl>
+<p>These are the supported infix operators:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">x and y</tt></dt>
+<dd>The intersection of files in x and y. Short form is <tt class="docutils literal">x &amp; y</tt>.</dd>
+<dt><tt class="docutils literal">x or y</tt></dt>
+<dd>The union of files in x and y. There are two alternative short
+forms: <tt class="docutils literal">x | y</tt> and <tt class="docutils literal">x + y</tt>.</dd>
+<dt><tt class="docutils literal">x - y</tt></dt>
+<dd>Files in x but not in y.</dd>
+</dl>
+</div>
+<div class="section" id="predicates">
+<h1><a class="toc-backref" href="#contents">Predicates</a></h1>
+<p>The following predicates are supported:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">added()</tt></dt>
+<dd>File that is added according to <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a>.</dd>
+<dt><tt class="docutils literal">binary()</tt></dt>
+<dd>File that appears to be binary (contains NUL bytes).</dd>
+<dt><tt class="docutils literal">clean()</tt></dt>
+<dd>File that is clean according to <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a>.</dd>
+<dt><tt class="docutils literal">copied()</tt></dt>
+<dd>File that is recorded as being copied.</dd>
+<dt><tt class="docutils literal">deleted()</tt></dt>
+<dd>Alias for <tt class="docutils literal">missing()</tt>.</dd>
+<dt><tt class="docutils literal">encoding(name)</tt></dt>
+<dd>File can be successfully decoded with the given character
+encoding. May not be useful for encodings other than ASCII and
+UTF-8.</dd>
+<dt><tt class="docutils literal">eol(style)</tt></dt>
+<dd>File contains newlines of the given style (dos, unix, mac). Binary
+files are excluded, files with mixed line endings match multiple
+styles.</dd>
+<dt><tt class="docutils literal">exec()</tt></dt>
+<dd>File that is marked as executable.</dd>
+<dt><tt class="docutils literal">grep(regex)</tt></dt>
+<dd>File contains the given regular expression.</dd>
+<dt><tt class="docutils literal">hgignore()</tt></dt>
+<dd>File that matches the active .hgignore pattern.</dd>
+<dt><tt class="docutils literal">ignored()</tt></dt>
+<dd>File that is ignored according to <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a>.</dd>
+<dt><tt class="docutils literal">missing()</tt></dt>
+<dd>File that is missing according to <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a>.</dd>
+<dt><tt class="docutils literal">modified()</tt></dt>
+<dd>File that is modified according to <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a>.</dd>
+<dt><tt class="docutils literal">portable()</tt></dt>
+<dd>File that has a portable name. (This doesn't include filenames with case
+collisions.)</dd>
+<dt><tt class="docutils literal">removed()</tt></dt>
+<dd>File that is removed according to <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a>.</dd>
+<dt><tt class="docutils literal">resolved()</tt></dt>
+<dd>File that is marked resolved according to <a class="reference external" href="hg-resolve.html"><tt class="docutils literal">hg resolve <span class="pre">-l</span></tt></a>.</dd>
+<dt><tt class="docutils literal">revs(revs, pattern)</tt></dt>
+<dd>Evaluate set in the specified revisions. If the revset match multiple
+revs, this will return file matching pattern in any of the revision.</dd>
+<dt><tt class="docutils literal">size(expression)</tt></dt>
+<dd><p class="first">File size matches the given expression. Examples:</p>
+<ul class="last simple">
+<li>size('1k') - files from 1024 to 2047 bytes</li>
+<li>size('&lt; 20k') - files less than 20480 bytes</li>
+<li>size('&gt;= .5MB') - files at least 524288 bytes</li>
+<li>size('4k - 1MB') - files from 4096 bytes to 1048576 bytes</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal">status(base, rev, pattern)</tt></dt>
+<dd><p class="first">Evaluate predicate using status change between <tt class="docutils literal">base</tt> and
+<tt class="docutils literal">rev</tt>. Examples:</p>
+<ul class="last simple">
+<li><tt class="docutils literal">status(3, 7, <span class="pre">added())</span></tt> - matches files added from &quot;3&quot; to &quot;7&quot;</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">subrepo([pattern])</span></tt></dt>
+<dd>Subrepositories whose paths match the given pattern.</dd>
+<dt><tt class="docutils literal">symlink()</tt></dt>
+<dd>File that is marked as a symlink.</dd>
+<dt><tt class="docutils literal">tracked()</tt></dt>
+<dd>File that is under Mercurial control.</dd>
+<dt><tt class="docutils literal">unknown()</tt></dt>
+<dd>File that is unknown according to <a class="reference external" href="hg-status.html"><tt class="docutils literal">hg status</tt></a>.</dd>
+<dt><tt class="docutils literal">unresolved()</tt></dt>
+<dd>File that is marked unresolved according to <a class="reference external" href="hg-resolve.html"><tt class="docutils literal">hg resolve <span class="pre">-l</span></tt></a>.</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="#contents">Examples</a></h1>
+<p>Some sample queries:</p>
+<ul>
+<li><p class="first">Show status of files that appear to be binary in the working directory:</p>
+<pre class="literal-block">
+hg status -A &quot;set:binary()&quot;
+</pre>
+</li>
+<li><p class="first">Forget files that are in .hgignore but are already tracked:</p>
+<pre class="literal-block">
+hg forget &quot;set:hgignore() and not ignored()&quot;
+</pre>
+</li>
+<li><p class="first">Find text files that contain a string:</p>
+<pre class="literal-block">
+hg files &quot;set:grep(magic) and not binary()&quot;
+</pre>
+</li>
+<li><p class="first">Find C files in a non-standard encoding:</p>
+<pre class="literal-block">
+hg files &quot;set:**.c and not encoding('UTF-8')&quot;
+</pre>
+</li>
+<li><p class="first">Revert copies of large binary files:</p>
+<pre class="literal-block">
+hg revert &quot;set:copied() and binary() and size('&gt;1M')&quot;
+</pre>
+</li>
+<li><p class="first">Revert files that were added to the working directory:</p>
+<pre class="literal-block">
+hg revert &quot;set:revs('wdir()', added())&quot;
+</pre>
+</li>
+<li><p class="first">Remove files listed in foo.lst that contain the letter a or b:</p>
+<pre class="literal-block">
+hg remove &quot;set: listfile:foo.lst and (**a* or **b*)&quot;
+</pre>
+</li>
+</ul>
+</div>
+</div>
+</body>
+</html>

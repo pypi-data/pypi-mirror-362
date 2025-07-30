@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Environment Variables</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="environment-variables">
+<span id="topic-environment"></span>
+<h1 class="title">Environment Variables</h1>
+
+<span id="environment"></span><dl class="docutils" id="env">
+<dt>HG</dt>
+<dd>Path to the 'hg' executable, automatically passed when running
+hooks, extensions or external tools. If unset or empty, this is
+the hg executable's name if it's frozen, or an executable named
+'hg' (with %PATHEXT% [defaulting to COM/EXE/BAT/CMD] extensions on
+Windows) is searched.</dd>
+<dt>HGEDITOR</dt>
+<dd><p class="first">This is the name of the editor to run when committing. See EDITOR.</p>
+<p class="last">(deprecated, see <a class="reference external" href="hgrc.5.html#ui"><tt class="docutils literal">hg help config.ui.editor</tt></a>)</p>
+</dd>
+<dt>HGENCODING</dt>
+<dd>This overrides the default locale setting detected by Mercurial.
+This setting is used to convert data including usernames,
+changeset descriptions, tag names, and branches. This setting can
+be overridden with the --encoding command-line option.</dd>
+<dt>HGENCODINGMODE</dt>
+<dd>This sets Mercurial's behavior for handling unknown characters
+while transcoding user input. The default is &quot;strict&quot;, which
+causes Mercurial to abort if it can't map a character. Other
+settings include &quot;replace&quot;, which replaces unknown characters, and
+&quot;ignore&quot;, which drops them. This setting can be overridden with
+the --encodingmode command-line option.</dd>
+<dt>HGENCODINGAMBIGUOUS</dt>
+<dd>This sets Mercurial's behavior for handling characters with
+&quot;ambiguous&quot; widths like accented Latin characters with East Asian
+fonts. By default, Mercurial assumes ambiguous characters are
+narrow, set this variable to &quot;wide&quot; if such characters cause
+formatting problems.</dd>
+<dt>HGMERGE</dt>
+<dd><p class="first">An executable to use for resolving merge conflicts. The program
+will be executed with three arguments: local file, remote file,
+ancestor file.</p>
+<p class="last">(deprecated, see <a class="reference external" href="hgrc.5.html#ui"><tt class="docutils literal">hg help config.ui.merge</tt></a>)</p>
+</dd>
+<dt>HGRCPATH</dt>
+<dd><p class="first">A list of files or directories to search for configuration
+files. Item separator is &quot;:&quot; on Unix, &quot;;&quot; on Windows. If HGRCPATH
+is not set, platform default search path is used. If empty, only
+the .hg/hgrc from the current repository is read.</p>
+<p>For each element in HGRCPATH:</p>
+<ul class="last simple">
+<li>if it's a directory, all files ending with .rc are added</li>
+<li>otherwise, the file itself will be added</li>
+</ul>
+</dd>
+<dt>HGRCSKIPREPO</dt>
+<dd>When set, the .hg/hgrc from repositories are not read.</dd>
+<dt>HGPLAIN</dt>
+<dd><p class="first">When set, this disables any configuration settings that might
+change Mercurial's default output. This includes encoding,
+defaults, verbose mode, debug mode, quiet mode, tracebacks, and
+localization. This can be useful when scripting against Mercurial
+in the face of existing user configuration.</p>
+<p>In addition to the features disabled by <tt class="docutils literal">HGPLAIN=</tt>, the following
+values can be specified to adjust behavior:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">+strictflags</tt></dt>
+<dd>Restrict parsing of command line flags.</dd>
+</dl>
+<p>Equivalent options set via command line flags or environment
+variables are not overridden.</p>
+<p class="last">See <a class="reference external" href="topic-scripting.html"><tt class="docutils literal">hg help scripting</tt></a> for details.</p>
+</dd>
+<dt>HGPLAINEXCEPT</dt>
+<dd><p class="first">This is a comma-separated list of features to preserve when
+HGPLAIN is enabled. Currently the following values are supported:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">alias</tt></dt>
+<dd>Don't remove aliases.</dd>
+<dt><tt class="docutils literal">color</tt></dt>
+<dd>Don't disable colored output.</dd>
+<dt><tt class="docutils literal">i18n</tt></dt>
+<dd>Preserve internationalization.</dd>
+<dt><tt class="docutils literal">revsetalias</tt></dt>
+<dd>Don't remove revset aliases.</dd>
+<dt><tt class="docutils literal">templatealias</tt></dt>
+<dd>Don't remove template aliases.</dd>
+<dt><tt class="docutils literal">progress</tt></dt>
+<dd>Don't hide progress output.</dd>
+</dl>
+<p class="last">Setting HGPLAINEXCEPT to anything (even an empty string) will
+enable plain mode.</p>
+</dd>
+<dt>HGUSER</dt>
+<dd><p class="first">This is the string used as the author of a commit. If not set,
+available values will be considered in this order:</p>
+<ul class="simple">
+<li>HGUSER (deprecated)</li>
+<li>configuration files from the HGRCPATH</li>
+<li>EMAIL</li>
+<li>interactive prompt</li>
+<li>LOGNAME (with <tt class="docutils literal">&#64;hostname</tt> appended)</li>
+</ul>
+<p class="last">(deprecated, see <a class="reference external" href="hgrc.5.html#ui"><tt class="docutils literal">hg help config.ui.username</tt></a>)</p>
+</dd>
+<dt>EMAIL</dt>
+<dd>May be used as the author of a commit; see HGUSER.</dd>
+<dt>LOGNAME</dt>
+<dd>May be used as the author of a commit; see HGUSER.</dd>
+<dt>VISUAL</dt>
+<dd>This is the name of the editor to use when committing. See EDITOR.</dd>
+<dt>EDITOR</dt>
+<dd>Sometimes Mercurial needs to open a text file in an editor for a
+user to modify, for example when writing commit messages. The
+editor it uses is determined by looking at the environment
+variables HGEDITOR, VISUAL and EDITOR, in that order. The first
+non-empty one is chosen. If all of them are empty, the editor
+defaults to 'vi'.</dd>
+<dt>PYTHONPATH</dt>
+<dd>This is used by Python to find imported modules and may need to be
+set appropriately if this Mercurial is not installed system-wide.</dd>
+</dl>
+</div>
+</body>
+</html>

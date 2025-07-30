@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>clonebundles</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="clonebundles">
+<span id="ext-clonebundles"></span>
+<h1 class="title">clonebundles</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a><ul>
+<li><a class="reference internal" href="#inline-clonebundles" id="toc-entry-2">inline clonebundles</a></li>
+<li><a class="reference internal" href="#auto-generation-of-clone-bundles" id="toc-entry-3">auto-generation of clone bundles</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#commands" id="toc-entry-4">Commands</a><ul>
+<li><a class="reference internal" href="#uncategorized-commands" id="toc-entry-5">Uncategorized commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>advertise pre-generated bundles to seed clones</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>&quot;clonebundles&quot; is a server-side extension used to advertise the existence
+of pre-generated, externally hosted bundle files to clients that are
+cloning so that cloning can be faster, more reliable, and require less
+resources on the server. &quot;pullbundles&quot; is a related feature for sending
+pre-generated bundle files to clients as part of pull operations.</p>
+<p>Cloning can be a CPU and I/O intensive operation on servers. Traditionally,
+the server, in response to a client's request to clone, dynamically generates
+a bundle containing the entire repository content and sends it to the client.
+There is no caching on the server and the server will have to redundantly
+generate the same outgoing bundle in response to each clone request. For
+servers with large repositories or with high clone volume, the load from
+clones can make scaling the server challenging and costly.</p>
+<p>This extension provides server operators the ability to offload
+potentially expensive clone load to an external service. Pre-generated
+bundles also allow using more CPU intensive compression, reducing the
+effective bandwidth requirements.</p>
+<p>Here's how clone bundles work:</p>
+<ol class="arabic simple">
+<li>A server operator establishes a mechanism for making bundle files available
+on a hosting service where Mercurial clients can fetch them.</li>
+<li>A manifest file listing available bundle URLs and some optional metadata
+is added to the Mercurial repository on the server.</li>
+<li>A client initiates a clone against a clone bundles aware server.</li>
+<li>The client sees the server is advertising clone bundles and fetches the
+manifest listing available bundles.</li>
+<li>The client filters and sorts the available bundles based on what it
+supports and prefers.</li>
+<li>The client downloads and applies an available bundle from the
+server-specified URL.</li>
+<li>The client reconnects to the original server and performs the equivalent
+of <a class="reference external" href="hg-pull.html"><tt class="docutils literal">hg pull</tt></a> to retrieve all repository data not in the bundle. (The
+repository could have been updated between when the bundle was created
+and when the client started the clone.) This may use &quot;pullbundles&quot;.</li>
+</ol>
+<p>Instead of the server generating full repository bundles for every clone
+request, it generates full bundles once and they are subsequently reused to
+bootstrap new clones. The server may still transfer data at clone time.
+However, this is only data that has been added/changed since the bundle was
+created. For large, established repositories, this can reduce server load for
+clones to less than 1% of original.</p>
+<p>Here's how pullbundles work:</p>
+<ol class="arabic simple">
+<li>A manifest file listing available bundles and describing the revisions
+is added to the Mercurial repository on the server.</li>
+<li>A new-enough client informs the server that it supports partial pulls
+and initiates a pull.</li>
+<li>If the server has pull bundles enabled and sees the client advertising
+partial pulls, it checks for a matching pull bundle in the manifest.
+A bundle matches if the format is supported by the client, the client
+has the required revisions already and needs something from the bundle.</li>
+<li>If there is at least one matching bundle, the server sends it to the client.</li>
+<li>The client applies the bundle and notices that the server reply was
+incomplete. It initiates another pull.</li>
+</ol>
+<p>To work, this extension requires the following of server operators:</p>
+<ul class="simple">
+<li>Generating bundle files of repository content (typically periodically,
+such as once per day).</li>
+<li>Clone bundles: A file server that clients have network access to and that
+Python knows how to talk to through its normal URL handling facility
+(typically an HTTP/HTTPS server).</li>
+<li>A process for keeping the bundles manifest in sync with available bundle
+files.</li>
+</ul>
+<p>Strictly speaking, using a static file hosting server isn't required: a server
+operator could use a dynamic service for retrieving bundle data. However,
+static file hosting services are simple and scalable and should be sufficient
+for most needs.</p>
+<p>Bundle files can be generated with the <a class="reference external" href="hg-bundle.html"><tt class="docutils literal">hg bundle</tt></a> command. Typically
+<a class="reference external" href="hg-bundle.html"><tt class="docutils literal">hg bundle <span class="pre">--all</span></tt></a> is used to produce a bundle of the entire repository.</p>
+<p>The bundlespec option <cite>stream</cite> (see <a class="reference external" href="topic-bundlespec.html"><tt class="docutils literal">hg help bundlespec</tt></a>)
+can be used to produce a special <em>streaming clonebundle</em>, typically using
+<a class="reference external" href="hg-bundle.html"><tt class="docutils literal">hg bundle <span class="pre">--all</span> <span class="pre">--type=&quot;none-streamv2&quot;</span></tt></a>.
+These are bundle files that are extremely efficient
+to produce and consume (read: fast). However, they are larger than
+traditional bundle formats and require that clients support the exact set
+of repository data store formats in use by the repository that created them.
+Typically, a newer server can serve data that is compatible with older clients.
+However, <em>streaming clone bundles</em> don't have this guarantee. <strong>Server
+operators need to be aware that newer versions of Mercurial may produce
+streaming clone bundles incompatible with older Mercurial versions.</strong></p>
+<p>A server operator is responsible for creating a <tt class="docutils literal">.hg/clonebundles.manifest</tt>
+file containing the list of available bundle files suitable for seeding
+clones. If this file does not exist, the repository will not advertise the
+existence of clone bundles when clients connect. For pull bundles,
+<tt class="docutils literal">.hg/pullbundles.manifest</tt> is used.</p>
+<p>The manifest file contains a newline (n) delimited list of entries.</p>
+<p>Each line in this file defines an available bundle. Lines have the format:</p>
+<blockquote>
+&lt;URL&gt; [&lt;key&gt;=&lt;value&gt;[ &lt;key&gt;=&lt;value&gt;]]</blockquote>
+<p>That is, a URL followed by an optional, space-delimited list of key=value
+pairs describing additional properties of this bundle. Both keys and values
+are URI encoded.</p>
+<p>For pull bundles, the URL is a path under the <tt class="docutils literal">.hg</tt> directory of the
+repository.</p>
+<p>Keys in UPPERCASE are reserved for use by Mercurial and are defined below.
+All non-uppercase keys can be used by site installations. An example use
+for custom properties is to use the <em>datacenter</em> attribute to define which
+data center a file is hosted in. Clients could then prefer a server in the
+data center closest to them.</p>
+<p>The following reserved keys are currently defined:</p>
+<dl class="docutils">
+<dt>BUNDLESPEC</dt>
+<dd><p class="first">A &quot;bundle specification&quot; string that describes the type of the bundle.</p>
+<p>These are string values that are accepted by the &quot;--type&quot; argument of
+<a class="reference external" href="hg-bundle.html"><tt class="docutils literal">hg bundle</tt></a>.</p>
+<p>The values are parsed in strict mode, which means they must be of the
+&quot;&lt;compression&gt;-&lt;type&gt;&quot; form. See
+mercurial.exchange.parsebundlespec() for more details.</p>
+<p><a class="reference external" href="hg-debugbundle.html"><tt class="docutils literal">hg debugbundle <span class="pre">--spec</span></tt></a> can be used to print the bundle specification
+string for a bundle file. The output of this command can be used verbatim
+for the value of <tt class="docutils literal">BUNDLESPEC</tt> (it is already escaped).</p>
+<p>Clients will automatically filter out specifications that are unknown or
+unsupported so they won't attempt to download something that likely won't
+apply.</p>
+<p>The actual value doesn't impact client behavior beyond filtering:
+clients will still sniff the bundle type from the header of downloaded
+files.</p>
+<p class="last"><strong>Use of this key is highly recommended</strong>, as it allows clients to
+easily skip unsupported bundles. If this key is not defined, an old
+client may attempt to apply a bundle that it is incapable of reading.</p>
+</dd>
+<dt>REQUIRESNI</dt>
+<dd><p class="first">Whether Server Name Indication (SNI) is required to connect to the URL.
+SNI allows servers to use multiple certificates on the same IP. It is
+somewhat common in CDNs and other hosting providers. Older Python
+versions do not support SNI. Defining this attribute enables clients
+with older Python versions to filter this entry without experiencing
+an opaque SSL failure at connection time.</p>
+<p>If this is defined, it is important to advertise a non-SNI fallback
+URL or clients running old Python releases may not be able to clone
+with the clonebundles facility.</p>
+<p class="last">Value should be &quot;true&quot;.</p>
+</dd>
+<dt>REQUIREDRAM</dt>
+<dd><p class="first">Value specifies expected memory requirements to decode the payload.
+Values can have suffixes for common bytes sizes. e.g. &quot;64MB&quot;.</p>
+<p class="last">This key is often used with zstd-compressed bundles using a high
+compression level / window size, which can require 100+ MB of memory
+to decode.</p>
+</dd>
+<dt>heads</dt>
+<dd>Used for pull bundles. This contains the <tt class="docutils literal">;</tt> separated changeset
+hashes of the heads of the bundle content.</dd>
+<dt>bases</dt>
+<dd>Used for pull bundles. This contains the <tt class="docutils literal">;</tt> separated changeset
+hashes of the roots of the bundle content. This can be skipped if
+the bundle was created without <tt class="docutils literal"><span class="pre">--base</span></tt>.</dd>
+</dl>
+<p>Manifests can contain multiple entries. Assuming metadata is defined, clients
+will filter entries from the manifest that they don't support. The remaining
+entries are optionally sorted by client preferences
+(<tt class="docutils literal">ui.clonebundleprefers</tt> config option). The client then attempts
+to fetch the bundle at the first URL in the remaining list.</p>
+<p><strong>Errors when downloading a bundle will fail the entire clone operation:
+clients do not automatically fall back to a traditional clone.</strong> The reason
+for this is that if a server is using clone bundles, it is probably doing so
+because the feature is necessary to help it scale. In other words, there
+is an assumption that clone load will be offloaded to another service and
+that the Mercurial server isn't responsible for serving this clone load.
+If that other service experiences issues and clients start mass falling back to
+the original Mercurial server, the added clone load could overwhelm the server
+due to unexpected load and effectively take it offline. Not having clients
+automatically fall back to cloning from the original server mitigates this
+scenario.</p>
+<p>Because there is no automatic Mercurial server fallback on failure of the
+bundle hosting service, it is important for server operators to view the bundle
+hosting service as an extension of the Mercurial server in terms of
+availability and service level agreements: if the bundle hosting service goes
+down, so does the ability for clients to clone. Note: clients will see a
+message informing them how to bypass the clone bundles facility when a failure
+occurs. So server operators should prepare for some people to follow these
+instructions when a failure occurs, thus driving more load to the original
+Mercurial server when the bundle hosting service fails.</p>
+<div class="section" id="inline-clonebundles">
+<h2><a class="toc-backref" href="#contents">inline clonebundles</a></h2>
+<p>It is possible to transmit clonebundles inline in case repositories are
+accessed over SSH. This avoids having to setup an external HTTPS server
+and results in the same access control as already present for the SSH setup.</p>
+<p>Inline clonebundles should be placed into the <cite>.hg/bundle-cache</cite> directory.
+A clonebundle at <cite>.hg/bundle-cache/mybundle.bundle</cite> is referred to
+in the <cite>clonebundles.manifest</cite> file as <cite>peer-bundle-cache://mybundle.bundle</cite>.</p>
+</div>
+<div class="section" id="auto-generation-of-clone-bundles">
+<h2><a class="toc-backref" href="#contents">auto-generation of clone bundles</a></h2>
+<p>It is possible to set Mercurial to automatically re-generate clone bundles when
+enough new content is available.</p>
+<p>Mercurial will take care of the process asynchronously. The defined list of
+bundle-type will be generated, uploaded, and advertised. Older bundles will get
+decommissioned as newer ones replace them.</p>
+<div class="section" id="bundles-generation">
+<h3>Bundles Generation:</h3>
+<p>The extension can generate multiple variants of the clone bundle. Each
+different variant will be defined by the &quot;bundle-spec&quot; they use:</p>
+<pre class="literal-block">
+[clone-bundles]
+auto-generate.formats= zstd-v2, gzip-v2
+</pre>
+<p>See <cite>hg help bundlespec</cite> for details about available options.</p>
+<p>By default, new bundles are generated when 5% of the repository contents or at
+least 1000 revisions are not contained in the cached bundles. This option can
+be controlled by the <cite>clone-bundles.trigger.below-bundled-ratio</cite> option
+(default 0.95) and the <cite>clone-bundles.trigger.revs</cite> option (default 1000):</p>
+<pre class="literal-block">
+[clone-bundles]
+trigger.below-bundled-ratio=0.95
+trigger.revs=1000
+</pre>
+<p>This logic can be manually triggered using the <cite>admin::clone-bundles-refresh</cite>
+command, or automatically on each repository change if
+<cite>clone-bundles.auto-generate.on-change</cite> is set to <cite>yes</cite>:</p>
+<pre class="literal-block">
+[clone-bundles]
+auto-generate.on-change=yes
+auto-generate.formats= zstd-v2, gzip-v2
+</pre>
+</div>
+<div class="section" id="automatic-inline-serving">
+<h3>Automatic Inline serving</h3>
+<p>The simplest way to serve the generated bundle is through the Mercurial
+protocol. However it is not the most efficient as request will still be served
+by that main server. It is useful in case where authentication is complexe or
+when an efficient mirror system is already in use anyway. See the <cite>inline
+clonebundles</cite> section above for details about inline clonebundles</p>
+<p>To automatically serve generated bundle through inline clonebundle, simply set
+the following option:</p>
+<pre class="literal-block">
+auto-generate.serve-inline=yes
+</pre>
+<p>Enabling this option disable the managed upload and serving explained below.</p>
+</div>
+<div class="section" id="bundles-upload-and-serving">
+<h3>Bundles Upload and Serving:</h3>
+<p>This is the most efficient way to serve automatically generated clone bundles,
+but requires some setup.</p>
+<p>The generated bundles need to be made available to users through a &quot;public&quot; URL.
+This should be donne through <cite>clone-bundles.upload-command</cite> configuration. The
+value of this command should be a shell command. It will have access to the
+bundle file path through the <cite>$HGCB_BUNDLE_PATH</cite> variable. And the expected
+basename in the &quot;public&quot; URL is accessible at:</p>
+<pre class="literal-block">
+[clone-bundles]
+upload-command=sftp put $HGCB_BUNDLE_PATH       sftp://bundles.host/clone-bundles/$HGCB_BUNDLE_BASENAME
+</pre>
+<p>If the file was already uploaded, the command must still succeed.</p>
+<p>After upload, the file should be available at an url defined by
+<cite>clone-bundles.url-template</cite>.</p>
+<blockquote>
+[clone-bundles]
+url-template=https://bundles.host/cache/clone-bundles/{basename}</blockquote>
+</div>
+<div class="section" id="old-bundles-cleanup">
+<h3>Old bundles cleanup:</h3>
+<p>When new bundles are generated, the older ones are no longer necessary and can
+be removed from storage. This is done through the <cite>clone-bundles.delete-command</cite>
+configuration. The command is given the url of the artifact to delete through
+the <cite>$HGCB_BUNDLE_URL</cite> environment variable.</p>
+<blockquote>
+[clone-bundles]
+delete-command=sftp rm sftp://bundles.host/clone-bundles/$HGCB_BUNDLE_BASENAME</blockquote>
+<p>If the file was already deleted, the command must still succeed.</p>
+</div>
+</div>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="uncategorized-commands">
+<h2><a class="toc-backref" href="#contents">Uncategorized commands</a></h2>
+<div class="section" id="admin-clone-bundles-clear">
+<h3>admin::clone-bundles-clear</h3>
+<p>remove existing clone bundle caches:</p>
+<pre class="literal-block">
+hg admin::clone-bundles-clear
+</pre>
+<p>See <cite>hg help admin::clone-bundles-refresh</cite> for details on how to regenerate
+them.</p>
+<p>This command will only affect bundles currently available, it will not
+affect bundles being asynchronously generated.</p>
+</div>
+<div class="section" id="admin-clone-bundles-refresh">
+<h3>admin::clone-bundles-refresh</h3>
+<p>generate clone bundles according to the configuration:</p>
+<pre class="literal-block">
+hg admin::clone-bundles-refresh
+</pre>
+<p>This runs the logic for automatic generation, removing outdated bundles and
+generating new ones if necessary. See <a class="reference external" href="hg.1.html#-e"><tt class="docutils literal">hg help <span class="pre">-e</span> <span class="pre">clone-bundles</span></tt></a> for
+details about how to configure this feature.</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--background</span></kbd></td>
+<td>start bundle generation in the background</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

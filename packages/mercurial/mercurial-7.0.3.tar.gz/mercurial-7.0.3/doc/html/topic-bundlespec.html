@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Bundle File Formats</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="bundle-file-formats">
+<span id="topic-bundlespec"></span>
+<h1 class="title">Bundle File Formats</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#available-types" id="toc-entry-1">Available Types</a></li>
+<li><a class="reference internal" href="#available-compression-engines" id="toc-entry-2">Available Compression Engines</a></li>
+<li><a class="reference internal" href="#available-options" id="toc-entry-3">Available Options</a></li>
+<li><a class="reference internal" href="#examples" id="toc-entry-4">Examples</a></li>
+</ul>
+</div>
+<p id="bundlespec">Mercurial supports generating standalone &quot;bundle&quot; files that hold repository
+data. These &quot;bundles&quot; are typically saved locally and used later or exchanged
+between different repositories, possibly on different machines. Example
+commands using bundles are <a class="reference external" href="hg-bundle.html"><tt class="docutils literal">hg bundle</tt></a> and <a class="reference external" href="hg-unbundle.html"><tt class="docutils literal">hg unbundle</tt></a>.</p>
+<p>Generation of bundle files is controlled by a &quot;bundle specification&quot;
+(&quot;bundlespec&quot;) string. This string tells the bundle generation process how
+to create the bundle.</p>
+<p>A &quot;bundlespec&quot; string is composed of the following elements:</p>
+<dl class="docutils">
+<dt>type</dt>
+<dd>A string denoting the bundle format to use.</dd>
+<dt>compression</dt>
+<dd>Denotes the compression engine to use compressing the raw bundle data.</dd>
+<dt>parameters</dt>
+<dd>Arbitrary key-value parameters to further control bundle generation.</dd>
+</dl>
+<p>A &quot;bundlespec&quot; string has the following formats:</p>
+<dl class="docutils">
+<dt>&lt;type&gt;</dt>
+<dd>The literal bundle format string is used.</dd>
+<dt>&lt;compression&gt;-&lt;type&gt;</dt>
+<dd>The compression engine and format are delimited by a hyphen (<tt class="docutils literal">-</tt>).</dd>
+</dl>
+<p>Optional parameters follow the <tt class="docutils literal">&lt;type&gt;</tt>. Parameters are URI escaped
+<tt class="docutils literal">key=value</tt> pairs. Each pair is delimited by a semicolon (<tt class="docutils literal">;</tt>). The
+first parameter begins after a <tt class="docutils literal">;</tt> immediately following the <tt class="docutils literal">&lt;type&gt;</tt>
+value.</p>
+<div class="section" id="available-types">
+<h1><a class="toc-backref" href="#contents">Available Types</a></h1>
+<p>The following bundle &lt;type&gt; strings are available:</p>
+<dl class="docutils">
+<dt>v1</dt>
+<dd><p class="first">Produces a legacy &quot;changegroup&quot; version 1 bundle.</p>
+<p>This format is compatible with nearly all Mercurial clients because it is
+the oldest. However, it has some limitations, which is why it is no longer
+the default for new repositories.</p>
+<p><tt class="docutils literal">v1</tt> bundles can be used with modern repositories using the &quot;generaldelta&quot;
+storage format. However, it may take longer to produce the bundle and the
+resulting bundle may be significantly larger than a <tt class="docutils literal">v2</tt> bundle.</p>
+<p class="last"><tt class="docutils literal">v1</tt> bundles can only use the <tt class="docutils literal">gzip</tt>, <tt class="docutils literal">bzip2</tt>, and <tt class="docutils literal">none</tt> compression
+formats.</p>
+</dd>
+<dt>v2</dt>
+<dd><p class="first">Produces a version 2 bundle.</p>
+<p>Version 2 bundles are an extensible format that can store additional
+repository data (such as bookmarks and phases information) and they can
+store data more efficiently, resulting in smaller bundles.</p>
+<p class="last">Version 2 bundles can also use modern compression engines, such as
+<tt class="docutils literal">zstd</tt>, making them faster to compress and often smaller.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="available-compression-engines">
+<h1><a class="toc-backref" href="#contents">Available Compression Engines</a></h1>
+<p>The following bundle &lt;compression&gt; engines can be used:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">bzip2</tt></dt>
+<dd><p class="first">An algorithm that produces smaller bundles than <tt class="docutils literal">gzip</tt>.</p>
+<p>All Mercurial clients should support this format.</p>
+<p>This engine will likely produce smaller bundles than <tt class="docutils literal">gzip</tt> but
+will be significantly slower, both during compression and
+decompression.</p>
+<p class="last">If available, the <tt class="docutils literal">zstd</tt> engine can yield similar or better
+compression at much higher speeds.</p>
+</dd>
+<dt><tt class="docutils literal">gzip</tt></dt>
+<dd><p class="first">zlib compression using the DEFLATE algorithm.</p>
+<p class="last">All Mercurial clients should support this format. The compression
+algorithm strikes a reasonable balance between compression ratio
+and size.</p>
+</dd>
+<dt><tt class="docutils literal">none</tt></dt>
+<dd><p class="first">No compression is performed.</p>
+<p class="last">Use this compression engine to explicitly disable compression.</p>
+</dd>
+</dl>
+<p>The compression engines can be prepended with <tt class="docutils literal">stream</tt> to create a streaming bundle.
+These are bundles that are extremely efficient to produce and consume,
+but do not have guaranteed compatibility with older clients.</p>
+</div>
+<div class="section" id="available-options">
+<h1><a class="toc-backref" href="#contents">Available Options</a></h1>
+<p>The following options exist:</p>
+<dl class="docutils">
+<dt>changegroup</dt>
+<dd>Include the changegroup data in the bundle (default to True).</dd>
+<dt>cg.version</dt>
+<dd>Select the version of the changegroup to use. Available options are : 01, 02
+or 03. By default it will be automatically selected according to the current
+repository format.</dd>
+<dt>obsolescence</dt>
+<dd>Include obsolescence-markers relevant to the bundled changesets.</dd>
+<dt>phases</dt>
+<dd>Include phase information relevant to the bundled changesets.</dd>
+<dt>revbranchcache</dt>
+<dd>Include the &quot;rev-branch&quot; cache inside the bundle.</dd>
+<dt>tagsfnodescache</dt>
+<dd>Include the &quot;tags-fnodes&quot; cache inside the bundle.</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="#contents">Examples</a></h1>
+<dl class="docutils">
+<dt><tt class="docutils literal">v2</tt></dt>
+<dd>Produce a <tt class="docutils literal">v2</tt> bundle using default options, including compression.</dd>
+<dt><tt class="docutils literal"><span class="pre">none-v1</span></tt></dt>
+<dd>Produce a <tt class="docutils literal">v1</tt> bundle with no compression.</dd>
+<dt><tt class="docutils literal"><span class="pre">zstd-v2</span></tt></dt>
+<dd>Produce a <tt class="docutils literal">v2</tt> bundle with zstandard compression using default
+settings.</dd>
+<dt><tt class="docutils literal"><span class="pre">zstd-v1</span></tt></dt>
+<dd>This errors because <tt class="docutils literal">zstd</tt> is not supported for <tt class="docutils literal">v1</tt> types.</dd>
+<dt><tt class="docutils literal"><span class="pre">none-streamv2</span></tt></dt>
+<dd>Produce a <tt class="docutils literal">v2</tt> streaming bundle with no compression.</dd>
+<dt><tt class="docutils literal"><span class="pre">zstd-v2;obsolescence=true;phases=true</span></tt></dt>
+<dd>Produce a <tt class="docutils literal">v2</tt> bundle with zstandard compression which includes
+obsolescence markers and phases.</dd>
+</dl>
+</div>
+</div>
+</body>
+</html>

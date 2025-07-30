@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hgk</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hgk">
+<span id="ext-hgk"></span>
+<h1 class="title">hgk</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+<li><a class="reference internal" href="#commands" id="toc-entry-2">Commands</a><ul>
+<li><a class="reference internal" href="#change-navigation" id="toc-entry-3">Change navigation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>browse the repository in a graphical way</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>The hgk extension allows browsing the history of a repository in a
+graphical way. It requires Tcl/Tk version 8.4 or later. (Tcl/Tk is not
+distributed with Mercurial.)</p>
+<p>hgk consists of two parts: a Tcl script that does the displaying and
+querying of information, and an extension to Mercurial named hgk.py,
+which provides hooks for hgk to get information. hgk can be found in
+the contrib directory, and the extension is shipped in the hgext
+repository, and needs to be enabled.</p>
+<p>The <a class="reference external" href="hg-view.html"><tt class="docutils literal">hg view</tt></a> command will launch the hgk Tcl script. For this command
+to work, hgk must be in your search path. Alternately, you can specify
+the path to hgk in your configuration file:</p>
+<pre class="literal-block">
+[hgk]
+path = /location/of/hgk
+</pre>
+<p>hgk can make use of the extdiff extension to visualize revisions.
+Assuming you had already configured extdiff vdiff command, just add:</p>
+<pre class="literal-block">
+[hgk]
+vdiff=vdiff
+</pre>
+<p>Revisions context menu will now display additional entries to fire
+vdiff on hovered and selected revisions.</p>
+</div>
+<div class="section" id="commands">
+<h1><a class="toc-backref" href="#contents">Commands</a></h1>
+<div class="section" id="change-navigation">
+<h2><a class="toc-backref" href="#contents">Change navigation</a></h2>
+<div class="section" id="view">
+<h3>view</h3>
+<p>start interactive history viewer:</p>
+<pre class="literal-block">
+hg view [-l LIMIT] [REVRANGE]
+</pre>
+<p>start interactive history viewer</p>
+<p>Options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--limit <var>&lt;NUM&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>limit number of changes displayed</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

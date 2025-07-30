@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>logtoprocess</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="logtoprocess">
+<span id="ext-logtoprocess"></span>
+<h1 class="title">logtoprocess</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="toc-entry-1">Description</a></li>
+</ul>
+</div>
+<p>send ui.log() data to a subprocess (EXPERIMENTAL)</p>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>This extension lets you specify a shell command per ui.log() event,
+sending all remaining arguments to as environment variables to that command.</p>
+<p>Positional arguments construct a log message, which is passed in the <cite>MSG1</cite>
+environment variables. Each keyword argument is set as a <cite>OPT_UPPERCASE_KEY</cite>
+variable (so the key is uppercased, and prefixed with <cite>OPT_</cite>). The original
+event name is passed in the <cite>EVENT</cite> environment variable, and the process ID
+of mercurial is given in <cite>HGPID</cite>.</p>
+<p>So given a call <cite>ui.log('foo', 'bar %s
+', 'baz', spam='eggs'), a script
+configured for the `foo</cite> event can expect an environment with <cite>MSG1=bar baz</cite>,
+and <cite>OPT_SPAM=eggs</cite>.</p>
+<p>Scripts are configured in the <cite>[logtoprocess]</cite> section, each key an event name.
+For example:</p>
+<pre class="literal-block">
+[logtoprocess]
+commandexception = echo &quot;$MSG1&quot; &gt; /var/log/mercurial_exceptions.log
+</pre>
+<p>would log the warning message and traceback of any failed command dispatch.</p>
+<p>Scripts are run asynchronously as detached daemon processes; mercurial will
+not ensure that they exit cleanly.</p>
+</div>
+</div>
+</body>
+</html>

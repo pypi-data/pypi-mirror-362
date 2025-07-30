@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg log</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-log">
+<span id="hg-log-1"></span>
+<h1 class="title">hg log</h1>
+<h2 class="subtitle" id="show-revision-history-of-entire-repository-or-files">show revision history of entire repository or files</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-4">Aliases</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg log [OPTION]... [FILE]
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Print the revision history of the specified files or the entire
+project.</p>
+<p>If no revision range is specified, the default is <tt class="docutils literal">tip:0</tt> unless
+--follow is set.</p>
+<p>File history is shown without following rename or copy history of
+files. Use -f/--follow with a filename to follow history across
+renames and copies. --follow without a filename will only show
+ancestors of the starting revisions. The starting revisions can be
+specified by -r/--rev, which default to the working directory parent.</p>
+<p>By default this command prints revision number and changeset id,
+tags, non-trivial parents, user, date and time, and a summary for
+each commit. When the -v/--verbose switch is used, the list of
+changed files and full commit message are shown.</p>
+<p>With --graph the revisions are shown as an ASCII art DAG with the most
+recent changeset at the top.
+'o' is a changeset, '&#64;' is a working directory parent, '%' is a changeset
+involved in an unresolved merge conflict, '_' closes a branch,
+'x' is obsolete, '*' is unstable, and '+' represents a fork where the
+changeset from the lines below is a parent of the 'o' merge on the same
+line.
+Paths in the DAG are represented with '|', '/' and so forth. ':' in place
+of a '|' indicates one or more revisions in a path are omitted.</p>
+<div class="verbose docutils container">
+Use -L/--line-range FILE,M:N options to follow the history of lines
+from M to N in FILE. With -p/--patch only diff hunks affecting
+specified line range will be shown. This option requires --follow;
+it can be specified multiple times. Currently, this option is not
+compatible with --graph. This option is experimental.</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference external" href="hg-log.html"><tt class="docutils literal">hg log <span class="pre">--patch</span></tt></a> may generate unexpected diff output for merge
+changesets, as it will only compare the merge changeset against
+its first parent. Also, only files different from BOTH parents
+will appear in files:.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For performance reasons, <a class="reference external" href="hg-log.html"><tt class="docutils literal">hg log FILE</tt></a> may omit duplicate changes
+made on branches and will not show removals or mode changes. To
+see all such changes, use the --removed switch.</p>
+</div>
+<div class="verbose docutils container">
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The history resulting from -L/--line-range options depends on diff
+options; for instance if white-spaces are ignored, respective changes
+with only white-spaces in specified line range will not be listed.</p>
+</div>
+</div>
+<div class="verbose docutils container">
+<p>Some examples:</p>
+<ul>
+<li><p class="first">changesets with full descriptions and file lists:</p>
+<pre class="literal-block">
+hg log -v
+</pre>
+</li>
+<li><p class="first">changesets ancestral to the working directory:</p>
+<pre class="literal-block">
+hg log -f
+</pre>
+</li>
+<li><p class="first">last 10 commits on the current branch:</p>
+<pre class="literal-block">
+hg log -l 10 -b .
+</pre>
+</li>
+<li><p class="first">changesets showing all modifications of a file, including removals:</p>
+<pre class="literal-block">
+hg log --removed file.c
+</pre>
+</li>
+<li><p class="first">all changesets that touch a directory, with diffs, excluding merges:</p>
+<pre class="literal-block">
+hg log -Mp lib/
+</pre>
+</li>
+<li><p class="first">all revision numbers that match a keyword:</p>
+<pre class="literal-block">
+hg log -k bug --template &quot;{rev}\n&quot;
+</pre>
+</li>
+<li><p class="first">the full hash identifier of the working directory parent:</p>
+<pre class="literal-block">
+hg log -r . --template &quot;{node}\n&quot;
+</pre>
+</li>
+<li><p class="first">list available log templates:</p>
+<pre class="literal-block">
+hg log -T list
+</pre>
+</li>
+<li><p class="first">check if a given changeset is included in a tagged release:</p>
+<pre class="literal-block">
+hg log -r &quot;a21ccf and ancestor(1.9)&quot;
+</pre>
+</li>
+<li><p class="first">find all changesets by some user in a date range:</p>
+<pre class="literal-block">
+hg log -k alice -d &quot;may 2008 to jul 2008&quot;
+</pre>
+</li>
+<li><p class="first">summary of all changesets after the last tag:</p>
+<pre class="literal-block">
+hg log -r &quot;last(tagged())::&quot; --template &quot;{desc|firstline}\n&quot;
+</pre>
+</li>
+<li><p class="first">changesets touching lines 13 to 23 for file.c:</p>
+<pre class="literal-block">
+hg log -L file.c,13:23
+</pre>
+</li>
+<li><p class="first">changesets touching lines 13 to 23 for file.c and lines 2 to 6 of
+main.c with patch:</p>
+<pre class="literal-block">
+hg log -L file.c,13:23 -L main.c,2:6 -p
+</pre>
+</li>
+</ul>
+</div>
+<p>See <a class="reference external" href="topic-dates.html"><tt class="docutils literal">hg help dates</tt></a> for a list of formats valid for -d/--date.</p>
+<p>See <a class="reference external" href="topic-revisions.html"><tt class="docutils literal">hg help revisions</tt></a> for more about specifying and ordering
+revisions.</p>
+<p>See <a class="reference external" href="hg.1.html#templates"><tt class="docutils literal">hg help templates</tt></a> for more about pre-packaged styles and
+specifying custom templates. The default template used by the log
+command can be customized via the <tt class="docutils literal"><span class="pre">command-templates.log</span></tt> configuration
+setting.</p>
+<p>Returns 0 on success.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--follow</span></kbd></td>
+<td>follow changeset history, or file history across copies and renames</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--follow-first</span></kbd></td>
+<td>only follow the first parent of merge changesets (DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-d</span>, <span class="option">--date <var>&lt;DATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show revisions matching date spec</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-C</span>, <span class="option">--copies</span></kbd></td>
+<td>show copied files</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-k</span>, <span class="option">--keyword <var>&lt;TEXT[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>do case-insensitive search for a given text</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revisions to select or follow from</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-L</span>, <span class="option">--line-range <var>&lt;FILE,RANGE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>follow line range of specified file (EXPERIMENTAL)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--removed</span></kbd></td>
+<td>include revisions where files were removed</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-m</span>, <span class="option">--only-merges</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show only merges (DEPRECATED) (use -r &quot;merge()&quot; instead)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-u</span>, <span class="option">--user <var>&lt;USER[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>revisions committed by user</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--only-branch <var>&lt;BRANCH[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show only changesets within the given named branch (DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--branch <var>&lt;BRANCH[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show changesets within the given named branch</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--bookmark <var>&lt;BOOKMARK[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show changesets within the given bookmark</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-P</span>, <span class="option">--prune <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>do not display revision or any of its ancestors</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-p</span>, <span class="option">--patch</span></kbd></td>
+<td>show patch</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--git</span></kbd></td>
+<td>use git extended diff format</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--limit <var>&lt;NUM&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>limit number of changes displayed</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-M</span>, <span class="option">--no-merges</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>do not show merges</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stat</span></kbd></td>
+<td>output diffstat-style summary of changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-G</span>, <span class="option">--graph</span></kbd></td>
+<td>show the revision DAG</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--style <var>&lt;STYLE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display using template map file (DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-I</span>, <span class="option">--include <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>include names matching the given patterns</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-X</span>, <span class="option">--exclude <var>&lt;PATTERN[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>exclude names matching the given patterns</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<pre class="literal-block">
+history
+</pre>
+</div>
+</div>
+</body>
+</html>

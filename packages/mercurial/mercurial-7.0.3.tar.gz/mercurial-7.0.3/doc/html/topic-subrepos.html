@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Subrepositories</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="subrepositories">
+<span id="topic-subrepos"></span>
+<h1 class="title">Subrepositories</h1>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#adding-a-subrepository" id="toc-entry-1">Adding a Subrepository</a></li>
+<li><a class="reference internal" href="#synchronizing-a-subrepository" id="toc-entry-2">Synchronizing a Subrepository</a></li>
+<li><a class="reference internal" href="#deleting-a-subrepository" id="toc-entry-3">Deleting a Subrepository</a></li>
+<li><a class="reference internal" href="#interaction-with-mercurial-commands" id="toc-entry-4">Interaction with Mercurial Commands</a></li>
+<li><a class="reference internal" href="#remapping-subrepositories-sources" id="toc-entry-5">Remapping Subrepositories Sources</a></li>
+</ul>
+</div>
+<p id="subrepo"><span id="subrepos"></span>Subrepositories let you nest external repositories or projects into a
+parent Mercurial repository, and make commands operate on them as a
+group.</p>
+<p>Mercurial currently supports Mercurial, Git, and Subversion
+subrepositories.</p>
+<p>Subrepositories are made of three components:</p>
+<ol class="arabic">
+<li><p class="first">Nested repository checkouts. They can appear anywhere in the
+parent working directory.</p>
+</li>
+<li><p class="first">Nested repository references. They are defined in <tt class="docutils literal">.hgsub</tt>, which
+should be placed in the root of working directory, and
+tell where the subrepository checkouts come from. Mercurial
+subrepositories are referenced like:</p>
+<pre class="literal-block">
+path/to/nested = https://example.com/nested/repo/path
+</pre>
+<p>Git and Subversion subrepos are also supported:</p>
+<pre class="literal-block">
+path/to/nested = [git]git://example.com/nested/repo/path
+path/to/nested = [svn]https://example.com/nested/trunk/path
+</pre>
+<p>where <tt class="docutils literal">path/to/nested</tt> is the checkout location relatively to the
+parent Mercurial root, and <tt class="docutils literal"><span class="pre">https://example.com/nested/repo/path</span></tt>
+is the source repository path. The source can also reference a
+filesystem path.</p>
+<p>Note that <tt class="docutils literal">.hgsub</tt> does not exist by default in Mercurial
+repositories, you have to create and add it to the parent
+repository before using subrepositories.</p>
+</li>
+<li><p class="first">Nested repository states. They are defined in <tt class="docutils literal">.hgsubstate</tt>, which
+is placed in the root of working directory, and
+capture whatever information is required to restore the
+subrepositories to the state they were committed in a parent
+repository changeset. Mercurial automatically record the nested
+repositories states when committing in the parent repository.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal">.hgsubstate</tt> file should not be edited manually.</p>
+</div>
+</li>
+</ol>
+<div class="section" id="adding-a-subrepository">
+<h1><a class="toc-backref" href="#contents">Adding a Subrepository</a></h1>
+<p>If <tt class="docutils literal">.hgsub</tt> does not exist, create it and add it to the parent
+repository. Clone or checkout the external projects where you want it
+to live in the parent repository. Edit <tt class="docutils literal">.hgsub</tt> and add the
+subrepository entry as described above. At this point, the
+subrepository is tracked and the next commit will record its state in
+<tt class="docutils literal">.hgsubstate</tt> and bind it to the committed changeset.</p>
+</div>
+<div class="section" id="synchronizing-a-subrepository">
+<h1><a class="toc-backref" href="#contents">Synchronizing a Subrepository</a></h1>
+<p>Subrepos do not automatically track the latest changeset of their
+sources. Instead, they are updated to the changeset that corresponds
+with the changeset checked out in the top-level changeset. This is so
+developers always get a consistent set of compatible code and
+libraries when they update.</p>
+<p>Thus, updating subrepos is a manual process. Simply check out target
+subrepo at the desired revision, test in the top-level repo, then
+commit in the parent repository to record the new combination.</p>
+</div>
+<div class="section" id="deleting-a-subrepository">
+<h1><a class="toc-backref" href="#contents">Deleting a Subrepository</a></h1>
+<p>To remove a subrepository from the parent repository, delete its
+reference from <tt class="docutils literal">.hgsub</tt>, then remove its files.</p>
+</div>
+<div class="section" id="interaction-with-mercurial-commands">
+<h1><a class="toc-backref" href="#contents">Interaction with Mercurial Commands</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">add:</th><td class="field-body">add does not recurse in subrepos unless -S/--subrepos is
+specified.  However, if you specify the full path of a file in a
+subrepo, it will be added even without -S/--subrepos specified.
+Subversion subrepositories are currently silently
+ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">addremove:</th><td class="field-body">addremove does not recurse into subrepos unless
+-S/--subrepos is specified.  However, if you specify the full
+path of a directory in a subrepo, addremove will be performed on
+it even without -S/--subrepos being specified.  Git and
+Subversion subrepositories will print a warning and continue.</td>
+</tr>
+<tr class="field"><th class="field-name">archive:</th><td class="field-body">archive does not recurse in subrepositories unless
+-S/--subrepos is specified.</td>
+</tr>
+<tr class="field"><th class="field-name">cat:</th><td class="field-body">Git subrepositories only support exact file matches.
+Subversion subrepositories are currently ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">commit:</th><td class="field-body">commit creates a consistent snapshot of the state of the
+entire project and its subrepositories. If any subrepositories
+have been modified, Mercurial will abort.  Mercurial can be made
+to instead commit all modified subrepositories by specifying
+-S/--subrepos, or setting &quot;ui.commitsubrepos=True&quot; in a
+configuration file (see <a class="reference external" href="hgrc.5.html"><tt class="docutils literal">hg help config</tt></a>).  After there are no
+longer any modified subrepositories, it records their state and
+finally commits it in the parent repository.  The --addremove
+option also honors the -S/--subrepos option.  However, Git and
+Subversion subrepositories will print a warning and abort.</td>
+</tr>
+<tr class="field"><th class="field-name">diff:</th><td class="field-body">diff does not recurse in subrepos unless -S/--subrepos is
+specified.  However, if you specify the full path of a file or
+directory in a subrepo, it will be diffed even without
+-S/--subrepos being specified.  Subversion subrepositories are
+currently silently ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">files:</th><td class="field-body">files does not recurse into subrepos unless -S/--subrepos is
+specified.  However, if you specify the full path of a file or
+directory in a subrepo, it will be displayed even without
+-S/--subrepos being specified.  Git and Subversion subrepositories
+are currently silently ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">forget:</th><td class="field-body">forget currently only handles exact file matches in subrepos.
+Git and Subversion subrepositories are currently silently ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">incoming:</th><td class="field-body">incoming does not recurse in subrepos unless -S/--subrepos
+is specified. Git and Subversion subrepositories are currently
+silently ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">outgoing:</th><td class="field-body">outgoing does not recurse in subrepos unless -S/--subrepos
+is specified. Git and Subversion subrepositories are currently
+silently ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">pull:</th><td class="field-body">pull is not recursive since it is not clear what to pull prior
+to running <a class="reference external" href="hg-update.html"><tt class="docutils literal">hg update</tt></a>. Listing and retrieving all
+subrepositories changes referenced by the parent repository pulled
+changesets is expensive at best, impossible in the Subversion
+case.</td>
+</tr>
+<tr class="field"><th class="field-name">push:</th><td class="field-body">Mercurial will automatically push all subrepositories first
+when the parent repository is being pushed. This ensures new
+subrepository changes are available when referenced by top-level
+repositories.  Push is a no-op for Subversion subrepositories.</td>
+</tr>
+<tr class="field"><th class="field-name">serve:</th><td class="field-body">serve does not recurse into subrepositories unless
+-S/--subrepos is specified.  Git and Subversion subrepositories
+are currently silently ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">status:</th><td class="field-body">status does not recurse into subrepositories unless
+-S/--subrepos is specified. Subrepository changes are displayed as
+regular Mercurial changes on the subrepository
+elements. Subversion subrepositories are currently silently
+ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">remove:</th><td class="field-body">remove does not recurse into subrepositories unless
+-S/--subrepos is specified.  However, if you specify a file or
+directory path in a subrepo, it will be removed even without
+-S/--subrepos.  Git and Subversion subrepositories are currently
+silently ignored.</td>
+</tr>
+<tr class="field"><th class="field-name">update:</th><td class="field-body">update restores the subrepos in the state they were
+originally committed in target changeset. If the recorded
+changeset is not available in the current subrepository, Mercurial
+will pull it in first before updating.  This means that updating
+can require network access when using subrepositories.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="remapping-subrepositories-sources">
+<h1><a class="toc-backref" href="#contents">Remapping Subrepositories Sources</a></h1>
+<p>A subrepository source location may change during a project life,
+invalidating references stored in the parent repository history. To
+fix this, rewriting rules can be defined in parent repository <tt class="docutils literal">hgrc</tt>
+file or in Mercurial configuration. See the <tt class="docutils literal">[subpaths]</tt> section in
+hgrc(5) for more details.</p>
+</div>
+</div>
+</body>
+</html>

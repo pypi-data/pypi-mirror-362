@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg push</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-push">
+<span id="hg-push-1"></span>
+<h1 class="title">hg push</h1>
+<h2 class="subtitle" id="push-changes-to-the-specified-destination">push changes to the specified destination</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg push [-f] [-r REV]... [-e CMD] [--remotecmd CMD] [DEST]...
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Push changesets from the local repository to the specified
+destination.</p>
+<p>This operation is symmetrical to pull: it is identical to a pull
+in the destination repository from the current one.</p>
+<p>By default, push will not allow creation of new heads at the
+destination, since multiple heads would make it unclear which head
+to use. In this situation, it is recommended to pull and merge
+before pushing.</p>
+<p>Use --new-branch if you want to allow push to create a new named
+branch that is not present at the destination. This allows you to
+only create a new branch without forcing other changes.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Extra care should be taken with the -f/--force option,
+which will push all new heads on all branches, an action which will
+almost always cause confusion for collaborators.</p>
+</div>
+<p>If -r/--rev is used, the specified revision and all its ancestors
+will be pushed to the remote repository.</p>
+<p>If -B/--bookmark is used, the specified bookmarked revision, its
+ancestors, and the bookmark will be pushed to the remote
+repository. Specifying <tt class="docutils literal">.</tt> is equivalent to specifying the active
+bookmark's name. Use the --all-bookmarks option for pushing all
+current bookmarks.</p>
+<p>Please see <a class="reference external" href="topic-urls.html"><tt class="docutils literal">hg help urls</tt></a> for important details about <tt class="docutils literal"><span class="pre">ssh://</span></tt>
+URLs. If DESTINATION is omitted, a default path will be used.</p>
+<p>When passed multiple destinations, push will process them one after the
+other, but stop should an error occur.</p>
+<div class="verbose docutils container">
+<p>The --pushvars option sends strings to the server that become
+environment variables prepended with <tt class="docutils literal">HG_USERVAR_</tt>. For example,
+<tt class="docutils literal"><span class="pre">--pushvars</span> ENABLE_FEATURE=true</tt>, provides the server side hooks with
+<tt class="docutils literal">HG_USERVAR_ENABLE_FEATURE=true</tt> as part of their environment.</p>
+<p>pushvars can provide for user-overridable hooks as well as set debug
+levels. One example is having a hook that blocks commits containing
+conflict markers, but enables the user to override the hook if the file
+is using conflict markers for testing purposes or the file format has
+strings that look like conflict markers.</p>
+<p>By default, servers will ignore <cite>--pushvars</cite>. To enable it add the
+following to your configuration file:</p>
+<pre class="literal-block">
+[push]
+pushvars.server = true
+</pre>
+</div>
+<p>Returns 0 if push was successful, 1 if nothing to push.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>force push</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>a changeset intended to be included in the destination</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--bookmark <var>&lt;BOOKMARK[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>bookmark to push</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--all-bookmarks</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>push all bookmarks (EXPERIMENTAL)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--branch <var>&lt;BRANCH[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>a specific branch you would like to push</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--new-branch</span></kbd></td>
+<td>allow pushing a new branch</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--pushvars <var>&lt;VALUE[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>variables that can be sent to server (ADVANCED)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--publish</span></kbd></td>
+<td>push the changeset as public (EXPERIMENTAL)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+</div>
+</body>
+</html>

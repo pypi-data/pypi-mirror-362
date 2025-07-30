@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>hg incoming</title>
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="hg-incoming">
+<span id="hg-incoming-1"></span>
+<h1 class="title">hg incoming</h1>
+<h2 class="subtitle" id="show-new-changesets-found-in-source">show new changesets found in source</h2>
+
+<div class="contents htmlonly topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="toc-entry-1">Synopsis</a></li>
+<li><a class="reference internal" href="#description" id="toc-entry-2">Description</a></li>
+<li><a class="reference internal" href="#options" id="toc-entry-3">Options</a></li>
+<li><a class="reference internal" href="#aliases" id="toc-entry-4">Aliases</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#contents">Synopsis</a></h1>
+<pre class="literal-block">
+hg incoming [-p] [-n] [-M] [-f] [-r REV]... [--bundle FILENAME] [SOURCE]
+</pre>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#contents">Description</a></h1>
+<p>Show new changesets found in the specified path/URL or the default
+pull location. These are the changesets that would have been pulled
+by <a class="reference external" href="hg-pull.html"><tt class="docutils literal">hg pull</tt></a> at the time you issued this command.</p>
+<p>See pull for valid source format details.</p>
+<div class="verbose docutils container">
+<p>With -B/--bookmarks, the result of bookmark comparison between
+local and remote repositories is displayed. With -v/--verbose,
+status is also displayed for each bookmark like below:</p>
+<pre class="literal-block">
+BM1               01234567890a added
+BM2               1234567890ab advanced
+BM3               234567890abc diverged
+BM4               34567890abcd changed
+</pre>
+<p>The action taken locally when pulling depends on the
+status of each bookmark:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name"><tt class="docutils literal">added</tt>:</th><td class="field-body">pull will create it</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">advanced</tt>:</th><td class="field-body">pull will update it</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">diverged</tt>:</th><td class="field-body">pull will create a divergent bookmark</td>
+</tr>
+<tr class="field"><th class="field-name"><tt class="docutils literal">changed</tt>:</th><td class="field-body">result depends on remote changesets</td>
+</tr>
+</tbody>
+</table>
+<p>From the point of view of pulling behavior, bookmark
+existing only in the remote repository are treated as <tt class="docutils literal">added</tt>,
+even if it is in fact locally deleted.</p>
+</div>
+<div class="verbose docutils container">
+<p>For remote repository, using --bundle avoids downloading the
+changesets twice if the incoming is followed by a pull.</p>
+<p>Examples:</p>
+<ul>
+<li><p class="first">show incoming changes with patches and full description:</p>
+<pre class="literal-block">
+hg incoming -vp
+</pre>
+</li>
+<li><p class="first">show incoming changes excluding merges, store a bundle:</p>
+<pre class="literal-block">
+hg in -vpM --bundle incoming.hg
+hg pull incoming.hg
+</pre>
+</li>
+<li><p class="first">briefly list changes inside a bundle:</p>
+<pre class="literal-block">
+hg in changes.hg -T &quot;{desc|firstline}\n&quot;
+</pre>
+</li>
+</ul>
+</div>
+<p>Returns 0 if there are incoming changes, 1 otherwise.</p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="#contents">Options</a></h1>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>run even if remote repository is unrelated</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-n</span>, <span class="option">--newest-first</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>show newest record first</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--bundle <var>&lt;FILE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>file to store the bundles into</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-r</span>, <span class="option">--rev <var>&lt;REV[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>a remote changeset intended to be added</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-B</span>, <span class="option">--bookmarks</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>compare bookmarks</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-b</span>, <span class="option">--branch <var>&lt;BRANCH[+]&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>a specific branch you would like to pull</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-p</span>, <span class="option">--patch</span></kbd></td>
+<td>show patch</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-g</span>, <span class="option">--git</span></kbd></td>
+<td>use git extended diff format</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--limit <var>&lt;NUM&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>limit number of changes displayed</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-M</span>, <span class="option">--no-merges</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>do not show merges</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stat</span></kbd></td>
+<td>output diffstat-style summary of changes</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-G</span>, <span class="option">--graph</span></kbd></td>
+<td>show the revision DAG</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--style <var>&lt;STYLE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display using template map file (DEPRECATED)</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-T</span>, <span class="option">--template <var>&lt;TEMPLATE&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>display with template</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-e</span>, <span class="option">--ssh <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify ssh command to use</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--remotecmd <var>&lt;CMD&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>specify hg command to run on the remote side</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--insecure</span></kbd></td>
+<td>do not verify server certificate (ignoring web.cacerts config)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-S</span>, <span class="option">--subrepos</span></kbd></td>
+<td>recurse into subrepositories</td></tr>
+</tbody>
+</table>
+<p>[+] marked option can be specified multiple times</p>
+</div>
+<div class="section" id="aliases">
+<h1><a class="toc-backref" href="#contents">Aliases</a></h1>
+<pre class="literal-block">
+in
+</pre>
+</div>
+</div>
+</body>
+</html>
