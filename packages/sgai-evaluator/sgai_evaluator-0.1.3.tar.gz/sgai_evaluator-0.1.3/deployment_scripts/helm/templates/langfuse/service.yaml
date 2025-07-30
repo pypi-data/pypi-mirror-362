@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "langfuse.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "langfuse.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "langfuse.selectorLabels" . | nindent 4 }} 

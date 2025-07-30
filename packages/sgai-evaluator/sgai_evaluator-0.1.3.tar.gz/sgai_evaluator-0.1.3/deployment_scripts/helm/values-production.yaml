@@ -1,0 +1,122 @@
+# Production values for Langfuse
+# This is a YAML-formatted file.
+
+global:
+  environment: production
+  namespace: langfuse-prod  # Change this to your production namespace
+  domain: "langfuse.yourdomain.com"  # Change this to your domain
+  monitoring:
+    enabled: true
+    type: signoz
+  tls:
+    enabled: true
+    certManager:
+      enabled: true
+      issuerName: letsencrypt-prod
+      issuerKind: ClusterIssuer
+
+security:
+  networkPolicies:
+    enabled: true
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+
+# Override specific values for production
+langfuse:
+  replicaCount: 3
+  
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "500m"
+    limits:
+      memory: "4Gi"
+      cpu: "1000m"
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  worker:
+    enabled: true
+    replicaCount: 4
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "250m"
+      limits:
+        memory: "2Gi"
+        cpu: "500m"
+
+clickhouse:
+  replicaCount: 2
+  persistence:
+    size: 100Gi
+    storageClass: "managed-premium"  # Change this to your storage class
+  
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "2000m"
+
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"
+    retention:
+      daily: 7
+      weekly: 4
+      monthly: 3
+
+redis:
+  architecture: replication
+  replicaCount: 3
+  auth:
+    enabled: true
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: "managed-premium"  # Change this to your storage class
+
+minio:
+  mode: distributed
+  replicaCount: 4
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: "managed-premium"  # Change this to your storage class
+
+signoz:
+  enabled: true
+  otelCollector:
+    enabled: true
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "200m"
+  samplingRate: 1.0
+  retention:
+    traces: 7d
+    metrics: 30d
+
+config:
+  nextAuthUrl: "https://langfuse.yourdomain.com"  # Change this to your domain
+  telemetryEnabled: false
+  enableExperimentalFeatures: false
+  autoPostgresMigrationDisabled: false  # Consider setting to true in production
+  backgroundProcessingEnabled: true
+  backgroundMigrationsEnabled: true 
