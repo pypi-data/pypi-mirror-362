@@ -1,0 +1,165 @@
+# Nuuly Postgres MCP Server
+
+MCP server for accessing Nuuly PostgreSQL database resources through Claude Desktop and other AI assistants.
+
+## Contents
+- `src/nuuly_postgres_mcp_server/`: Package source code
+  - `__init__.py`: Package initialization
+  - `__main__.py`: Entry point for running as a module
+  - `server.py`: Main server implementation
+- `pyproject.toml`: Package configuration
+- `.env.example`: Example environment variables
+
+## Purpose
+This MCP server provides PostgreSQL database connectivity functionality for the broader MCP platform. It connects to CloudSQL Postgres non-prod databases and enables AI code editors to:
+
+1. Understand all tables and schemas
+2. Run queries against the non-prod database
+3. List available databases and their aliases
+
+---
+
+## Installation
+
+### Option 1: Install from PyPI
+
+```bash
+pip install nuuly-postgres-mcp-server
+```
+
+### Option 2: Install from Source
+
+1. Clone the repository:
+```bash
+git clone <REPO_URL>
+cd r15-mcp/mcp_servers/postgres-mcp
+```
+
+2. Install the package in development mode:
+```bash
+pip install -e .
+```
+
+## Local Development
+
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+
+### Setup
+
+1. Clone the repository:
+```bash
+git clone <REPO_URL>
+cd r15-mcp/mcp_servers/postgres-mcp
+```
+
+2. Create and activate a virtual environment (optional but recommended):
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install development dependencies:
+```bash
+pip install -e .
+```
+
+4. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your actual values
+```
+
+## Environment Variables
+
+The following environment variables can be set to customize the behavior of the MCP server:
+
+- `POSTGRES_MCP_SERVER_URL`: URL of the Cloud Run DB Proxy (default: "https://postgres-mcp-toolbox-186512416539.us-east4.run.app")
+- `DB_PROXY_API_KEY`: API key for authenticating with the Cloud Run DB Proxy (required)
+- `LOG_LEVEL`: Logging level (default: INFO)
+
+## Usage
+
+### For Claude Desktop
+
+Add this configuration to your Claude Desktop settings:
+
+```json
+{
+  "Nuuly Postgres MCP": {
+    "command": "nuuly-postgres-mcp",
+    "env": {
+      "PYTHONUNBUFFERED": "1",
+      "POSTGRES_MCP_SERVER_URL": "https://postgres-mcp-toolbox-186512416539.us-east4.run.app",
+      "DB_PROXY_API_KEY": "YOUR_API_KEY_HERE"
+    }
+  }
+}
+```
+
+### Command Line Usage
+
+```bash
+nuuly-postgres-mcp
+```
+
+## Deployment
+
+### As a GCP Cloud Function
+
+This MCP server is designed to be deployed as a GCP Cloud Function with the following parameters:
+
+- Project: `rental-dev`
+- Region: `us-east4`
+- Serverless VPC Connector: `rental-vpc-connector`
+- Entry point: `main.py`
+
+The function connects to CloudSQL PostgreSQL using private IP (10.171.208.52) and uses environment variables for DB credentials.
+
+```yaml
+environment_variables:
+  POSTGRES_MCP_SERVER_URL: "https://postgres-mcp-toolbox-186512416539.us-east4.run.app"
+  DB_PROXY_API_KEY: "${DB_PROXY_API_KEY}"
+  LOG_LEVEL: "INFO"
+```
+
+### Building and Publishing the Package
+
+To build and publish the package to PyPI:
+
+```bash
+python -m build
+python -m twine upload dist/*
+```
+
+## Available Tools
+
+This MCP server provides the following tools to AI assistants:
+
+- `run_query`: Execute SQL queries against the database
+- `get_schema`: Get database schema information
+- `list_databases`: List available databases
+
+## Troubleshooting
+
+### Connection Issues with Claude Desktop
+
+If you experience connection issues with Claude Desktop (client transport closing), ensure that:
+
+1. The server is running with the correct URL for the Cloud Run DB Proxy
+2. The API key is correctly set and properly escaped in any curl commands (use single quotes)
+3. The server is properly handling heartbeat and shutdown messages
+4. The JSON-RPC initialization response includes `keepAlive: true` and `supportsHeartbeats: true`
+
+Example curl command to test the API:
+```bash
+curl -X GET "https://postgres-mcp-toolbox-186512416539.us-east4.run.app/databases" -H 'X-API-KEY: YOUR_API_KEY_HERE'
+```
+
+### Common Issues
+
+- **Missing API Key**: Ensure the `DB_PROXY_API_KEY` environment variable is set
+- **Permission Errors**: Verify that your API key has the necessary permissions
+- **Timeout Errors**: Check network latency or increase the timeout settings in the code
+- **Heartbeat Issues**: Ensure the MCP server properly implements heartbeat handlers
