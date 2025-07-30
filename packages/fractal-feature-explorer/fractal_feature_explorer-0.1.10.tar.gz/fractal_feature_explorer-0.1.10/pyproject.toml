@@ -1,0 +1,73 @@
+[project]
+authors = [{ name = "lorenzo", email = "lorenzo.cerrone@uzh.ch" }]
+dependencies = [
+    "streamlit",
+    "ngio>=0.3.2, <0.4.0",
+    "plotly",
+    "matplotlib",
+    "orjson",
+    "rich",
+    "urllib3",
+]
+name = "fractal-feature-explorer"
+requires-python = ">=3.12,<3.13"
+dynamic = ["version"]
+description = "A Dashboard for exploring features in OME-Zarr datasets."
+readme = "README.md"
+license = { text = "BSD-3-Clause" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+
+
+[project.urls]
+homepage = "https://github.com/fractal-analytics-platform/fractal-feature-explorer"
+repository = "https://github.com/fractal-analytics-platform/fractal-feature-explorer"
+
+[project.optional-dependencies]
+dev = [
+    "devtools",
+    "notebook",
+    "pre-commit",
+    "ruff",
+    "watchdog",
+    "psrecord[plot]",
+]
+
+test = ["pytest", "pytest-cov", "devtools"]
+
+
+[project.scripts]
+explorer = "fractal_feature_explorer.cli:cli"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+# https://hatch.pypa.io/latest/config/metadata/
+[tool.hatch.version]
+source = "vcs"
+
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64", "win-64"]
+
+[tool.pixi.pypi-dependencies]
+fractal_feature_explorer = { path = ".", editable = true }
+# ngio = { path = "../ngio", editable = true }
+
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+dev = { features = ["dev"], solve-group = "dev" }
+test = { features = ["test"], solve-group = "test" }
+
+
+[tool.pixi.tasks]
+explorer-dev = { cmd = "streamlit run src/fractal_feature_explorer/main.py" }
