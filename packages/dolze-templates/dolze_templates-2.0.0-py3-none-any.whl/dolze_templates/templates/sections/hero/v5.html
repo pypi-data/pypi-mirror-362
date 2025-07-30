@@ -1,0 +1,74 @@
+<section id="hero" class="py-32 bg-white relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-gray-50 to-white"></div>
+  <div class="absolute inset-0">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5"></div>
+    <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+  </div>
+  
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <div class="space-y-8" data-aos="fade-right">
+        {% if sections.hero.badge %}
+        <div class="inline-flex items-center px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg">
+          <div class="w-2 h-2 bg-primary rounded-full mr-3"></div>
+          <span class="text-primary font-medium text-sm">{{ sections.hero.badge }}</span>
+        </div>
+        {% endif %}
+        
+        <h1 class="text-5xl lg:text-6xl font-light text-gray-900 leading-tight tracking-tight">
+          {{ sections.hero.title }}
+        </h1>
+        
+        {% if sections.hero.subtitles %}
+        <div class="flex flex-wrap gap-3">
+          {% for subtitle in sections.hero.subtitles %}
+          <span class="px-4 py-2 bg-gray-100 border border-gray-200 rounded-md text-gray-700 text-sm font-medium">
+            {{ subtitle }}
+          </span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <p class="text-xl text-gray-600 leading-relaxed max-w-lg">
+          {{ sections.hero.description }}
+        </p>
+        
+        {% if sections.hero.ctaButtons %}
+        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+          {% for btn in sections.hero.ctaButtons %}
+          <a href="{{ btn.url }}" 
+             class="{% if btn.style == 'filled' %}bg-primary text-white hover:bg-primary/90 shadow-lg{% else %}bg-white text-primary border border-primary hover:bg-primary/5{% endif %} px-8 py-4 rounded-lg font-medium transition-all duration-300 text-center inline-flex items-center justify-center"
+             {% if btn.ariaLabel %}aria-label="{{ btn.ariaLabel }}"{% endif %}>
+            {{ btn.label }}
+            <i class="ri-arrow-right-line ml-2"></i>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if sections.hero.stats %}
+        <div class="grid grid-cols-3 gap-8 pt-12 border-t border-gray-200">
+          {% for stat in sections.hero.stats %}
+          <div class="text-center">
+            <div class="text-3xl font-light text-gray-900 mb-1">{{ stat.value }}</div>
+            <div class="text-sm text-gray-600 uppercase tracking-wide">{{ stat.label }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      
+      <div class="relative" data-aos="fade-left" data-aos-delay="200">
+        {% if sections.hero.heroImage %}
+        <div class="relative">
+          <div class="absolute -inset-4 bg-gradient-to-r from-primary/10 to-secondary/10 blur-2xl opacity-50"></div>
+          <img src="{{ sections.hero.heroImage.src }}" 
+               alt="{{ sections.hero.heroImage.alt }}" 
+               class="relative w-full h-auto rounded-lg shadow-2xl border border-gray-200"
+               loading="{% if sections.hero.heroImage.lazyLoad %}lazy{% else %}eager{% endif %}">
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

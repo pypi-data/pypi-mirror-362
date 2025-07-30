@@ -1,0 +1,43 @@
+<section id="team" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        👥 {{ sections.team.title }}
+      </h2>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for member in sections.team.members %}
+      <div class="text-center group" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="relative mb-6">
+            <img src="{{ member.photo }}" 
+                 alt="{{ member.name }}" 
+                 class="w-20 h-20 rounded-full object-cover mx-auto border-2 border-blue-200 shadow-sm">
+            <div class="absolute -bottom-2 -right-2 w-5 h-5 bg-green-400 rounded-full border-2 border-white"></div>
+          </div>
+          
+          <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ member.name }}</h3>
+          <p class="text-blue-600 font-semibold text-sm mb-4">{{ member.role }}</p>
+          
+          {% if member.bio %}
+          <p class="text-gray-600 text-sm leading-relaxed mb-6">{{ member.bio }}</p>
+          {% endif %}
+          
+          {% if member.socialLinks %}
+          <div class="flex justify-center gap-3">
+            {% for social in member.socialLinks %}
+            <a href="{{ social.url }}" 
+               class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition-colors duration-300 shadow-sm"
+               target="_blank" rel="noopener">
+              <i class="ri-{{ social.platform }}-line text-sm"></i>
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

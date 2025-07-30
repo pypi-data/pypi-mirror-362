@@ -1,0 +1,39 @@
+<section id="gallery" class="py-32 bg-gradient-to-b from-gray-50 to-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <h2 class="text-5xl font-bold text-gray-900 mb-6">
+        {{ sections.gallery.title }}
+      </h2>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for item in sections.gallery.items %}
+      <div class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <div class="aspect-[4/3] overflow-hidden">
+          <img src="{{ item.src }}" 
+               alt="{{ item.alt }}" 
+               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+        </div>
+        
+        {% if item.caption %}
+        <div class="p-6">
+          <h3 class="font-semibold text-gray-900 group-hover:text-primary transition-colors duration-300">
+            {{ item.caption }}
+          </h3>
+        </div>
+        {% endif %}
+        
+        {% if item.lightbox %}
+        <div class="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg">
+          <i class="ri-zoom-in-line text-gray-700"></i>
+        </div>
+        {% endif %}
+        
+        <div class="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-br from-primary to-secondary rounded-full opacity-60"></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,63 @@
+<section id="cta" class="py-16 bg-primary text-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="space-y-8" data-aos="fade-up">
+      {% if sections.cta.badge %}
+      <span
+        class="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-sm font-medium"
+      >
+        {{ sections.cta.badge }}
+      </span>
+      {% endif %}
+
+      <h2 class="text-3xl md:text-4xl font-bold">
+        {{ sections.cta.title }} {% if sections.cta.highlight %}
+        <span class="text-secondary">{{ sections.cta.highlight }}</span>
+        {% endif %}
+      </h2>
+
+      <p class="text-xl text-white/90 max-w-2xl mx-auto">
+        {{ sections.cta.description }}
+      </p>
+
+      {% if sections.cta.buttons %}
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        {% for button in sections.cta.buttons %}
+        <a
+          href="{{ button.url }}"
+          class="bg-white text-primary hover:bg-gray-100 px-8 py-4 rounded-lg font-medium transition-colors inline-flex items-center justify-center gap-2"
+        >
+          {% if button.icon %}
+          <i class="{{ button.icon }}"></i>
+          {% endif %} {{ button.label }}
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %} {% if sections.cta.trustIndicators %}
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8">
+        {% for indicator in sections.cta.trustIndicators %}
+        <div class="text-center">
+          <div class="text-2xl font-bold text-white">{{ indicator.value }}</div>
+          <div class="text-sm text-white/80">{{ indicator.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %} {% if sections.cta.guarantees %}
+      <div class="grid md:grid-cols-3 gap-6 pt-8">
+        {% for guarantee in sections.cta.guarantees %}
+        <div class="flex items-center gap-3 justify-center">
+          <div
+            class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"
+          >
+            <i class="{{ guarantee.icon }} text-white"></i>
+          </div>
+          <div class="text-left">
+            <div class="font-medium text-white">{{ guarantee.title }}</div>
+            <div class="text-sm text-white/80">{{ guarantee.description }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

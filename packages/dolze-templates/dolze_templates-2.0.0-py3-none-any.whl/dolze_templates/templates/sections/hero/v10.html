@@ -1,0 +1,149 @@
+<section id="hero" class="relative min-h-screen bg-white overflow-hidden">
+  <!-- SEO-friendly hidden heading for screen readers -->
+  <h1 class="sr-only">{{ sections.hero.title }}</h1>
+
+  <!-- Background elements -->
+  <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 opacity-50"></div>
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="hero-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M0 0h40v40H0z" fill="none" />
+            <path d="M0 0h1v40H0zm40 0v1H0V0zm0 40h-1V0h1zM0 40v-1h40v1z" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#hero-grid)" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 flex items-center min-h-[90vh]">
+    <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+      <!-- Left content column -->
+      <div class="space-y-8" data-aos="fade-up" data-aos-delay="100">
+        <!-- Badge -->
+        {% if sections.hero.badge %}
+        <div class="inline-flex items-center px-4 py-2 rounded-full bg-indigo-100 text-indigo-800 font-medium">
+          <span class="flex h-2 w-2 rounded-full bg-indigo-500 mr-2"></span>
+          <span>{{ sections.hero.badge }}</span>
+        </div>
+        {% endif %}
+        
+        <!-- Main heading -->
+        <h2 class="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+          {{ sections.hero.title }}
+        </h2>
+        
+        <!-- Subtitles -->
+        {% if sections.hero.subtitles %}
+        <div class="flex flex-wrap gap-3">
+          {% for subtitle in sections.hero.subtitles %}
+          <span class="text-lg font-medium px-4 py-1 rounded-full bg-indigo-100 text-indigo-800">{{ subtitle }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Description -->
+        <p class="text-xl text-gray-600 max-w-xl">
+          {{ sections.hero.description }}
+        </p>
+        
+        <!-- CTA buttons -->
+        <div class="flex flex-col sm:flex-row gap-5 pt-4">
+          {% for btn in sections.hero.ctaButtons %}
+          <a 
+            href="{{ btn.url }}" 
+            class="{% if btn.style == 'filled' %}
+              inline-flex items-center justify-center px-8 py-4 bg-indigo-600 text-white font-medium rounded-xl shadow-lg hover:bg-indigo-700 transition-all duration-300
+            {% else %}
+              inline-flex items-center justify-center px-8 py-4 bg-white text-gray-700 font-medium rounded-xl border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-300
+            {% endif %}"
+            {% if btn.ariaLabel %}aria-label="{{ btn.ariaLabel }}"{% endif %}
+            {% if btn.modalVideo %}data-modal-trigger="video-modal"{% endif %}
+          >
+            {% if btn.icon %}
+            <svg class="w-5 h-5 mr-2 {% if btn.style == 'filled' %}text-white{% else %}text-indigo-500{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ btn.icon }}"></path>
+            </svg>
+            {% endif %}
+            <span>{{ btn.label }}</span>
+          </a>
+          {% endfor %}
+        </div>
+        
+        <!-- Stats display -->
+        {% if sections.hero.stats %}
+        <div class="grid grid-cols-3 gap-6 pt-8 mt-4">
+          {% for stat in sections.hero.stats %}
+          <div class="text-center">
+            <p class="text-3xl font-bold text-indigo-600">{{ stat.value }}</p>
+            <p class="text-gray-600">{{ stat.label }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Features list -->
+        {% if sections.hero.features %}
+        <div class="pt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {% for feature in sections.hero.features %}
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+              <i class="{{ feature.icon }}" aria-hidden="true"></i>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">{{ feature.title }}</p>
+              <p class="text-sm text-gray-600">{{ feature.description }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      
+      <!-- Right image column -->
+      <div class="relative" data-aos="fade-left" data-aos-delay="300">
+        <!-- Main image with decorative elements -->
+        <div class="relative rounded-2xl overflow-hidden shadow-2xl border-8 border-white">
+          <!-- Image with fixed aspect ratio -->
+          <div class="aspect-[3/4] w-full">
+            <img 
+              src="{{ sections.hero.heroImage.src }}" 
+              alt="{{ sections.hero.heroImage.alt }}" 
+              class="w-full h-full object-cover"
+              loading="{% if sections.hero.heroImage.lazyLoad %}lazy{% else %}eager{% endif %}"
+            />
+          </div>
+        </div>
+        
+        <!-- Decorative elements -->
+        <div class="absolute -top-6 -right-6 w-32 h-32 bg-indigo-200 rounded-full opacity-70 -z-10"></div>
+        <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-purple-200 rounded-full opacity-70 -z-10"></div>
+      </div>
+    </div>
+    
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+      <span class="text-sm text-indigo-700 font-medium mb-2">Scroll to explore</span>
+      <svg class="w-6 h-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      </svg>
+    </div>
+  </div>
+  
+  <!-- Video modal -->
+  <div id="video-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 opacity-0 invisible transition-all duration-300">
+    <div class="relative bg-white rounded-2xl overflow-hidden max-w-4xl w-full max-h-[80vh]">
+      <button class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors duration-300" data-modal-close>
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <div class="aspect-video">
+        <iframe id="video-frame" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</section>

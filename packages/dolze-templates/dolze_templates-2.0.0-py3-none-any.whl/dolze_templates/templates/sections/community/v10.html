@@ -1,0 +1,196 @@
+<section id="community" class="py-24 bg-white relative overflow-hidden">
+  <!-- Background elements -->
+  <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-30"></div>
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="community-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M0 0h40v40H0z" fill="none" />
+            <path d="M0 0h1v40H0zm40 0v1H0V0zm0 40h-1V0h1zM0 40v-1h40v1z" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#community-grid)" />
+      </svg>
+    </div>
+  </div>
+  
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+      {% if sections.community.badge %}
+      <span class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-700 mb-4">
+        {{ sections.community.badge }}
+      </span>
+      {% endif %}
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">
+        {{ sections.community.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.community.subtitle }}
+      </p>
+    </div>
+    
+    <!-- Stats section -->
+    {% if sections.community.stats %}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+      {% for stat in sections.community.stats %}
+      <div class="bg-white rounded-xl shadow-md p-6 text-center" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="text-4xl font-bold text-indigo-600 mb-2">{{ stat.value }}</div>
+        <div class="text-gray-600">{{ stat.label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Highlights grid -->
+    {% if sections.community.highlights %}
+    <div class="grid md:grid-cols-3 gap-8 mb-16">
+      {% for highlight in sections.community.highlights %}
+      <div 
+        class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-indigo-200"
+        data-aos="fade-up" 
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        {% if highlight.image %}
+        <div class="aspect-video w-full">
+          <img 
+            src="{{ highlight.image }}" 
+            alt="{{ highlight.title }}" 
+            class="w-full h-full object-cover"
+            loading="lazy"
+          >
+        </div>
+        {% endif %}
+        <div class="p-6">
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ highlight.title }}</h3>
+          <p class="text-gray-600 mb-4">{{ highlight.description }}</p>
+          {% if highlight.link_url and highlight.link_text %}
+          <a href="{{ highlight.link_url }}" class="text-indigo-600 font-medium hover:text-indigo-700 inline-flex items-center">
+            {{ highlight.link_text }}
+            <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Featured community content -->
+    {% if sections.community.featured %}
+    <div class="bg-indigo-600 rounded-2xl shadow-xl overflow-hidden mb-16" data-aos="fade-up" data-aos-delay="300">
+      <div class="grid md:grid-cols-2 items-center">
+        <div class="p-8 md:p-12">
+          <div class="text-indigo-200 mb-4">{{ sections.community.featured.badge }}</div>
+          <h3 class="text-3xl font-bold text-white mb-4">{{ sections.community.featured.title }}</h3>
+          <p class="text-indigo-100 mb-6">{{ sections.community.featured.description }}</p>
+          {% if sections.community.featured.cta_url and sections.community.featured.cta_text %}
+          <a 
+            href="{{ sections.community.featured.cta_url }}" 
+            class="inline-flex items-center px-6 py-3 bg-white text-indigo-600 font-medium rounded-lg hover:bg-indigo-50 transition-colors duration-300"
+          >
+            {{ sections.community.featured.cta_text }}
+            <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+          {% endif %}
+        </div>
+        {% if sections.community.featured.image %}
+        <div class="aspect-[4/3] w-full h-full">
+          <img 
+            src="{{ sections.community.featured.image }}" 
+            alt="{{ sections.community.featured.title }}" 
+            class="w-full h-full object-cover"
+            loading="lazy"
+          >
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Testimonials carousel -->
+    {% if sections.community.testimonials %}
+    <div class="mb-16" data-aos="fade-up" data-aos-delay="400">
+      <div class="text-center mb-8">
+        <h3 class="text-2xl font-semibold text-gray-900">{{ sections.community.testimonials.title }}</h3>
+      </div>
+      <div class="relative">
+        <div class="overflow-hidden">
+          <div class="flex transition-transform duration-500 ease-out" id="community-testimonials-slider">
+            {% for testimonial in sections.community.testimonials.items %}
+            <div class="w-full flex-shrink-0 px-4">
+              <div class="bg-white rounded-xl shadow-md p-8 border border-gray-100">
+                <div class="mb-6">
+                  <svg class="w-10 h-10 text-indigo-200" fill="currentColor" viewBox="0 0 32 32" aria-hidden="true">
+                    <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                  </svg>
+                </div>
+                <blockquote class="text-gray-600 mb-6">
+                  {{ testimonial.quote }}
+                </blockquote>
+                <div class="flex items-center">
+                  {% if testimonial.avatar %}
+                  <div class="flex-shrink-0 mr-4">
+                    <img 
+                      src="{{ testimonial.avatar }}" 
+                      alt="{{ testimonial.name }}" 
+                      class="w-12 h-12 rounded-full object-cover"
+                      loading="lazy"
+                    >
+                  </div>
+                  {% endif %}
+                  <div>
+                    <div class="font-medium text-gray-900">{{ testimonial.name }}</div>
+                    {% if testimonial.title %}
+                    <div class="text-sm text-gray-500">{{ testimonial.title }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <!-- Navigation buttons -->
+        <button class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center text-gray-600 hover:text-indigo-600 focus:outline-none" id="community-prev-btn">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button class="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center text-gray-600 hover:text-indigo-600 focus:outline-none" id="community-next-btn">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- CTA section -->
+    {% if sections.community.cta %}
+    <div class="text-center" data-aos="fade-up" data-aos-delay="500">
+      <h3 class="text-2xl font-semibold text-gray-900 mb-4">{{ sections.community.cta.title }}</h3>
+      <p class="text-gray-600 max-w-2xl mx-auto mb-8">{{ sections.community.cta.description }}</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        {% for button in sections.community.cta.buttons %}
+        <a 
+          href="{{ button.url }}" 
+          class="inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-all duration-300 {% if button.style == 'primary' %}bg-indigo-600 text-white hover:bg-indigo-700{% else %}bg-white text-gray-700 border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50{% endif %}"
+        >
+          {% if button.icon %}
+          <i class="{{ button.icon }} mr-2" aria-hidden="true"></i>
+          {% endif %}
+          {{ button.label }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>

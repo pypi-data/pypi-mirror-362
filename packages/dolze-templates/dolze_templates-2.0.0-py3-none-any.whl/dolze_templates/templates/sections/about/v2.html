@@ -1,0 +1,77 @@
+<section id="about" class="py-32 bg-white relative">
+  <div class="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-transparent"></div>
+  
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-20 items-center">
+      <div class="space-y-8" data-aos="fade-up">
+        <div class="space-y-4">
+          <div class="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+            {{ sections.about.title }}
+          </div>
+          <h2 class="text-5xl font-bold text-gray-900 leading-tight">
+            {{ sections.about.subtitle }}
+          </h2>
+        </div>
+        
+        <p class="text-xl text-gray-600 leading-relaxed">
+          {{ sections.about.content }}
+        </p>
+        
+        {% if sections.about.timeline %}
+        <div class="space-y-6">
+          {% for item in sections.about.timeline %}
+          <div class="flex gap-4 group" data-aos="slide-right" data-aos-delay="{{ loop.index0 * 100 }}">
+            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <i class="{{ item.icon | default('ri-calendar-line') }} text-white"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-sm font-bold text-primary bg-primary/10 px-2 py-1 rounded">{{ item.year }}</span>
+                <h4 class="text-lg font-semibold text-gray-900">{{ item.title }}</h4>
+              </div>
+              <p class="text-gray-600">{{ item.description }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      
+      <div class="relative" data-aos="fade-up" data-aos-delay="200">
+        {% if sections.about.media %}
+        <div class="relative group">
+          <div class="absolute -inset-6 bg-gradient-to-r from-primary/20 to-secondary/20 blur-2xl opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+          <img src="{{ sections.about.media.src }}" 
+               alt="{{ sections.about.media.alt }}" 
+               class="relative w-full h-auto rounded-2xl shadow-xl">
+          
+          {% if sections.about.media.stat_value %}
+          <div class="absolute -top-6 -right-6 bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+            <div class="text-3xl font-bold text-gray-900">{{ sections.about.media.stat_value }}</div>
+            <div class="text-sm text-gray-600">{{ sections.about.media.stat_label }}</div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if sections.about.stats %}
+        <div class="grid grid-cols-2 gap-6 mt-12">
+          {% for stat in sections.about.stats %}
+          <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 100 }}">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                <i class="{{ stat.icon | default('ri-bar-chart-line') }} text-primary text-lg"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-gray-900">{{ stat.value }}</div>
+                <div class="text-sm text-gray-600">{{ stat.label }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,50 @@
+<section id="team" class="py-24 bg-gradient-to-br from-primary/5 via-white to-secondary/5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="zoom-in">
+      <h2 class="text-5xl md:text-6xl font-black text-gray-900 mb-6">
+        {{ sections.team.title }}
+      </h2>
+      <div class="w-32 h-2 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mt-8"></div>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+      {% for member in sections.team.members %}
+      <div class="group relative" data-aos="flip-up" data-aos-delay="{{ loop.index0 * 150 }}">
+        <div class="absolute -inset-4 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <div class="relative bg-white p-10 rounded-3xl shadow-2xl border border-gray-100 text-center transform group-hover:scale-105 transition-all duration-500">
+          <div class="relative mb-8">
+            <div class="absolute -inset-4 bg-gradient-to-r from-primary to-secondary rounded-full blur-lg opacity-30 group-hover:opacity-60 transition-opacity duration-500"></div>
+            <img src="{{ member.photo }}" 
+                 alt="{{ member.name }}" 
+                 class="relative w-32 h-32 rounded-full object-cover mx-auto border-4 border-white shadow-xl group-hover:scale-110 transition-transform duration-500">
+          </div>
+          
+          <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors duration-300">
+            {{ member.name }}
+          </h3>
+          <p class="text-lg font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+            {{ member.role }}
+          </p>
+          
+          {% if member.bio %}
+          <p class="text-gray-600 mb-6 leading-relaxed">{{ member.bio }}</p>
+          {% endif %}
+          
+          {% if member.socialLinks %}
+          <div class="flex justify-center gap-4">
+            {% for social in member.socialLinks %}
+            <a href="{{ social.url }}" 
+               class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center text-white shadow-lg hover:shadow-xl hover:shadow-primary/25 transform hover:scale-110 hover:rotate-12 transition-all duration-500"
+               target="_blank" rel="noopener">
+              <i class="ri-{{ social.platform }}-line"></i>
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,32 @@
+<footer id="footer" class="bg-white border-t border-gray-200">
+  <div class="max-w-4xl mx-auto px-4 py-16">
+    <div class="grid md:grid-cols-4 gap-8">
+      <div>
+        {% if sections.footer.brand %}
+        <h3 class="font-medium text-gray-900 mb-4">{{ sections.footer.brand.name }}</h3>
+        {% endif %}
+      </div>
+      
+      {% for nav in sections.footer.navigation %}
+      <div>
+        <h4 class="font-medium text-gray-900 mb-4">{{ nav.title }}</h4>
+        <ul class="space-y-2">
+          {% for link in nav.links %}
+          <li>
+            <a href="{{ link.url }}" class="text-gray-600 hover:text-gray-900 transition-colors">
+              {{ link.label }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% if sections.footer.bottom %}
+    <div class="border-t border-gray-200 mt-12 pt-8 text-center">
+      <p class="text-gray-600 text-sm">{{ sections.footer.bottom.copyright }}</p>
+    </div>
+    {% endif %}
+  </div>
+</footer>

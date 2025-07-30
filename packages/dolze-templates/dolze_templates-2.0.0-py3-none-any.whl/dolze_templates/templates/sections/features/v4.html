@@ -1,0 +1,57 @@
+<section id="features" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {{ sections.features.title }}
+      </h2>
+      <p class="text-base text-gray-600 max-w-2xl mx-auto">
+        {{ sections.features.subtitle }}
+      </p>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for feature in sections.features.items %}
+      <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+          <i class="{{ feature.icon | default('ri-star-line') }} text-white text-lg"></i>
+        </div>
+        
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ feature.title }}</h3>
+        <p class="text-gray-600 text-sm mb-4">{{ feature.subtitle }}</p>
+        
+        {% if feature.badge %}
+        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-semibold mb-3">
+          🏆 {{ feature.badge }}
+        </span>
+        {% endif %}
+        
+        {% if feature.status %}
+        <div class="inline-flex items-center px-3 py-1 bg-green-100 text-green-600 rounded-full text-xs font-semibold mb-4">
+          <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+          {{ feature.status }}
+        </div>
+        {% endif %}
+        
+        {% if feature.benefits %}
+        <ul class="space-y-2">
+          {% for benefit in feature.benefits %}
+          <li class="flex items-start gap-2 text-sm text-gray-600">
+            <span class="text-green-500 mt-1">✓</span>
+            <span>{{ benefit }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        
+        {% if feature.media %}
+        <div class="mt-4 rounded-xl overflow-hidden">
+          <img src="{{ feature.media.src }}" 
+               alt="{{ feature.media.alt }}" 
+               class="w-full h-32 object-cover">
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

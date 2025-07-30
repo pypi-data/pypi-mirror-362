@@ -1,0 +1,50 @@
+<section class="py-24 bg-gray-50" id="features">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <span class="inline-block text-xs uppercase tracking-widest text-gray-500 mb-3">
+        {{ sections.features.title }}
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-light text-gray-900 mb-4">
+        {{ sections.features.subtitle }}
+      </h2>
+      <div class="w-16 h-px bg-gray-300 mx-auto mb-6"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+      {% for feature in sections.features.items %}
+      <div class="bg-white p-8 border border-gray-100 hover:shadow-sm transition-shadow duration-300" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        {% if feature.media %}
+        <div class="aspect-[4/3] overflow-hidden mb-6">
+          <img
+            src="{{ feature.media.src }}"
+            alt="{{ feature.media.alt }}"
+            class="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+        {% endif %}
+        
+        <h3 class="text-xl font-light text-gray-900 mb-4">
+          {{ feature.title }}
+        </h3>
+        <div class="w-8 h-px bg-gray-300 mb-4"></div>
+        <p class="text-gray-600 font-light mb-6 leading-relaxed">
+          {{ feature.subtitle }}
+        </p>
+        
+        {% if feature.benefits %}
+        <div class="space-y-2 mb-6">
+          {% for benefit in feature.benefits %}
+          <div class="flex items-start gap-2">
+            <span class="text-xs text-gray-400 mt-1">—</span>
+            <span class="text-gray-600 font-light text-sm">{{ benefit }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>

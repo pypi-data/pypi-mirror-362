@@ -1,0 +1,73 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Light & Subtle Shop</title>
+    <script
+      crossorigin
+      src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.6/babel.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "{{settings.theme.colors.primary}}",
+              secondary: "{{settings.theme.colors.secondary}}",
+            },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .animate-slide-in {
+        animation: slideIn 0.3s ease-out;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .hover-scale {
+        transition: transform 0.2s ease;
+      }
+      .hover-scale:hover {
+        transform: scale(1.03);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 font-sans antialiased text-gray-900">
+    {% for section_name in
+    registry.brand_service_digital_saas.pages[page].sections %} {% if
+    sections[section_name] is defined %} {{ sections[section_name] | safe }} {%
+    endif %} {% endfor %}
+  </body>
+</html>

@@ -1,0 +1,61 @@
+<section id="product_grid" class="py-32 bg-gradient-to-b from-gray-50 to-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <h2 class="text-5xl font-bold text-gray-900 mb-6">
+        {{ sections.product_grid.title }}
+      </h2>
+      {% if sections.product_grid.subheading %}
+      <p class="text-xl text-gray-600">{{ sections.product_grid.subheading }}</p>
+      {% endif %}
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+      {% for item in sections.product_grid.items %}
+      <div class="group bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        {% if item.image %}
+        <div class="relative overflow-hidden">
+          <img src="{{ item.image.src }}" 
+               alt="{{ item.image.alt }}" 
+               class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700">
+          
+          {% if item.offer %}
+          <div class="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl font-bold shadow-lg">
+            {{ item.offer.discount }} OFF
+          </div>
+          {% endif %}
+          
+          <div class="absolute -bottom-4 -left-4 w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full opacity-60"></div>
+        </div>
+        {% endif %}
+        
+        <div class="relative p-8">
+          <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors duration-300">
+            {{ item.name }}
+          </h3>
+          <p class="text-gray-600 mb-6 leading-relaxed">{{ item.description }}</p>
+          
+          {% if item.price %}
+          <div class="flex items-center justify-between mb-6">
+            <span class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              ${{ item.price.amount }}
+            </span>
+          </div>
+          {% endif %}
+          
+          {% if item.offer and item.offer.description %}
+          <p class="text-sm text-gray-500 mb-6 bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200">
+            {{ item.offer.description }}
+          </p>
+          {% endif %}
+          
+          <button class="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

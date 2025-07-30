@@ -1,0 +1,32 @@
+<section id="stats" class="py-24 bg-primary text-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16" data-aos="fade-up">
+      <div class="w-12 h-px bg-white/30 mx-auto mb-6"></div>
+      <h2 class="text-4xl font-light text-white mb-4">
+        {{ sections.stats.title }}
+      </h2>
+      {% if sections.stats.subtitle %}
+      <p class="text-lg text-white/80">{{ sections.stats.subtitle }}</p>
+      {% endif %}
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {% for stat in sections.stats.items %}
+      <div class="text-center" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="bg-white/10 backdrop-blur-sm p-8 rounded-lg border border-white/20">
+          <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mx-auto mb-6">
+            <i class="{{ stat.icon | default('ri-bar-chart-line') }} text-white"></i>
+          </div>
+          
+          <div class="text-4xl font-light text-white mb-2">{{ stat.value }}</div>
+          <div class="text-sm font-medium text-white/80 uppercase tracking-wide">{{ stat.label }}</div>
+          
+          {% if stat.description %}
+          <p class="text-xs text-white/60 mt-2">{{ stat.description }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
