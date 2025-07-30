@@ -1,0 +1,34 @@
+name: Build and upload to PyPI
+
+env:
+  CIBW_SKIP: "cp36-*"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_upload_wheels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Build SDist and wheel
+        run: pipx run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels
+          path: dist/*
+
+      - name: Check metadata
+        run: pipx run twine check dist/*
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: ${{ secrets.PYRANGES_1_PYPI_USER }}
+          password: ${{ secrets.PYRANGES_1_PYPI_PASSWORD }}
+          verbose: true

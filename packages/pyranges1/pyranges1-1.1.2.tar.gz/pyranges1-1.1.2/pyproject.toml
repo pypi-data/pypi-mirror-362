@@ -1,0 +1,118 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel", "cython", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyranges1"
+version = "1.1.2"
+description = "GenomicRanges for Python."
+requires-python = ">=3.12.0"
+readme = "README.md"
+authors = [
+    { name = "Endre Bakken Stovner", email = "endbak@pm.me" },
+    { name = "Marco Mariotti", email = "marco.mariotti@ub.edu" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta", "Environment :: Other Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Topic :: Scientific/Engineering"
+]
+keywords = ["bioinformatics", "genomicranges", "genomics"]
+dependencies = ["pandas", "tabulate", "natsort", "ruranges>=0.0.9"]
+
+[project.optional-dependencies]
+add-ons = ["pyrle >= 0.0.39", "bamread",  "pyfaidx", "pyBigWig", "joblib"] #"fisher",
+dev = ["tox", "ruff == 0.11.0", "pyright", "pandas-stubs", "types-tabulate", "pytest-watcher", "pytest-xdist", "hypothesis>=6.92.1"]
+docs = ["sphinx", "sphinx_rtd_theme", "sphinx-autoapi", "sphinxcontrib-napoleon"]
+cli = ["fire"]
+all = ["pyranges1[add-ons]", "pyranges1[dev]", "pyranges1[docs]", "pyranges1[cli]"]
+
+[project.scripts]
+# <script‐name> = "<module.path>:<callable>"
+pyranger = "pyranges.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.pytype]
+inputs = ['pyranges']
+
+[project.urls]
+Homepage="http://github.com/pyranges/pyranges_1.x"
+
+[tool.tox]  # Legacy tox configuration (to be replaced with native tox.ini when supported)
+legacy_tox_ini = """
+[tox]
+envlist = py312, py313
+
+[testenv]
+basepython =
+    py312: python3.12
+    py313: python3.13
+deps =
+    pyrle >= 0.0.41
+    bamread
+    pyBigWig
+    pyfaidx
+    tox
+    ruff == 0.11.0
+    pandas-stubs
+    types-tabulate
+    pytest
+    pyright
+    joblib
+    hypothesis==6.92.1
+    ruranges >= 0.0.9
+    # fisher
+commands =
+    python tests/run_doctest_tutorial_howto.py
+    pytest --doctest-modules pyranges
+    pytest tests/unit
+    ruff format --check pyranges
+    ruff check pyranges
+    pyright
+"""
+
+[tool.mypy]
+python_version = "3.12"
+
+[tool.ruff]
+
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "E501", "ANN002", "ANN003", "ANN001", "ANN401", "PLR0913", "PLC0415",
+    "PD901", "D101", "D100", "D107", "CPY", "D105", "D104", "D203", "D211", "D213", "COM812", "ISC001"
+]
+
+[tool.pytest-watcher]
+now = true
+
+[tool.pyright]
+include = ["pyranges"]
+# typeCheckingMode = "strict"
+pythonVersion = "3.12"
+
+ignore = ["pyranges/core/pyranges_groupby.py"]
+
+# specific rules to disable
+reportUnknownParameterType = false
+reportUnknownMemberType = false
+reportUnknownArgumentType = false
+reportUnknownVariableType = false
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "bedtools: marks tests that require bedtools",
+]
+
