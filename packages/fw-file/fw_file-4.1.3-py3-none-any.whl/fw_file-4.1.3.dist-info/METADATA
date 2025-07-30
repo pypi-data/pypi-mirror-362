@@ -1,0 +1,308 @@
+Metadata-Version: 2.4
+Name: fw-file
+Version: 4.1.3
+Summary: Unified data-file interface
+Project-URL: Repository, https://gitlab.com/flywheel-io/tools/lib/fw-file
+Project-URL: Documentation, https://gitlab.com/flywheel-io/tools/lib/fw-file
+Author-email: Flywheel <support@flywheel.io>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: Bruker,CT,DICOM,EEG,Flywheel,GE,JPEG,JPG,MR,NIfTI,PARREC,PET,PFile,PNG,PTD,ParaVision,Philips,RAW,Siemens,extract,file,medical,metadata,parse
+Classifier: Topic :: Scientific/Engineering :: Medical Science Apps.
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: ~=3.10
+Requires-Dist: dicom-validator>=0.4.1
+Requires-Dist: faker>=30.6.0
+Requires-Dist: fw-meta>=4.0.0
+Requires-Dist: fw-utils>=4.3.4
+Requires-Dist: natsort<9,>=8.0.0
+Requires-Dist: pydantic-settings<3,>=2.0.3
+Requires-Dist: pydantic<3,>=2.4.2
+Requires-Dist: pydicom<4,>=3.0.1
+Requires-Dist: python-dateutil<3,>=2.8.1
+Requires-Dist: pyyaml>=5.4.1
+Provides-Extra: all
+Requires-Dist: dotty-dict<2,>=1.3.1; extra == 'all'
+Requires-Dist: edfio<1,>=0; extra == 'all'
+Requires-Dist: edflib-python<2,>=1.0.8; extra == 'all'
+Requires-Dist: eeglabio<1,>=0; extra == 'all'
+Requires-Dist: mne[hdf5]<2,>=1.8.0; extra == 'all'
+Requires-Dist: nibabel>=4.0.2; extra == 'all'
+Requires-Dist: piexif<2,>=1.1.3; extra == 'all'
+Requires-Dist: pillow>=9; extra == 'all'
+Requires-Dist: pybv<1,>=0; extra == 'all'
+Requires-Dist: pypng<1,>=0; extra == 'all'
+Provides-Extra: eeg
+Requires-Dist: edfio<1,>=0; extra == 'eeg'
+Requires-Dist: edflib-python<2,>=1.0.8; extra == 'eeg'
+Requires-Dist: eeglabio<1,>=0; extra == 'eeg'
+Requires-Dist: mne[hdf5]<2,>=1.8.0; extra == 'eeg'
+Requires-Dist: pybv<1,>=0; extra == 'eeg'
+Provides-Extra: jpg
+Requires-Dist: piexif<2,>=1.1.3; extra == 'jpg'
+Requires-Dist: pillow>=9; extra == 'jpg'
+Provides-Extra: json
+Requires-Dist: dotty-dict<2,>=1.3.1; extra == 'json'
+Provides-Extra: nifti
+Requires-Dist: nibabel>=4.0.2; extra == 'nifti'
+Provides-Extra: png
+Requires-Dist: piexif<2,>=1.1.3; extra == 'png'
+Requires-Dist: pillow>=9; extra == 'png'
+Requires-Dist: pypng<1,>=0; extra == 'png'
+Description-Content-Type: text/markdown
+
+# fw-file
+
+Unified interface for reading medical file types, exposing parsed fields as dict
+keys as well as attributes and for saving any modifications to disk or a buffer.
+
+DICOM support - built on top of `pydicom` - is the primary goal of the library.
+`fw-file` also provides helpers for parsing DICOMs containing non-standard tags
+and utilities for organizing datasets and extracting metadata.
+
+Additional file types supported:
+
+- NIfTI1 and NIfTI2 (.nii.gz)
+- Bruker ParaVision (subject/acqp/method)
+- GE MR RAW / PFile (P_NNNNN_.7)
+- Philips MR PAR/REC header (.par)
+- Philips MR PAR/REC zipfile (.parrec.zip) (read-only)
+- Siemens MR RAW (.dat)
+- Siemens MR Spectroscopy (.rda)
+- Siemens PET RAW (.ptd)
+- PNG (.png)
+- JPEG/JPG (.jpeg/.jpg)
+- BrainVision EEG (.vhdr/.vmrk/.eeg)
+- EEGLAB EEG (.set/.fdt)
+- European Data Format EEG (.edf)
+- BioSemi Data Format EEG (.bdf)
+- JSON (.json)
+
+## Installation
+
+To install the package with all the optional dependencies:
+
+```bash
+pip install "fw-file[all]"
+```
+
+## Usage
+
+### Opening
+
+```python
+from fw_file.dicom import DICOM
+dcm = DICOM("dataset.dcm")  # also works with any readable file-like object
+```
+
+### Fields
+
+**Attribute access** on DICOMs works similarly to that in `pydicom`:
+
+```python
+dcm.PatientAge == "060Y"
+dcm.patientage == "060Y"   # attrs are case-insensitive
+dcm.patient_age == "060Y"  # and snake_case compatible
+```
+
+**Key access** also returns values instead of `pydicom.DataElement`:
+
+```python
+dcm["PatientAge"] == "060Y"
+dcm["patientage"] == "060Y"   # keys are case-insensitive too
+dcm["patient_age"] == "060Y"  # and snake_case compatible
+dcm["00101010"] == "060Y"
+dcm["0010", "1010"] == "060Y"
+dcm[0x00101010] == "060Y"
+dcm[0x0010, 0x1010] == "060Y"
+```
+
+**Private tags** can be accessed as keys when including the creator:
+
+```python
+dcm["AGFA", "Zoom factor"] == 2
+dcm["AGFA", "0019xx82"] == 2
+```
+
+**Assignment and deletion** works with attributes and keys alike:
+
+```python
+dcm.PatientAge = "065Y"
+del dcm["PatientAge"]
+```
+
+### Metadata
+
+Flywheel metadata can be extracted using the `get_meta()` method:
+
+```python
+from fw_file.dicom import DICOM
+dcm = DICOM("dataset.dcm")
+dcm.get_meta() == {
+    "subject.label": "PatientID",
+    "session.label": "StudyDescription",
+    "session.uid": "1.2.3",  # StudyInstanceUID
+    "acquisition.label": "SeriesDescription",
+    "acquisition.uid": "4.5.6",  # SeriesInstanceUID
+    # and much, much more...
+}
+```
+
+### Saving
+
+```python
+dcm.save()              # save to the original location
+dcm.save("edited.dcm")  # save to a given filepath
+dcm.save(io.BytesIO())  # save to any writable object
+```
+
+### Collections and series
+
+Handling multiple DICOM files together is a common use case, where the tags of
+more than one file need to be inspected in tandem for QA/validation or even
+modified for de-identification. `DICOMCollection` facilitates that and exposes
+convenience methods to be loaded from a list of files, a directory or a zip
+archive.
+
+```python
+from fw_file.dicom import DICOMCollection
+coll_dcm = DICOMCollection("001.dcm", "002.dcm")  # from a list of files
+coll_dir = DICOMCollection.from_dir(".")          # from a directory
+coll_zip = DICOMCollection.from_zip("dicom.zip")  # from a zip archive
+coll = DICOMCollection()  # or start from scratch
+coll.append("001.dcm")    # and add files later
+```
+
+To interact with the underlying DICOMs:
+
+```python
+# access individual instances through list indexes
+coll[0].SOPInstanceUID == "1.2.3"
+# get tag value of all instances as a list, allowing different values
+coll.bulk_get("SOPInstanceUID") == ["1.2.3", "1.2.4"]
+# get a unique tag value, raising when encountering multiple values
+coll.get("SeriesInstanceUID") == "1.2"
+coll.get("SOPInstanceUID")  # raises ValueError
+# set a tag value uniformly on all instances
+coll.set("PatientAge", "060Y")
+# delete a tag across all instances
+coll.delete("PatientID")
+```
+
+Finally, a `DICOMCollection` can be saved in place, exported to a directory or
+packed as a zip archive:
+
+```python
+coll.save()
+coll.to_dir("/tmp/dicom")
+coll.to_zip("/tmp/dicom.zip")
+```
+
+`DICOMSeries` is a subclass of `DICOMCollection`, intended to be used on files
+that belong to the same DICOM series. The instances normally have the same
+`SeriesInstanceUID` attribute and are uploaded together (zipped) into a Flywheel
+acquisition. In addition to the collection methods, `DICOMSeries` can be used to
+pack the instances into an appropriately named ZIP archive and extract Flywheel
+metadata from multiple files while also validating the values, checking for any
+discrepancies among the instances along the way.
+
+```python
+from fw_file.dicom import DICOMSeries
+series = DICOMSeries("001.dcm", "002.dcm")
+filepath, metadata = series.to_upload()
+```
+
+### DICOM Standard Editions
+
+As the DICOM Standard is typically revised multiple times throughout the year,
+`fw-file` provides the option to choose which edition is being utilized via
+environment variables. The default is `"2024e"`, which utilizes the locally-saved
+2024e edition. Additional options are `"current"` and any valid 5-character edition
+(i.e. `"2022d"`). Specifying `"current"` will fetch the most recent edition at runtime.
+
+```bash
+FW_DCM_STANDARD_REV=current
+FW_DCM_STANDARD_REV=2022d
+```
+
+### Private dictionary
+
+In addition to the private tags included in
+[`pydicom`](https://github.com/pydicom/pydicom/blob/v2.1.2/pydicom/_private_dict.py),
+`fw-file` ships with an [extended dictionary](fw_file/dicom/dcmdict.py) to
+make accessing even more private tags that much simpler.
+
+The private dictionary can be further extended by creating a DCMTK-style
+[data dict](https://github.com/DCMTK/dcmtk/blob/master/dcmdata/data/private.dic)
+file and setting the
+[`DCMDICTPATH`](https://support.dcmtk.org/docs/file_envvars.html)
+environment variable to it's path.
+
+### `DataElement` decoding
+
+DICOMs are often saved with non-standard and/or corrupt data elements. To enable
+loading these datasets, `fw-file` provides fixes for some common problems:
+
+- Fix `VM=1` strings that contain `\` by replacing with `_` (default: enabled)
+- Fix `VR` for known data elements encoded as explicit `UN` (default: enabled)
+- Extend/improve handling of data elements with a `VR` mismatch (default: disabled)
+
+These fixes can also be enabled/disabled via environment variables:
+
+```bash
+FW_DCM_REPLACE_UN_WITH_KNOWN_VR=false
+FW_DCM_FIX_VM1_STRINGS=false
+FW_DCM_FIX_VR_MISMATCH=true
+```
+
+To extract as much information from a DICOM as possible, `fw-file` can be run in
+read-only mode. When enabled, invalid values are retained and the VR is set to OB.
+As it is not safe to write the DICOM back in this state, saving is disabled. This
+mode can be enabled via an environment variable. (default: disabled)
+
+```bash
+FW_DCM_READ_ONLY=true
+```
+
+Additionally, validation mode can be set via environment variables. Default is
+1 (WARN), additional options are 2 (RAISE) and 0 (IGNORE).
+
+```bash
+FW_DCM_READING_VALIDATION_MODE=1
+FW_DCM_WRITING_VALIDATION_MODE=1
+```
+
+## EEG
+
+Multiple EEG filetypes are supported including BrainVision, EEGLAB, EDF, and BDF files.
+These files are parsed using the MNE-Python library.
+
+BrainVision data must contain both the header file (.vhdr) and the marker file (.vmrk)
+in the same directory.
+
+If EEGLAB data is made up of two files (.set and .fdt), these files must be
+in the same directory.
+
+A zip archive can also be used to instantiate a `fw-file` BrainVision or EEGLAB object.
+
+```python
+from fw_file.eeg import BrainVision, EEGLAB
+bv = BrainVision.from_zip("brainvision.zip")
+e = EEGLAB.from_zip("eeglab.zip")
+```
+
+## Testing
+
+```bash
+uv run pytest
+```
+
+## Linting
+
+```bash
+pre-commit run -a
+```
+
+## License
+
+[![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
