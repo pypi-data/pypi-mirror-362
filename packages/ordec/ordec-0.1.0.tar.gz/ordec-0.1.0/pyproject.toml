@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ordec"
+maintainers = [
+  {name = "Tobias Kaiser", email = "kaiser@tu-berlin.de"}
+]
+description = "ORDeC"
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "pyrsistent>=0.18.1",
+    "lark>=1.1.5",
+    "astor>=0.8.1",
+    "numpy>=1.24.2",
+    "scipy>=1.10.1",
+    "atpublic>=6.0.1",
+    "websockets>=15.0.1",
+    "tabulate>=0.8.9",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/tub-msc/ordec"
+Documentation = "https://ordec.readthedocs.io"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.2.1",
+    "pytest-cov>=4.0.0",
+]
+extra = [
+    "black>=23.1.0",
+]
+
+[project.scripts]
+ordec-server =  "ordec.ws_server:main"
+
+[tool.setuptools]
+packages = [
+    "ordec",
+    "ordec.lib",
+    "ordec.lib.examples",
+    "ordec.lib.ord_test",
+    "ordec.parser",
+    "ordec.sim2",
+]
+
+[tool.setuptools.package-data]
+"ordec" = ["webdist.tar"]
+
+[tool.setuptools_scm]
+version_scheme = "release-branch-semver"
