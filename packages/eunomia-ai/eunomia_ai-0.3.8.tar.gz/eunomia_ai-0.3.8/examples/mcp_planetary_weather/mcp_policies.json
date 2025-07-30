@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "name": "mcp-planetary-weather-policy",
+  "default_effect": "deny",
+  "rules": [
+    {
+      "name": "list-and-call",
+      "description": "All principals can list and call the specified tools",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.name",
+          "operator": "in",
+          "value": ["get_venus_weather", "get_mars_weather"]
+        }
+      ],
+      "actions": ["list", "call"]
+    },
+    {
+      "name": "list-only",
+      "description": "All principals can list the specified tool",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.name",
+          "operator": "in",
+          "value": ["get_jupiter_weather"]
+        }
+      ],
+      "actions": ["list"]
+    },
+    {
+      "name": "restricted-call",
+      "description": "All principals can call the specified tool with restricted arguments",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.name",
+          "operator": "in",
+          "value": ["get_jupiter_weather"]
+        },
+        {
+          "path": "attributes.arguments.request.time",
+          "operator": "equals",
+          "value": "night"
+        }
+      ],
+      "actions": ["call"]
+    }
+  ]
+}
