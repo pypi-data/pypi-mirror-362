@@ -1,0 +1,45 @@
+[project]
+name = "abcreate"
+dynamic = ["version"]
+description = "application bundle creator"
+readme = "README.md"
+authors = [
+    { name = "René de Hesselle", email = "dehesselle@web.de" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "lxml>=5.3.1",
+    "pydantic-xml>=2.14.1",
+]
+license = { file = "LICENSE" }
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Environment :: MacOS X",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+  "Operating System :: MacOS :: MacOS X",
+  "Topic :: Software Development :: Build Tools",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Software Development :: Build Tools",
+  "Topic :: Utilities"
+]
+
+[project.urls]
+"Bug Reports" = "https://github.com/dehesselle/abcreate/issues"
+"Source" = "https://github.com/dehesselle/abcreate"
+
+[project.scripts]
+abcreate = "abcreate:main"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/abcreate/_version.py"
