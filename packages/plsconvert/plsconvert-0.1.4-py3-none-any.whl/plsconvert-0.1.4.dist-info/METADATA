@@ -1,0 +1,101 @@
+Metadata-Version: 2.4
+Name: plsconvert
+Version: 0.1.4
+Summary: Convert any file to any other.
+Project-URL: Homepage, https://github.com/ThorTuwy/plsconvert
+Project-URL: Bug Tracker, https://github.com/ThorTuwy/plsconvert/issues
+Author-email: ThorTuwy <tuwy@tuwy.win>
+License-File: LICENSE
+Requires-Python: >=3.13
+Requires-Dist: halo>=0.0.31
+Requires-Dist: openpyxl>=3.1.5
+Provides-Extra: ai
+Requires-Dist: onnxruntime>=1.22.1; extra == 'ai'
+Requires-Dist: pillow>=11.3.0; extra == 'ai'
+Requires-Dist: rapidocr>=3.2.0; extra == 'ai'
+Provides-Extra: all
+Requires-Dist: matplotlib>=3.10.3; extra == 'all'
+Requires-Dist: midi2audio>=0.1.1; extra == 'all'
+Requires-Dist: onnxruntime>=1.22.1; extra == 'all'
+Requires-Dist: openpyxl>=3.1.5; extra == 'all'
+Requires-Dist: pandas>=2.3.1; extra == 'all'
+Requires-Dist: pdf2docx>=0.5.8; extra == 'all'
+Requires-Dist: pillow>=11.3.0; extra == 'all'
+Requires-Dist: pyttsx3>=2.99; extra == 'all'
+Requires-Dist: pyyaml>=6.0.2; extra == 'all'
+Requires-Dist: rapidocr>=3.2.0; extra == 'all'
+Requires-Dist: scipy>=1.16.0; extra == 'all'
+Requires-Dist: tomlkit>=0.13.3; extra == 'all'
+Provides-Extra: audio
+Requires-Dist: matplotlib>=3.10.3; extra == 'audio'
+Requires-Dist: midi2audio>=0.1.1; extra == 'audio'
+Requires-Dist: pyttsx3>=2.99; extra == 'audio'
+Requires-Dist: scipy>=1.16.0; extra == 'audio'
+Provides-Extra: config
+Requires-Dist: pyyaml>=6.0.2; extra == 'config'
+Requires-Dist: tomlkit>=0.13.3; extra == 'config'
+Provides-Extra: docs
+Requires-Dist: openpyxl>=3.1.5; extra == 'docs'
+Requires-Dist: pandas>=2.3.1; extra == 'docs'
+Requires-Dist: pdf2docx>=0.5.8; extra == 'docs'
+Provides-Extra: noai
+Requires-Dist: matplotlib>=3.10.3; extra == 'noai'
+Requires-Dist: midi2audio>=0.1.1; extra == 'noai'
+Requires-Dist: openpyxl>=3.1.5; extra == 'noai'
+Requires-Dist: pandas>=2.3.1; extra == 'noai'
+Requires-Dist: pdf2docx>=0.5.8; extra == 'noai'
+Requires-Dist: pyttsx3>=2.99; extra == 'noai'
+Requires-Dist: pyyaml>=6.0.2; extra == 'noai'
+Requires-Dist: scipy>=1.16.0; extra == 'noai'
+Requires-Dist: tomlkit>=0.13.3; extra == 'noai'
+Description-Content-Type: text/markdown
+
+# plsconvert
+Convert any file to any other.
+* * *
+## About The Project
+**plsconvert** is a CLI tool built in Python. It wraps a multitude of converters using a graph-based approach, enabling complex or unusual conversions that would typically require searching the internet for multiple commands. 
+The project also heavily focuses on being easily expandable, welcoming contributions for new converters.
+
+## Getting Started
+
+You can simple installed from Pypi as follow:
+>[!TIP]
+>If you dont want all converters, you can install only the ones you want, for that I recommend cheking the [pyproject.toml](pyproject.toml)
+
+```sh
+pip install "plsconvert[all]"
+```
+
+Next, you can check if you have all the converters you want using:
+```sh
+plsconvert --dependencies 
+```
+
+And with that, you can now start converting your owns files to 😎:
+```sh
+plsconvert pipe.mp3 funny.pdf
+```
+<img width="493" height="517" alt="image" src="https://github.com/user-attachments/assets/d25a7d55-2a69-4571-b1f2-b36280bb4f1f" />
+
+## Actual converters used
+
+* Compression
+  * **7z**
+  * **Tar+gz+bz2+xz**
+* Docs
+  * **pandoc**
+  * **pdf2docx**
+  * **docxFromPdf**
+  * **pandas+openpyxl**
+* Media
+  * **ffmpeg**
+  * **imagemagick**
+* Audio
+  * **matplotlib+scipy** (For the spectograms)
+  * **pyttsx3**
+  * **midi2audio**
+* Config
+  * Native Python Libs + **pyyaml+tomlkit**
+* AI
+  * **RapidOCR**
