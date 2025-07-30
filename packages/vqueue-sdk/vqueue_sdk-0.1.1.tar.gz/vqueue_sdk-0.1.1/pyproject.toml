@@ -1,0 +1,50 @@
+[project]
+name = "vqueue-sdk"
+version = "0.1.1"
+description = "A toolset for Virtual Queue integrations in Python"
+readme = "README.md"
+authors = [{ name = "Animus Coop.", email = "info@animus.com.ar" }]
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+keywords = ["tickets", "queue", "async", "events", "high-demand"]
+dependencies = [
+    "requests",
+    'tomli; python_version < "3.11"',
+]
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+"vqueue" = ["config.toml"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+    "pytest>=8.4.1",
+    "ruff>=0.12.2",
+]
+
+[tool.ruff]
+line-length = 127
+
+[tool.ruff.lint]
+extend-select = [
+	# Pycodestyle Errors and Warnings
+	"E",
+	"W",
+	# Flake8-bugbear
+	"B",
+	# Pyflakes
+	"F",
+	# isort
+	"I",
+]
+unfixable = ["B"]
+
+[project.urls]
+Homepage = "https://github.com/animus-coop/virtual-queue-python-sdk"
