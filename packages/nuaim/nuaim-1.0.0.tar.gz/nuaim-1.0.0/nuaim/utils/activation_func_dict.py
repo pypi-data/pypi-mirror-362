@@ -1,0 +1,33 @@
+import torch.nn as nn
+
+activation_func_dict = {
+    "ReLU": lambda: nn.ReLU(),
+    "LeakyReLU": lambda negative_slope=0.01: nn.LeakyReLU(negative_slope=negative_slope),
+    "ELU": lambda alpha=1.0: nn.ELU(alpha=alpha),
+    "SELU": lambda: nn.SELU(),
+    "GELU": lambda: nn.GELU(),
+    "SiLU": lambda: nn.SiLU(),
+    "PReLU": lambda: nn.PReLU(),
+    "Hardtanh": lambda: nn.Hardtanh(),
+    "Softplus": lambda: nn.Softplus(),
+    "Sigmoid": lambda: nn.Sigmoid(),
+    "Tanh": lambda: nn.Tanh(),
+    "Softmax": lambda dim=1: nn.Softmax(dim=dim),
+    "None": lambda: nn.Identity(),
+    # Added activation functions
+    "ReLU6": lambda: nn.ReLU6(),
+    "CELU": lambda alpha=1.0: nn.CELU(alpha=alpha),
+    "GLU": lambda dim=-1: nn.GLU(dim=dim),
+    "Hardshrink": lambda lambd=0.5: nn.Hardshrink(lambd=lambd),
+    "Hardsigmoid": lambda: nn.Hardsigmoid(),
+    "Hardswish": lambda: nn.Hardswish(),
+    "LogSigmoid": lambda: nn.LogSigmoid(),
+    "LogSoftmax": lambda dim=1: nn.LogSoftmax(dim=dim),
+    "Mish": lambda: nn.Mish(),
+    "MultiheadAttention": lambda embed_dim, num_heads: nn.MultiheadAttention(embed_dim, num_heads),
+    "RReLU": lambda lower=0.125, upper=0.3333333333333333: nn.RReLU(lower=lower, upper=upper),
+    "Softsign": lambda: nn.Softsign(),
+    "Softshrink": lambda lambd=0.5: nn.Softshrink(lambd=lambd),
+    "Tanhshrink": lambda: nn.Tanhshrink(),
+    "Threshold": lambda threshold, value: nn.Threshold(threshold, value),
+}
