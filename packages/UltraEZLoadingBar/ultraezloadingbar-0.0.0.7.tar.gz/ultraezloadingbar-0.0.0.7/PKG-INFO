@@ -1,0 +1,300 @@
+Metadata-Version: 2.4
+Name: UltraEZLoadingBar
+Version: 0.0.0.7
+Summary: A simple console-based loading bar for Python.
+Author: ItsAlexander91
+Author-email: alexander.bagwell9@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: cryptography
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+
+# UltraEZLoadingBar
+
+`UltraEZLoadingBar` is a simple Python package that displays a loading bar in the console.
+
+---
+
+## Installation
+
+To install the package, use `pip`:
+
+```bash
+pip install UltraEZLoadingBar
+```
+
+---
+
+## loading_bar Function
+
+### Purpose:
+Displays a horizontal loading bar with optional color support and a customizable message.
+
+### Arguments:
+- **steps** (int): Total number of steps (e.g., iterations).
+- **bar_length** (int): The length of the loading bar in characters.
+- **delay_per_step** (float): The delay between each step (in seconds).
+- **message** (str): The message to display before the loading bar.
+- **color** (str): Optional. Adds color to the loading bar using ANSI escape codes. Examples: "r" (red), "g" (green), "b" (blue), etc.
+
+### Usage:
+1. Create a loading bar with 100 steps, 100 characters, a 0.1 second delay, and a red message:  
+   ```python
+   loading_bar(100, 100, 0.1, "Loading... ", "r")
+   ```
+
+2. Create a loading bar with 100 steps, 100 characters, a 0.1 second delay, and a default color:  
+   ```python
+   loading_bar(100, 100, 0.1, "Processing... ")
+   ```
+
+   (If you don't want any color, omit the `color` argument, or pass `""` for no text.)
+
+---
+
+## enhancedloading_bar Function
+
+### Purpose:
+Displays a horizontal loading bar with estimated time remaining.
+
+### Arguments:
+- **steps** (int): Total number of steps.
+- **bar_length** (int): The length of the loading bar in characters.
+- **delay_per_step** (float): The delay between each step (in seconds).
+- **message** (str): The message to display before the loading bar.
+- **color** (str): Optional. Adds color to the loading bar using ANSI escape codes. Examples: "r" (red), "g" (green), "b" (blue), etc.
+
+### Usage:
+1. Create a loading bar with 100 steps, 100 characters, a 0.1 second delay, and a red message:  
+   ```python
+   enhancedloading_bar(100, 100, 0.1, "Loading... ", "r")
+
+---
+
+## new_line Function
+
+### Purpose:
+Creates a new line in the console.
+
+### Usage:
+```python
+new_line()
+```
+
+---
+
+## colored_text Function
+
+### Purpose:
+Prints the given text in the specified color.
+
+### Arguments:
+- **text** (str): The text to be printed.
+- **color** (str): The color of the text. Available colors: "red", "green", "blue", "yellow", "magenta", "cyan", "white", etc.
+
+### Usage:
+Print "Hello!" in blue:
+```python
+colored_text("Hello!", "blue")
+```
+
+---
+
+## cls Function
+
+### Purpose:
+Clears the console screen.
+
+### Usage:
+```python
+cls()
+```
+
+---
+
+## generatekey Function
+
+### Purpose:
+
+### Returns:
+- A random key string (e.g., `'...your_key...'`).
+
+### Usage:
+```python
+key = generatekey()
+print(key)
+```
+
+Output:
+```
+
+## version Function
+
+### Purpose:
+Returns the version of the UltraEZLoadingBar module as a string.
+
+### Returns:
+- **str**: The version of the module (e.g., `'0.0.0.7'`).
+
+### Usage:
+```python
+from UltraEZLoadingBar import version
+print(version())
+```
+
+Output:
+```
+UltraEZLoadingBar Version: 0.0.0.7
+```
+
+
+## version Function
+
+### Purpose:
+Returns the version of the UltraEZLoadingBar module as a string.
+
+### Returns:
+- **str**: The version of the module (e.g., `'0.0.0.7'`).
+
+### Usage:
+```python
+from UltraEZLoadingBar import version
+print(version())
+```
+
+Output:
+```
+UltraEZLoadingBar Version: 0.0.0.7
+```
+
+---
+
+## Real Code Example:
+
+```python
+import sys
+import time
+from cryptography.fernet import Fernet
+
+# Color Stuff
+def loading_bar(steps=50, bar_length=50, delay_per_step=0.1, message="Loading... ", color=None):
+    # Define basic ANSI color codes
+    colors = {
+        "r": "\033[91m",
+        "g": "\033[92m",
+        "y": "\033[93m",
+        "b": "\033[94m",
+        "m": "\033[95m",
+        "c": "\033[96m",
+        "w": "\033[97m",
+        "refresh": "\033[0m"
+    }
+
+    # Apply color if specified
+    start_color = colors.get(color, "")  # Get the color code or empty string if invalid
+    reset_color = colors["refresh"]
+
+    for current_step in range(steps + 1):
+        # Calculate progress
+        filled_length = int((current_step / steps) * bar_length)
+        bar = f"[{'=' * filled_length}{' ' * (bar_length - filled_length)}]"
+
+        # Print the bar on the same line without adding extra lines
+        sys.stdout.write(f"\r{start_color}{message}{bar} {current_step}/{steps}{reset_color}")
+        sys.stdout.flush()
+        time.sleep(delay_per_step)
+
+    # Clear and overwrite the bar with a "Complete!" message
+    sys.stdout.write("\n")
+
+def enhancedloading_bar(steps=50, bar_length=50, delay_per_step=0.1, message="Loading...", color=None):
+    """
+    Displays a horizontal loading bar with estimated time remaining.
+    """
+    # Define basic ANSI color codes
+    colors = {
+        "r": "\033[91m",
+        "g": "\033[92m",
+        "y": "\033[93m",
+        "b": "\033[94m",
+        "m": "\033[95m",
+        "c": "\033[96m",
+        "w": "\033[97m",
+        "refresh": "\033[0m"
+    }
+
+    # Apply color if specified
+    start_color = colors.get(color, "")
+    reset_color = colors["refresh"]
+
+    start_time = time.time()
+
+    for current_step in range(steps + 1):
+        # Calculate progress
+        filled_length = int((current_step / steps) * bar_length)
+        bar = f"[{'=' * filled_length}{' ' * (bar_length - filled_length)}]"
+
+        elapsed_time = time.time() - start_time
+        eta = (elapsed_time / (current_step + 1)) * (steps - current_step) if current_step > 0 else 0
+
+        # Print the bar with ETA
+        sys.stdout.write(f"\r{start_color}{message}{bar} {current_step}/{steps} ETA: {eta:.1f}s{reset_color}")
+        sys.stdout.flush()
+        time.sleep(delay_per_step)
+
+    sys.stdout.write("\nDone!\n")
+
+def new_line():
+    print("\n")
+
+def colored_text(text, color):
+    colors = {
+        "red": "\033[91m",
+        "green": "\033[92m",
+        "yellow": "\033[93m",
+        "blue": "\033[94m",
+        "magenta": "\033[95m",
+        "cyan": "\033[96m",
+        "white": "\033[97m",
+        "reset": "\033[0m"
+    }
+
+    color_code = colors.get(color.lower(), colors["white"])
+    print(f"{color_code}{text}{colors['reset']}")
+
+def cls():
+    print("\033[H\033[J")
+
+def generatekey():
+    return Fernet.generate_key().decode()  # Decoding the byte key to a string
+```
+
+---
+
+
+
+
+## Changelog
+
+**Version 0.0.7**  
+- Added `version` function to return the module version.
+- Added a 5 version changelog
+- Added an error handler to the functions.
+
+**Version 0.0.6**  
+- Removed Devmode Function.
+- Added Enhanced Loading Bar
+- Added Key Generator
+
+---
