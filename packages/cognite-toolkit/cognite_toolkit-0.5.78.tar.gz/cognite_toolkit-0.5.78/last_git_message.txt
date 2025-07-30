@@ -1,0 +1,34 @@
+[CDF-25245] 🐛 Listed FROM blocks in SQL queries (#1741)
+
+# Description
+
+The `SQLParser` fails for queries that has a list of identifiers in the
+FROM block
+
+```sql
+select
+  first(wa.sourceExternalId) as workorderid,
+  collect_list(ai.id)        as assetIds
+from
+  `workorder_oid_workmate`.`workorder2assets` wa,
+  _cdf.assets                                 ai
+```
+This is fixed by this PR.
+
+## Changelog
+
+- [x] Patch
+- [ ] Minor
+- [ ] Skip
+
+## cdf
+
+### Fixed
+
+- [alpha] The `cdf profile transformations/raw/assets` no longer fails
+to parse transformations queries that has lists of identifiers in the
+FROM block.
+
+## templates
+
+No changes.
