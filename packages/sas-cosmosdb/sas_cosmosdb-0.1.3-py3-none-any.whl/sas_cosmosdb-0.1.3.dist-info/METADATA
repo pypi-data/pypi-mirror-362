@@ -1,0 +1,279 @@
+Metadata-Version: 2.4
+Name: sas-cosmosdb
+Version: 0.1.3
+Summary: A comprehensive Python library for working with Azure Cosmos DB using both MongoDB and SQL APIs
+Author-email: DB Lee <db.lee@microsoft.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/mcaps-microsoft/python_cosmosdb_helper
+Project-URL: Documentation, https://github.com/mcaps-microsoft/python_cosmosdb_helper/blob/main/README.md
+Project-URL: Repository, https://github.com/mcaps-microsoft/python_cosmosdb_helper
+Project-URL: Issues, https://github.com/mcaps-microsoft/python_cosmosdb_helper/issues
+Project-URL: Changelog, https://github.com/mcaps-microsoft/python_cosmosdb_helper/releases
+Keywords: azure,cosmosdb,mongodb,sql,database,sas
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Database
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: aiohttp>=3.12.13
+Requires-Dist: azure-appconfiguration>=1.7.1
+Requires-Dist: azure-cosmos>=4.9.0
+Requires-Dist: azure-identity>=1.22.0
+Requires-Dist: black>=25.1.0
+Requires-Dist: pydantic>=2.11.5
+Requires-Dist: pydantic-settings>=2.9.1
+Requires-Dist: pymongo>=4.13.2
+Requires-Dist: twine>=6.0.1
+Provides-Extra: dev
+Requires-Dist: pytest>=8.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=1.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=6.2.1; extra == "dev"
+Requires-Dist: black>=24.0.0; extra == "dev"
+Requires-Dist: isort>=5.13.0; extra == "dev"
+Requires-Dist: mypy>=1.9.0; extra == "dev"
+Dynamic: license-file
+
+# CosmosDB Helper for Python
+
+## Overview
+
+This repository provides a **comprehensive Python library** for working with Azure Cosmos DB using both MongoDB and SQL APIs. Built with enterprise-grade architecture and modern Python best practices, this library offers a unified, type-safe interface that simplifies database operations while maintaining optimal performance and scalability.
+
+### **🎯 What This Library Solves**
+
+**Azure Cosmos DB Complexity**: While Azure Cosmos DB is incredibly powerful, it can be complex to work with effectively. Developers often struggle with:
+
+- Managing different API patterns (SQL vs MongoDB)
+- Writing optimal queries and handling partition keys correctly
+- Implementing proper error handling and retry logic
+- Maintaining type safety across database operations
+- Following enterprise patterns for scalable applications
+
+**This library eliminates these challenges** by providing a clean, intuitive abstraction layer that handles the complexity behind the scenes while giving you full control when needed.
+
+### **🏢 Enterprise-Grade Solution**
+
+This isn't just another database wrapper - it's an **enterprise-grade solution** designed for production applications:
+
+- ✅ **Type-Safe Architecture** - Full Pydantic validation with compile-time error detection
+- ✅ **Performance Optimized** - Automatic partition key handling and connection pooling
+- ✅ **Enterprise Patterns** - Repository pattern, Domain-Driven Design, async/await architecture
+- ✅ **Comprehensive Testing** - Extensive test suite with 63+ test scenarios
+- ✅ **Cosmos DB Best Practices** - Follows Microsoft's recommended patterns and optimizations
+- ✅ **Security First** - Built-in support for Azure AD authentication (SQL API)
+
+### **👥 Who This Library Is For**
+
+- **Enterprise Developers** building scalable applications that need reliable database operations with minimal boilerplate code
+- **Data Engineers** who want type-safe database interactions without sacrificing the flexibility to write complex queries when needed  
+- **DevOps Teams** seeking standardized database patterns that work consistently across different Cosmos DB API types
+- **Python Developers** who value clean architecture, comprehensive type hints, and developer experience with full IDE support
+
+### **⭐ Key Features**
+
+- **� Dual API Support**: Seamlessly switch between MongoDB and SQL APIs or use both simultaneously
+- **🎯 Zero SQL Knowledge Required**: Use intuitive Python dictionaries for 90% of your queries
+- **⚡ Smart Query Optimization**: Automatic predicate-to-SQL conversion with partition key optimization
+- **🔑 Automatic Partition Key Management**: Intelligent handling for both data distribution and query optimization (SQL API)
+- **🛡️ Comprehensive Error Handling**: Built-in retry logic, connection resilience, and detailed error reporting
+- **� Developer Experience First**: Full IntelliSense, type checking, and extensive documentation
+
+*The library is packaged under the `sas` namespace and provides a unified interface for database operations.*
+
+## 🚀 Quick Start
+
+�🔧 **Ready to start coding?** Check out the [**Hands-On Guide**](HANDS_ON_GUIDE.md) for step-by-step instructions, real code examples, and practical tutorials.
+
+📚 **Need detailed API documentation?** Choose your API:
+
+- **[API Overview](API_REFERENCE.md)** - Quick comparison and getting started guide
+- **[SQL API Reference](API_REFERENCE_SQL.md)** - Complete documentation for SQL (Core) API
+- **[MongoDB API Reference](API_REFERENCE_MONGO.md)** - Complete documentation for MongoDB API
+
+## 🏗️ Architecture Overview
+
+This library implements the **Repository Pattern**, a proven architectural approach that separates data access logic from business logic, making your applications more maintainable, testable, and scalable.
+
+### **Core Components**
+
+- **🏠 Entities** - Domain objects that represent your data models with business logic and validation
+- **📚 Repositories** - Data access objects that handle CRUD operations and queries
+- **🔄 Unified Interface** - Consistent patterns that work across both MongoDB and SQL APIs
+
+### **Repository Pattern Benefits**
+
+- **🏗️ Separation of Concerns** - Business logic stays in entities, data access logic in repositories
+- **🔄 Database Agnostic** - Switch between SQL/MongoDB APIs without changing business logic
+- **🧪 Testability** - Mock repositories easily for comprehensive unit testing
+- **🛡️ Type Safety** - Full Pydantic validation and type hints throughout the entire stack
+- **⚡ Performance** - Optimized queries and intelligent partition key handling
+- **📐 Consistency** - Standardized patterns across all data operations
+
+## 🚨 Essential: Type Variable Usage
+
+**Critical Rule for All Entity Classes:**
+
+Every `RootEntityBase` class **MUST** be defined with type variables:
+
+```python
+# ✅ CORRECT - Always specify both entity type and key type
+class Customer(RootEntityBase["Customer", str]): pass
+
+# ❌ WRONG - Missing type variables
+class Customer(RootEntityBase): pass
+```
+
+**Why This Pattern Is Essential:**
+
+- **🎯 Type Safety** - Enables compile-time error checking and IDE autocompletion
+- **� Repository Integration** - Allows the repository to know exactly what entity type it manages
+- **⚡ Performance** - Enables runtime optimizations and early error detection
+- **🛡️ Production Reliability** - Prevents type-related bugs before deployment
+
+**The Pattern:** `RootEntityBase["EntityClassName", KeyType]`
+
+This leverages [Python Generics](https://typing.python.org/en/latest/reference/generics.html) to provide type safety throughout your application.
+
+## 💡 Simple Example
+
+Here's how easy it is to get started:
+
+```python
+from sas.cosmosdb.sql import RootEntityBase, RepositoryBase
+from typing import Optional
+
+# 1. Define your entity
+class Customer(RootEntityBase["Customer", str]):
+    name: str
+    email: str
+    is_active: bool = True
+
+# 2. Create a repository
+class CustomerRepository(RepositoryBase[Customer, str]):
+    def __init__(self, connection_string: str, database_name: str):
+        super().__init__(
+            connection_string=connection_string,
+            database_name=database_name,
+            container_name="customers"
+        )
+
+# 3. Use it in your application
+async def main():
+    repo = CustomerRepository("your-connection-string", "mydb")
+    
+    async with repo:
+        # Create and save a customer
+        customer = Customer(
+            id="cust-001",
+            name="John Doe", 
+            email="john@example.com"
+        )
+        await repo.add_async(customer)
+        
+        # Find customers with simple predicates
+        active_customers = await repo.find_async({"is_active": True})
+        
+        # Get a specific customer  
+        found = await repo.get_async("cust-001")
+```
+
+## 🔍 Query Operations
+
+The library eliminates the need to write complex SQL queries for most database operations. Instead, use intuitive Python dictionaries and let the library handle query optimization automatically.
+
+### **Simple Predicate Queries**
+
+```python
+# Simple field matching - no SQL required
+customers = await repo.find_async({"name": "John Doe"})
+
+# Range queries with operators  
+young_adults = await repo.find_async({"age": {"$gte": 18, "$lt": 30}})
+
+# Multiple conditions
+active_customers = await repo.find_async({
+    "is_active": True,
+    "registration_date": {"$gte": "2024-01-01"}
+})
+
+# Nested field queries
+seattle_customers = await repo.find_async({
+    "address.city": "Seattle",
+    "address.state": "WA"  
+})
+
+# Array operations
+tagged_customers = await repo.find_async({
+    "tags": {"$in": ["premium", "vip"]}
+})
+```
+
+### **Supported Query Operators**
+
+The library provides intuitive operators that work across both APIs:
+
+```python
+# Comparison operators (Both APIs)
+{"age": {"$gt": 25}}           # Greater than
+{"age": {"$gte": 25}}          # Greater than or equal
+{"age": {"$lt": 65}}           # Less than
+{"age": {"$lte": 65}}          # Less than or equal
+{"status": {"$ne": "inactive"}} # Not equal
+
+# Array and inclusion operators
+{"category": {"$in": ["A", "B", "C"]}}        # Value in list (Both APIs)
+{"tags": {"$nin": ["deprecated", "old"]}}     # Value not in list (MongoDB only)
+
+# Text operations
+{"name": {"$regex": ".*John.*"}}              # Pattern matching (MongoDB)
+{"name": {"$contains": "John"}}               # Substring matching (SQL API)
+{"phone": {"$exists": True}}                  # Field exists (MongoDB only)
+```
+
+### **Raw SQL for Complex Operations**
+
+When you need complex aggregations or joins, drop down to raw SQL:
+
+```python
+class CustomerRepository(RepositoryBase[Customer, str]):
+    
+    async def get_customer_statistics(self) -> List[dict]:
+        """Complex analytics using raw SQL"""
+        query = """
+        SELECT 
+            c.address.region as region,
+            COUNT(*) as total_customers,
+            AVG(c.age) as average_age
+        FROM customers c 
+        WHERE c.is_active = true
+        GROUP BY c.address.region
+        """
+        return await self.query_raw_dynamic_cursor_async(query)
+```
+
+### **Type-Safe Operations**
+
+All operations are fully type-safe with IDE support:
+
+```python
+# Type-safe entity creation with validation
+customer = Customer(
+    name="John Smith",        # String - validated
+    age=35,                  # Integer - validated 
+    email="john@example.com", # Email format - validated
+    is_active=True           # Boolean - type-checked
+)
+
+# Type-safe repository operations with return type hints
+await repo.add_async(customer)           # Returns: None
+found = await repo.get_async("cust-123") # Returns: Customer | None
+all_active = await repo.find_async({     # Returns: List[Customer]
+    "is_active": True
+})
+```
+
+*Ready to dive deeper? Check out the [**Hands-On Guide**](HANDS_ON_GUIDE.md) for complete tutorials and the [**API References**](API_REFERENCE.md) for detailed documentation.*
