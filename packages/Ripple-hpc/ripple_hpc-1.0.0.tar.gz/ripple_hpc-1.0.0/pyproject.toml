@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=69.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Ripple-hpc"
+dynamic = ["version"]                     # <-- 用 dynamic 而不是 version =
+description = "Ripple is a Python package designed to analyze particle-motion correlation functions at scale on HPC."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "numpy",
+  "ase",
+  "h5py",
+  "joblib",
+  "psutil"
+]
+authors = [
+  { name = "Lucius Liu", email = "l.liu21@imperial.ac.uk" }
+]
+license = { text = "MIT License" }
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+
+[project.urls]
+homepage   = "https://github.com/Frost-group/Ripple"
+repository = "https://github.com/Frost-group/Ripple"
+
+# 这里告诉 setuptools 到哪儿去读版本号
+[tool.setuptools.dynamic]
+version = { file = "ripple/VERSION" }
