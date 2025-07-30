@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+
+import atexit
+from .fast_set import DelayButFastSet
+
+
+class TwoStepCompare:
+    """
+    In some scenario, you have some pending task, for example:
+        orders waiting response from paypal or visa
+
+    how it works:
+        it will create a temporary set to restore the task need to be created
+        after timeout seconds
+            1. it will refresh data in compare_to
+            2. it will check if some data exists in pending_tasks
+    """
+
+<<<<<<< HEAD
+    def __init__(self, target, comare_to: DelayButFastSet, timeout: int):
+=======
+    def __init__(self, target, compare_to: DelayButFastSet, timeout: int):
+>>>>>>> 361c173 (feat: support set to integer)
+        """
+        params:
+            timeout: every timeout seconds, the compare will be executed
+        """
+        self.pending_tasks = set()
+        self.compare_to = compare_to
+        atexit.register(self.check)
+        self.timeout = timeout
+
+    def handle(self, task: str):
+        self.pending_tasks.add(task)
+        self.compare_in_need()
