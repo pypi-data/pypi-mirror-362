@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-eval"
+version = "0.1.14"
+description = "Agent evaluation toolkit"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "click",
+  "inspect-ai",
+  "litellm",
+  "pydantic>=2.0.0",
+  # For leaderboard
+  "huggingface_hub",
+  "pyarrow",
+  "datasets",
+]
+
+[project.urls]
+Homepage = "https://github.com/allenai/agent-eval"
+
+[project.optional-dependencies]
+dev = [
+  "black==24.2.0",
+  "isort",
+  "autoflake",
+  "pytest",
+  "pytest-asyncio",
+  "mypy==1.15",
+  "types-PyYAML",
+  "types-setuptools"
+]
+# Leaderboard view dependencies
+leaderboard = [
+  "seaborn",
+  "matplotlib",
+  "pandas"
+]
+
+[project.scripts]
+agenteval = "agenteval.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"agenteval.leaderboard" = ["dataset_features.yml"]
