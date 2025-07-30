@@ -1,0 +1,112 @@
+Metadata-Version: 2.4
+Name: mcp-notes-server
+Version: 0.1.0
+Summary: A Model Context Protocol server for developer note-taking
+Home-page: https://mcp-hunt.com/mcp/server/adobe-xd-mcp-server
+Author: filib
+Author-email: filib <filib@pypi.org>
+License: MIT
+Project-URL: Homepage, https://mcp-hunt.com/mcp/server/adobe-xd-mcp-server
+Project-URL: Documentation, https://mcp-hunt.com/mcp/server/adobe-xd-mcp-server
+Project-URL: Repository, https://github.com/dekdee/note-taking-mcp.git
+Project-URL: Issues, https://github.com/dekdee/note-taking-mcp/issues
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: mcp>=0.1.0
+Requires-Dist: pydantic>=2.0.0
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# MCP Notes Server
+
+A Model Context Protocol (MCP) server for developer note-taking. Track your project implementation progress with easy-to-use tools for creating, managing, and exporting development notes.
+
+## Features
+
+- **Add Notes**: Create notes for features you're implementing with tags, status, and priority
+- **List Notes**: View and filter notes by feature, tags, or status
+- **Update Notes**: Modify existing notes as your implementation progresses
+- **Delete Notes**: Remove notes that are no longer needed
+- **Export Notes**: Export your notes to Markdown or JSON format
+- **Persistent Storage**: Notes are saved locally in JSON format
+
+## Installation
+
+```bash
+pip install mcp-notes-server
+```
+
+## Usage
+
+### Running the Server
+
+```bash
+mcp-notes-server
+```
+
+### Available Tools
+
+1. **add_note**: Add a new development note
+   - `feature` (required): The feature being implemented
+   - `content` (required): The note content
+   - `tags` (optional): Array of tags for categorization
+   - `status` (optional): "in_progress", "completed", or "blocked"
+   - `priority` (optional): "low", "medium", or "high"
+
+2. **list_notes**: List notes with optional filtering
+   - `feature` (optional): Filter by feature name (partial match)
+   - `tags` (optional): Filter by tags
+   - `status` (optional): Filter by status
+
+3. **update_note**: Update an existing note
+   - `note_id` (required): The ID of the note to update
+   - `content` (optional): New content
+   - `status` (optional): New status
+   - `priority` (optional): New priority
+   - `tags` (optional): New tags
+
+4. **delete_note**: Delete a note
+   - `note_id` (required): The ID of the note to delete
+
+5. **export_notes**: Export notes to markdown or JSON format
+   - `feature` (optional): Filter by feature before export
+   - `format` (optional): "markdown" or "json" (default: "markdown")
+
+### Integration with Claude Desktop
+
+Add this to your Claude Desktop configuration:
+
+```json
+{
+  "mcpServers": {
+    "notes": {
+      "command": "mcp-notes-server"
+    }
+  }
+}
+```
+
+## Storage
+
+Notes are stored in `~/.mcp_notes/notes.json` by default.
+
+## Development
+
+To install in development mode:
+
+```bash
+git clone https://github.com/yourusername/mcp-notes-server.git
+cd mcp-notes-server
+pip install -e .
+```
+
+## License
+
+MIT License
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
