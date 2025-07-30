@@ -1,0 +1,54 @@
+[build-system]
+# setuptools requirement due to specifiying the version the in pyproject.toml
+# https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
+requires = [
+    "setuptools>=61.0.0",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scwidgets"
+description = "A collection of widgets to prepare interactive scientific visualisations, including user code input and validation"
+readme = "README.rst"
+requires-python = ">=3.9"
+license = {text = "BSD-3-Clause"}
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "ipywidgets>=8.0.0",
+  "numpy<2.0.0",
+  "widget_code_input>=4.0.17",
+  "matplotlib",
+  "termcolor"
+]
+dynamic = ["version"]
+
+[project.urls]
+Documentation = "https://scicode-widgets.readthedocs.io/en/latest/"
+Repository = "https://github.com/osscar-org/scicode-widgets"
+Issues = "https://github.com/osscar-org/scicode-widgets/issues"
+Changelog = "https://github.com/osscar-org/scicode-widgets/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = {attr = "scwidgets.__version__"}
+readme = {file = ["README.rst"]}
+
+[tool.setuptools.package-data]
+scwidgets = ["css/widgets.css"]
+
+[tool.isort]
+profile = "black"
