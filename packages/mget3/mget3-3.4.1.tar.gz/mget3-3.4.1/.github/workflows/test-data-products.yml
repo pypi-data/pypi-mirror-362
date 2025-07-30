@@ -1,0 +1,274 @@
+# test-data-products.yml
+#
+# This action tests that MGET can successfully download data products from the
+# various services and providers using the modules within GeoEco.DataProducts.
+# These tests help us validate that the data products are still available and
+# alert us to breaking changes implemented by the services and providers.
+
+name: Test data products
+
+on:
+  schedule:
+    - cron: "41 16 * * *"  # Runs every day at 4:41 PM UTC
+
+  workflow_run:
+    workflows: ["Build and test wheels"]
+    types: [completed]
+    conclusion: success
+
+  workflow_dispatch:  # Allows manual trigger
+
+
+jobs:
+  test_data_products_linux:
+    name: Test data products on Linux
+    runs-on: ubuntu-24.04
+
+    environment:
+      name: "Test data products"
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Display system information
+        run: |
+          echo "uname -a:"
+          uname -a
+          echo ""
+          echo "hostnamectl:"
+          hostnamectl
+          echo ""
+          echo "python3 --version:"
+          python3 --version
+
+      - name: Display GDAL versions available for installation
+        run: |
+          apt-cache policy gdal-bin gdal-data gdal-plugins libgdal-dev 
+
+      # Now we need to install GDAL. Unfortunately, we cannot use
+      # awalsh128/cache-apt-pkgs-action for this, at least on ubuntu-24.04,
+      # because it appears that GDAL has a post-install script that sets
+      # LD_LIBRARY_PATH, and that script does not appear to run even if
+      # execute_install_scripts is true for cache-apt-pkgs-action. At least, I
+      # THINK that is the problem. In any case, if we use
+      # cache-apt-pkgs-action, we get the following error when we try to run
+      # gdalinfo later below:
+      #
+      #     gdalinfo: error while loading shared libraries: libblas.so.3: cannot open shared object file: No such file or directory
+      #
+      # So call apt-get ourselves. The line with curl installs apt-fast.
+
+      - name: Install apt-fast
+        run: |
+          sudo /bin/bash -c "$(curl -sL https://git.io/vokNn)"
+          sudo apt-get update -y
+
+      - name: Install GDAL on ubuntu-24.04
+        run: |
+          sudo apt-fast install -y gdal-bin gdal-data gdal-plugins libgdal-dev libgdal34t64
+
+      - name: Install Python packages needed to install GDAL's Python bindings
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy<2" setuptools wheel
+
+      - name: Install GDAL's Python package
+        run: |
+          GDAL_VERSION_NEEDED=$(gdalinfo --version | awk '{print $2}' | sed 's/,//')
+          python -m pip install gdal==$GDAL_VERSION_NEEDED
+          echo ""
+          echo "Testing GDAL's python bindings"
+          python -c "from osgeo import _gdal_array"
+
+      - name: Get latest run of build-wheels.yml workflow on main branch
+        id: get_run_id
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          workflow_file_name="build-wheels.yml"
+          # Get the latest workflow run ID from the main branch; supposedly these are returned in reverse chronological order 
+          workflow_runs=$(gh api repos/${{ github.repository }}/actions/workflows/$workflow_file_name/runs --paginate --jq '.workflow_runs[] | select(.head_branch == "main") | .id' | head -n 1)
+          echo "RUN_ID: $workflow_runs"
+          echo "RUN_ID=$workflow_runs" >> "$GITHUB_OUTPUT"
+
+      - name: Download built wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: cibw-wheels-ubuntu-latest
+          path: ./wheels
+          run-id: ${{ steps.get_run_id.outputs.RUN_ID }}
+          github-token: ${{ github.token }}    # Needed to download from another workflow run than the current run
+
+      - name: Install wheel
+        run: |
+          GEOECO_VERSION=$(ls ./wheels | grep -m 1 mget3 | sed 's/.*mget3-\(.*\)-cp.*-cp.*.whl/\1/')
+          python -m pip install mget3==$GEOECO_VERSION --find-links=./wheels
+
+      - name: Install Python packages needed to run tests
+        run: |
+          python -m pip install pytest python-dotenv
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run tests
+        env:
+          CMEMS_USERNAME: ${{ secrets.CMEMS_USERNAME }}
+          CMEMS_PASSWORD: ${{ secrets.CMEMS_PASSWORD }}
+          NASA_EARTHDATA_USERNAME: ${{ secrets.NASA_EARTHDATA_USERNAME }}
+          NASA_EARTHDATA_PASSWORD: ${{ secrets.NASA_EARTHDATA_PASSWORD }}
+        run: |
+          python -m pytest -rs --junitxml=linux_results.xml ./test/GeoEco/DataProducts
+        continue-on-error: true
+
+      - name: Upload test linux_results.xml as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux_results
+          path: linux_results.xml
+
+
+  test_data_products_windows:
+    name: Test data products on Windows
+    runs-on: windows-latest
+
+    environment:
+      name: "Test data products"
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Cache GDAL wheels from cgohlke/geospatial-wheels
+        id: cache-GDAL-wheels
+        uses: actions/cache@v4
+        with:
+          path: GDAL_wheels
+          key: cache-GDAL-3.10.1-win_amd64-wheels
+
+      - name: Download GDAL wheels from cgohlke/geospatial-wheels
+        if: steps.cache-GDAL-wheels.outputs.cache-hit != 'true'
+        run: |
+          mkdir GDAL_wheels
+          curl -L -o GDAL_wheels\\GDAL-3.9.2-cp39-cp39-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2024.9.22/GDAL-3.9.2-cp39-cp39-win_amd64.whl
+          curl -L -o GDAL_wheels\\GDAL-3.10.1-cp310-cp310-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2025.1.20/GDAL-3.10.1-cp310-cp310-win_amd64.whl
+          curl -L -o GDAL_wheels\\GDAL-3.10.1-cp311-cp311-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2025.1.20/GDAL-3.10.1-cp311-cp311-win_amd64.whl
+          curl -L -o GDAL_wheels\\GDAL-3.10.1-cp312-cp312-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2025.1.20/GDAL-3.10.1-cp312-cp312-win_amd64.whl
+          curl -L -o GDAL_wheels\\GDAL-3.10.1-cp313-cp313-win_amd64.whl https://github.com/cgohlke/geospatial-wheels/releases/download/v2025.1.20/GDAL-3.10.1-cp313-cp313-win_amd64.whl
+
+      - name: Install GDAL wheel
+        shell: bash   # Yes, bash on Windows
+        run: |
+          python -m pip install -U pip
+          python -m pip install -U setuptools wheel
+          if [ "${{ matrix.python-version }}" = "3.9" ]; then
+            python -m pip install GDAL==3.9.2 --find-links=GDAL_wheels
+          else
+            python -m pip install GDAL==3.10.1 --find-links=GDAL_wheels
+          fi        
+
+      - name: Get latest run of build-wheels.yml workflow on main branch
+        id: get_run_id
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $workflow_file_name = "build-wheels.yml"
+          # Get the latest workflow run ID from the main branch; supposedly these are returned in reverse chronological order 
+          $workflow_runs = gh api repos/${{ github.repository }}/actions/workflows/$workflow_file_name/runs --paginate --jq '.workflow_runs[] | select(.head_branch == "main") | .id' | Select-Object -First 1
+          echo "RUN_ID: $workflow_runs"
+          echo "RUN_ID=$workflow_runs" >> $env:GITHUB_OUTPUT     # Important: use $env:GITHUB_OUTPUT rather than $GITHUB_OUTPUT so variable is exported
+
+      - name: Download built wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: cibw-wheels-windows-latest
+          path: wheels
+          run-id: ${{ steps.get_run_id.outputs.RUN_ID }}
+          github-token: ${{ github.token }}    # Needed to download from another workflow run than the current run
+
+      - name: Install wheel
+        shell: pwsh
+        run: |
+          $env:MGET_VERSION = python -c "import glob; import os; files = glob.glob(os.path.join('wheels', 'mget3-*.whl')); print(os.path.basename(files[0]).split('-')[1])"
+          python -m pip install mget3==$env:MGET_VERSION --find-links=wheels
+
+      - name: Install Python packages needed to run tests
+        run: |
+          python -m pip install pytest python-dotenv
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run tests
+        env:
+          CMEMS_USERNAME: ${{ secrets.CMEMS_USERNAME }}
+          CMEMS_PASSWORD: ${{ secrets.CMEMS_PASSWORD }}
+          NASA_EARTHDATA_USERNAME: ${{ secrets.NASA_EARTHDATA_USERNAME }}
+          NASA_EARTHDATA_PASSWORD: ${{ secrets.NASA_EARTHDATA_PASSWORD }}
+        run: |
+          python -m pytest -rs --junitxml=windows_results.xml ./test/GeoEco/DataProducts
+        continue-on-error: true
+
+      - name: Upload test windows_results.xml as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_results
+          path: windows_results.xml
+
+
+  summarize_results:
+    name: Summarize results and update badge
+    runs-on: ubuntu-latest
+    needs: [test_data_products_linux, test_data_products_windows]
+
+    environment:
+      name: "Test data products"
+
+    steps:
+      - name: Download results
+        uses: actions/download-artifact@v4
+
+      - name: Compute pass percentage
+        id: get_pass_pct
+        run: |
+          LIN_TOTAL=$(grep -o 'tests="[0-9]*"' linux_results/linux_results.xml | grep -o "[0-9]*")
+          LIN_SKIP=$(grep -o 'skipped="[0-9]*"' linux_results/linux_results.xml | grep -o "[0-9]*")
+          LIN_FAIL=$(grep -o 'failures="[0-9]*"' linux_results/linux_results.xml | grep -o "[0-9]*")
+          LIN_ERROR=$(grep -o 'errors="[0-9]*"' linux_results/linux_results.xml | grep -o "[0-9]*")
+          WIN_TOTAL=$(grep -o 'tests="[0-9]*"' windows_results/windows_results.xml | grep -o "[0-9]*")
+          WIN_SKIP=$(grep -o 'skipped="[0-9]*"' windows_results/windows_results.xml | grep -o "[0-9]*")
+          WIN_FAIL=$(grep -o 'failures="[0-9]*"' windows_results/windows_results.xml | grep -o "[0-9]*")
+          WIN_ERROR=$(grep -o 'errors="[0-9]*"' windows_results/windows_results.xml | grep -o "[0-9]*")
+          PASS_PERCENTAGE=$(awk "BEGIN {printf \"%.f\", (($LIN_TOTAL-$LIN_SKIP-$LIN_FAIL-$LIN_ERROR+$WIN_TOTAL-$WIN_SKIP-$WIN_FAIL-$WIN_ERROR)/($LIN_TOTAL-$LIN_SKIP+$WIN_TOTAL-$WIN_SKIP))*100}")
+          echo "PASS_PERCENTAGE: $PASS_PERCENTAGE%"
+          echo "$PASS_PERCENTAGE" > pass_percentage.txt
+          echo "PASS_PERCENTAGE=$PASS_PERCENTAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Upload test pass percentage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pass_percentage.txt
+          path: pass_percentage.txt
+
+      - name: Update badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GISTS_TOKEN }}
+          gistID: c3761a6823cbf5aaded07b64fa4964b8
+          filename: badge.json
+          label: Data products tests
+          message: "${{ steps.get_pass_pct.outputs.PASS_PERCENTAGE }}% passing"
+          valColorRange: ${{ steps.get_pass_pct.outputs.PASS_PERCENTAGE }}
+          maxColorRange: 100
+          minColorRange: 0
+          style: plastic
