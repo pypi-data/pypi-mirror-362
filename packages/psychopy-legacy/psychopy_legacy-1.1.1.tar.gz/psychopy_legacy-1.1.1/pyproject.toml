@@ -1,0 +1,67 @@
+[project]
+# the name of your plugin (required)
+name = "psychopy-legacy"
+# the current version of the plugin (required)
+version = "1.1.1" 
+# a brief description of what your plugin does
+description = "Legacy stimuli and Components for PsychoPy"
+# contact information for yourself and anyone else who worked on the plugin 
+authors = [
+  { name = "OST Science Team", email = "science@opensceincetools.org" },
+]
+# a license tells other people how to use your code and protects you from stealing
+license = { text = "MIT" }
+
+[project.urls]
+# some handy links to help people find your plugin's documentation
+homepage = "https://github.com/psychopy/psychopy-legacy"
+changelog = "https://github.com/psychopy/psychopy-legacy/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+# dependencies for using different movie stims
+movie2 = [
+  "opencv-python",
+  "python-vlc",
+]
+movie3 = [
+  "moviepy",
+]
+# dependencies for building the docs
+docs = [
+  "psychopy",
+  "sphinx",
+  "furo",
+  "moviepy",
+  "opencv-python",
+  "python-vlc",
+]
+# dependencies for running the test suite
+tests = [
+  "psychopy",
+  "pytest",
+  "moviepy",
+  "opencv-python",
+  "python-vlc",
+]
+
+
+[project.entry-points."psychopy.experiment.components"]
+RatingScaleComponent = "psychopy_legacy.components.ratingScale:RatingScaleComponent"
+PatchComponent = "psychopy_legacy.components.patch:PatchComponent"
+
+[project.entry-points."psychopy.visual"]
+MovieStim2 = "psychopy_legacy.visual.movie2:MovieStim2"
+MovieStim3 = "psychopy_legacy.visual.movie3:MovieStim3"
+PatchStim = "psychopy_legacy.visual.patch:PatchStim"
+RatingScale = "psychopy_legacy.visual.ratingscale:RatingScale"
+
+[project.entry-points."psychopy"]
+voicekey = "psychopy_legacy.voicekey"
+
+[tool.setuptools.package-data]
+# any resources you want including in the package, add their file extensions here (e.g. "*.wav" if you want audio files)
+"*" = ["*.png"] 
+
+[tool.setuptools.packages.find]
+# any folders to ignore when building the Python package for this plugin
+exclude = ["docs*", "docs_src*", "tests*"]
