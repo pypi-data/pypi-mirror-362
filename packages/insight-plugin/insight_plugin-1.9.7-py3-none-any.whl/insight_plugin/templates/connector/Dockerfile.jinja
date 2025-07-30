@@ -1,0 +1,30 @@
+FROM --platform=linux/amd64 {{ sdk_type }}:{{ sdk_version }}
+
+LABEL organization={{ vendor }}
+LABEL sdk=python
+{% if packages %}
+RUN {{ install_package_command }}{% for package in packages %} {{ package }}{% endfor %}{% if "slim" in sdk_type %} -y{% endif %}
+{% endif %}
+WORKDIR /python/src
+{% if archived_packages %}
+{% for package in archived_packages %}COPY {{package}} /python/src/
+RUN pip install {{package}}
+
+{% endfor %}
+{% endif -%}
+RUN pip install -U noetic_connector_api -i "https://artifacts.corp.rapid7.com/artifactory/api/pypi/pypi-local/simple" --extra-index-url "https://artifacts.corp.rapid7.com/artifactory/api/pypi/pypi-remote/simple"
+
+ADD ./plugin.spec.yaml /plugin.spec.yaml
+ADD ./requirements.txt /python/src/requirements.txt
+
+RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+ADD . /python/src
+
+RUN pip install .
+
+# User to run plugin code. The two supported users are: root, nobody
+USER {{ user }}
+
+ENTRYPOINT ["/usr/local/bin/{{prefix}}_{{ plugin_name }}"]
+
