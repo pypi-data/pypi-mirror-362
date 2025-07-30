@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+wsssss = ["_bin/gyre_driver/*.in"]
+
+[project]
+name = "wsssss"
+version = "0.7.2"
+authors = [
+  { name="Walter van Rossem", email="walter_v_rossem@hotmail.com" },
+]
+description = "Walter's set of scripts for studying simulated stars."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy",
+    "scipy",
+    "f90nml",
+    "dill",
+    "matplotlib",
+    "setproctitle",
+    "joblib"
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+license = {file = "LICENSE"}
+
+[project.optional-dependencies]
+dev = [
+    "pytest-env",
+]
+
+[tool.pytest_env]
+
+MESA_DIR = {value = "{MESA_DIR}", transform = true, skip_if_set = true}
+MESASDK_ROOT = {value = "{MESASDK_ROOT}", transform = true, skip_if_set = true}
+GYRE_DIR = {value = "{GYRE_DIR}", transform = true, skip_if_set = true}
+PATH = {value = "{MESASDK_ROOT}/bin:{PATH}", transform = true}
+PGPLOT_DIR = {value = "{MESASDK_ROOT}/lib/pgplot", transform = true}
+VALGRIND_LIB = {value = "{MESASDK_ROOT}/lib/valgrind", transform = true}
+MESASDK_VERSION = {value = "{MESASDK_VERSION}", transform = true}
+
+[project.scripts]
+gyre-driver = "wsssss._bin.gyre_driver:gyre_driver.run"
+mesa-go = "wsssss._bin:mesa_go.run"
+check-grid = "wsssss._bin:check_grid.run"
+
+[project.urls]
+Homepage = "https://github.com/waltervrossem/wsssss"
+Issues = "https://github.com/waltervrossem/wsssss/issues"
+Source = "https://github.com/waltervrossem/wsssss"
+Documentation = "https://wsssss.readthedocs.io"
