@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ini2py"
+version = "0.2.1"
+authors = [
+  { name="JonesHong", email="latte831104@example.com" },
+]
+description = "A CLI tool to generate type-hinted Python config classes from .ini files."
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Utilities",
+]
+dependencies = [
+    # 在這裡列出你的函式庫執行時的依賴
+    # 我們的 generate.py 本身沒有外部依賴，所以這裡可以是空的
+    # 但如果 CLI 介面改用 Click 或 Typer，就要加進來
+    "click>=8.0", 
+    "watchdog>=2.1.6",  # 用於監控 .ini 檔案變化
+]
+
+[project.urls]
+"Homepage" = "https://github.com/joneshong/ini2py"
+"Bug Tracker" = "https://github.com/joneshong/ini2py/issues"
+
+# 【關鍵】這一段定義了 CLI 命令
+[project.scripts]
+ini2py = "ini2py.cli:main"
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
