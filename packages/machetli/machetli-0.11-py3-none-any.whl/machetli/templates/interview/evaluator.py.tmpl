@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+import re
+
+#import pathlib
+#def get_abs_path(path)
+    #return str(pathlib.Path(path).expanduser().resolve())
+#end def
+#if $input_type == "PDDL"
+    #set $module = "pddl"
+    #set $instance = "domain, problem"
+#elif $input_type == "SAS"
+    #set $module = "sas"
+    #set $instance = "task"
+#end if
+#set $has_reference_planner = self.hasVar("reference_planner")
+#set $should_parse_value = self.hasVar("parsed_value_regex")
+
+from machetli import $module, tools
+
+
+PLANNER = "$get_abs_path($planner)"
+PLANNER_CMD_TEMPLATE = $planner_cmd
+#if has_reference_planner
+REFERENCE_PLANNER = "$get_abs_path($reference_planner)"
+REFERENCE_PLANNER_CMD_TEMPLATE = $reference_planner_cmd
+#end if
+TIME_LIMIT = "$time_limit"
+MEMORY_LIMIT = "$memory_limit"
+#if should_parse_value
+PARSED_VALUE_REGEX = r$repr($parsed_value_regex)
+#end if
+
+def run_planner(planner, $instance, cmd_template, logname):
+    cmd = [part.format(**locals()) for part in cmd_template]
+    return tools.run(cmd, cpu_time_limit=TIME_LIMIT,
+                     memory_limit=MEMORY_LIMIT, text=True,
+                     stdout_filename=f"{logname}.log",
+                     stderr_filename=f"{logname}.err")
+
+def evaluate($instance):
+    result = run_planner(PLANNER, $instance, PLANNER_CMD_TEMPLATE, "planner")
+#if should_parse_value
+#if $parsed_value_source == "stdout"
+    value = tools.parse(result.stdout, PARSED_VALUE_REGEX, ${parsed_value_type})
+#elif $parsed_value_source == "stderr"
+    value = tools.parse(result.stderr, PARSED_VALUE_REGEX, ${parsed_value_type})
+#else
+    content = Path("$parsed_value_source").readtext()
+    value = tools.parse(content, PARSED_VALUE_REGEX, ${parsed_value_type})
+#end if
+    if value is None:
+        return False
+#else
+    exit_code = result.returncode
+#end if
+
+#if has_reference_planner
+    reference_result = run_planner(REFERENCE_PLANNER, $instance, REFERENCE_PLANNER_CMD_TEMPLATE, "reference_planner")
+#if should_parse_value
+#if $parsed_value_source == "stdout"
+    reference_value = tools.parse(reference_result.stdout, PARSED_VALUE_REGEX, ${parsed_value_type})
+#elif $parsed_value_source == "stderr"
+    reference_value = tools.parse(reference_result.stderr, PARSED_VALUE_REGEX, ${parsed_value_type})
+#else
+    content = Path("$parsed_value_source").readtext()
+    reference_value = tools.parse(content, PARSED_VALUE_REGEX, ${parsed_value_type})
+#end if
+    if reference_value is None:
+        return False
+#else
+    reference_exit_code = reference_result.returncode
+#end if
+#end if
+
+#if self.hasVar("parsed_value_evaluation")
+    return $parsed_value_evaluation
+#else
+    return $exit_code_evaluation
+#end if
+
+if __name__ == "__main__":
+    ${module}.run_evaluator(evaluate)
