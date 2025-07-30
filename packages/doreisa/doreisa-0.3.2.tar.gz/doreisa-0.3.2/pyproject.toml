@@ -1,0 +1,47 @@
+[project]
+name = "doreisa"
+version = "0.3.2"
+description = ""
+authors = [{ name = "Adrien Vannson", email = "adrien.vannson@protonmail.com" }]
+requires-python = ">=3.12"
+readme = "README.md"
+dependencies = [
+    "dask[dataframe] (==2024.6.0)",
+    "ray[default] (>=2.46.0,<3.0.0)",
+    "numpy (==1.26.4)", # TODO this was pinned for PDI, remove the pinning?
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.7,<0.10",
+    "poethepoet>=0.32.2,<0.33",
+    "pytest>=8.3.5,<9",
+    "pre-commit>=4.2.0,<5",
+    "mkdocs-material>=9.6.14",
+    "mkdocstrings[python]>=0.29.1",
+    "pyright (>=1.1.397,<2.0.0)",
+    "py-spy>=0.4.0",
+]
+
+[tool.ruff]
+line-length = 120
+exclude = ["build", "dist", ".venv"]
+
+[tool.poe.tasks]
+test = "pytest ."
+check = "ruff check"
+typecheck = "pyright doreisa head.py"
+_format = "ruff format"
+_sort-imports = "ruff check --select I --fix"
+
+[tool.poe.tasks.format]
+sequence = ["_format", "_sort-imports"]
+help = "Format the source code, and sort the imports"
+
+[tool.poe.tasks.serve-docs]
+cmd = "mkdocs serve"
+help = "Serve the documentation locally"
