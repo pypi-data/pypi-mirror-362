@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "laygo/__init__.py"
+
+[project]
+name = "laygo"
+dynamic = ["version"]
+description = "A lightweight Python library for building resilient, in-memory data pipelines with elegant, chainable syntax"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Ringolds Lescinskis", email = "ringolds@lescinskis.com"},
+]
+keywords = ["pipeline", "data-processing", "etl", "functional", "chaining"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/ringoldsdev/laygo-python"
+Documentation = "https://github.com/ringoldsdev/laygo-python/wiki"
+Repository = "https://github.com/ringoldsdev/laygo-python.git"
+Issues = "https://github.com/ringoldsdev/laygo-python/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.1.0",
+    "twine>=4.0.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+indent-width = 2
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+force-single-line = true
+order-by-type = true
+known-first-party = ["laygo"]
+combine-as-imports = false
+force-sort-within-sections = true
+case-sensitive = false
+split-on-trailing-comma = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v"
