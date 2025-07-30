@@ -1,0 +1,37 @@
+
+[env]
+SECOND_MONITOR = 'HDMI-A-1'
+SECOND_RESOLUTION = 'preferred'
+SECOND_SCALE = 'auto'
+
+FIRST_WIDTH = "1920"
+FIRST_HEIGHT = "1080"
+
+# mirror and original
+SECOND_MONITOR_ORIGINAL_POSITION = '-1920x-650'
+FIRST_MONITOR = 'eDP-1'
+
+[hyprland.diplaymode.mirror]
+label="Mirror the screen"
+exec='hyprctl keyword monitor "$SECOND_MONITOR,$SECOND_RESOLUTION,auto,1,mirror,$FIRST_MONITOR"'
+
+[diplaymode.original]
+label="Extend the second monitor screen (orginal)"
+exec='hyprctl keyword monitor "$SECOND_MONITOR, $SECOND_RESOLUTION, $SECOND_MONITOR_ORIGINAL_POSITION, $SECOND_SCALE"'
+
+
+[diplaymode.extend.up]
+label="Extend the second upwards"
+exec='hyprctl keyword monitor "$SECOND_MONITOR, $SECOND_RESOLUTION, 0x-$FIRST_HEIGHT, $SECOND_SCALE"'
+
+[diplaymode.extend.down]
+label="Extend the second downwards"
+exec='hyprctl keyword monitor "$SECOND_MONITOR, $SECOND_RESOLUTION, 0x$FIRST_HEIGHT, $SECOND_SCALE"'
+
+[diplaymode.extend.left]
+label="Extend the second left"
+exec='hyprctl keyword monitor "$SECOND_MONITOR, $SECOND_RESOLUTION, 0x-$FIRST_WIDTH, $SECOND_SCALE"'
+
+[diplaymode.extend.right]
+label="Extend the second right"
+exec='hyprctl keyword monitor "$SECOND_MONITOR, $SECOND_RESOLUTION, 0x$FIRST_WIDTH, $SECOND_SCALE"'
