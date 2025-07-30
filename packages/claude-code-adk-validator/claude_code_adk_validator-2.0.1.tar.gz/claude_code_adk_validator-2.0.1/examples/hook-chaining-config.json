@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|Update",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx claude-code-adk-validator --stage=security",
+            "timeout": 8000
+          },
+          {
+            "type": "command", 
+            "command": "uvx claude-code-adk-validator --stage=tdd",
+            "timeout": 8000
+          },
+          {
+            "type": "command",
+            "command": "uvx claude-code-adk-validator --stage=file-analysis",
+            "timeout": 8000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx claude-code-adk-validator --stage=security",
+            "timeout": 8000
+          }
+        ]
+      }
+    ]
+  }
+}
