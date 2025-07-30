@@ -1,0 +1,282 @@
+Metadata-Version: 2.4
+Name: euriai
+Version: 0.4
+Summary: Python client for Euri API (euron.one) with CLI, LangChain, and LlamaIndex integration
+Author: Euri
+Author-email: tech@euron.one
+License: MIT
+Keywords: euriai,llm,langchain,llamaindex,langgraph,smolagents,n8n,agents,ai,sdk
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: numpy
+Requires-Dist: pyyaml
+Provides-Extra: langchain-core
+Requires-Dist: langchain-core; extra == "langchain-core"
+Provides-Extra: langchain
+Requires-Dist: langchain; extra == "langchain"
+Provides-Extra: llama-index
+Requires-Dist: llama-index>=0.10.0; extra == "llama-index"
+Provides-Extra: langgraph
+Requires-Dist: langgraph; extra == "langgraph"
+Provides-Extra: smolagents
+Requires-Dist: smolagents; extra == "smolagents"
+Provides-Extra: n8n
+Requires-Dist: requests; extra == "n8n"
+Provides-Extra: crewai
+Requires-Dist: crewai; extra == "crewai"
+Provides-Extra: autogen
+Requires-Dist: pyautogen; extra == "autogen"
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# euriai 🧠 
+
+**EURI AI Python Client** – A simple wrapper and CLI tool for the [Euri API](https://euron.one/euri). Supports completions, streaming responses, embeddings, CLI interaction, and an interactive guided wizard!
+
+---
+
+## 🔧 Installation 
+
+```bash
+pip install euriai
+```
+
+## 🚀 Python Usage
+
+### Text Generation
+
+```python
+from euriai import EuriaiClient
+
+client = EuriaiClient(
+    api_key="your_api_key_here",
+    model="gpt-4.1-nano"  # You can also try: "gemini-2.0-flash-001", "llama-4-maverick", etc.
+)
+
+response = client.generate_completion(
+    prompt="Write a short poem about artificial intelligence.",
+    temperature=0.7,
+    max_tokens=300
+)
+
+print(response)
+```
+
+### Embeddings
+
+```python
+from euriai.embedding import EuriaiEmbeddingClient
+
+client = EuriaiEmbeddingClient(api_key="your_key")
+embedding = client.embed("Hello world")
+print(embedding[:5])  # Print first 5 dimensions of the embedding vector
+```
+
+## 💻 Command-Line Interface (CLI) Usage
+
+Run prompts directly from the terminal:
+
+```bash
+euriai --api_key YOUR_API_KEY --prompt "Tell me a joke"
+```
+
+Enable streaming output (if supported by the model):
+
+```bash
+euriai --api_key YOUR_API_KEY --prompt "Stream a fun fact" --stream
+```
+
+List all supported model IDs with recommended use-cases and temperature/token advice:
+
+```bash
+euriai --models
+```
+
+## 🤖 LangChain Integration
+
+### Text Generation
+
+Use Euriai with LangChain directly:
+
+```python
+from euriai import EuriaiLangChainLLM
+
+llm = EuriaiLangChainLLM(
+    api_key="your_api_key",
+    model="gpt-4.1-nano", 
+    temperature=0.7,
+    max_tokens=300
+)
+
+print(llm.invoke("Write a poem about time travel."))
+```
+
+### Embeddings
+
+Use Euriai embeddings with LangChain:
+
+```python
+from euriai.langchain_embed import EuriaiEmbeddings
+
+embedding_model = EuriaiEmbeddings(api_key="your_key")
+print(embedding_model.embed_query("What's AI?")[:5])  # Print first 5 dimensions
+```
+
+## Usage Examples
+
+### CrewAI Integration
+```python
+from euriai import EuriaiCrewAI
+
+# Example: Create a crew from YAML config files
+crew = EuriaiCrewAI.from_yaml('agents.yaml', 'tasks.yaml')
+result = crew.run(inputs={"topic": "AI in Healthcare"})
+print(result)
+
+# Or programmatically
+crew = EuriaiCrewAI()
+crew.add_agent("researcher", {
+    "role": "Researcher",
+    "goal": "Find information about {topic}",
+    "llm": "openai/gpt-4o"
+})
+crew.add_task("research_task", {
+    "description": "Research the topic {topic}",
+    "agent": "researcher"
+})
+crew.build_crew()
+result = crew.run(inputs={"topic": "AI in Healthcare"})
+print(result)
+```
+
+### AutoGen Integration
+```python
+from euriai import EuriaiAutoGen
+
+autogen = EuriaiAutoGen()
+# Add an agent (see AutoGen docs for agent config details)
+agent = autogen.add_agent({
+    "name": "assistant",
+    "llm_config": {"api_key": "YOUR_OPENAI_KEY", "model": "gpt-4o"}
+})
+# Run a chat
+response = autogen.run_chat("Hello, what is the weather today?")
+print(response)
+# Access chat history
+print(autogen.get_history())
+```
+
+### LlamaIndex Integration
+```python
+from euriai import EuriaiLlamaIndex
+
+llama = EuriaiLlamaIndex()
+llama.add_documents([
+    "Abraham Lincoln was the 16th President of the United States.",
+    "He led the country during the American Civil War."
+])
+llama.build_index()
+response = llama.query("Who was Abraham Lincoln?")
+print(response)
+```
+
+### LangGraph Integration
+```python
+from euriai import EuriaiLangGraph
+
+def greet_node(state):
+    print(f"Hello, {state['name']}!")
+    state['greeted'] = True
+    return state
+
+def farewell_node(state):
+    if state.get('greeted'):
+        print(f"Goodbye, {state['name']}!")
+    return state
+
+# Create the graph
+graph = EuriaiLangGraph()
+graph.add_node("greet", greet_node)
+graph.add_node("farewell", farewell_node)
+graph.add_edge("greet", "farewell")
+graph.set_state({"name": "Alice"})
+result = graph.run()
+print(result)
+```
+
+---
+
+## 2. **SmolAgents Integration**
+
+```python
+from euriai import EuriaiSmolAgent
+
+# Define a tool using the @tool decorator
+try:
+    from smolagents import tool
+except ImportError:
+    raise ImportError("Please install smolagents: pip install smolagents")
+
+@tool
+def add(a: int, b: int) -> int:
+    """Add two numbers."""
+    return a + b
+
+# Create the agent with the tool
+agent = EuriaiSmolAgent(tools=[add])
+response = agent.run("What is 2 + 3?")
+print(response)
+```
+
+---
+
+## 3. **n8n Integration**
+
+```python
+from euriai import EuriaiN8N
+
+# Initialize with your n8n instance URL and (optionally) API key
+n8n = EuriaiN8N(base_url="http://localhost:5678", api_key="YOUR_N8N_API_KEY")
+
+# Trigger a workflow by its webhook ID, passing data as needed
+workflow_id = "your-workflow-webhook-id"
+data = {"message": "Hello from EURI SDK!"}
+result = n8n.trigger_workflow(workflow_id, data)
+print(result)
+```
+
+---
+
+**You can copy-paste these code blocks into your client documentation or UI for user reference.**  
+If you want advanced examples (e.g., multi-tool SmolAgents, LangGraph with more nodes, or n8n with authentication), just let me know!
+
+## 📘 Documentation
+
+For full documentation, visit our [official docs site](https://euron.one/euri).
+
+## 🔑 Getting an API Key
+
+Sign up for an API key at [Euron AI Platform](https://euron.one/euri).
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
