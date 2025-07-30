@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tdmrsdm"
+description = "A Temperature-Dependent Multi-Relaxation Spectroscopic Dielectric Model (TD-MRSDM)."
+readme = "README.md"
+authors = [
+    { name = "Morteza Khazaei", email = "morteza.khazaei@usherbrooke.ca" },
+]
+license = { text = "MIT License" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "matplotlib",
+    "seaborn",
+    "numpy",
+
+]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/Morteza-Khazaei/TD-MRSDM"
+"Repository" = "https://github.com/Morteza-Khazaei/TD-MRSDM"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools_scm]
+version_scheme = "python-simplified-semver"
+local_scheme = "no-local-version"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["dataset"]
+
+[tool.setuptools.package-data]
+tdmrsdm = ["constants/*.json"]

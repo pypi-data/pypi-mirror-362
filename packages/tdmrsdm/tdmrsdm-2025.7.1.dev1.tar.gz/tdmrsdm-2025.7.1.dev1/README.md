@@ -1,0 +1,78 @@
+# TD-MRSDM
+
+[![Python Version](https://img.shields.io/badge/python-3.7%20|%203.8%20|%203.9-blue.svg)](https://www.python.org/downloads/)
+
+
+This Python package, based on the paper titled [Spectroscopic Multirelaxation Dielectric Model of Thawed and Frozen Arctic Soils Considering the Dependence on Temperature and Organic Matter Content](https://doi.org/10.1134/S0001433819090305), provides an implementation of the temperature-dependent multi-relaxation spectroscopic dielectric model described in the paper. The model is designed for characterizing the dielectric properties of organic soil at frequencies ranging from 0.05 to 15 GHz under various temperature conditions.
+
+<p float="center">
+<img src="figures/TD-MRSDM.png" width="800">
+</p>
+
+## Installation
+
+To use **TD-MRSDM**, you need to install it first. You can install it using `pip`:
+
+```bash
+pip install tdmrsdm
+```
+
+## Usage
+
+Here's a simple example of how to use the smwlst package to compute LST:
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tdmrsdm import TDMRSDM
+
+
+# Define temperature and MgCl2 concentration ranges
+ssts = np.arange(-30, 26, 1)  # From -30 to 25 degrees Celsius
+mvs = np.arange(0, 0.86, 0.01) # From 0 to 0.85
+
+# Create empty lists to store results
+epsr_values = []
+epsi_values = []
+moisture_values = []
+
+
+# Loop through soil moisture content
+for mv in mvs:
+    for sst in ssts:
+        mrsdm = TDMRSDM(freq_GHz=1.41, sst=sst, som=25, sbd=0.95, ssm=mv)
+        eps = mrsdm.run()
+        epsr, epsi = eps.real, eps.imag
+        epsr_values.append(epsr[0]) # Access the first element because epsr is an array
+        epsi_values.append(epsi[0]) # Access the first element because epsi is an array
+        moisture_values.append(mv)
+
+
+# Create the plot using seaborn
+plt.figure(figsize=(10, 6))
+sns.lineplot(x=moisture_values, y=epsr_values, label='Real Soil DC')
+sns.lineplot(x=moisture_values, y=epsi_values, label='Imaginary Soil DC')
+
+plt.xlabel('Soil Moisture (g/g)')
+plt.ylabel('Soil DC')
+plt.title('Real and Imaginary Soil DC as a Function of Soil Moisture')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+```
+<p float="center">
+<img src="figures/soil_dc_vs_ssm.png" width="800">
+</p>
+
+>[!WARNING]
+>**Copyright Notice:** This code is part of a PhD research program and is not licensed for public use or distribution yet! All rights are reserved by the author [**Morteza Khazaei**]. Unauthorized use, reproduction, or distribution of this code is prohibited without prior written permission from the author. For inquiries or collaboration, please contact [morteza.khazaei@usherbrooke.ca](morteza.khazaei@usherbrooke.ca).
+
+## Authors
+
+- [Morteza Khazaei - [morteza.khazaei@usherbrooke.ca]](https://github.com/Morteza-Khazaei)
+
+## References
+
+- [Mironov, V., & Savin, I. (2015). A temperature-dependent multi-relaxation spectroscopic dielectric model for thawed and frozen organic soil at 0.05–15 GHz. Physics and Chemistry of the Earth, Parts A/B/C, 83, 57-64.](https://doi.org/10.1016/j.pce.2015.02.011)
