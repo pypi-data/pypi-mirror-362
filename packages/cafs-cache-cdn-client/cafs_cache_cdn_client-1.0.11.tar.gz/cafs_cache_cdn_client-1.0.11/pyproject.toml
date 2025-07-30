@@ -1,0 +1,74 @@
+[project]
+name = "cafs-cache-cdn-client"
+version = "1.0.11"
+description = "Async Cache CDN client implementation"
+authors = [
+    { name = "Konstantin Belov", "email" = "k.belov@gaijin.team" },
+]
+readme = "README.md"
+keywords = ["cafs", "cache"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+blake3 = "*"
+zstandard = "*"
+aiofiles = "*"
+aiohttp = "*"
+
+[tool.poetry.group.dev.dependencies]
+types-aiofiles = "*"
+bandit = "*"
+mypy = "*"
+pylint = "*"
+ruff = "*"
+pytest = "*"
+pytest-asyncio = "*"
+pytest-cov = "*"
+pre-commit = "*"
+
+[tool.ruff]
+force-exclude = true
+extend-exclude = ["examples"]
+
+[tool.ruff.lint]
+select = ["I"]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.pylint.main]
+ignore = ["examples"]
+
+[tool.pylint.FORMAT]
+max-line-length = 160
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "too-few-public-methods",
+    "too-many-instance-attributes",
+]
+
+[tool.mypy]
+python_version = "3.13"
+follow_imports = "skip"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_calls = false
+disallow_untyped_defs = true
+strict_optional = true
+exclude = ['examples/']
