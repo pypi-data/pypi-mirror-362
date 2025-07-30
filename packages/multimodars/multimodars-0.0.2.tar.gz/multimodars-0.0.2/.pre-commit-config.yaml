@@ -1,0 +1,27 @@
+repos:
+  - repo: local
+    hooks:
+      - id: rust-fmt
+        name: Rust format (cargo fmt)
+        entry: bash -lc 'cargo fmt'
+        language: system
+        types: [rust]
+
+      - id: rust-test
+        name: Rust unit tests
+        entry: bash -lc 'cargo test --lib --quiet'
+        language: system
+        # only run when Rust files change
+        files: \.rs$
+
+      - id: local-black
+        name: Black
+        entry: bash -lc 'run black'
+        language: system
+        types: [python]
+
+      - id: local-ruff
+        name: Ruff
+        entry: bash -lc 'ruff check --fix'
+        language: system
+        types: [python]
