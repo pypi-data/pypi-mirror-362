@@ -1,0 +1,121 @@
+Metadata-Version: 2.1
+Name: akride
+Version: 0.7.3
+Summary: Data Explorer Client SDK
+Home-page: https://github.com/akridata-ai/akride-examples
+License: Proprietary
+Project-URL: Documentation, https://akridata-akride.readthedocs-hosted.com/en/latest/
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+License-File: LICENSE.txt
+Requires-Dist: importlib-metadata
+Requires-Dist: akridata-akrimanager-v2 <1.26.0.dev0,>=1.25.0.dev0
+Requires-Dist: akridata-dsp <2.17.0.dev0,>=2.16.0.dev0
+Requires-Dist: attrs >=23.1.0
+Requires-Dist: yarl >=1.9.2
+Requires-Dist: tqdm >=4.66.1
+Requires-Dist: pydantic <3,>=2
+Requires-Dist: sink-writer-filters <1.26.0.dev0,>=1.25.0.dev0
+Provides-Extra: cpu
+Requires-Dist: pyakri-de-filters[cpu] <1.26.0.dev0,>=1.25.0.dev0 ; extra == 'cpu'
+Requires-Dist: pyakri-de-utils[cpu] <1.26.0.dev0,>=1.25.0.dev0 ; extra == 'cpu'
+Provides-Extra: gpu
+Requires-Dist: pyakri-de-filters[gpu] <1.26.0.dev0,>=1.25.0.dev0 ; extra == 'gpu'
+Requires-Dist: pyakri-de-utils[gpu] <1.26.0.dev0,>=1.25.0.dev0 ; extra == 'gpu'
+Provides-Extra: testing
+Requires-Dist: setuptools ; extra == 'testing'
+Requires-Dist: pytest ; extra == 'testing'
+Requires-Dist: pytest-cov ; extra == 'testing'
+Requires-Dist: pytest-vcr ; extra == 'testing'
+Requires-Dist: pytest-xdist ; extra == 'testing'
+Requires-Dist: mockito ; extra == 'testing'
+Requires-Dist: boto3 ; extra == 'testing'
+
+# Data Explorer Client SDK
+
+## Introduction
+
+`akride` is a Python SDK that facilitates interaction with Akridata's Data Explorer, providing seamless integration and tools for streamlined data analysis.
+
+Akridata's Data Explorer allows you to save time building the best training and test sets for your application.
+
+`akride` will help you:
+
+- Visualize your data
+- Detect and remove outliers
+- Check class imbalance
+- Sample the data and remove duplications
+- Apply Image-based-Search
+- Analyze model's accuracy
+
+and much more!
+
+## Installation
+
+You can install the latest stable version of `akride` via `pip` -
+
+for a CPU-only version:
+```bash
+pip install akride[cpu]
+```
+or on a GPU-enabled machine:
+```bash
+pip install akride[gpu]
+```
+
+You can upgrade your existing installation to the latest version by running
+
+```bash
+pip install -U akride[cpu]
+```
+
+or
+
+```bash
+pip install -U akride[gpu]
+```
+
+## QuickStart
+
+Start using Akride by downloading the SDK configuration through the steps outlined [here]( https://docs.akridata.ai/docs/download-config-saas) and paste the following code snippet into your Python terminal:
+
+```python
+from akride import AkriDEClient
+SAAS_ENDPOINT="https://app.akridata.ai"
+API_KEY=<your-api-key-from-sdk-config>
+# API Key Configurations
+sdk_config_dict = {
+  "saas_endpoint": SAAS_ENDPOINT,
+  "api_key": API_KEY,
+  "mode": "saas"
+}
+
+
+client = AkriDEClient(sdk_config_dict=sdk_config_dict)
+print(client.get_server_version())
+```
+
+## Documentation
+
+For detailed documentation on how to use the akride client and its capabilities, please refer to the [official SDK documentation](https://akridata-akride.readthedocs-hosted.com/en/latest/).
+
+For more information about Akridata's Data Explorer, please refer to the [official Akridata documentation](https://docs.akridata.ai/docs).
+
+## Examples
+
+Check out the [akride-examples](https://github.com/akridata-ai/akride-examples)
+repository for examples of using `akride` client to interact with DataExplorer
+
+---
+
+For more information about AkriData, please visit [akridata.ai](https://www.akridata.ai).
+
+
+## Docker command to ingest data
+### CPU docker image
+docker run -v ${PWD}/data:/data akridata/akride:latest akride ingest [-n <dataset_name> | -d <dataset_id>] -i /data -e <de_endpoint> -a <api_key>
+
+### GPU docker image
+docker run --gpus=all -v ${PWD}/data:/data akridata/akride-gpu:latest akride ingest [-n <dataset_name> | -d <dataset_id>] -i /data -e <de_endpoint> -a <api_key>
