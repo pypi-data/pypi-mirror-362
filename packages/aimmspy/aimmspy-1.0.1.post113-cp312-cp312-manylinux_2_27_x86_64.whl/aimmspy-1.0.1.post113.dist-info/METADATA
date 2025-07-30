@@ -1,0 +1,180 @@
+Metadata-Version: 2.2
+Name: aimmspy
+Version: 1.0.1.post113
+Summary: Python bindings for the AIMMS optimization platform, built with pybind11 for seamless C++ integration. Enables efficient data exchange and interaction with AIMMS projects using pandas, polars, and pyarrow. Ideal for advanced optimization workflows requiring high-performance native code.
+Keywords: AIMMS,API,Python,Optimization,Operations Research,pybind11,C++,bindings
+Author: AIMMS B.V.
+Maintainer: AIMMS B.V.
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: C++
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Requires-Python: >=3.10
+Requires-Dist: pyarrow>=19
+Requires-Dist: pandas
+Requires-Dist: polars==1.30.0
+Description-Content-Type: text/markdown
+
+# AIMMS Python library
+
+This is a **BETA** version of the AIMMS Python library. Any feedback, bug reports, or feature requests are welcome.
+
+With this library it is possible to interact with AIMMS models from Python.
+
+## Features
+
+- Seamless integration with AIMMS models from Python
+- Assign and retrieve data using Python dicts, Pandas, Polars, or Arrow tables
+- Execute AIMMS procedures and retrieve results programmatically
+- Built with pybind11 for high-performance C++ integration
+- Flexible data return types for different workflows
+
+## Getting Started
+
+To use the AIMMS Python library, you need to have an AIMMS developer version installed (see https://www.aimms.com/support/downloads/), a valid license (see https://licensing.aimms.cloud/license) and an already existing AIMMS project. Below is a step-by-step example of how to use the library to solve a simple transportation optimization problem.
+
+### Step 1: Initialize the AIMMS Project
+
+First, initialize the AIMMS project by specifying the AIMMS executable path, project path, and other configurations.
+
+> **Note:** Ensure that the `aimms_path` points to a valid AIMMS Bin (or Lib on linux) folder of an installed AIMMS version. You use can the utility function `find_aimms_path` to automatically search your system for that path.
+
+```python
+import os
+from aimmspy.project.project import Project 
+from aimmspy.utils import find_aimms_path
+
+# Initialize the AIMMS project
+project = Project(
+    # path to the AIMMS Bin folder (on linux the Lib folder)
+    aimms_path=find_aimms_path("25.4.3.3"),
+
+    # path to the AIMMS project
+    aimms_project_file=R"C:\AimmsProjects\MyAimmsProject\MyAimmsProject.aimms",
+
+    # url
+    license_url=R"wss://licensing.aimms.cloud/license-ws/license?profile=community&license=12345678-90ab-cdef-1234-567890abcdef"
+)
+my_aimms : Model = project.get_model(__file__)
+```
+
+### Step 2: Assign Data to Parameters
+
+This is an example of assigning data to parameters with Pandas DataFrames.
+
+```python
+demand_df = pd.DataFrame({
+    "c": ["Houston", "Phoenix", "Philadelphia"],
+    "demand": [50.0, 60.0, 40.0]
+})
+
+supply_df = pd.DataFrame(data={
+    "w": ["NewYork", "LosAngeles", "Chicago"],
+    "supply": [70.0, 80.0, 60.0]
+})
+
+unit_transport_cost_df = pd.DataFrame({
+    "w": ["NewYork", "NewYork", "NewYork", "LosAngeles", "LosAngeles", "LosAngeles", "Chicago", "Chicago", "Chicago"],
+    "c": ["Houston", "Phoenix", "Philadelphia", "Houston", "Phoenix", "Philadelphia", "Houston", "Phoenix", "Philadelphia"],
+    "unit_transport_cost": [5.0, 6.0, 4.0, 3.0, 2.0, 7.0, 4.0, 5.0, 3.0]
+})
+
+my_aimms.demand.assign( demand_df)
+my_aimms.supply.assign( supply_df)
+my_aimms.unit_transport_cost.assign( unit_transport_cost_df)
+```
+
+You can assign doubles, integers, strings to AIMMS parameters. The library will automatically convert the data types to the appropriate AIMMS types. The sets will be filled automatically based on the data you assign to the parameters.
+
+### Step 3: Execute the Optimization Procedure
+
+It is possible in AIMMS to define procedures that encapsulate the logic of your optimization model. These procedures can be executed from Python using the AIMMS Python library.
+In this example we run the main procedure in the AIMMS project to solve the optimization problem.
+
+```python
+my_aimms.MainExecution()
+```
+
+It is also possible to run procedures with arguments for example:
+
+```python
+my_aimms.run_procedure(test1=5.0, test2=10.0, test3="hello")
+```
+
+Make sure the order of the arguments is correct, as well as the types.
+
+### Step 4: Retrieve and Display Results
+
+Retrieve the results of the optimization, such as the total transport cost and the transport plan.
+
+```python
+# Retrieve results
+print(f"Total Transport Cost: {my_aimms.total_transport_cost.data()}")
+print(f"Transport Plan: {my_aimms.transport.data()}")
+```
+
+The `.data()` function is used to fetch the current value of an AIMMS identifier (e.g., a parameter, variable, or set) into Python. This function is efficient and only fetches data if it has changed since the last fetch.
+
+#### Data Types Returned by `.data()`
+
+depending on the data_type_preference you set in the `Project` constructor, the `.data()` function will return different types of Python objects:
+
+**Sets** always return a list of strings.
+
+For **parameters** and **variables**, `.data()` can return:
+
+- A **scalar value** (e.g., `float` or `int` or `string`) if the parameter or variable is scalar.
+- A **dictionary** where the keys are tuples of strings (representing indices) and the values are `float`, `int`, `string`.
+- A **Arrow Table** or **Pandas or Polars DataFrame** depending on the data_type_preference set in the `Project` constructor.
+
+### Example Output
+
+Depending on you return type preference the python object returned from the `.data()` function will be different, the output for dictionaries can look like this:
+
+```plaintext
+Total Transport Cost: 150.0
+Transport: {("NewYork", "Houston"): 30, ("LosAngeles", "Phoenix"): 50, ...}
+```
+
+for Pandas DataFrames can look like this:
+
+```plaintext
+Total Transport Cost: 150.0
+Transport:
+        w               c               transport
+    0   NewYork         Houston         30
+    1   LosAngeles      Phoenix         50
+    2   Chicago         Philadelphia    40
+    3   NewYork         Philadelphia    20
+```
+
+---
+
+## extra
+
+it is possible to generate a stub file for your project which can greatly help with autocompletion in your IDE. This stub file contains all the identifiers in your AIMMS project and their types. You can generate this stub file by running the following command:
+
+```python
+my_aimms.generate_stub_file( "my_project_stub.py" )
+```
+
+To use this stub file you can the following to the top of your python script:
+
+```python
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from my_project_stub import Project
+```
+
+## License
+
+This project is licensed under the MIT License.
+
+## Support
+
+For questions, bug reports, or feature requests, please contact AIMMS B.V. via [support](https://community.aimms.com/p/developer-support). Or post an question on the [AIMMS Community](https://community.aimms.com/). We are happy to help you with any issues or questions you may have.
