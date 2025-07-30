@@ -1,0 +1,135 @@
+Metadata-Version: 2.4
+Name: jusflpyroot
+Version: 0.1.7
+Summary: Useful tools for root in python
+Requires-Python: >=3.12
+Requires-Dist: click>=8.2.1
+Requires-Dist: console>=0.9911
+Requires-Dist: iminuit>=2.31.1
+Requires-Dist: matplotlib>=3.10.3
+Requires-Dist: numpy<2.2.0
+Requires-Dist: pyqt5>=5.15.11
+Requires-Dist: scipy>=1.16.0
+Description-Content-Type: text/markdown
+
+# JusflPyRoot
+
+a library to ease the life with powerfull python numpy and powerfull
+ROOT classes.
+
+*in progress, very early stage*
+
+## Installation
+
+Use `uv`{.verbatim} from astral to handle the environment.
+
+``` bash
+ uv tool install jusflpyroot
+# OR classically
+ pip install jusflpyroot
+```
+
+## Use examples
+
+### Basic histo creation, save, load
+
+Self-explanatory, create TH1F, induce NumpyTH1, save, destoy, repeat,
+etc...
+
+``` python
+if __name__ == "__main__":
+
+    NumpyTH1.list_file("bobes.root") #  list the file content if exists
+    #   create one ROOT  histogram
+    h = ROOT.TH1F("namea", "histogram that goes to file", 100, 0, 100)
+
+    print("i... filling-in with a binary pattern to distinguish under/ovrflow and the content")
+    h.Fill(- 1 )            # underflow
+    h.Fill(0, 2)            # 2x inside
+    h.Fill(100 - 0.0001, 4) # 4x inside
+    h.Fill(100 , 8)         # 8x overflow
+
+    #   create THE OBJECT
+    nh = NumpyTH1.from_th1(h)
+    nh.save("bobes.root", save_format="root")
+    nh.force_del()  # brutally remove the object from instances
+
+    # once more, but empty, I dont care about 'h'
+    h = ROOT.TH1F("nameb", "histogram that also goes to file", 100, 0, 100)
+    nh = NumpyTH1.from_th1(h)
+    nh.save("bobes.root", save_format="root")
+    nh.force_del()
+
+    # last time, but dont delete this time
+    h = ROOT.TH1F("namec", "histogram just here", 100, 0, 100)
+    nh = NumpyTH1.from_th1(h)
+    nh2 = NumpyTH1.load("bobes.root", "namea", load_format="root")
+
+    print(" ... _______ I expect to see 'namec' (still in memory)   and 'namea' from disk")
+    NumpyTH1.list()
+    print(" ... _______ on disk:")
+    NumpyTH1.list_file("bobes.root")
+
+    # get three vectors for the model Fit
+    x, y, dy = nh.get_xy()
+```
+
+The output should look like this:
+
+``` example
+i... filling-in with a binary pattern to distinguish under/ovrflow and the content
+i...  saving   histo 'namea'  into   'bobes.root'
+D...  deleting histo 'namea'  #instances   1 =>   0
+i...  saving   histo 'nameb'  into   'bobes.root'
+D...  deleting histo 'nameb'  #instances   1 =>   0
+i...  loading        'namea'    from bobes.root
+i... there is 2 histograms total in the file
+ ... _______ I expect to see 'namec' (still in memory)   and 'namea' from disk
+ 0. namec      'histogram just here                '  2025-07-09 14:21:17.876   100   <0.0 - 100.0)   [ 0.0 / 0.0 / 0.0 ]
+ 1. namea      'histogram that goes to file        '  2025-07-09 14:21:17.876   100   <0.0 - 100.0)   [ 1.0 / 6.0 / 8.0 ]
+ ... _______ on disk:
+f...   ...   namea     (TH1 in bobes.root)
+f...   ...   nameb     (TH1 in bobes.root)
+```
+
+### Minuit fit
+
+``` python
+h = ROOT.TH1F("namec", "histogram just here", 10, 0, 10)
+for i in range(10): # for range(11) .... 10 will already go to overflows
+    h.Fill(i, i)
+for i in range(10): # make some mess
+    h.Fill(2)
+    h.Fill(3)
+    h.Fill(4)
+    h.Fill(5)
+
+NumpyTH1.by_name("namec").Draw("numpy") # Draw using matplotlib
+
+print("... ========================= fitting ==========================")
+x, y, dy = nh.get_xy()  # Get data for fit (from histogram)
+print(x)
+print(y)
+print(dy)
+
+A = PrepareLSQFit(x, y, dy ) # provide data to FITTER
+A.set_model("p2")            # select mode name and function
+A.FIT( a= -0.1, b=1, c=1)    # initial values + constant names; paramater names must match
+A.conclude()  # prints and plots using matplotlib
+# NumpyTH1.wait_loop() # not needed with matplotlib plt
+```
+
+### Delete all
+
+Can be useful in emacs codeblocks
+
+``` python
+print("i... LIST")
+NumpyTH1.list()
+print("X...  DELETEING")
+NumpyTH1.reset_all()
+print("X...  DELETED")
+print("i... LIST EMPTY START")
+NumpyTH1.list()
+print("i... LIST EMPTY END")
+```
