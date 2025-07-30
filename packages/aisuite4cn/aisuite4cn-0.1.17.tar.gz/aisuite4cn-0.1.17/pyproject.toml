@@ -1,0 +1,40 @@
+[project]
+name = "aisuite4cn"
+version = "0.1.17"
+description = "Uniform access layer for LLMs of China"
+authors = [{name="胡伟", email="3314672@qq.com"}]
+readme = "README.md"
+requires-python = ">=3.9,<3.12"
+
+dependencies = [
+    "pydantic (>=2.10.3,<3.0.0)",
+    "httpx (~=0.27.0)",
+    "openai (>=1.82.1); extra == 'openai'",
+    "python-dotenv (>=1.1.0,<2.0.0)",
+    "python-box (>=7.3.2,<8.0.0)"
+]
+
+[project.optional-dependencies]
+moonshot = ["openai"]
+ark = ["openai"]
+qwen = ["openai"]
+qianfan = ["qianfan>=0.4.12.2"]
+hunyuan = ["openai"]
+zhipuai = ["zhipuai>=2.1.5.20241204"]
+deepseek = ["openai"]
+spark = ["openai"]
+ollama = ["openai"]
+
+all = ["openai", "qianfan>=0.4.12.2", "zhipuai>=2.1.5.20241204"]
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.2.2"
+pytest-cov = "^6.0.0"
+python-dotenv = "^1.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
