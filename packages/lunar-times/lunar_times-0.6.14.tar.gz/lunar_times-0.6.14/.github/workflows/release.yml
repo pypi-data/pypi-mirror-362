@@ -1,0 +1,95 @@
+# Lunar Times Release Workflow
+# Automated PyPI publishing on version tags
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Build and Publish Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install uv
+      run: pip install uv
+
+    - name: Install dependencies
+      run: uv sync --extra dev
+
+    - name: Verify version tag matches package version
+      run: |
+        PACKAGE_VERSION=$(grep '^version = ' pyproject.toml | cut -d'"' -f2)
+        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+        echo "Package version: $PACKAGE_VERSION"
+        echo "Tag version: $TAG_VERSION"
+        if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+          echo "Version mismatch between tag and package!"
+          exit 1
+        fi
+
+    - name: Run full test suite
+      run: make ci
+
+    - name: Build package
+      run: make build-package
+
+    - name: Publish to Test PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      run: make upload-test-pypi
+
+    - name: Test installation from Test PyPI
+      run: |
+        sleep 60  # Wait for package to be available
+        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+        pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ lunar-times==$TAG_VERSION
+        lunar-times -d
+
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        echo "y" | make upload-pypi
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        name: Lunar Times ${{ github.ref }}
+        draft: false
+        prerelease: false
+        files: dist/*
+        body: |
+          ## What's Changed
+          
+          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/docs/CHANGELOG.md) for detailed changes.
+          
+          ## Installation
+          
+          ```bash
+          pip install lunar-times
+          ```
+          
+          ## Usage
+          
+          ```bash
+          lunar-times
+          # or debug mode
+          lunar-times -d
+          ``` 

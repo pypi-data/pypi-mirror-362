@@ -1,0 +1,173 @@
+# Lunar Times - Cursor Rules
+
+## Project Overview
+This is a Python command-line application that calculates moonrise and moonset times for any given city and state. The application integrates with external APIs to provide accurate astronomical data with proper timezone handling.
+
+## Key Features
+- Location-based moon data retrieval using city/state input
+- Automatic coordinate resolution via Nominatim geocoding
+- Timezone-aware calculations using timezonefinder and pytz
+- Clean command-line interface with debug mode support
+- Integration with USNO Navy Astronomical API
+
+## Architecture & Design Patterns
+- **Functional Programming**: Use pure functions for data transformation
+- **Single Responsibility**: Each function should have one clear purpose
+- **Modular Design**: Keep external service interactions separate from business logic
+- **Error Handling**: Graceful degradation with meaningful error messages
+- **No Classes**: Current design uses standalone functions, maintain this approach
+
+## Code Style & Standards
+- **Python Version**: Target Python 3.13+
+- **Style Guide**: Follow PEP 8 conventions
+- **Function Documentation**: Use Google-style docstrings for all functions
+- **Type Hints**: Add type hints where beneficial for clarity
+- **Error Messages**: Provide clear, actionable error messages to users
+- **Comments**: Use inline comments sparingly, prefer self-documenting code
+
+## Dependencies
+- **requests**: HTTP client for API calls
+- **geopy**: Geocoding services (Nominatim)
+- **timezonefinder**: Timezone resolution from coordinates
+- **pytz**: Timezone handling and conversion
+- **Standard Library**: datetime, sys for core functionality
+
+## External Services
+- **Nominatim API**: OpenStreetMap geocoding service
+- **USNO Navy API**: Astronomical data (https://aa.usno.navy.mil/api/rstt/oneday)
+- **TimezoneFinder**: Offline timezone resolution
+
+## File Structure
+- `pyproject.toml`: Project configuration and dependency management
+- `uv.lock`: Dependency lock file (auto-generated)
+- `README.md`: Project overview and basic usage
+- `docs/ARCH.md`: Architecture documentation
+- `docs/SETUP.md`: Installation and setup guide
+- `docs/USAGE.md`: Detailed usage instructions and examples
+- `docs/CHANGELOG.md`: Version history and release notes
+- `docs/FAILURE.md`: Troubleshooting and known issues
+
+- `LICENSE`: Project license
+
+## Function Guidelines
+- Keep functions focused on single tasks
+- Use descriptive function names (e.g., `find_latlong`, `get_timezone`)
+- Return tuples for multiple related values
+- Handle errors at appropriate levels (ValueError for user input, ConnectionError for API failures)
+- Use consistent parameter naming (city, state, latitude, longitude)
+
+## Testing Approach
+- **Manual Testing**: Use debug mode (`-d` flag) for quick testing
+- **Error Testing**: Test with invalid locations and network issues
+- **Location Testing**: Use common US cities for verification
+- **Default Location**: El Paso, TX is used for debug mode
+
+## API Integration Rules
+- **Rate Limiting**: Be respectful of external API limits
+- **Error Handling**: Handle HTTP errors gracefully
+- **Request Format**: Use proper parameter formatting for APIs
+- **Response Parsing**: Validate API responses before processing
+- **Timeouts**: Consider adding request timeouts for reliability
+
+## User Experience Guidelines
+- **Input Validation**: Clean and validate user input (title case cities, uppercase states)
+- **Clear Output**: Format times in 12-hour format with AM/PM
+- **Error Messages**: Provide actionable guidance for common issues
+- **Debug Mode**: Support `-d` flag for development and testing
+- **Timezone Display**: Show timezone information with UTC offset
+
+## Security Considerations
+- **No API Keys**: Use public APIs that don't require authentication
+- **Input Sanitization**: Basic string cleaning for user input
+- **No Data Storage**: Don't persist user data locally
+- **HTTPS Only**: All external API calls use HTTPS
+
+## Performance Guidelines
+- **Single-threaded**: Keep application simple and synchronous
+- **No Caching**: Fresh API calls for current data
+- **Network Dependent**: Accept that performance depends on external services
+- **Minimal Memory**: Use simple data structures, avoid unnecessary complexity
+
+## Documentation Standards
+- **Docstrings**: Complete parameter and return type documentation
+- **Architecture**: Maintain docs/ARCH.md for system overview
+- **Setup Guide**: Keep docs/SETUP.md updated with installation instructions
+- **Code Comments**: Focus on "why" rather than "what"
+
+## Common Tasks & Patterns
+- **Adding New Features**: Follow the existing functional pattern
+- **Error Handling**: Use try/except blocks with specific exception types
+- **API Changes**: Update parameter handling and response parsing as needed
+- **New Dependencies**: Add to pyproject.toml and update documentation
+
+## Debugging & Development
+- **Debug Mode**: Use `-d` flag for consistent testing
+- **Print Statements**: Use for debugging, remove before committing
+- **Test Locations**: Use well-known cities for testing
+- **API Response**: Use embedded test data for expected data structure
+
+## Code Review Checklist
+- [ ] Functions have clear, single responsibilities
+- [ ] Error handling covers expected failure modes
+- [ ] User input is properly validated and formatted
+- [ ] API responses are properly parsed
+- [ ] Documentation is updated if needed
+- [ ] Debug mode works correctly
+- [ ] No hardcoded values (except debug defaults)
+
+## Preferred AI Assistance Style
+- **Functional Focus**: Suggest functional programming solutions
+- **Error Awareness**: Always consider error cases and edge conditions
+- **API Integration**: Understand external service dependencies
+- **Documentation**: Help maintain clear, comprehensive documentation
+- **Testing**: Suggest practical testing approaches for CLI applications
+- **User Experience**: Consider the end-user experience for CLI interactions
+
+## Avoid These Patterns
+- **Classes**: Don't introduce OOP unless absolutely necessary
+- **Global Variables**: Use function parameters and return values
+- **Complex Data Structures**: Keep data simple and straightforward
+- **Unnecessary Abstractions**: Don't over-engineer the simple design
+- **Synchronous Blocking**: Don't introduce async/await complexity
+- **File I/O**: Avoid persistent storage unless specifically needed
+
+## Example Code Style
+```python
+def function_name(param1: str, param2: float) -> tuple[str, float]:
+    """
+    Brief description of what the function does.
+    
+    Args:
+        param1 (str): Description of param1.
+        param2 (float): Description of param2.
+    
+    Returns:
+        tuple: (description, of_return_values)
+    
+    Raises:
+        ValueError: When param1 is invalid.
+    """
+    # Implementation here
+    return result1, result2
+```
+
+## When Making Changes
+1. Test with debug mode first
+2. Verify error handling works
+3. Update documentation if needed
+4. Check that the change follows existing patterns
+5. Consider impact on external API usage
+
+## Documentation Maintenance Rules
+- **CRITICAL**: Update ALL relevant documentation with EVERY code change
+- **Required Updates**: When code changes, update these files:
+  - `README.md`: If functionality, usage, or examples change
+  - `docs/ARCH.md`: If architecture, data flow, or design patterns change
+  - `docs/SETUP.md`: If dependencies, installation, or configuration change
+  - `docs/USAGE.md`: If command-line options, input formats, or output changes
+  - `docs/CHANGELOG.md`: Document ALL changes with version, date, and description
+  - `docs/FAILURE.md`: Document any issues encountered and solutions found
+- **Documentation First**: Consider documentation updates as part of the code change, not optional
+- **Consistency Check**: Ensure all documentation remains consistent with current code state
+- **Examples Update**: Update code examples in documentation when relevant functions change
+- **Version Tracking**: Always update docs/CHANGELOG.md with proper versioning and categorization 
