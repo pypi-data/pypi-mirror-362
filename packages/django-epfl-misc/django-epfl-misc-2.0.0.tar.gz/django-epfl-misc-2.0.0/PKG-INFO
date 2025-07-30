@@ -1,0 +1,105 @@
+Metadata-Version: 2.1
+Name: django-epfl-misc
+Version: 2.0.0
+Summary: A Django application with helper functions and utilities.
+Home-page: https://github.com/epfl-si/django-epfl-misc
+Author: William Belle
+Author-email: william.belle@gmail.com
+License: MIT
+Project-URL: Changelog, https://github.com/epfl-si/django-epfl-misc/blob/main/CHANGELOG.md
+Project-URL: Source, https://github.com/epfl-si/django-epfl-misc
+Project-URL: Tracker, https://github.com/epfl-si/django-epfl-misc/issues
+Description: # django-epfl-misc
+        
+        [![Build Status][github-actions-image]][github-actions-url]
+        [![Coverage Status][codecov-image]][codecov-url]
+        [![PyPI version][pypi-image]][pypi-url]
+        [![PyPI Python version][pypi-python-image]][pypi-url]
+        
+        A Django application with helper functions and utilities.
+        
+        ## Requirements
+        
+        - Python 3.7 or later
+        - Django 2.2, 3.2, 4.2 or 5.2
+        
+        ## Installation
+        
+        Installing from PyPI is as easy as doing:
+        
+        ```bash
+        pip install django-epfl-misc
+        ```
+        
+        ## Documentation
+        
+        ### Auth
+        
+        #### `superuser_required_or_403()`
+        
+        ```python
+        from django_epflmisc.decorators import superuser_required_or_403
+        
+        @superuser_required_or_403()
+        def my_view(request):
+            # I can assume now that the view is only accessible as a superuser.
+        ```
+        
+        ### Cache
+        
+        The cache system requires a small amount of setup. Namely, you have to tell
+        it where your cached data should live – whether in a database, on the
+        filesystem or directly in memory.
+        
+        See [Django's cache framework][django-cache]
+        
+        #### `cache_anonymous_user(timeout, cache="default")`
+        
+        ```python
+        from django_epflmisc.decorators import cache_anonymous_user
+        
+        @cache_anonymous_user(60 * 15)
+        def my_view(request):
+            # I can assume now that the view is cached for anonymous users.
+        ```
+        
+        ## License
+        
+        The MIT License (MIT)
+        
+        Copyright (c) 2021-2025 ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland.
+        
+        [github-actions-image]: https://github.com/epfl-si/django-epfl-misc/actions/workflows/build.yml/badge.svg?branch=main
+        [github-actions-url]: https://github.com/epfl-si/django-epfl-misc/actions
+        
+        [codecov-image]:https://codecov.io/gh/epfl-si/django-epfl-misc/branch/main/graph/badge.svg
+        [codecov-url]:https://codecov.io/gh/epfl-si/django-epfl-misc
+        
+        [pypi-python-image]: https://img.shields.io/pypi/pyversions/django-epfl-misc
+        [pypi-image]: https://img.shields.io/pypi/v/django-epfl-misc
+        [pypi-url]: https://pypi.org/project/django-epfl-misc/
+        
+        [django-cache]: https://docs.djangoproject.com/en/2.2/topics/cache/#setting-up-the-cache
+        
+Platform: UNKNOWN
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 2.2
+Classifier: Framework :: Django :: 3.2
+Classifier: Framework :: Django :: 4.2
+Classifier: Framework :: Django :: 5.2
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Utilities
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
