@@ -1,0 +1,29 @@
+{% from 'macros.jinja2' import naturalfar, grbmission, grbmission_targeted, naturalotherexternalpipelines, propername %}
+{% if not update_alert %}{% include 'authors.jinja2' %}
+
+{% include 'initial_body.jinja2' %}
+{% endif %}
+{% filter rewrap(text_width) %}
+A search performed by the RAVEN pipeline [{{citation_index['raven']}}] found a temporal coincidence between
+{{gracedb_id}} and a {% if snews %}SNEWS supernova{% elif grb %}{% if subthreshold %}sub-threshold {% endif %}{{grbmission(external_pipeline)}}{% endif %} {{propername(external_trigger)}} **CITE ORIGINAL GCN FOR THE EXTERNAL CANDIDATE FROM https://gcn.nasa.gov/circulars, e.g., (Bhalerao et al., GCN Circular XXXXX)**.
+The {% if snews %}neutrino{% elif grb %}GRB{% endif %} candidate time is {{latency}} seconds {{beforeafter}} the GW candidate event.
+{% if grb %}
+The estimated joint false alarm rate for the coincidence using just timing info before trials are applied is {{naturalfar(time_coinc_far)}}.
+{% if subthreshold_targeted %}The GRB candidate was found during a joint targeted search between the LIGO/Virgo/KAGRA collaboration and {{grbmission_targeted(external_pipeline)}}, and has a false alarm rate of {{naturalfar(far_grb)}}. {% endif %}
+{% if other_ext_pipelines %}RAVEN has also identified {% if other_ext_pipelines|length == 1 %}an additional detection{% elif other_ext_pipelines|length > 1%}additional detections{% endif %} from {{naturalotherexternalpipelines(other_ext_pipelines)}}.{% endif %}
+
+{% endif %}
+{% if combined_skymap %}
+{% include 'combine_skymaps.jinja2' %}
+{% endif %}
+{% if combined_skymap and space_time_coinc_far is not none %}
+Considering the overlap of the individual sky maps, the estimated joint false alarm rate for the spatial and temporal coincidence before trials are applied is {{naturalfar(space_time_coinc_far)}}.
+{% elif combined_skymap and space_time_coinc_far is none %}
+The spatial and temporal coincidence is not yet available.
+{% endif %}
+
+{% if not update_alert %}
+{% include 'userguide_conclusion.jinja2'%}
+{% include 'numbered_pipeline_citations.jinja2' %}
+{% endif %}
+{% endfilter %}

@@ -1,0 +1,15 @@
+{% from 'macros.jinja2' import naturalgrbmediumlatencypipelines,
+                               naturalfap, grbmission, propername %}
+{% filter rewrap(text_width) %}
+The {{naturalgrbmediumlatencypipelines(detections, citation_index)}} made{% if detections|length == 1 %} a{% endif %} preliminary identification of {% if detections|length == 1 %}a {% endif %}gravitational wave (GW) candidate{% if detections|length == 2 %}s{% endif %} associated with the time and sky position of GRB {{grbmission(pipeline)}} {{propername(external_trigger)}} **CITE ORIGINAL GCN FOR THE EXTERNAL CANDIDATE FROM https://gcn.nasa.gov/circulars, e.g., (Bhalerao et al., GCN Circular XXXXX)**.
+
+{% if detections|length == 2 %}
+In PyGRB, the candidate is consistent with a binary coalescence with False Alarm Probability of {{naturalfap(online_pygrb_fap)}}.
+
+In X-Pipeline, the candidate is an unmodeled GW transient with False Alarm Probability of {{naturalfap(online_xpipeline_fap)}}.
+{% elif detections| length == 1%}
+The candidate is {% if 'Burst' in detections %}an unmodeled GW transient{% else %}consistent with a binary coalescence{% endif %} with False Alarm Probability of {% if 'Burst' in detections %}{{online_xpipeline_fap}}{% else %}{{online_pygrb_fap}}{% endif %}.
+{% endif %}
+
+The False Alarm Probability is calculated by counting the fraction of background trials containing an event with a greater detection statistic than the loudest on-source event. The off-source trials are of {% if detections|length == 2 %}6 s duration for CBC and 660 s duration for Burst{% elif detections| length == 1%}{% if 'Burst' in detections %}660 s duration{% else %}6 s duration{% endif %}{% endif %}.
+{% endfilter %}

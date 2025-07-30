@@ -1,0 +1,7 @@
+{% filter rewrap %} 
+Area  Overlap   Algorithm (filename)         
+-------------------------------------------------------------
+{%- for filename, pipeline, area, joint_area in params %}
+ {{'%4d'|format(area|round(-1)|int)}}   {% if loop.last %}----{% else %}{{'%4d'|format(joint_area|round(-1)|int)}}{% endif %}     {{pipeline}} ({{filename}})
+{%- endfor -%}
+{% endfilter %}

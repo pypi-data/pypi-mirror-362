@@ -1,0 +1,39 @@
+{% from 'macros.jinja2' import evidence_for, probability,
+                               citeskymap_number %}
+{% filter rewrap(text_width) %}
+{% if not update_alert and prob_has_ssm is not none and 'aframe' not in pipeline_search|lower%}
+The analysis which found this candidate used a template
+bank including sub-solar-mass components. The usual classification probabilities for BNS, NSBH, or BBH
+binaries versus Terrestrial noise are not calculated for this candidate. The probability of matter
+remaining outside the final compact object (HasRemnant) [{{citation_index['em_bright']}}] is not estimated either.
+
+{% endif%}
+{% if prob_has_ns is not none %}
+{% if update_alert %}Based on posterior support from parameter
+estimation {{citeskymap_number(updated_skymap.pipeline, citation_index)}},
+under the assumption that the candidate {{gracedb_id}} is astrophysical in
+origin, {% else %}Assuming the candidate is astrophysical in origin, {% endif %}
+{% if 'aframe' in pipeline_search|lower %}using an approximate posterior, {% endif %}
+the probability that at least one of the compact objects is consistent with
+a neutron star mass{% if not update_alert and prob_has_ssm is not none and 'aframe' not in pipeline_search|lower%} between 1 and 3 solar
+masses{% elif update_alert or 'aframe' in pipeline_search|lower%} above one solar mass{% endif%} (HasNS) is {{probability(prob_has_ns)}}. [{{citation_index['em_bright']}}]
+{% endif %}
+{% if prob_has_remnant is not none %}
+Using the masses and{% if 'aframe' in pipeline_search|lower %} assuming no spin {% else %} spins inferred from the signal, {% endif %}the
+probability of matter outside the final compact object (HasRemnant)
+is {{probability(prob_has_remnant)}}. [{{citation_index['em_bright']}}]
+{% if update_alert or 'aframe' in pipeline_search|lower%}HasRemnant is assumed to be zero when the heavier component mass is below 1 solar mass. {% endif %}
+Both HasNS and HasRemnant consider the
+support of several neutron star equations of state for maximum neutron star
+mass.
+{% endif %}
+{% if prob_has_massgap is not none %}
+The probability that either of the binary components lies between 3 and 5 solar masses (HasMassGap) is
+{{probability(prob_has_massgap)}}.
+{% endif %}
+{% if prob_has_ssm is not none %}
+The probability that the lighter
+compact object is below 1 solar mass (HasSSM) is {{probability(prob_has_ssm)}}.
+{% endif %}
+
+{% endfilter %}

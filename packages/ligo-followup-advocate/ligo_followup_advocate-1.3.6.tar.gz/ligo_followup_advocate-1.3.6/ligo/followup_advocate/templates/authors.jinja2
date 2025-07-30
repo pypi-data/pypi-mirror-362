@@ -1,0 +1,8 @@
+{% from 'macros.jinja2' import grbmission, oxford_commas %}
+{% filter rewrap(text_width) %}
+{% if authors %}
+{{oxford_commas(authors)}} report{% if authors|length == 1 %}s{% endif %} on behalf of the LIGO Scientific Collaboration, the Virgo Collaboration, and the KAGRA Collaboration{% if llama and not icecube_alert %} in conjunction with the IceCube Collaboration (http://icecube.wisc.edu/){% endif %} report:
+{% else %}
+The LIGO Scientific Collaboration, the Virgo Collaboration, and the KAGRA Collaboration{% if subthreshold_targeted %} along with the {{grbmission(external_pipeline)}} Collaboration{% elif llama and not icecube_alert %} along with the IceCube Collaboration (http://icecube.wisc.edu/){% endif %} report:
+{% endif %}
+{% endfilter %}
