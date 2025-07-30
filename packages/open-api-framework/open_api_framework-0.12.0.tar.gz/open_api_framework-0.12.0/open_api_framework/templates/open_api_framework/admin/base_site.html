@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% load static open_api_framework %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'open_api_framework/css/admin.css' %}">
+{% endblock %}
+
+{% block messages %}
+    {% if show_environment %}
+        {% environment %}
+    {% endif %}
+
+    {{ block.super }}
+{% endblock %}
+
+{% block footer %}
+    <div id="footer">
+        {% if show_version %}
+            {% version %}
+        {% endif %}
+    </div>
+{% endblock %}

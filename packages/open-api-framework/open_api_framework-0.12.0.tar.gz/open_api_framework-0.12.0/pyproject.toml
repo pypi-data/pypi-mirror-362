@@ -1,0 +1,139 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "open-api-framework"
+version = "0.12.0"
+description = "A metapackage for registration components, that bundles the dependencies shared between these components and provides generic settings"
+authors = [
+    {name = "Maykin Media", email = "support@maykinmedia.nl"}
+]
+readme = "README.rst"
+license = {file = "LICENSE"}
+keywords = ["metapackage", "dependencies", "settings"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Django",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2",
+    "django-axes>=6.5.1",
+    "django-jsonform>=2.22.0",
+    "django-log-outgoing-requests>=0.6.1",
+    "django-admin-index>=3.1.0",
+    "djangorestframework>=3.15.2",
+    "django-filter>=24.2",
+    "drf-spectacular[sidecar]>=0.27.2",
+    "mozilla-django-oidc-db>=0.19.0",
+    "psycopg[binary]>=3.2.9",
+    "python-dotenv>=1.0.0",
+    "python-decouple>=3.8",
+    "requests>=2.32.3",
+    "sentry-sdk>=2.11.0",
+    "elastic-apm>=6.22.0",
+    "maykin-2fa>=1.0.1",
+    "django-setup-configuration>=0.1.0",
+    "django-sessionprofile>=3.0.0",
+    "django-upgrade-check>=1.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/maykinmedia/open-api-framework"
+Documentation = "http://open-api-framework.readthedocs.io/en/latest/"
+"Bug Tracker" = "https://github.com/maykinmedia/open-api-framework/issues"
+"Source Code" = "https://github.com/maykinmedia/open-api-framework"
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "pytest-django",
+    "pytest-env",
+    "tox",
+    "ruff",
+    "factory-boy",
+    "django-rosetta",
+    "django-webtest"
+]
+coverage = [
+    "pytest-cov",
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+]
+release = [
+    "bump-my-version",
+    "twine",
+]
+celery = [
+    "celery>=5.4.0",
+    "flower>=2.0.1"
+]
+cors = [
+    "django-cors-headers>=4.4.0"
+]
+markup = [
+    "django-markup>=1.8.1"
+]
+geo = [
+    "djangorestframework-gis>=1.0"
+]
+csp = [
+    "django-csp>=3.8"
+]
+commonground = [
+    "commonground-api-common>=2.7.0"
+]
+inclusions = [
+    "djangorestframework-inclusions>=1.2.0"
+]
+sanitization = [
+    "bleach>=6.1.0"
+]
+server = [
+    "uwsgi>=2.0.23"
+]
+redis = [
+    "django-redis>=5.4.0"
+]
+
+[tool.setuptools.packages.find]
+include = ["open_api_framework*"]
+namespaces = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = "."
+env = [
+    "DJANGO_SETTINGS_MODULE=testapp.settings",
+    "SECRET_KEY=not-so-secret",
+    "SENTRY_DSN=https://public@sentry.example.com/1"
+]
+
+[tool.bumpversion]
+current_version = "0.12.0"
+files = [
+    {filename = "pyproject.toml"},
+    {filename = "README.rst"},
+    {filename = "docs/conf.py"},
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "if (typing\\.)?TYPE_CHECKING:",
+    "@(typing\\.)?overload",
+    "class .*\\(.*Protocol.*\\):",
+    "@(abc\\.)?abstractmethod",
+    "raise NotImplementedError",
+    "\\.\\.\\.",
+    "pass",
+]
