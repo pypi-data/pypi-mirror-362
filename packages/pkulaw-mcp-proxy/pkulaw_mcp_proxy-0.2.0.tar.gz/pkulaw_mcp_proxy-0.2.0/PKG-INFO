@@ -1,0 +1,41 @@
+Metadata-Version: 2.4
+Name: pkulaw-mcp-proxy
+Version: 0.2.0
+Summary: PKULAW MCP server proxy
+Author-email: PKULAW <fxtj@chinalawinfo.com>
+License-Expression: MIT
+Keywords: MCP server,PKULAW,proxy
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Requires-Python: >=3.10
+Requires-Dist: fastmcp>=2.10.5
+Description-Content-Type: text/markdown
+
+# PKULAW MCP server proxy
+
+Proxy existing MCP servers for bridging transports - exposing a server running on streamable-http to a different transport. 
+
+
+## Usage
+
+Run (exposing streamable-http):
+
+    uv run pkulaw-mcp-proxy \
+    --type streamable-http \
+    --name proxy-mcp-server \
+    --backend-url http://${URL}:3000/mcp \
+    --backend-token xxxxxx \
+    --port 3000
+
+
+Run (exposing stdio):
+
+    uv run pkulaw-mcp-proxy \
+    --name proxy-mcp-server \
+    --backend-url http://${URL}:3000/mcp
+
+
