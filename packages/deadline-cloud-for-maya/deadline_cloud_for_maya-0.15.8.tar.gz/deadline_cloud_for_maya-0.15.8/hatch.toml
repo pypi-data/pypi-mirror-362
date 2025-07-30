@@ -1,0 +1,63 @@
+[envs.default]
+pre-install-commands = [
+  "pip install -r requirements-testing.txt"
+]
+
+[envs.default.scripts]
+sync = "pip install -r requirements-testing.txt"
+test = "pytest --cov-config pyproject.toml {args:test/unit}"
+test-installer = "pytest --no-cov {args:test/installer} -vvv"
+typing = "mypy {args:src test maya_submitter_plugin/plug-ins}"
+style = [
+  "ruff check {args:.}",
+  "black --check --diff {args:.}",
+]
+fmt = [
+  "black {args:.}",
+  "style",
+]
+lint = [
+  "style",
+  "typing",
+]
+install = "python {root}/scripts/install_dev_submitter.py {args:}"
+
+[[envs.all.matrix]]
+python = ["3.9", "3.10", "3.11", "3.12"]
+
+[envs.default.env-vars]
+SKIP_BOOTSTRAP_TEST_RESOURCES="True"
+MAYA_ENV_DIR="{root}/plugin_env"
+
+[envs.codebuild.scripts]
+build = "hatch build"
+
+[envs.codebuild.env-vars]
+SKIP_BOOTSTRAP_TEST_RESOURCES="True"
+
+[envs.integ]
+pre-install-commands = [
+  "mayapy -m pip install -r requirements-integ-testing.txt",
+  "mayapy -m pip install -r requirements-testing.txt",
+]
+
+[envs.integ.scripts]
+test = 'mayapy -m pytest --no-cov {args:test/integ} -vvv --numprocesses=1'
+test_submitters = 'mayapy -m pytest --no-cov {args:test/integ} -vvv --numprocesses=1 -m submitter'
+test_adaptors_all = 'mayapy -m pytest --no-cov {args:test/integ} -vvv --numprocesses=1 -m adaptor'
+test_adaptors_maya = 'mayapy -m pytest --no-cov {args:test/integ} -vvv --numprocesses=1 -m "adaptor and maya_renderer"'
+test_adaptors_redshift = 'mayapy -m pytest --no-cov {args:test/integ} -vvv --numprocesses=1 -m "adaptor and redshift_renderer"'
+
+[envs.e2e.scripts]
+test = "pytest --no-cov {args:test/*/e2e}"
+
+[envs.release]
+detached = true
+
+[envs.release.scripts]
+deps = "pip install -r requirements-release.txt"
+bump = "semantic-release -v --strict version --no-push --no-commit --no-tag --skip-build {args}"
+version = "semantic-release -v --strict version --print {args}"
+
+[envs.installer.scripts]
+build-installer = "python {root}/scripts/build_installer_cli.py --installer-source-path {root}/installer/DeadlineCloudForMayaSubmitter.xml {args:}"
