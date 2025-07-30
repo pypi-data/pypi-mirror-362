@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "txtify"
+dynamic = ["version"]
+description = 'A versatile Python tool to convert documents (PPTX, DOCX, PDF, XLSX) to plain text, ideal for providing context to AI code assistants like GitHub Copilot and Amazon CodeWhisperer.'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = ["document", "converter", "powerpoint", "word", "pdf", "excel", "text", "ai", "llm", "context", "github copilot", "code generation", "documentation"]
+authors = [
+  { name = "Ray Rada", email = "rayrada1@gmail.com" },
+  { name = "Anthony Furst", email = "anthony.furst@afs.com" }
+]
+
+dependencies = [
+  "python-pptx",
+  "docx2txt",
+  "PyPDF2",
+  "pandas",
+  "xlrd",
+  "click",
+]
+
+[project.scripts]
+txtify = "txtify.cli:main"
+
+[tool.hatch.version]
+path = "src/txtify/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/txtify tests}"
+
+[tool.coverage.run]
+source_pkgs = ["txtify", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/txtify/__about__.py",
+]
+
+[tool.coverage.paths]
+txtify = ["src/txtify", "*/txtify/src/txtify"]
+tests = ["tests", "*/txtify/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
