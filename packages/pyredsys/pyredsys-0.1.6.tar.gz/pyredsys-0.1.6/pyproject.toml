@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=70.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyredsys"
+requires-python = ">=3.11"
+authors = [{ name = "Pradish Bijukchhe", email = "pradish@sandbox.com.np" }]
+description = "Typed RedSys integration in python"
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = []
+classifiers = ["Programming Language :: Python :: 3"]
+dependencies = ["cryptography>=3.3.2", "pydantic>=0.1"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+pre-commit = ["pre-commit"]
+
+
+[project.urls]
+Homepage = "https://github.com/sandbox-pokhara/pyredsys"
+Issues = "https://github.com/sandbox-pokhara/pyredsys/issues"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-dir]
+"pyredsys" = "pyredsys"
+
+[tool.setuptools.dynamic]
+version = { attr = "pyredsys.__version__" }
+
+[tool.ruff.lint]
+select = ["I"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+include = ["pyredsys"]
+typeCheckingMode = "strict"
