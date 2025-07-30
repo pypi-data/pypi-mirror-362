@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "osia"
+version = "0.2.0-alpha14"
+description = "OpenShift infra automation"
+authors = ["Miroslav Jaros <mirek@mijaros.cz>"]
+maintainers = ["Matej Dujava <mdujava@redhat.com>"]
+license = "Apache-2.0"
+readme = 'README.md'
+keywords = ["OpenShift", "OpenStack", "AWS", "automation"]
+classifiers = [
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Build Tools",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13"
+]
+
+
+[tool.poetry.scripts]
+osia = 'osia.cli:main_cli'
+
+[tool.poetry.dependencies]
+beautifulsoup4 = "*"
+boto3 = "*"
+coloredlogs = "*"
+dynaconf = {extras = ["yaml"], version = "*"}
+distro = "*"
+gitpython = "*"
+jinja2 = "*"
+openstacksdk = "*"
+python = "^3.10"
+semantic-version = "^2.10.0"
+urllib3 = "*"
+
+[tool.poetry.group.dev.dependencies]
+boto3-stubs = "^1.35.39"
+flake8 = "*"
+ipython = "*"
+mypy = "*"
+pylint = "*"
+recommonmark = "*"
+sphinx = "*"
+sphinx-argparse = "*"
+sphinx-rtd-theme = "*"
+types-PyYAML = "*"
+types-beautifulsoup4 = "*"
+types-html5lib = "*"
+types-requests = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+check_untyped_defs = true
+local_partial_types = true
