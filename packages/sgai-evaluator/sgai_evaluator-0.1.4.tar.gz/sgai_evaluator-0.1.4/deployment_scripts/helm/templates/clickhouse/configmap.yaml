@@ -1,0 +1,35 @@
+{{- if .Values.clickhouse.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "langfuse.fullname" . }}-clickhouse-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "langfuse.labels" . | nindent 4 }}
+    app.kubernetes.io/component: clickhouse
+data:
+  custom.xml: |
+    <clickhouse>
+        <listen_host>0.0.0.0</listen_host>
+        <http_port>8123</http_port>
+        <tcp_port>9000</tcp_port>
+        <logger>
+            <level>information</level>
+            <console>true</console>
+        </logger>
+        <users>
+            <{{ .Values.clickhouse.auth.username }}>
+                <password_sha256_hex>{{ .Values.clickhouse.auth.password | sha256sum }}</password_sha256_hex>
+                <networks>
+                    <ip>::/0</ip>
+                </networks>
+                <profile>default</profile>
+                <quota>default</quota>
+                <access_management>1</access_management>
+                <databases>
+                    <database>{{ .Values.clickhouse.auth.database }}</database>
+                </databases>
+            </{{ .Values.clickhouse.auth.username }}>
+        </users>
+    </clickhouse>
+{{- end }} 
