@@ -1,0 +1,173 @@
+Metadata-Version: 2.4
+Name: nuaim
+Version: 1.0.0
+Summary: NUAIM - Black-Box Generator for Meta-Variable Optimization.
+Author-email: Noam Charette <charettenoam@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/NoVTeKa/NUAIM-BBO
+Project-URL: Source, https://github.com/NoVTeKa/NUAIM-BBO
+Project-URL: Documentation, https://github.com/NoVTeKa/NUAIM-BBO/blob/main/README.md
+Project-URL: Issues, https://github.com/NoVTeKa/NUAIM-BBO/issues
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch>=1.9.0
+Requires-Dist: torchvision>=0.10.0
+Requires-Dist: pytorch-ignite>=0.4.8
+Requires-Dist: tqdm>=4.62.0
+Requires-Dist: numpy>=1.21.0
+Dynamic: license-file
+
+# NUAIM - Black-Box Generator for Meta-Variable Optimization
+
+**NUAIM** is a Python package designed for Black-Box Optimization (BBO). It acts as a **black-box generator** for meta-variable (or hierarchical variable) optimization, a feature that is rarely available in black-box generators. With NUAIM, you can explore and optimize complex neural network architectures and hyperparameters in a structured and extensible way.
+
+## ✨ Features
+
+- **🧠 Black-Box Generator**: Generate and evaluate neural network architectures as black-box functions for optimization.
+- **📊 Meta-Variable Optimization**: Supports hierarchical variables, enabling optimization of both architecture and hyperparameters.
+- **🔧 Flexible Hyperparameter Management**: Easily customize optimizers, learning rates, and other parameters.
+- **📈 Detailed Performance Metrics**: Logs training time, forward pass time, and accuracy for each model.
+- **🎯 Preset Configurations**: Ready-to-use presets for MLPs, CNNs, Transformers, and hybrid architectures.
+- **🔄 Modular Design**: Clean and extensible architecture for research and experimentation.
+- **📝 Rich Logging**: Save results in table and JSON formats for easy analysis.
+- **🚀 Easy Integration**: Simple Python API for seamless integration into your workflows.
+
+## 🚀 Quick Start
+
+### Installation
+
+Install NUAIM using pip:
+```bash
+pip install nuaim
+```
+
+### Basic Usage
+
+#### What is Possible with `sample_instance`
+
+The `sample_instance` method allows you to:
+- Train multiple models with different configurations
+- Log results in various formats (table, JSON, or both)
+- Track training and forward pass times
+
+Optional parameters for `sample_instance`:
+- `dataset_frac`: Fraction of the dataset to use (default: 1)
+- `num_samples`: Number of models to sample (default: 5)
+- `max_epochs`: Maximum number of training epochs (default: 1000)
+- `filename`: Name of the file to save results (default: None)
+- `log_dir`: Directory to save logs (default: "logs")
+- `verbose`: Whether to print progress (default: True)
+- `output_format`: Format of the output ("table", "json", or "both", default: "both")
+- `track_train_time`: Track training time (default: True)
+- `track_forward_time`: Track forward pass time (default: True)
+- `custom_params`: Custom hyperparameters (default: None)
+
+#### Simple Implementation of `sample_instance`
+
+```python
+from nuaim import ModelFactory
+
+# Create a model factory with a preset configuration
+factory = ModelFactory("BasicMLP")
+
+# Train multiple models and get results
+results = factory.sample_instance(
+    num_samples=10,
+    max_epochs=20,
+    filename="experiment_results",
+    log_dir="./logs",
+    output_format="both",  # "table", "json", or "both"
+    track_train_time=True,
+    track_forward_time=True
+)
+
+print(f"Best accuracy: {results['best_accuracy']:.4f}")
+print(f"Average accuracy: {results['average_accuracy']:.4f}")
+```
+
+#### What is Possible with `factory.train`
+
+The `factory.train` method allows you to:
+- Train a single model with specific hyperparameters
+- Customize training parameters like epochs and verbosity
+- TBD -> Append results to log file
+
+Optional parameters for `train`:
+- `hyper_params`: Dictionary of hyperparameters for the model (default: None)
+- `max_epochs`: Maximum number of training epochs (default: 1000)
+- `verbose`: Whether to print progress in (default: True)
+
+#### Simple Implementation of `factory.train`
+
+```python
+# Generate random hyperparameters for a model
+hyperparams = factory.generate_random_model_dict()
+
+# Train the model and get accuracy
+accuracy = factory.train(
+    hyper_params=hyperparams,
+    max_epochs=10,
+    verbose=True
+)
+
+print(f"Model accuracy: {accuracy:.4f}")
+```
+
+## 📖 Available Presets
+
+NUAIM includes several built-in preset configurations for different levels of complexity:
+
+### Basic Presets
+- **BasicMLP**: Simple multi-layer perceptron configurations
+- **BasicCNN**: Basic convolutional neural networks
+- **BasicTransformer**: Simple transformer architectures
+
+### Advanced Presets
+- **AdvancedMLP**: Complex MLP with advanced optimization
+- **AdvancedCNN**: Advanced CNN architectures
+- **AdvancedTransformer**: Multi-head attention mechanisms
+
+### Hard Presets
+- **HardMLP**: Complex MLP with extensive hyperparameter spaces
+- **HardCNN-MLP**: Hybrid CNN-MLP architectures
+- **HardTransformer**: Advanced transformer configurations
+
+### Complete Preset
+- **Complete**: Comprehensive search space with all layer types.
+
+
+## 🔬 Research Applications
+
+NUAIM is ideal for:
+- **Black-Box Optimization (BBO)**: Treat neural network architectures as black-box functions for optimization.
+- **Meta-Variable Optimization**: Optimize hierarchical variables like architecture and hyperparameters.
+- **Neural Architecture Search (NAS)**: Automate the discovery of optimal architectures.
+- **Hyperparameter Tuning**: Systematically explore hyperparameter spaces.
+- **Model Benchmarking**: Compare different architectures and configurations.
+
+## 🤝 Contributing
+
+We welcome contributions! Please feel free to:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Made with ❤️ for the research community**
