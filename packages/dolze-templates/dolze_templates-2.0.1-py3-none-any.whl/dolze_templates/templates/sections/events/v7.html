@@ -1,0 +1,54 @@
+<section id="events" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ sections.events.title }}</h2>
+      {% if sections.events.subtitle %}
+      <p class="text-lg text-gray-600">{{ sections.events.subtitle }}</p>
+      {% endif %}
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+    
+    <div class="space-y-6">
+      {% for event in sections.events.items %}
+      <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col md:flex-row gap-6" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        {% if event.image %}
+        <img src="{{ event.image.src }}" 
+             alt="{{ event.image.alt }}" 
+             class="w-full md:w-48 h-32 object-cover rounded-lg">
+        {% endif %}
+        
+        <div class="flex-1">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
+            <h3 class="text-xl font-semibold text-gray-900">{{ event.title }}</h3>
+            {% if event.date %}
+            <span class="text-sm text-primary font-medium">{{ event.date }}</span>
+            {% endif %}
+          </div>
+          
+          {% if event.location %}
+          <div class="flex items-center gap-2 text-gray-600 mb-3">
+            <i class="ri-map-pin-line text-primary"></i>
+            <span class="text-sm">{{ event.location }}</span>
+          </div>
+          {% endif %}
+          
+          <p class="text-gray-600 mb-4">{{ event.description }}</p>
+          
+          <div class="flex items-center justify-between">
+            {% if event.price %}
+            <span class="text-lg font-bold text-primary">{{ event.price }}</span>
+            {% endif %}
+            
+            {% if event.cta %}
+            <a href="{{ event.cta.url }}" 
+               class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+              {{ event.cta.label }}
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

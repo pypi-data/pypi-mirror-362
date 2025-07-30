@@ -1,0 +1,107 @@
+<header class="py-6 bg-white sticky top-0 z-50" id="header">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <nav class="relative z-50 flex justify-between">
+      <div class="flex items-center md:gap-x-12">
+        <a aria-label="Home" class="text-2xl font-bold capitalize" href="#">
+       {{ settings.seo.title.split(' - ')[0] }}
+        </a>
+        <div class="hidden md:flex md:gap-x-6">
+          {% for item in navigation.items %}
+          <a
+            href="{{ item.url }}"
+            class="inline-block rounded-lg px-2 py-1 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+            >{{ item.label }}</a
+          >
+          {% endfor %}
+        </div>
+      </div>
+      
+        <div class="-mr-1 md:hidden">
+          <div data-headlessui-state="" id="mobile-menu-container">
+            <button
+              class="relative z-10 flex h-8 w-8 items-center justify-center focus:not-data-focus:outline-hidden"
+              aria-label="Toggle Navigation"
+              type="button"
+              aria-expanded="false"
+              data-headlessui-state=""
+              id="mobile-menu-button"
+            >
+              <svg
+                aria-hidden="true"
+                class="h-3.5 w-3.5 overflow-visible stroke-slate-700"
+                fill="none"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path
+                  d="M0 1H14M0 7H14M0 13H14"
+                  class="origin-center transition"
+                  id="menu-icon-bars"
+                ></path>
+                <path
+                  d="M2 2L12 12M12 2L2 12"
+                  class="origin-center transition scale-90 opacity-0"
+                  id="menu-icon-close"
+                ></path>
+              </svg>
+            </button>
+            <div 
+              class="fixed inset-0 bg-slate-300/50 opacity-0 pointer-events-none transition-opacity duration-150 ease-out" 
+              id="mobile-menu-backdrop"
+              aria-hidden="true"
+            ></div>
+            <div 
+              class="absolute inset-x-0 top-full mt-4 flex origin-top flex-col rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5 opacity-0 pointer-events-none scale-95 transition-all duration-150 ease-out"
+              id="mobile-menu-panel"
+              tabindex="-1"
+              style="--button-width: 32px;"
+            >
+              {% for item in navigation.items %}
+              <a class="block w-full p-2" href="{{ item.url }}">{{ item.label }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuButton = document.getElementById('mobile-menu-button');
+      const menuBackdrop = document.getElementById('mobile-menu-backdrop');
+      const menuPanel = document.getElementById('mobile-menu-panel');
+      const menuIconBars = document.getElementById('menu-icon-bars');
+      const menuIconClose = document.getElementById('menu-icon-close');
+      
+      function toggleMenu() {
+        const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+        
+        if (isOpen) {
+          // Close menu
+          menuButton.setAttribute('aria-expanded', 'false');
+          menuBackdrop.classList.add('opacity-0', 'pointer-events-none');
+          menuPanel.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+          menuIconBars.classList.remove('scale-90', 'opacity-0');
+          menuIconClose.classList.add('scale-90', 'opacity-0');
+        } else {
+          // Open menu
+          menuButton.setAttribute('aria-expanded', 'true');
+          menuBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+          menuPanel.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+          menuIconBars.classList.add('scale-90', 'opacity-0');
+          menuIconClose.classList.remove('scale-90', 'opacity-0');
+        }
+      }
+      
+      menuButton.addEventListener('click', toggleMenu);
+      menuBackdrop.addEventListener('click', toggleMenu);
+      
+      // Close menu when clicking on menu items
+      const menuItems = menuPanel.querySelectorAll('a');
+      menuItems.forEach(item => {
+        item.addEventListener('click', toggleMenu);
+      });
+    });
+  </script>
+</header>

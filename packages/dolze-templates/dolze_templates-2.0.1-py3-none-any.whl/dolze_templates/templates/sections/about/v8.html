@@ -1,0 +1,176 @@
+<section id="about" class="py-32 bg-white relative overflow-hidden">
+  <!-- Subtle background elements -->
+  <div class="absolute inset-0 bg-[#F9F9F9] opacity-30 -skew-y-3 transform origin-top-right h-1/2"></div>
+  <div class="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-gray-100 to-transparent opacity-70"></div>
+  
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <!-- Section header with elegant typography -->
+    <div class="text-center max-w-3xl mx-auto mb-24">
+      <span class="inline-block text-xs uppercase tracking-widest text-gray-500 mb-3">Our Story</span>
+      <h2 class="text-3xl sm:text-4xl font-light text-gray-900 mb-4">
+        {{ sections.about.title }}
+      </h2>
+      <div class="w-16 h-px bg-gray-300 mx-auto mb-6"></div>
+      <p class="text-gray-600 font-light leading-relaxed">
+        {{sections.about.content}}
+      </p>
+    </div>
+    
+    <div class="grid lg:grid-cols-[55%_45%] gap-16 items-center">
+      <!-- Media Container with elegant styling -->
+      <div class="relative">
+        {% if sections.about.media.type == 'image' %}
+        <div class="relative overflow-hidden group">
+          <!-- Decorative frame -->
+          <div class="absolute -inset-1 border border-gray-200"></div>
+          
+          <!-- Main image with hover effect -->
+          <img
+            src="{{ sections.about.media.src }}"
+            alt="{{ sections.about.media.alt }}"
+            class="w-full aspect-[4/5] object-cover transform transition-transform duration-1000 ease-out group-hover:scale-105"
+            loading="{{ 'lazy' if sections.about.media.lazyLoad }}"
+          />
+          
+          <!-- Subtle gradient overlay -->
+          <div class="absolute inset-0 bg-gradient-to-tr from-gray-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          
+          <!-- Elegant caption -->
+          <div class="absolute bottom-6 right-6 bg-white py-2 px-4 text-xs tracking-wider text-gray-500 shadow-sm">
+            <span class="inline-block w-6 h-px bg-gray-300 mr-2 align-middle"></span>
+            Our Heritage
+          </div>
+          
+          <!-- Decorative element -->
+          <div class="absolute -bottom-3 -left-3 w-16 h-16 border border-gray-200 bg-white"></div>
+        </div>
+        {% else %}
+        <div
+          id="video-container"
+          class="relative aspect-video overflow-hidden group"
+        >
+          <!-- Decorative frame -->
+          <div class="absolute -inset-1 border border-gray-200"></div>
+          
+          <!-- Video overlay with enhanced styling -->
+          <div
+            class="absolute inset-0 bg-gradient-to-tr from-gray-900/70 to-gray-900/40 flex items-center justify-center cursor-pointer z-10 transition-opacity duration-500"
+            id="video-overlay"
+          >
+            <div
+              class="w-20 h-20 bg-white/90 backdrop-blur-sm flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:bg-white"
+            >
+              <i class="ri-play-fill text-4xl text-gray-900"></i>
+            </div>
+          </div>
+          
+          <video
+            id="demo-video"
+            class="w-full h-full object-cover"
+            poster="{{ sections.about.media.poster }}"
+            controls
+          >
+            <source src="{{ sections.about.media.src }}" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          
+          <!-- Decorative element -->
+          <div class="absolute -bottom-3 -left-3 w-16 h-16 border border-gray-200 bg-white"></div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Features Grid with refined styling -->
+      <div class="space-y-8">
+        <!-- Section subtitle -->
+        <div class="mb-8">
+          <span class="text-xs uppercase tracking-widest text-gray-500">Our Approach</span>
+          <h3 class="text-2xl font-light text-gray-900 mt-2">{{ sections.about.subtitle | default('What Sets Us Apart') }}</h3>
+          <div class="w-12 h-px bg-gray-300 mt-3"></div>
+        </div>
+        
+        <!-- Features list -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          {% for item in sections.about.items %}
+          <div class="group">
+            <div class="bg-white p-6 border border-gray-100 shadow-sm transition-all duration-300 hover:shadow hover:border-gray-200">
+              <div class="w-10 h-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <i class="{{ item.icon }} text-xl text-gray-700"></i>
+              </div>
+              <h3 class="text-lg font-light text-gray-900 mb-2">{{ item.title }}</h3>
+              <div class="w-8 h-px bg-gray-200 mb-3 transform origin-left transition-all duration-300 group-hover:w-12 group-hover:bg-gray-300"></div>
+              <p class="text-gray-600 text-sm font-light leading-relaxed">{{ item.description }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <!-- Quote or testimonial -->
+        <div class="mt-8 pl-6 border-l-2 border-gray-200">
+          <p class="text-gray-600 italic font-light">{{ sections.about.quote | default('"Our commitment to quality and craftsmanship defines everything we create."') }}</p>
+          <p class="text-sm text-gray-500 mt-2">— {{ sections.about.quoteAuthor | default('Founder & Creative Director') }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- CTA section with elegant styling -->
+    <div class="mt-24 text-center">
+      <div class="inline-block mx-auto mb-8">
+        <div class="flex items-center justify-center">
+          <div class="w-12 h-px bg-gray-300"></div>
+          <span class="mx-4 text-xs uppercase tracking-widest text-gray-500">Experience The Difference</span>
+          <div class="w-12 h-px bg-gray-300"></div>
+        </div>
+      </div>
+      
+      <a 
+        href="#contact" 
+        class="inline-flex items-center px-10 py-3 border border-gray-900 text-gray-900 font-light text-sm tracking-widest uppercase hover:bg-gray-900 hover:text-white transition-colors duration-300"
+      >
+        <span>Learn More About Us</span>
+        <svg class="ml-3 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+  
+  <!-- Video player script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Video player functionality
+      const videoContainer = document.getElementById("video-container");
+      if (!videoContainer) return;
+      
+      const overlay = document.getElementById("video-overlay");
+      if (!overlay) return;
+      
+      const videoElement = document.getElementById("demo-video");
+      
+      overlay.addEventListener("click", function () {
+        overlay.style.opacity = 0;
+        setTimeout(() => {
+          overlay.style.display = "none";
+        }, 500);
+        
+        if (videoElement) {
+          videoElement.play();
+        }
+      });
+      
+      // Subtle parallax effect on scroll
+      const handleScroll = () => {
+        const scrollY = window.scrollY;
+        const aboutSection = document.getElementById("about");
+        const elements = aboutSection.querySelectorAll('.relative');
+        
+        elements.forEach((el, index) => {
+          const speed = 0.05 + (index * 0.01);
+          el.style.transform = `translateY(${scrollY * speed}px)`;
+        });
+      };
+      
+      window.addEventListener('scroll', handleScroll);
+    });
+  </script>
+</section>

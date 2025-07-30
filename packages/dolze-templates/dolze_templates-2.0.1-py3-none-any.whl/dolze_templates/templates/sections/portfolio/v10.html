@@ -1,0 +1,344 @@
+<section id="portfolio" class="py-24 bg-white relative overflow-hidden">
+  <!-- Background elements -->
+  <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-indigo-50 opacity-30"></div>
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="portfolio-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="1" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#portfolio-dots)" />
+      </svg>
+    </div>
+  </div>
+  
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+      {% if sections.portfolio.badge %}
+      <span class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-700 mb-4">
+        {{ sections.portfolio.badge }}
+      </span>
+      {% endif %}
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">
+        {{ sections.portfolio.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.portfolio.subtitle }}
+      </p>
+    </div>
+    
+    <!-- Filter categories if available -->
+    {% if sections.portfolio.categories %}
+    <div class="flex flex-wrap justify-center gap-4 mb-12" data-aos="fade-up" data-aos-delay="100">
+      <button class="px-6 py-2 rounded-full text-sm font-medium bg-indigo-600 text-white" data-filter="all">
+        All Projects
+      </button>
+      {% for category in sections.portfolio.categories %}
+      <button class="px-6 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-300" data-filter="{{ category.value }}">
+        {{ category.label }}
+      </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Portfolio layout options -->
+    {% if sections.portfolio.layout == 'grid' %}
+    <!-- Grid layout -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="200">
+      {% for project in sections.portfolio.items %}
+      <div 
+        class="portfolio-item bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-indigo-200 group"
+        data-category="{{ project.category|default('') }}"
+      >
+        <!-- Project image -->
+        <div class="aspect-[4/3] w-full relative overflow-hidden">
+          <img 
+            src="{{ project.image }}" 
+            alt="{{ project.title }}" 
+            class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            loading="lazy"
+          >
+          
+          <!-- Overlay with actions -->
+          <div class="absolute inset-0 bg-indigo-900/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6">
+            <h3 class="text-xl font-semibold text-white mb-2">{{ project.title }}</h3>
+            <p class="text-indigo-100 text-center mb-6">{{ project.short_description }}</p>
+            <div class="flex gap-4">
+              {% if project.demo_url %}
+              <a 
+                href="{{ project.demo_url }}" 
+                class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/40 transition-colors duration-300"
+                aria-label="View Demo"
+                target="_blank"
+                rel="noopener"
+              >
+                <i class="ri-eye-line" aria-hidden="true"></i>
+              </a>
+              {% endif %}
+              
+              {% if project.url %}
+              <a 
+                href="{{ project.url }}" 
+                class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/40 transition-colors duration-300"
+                aria-label="View Project Details"
+                target="_blank"
+                rel="noopener"
+              >
+                <i class="ri-arrow-right-line" aria-hidden="true"></i>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Project info -->
+        <div class="p-6">
+          <!-- Category -->
+          {% if project.category_label %}
+          <div class="text-sm text-indigo-600 mb-1">{{ project.category_label }}</div>
+          {% endif %}
+          
+          <!-- Title -->
+          <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">
+            <a href="{{ project.url }}">{{ project.title }}</a>
+          </h3>
+          
+          <!-- Description -->
+          <p class="text-gray-600">{{ project.short_description }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% elif sections.portfolio.layout == 'masonry' %}
+    <!-- Masonry layout -->
+    <div class="columns-1 sm:columns-2 lg:columns-3 gap-8 space-y-8" data-aos="fade-up" data-aos-delay="200">
+      {% for project in sections.portfolio.items %}
+      <div 
+        class="portfolio-item bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-indigo-200 group break-inside-avoid"
+        data-category="{{ project.category|default('') }}"
+      >
+        <!-- Project image -->
+        <div class="w-full relative overflow-hidden">
+          <img 
+            src="{{ project.image }}" 
+            alt="{{ project.title }}" 
+            class="w-full h-auto object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            loading="lazy"
+          >
+          
+          <!-- Overlay with actions -->
+          <div class="absolute inset-0 bg-indigo-900/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6">
+            <div class="flex gap-4">
+              {% if project.demo_url %}
+              <a 
+                href="{{ project.demo_url }}" 
+                class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/40 transition-colors duration-300"
+                aria-label="View Demo"
+                target="_blank"
+                rel="noopener"
+              >
+                <i class="ri-eye-line" aria-hidden="true"></i>
+              </a>
+              {% endif %}
+              
+              {% if project.url %}
+              <a 
+                href="{{ project.url }}" 
+                class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/40 transition-colors duration-300"
+                aria-label="View Project Details"
+                target="_blank"
+                rel="noopener"
+              >
+                <i class="ri-arrow-right-line" aria-hidden="true"></i>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Project info -->
+        <div class="p-6">
+          <!-- Category -->
+          {% if project.category_label %}
+          <div class="text-sm text-indigo-600 mb-1">{{ project.category_label }}</div>
+          {% endif %}
+          
+          <!-- Title -->
+          <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">
+            <a href="{{ project.url }}">{{ project.title }}</a>
+          </h3>
+          
+          <!-- Description -->
+          <p class="text-gray-600">{{ project.short_description }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- Default cards layout -->
+    <div class="space-y-12" data-aos="fade-up" data-aos-delay="200">
+      {% for project in sections.portfolio.items %}
+      <div 
+        class="portfolio-item bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-indigo-200"
+        data-category="{{ project.category|default('') }}"
+      >
+        <div class="grid md:grid-cols-2 items-center">
+          <!-- Media column -->
+          <div class="aspect-[4/3] w-full h-full relative overflow-hidden">
+            <img 
+              src="{{ project.image }}" 
+              alt="{{ project.title }}" 
+              class="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+              loading="lazy"
+            >
+          </div>
+          
+          <!-- Content column -->
+          <div class="p-8 md:p-12">
+            {% if project.category_label %}
+            <div class="text-sm text-indigo-600 mb-2">{{ project.category_label }}</div>
+            {% endif %}
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ project.title }}</h3>
+            <p class="text-gray-600 mb-6">{{ project.description }}</p>
+            
+            <!-- Project details if available -->
+            {% if project.details %}
+            <ul class="space-y-3 mb-6">
+              {% for detail in project.details %}
+              <li class="flex items-center">
+                <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-gray-600">{{ detail }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            
+            <!-- CTA buttons -->
+            <div class="flex flex-wrap gap-4 mt-8">
+              {% if project.demo_url %}
+              <a 
+                href="{{ project.demo_url }}" 
+                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+                target="_blank"
+                rel="noopener"
+              >
+                <i class="ri-eye-line mr-2" aria-hidden="true"></i>
+                View Demo
+              </a>
+              {% endif %}
+              
+              {% if project.url %}
+              <a 
+                href="{{ project.url }}" 
+                class="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors duration-300"
+                target="_blank"
+                rel="noopener"
+              >
+                View Details
+                <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Load more button if available -->
+    {% if sections.portfolio.load_more %}
+    <div class="mt-16 text-center" data-aos="fade-up" data-aos-delay="300">
+      <button 
+        class="inline-flex items-center px-8 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+        id="load-more-projects"
+      >
+        {{ sections.portfolio.load_more.label }}
+        <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </div>
+    {% endif %}
+    
+    <!-- Featured project if available -->
+    {% if sections.portfolio.featured_project %}
+    <div class="mt-24 bg-indigo-600 rounded-2xl shadow-xl overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+      <div class="grid md:grid-cols-2 items-center">
+        <div class="p-8 md:p-12">
+          {% if sections.portfolio.featured_project.badge %}
+          <span class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-white/20 text-white mb-4">
+            {{ sections.portfolio.featured_project.badge }}
+          </span>
+          {% endif %}
+          <h3 class="text-3xl font-bold text-white mb-4">{{ sections.portfolio.featured_project.title }}</h3>
+          <p class="text-indigo-100 mb-6">{{ sections.portfolio.featured_project.description }}</p>
+          
+          <!-- Project details if available -->
+          {% if sections.portfolio.featured_project.details %}
+          <ul class="space-y-3 mb-8">
+            {% for detail in sections.portfolio.featured_project.details %}
+            <li class="flex items-center text-indigo-100">
+              <svg class="w-5 h-5 text-indigo-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{{ detail }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          
+          <!-- CTA buttons -->
+          <div class="flex flex-wrap gap-4">
+            {% if sections.portfolio.featured_project.demo_url %}
+            <a 
+              href="{{ sections.portfolio.featured_project.demo_url }}" 
+              class="inline-flex items-center px-6 py-3 bg-white text-indigo-600 font-medium rounded-lg hover:bg-indigo-50 transition-colors duration-300"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="ri-eye-line mr-2" aria-hidden="true"></i>
+              View Demo
+            </a>
+            {% endif %}
+            
+            {% if sections.portfolio.featured_project.url %}
+            <a 
+              href="{{ sections.portfolio.featured_project.url }}" 
+              class="inline-flex items-center px-6 py-3 bg-indigo-700/50 text-white font-medium rounded-lg hover:bg-indigo-700/80 transition-colors duration-300 border border-indigo-500"
+              target="_blank"
+              rel="noopener"
+            >
+              View Details
+              <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        
+        {% if sections.portfolio.featured_project.image %}
+        <div class="aspect-[4/3] w-full h-full">
+          <img 
+            src="{{ sections.portfolio.featured_project.image }}" 
+            alt="{{ sections.portfolio.featured_project.title }}" 
+            class="w-full h-full object-cover"
+            loading="lazy"
+          >
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>

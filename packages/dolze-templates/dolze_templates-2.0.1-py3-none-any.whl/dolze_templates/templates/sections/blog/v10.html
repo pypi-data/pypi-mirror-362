@@ -1,0 +1,415 @@
+<section id="blog" class="py-24 bg-white relative overflow-hidden">
+  <!-- Background elements -->
+  <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-30"></div>
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="blog-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="1" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#blog-dots)" />
+      </svg>
+    </div>
+  </div>
+  
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+      {% if sections.blog.badge %}
+      <span class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 mb-4">
+        {{ sections.blog.badge }}
+      </span>
+      {% endif %}
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">
+        {{ sections.blog.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.blog.subtitle }}
+      </p>
+    </div>
+    
+    <!-- Blog layout options -->
+    {% if sections.blog.layout == 'featured' %}
+    <!-- Featured post layout -->
+    <div class="mb-16" data-aos="fade-up" data-aos-delay="100">
+      {% if sections.blog.featured_post %}
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:border-blue-200">
+        <div class="grid lg:grid-cols-2 items-center">
+          <!-- Featured post image -->
+          <div class="aspect-[16/9] w-full h-full relative overflow-hidden">
+            <img 
+              src="{{ sections.blog.featured_post.image }}" 
+              alt="{{ sections.blog.featured_post.title }}" 
+              class="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+              loading="lazy"
+            >
+            
+            <!-- Category badge -->
+            {% if sections.blog.featured_post.category %}
+            <div class="absolute top-4 left-4">
+              <span class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-blue-600 text-white">
+                {{ sections.blog.featured_post.category }}
+              </span>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Featured post content -->
+          <div class="p-8 lg:p-12">
+            <h3 class="text-3xl font-bold text-gray-900 mb-4 hover:text-blue-600 transition-colors duration-300">
+              <a href="{{ sections.blog.featured_post.url }}">{{ sections.blog.featured_post.title }}</a>
+            </h3>
+            <p class="text-lg text-gray-600 mb-6">{{ sections.blog.featured_post.excerpt }}</p>
+            
+            <!-- Post meta -->
+            <div class="flex items-center mb-8">
+              {% if sections.blog.featured_post.author_image %}
+              <img 
+                src="{{ sections.blog.featured_post.author_image }}" 
+                alt="{{ sections.blog.featured_post.author }}" 
+                class="w-10 h-10 rounded-full mr-4 object-cover"
+              >
+              {% endif %}
+              <div>
+                <div class="text-gray-900 font-medium">{{ sections.blog.featured_post.author }}</div>
+                <div class="text-gray-500 text-sm flex items-center">
+                  <span>{{ sections.blog.featured_post.date }}</span>
+                  {% if sections.blog.featured_post.read_time %}
+                  <span class="mx-2">•</span>
+                  <span>{{ sections.blog.featured_post.read_time }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Read more button -->
+            <a 
+              href="{{ sections.blog.featured_post.url }}" 
+              class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300"
+            >
+              {{ sections.blog.featured_post.cta_text|default('Read More') }}
+              <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Blog posts grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="200">
+      {% for post in sections.blog.posts %}
+      <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-200 flex flex-col">
+        <!-- Post image -->
+        <div class="aspect-[16/9] w-full relative overflow-hidden">
+          <img 
+            src="{{ post.image }}" 
+            alt="{{ post.title }}" 
+            class="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+            loading="lazy"
+          >
+          
+          <!-- Category badge -->
+          {% if post.category %}
+          <div class="absolute top-4 left-4">
+            <span class="inline-block px-3 py-1 text-xs font-medium rounded-full bg-blue-600 text-white">
+              {{ post.category }}
+            </span>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Post content -->
+        <div class="p-6 flex-grow">
+          <h3 class="text-xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors duration-300">
+            <a href="{{ post.url }}">{{ post.title }}</a>
+          </h3>
+          <p class="text-gray-600 mb-4">{{ post.excerpt }}</p>
+        </div>
+        
+        <!-- Post meta -->
+        <div class="px-6 pb-6 mt-auto">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              {% if post.author_image %}
+              <img 
+                src="{{ post.author_image }}" 
+                alt="{{ post.author }}" 
+                class="w-8 h-8 rounded-full mr-3 object-cover"
+              >
+              {% endif %}
+              <div class="text-sm">
+                <div class="text-gray-900 font-medium">{{ post.author }}</div>
+              </div>
+            </div>
+            <div class="text-gray-500 text-sm">{{ post.date }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Load more button if available -->
+    {% if sections.blog.load_more %}
+    <div class="mt-16 text-center" data-aos="fade-up" data-aos-delay="300">
+      <button 
+        class="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300"
+        id="load-more-posts"
+      >
+        {{ sections.blog.load_more.label }}
+        <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </div>
+    {% endif %}
+    
+    <!-- Categories sidebar layout -->
+    {% if sections.blog.layout == 'with_sidebar' %}
+    <div class="mt-24 grid lg:grid-cols-4 gap-8" data-aos="fade-up" data-aos-delay="300">
+      <!-- Sidebar -->
+      <div class="lg:col-span-1">
+        <!-- Categories -->
+        {% if sections.blog.categories %}
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 mb-8">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Categories</h3>
+          <ul class="space-y-2">
+            {% for category in sections.blog.categories %}
+            <li>
+              <a 
+                href="{{ category.url }}" 
+                class="flex items-center justify-between text-gray-600 hover:text-blue-600 transition-colors duration-300"
+              >
+                <span>{{ category.name }}</span>
+                {% if category.count %}
+                <span class="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full">{{ category.count }}</span>
+                {% endif %}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Popular posts -->
+        {% if sections.blog.popular_posts %}
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 mb-8">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Popular Posts</h3>
+          <div class="space-y-4">
+            {% for post in sections.blog.popular_posts %}
+            <div class="flex items-center">
+              {% if post.image %}
+              <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden mr-4">
+                <img 
+                  src="{{ post.image }}" 
+                  alt="{{ post.title }}" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                >
+              </div>
+              {% endif %}
+              <div>
+                <h4 class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors duration-300">
+                  <a href="{{ post.url }}">{{ post.title }}</a>
+                </h4>
+                <div class="text-xs text-gray-500 mt-1">{{ post.date }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Tags -->
+        {% if sections.blog.tags %}
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Tags</h3>
+          <div class="flex flex-wrap gap-2">
+            {% for tag in sections.blog.tags %}
+            <a 
+              href="{{ tag.url }}" 
+              class="inline-block px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-300"
+            >
+              {{ tag.name }}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      
+      <!-- Main content -->
+      <div class="lg:col-span-3">
+        <!-- Featured post if available -->
+        {% if sections.blog.featured_post %}
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-200 mb-8">
+          <!-- Featured post image -->
+          <div class="aspect-[16/9] w-full relative overflow-hidden">
+            <img 
+              src="{{ sections.blog.featured_post.image }}" 
+              alt="{{ sections.blog.featured_post.title }}" 
+              class="w-full h-full object-cover"
+              loading="lazy"
+            >
+            
+            <!-- Category badge -->
+            {% if sections.blog.featured_post.category %}
+            <div class="absolute top-4 left-4">
+              <span class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-blue-600 text-white">
+                {{ sections.blog.featured_post.category }}
+              </span>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Featured post content -->
+          <div class="p-6">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4 hover:text-blue-600 transition-colors duration-300">
+              <a href="{{ sections.blog.featured_post.url }}">{{ sections.blog.featured_post.title }}</a>
+            </h3>
+            <p class="text-gray-600 mb-6">{{ sections.blog.featured_post.excerpt }}</p>
+            
+            <!-- Post meta -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                {% if sections.blog.featured_post.author_image %}
+                <img 
+                  src="{{ sections.blog.featured_post.author_image }}" 
+                  alt="{{ sections.blog.featured_post.author }}" 
+                  class="w-10 h-10 rounded-full mr-3 object-cover"
+                >
+                {% endif %}
+                <div>
+                  <div class="text-gray-900 font-medium">{{ sections.blog.featured_post.author }}</div>
+                  <div class="text-gray-500 text-sm">{{ sections.blog.featured_post.date }}</div>
+                </div>
+              </div>
+              
+              <!-- Read more link -->
+              <a 
+                href="{{ sections.blog.featured_post.url }}" 
+                class="text-blue-600 font-medium hover:text-blue-700 inline-flex items-center"
+              >
+                {{ sections.blog.featured_post.cta_text|default('Read More') }}
+                <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Posts grid -->
+        <div class="grid md:grid-cols-2 gap-8">
+          {% for post in sections.blog.posts %}
+          <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-200 flex flex-col">
+            <!-- Post image -->
+            <div class="aspect-[16/9] w-full relative overflow-hidden">
+              <img 
+                src="{{ post.image }}" 
+                alt="{{ post.title }}" 
+                class="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+                loading="lazy"
+              >
+              
+              <!-- Category badge -->
+              {% if post.category %}
+              <div class="absolute top-4 left-4">
+                <span class="inline-block px-3 py-1 text-xs font-medium rounded-full bg-blue-600 text-white">
+                  {{ post.category }}
+                </span>
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Post content -->
+            <div class="p-6 flex-grow">
+              <h3 class="text-xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors duration-300">
+                <a href="{{ post.url }}">{{ post.title }}</a>
+              </h3>
+              <p class="text-gray-600 mb-4">{{ post.excerpt }}</p>
+            </div>
+            
+            <!-- Post meta -->
+            <div class="px-6 pb-6 mt-auto">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  {% if post.author_image %}
+                  <img 
+                    src="{{ post.author_image }}" 
+                    alt="{{ post.author }}" 
+                    class="w-8 h-8 rounded-full mr-3 object-cover"
+                  >
+                  {% endif %}
+                  <div class="text-sm">
+                    <div class="text-gray-900 font-medium">{{ post.author }}</div>
+                  </div>
+                </div>
+                <div class="text-gray-500 text-sm">{{ post.date }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Newsletter subscription if available -->
+    {% if sections.blog.newsletter %}
+    <div class="mt-24 bg-blue-600 rounded-2xl shadow-xl overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+      <div class="grid md:grid-cols-2 items-center">
+        <div class="p-8 md:p-12">
+          <h3 class="text-3xl font-bold text-white mb-4">{{ sections.blog.newsletter.title }}</h3>
+          <p class="text-blue-100 mb-8">{{ sections.blog.newsletter.description }}</p>
+          
+          <!-- Newsletter form -->
+          <form class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-grow">
+              <label for="email" class="sr-only">Email address</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                placeholder="{{ sections.blog.newsletter.placeholder|default('Enter your email') }}" 
+                class="w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
+                required
+              >
+            </div>
+            <button 
+              type="submit" 
+              class="inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors duration-300"
+            >
+              {{ sections.blog.newsletter.button_text|default('Subscribe') }}
+            </button>
+          </form>
+          
+          <!-- Privacy note -->
+          {% if sections.blog.newsletter.privacy_note %}
+          <div class="mt-4 text-sm text-blue-200">
+            {{ sections.blog.newsletter.privacy_note }}
+          </div>
+          {% endif %}
+        </div>
+        
+        {% if sections.blog.newsletter.image %}
+        <div class="aspect-[4/3] w-full h-full">
+          <img 
+            src="{{ sections.blog.newsletter.image }}" 
+            alt="Newsletter subscription" 
+            class="w-full h-full object-cover"
+            loading="lazy"
+          >
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>

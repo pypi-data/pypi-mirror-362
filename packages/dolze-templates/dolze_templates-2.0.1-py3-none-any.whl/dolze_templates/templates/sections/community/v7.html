@@ -1,0 +1,84 @@
+<section id="community" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.community.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.community.subtitle }}
+      </p>
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    {% if sections.community.liveActivity %}
+    <div class="bg-gray-50 p-6 rounded-xl mb-12 text-center" data-aos="fade-up">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+        <span class="text-sm font-medium text-gray-900"
+          >{{ sections.community.liveActivity.onlineMembers }} members
+          online</span
+        >
+      </div>
+      <p class="text-sm text-gray-600">
+        {{ sections.community.liveActivity.recentJoiner }} from {{
+        sections.community.liveActivity.location }} just joined
+      </p>
+    </div>
+    {% endif %} {% if sections.community.stats %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      {% for stat in sections.community.stats %}
+      <div
+        class="text-center p-6 bg-gray-50 rounded-xl"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        <div
+          class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="{{ stat.icon }} text-primary text-xl"></i>
+        </div>
+        <div class="text-2xl font-bold text-gray-900 mb-1">
+          {{ stat.value }}
+        </div>
+        <div class="text-sm font-medium text-gray-900 mb-1">
+          {{ stat.label }}
+        </div>
+        <p class="text-xs text-gray-600">{{ stat.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% if sections.community.highlights %}
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+      {% for highlight in sections.community.highlights %}
+      <div
+        class="bg-gray-50 p-6 rounded-xl"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        <div
+          class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
+        >
+          <i class="{{ highlight.icon }} text-primary text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          {{ highlight.title }}
+        </h3>
+        <p class="text-gray-600 mb-3">{{ highlight.description }}</p>
+        <div class="text-sm text-primary font-medium">
+          {{ highlight.members }} members
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% if sections.community.cta %}
+    <div class="text-center" data-aos="fade-up">
+      <a
+        href="{{ sections.community.cta.url }}"
+        class="{% if sections.community.cta.style == 'filled' %}bg-primary text-white hover:bg-primary/90{% else %}bg-white text-primary border border-primary hover:bg-primary/5{% endif %} px-8 py-4 rounded-lg font-medium transition-colors inline-block"
+      >
+        {{ sections.community.cta.label }}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>

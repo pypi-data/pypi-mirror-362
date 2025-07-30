@@ -1,0 +1,119 @@
+<footer class="bg-slate-50">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="py-8 flex flex-col items-center">
+      <p class="capitalize text-2xl font-bold mx-auto h-10 w-auto">
+        {{ settings.seo.title.split(' - ')[0] }}
+      </p>
+
+      <!-- Main Navigation Links -->
+      <div class="mt-10 grid grid-cols-1 lg:grid-cols-4 gap-8 w-full max-w-5xl">
+        <!-- Products Column -->
+        <div class="text-center md:text-left">
+          <h3 class="font-medium text-slate-900 mb-3">
+            {{ sections.footer.navigation[0].title }}
+          </h3>
+          <ul class="space-y-2">
+            {% for link in sections.footer.navigation[0].links %}
+            <li>
+              <a
+                href="{{ link.url }}"
+                class="text-sm text-slate-600 hover:text-slate-900"
+                >{{ link.label }}</a
+              >
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Customer Care Column -->
+        <div class="text-center md:text-left">
+          <h3 class="font-medium text-slate-900 mb-3">
+            {{ sections.footer.navigation[1].title }}
+          </h3>
+          <ul class="space-y-2">
+            {% for link in sections.footer.navigation[1].links %}
+            <li>
+              <a
+                href="{{ link.url }}"
+                class="text-sm text-slate-600 hover:text-slate-900"
+                >{{ link.label }}</a
+              >
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Company Column -->
+        <div class="text-center md:text-left">
+          <h3 class="font-medium text-slate-900 mb-3">
+            {{ sections.footer.navigation[2].title }}
+          </h3>
+          <ul class="space-y-2">
+            {% for link in sections.footer.navigation[2].links %}
+            <li>
+              <a
+                href="{{ link.url }}"
+                class="text-sm text-slate-600 hover:text-slate-900"
+                >{{ link.label }}</a
+              >
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Subscribe Form -->
+        <div class="text-center md:text-left">
+          <h3 class="font-medium text-slate-900 mb-3">
+            {{ sections.footer.subscribe.title }}
+          </h3>
+          <p class="text-sm text-slate-600 mb-4">
+            {{ sections.footer.subscribe.description.text }}
+          </p>
+
+          <form class="flex flex-col space-y-3">
+            <div class="flex">
+              <input
+                type="email"
+                placeholder="{{ sections.footer.subscribe.input.placeholder }}"
+                class="flex-1 px-3 py-2 text-sm bg-white border border-slate-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+              <button
+                type="submit"
+                class="bg-blue-600 text-white px-4 py-2 text-sm font-medium rounded-r-md hover:bg-blue-700 transition-colors"
+              >
+                {{ sections.footer.subscribe.button.text }}
+              </button>
+            </div>
+            <p class="text-xs text-slate-500">
+              We respect your privacy. Unsubscribe anytime.
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+    </div>
+    <div
+      class="flex flex-col items-center border-t border-slate-400/10 py-10 sm:flex-row-reverse sm:justify-between"
+    >
+      <div class="flex gap-x-6">
+        {% for item in sections.footer.brand.socialLinks.links %}
+        <a
+          class="group"
+          aria-label="{{ settings.seo.title.split(' - ')[0] }} on {{item.name}}"
+          href="{{ item.url }}"
+          ><i
+            class="{{ item.icon }} text-xl text-slate-500 hover:text-slate-700 transition-colors"
+          ></i
+        ></a>
+        {% endfor %}
+      </div>
+      <p class="mt-6 text-sm text-slate-500 sm:mt-0">
+        Copyright ©
+        <!-- -->2025<!-- -->
+        {{ sections.footer.copyright }}
+      </p>
+    </div>
+  </div>
+</footer>

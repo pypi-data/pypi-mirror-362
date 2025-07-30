@@ -1,0 +1,53 @@
+<section id="pricing" class="py-24 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16" data-aos="fade-up">
+      <div class="w-12 h-px bg-primary mx-auto mb-6"></div>
+      <h2 class="text-4xl font-light text-gray-900 mb-4">
+        {{ sections.pricing.title }}
+      </h2>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      {% for plan in sections.pricing.plans %}
+      <div class="{% if plan.highlighted %}bg-primary text-white shadow-xl{% else %}bg-white border border-gray-200{% endif %} p-8 rounded-lg relative" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        {% if plan.highlighted %}
+        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+          <span class="bg-secondary text-white px-4 py-1 rounded text-sm font-medium">Recommended</span>
+        </div>
+        {% endif %}
+        
+        <div class="text-center mb-8">
+          <h3 class="text-xl font-medium mb-4 {% if not plan.highlighted %}text-gray-900{% endif %}">
+            {{ plan.name }}
+          </h3>
+          
+          <div class="mb-2">
+            <span class="text-4xl font-light {% if not plan.highlighted %}text-gray-900{% endif %}">
+              {{ plan.price }}
+            </span>
+            {% if sections.pricing.currency and plan.price != 'Custom' %}
+            <span class="text-sm {% if plan.highlighted %}text-white/80{% else %}text-gray-600{% endif %}">
+              /month
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        
+        <ul class="space-y-4 mb-8">
+          {% for feature in plan.features %}
+          <li class="flex items-start gap-3">
+            <i class="ri-check-line {% if plan.highlighted %}text-white{% else %}text-primary{% endif %} mt-0.5 flex-shrink-0"></i>
+            <span class="{% if plan.highlighted %}text-white/90{% else %}text-gray-700{% endif %}">{{ feature }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        
+        <a href="{{ plan.cta.url }}" 
+           class="{% if plan.highlighted %}bg-white text-primary hover:bg-gray-50{% else %}bg-primary text-white hover:bg-primary/90{% endif %} w-full py-3 rounded-lg font-medium transition-colors duration-300 text-center block">
+          {{ plan.cta.label }}
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

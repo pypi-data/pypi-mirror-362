@@ -1,0 +1,56 @@
+<nav
+  id="header"
+  class="sticky w-full bg-white/90 backdrop-blur-sm z-50 border-b border-gray-100"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+      <div class="flex items-center">
+        <!-- Logo -->
+        <a href="/" class="text-3xl font-['Montserrat'] text-primary">
+          {{ settings.seo.title.split(' - ')[0] }}
+        </a>
+      </div>
+      <div class="hidden md:flex items-center space-x-8">
+        {% for item in navigation.items %}
+        <a href="{{ item.url }}" class="text-gray-700 hover:text-primary"
+          >{{ item.label }}</a
+        >
+        {% endfor %}
+      </div>
+      <!-- Mobile menu button -->
+      <div class="md:hidden flex items-center">
+        <button
+          id="mobile-menu-button"
+          class="text-gray-700 hover:text-primary focus:outline-none"
+        >
+          <i class="ri-menu-line h-6 w-6 text-2xl"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="md:hidden hidden">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      {% for item in navigation.items %}
+      <a
+        href="{{ item.url }}"
+        class="mobile-nav-link block text-gray-600 hover:text-primary px-6 py-2"
+        >{{ item.label }}</a
+      >
+      {% endfor %}
+    </div>
+  </div>
+  <script>
+    document
+      .getElementById("mobile-menu-button")
+      .addEventListener("click", function () {
+        var mobileMenu = document.getElementById("mobile-menu");
+        mobileMenu.classList.toggle("hidden");
+      });
+    document.querySelectorAll(".mobile-nav-link").forEach((link) => {
+      link.addEventListener("click", function () {
+        document.getElementById("mobile-menu").classList.add("hidden");
+      });
+    });
+  </script>
+</nav>

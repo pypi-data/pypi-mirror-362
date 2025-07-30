@@ -1,0 +1,27 @@
+<section id="pricing" class="h-screen w-full bg-white flex items-center">
+  <div class="max-w-4xl mx-auto px-4">
+    <h2 class="text-4xl font-light text-gray-900 text-center mb-16" data-aos="fade-up">
+      {{ sections.pricing.title }}
+    </h2>
+    
+    <div class="grid md:grid-cols-3 gap-8">
+      {% for plan in sections.pricing.plans %}
+      <div class="{% if plan.highlighted %}border-2 border-gray-900{% else %}border border-gray-200{% endif %} p-8 bg-white" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <h3 class="text-xl font-medium text-gray-900 mb-4">{{ plan.name }}</h3>
+        <div class="text-3xl font-light text-gray-900 mb-6">{{ plan.price }}</div>
+        
+        <ul class="space-y-2 mb-8">
+          {% for feature in plan.features %}
+          <li class="text-gray-600">{{ feature }}</li>
+          {% endfor %}
+        </ul>
+        
+        <a href="{{ plan.cta.url }}" 
+           class="{% if plan.highlighted %}bg-gray-900 text-white{% else %}border border-gray-300 text-gray-900{% endif %} w-full py-3 text-center text-sm font-medium hover:opacity-80 transition-opacity block">
+          {{ plan.cta.label }}
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

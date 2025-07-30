@@ -1,0 +1,48 @@
+<section id="team" class="py-24 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <span class="inline-block text-xs uppercase tracking-widest text-gray-500 mb-3">
+        {{ sections.team.title }}
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-light text-gray-900 mb-4">
+        Meet Our Team
+      </h2>
+      <div class="w-16 h-px bg-gray-300 mx-auto mb-6"></div>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+      {% for member in sections.team.members %}
+      <div class="text-center group" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="bg-gray-50 p-8 border border-gray-100 hover:shadow-sm transition-shadow duration-300">
+          <div class="mb-6">
+            <img src="{{ member.photo }}" 
+                 alt="{{ member.name }}" 
+                 class="w-24 h-24 object-cover mx-auto border border-gray-200 group-hover:scale-105 transition-transform duration-300"
+                 loading="lazy">
+          </div>
+          
+          <h3 class="text-xl font-light text-gray-900 mb-2">{{ member.name }}</h3>
+          <div class="w-8 h-px bg-gray-300 mx-auto mb-3"></div>
+          <p class="text-gray-600 font-light mb-4">{{ member.role }}</p>
+          
+          {% if member.bio %}
+          <p class="text-gray-600 text-sm font-light leading-relaxed mb-6">{{ member.bio }}</p>
+          {% endif %}
+          
+          {% if member.socialLinks %}
+          <div class="flex justify-center gap-3">
+            {% for social in member.socialLinks %}
+            <a href="{{ social.url }}" 
+               class="w-8 h-8 border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors duration-300"
+               target="_blank" rel="noopener">
+              <i class="ri-{{ social.platform }}-line text-sm"></i>
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

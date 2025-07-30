@@ -1,0 +1,60 @@
+<section id="services" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.services.title }}
+      </h2>
+      {% if sections.services.subtitle %}
+      <p class="text-lg text-gray-600">{{ sections.services.subtitle }}</p>
+      {% endif %}
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for service in sections.services.items %}
+      <div
+        class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        {% if service.icon %}
+        <div
+          class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6"
+        >
+          <i class="{{ service.icon }} text-primary text-2xl"></i>
+        </div>
+        {% endif %}
+
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">
+          {{ service.title }}
+        </h3>
+        <p class="text-gray-600 mb-6 leading-relaxed">
+          {{ service.description }}
+        </p>
+
+        {% if service.features %}
+        <ul class="text-left space-y-2 mb-6">
+          {% for feature in service.features %}
+          <li class="flex items-start gap-2 text-sm text-gray-600">
+            <i class="ri-check-line text-primary mt-0.5 flex-shrink-0"></i>
+            <span>{{ feature }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %} {% if service.price %}
+        <div class="text-2xl font-bold text-primary mb-4">
+          {{ service.price }}
+        </div>
+        {% endif %} {% if service.cta %}
+        <a
+          href="{{ service.cta.url }}"
+          class="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors inline-block"
+        >
+          {{ service.cta.label }}
+        </a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

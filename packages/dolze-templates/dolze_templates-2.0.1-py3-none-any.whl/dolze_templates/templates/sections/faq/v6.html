@@ -1,0 +1,22 @@
+<section id="faq" class="h-screen w-full bg-gray-50 flex items-center">
+  <div class="max-w-3xl mx-auto px-4">
+    <h2 class="text-4xl font-light text-gray-900 text-center mb-16" data-aos="fade-up">
+      {{ sections.faq.title }}
+    </h2>
+    
+    <div class="space-y-8">
+      {% for item in sections.faq.items %}
+      <div class="border-b border-gray-200 pb-8" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <button class="w-full text-left flex items-center justify-between" onclick="toggleFaq({{ loop.index0 }})">
+          <h3 class="text-lg font-medium text-gray-900 pr-4">{{ item.question }}</h3>
+          <span class="text-gray-400" id="faq-icon-{{ loop.index0 }}">+</span>
+        </button>
+        
+        <div class="{% if not item.expanded %}hidden{% endif %} mt-4" id="faq-content-{{ loop.index0 }}">
+          <p class="text-gray-600">{{ item.answer }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
