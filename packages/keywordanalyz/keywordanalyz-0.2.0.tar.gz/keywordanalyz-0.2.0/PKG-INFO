@@ -1,0 +1,35 @@
+Metadata-Version: 2.3
+Name: keywordanalyz
+Version: 0.2.0
+Summary: A keyword analyser which uses YAKE and Lingua
+License: Unlicense
+Author: Pinguin
+Author-email: ponguout@posteo.net
+Requires-Python: >=3.13
+Classifier: License :: OSI Approved
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: lingua-language-detector (>=2.1.1,<3.0.0)
+Requires-Dist: yake (>=0.6.0,<0.7.0)
+Project-URL: Bug Tracker, https://codeberg.org/pinguin/keywordanalyz/issues
+Project-URL: Repository, https://codeberg.org/pinguin/keywordanalyz
+Description-Content-Type: text/markdown
+
+# Keywordanalyz
+
+This script analyzes language and keywords in a given text.
+
+## How to use
+After you cloned the repository and installed the needed packages with poetry (using `poetry install`), you can use the script like the following:
+```python
+import keywordanalyz
+kw = keywordanalyz.TextAnalyser(maximum_keywords=10)
+# You can also specify the length of the keywords using max_n_gram_size (defaults to 3)
+text = "Global warming is a significant issue that has been a concern for many years."
+print(kw.analyse(text))
+# Output: {'language': 'en', 'keywords': [('Global warming', 0.015380821171891606), ('significant issue', 0.02570861714399338), ('Global', 0.09568045026443411), ('years', 0.09568045026443411), ('warming', 0.15831692877998726), ('significant', 0.15831692877998726), ('issue', 0.15831692877998726), ('concern', 0.15831692877998726)]}
+# You can also set the language of the text:
+print(kw.analyse(text, language="en"))
+# Output is the same as before
+```
+
