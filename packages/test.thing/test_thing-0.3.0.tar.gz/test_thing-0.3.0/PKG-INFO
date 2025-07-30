@@ -1,0 +1,34 @@
+Metadata-Version: 2.4
+Name: test.thing
+Version: 0.3.0
+Summary: A simple modern VM runner
+License-Expression: GPL-3.0-or-later
+Project-URL: repository, https://codeberg.org/lis/test.thing
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: COPYING
+Dynamic: license-file
+
+# test.thing
+
+WIP.
+
+## Goals.
+
+ - one-file copypastelib
+ - easy to hook up to pytest
+ - future-oriented, built on systemd features in the guest (credentials, ssh-over-vsock, etc)
+   - might limit usefulness for testing older OSes but we can add
+     [workarounds](workarounds/) as required
+ - works without networking configured in guest
+ - supporting the existing features of [cockpit-bots](https://github.com/cockpit-project/bots)
+
+## Try it
+
+You can `pip install test.thing` which will put an executable called `tt` in
+your path. This is sort of like the existing cockpit-bots `vm-run`.
+
+You can also take a look at [`test/test_example.py`](test/test_example.py) and
+run `TEST_IMAGE=/path/to/image.qcow2 pytest`.  This was originally tested with
+the [examples images from
+composefs-rs](https://github.com/containers/composefs-rs/tree/main/examples).
