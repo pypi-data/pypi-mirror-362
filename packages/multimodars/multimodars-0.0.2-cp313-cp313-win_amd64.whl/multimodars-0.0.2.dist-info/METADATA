@@ -1,0 +1,83 @@
+Metadata-Version: 2.4
+Name: multimodars
+Version: 0.0.2
+Classifier: Programming Language :: Rust
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Dist: numpy>=2.0.0,<3.0.0
+Requires-Dist: sphinx>=8.0 ; extra == 'docs'
+Requires-Dist: sphinx-autobuild ; extra == 'docs'
+Requires-Dist: sphinx-rtd-theme ; extra == 'docs'
+Requires-Dist: breathe ; extra == 'docs'
+Requires-Dist: exhale ; extra == 'docs'
+Requires-Dist: pytest>=8.0 ; extra == 'test'
+Requires-Dist: pytest-cov ; extra == 'test'
+Requires-Dist: ruff ; extra == 'test'
+Requires-Dist: black ; extra == 'test'
+Provides-Extra: docs
+Provides-Extra: test
+Summary: A Rust-powered cardiac multi-image modality fusion package
+Author: Anselm W. Stark
+License: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+Project-URL: Homepage, https://github.com/yungselm/multimoda-rs
+Project-URL: Issues, https://github.com/yungselm/multimoda-rs/issues
+
+<p align="center">
+  <a href="https://github.com/yungselm/multimoda-rs">
+    <img
+      src="https://raw.githubusercontent.com/yungselm/multimoda-rs/main/media/multimoda-rs.jpg"
+      alt="multimoda-rs logo"
+    >
+  </a>
+</p>
+
+[![PyPI](https://img.shields.io/pypi/v/multimodars.svg)](https://pypi.org/project/multimodars)
+[![License](https://img.shields.io/pypi/l/multimodars.svg)](LICENSE.md)
+[![Docs](https://img.shields.io/readthedocs/multimodars)](https://multimodars.readthedocs.io)
+
+<figure class="epigraph" style="text-align: center; font-style: italic;">
+  <blockquote>
+    “One package to fuse them all.”
+  </blockquote>
+  <figcaption>— <cite>The Lord of the Rings (probably)</cite></figcaption>
+</figure>
+
+---
+
+> A Rust‑powered cardiac imaging multi‑modality fusion package.
+
+---
+## Background
+
+
+## Installation
+
+Either directly from PyPI (recommended):
+```bash
+pip install multimodars
+```
+
+or by cloning the repo and building the project yourself:
+```bash
+git clone https://github.com/yungselm/multimoda-rs.git
+pip install maturin
+python -m venv .venv
+source .venv/bin/activate
+maturin develop
+```
+
+## Example Usage
+Run the script with the provided test cases, to ensure sufficient set up.
+```python
+import multimodars as mm
+
+# reads in ivus contours from .csv and aligns them
+rest, stress, dia, sys = mm.from_file_full("data/ivus_rest", "data/ivus_stress")
+
+# get the diastolic rest geometry and align with centerline
+geometry = rest.dia_geom
+```
+
+
