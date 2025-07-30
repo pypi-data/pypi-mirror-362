@@ -1,0 +1,169 @@
+name: Publish
+
+on:
+  workflow_run:
+    workflows: ["Tests"]
+    types:
+      - completed
+    branches: [main]
+
+jobs:
+  check-version:
+    name: Check Version Change
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: publish
+    outputs:
+      should_publish: ${{ steps.version_check.outputs.changed }}
+      version: ${{ steps.version_check.outputs.version }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      
+      - name: Check if version changed
+        id: version_check
+        run: |
+          # Get current version from pyproject.toml
+          CURRENT_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          echo "version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+          
+          # Get last published version from latest-publish tag
+          if git show-ref --tags --quiet --verify refs/tags/latest-publish; then
+            # Checkout the last published commit
+            git checkout latest-publish
+            LAST_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+            git checkout -
+          else
+            LAST_VERSION=""
+          fi
+          
+          echo "Current version: ${CURRENT_VERSION}"
+          echo "Last published version: ${LAST_VERSION:-none}"
+          
+          if [ "${CURRENT_VERSION}" != "${LAST_VERSION}" ]; then
+            echo "Version changed, will publish"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version unchanged, skipping publish"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  publish:
+    name: Publish PyPI Package and GitHub Release
+    needs: check-version
+    if: ${{ needs.check-version.outputs.should_publish == 'true' }}
+    runs-on: ubuntu-latest
+    environment: publish
+    permissions:
+      contents: write
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for commit count
+          token: ${{ secrets.PAT_TOKEN }}
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      
+      - name: Set up Python
+        run: uv python install
+      
+      - name: Install dependencies
+        run: |
+          uv sync --all-groups --locked
+      
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
+      
+      - name: Configure Git
+        run: |
+          git config user.name "${{ vars.SIGNED_COMMIT_USER }}"
+          git config user.email "${{ vars.SIGNED_COMMIT_EMAIL }}"
+          git config commit.gpgsign true
+          git config tag.gpgsign true
+      
+      - name: Build and tag release
+        run: |
+          # Get current version (3-part)
+          V=${{ needs.check-version.outputs.version }}
+          echo "VERSION=${V}" >> $GITHUB_ENV
+          
+          # Build the package
+          UV_FROZEN=true uv build
+          
+          # Create a 3-part version tag
+          TAG="v${V}"
+          echo "TAG=${TAG}" >> $GITHUB_ENV
+          TAG_MESSAGE="[Automatic] Release Version ${V} from $(git rev-parse --short HEAD)"
+          git tag -s -m "${TAG_MESSAGE}" "${TAG}"
+          
+          # Create or update 2-digit version tag (simple, unsigned)
+          MAJOR_MINOR=$(echo ${V} | cut -d. -f1-2)
+          TAG_2DIGIT="v${MAJOR_MINOR}"
+          # Delete existing 2-digit tag if it exists
+          git tag -d "${TAG_2DIGIT}" 2>/dev/null || true
+          git push origin :refs/tags/"${TAG_2DIGIT}" 2>/dev/null || true
+          # Create new simple unsigned tag
+          git tag --no-sign "${TAG_2DIGIT}"
+          
+          # Update latest-publish tag after getting changelog
+          LATEST_TAG="latest-publish"
+          
+          # Get changelog since last release with rich formatting
+          echo "CHANGELOG<<EOFEOF" >> $GITHUB_ENV
+          git log ${LATEST_TAG}..${{ github.sha }} --pretty=format:'### [%s](https://github.com/${{ github.repository }}/commit/%H)%nDate: %ad*%n%n%b%n' | sed '/^Signed-off-by:/d' | sed 's/^$/>/g' >> $GITHUB_ENV
+          echo "EOFEOF" >> $GITHUB_ENV
+          
+          # Delete remote latest-publish tag FIRST (before creating new one)
+          git push origin :refs/tags/${LATEST_TAG} || true
+          
+          # Now create the new latest-publish tag locally
+          git tag -d ${LATEST_TAG} || true
+          git tag --no-sign ${LATEST_TAG}
+          
+          # Push all tags to remote
+          git push origin --tags
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: 🧲 Magg Release v${{ env.VERSION }}
+          body: |
+            ## Changes
+            ${{ env.CHANGELOG }}
+
+            ## Installation
+            ```bash
+            uv add magg==${{ env.VERSION }}
+            ```
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
+
+      - name: Publish to PyPI
+        if: success()
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          uv publish --token $PYPI_TOKEN

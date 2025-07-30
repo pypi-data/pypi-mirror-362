@@ -1,0 +1,171 @@
+name: Manual Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no actual publish)'
+        required: true
+        default: true
+        type: boolean
+      create_github_release:
+        description: 'Create GitHub release'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - 'auto'
+          - 'yes'
+          - 'no'
+
+jobs:
+  manual-publish:
+    name: Manual Publish
+    runs-on: ubuntu-latest
+    environment: publish
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      
+      - name: Set up Python
+        run: uv python install
+      
+      - name: Install dependencies
+        run: |
+          uv sync --all-groups --locked
+      
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
+      
+      - name: Configure Git
+        run: |
+          git config user.name "${{ vars.SIGNED_COMMIT_USER }}"
+          git config user.email "${{ vars.SIGNED_COMMIT_EMAIL }}"
+          git config commit.gpgsign true
+          git config tag.gpgsign true
+      
+      - name: Validate version
+        id: validate
+        run: |
+          # Validate and get version info
+          VALIDATION_JSON=$(python scripts/validate_manual_release.py)
+          echo "Validation result:"
+          echo "${VALIDATION_JSON}" | jq .
+          
+          # Extract values
+          VERSION=$(echo "${VALIDATION_JSON}" | jq -r .version)
+          IS_POSTRELEASE=$(echo "${VALIDATION_JSON}" | jq -r .is_postrelease)
+          MESSAGE=$(echo "${VALIDATION_JSON}" | jq -r .message)
+          
+          echo "${MESSAGE}"
+          
+          # Set outputs
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "is_postrelease=${IS_POSTRELEASE}" >> $GITHUB_OUTPUT
+      
+      - name: Check if tag exists
+        run: |
+          TAG="v${VERSION}"
+          if git show-ref --tags --quiet --verify "refs/tags/${TAG}"; then
+            echo "❌ Tag ${TAG} already exists!"
+            exit 1
+          fi
+          echo "✅ Tag ${TAG} does not exist, can proceed"
+      
+      - name: Build package
+        if: ${{ !inputs.dry_run }}
+        run: UV_FROZEN=true uv build
+      
+      - name: Create and push tag
+        if: ${{ !inputs.dry_run }}
+        run: |
+          TAG="v${VERSION}"
+          TAG_MESSAGE="[Manual] Release Version ${VERSION}"
+          git tag -s -m "${TAG_MESSAGE}" "${TAG}"
+          
+          # Get changelog for GitHub release
+          echo "CHANGELOG<<EOFEOF" >> $GITHUB_ENV
+          git log latest-publish..HEAD --pretty=format:'### [%s](https://github.com/${{ github.repository }}/commit/%H)%n*%ad*%n%n%b%n' | sed '/^Signed-off-by:/d' | sed 's/^$/>/g' >> $GITHUB_ENV
+          echo "EOFEOF" >> $GITHUB_ENV
+          
+          git push origin "${TAG}"
+      
+      - name: Update latest-publish tag for post-releases
+        if: ${{ !inputs.dry_run && steps.validate.outputs.is_postrelease == 'true' }}
+        run: |
+          # Check if this is a post-release of the latest published version
+          if git show-ref --tags --quiet --verify refs/tags/latest-publish; then
+            # Get the version from latest-publish tag
+            git checkout latest-publish
+            LATEST_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+            git checkout -
+            
+            # Extract base versions (first 3 parts only)
+            LATEST_BASE=$(echo "${LATEST_VERSION}" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+            CURRENT_BASE=$(echo "${VERSION}" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+            
+            if [ "${LATEST_BASE}" = "${CURRENT_BASE}" ]; then
+              echo "Updating latest-publish tag for post-release ${VERSION}"
+              git push origin :refs/tags/latest-publish || true
+              git tag -d latest-publish || true
+              git tag --no-sign latest-publish
+              git push origin refs/tags/latest-publish
+            else
+              echo "Not updating latest-publish: post-release ${VERSION} (base ${CURRENT_BASE}) is not based on latest ${LATEST_VERSION} (base ${LATEST_BASE})"
+            fi
+          else
+            echo "No latest-publish tag found, skipping update"
+          fi
+      
+      - name: Create GitHub Release
+        if: ${{ !inputs.dry_run && (inputs.create_github_release == 'yes' || (inputs.create_github_release == 'auto' && steps.validate.outputs.is_postrelease == 'true')) }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: 🧲 Magg Release v${{ env.VERSION }}
+          body: |
+            ***Note: This is a manual release. PyPI availability depends on the type of release (pre, post, or dev).***
+            
+            ## Changes
+            ${{ env.CHANGELOG }}
+            
+            ## Installation
+            ```bash
+            uv add magg==${{ env.VERSION }}
+            ```
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
+      
+      - name: Publish to PyPI
+        if: ${{ !inputs.dry_run }}
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: uv publish --token $PYPI_TOKEN
+      
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "=== DRY RUN SUMMARY ==="
+          echo "Version: ${VERSION}"
+          echo "Tag: v${VERSION}"
+          echo "Would create GitHub release: ${{ (inputs.create_github_release == 'yes' || (inputs.create_github_release == 'auto' && steps.validate.outputs.is_postrelease == 'true')) && 'YES' || 'NO' }}"
+          echo ""
+          echo "No actual changes were made."
