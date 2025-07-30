@@ -1,0 +1,91 @@
+Metadata-Version: 2.4
+Name: noahs_openai_agent
+Version: 0.1.2
+Summary: A openai api agent module with semantic DB, SQL, and web scraping tools.
+Author-email: Noah Jones <jonesnoah45010@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/jonesnoah45010/openai_agent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: chromadb
+Requires-Dist: transformers
+Requires-Dist: torch==2.1.0
+Requires-Dist: sentence-transformers
+Requires-Dist: numpy<2.0
+Requires-Dist: textsplit
+Requires-Dist: beautifulsoup4
+Requires-Dist: requests
+Requires-Dist: openai
+Requires-Dist: tiktoken
+Requires-Dist: asyncio
+
+## Usage: `noahs_openai_agent`
+
+This library wraps interactions with a **local Ollama server** and provides tools for:
+
+- Maintaining a conversation history
+- Calling a local LLM via the Ollama REST API
+- Performing semantic text splitting and search
+- Running local SQL-style lookups
+- Extracting and analyzing URLs from text
+
+### Getting Started
+
+First, install the library:
+
+```bash
+pip install noahs_openai_agent
+```
+
+```python
+from noahs_openai_agent import ChatAgent
+
+# 1. initialize agent
+OPENAI_API_KEY = "YOUR_OPENAI_API_KEY_HERE"
+agent = ChatAgent(name="Tomatio", api_key=OPENAI_API_KEY)
+
+# 2. (optional) purge semantic database for fresh start
+agent.semantic_db.purge_collection();
+
+# 3. upload txt document of your choosing in chunks of 5 sentences to the semantic database
+doc_name = "docs/AliceInWonderland.txt"
+agent.upload_document(doc_name, max_sentences_per_chunk=5)
+
+# 4. do a semantic search for 5 relevent passages to a semantic_query and add it to the context window of the agent
+semantic_query = "Interactions between Alice and the Mad Hatter"
+semantic_contextualize_prompt = f"These are some passages from {doc_name} that should be considered"
+agent.discuss_document(semantic_query, doc_name="AliceInWonderland.txt", semantic_top_k=5, semantic_contextualize_prompt=semantic_contextualize_prompt)
+
+# 5. start the chat with a question about the uploaded content.
+message = "Tell me about the relationship between Alice and the Mad Hatter. Use examples from the provided passages"
+response_stream = agent.chat(message)
+print("\n")
+print(f"You: {message}")
+print(agent.name, end=": ")
+agent.print_stream(response_stream)
+
+print("\n")
+print("Continue to basic chat...")
+print("\n")
+
+while message not in ["bye","goodbye","exit","quit"]:
+    message = input("You: ")
+    response_stream = agent.chat(message)
+    print(agent.name, end=": ")
+    agent.print_stream(response_stream)
+    print("\n")
+
+
+
+
+```
+
+
+
+### Check out Source Code
+
+`https://github.com/jonesnoah45010/openai_agent`
+
+
+
+
