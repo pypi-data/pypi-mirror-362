@@ -1,0 +1,93 @@
+---
+site_name: pyCirclizely
+site_description: Circular visualization in Python
+site_author: mirodriguezgal
+repo_name: Avatar-Cognition/pyCirclizely
+site_url: https://Avatar-Cognition.github.io/pyCirclizely/
+repo_url: https://github.com/Avatar-Cognition/pyCirclizely
+edit_uri: ''
+use_directory_urls: true
+watch:
+  - src
+
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.ipynb
+  - Plot API Example: plot_api_example.ipynb
+  - Chord Diagram: chord_diagram.ipynb
+  - Radar Chart: radar_chart.ipynb
+  - Circos Plot (Prokaryotes): circos_plot_prok.ipynb
+  - Circos Plot (Eukaryotes): circos_plot_euk.ipynb
+  - Comparative Genomics: comparative_genomics.ipynb
+  - Phylogenetic Tree: phylogenetic_tree.ipynb
+  - Plot Tips: plot_tips.ipynb
+  - API Docs:
+      - Circos: api-docs/circos.md
+      - Sector: api-docs/sector.md
+      - Track: api-docs/track.md
+      - TreeViz: api-docs/treeviz.md
+      - utils: api-docs/utils.md
+
+theme:
+  name: material # material, readthedocs, mkdocs
+  features:
+    - navigation.top
+    - navigation.expand
+    # - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+  - admonition
+  - attr_list
+  - md_in_html
+  - markdown_katex: # https://gitlab.com/mbarkhau/markdown-katex#usage
+      no_inline_svg: true
+      insert_fonts_css: true
+      #macro-file: macros.tex
+
+plugins:
+  - mkdocs-jupyter:
+      execute: true
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            allow_inspection: true
+            # https://mkdocstrings.github.io/python/usage/configuration/docstrings
+            docstring_style: google
+            filters: ['!^_', '!hierarchy_cfg', '!sc_cfg']  # Hide private fields & private features
+            group_by_category: true
+            merge_init_into_class: true  # otherwise constructor appears amongst other functions
+            modernize_annotations: true # modernize annotations. Eg Optional[str] into str | None
+            relative_crossrefs: true # sponsors only https://mkdocstrings.github.io/python/usage/configuration/docstrings/#relative_crossrefs
+            scoped_crossrefs: true # sponsors only https://mkdocstrings.github.io/python/usage/configuration/docstrings/#scoped_crossrefs
+            separate_signature: true
+            show_category_heading: true
+            show_docstring_attributes: false  # Hide attributes in class documentation
+            show_if_no_docstring: true
+            show_inheritance_diagram: true # https://mkdocstrings.github.io/python/usage/configuration/general/#show_inheritance_diagram
+            show_labels: true # show if
+            show_root_heading: true # show module path & constructor at the top of each class
+            show_signature_annotations: true  #  function signatures type hints
+            show_source: false  # To Hide source code from PDF
+            signature_crossrefs: true
+            # show_attributes not available https://github.com/mkdocstrings/python/issues/226
+            summary:
+              attributes: false # it would be nicer to show them only in summary, but don't know how to do it
+              functions: true
+              modules: false
+  - to-pdf: # supports material & mkdocs
+      author: Avatar Cognition
+      copyright: Copyright 2025
+      cover_subtitle: Python Tutorial & API Reference
+      enabled_if_env: ENABLE_PDF_EXPORT
+  - search
+#  - section-index #https://github.com/oprypin/mkdocs-section-index not required if using navigation.indexes
