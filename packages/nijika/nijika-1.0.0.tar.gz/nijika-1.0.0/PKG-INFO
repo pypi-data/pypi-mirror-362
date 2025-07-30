@@ -1,0 +1,274 @@
+Metadata-Version: 2.4
+Name: nijika
+Version: 1.0.0
+Summary: A dynamic, industry-agnostic AI agent framework for seamless multi-provider integration
+Home-page: https://github.com/nijika-ai/nijika
+Author: Nijika Team
+Author-email: Nijika Team <support@nijika.ai>
+Maintainer-email: Nijika Team <support@nijika.ai>
+License: MIT
+Project-URL: Homepage, https://github.com/nijika-ai/nijika
+Project-URL: Documentation, https://docs.nijika.ai
+Project-URL: Repository, https://github.com/nijika-ai/nijika
+Project-URL: Bug Reports, https://github.com/nijika-ai/nijika/issues
+Project-URL: Changelog, https://github.com/nijika-ai/nijika/blob/main/CHANGELOG.md
+Keywords: ai,agent,framework,automation,workflow,rag,planning,tools,multi-provider,llm,openai,anthropic,google,enterprise,customer-service,finance,healthcare,e-commerce,education
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Office/Business
+Classifier: Topic :: System :: Distributed Computing
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: aiohttp>=3.8.0
+Requires-Dist: asyncio-mqtt>=0.11.0
+Requires-Dist: openai>=1.0.0
+Requires-Dist: anthropic>=0.3.0
+Requires-Dist: google-generativeai>=0.3.0
+Requires-Dist: azure-cognitiveservices-language-textanalytics>=5.2.0
+Requires-Dist: sqlalchemy>=1.4.0
+Requires-Dist: aiosqlite>=0.17.0
+Requires-Dist: pydantic>=1.10.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jinja2>=3.0.0
+Requires-Dist: rich>=12.0.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: python-multipart>=0.0.5
+Requires-Dist: python-jose[cryptography]>=3.3.0
+Requires-Dist: python-dateutil>=2.8.0
+Requires-Dist: requests>=2.28.0
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: numpy>=1.21.0
+Requires-Dist: pandas>=1.3.0
+Requires-Dist: scikit-learn>=1.0.0
+Requires-Dist: sentence-transformers>=2.2.0
+Requires-Dist: chromadb>=0.4.0
+Requires-Dist: pinecone-client>=2.2.0
+Requires-Dist: qdrant-client>=1.6.0
+Requires-Dist: redis>=4.5.0
+Requires-Dist: psycopg2-binary>=2.9.0
+Requires-Dist: pymongo>=4.3.0
+Requires-Dist: tiktoken>=0.5.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=22.0.0; extra == "dev"
+Requires-Dist: flake8>=4.0.0; extra == "dev"
+Requires-Dist: mypy>=0.950; extra == "dev"
+Requires-Dist: isort>=5.10.0; extra == "dev"
+Requires-Dist: pre-commit>=2.17.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=4.0.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.0.0; extra == "docs"
+Requires-Dist: sphinxcontrib-asyncio>=0.3.0; extra == "docs"
+Requires-Dist: myst-parser>=0.17.0; extra == "docs"
+Provides-Extra: server
+Requires-Dist: fastapi>=0.68.0; extra == "server"
+Requires-Dist: uvicorn[standard]>=0.15.0; extra == "server"
+Requires-Dist: gunicorn>=20.1.0; extra == "server"
+Provides-Extra: monitoring
+Requires-Dist: prometheus-client>=0.14.0; extra == "monitoring"
+Requires-Dist: grafana-client>=3.0.0; extra == "monitoring"
+Requires-Dist: datadog>=0.44.0; extra == "monitoring"
+Provides-Extra: cloud
+Requires-Dist: boto3>=1.24.0; extra == "cloud"
+Requires-Dist: google-cloud-storage>=2.5.0; extra == "cloud"
+Requires-Dist: azure-storage-blob>=12.12.0; extra == "cloud"
+Provides-Extra: all
+Requires-Dist: pytest>=7.0.0; extra == "all"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "all"
+Requires-Dist: pytest-cov>=4.0.0; extra == "all"
+Requires-Dist: black>=22.0.0; extra == "all"
+Requires-Dist: flake8>=4.0.0; extra == "all"
+Requires-Dist: mypy>=0.950; extra == "all"
+Requires-Dist: isort>=5.10.0; extra == "all"
+Requires-Dist: pre-commit>=2.17.0; extra == "all"
+Requires-Dist: sphinx>=4.0.0; extra == "all"
+Requires-Dist: sphinx-rtd-theme>=1.0.0; extra == "all"
+Requires-Dist: sphinxcontrib-asyncio>=0.3.0; extra == "all"
+Requires-Dist: myst-parser>=0.17.0; extra == "all"
+Requires-Dist: fastapi>=0.68.0; extra == "all"
+Requires-Dist: uvicorn[standard]>=0.15.0; extra == "all"
+Requires-Dist: gunicorn>=20.1.0; extra == "all"
+Requires-Dist: prometheus-client>=0.14.0; extra == "all"
+Requires-Dist: grafana-client>=3.0.0; extra == "all"
+Requires-Dist: datadog>=0.44.0; extra == "all"
+Requires-Dist: boto3>=1.24.0; extra == "all"
+Requires-Dist: google-cloud-storage>=2.5.0; extra == "all"
+Requires-Dist: azure-storage-blob>=12.12.0; extra == "all"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# Nijika AI Agent Framework
+
+A dynamic, industry-agnostic AI agent framework designed for seamless integration across multiple AI providers and models.
+
+## 🚀 Overview
+
+Nijika is a comprehensive Python-based AI agent framework that provides:
+- **Multi-Provider Support**: Seamless integration with OpenAI, Anthropic, Google, Azure, and more
+- **Workflow Management**: Visual workflow designer and execution engine
+- **Tools Integration**: Extensible tool system for various functionalities
+- **RAG Capabilities**: Built-in Retrieval-Augmented Generation support
+- **Planning & Execution**: Advanced planning algorithms with execution monitoring
+- **Industry Agnostic**: Adaptable to finance, healthcare, e-commerce, education, and more
+
+## 🏗️ Architecture
+
+```
+nijika/
+├── core/                    # Core framework components
+│   ├── agent/              # Agent management and lifecycle
+│   ├── providers/          # AI provider abstractions
+│   ├── memory/             # Memory management system
+│   └── config/             # Configuration management
+├── workflows/              # Workflow management system
+│   ├── engine/             # Workflow execution engine
+│   ├── designer/           # Visual workflow designer
+│   └── templates/          # Pre-built workflow templates
+├── tools/                  # Tool integration system
+│   ├── registry/           # Tool registry and discovery
+│   ├── builtin/            # Built-in tools
+│   └── custom/             # Custom tool development
+├── rag/                    # RAG implementation
+│   ├── retrievers/         # Document retrieval systems
+│   ├── embeddings/         # Embedding management
+│   └── storage/            # Vector storage backends
+├── planning/               # Planning and reasoning
+│   ├── strategies/         # Planning strategies
+│   ├── executors/          # Execution engines
+│   └── monitors/           # Execution monitoring
+├── ui/                     # User interface components
+│   ├── dashboard/          # Management dashboard
+│   ├── chat/               # Chat interface
+│   └── api/                # REST API
+└── examples/               # Example implementations
+```
+
+## 📦 Key Features
+
+### 1. Multi-Provider AI Integration
+- Unified interface for various AI providers
+- Dynamic model switching and load balancing
+- Cost optimization and rate limiting
+- Provider-specific optimizations
+
+### 2. Workflow Management
+- Visual drag-and-drop workflow designer
+- Conditional logic and branching
+- Parallel execution and synchronization
+- Workflow templates for common use cases
+
+### 3. Tools & Extensions
+- Plugin architecture for custom tools
+- Built-in tools for common operations
+- Tool composition and chaining
+- Security and sandboxing
+
+### 4. RAG System
+- Multiple vector database support
+- Hybrid search capabilities
+- Document chunking and preprocessing
+- Context-aware retrieval
+
+### 5. Planning & Execution
+- Multi-step planning algorithms
+- Self-correcting execution
+- Progress monitoring and logging
+- Rollback and error handling
+
+## 🚀 Quick Start
+
+```python
+from nijika import Agent, WorkflowEngine, RAGSystem
+
+# Create an agent with multiple providers
+agent = Agent(
+    name="customer_service_agent",
+    providers=["openai", "anthropic"],
+    tools=["email", "database", "knowledge_base"]
+)
+
+# Setup RAG system
+rag = RAGSystem(
+    documents_path="./knowledge_base",
+    embeddings_provider="openai",
+    vector_store="faiss"
+)
+
+# Create workflow
+workflow = WorkflowEngine().create_workflow([
+    {"step": "understand_query", "tool": "nlp_processor"},
+    {"step": "retrieve_context", "tool": "rag_retriever"},
+    {"step": "generate_response", "tool": "llm_generator"},
+    {"step": "validate_response", "tool": "quality_checker"}
+])
+
+# Execute
+result = agent.execute(
+    query="How can I return a product?",
+    workflow=workflow,
+    context=rag.get_context()
+)
+```
+
+## 🏭 Industry Applications
+
+### Finance
+- Fraud detection and risk assessment
+- Automated trading strategies
+- Customer service and support
+- Regulatory compliance monitoring
+
+### Healthcare
+- Medical diagnosis assistance
+- Patient care coordination
+- Drug discovery research
+- Clinical trial management
+
+### E-commerce
+- Product recommendations
+- Customer support automation
+- Inventory management
+- Price optimization
+
+### Education
+- Personalized learning paths
+- Automated grading and feedback
+- Content generation
+- Student support systems
+
+## 🔧 Installation
+
+```bash
+pip install nijika
+```
+
+## 📚 Documentation
+
+- [Getting Started Guide](docs/getting-started.md)
+- [API Reference](docs/api-reference.md)
+- [Workflow Designer](docs/workflow-designer.md)
+- [Tool Development](docs/tool-development.md)
+- [Examples](examples/)
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details. 
