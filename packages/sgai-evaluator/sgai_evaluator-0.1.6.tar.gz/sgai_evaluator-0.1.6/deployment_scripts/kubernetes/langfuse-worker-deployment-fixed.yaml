@@ -1,0 +1,185 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: langfuse-worker
+  namespace: ai-observability
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: langfuse-worker
+  template:
+    metadata:
+      labels:
+        app: langfuse-worker
+    spec:
+      containers:
+      - name: langfuse-worker
+        image: langfuse/langfuse-worker:3.79.0  # Updated to latest stable version
+        # Worker mode - no specific command needed, just env vars
+        env:
+        - name: LANGFUSE_WORKER_ENABLED
+          value: "true"
+        - name: LANGFUSE_ENABLE_BACKGROUND_PROCESSING
+          value: "true"
+        - name: NODE_ENV
+          value: "production"
+        - name: NEXTAUTH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: NEXTAUTH_URL
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: database-password
+        - name: DATABASE_URL
+          value: "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
+        - name: DIRECT_URL
+          value: "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
+        - name: NEXTAUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: nextauth-secret
+        - name: SALT
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: salt
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: encryption-key
+        - name: LANGFUSE_AUTO_POSTGRES_MIGRATION_DISABLED
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_AUTO_POSTGRES_MIGRATION_DISABLED
+        # ClickHouse configuration
+        - name: CLICKHOUSE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_URL
+        - name: CLICKHOUSE_USER
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_USER
+        - name: CLICKHOUSE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_PASSWORD
+        - name: CLICKHOUSE_MIGRATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_MIGRATION_URL
+        - name: CLICKHOUSE_DB
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_DB
+        # Redis configuration
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: REDIS_PORT
+        - name: REDIS_AUTH
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: REDIS_AUTH
+        # S3 configuration
+        - name: LANGFUSE_S3_EVENT_UPLOAD_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_BUCKET
+        - name: LANGFUSE_S3_EVENT_UPLOAD_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_PREFIX
+        - name: LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT
+        - name: LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID
+        - name: LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY
+        - name: LANGFUSE_S3_EVENT_UPLOAD_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_REGION
+        - name: LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "ps aux | grep -v grep | grep -q node || exit 1"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "ps aux | grep -v grep | grep -q node || exit 1"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3 

@@ -1,0 +1,23 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To get started with LangFuse:
+
+1. Wait for all pods to be ready:
+   kubectl get pods -n {{ .Values.global.namespace }} -l "app.kubernetes.io/instance={{ .Release.Name }}"
+
+2. Forward the LangFuse port:
+   kubectl port-forward -n {{ .Values.global.namespace }} svc/{{ include "langfuse.fullname" . }} 3000:3000
+
+3. Access LangFuse:
+   Visit: {{ .Values.config.nextAuthUrl }}
+
+Initial credentials:
+Email: {{ .Values.config.langfuseInitUserEmail }}
+Password: (Set in values.yaml or secrets)
+
+To view LangFuse logs:
+kubectl logs -n {{ .Values.global.namespace }} -l "app.kubernetes.io/instance={{ .Release.Name }}" -f
+
+For more information, visit: https://langfuse.com/docs 
