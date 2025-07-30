@@ -1,0 +1,73 @@
+Your task is to transform a simple question into a complex one by using information from 5 provided question-answer pairs. The goal is to replace a key entity in the main question with a complex, indirect description derived from the other questions.
+
+You are provided with 5 short-answer questions:
+1. `%(question_1)s` `%(answer_1)s`
+2. `%(question_2)s` `%(answer_2)s`
+3. `%(question_3)s` `%(answer_3)s`
+4. `%(question_4)s` `%(answer_4)s`
+5. `%(question_5)s` `%(answer_5)s`
+
+**Key data structure logic:**
+- The answer to question 1 matches the answer to question 3 (A1 = A3).
+- The answer to question 2 matches the answer to question 4 (A2 = A4).
+- Questions 3, 4, and 5 often revolve around the same central entity.
+
+**Follow this step-by-step algorithm precisely:**
+
+**Step 1: Identify Components**
+- **Base Question**: This is Question 5 (`%(question_5)s`).
+- **Core Entity**: Find the primary subject/entity in the Base Question. This same entity is also the subject of Questions 3 and 4.
+- **Property 1**: This is the fact about the Core Entity from Question 3. It links the Core Entity to Answer 3 (`%(answer_3)s`).
+- **Property 2**: This is the fact about the Core Entity from Question 4. It links the Core Entity to Answer 4 (`%(answer_4)s`).
+
+**Step 2: Create a Description of the Core Entity**
+- Using Property 1 and Property 2, formulate a phrase that describes the Core Entity.
+- *Example: "the place that is located in `%(answer_4)s` and is in the state of `%(answer_3)s`".*
+
+**Step 3: Cloak the Properties in the Description**
+- Now, you must replace the direct answers (`%(answer_3)s` and `%(answer_4)s`) in your description using the information from Questions 1 and 2. This is the most critical step.
+- **Cloaking Property 1**: Look at Question 1. Instead of naming `%(answer_3)s` directly, describe it using the context from Question 1. For example, instead of "Arkansas", use "the same state as KAGH-FM".
+- **Cloaking Property 2**: Do the same for `%(answer_4)s` using the context from Question 2. For example, instead of "White County", use "the same county as McRae".
+
+**Step 4: Assemble the Final Complex Question**
+- Take the Base Question (Question 5).
+- Find the Core Entity within it.
+- Replace the Core Entity with the fully cloaked description you created in Step 3.
+- Ensure the final question is grammatically correct and makes logical sense.
+
+---
+**Example 1: Geographical**
+
+**Input Data:**
+1. What state is KAGH-FM located in? Arkansas
+2. In which administrative territorial entity is McRae located? White County
+3. In which state is Midway located? Arkansas
+4. In which county is Midway located? White County
+5. Which country is Midway located in? U.S.
+
+**Thought Process:**
+1.  **Components**: Core Entity is `Midway`. Property 1 is "located in `Arkansas`". Property 2 is "located in `White County`".
+2.  **Description**: "Midway, which is located in White County, Arkansas".
+3.  **Cloaking**: `Arkansas` becomes "in the same state as KAGH-FM". `White County` becomes "in the same county as McRae". The cloaked description is "the place located in the same county as McRae and in the same state as KAGH-FM".
+4.  **Assembly**: Replace `Midway` in "Which country is Midway located in?" with the cloaked description.
+    *   **Result**: "In which country is the place located that is in the same county as McRae and in the same state as KAGH-FM?"
+
+---
+**Example 2: Abstract/Non-Geographical**
+
+**Input Data:**
+1. Which award did Tony Bill win? Academy Award for Best Picture
+2. Who was born in Southsea? Kathleen Lockhart
+3. Which award did Gentleman's Agreement receive? Academy Award for Best Picture
+4. Who is a cast member of Gentleman's Agreement? Kathleen Lockhart
+5. Who is a cast member of Gentleman's Agreement? Victor Arthur Kilian
+
+**Thought Process:**
+1.  **Components**: Core Entity is `Gentleman's Agreement`. Property 1 is "received `Academy Award for Best Picture`". Property 2 is "has `Kathleen Lockhart` as a cast member".
+2.  **Description**: "the film Gentleman's Agreement, which received the Academy Award for Best Picture and stars Kathleen Lockhart".
+3.  **Cloaking**: `Academy Award for Best Picture` becomes "the same award that Tony Bill won". `Kathleen Lockhart` becomes "the person who was born in Southsea". The cloaked description is "the film that won the same award as Tony Bill and which features a cast member who was born in Southsea".
+4.  **Assembly**: Replace `Gentleman's Agreement` in "Who is a cast member of Gentleman's Agreement?" with the cloaked description.
+    *   **Result**: "Who is a cast member of the film that won the same award as Tony Bill and which features a cast member who was born in Southsea?"
+---
+
+As a result, you should return **only the final, complex question** generated after all transformations.
