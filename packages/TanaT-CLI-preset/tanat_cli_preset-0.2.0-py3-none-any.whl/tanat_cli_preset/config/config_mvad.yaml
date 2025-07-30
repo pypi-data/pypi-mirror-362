@@ -1,0 +1,23 @@
+##########################################################################
+##          -- Define the global execution context --                   ##
+##########################################################################
+# This file provides a complete context for using TanaT runner on mvad data.
+# Usage: 
+# - mkdir mvad
+# - cd mvad
+# - python3 -m tanat init ./config
+# - python3 -m tanat run --config-path $PWD/config --config-name config_mvad
+##########################################################################
+
+
+BASE_OUTPUT_DIR: ./outputs
+defaults:
+- workflow: mvad
+- workenv: workenv_mvad
+- _self_
+hydra:
+  run:
+    dir: ${BASE_OUTPUT_DIR}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${BASE_OUTPUT_DIR}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: run-${hydra:job.num}
