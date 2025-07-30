@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskVine Report Tool</title>
+
+    <!-- icon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    
+    <!-- import d3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- import jquery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    
+    <!-- import datatables -->
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/4.0.1/js/dataTables.fixedHeader.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/dataTables.fixedColumns.js"></script>
+    
+    <!-- import axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <!-- import lodash -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+
+    <!-- parse csv files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    
+    <!-- import css files -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/4.0.1/css/fixedHeader.bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/5.0.1/css/fixedColumns.bootstrap.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/content.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/toolbox.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/legend.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/section.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/support.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tables.css') }}?v=1.0">        
+
+    <!-- import js modules -->
+    <script src="{{ url_for('static', filename='js/modules/base.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/modules/configs.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/modules/log_manager.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" type="module"></script>
+
+
+</head>
+<body>
+    <div id="vine-tooltip" class="tooltip"></div>  
+    <div id="sidebar">
+        <div id="sidebar-logo-container">
+            <img src="../static/imgs/taskvine_icon.svg" alt="Logo" id="sidebar-logo">
+            <div id="sidebar-logo-descripiton">
+                <p id="taskvine-text">TaskVine</p>
+                <p id="taskvine-version">V8.0.0</p>
+            </div>
+        </div>
+
+        <div id="log-selector-div">
+            <select id="log-selector">
+                {% for folder in log_folders %}
+                    <option value="{{ folder }}">{{ folder }}</option>
+                {% endfor %}
+            </select>
+            <button id="reload-button" class="reload-button" title="Reload current log">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                </svg>
+            </button>
+        </div>
+
+    </div>
+ 
+    <div id="content">
+
+    </div>
+
+</body>
+</html>
