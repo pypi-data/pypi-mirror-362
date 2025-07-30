@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=63.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PollEncOuNt"
+version = "0.0.7"
+authors = [
+  { name="Shan-En Chen", email="shawn.for.office@gmail.com" },
+]
+description = "The purpose of this project is to count the number of alive and dead pollens in an image."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.scripts]
+peon = "peon_gui.gui:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]  # ["."] by default
+include = ["*"]  # ["*"] by defaultgit 
+## cause it trigger error, i disable it before i fixed it.
+## Getting requirements to build editable ... error ...
+# addopts = [
+#     "--import-mode=importlib",
+# ]
