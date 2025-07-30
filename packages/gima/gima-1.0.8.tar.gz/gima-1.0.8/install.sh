@@ -1,0 +1,10 @@
+#rm gim
+#pyinstaller --onefile gim.py
+#cp ./dist/gim .
+#rm -rf build dist gim.spec
+
+rm -rf build dist gim.egg-info gima.egg-info
+python setup.py sdist bdist_wheel
+cd dist
+twine upload *
+cd ..
