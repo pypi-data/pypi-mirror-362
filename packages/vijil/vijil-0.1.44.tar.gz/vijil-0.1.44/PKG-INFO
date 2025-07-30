@@ -1,0 +1,64 @@
+Metadata-Version: 2.3
+Name: vijil
+Version: 0.1.44
+Summary: Python Client for Vijil
+Author: Subho Majumdar
+Author-email: subho@vijil.ai
+Requires-Python: >=3.10,<4.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: bs4 (>=0.0.2,<0.0.3)
+Requires-Dist: fastapi (>=0.115.12,<0.116.0)
+Requires-Dist: fastparquet (>=2024.5.0,<2025.0.0)
+Requires-Dist: mypy (>=1.12.1,<2.0.0)
+Requires-Dist: packaging (>=24.2,<25.0)
+Requires-Dist: pandas (>=2.1.4,<3.0.0)
+Requires-Dist: pyngrok (>=7.2.4,<8.0.0)
+Requires-Dist: python-dotenv (>=1.0.1,<2.0.0)
+Requires-Dist: requests (>=2.32.3,<3.0.0)
+Requires-Dist: tornado (>=6.5,<7.0)
+Requires-Dist: tqdm (>=4.67.1,<5.0.0)
+Requires-Dist: types-requests (>=2.32.0.20241016,<3.0.0.0)
+Requires-Dist: uvicorn (>=0.34.2,<0.35.0)
+Requires-Dist: wakepy (>=0.10.2.post1,<0.11.0)
+Requires-Dist: weasyprint (>=65.1,<66.0)
+Description-Content-Type: text/markdown
+
+# vijil-python
+Python Client for Vijil
+
+
+## Setup
+
+```bash
+pip install -U vijil
+```
+
+Then initialize the client using
+
+```python
+from vijil import Vijil
+
+client = Vijil()
+```
+
+
+Requires a `VIJIL_API_KEY`, either loaded in the environment or suppllied as `api_key` argument above.
+
+## Run Evaluations
+
+```python
+client.evaluations.create(
+    model_hub="openai",
+    model_name="gpt-3.5-turbo",
+    model_params={"temperature": 0},
+    harnesses=["ethics","hallucination"],
+    harness_params={"sample_size": 5}
+)
+```
+
+See the [minimal example](tutorials/minimal_example.ipynb) for more functionalities.
+
