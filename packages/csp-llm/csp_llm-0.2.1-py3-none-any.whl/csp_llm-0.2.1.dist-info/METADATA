@@ -1,0 +1,151 @@
+Metadata-Version: 2.4
+Name: csp_llm
+Version: 0.2.1
+Summary: Python app using llm via MCP for modeling and solving a csp problem in pycsp3
+Author-email: Alain Kemgue <kemgue@cril.fr>
+Maintainer-email: Alain Kemgue <kemgue@cril.fr>
+License: MIT
+Project-URL: Homepage, https://github.com/kemgue/csp_llm
+Project-URL: Repository, https://github.com/kemgue/csp_llm
+Project-URL: Bug Tracker, https://github.com/kemgue/csp_llm/issues
+Keywords: pycsp3,csp,ai,llm,openai,anthropic
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: streamlit>=1.28.0
+Requires-Dist: streamlit-ace>=0.1.1
+Requires-Dist: pycsp3>=2.3.0
+Requires-Dist: openai>=1.0.0
+Requires-Dist: anthropic>=0.7.0
+Requires-Dist: python-dotenv>=1.0.1
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: pre-commit>=3.0.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=5.0.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.0.0; extra == "docs"
+Dynamic: license-file
+
+## 💡 About csp-llm
+
+csp-llm is a python package running as an AI agent to enable the automatic generation and execution of [PyCSP3](https://github.com/xcsp3team/pycsp3/) code for a constraint problem.
+
+It provides an interactive and customizable web user interface, which allows the user to enter or import the description of a constraint problem in natural language. The problem description is then sent to a pre-configured LLM model, which will generate and display the code to the user. The user can either request that the code be executed directly, or make modifications to the generated code before requesting its execution.
+
+
+The application incorporates modern technologies to run any type of LLM model (LLM models deployed within CRIL, Anthropic models, OpenAI models, Google models, etc.).
+
+Once installed, the application offers a few examples of constraint problems with which the user can have fun testing.
+
+
+**NB:** *It may happen that the generated code contains errors, in which case the user is given the opportunity to correct them via the interface*.
+
+
+## 🛑 Requirements
+
+- Run on Linux and Mac platforms (tested on bash linux and zsh mac).
+- Have access to an LLM platform. LLM templates from CRIL are proposed by default. Those with a LAN account can use their API key. For further information, please contact Alain Kemgue( kemgue@cril.fr )
+- Have installed a version of python3 (**3.10** or higher)
+- Have installed a version of java to run pycsp3 (java 8 or higher)
+
+## 📦 Installation
+
+We recommend installing the application in a python virtual environment.
+
+### Virtual environment installation
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+
+```
+
+### Installing the csp-llm package on PyPi
+
+```bash
+pip install csp-llm
+
+```
+
+### Launch the application
+
+```bash
+(venv) ordi@alain% launch-csp-llm     
+🚀 Launching the application...
+💡 Application dependencies
+missing ScriptRunContext! This warning can be ignored when running in bare mode.
+✅ anthropic 0.55.0
+✅ openai 1.92.2
+✅ streamlit 1.46.1
+✅ streamlit_ace 0.1.1
+✅ dotenv
+✅ pycsp3 2.5.1
+✅ Java 21.0.7 detected (>= 8)
+🌐 Application available at: http://localhost:8501
+💡 Press Ctrl+C to stop
+--------------------------------------------------
+
+  You can now view your Streamlit app in your browser.
+
+  URL: http://localhost:8501
+
+**************************************************
+```
+
+The application is then available at http://localhost:8501
+
+You can change port and host by passing parameters to the launch script.
+
+```bash
+
+(venv) ordi@alain% launch-csp-llm --help              
+usage: launch-csp-llm [-h] [--host HOST] [--port PORT] [-ev]
+
+Launch the application
+
+options:
+  -h, --help   show this help message and exit
+  --host HOST
+  --port PORT
+  -ev
+```
+
+Example of launch on port 3000 and host 0.0.0.0( makes the application accessible on the entire network )
+
+```bash
+(venv) ordi@alain% launch-csp-llm --port 3000 --host 0.0.0.0
+🚀 Launching the application...
+💡 Application dependencies
+✅ anthropic 0.55.0
+✅ openai 1.92.2
+✅ streamlit 1.46.1
+✅ streamlit_ace 0.1.1
+✅ dotenv
+✅ pycsp3 2.5.1
+✅ Java 21.0.7 detected (>= 8)
+🌐 Application available at: http://0.0.0.0:3000
+💡 Press Ctrl+C to stop
+--------------------------------------------------
+
+  You can now view your Streamlit app in your browser.
+
+  URL: http://0.0.0.0:3000
+
+**************************************************
+
+```
