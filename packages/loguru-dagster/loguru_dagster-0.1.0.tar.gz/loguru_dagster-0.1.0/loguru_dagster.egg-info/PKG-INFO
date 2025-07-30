@@ -1,0 +1,57 @@
+Metadata-Version: 2.4
+Name: loguru-dagster
+Version: 0.1.0
+Summary: A bridge to integrate Loguru logging with Dagster context.log.
+Home-page: https://github.com/albersfast/loguru-dagster
+Author: Ahmet Sahiner
+Author-email: Ahmet Sahiner <ahmethasimsahiner@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/albertfast/loguru-dagster
+Project-URL: Repository, https://github.com/albertfast/loguru-dagster
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: loguru>=0.7.2
+Requires-Dist: dagster>=1.5.0
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# loguru-dagster
+
+**loguru-dagster** is a lightweight utility package that bridges [Loguru](https://github.com/Delgan/loguru) with [Dagster](https://github.com/dagster-io/dagster).  
+It enables colorized, contextual logging in Dagster pipelines with just a decorator.
+
+## Installation
+
+```bash
+pip install loguru-dagster
+```
+
+## Usage
+
+```python
+from loguru import logger
+from loguru_dagster import with_loguru_logger
+
+@asset
+@with_loguru_logger
+def greet(context):
+    logger.info("Hello from Loguru!")
+```
+
+All logs will show up in Dagster UI with proper formatting and level awareness.
+
+## Configuration
+
+Customize logging behavior using environment variables:
+
+- `DAGSTER_LOGURU_ENABLED` (`true`|`false`)
+- `DAGSTER_LOGURU_LOG_LEVEL` (`DEBUG`, `INFO`, ...)
+- `DAGSTER_LOGURU_FORMAT`
+- `DAGSTER_LOGURU_FILE_PATH`
+
+## License
+
+MIT
