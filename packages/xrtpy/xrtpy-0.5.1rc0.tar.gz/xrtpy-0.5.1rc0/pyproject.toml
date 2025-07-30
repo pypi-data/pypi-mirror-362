@@ -1,0 +1,153 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+  "setuptools>=62.1,!=71.0.1",
+  "setuptools-scm[toml]>=6.2",
+  "wheel>=0.34",
+]
+
+[project]
+name = "xrtpy"
+description = "For analyzing data from the X-Ray Telescope (XRT) on the Hinode spacecraft."
+readme = "README.md"
+keywords = [ "Hinode", "Solar Physics", "x-ray", "XRT" ]
+license = { file = "LICENSE" }
+authors = [
+  { name = "Joy Velasquez", email = "joy.velasquez@cfa.harvard.edu" },
+  { name = "Jonathan Slavin", email = "jslavin@cfa.harvard.edu" },
+  { name = "Nick Murpy", email = "namurphy@cfa.harvard.edu" },
+  { name = "Will Barnes" },
+  { name = "Nabil Freij", email = "nabil.freij@gmail.com" },
+  { name = "Stuart Mumford" },
+]
+
+# SPEC 0 recommends that packages in the scientific pythoniverse support
+# versions of Python that have been released in the last ≤36 months
+requires-python = ">=3.11"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Astronomy",
+  "Topic :: Scientific/Engineering :: Physics",
+]
+dynamic = [ "version" ]
+dependencies = [
+  "astropy>=6",
+  "matplotlib>=3.7",
+  "numpy>=1.24",
+  "scikit-image>=0.21",
+  "scipy>=1.11.1",
+  "sunpy[map]>=5.1",
+]
+
+optional-dependencies.dev = [
+  "nox>=2024.10.9",
+]
+optional-dependencies.docs = [
+  "astropy>=6",
+  "pydata-sphinx-theme>=0.15",
+  # Need pkg_resources for sphinxcontrib-bibtex
+  # and this comes from setuptools
+  # This is a bug upstream in the extension which
+  # has yet to be fixed.
+  "setuptools>71.0.1",
+  "sphinx>=7.3",
+  "sphinx-automodapi>=0.17",
+  "sphinx-copybutton>=0.5.2",
+  "sphinx-gallery>=0.16",
+  "sphinx-issues>=4.1",
+  "sphinxcontrib-bibtex>=2.6.2",
+  "sphinxext-opengraph>=0.6",
+  "sunpy[map,net]>=5",
+]
+optional-dependencies.tests = [
+  "pytest>=8.3.1",
+  "pytest-astropy>=0.11",
+  "pytest-cov>=6",
+  "pytest-xdist>=3.6.1",
+]
+urls.Changelog = "https://xrtpy.readthedocs.io/en/stable/changelog/index.html"
+urls.Documentation = "https://xrtpy.readthedocs.io"
+urls.Issues = "https://github.com/HinodeXRT/xrtpy/issues"
+urls.Repository = "https://github.com/HinodeXRT/xrtpy"
+
+[tool.setuptools]
+packages = [ "xrtpy" ]
+
+[tool.setuptools.package-data]
+"xrtpy" = [ "data/*" ]
+"xrtpy.response" = [ "data/*.txt", "data/*.geny" ]
+"xrtpy.response.tests" = [ "data/*/*/*.txt" ]
+
+[tool.setuptools_scm]
+write_to = "xrtpy/version.py"
+
+[tool.codespell]
+skip = "*.genx,*.geny,*.png,*egg*,.git,.hypothesis,.nox,.tox,.idea,__pycache__,_build"
+ignore-words-list = """
+4rd,
+aas,
+bu,
+circularly,
+egde,
+fo,
+nd,
+ons,
+sav,
+sav,
+te,
+tne,
+ue
+"""
+
+[tool.pytest.ini_options]
+testpaths = [ '.' ]
+xfail_strict = true
+norecursedirs = [
+  '*egg-info*',
+  '.*cache*',
+  '.*env',
+  '.[tn]ox',
+  '.cov*',
+  '.git*',
+  '.hypothesis',
+  '.idea',
+  '.jupyter',
+  '.vscode',
+  '__pycache__',
+  '_dev',
+  'binder',
+  'build',
+  'changelog',
+  'dist',
+  'docs',
+  'licenses',
+  'node_modules',
+  'tools',
+  'venv',
+  '.venv',
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "if TYPE_CHECKING",
+  "if typing.TYPE_CHECKING",
+  "coverage: ignore",
+  "ImportError",
+  "ModuleNotFoundError",
+  "raise NotImplementedError",
+  "@abstractmethod",
+]
+
+[tool.coverage.run]
+branch = true
+source = [ "xrtpy" ]
+omit = [
+  "*/*version.py",
+]

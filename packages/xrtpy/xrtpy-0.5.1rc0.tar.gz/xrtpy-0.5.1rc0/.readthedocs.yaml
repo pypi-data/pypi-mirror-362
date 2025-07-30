@@ -1,0 +1,26 @@
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html
+
+version: 2
+sphinx:
+  configuration: docs/conf.py
+
+build:
+  os: ubuntu-lts-latest
+  tools:
+    python: latest
+  apt_packages:
+  - graphviz
+  jobs:
+    post_build:
+    - echo $'\n'For help deciphering documentation build error messages, see:$'\n\n'\ \ https://xrtpy.readthedocs.io/en/latest/contributing.html#troubleshooting
+
+python:
+  install:
+  - method: pip
+    path: .
+    extra_requirements:
+    - docs
+
+formats:
+- htmlzip
