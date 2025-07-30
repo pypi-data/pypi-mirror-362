@@ -1,0 +1,153 @@
+# AlipayPlus MCP Server
+
+A Model Context Protocol (MCP) compatible server that integrates Ant International's AlipayPlus payment APIs, enabling AI assistants to handle payment and refund operations seamlessly.
+
+## Overview
+
+The AlipayPlus MCP Server wraps Ant International's AlipayPlus payment APIs into standardized MCP tools, allowing AI assistants to securely process payment-related operations during conversations. With this server, you can create payments, query transaction status, handle refunds, and more directly through AI interactions.
+
+## Features
+
+### 💳 Payment Operations
+- **Create Payment** (`create_payment`): Generate payment requests for processing transactions
+- **Query Payment** (`query_payment`): Retrieve transaction status and information for submitted payment requests
+- **Cancel Payment** (`cancel_payment`): Cancel payments when results are not returned within expected timeframes
+
+### 💰 Refund Operations
+- **Create Refund** (`create_refund`): Initiate full or partial refunds against successful payments
+
+### 🛃 Customs Operations
+- **Customs Declare** (`customs_declare`): Declare a payment to customs or update an existing declaration
+- **Query Customs Declaration** (`query_customs_declare`): Inquire about the status of declared payments
+
+
+## Prerequisites
+
+Before using the AlipayPlus MCP Server, ensure you have:
+
+- **Python 3.11 or higher**
+- **uv** (recommended package manager) or **pip**
+- **Valid AlipayPlus Merchant Account** with:
+  - Merchant Client ID (CLIENT_ID)
+  - Merchant RSA Private Key (MERCHANT_PRIVATE_KEY)
+  - Alipay RSA Public Key (ALIPAY_PUBLIC_KEY)
+  - Payment Notification Callback URL (PAYMENT_NOTIFY_URL)
+
+
+## Quick Start
+
+### 1. Installation
+
+#### Direct Usage with uvx (Recommended)
+```bash
+uvx ant-intl-alipayplus-mcp
+```
+
+#### Install with pip
+```bash
+pip install ant-intl-alipayplus-mcp
+```
+
+#### Install with uv
+```bash
+uv install ant-intl-alipayplus-mcp
+```
+
+#### Install from Source
+```bash
+git clone https://github.com/alipay/global-alipayplus-mcp.git
+cd global-alipayplus-mcp
+uv install
+```
+
+#### Requirements
+- Python 3.11 or higher
+- Dependencies:
+  - cryptography==44.0.3
+  - mcp[cli]>=1.9.1
+  - pycryptodome==3.22.0
+  - rsa>=4.9.1
+
+### 2. MCP Client Configuration
+Add the following configuration to your MCP client:
+
+```json
+{
+  "mcpServers": {
+    "alipayplus-mcp": {
+      "command": "uvx",
+      "args": ["ant-intl-alipayplus-mcp"],
+      "env": {
+        "GATEWAY_URL": "https://open-sea-global.alipay.com",
+        "CLIENT_ID": "your_client_id_here",
+        "MERCHANT_PRIVATE_KEY": "your_merchant_private_key_here",
+        "ALIPAY_PUBLIC_KEY": "your_alipay_public_key_here",
+        "PAYMENT_NOTIFY_URL": "https://your-domain.com/payment/notify",
+        "SETTLEMENT_CURRENCY": "USD",
+        "MERCHANT_NAME": "Your Merchant Name",
+        "MERCHANT_ID": "Your Merchant ID",
+        "MERCHANT_MCC": "5411",
+        "MERCHANT_REGION": "US"
+      }
+    }
+  }
+}
+```
+
+### 3. Environment Variables
+
+| Variable | Required | Description |
+| --- |----------| --- |
+| `GATEWAY_URL` | ❌        | AlipayPlus API gateway URL (defaults to https://open-sea-global.alipay.com) |
+| `CLIENT_ID` | ✅        | Merchant client ID for identity verification |
+| `MERCHANT_PRIVATE_KEY` | ✅        | Merchant RSA private key for request signing |
+| `ALIPAY_PUBLIC_KEY` | ✅        | Alipay RSA public key for response verification |
+| `PAYMENT_REDIRECT_URL` | ❌        | URL to redirect after payment (defaults to empty string) |
+| `PAYMENT_NOTIFY_URL` | ❌        | Payment result notification callback URL (defaults to http://localhost:8080/notify) |
+| `SETTLEMENT_CURRENCY` | ❌        | Currency for settlement (defaults to empty string) |
+| `MERCHANT_NAME` | ❌        | Merchant name (defaults to "Alipayplus MCP") |
+| `MERCHANT_ID` | ❌        | Merchant ID (defaults to "M0000000001") |
+| `MERCHANT_MCC` | ❌        | Merchant Category Code (defaults to "5411") |
+| `MERCHANT_REGION` | ❌        | Merchant region code (defaults to "CN") |
+
+
+## Integration Example
+Here's how you can integrate the AlipayPlus MCP Server with your AI agent (using QwenAgent as an example):
+
+```python
+import os
+from qwen_agent.agents import Assistant
+
+# Configure the MCP server as a tool
+tools = [{
+    "mcpServers": {
+        "alipayplus-mcp": {
+            "command": "uvx",
+            "args": ["ant-intl-alipayplus-mcp"],
+            "env": {
+                "CLIENT_ID": os.getenv('CLIENT_ID'),
+                "MERCHANT_PRIVATE_KEY": os.getenv('MERCHANT_PRIVATE_KEY'),
+                "ALIPAY_PUBLIC_KEY": os.getenv('ALIPAY_PUBLIC_KEY'),
+                "GATEWAY_URL": "https://open-sea-global.alipay.com",
+                "PAYMENT_NOTIFY_URL": "https://your-domain.com/notify"
+            }
+        }
+    }
+}]
+
+# Create your AI assistant with payment capabilities
+bot = Assistant(
+    llm={'model': 'qwen-max', 'api_key': 'your-api-key'},
+    function_list=tools,
+)
+```
+
+## Changelog
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
+
+## License
+This project is licensed under the MIT License.
+
+## Acknowledgments
+- [Model Context Protocol](https://modelcontextprotocol.io/) for the standard
+- [AlipayPlus Integration](https://docs.alipayplus.com/alipayplus/alipayplus/api_acq/api_overview?role=ACQP&product=Payment1&version=1.4.6) for the AlipayPlus payment platform
