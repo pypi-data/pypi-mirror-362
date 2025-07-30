@@ -1,0 +1,238 @@
+Metadata-Version: 2.4
+Name: pysdsim
+Version: 2025.7.1
+Summary: An implementation of the Temperature-Dependent Multi-Relaxation Spectroscopic Dielectric Model for thawed and frozen organic soils.
+Author-email: Morteza Khazaei <morteza.khazaei@usherbrooke.ca>
+License: MIT License
+        
+        Copyright (c) 2023 Morteza Khazaei
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Homepage, https://github.com/Morteza-Khazaei/PySDS
+Project-URL: Repository, https://github.com/Morteza-Khazaei/PySDS
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: rasterio
+Requires-Dist: numpy
+Requires-Dist: tables
+Requires-Dist: scikit-learn
+Requires-Dist: tdmrsdm
+Dynamic: license-file
+
+# PySDS: Soil Dielectric Simulator
+
+<!-- Badges: Add more badges as you set them up, e.g., from PyPI or GitHub Actions -->
+[![Python Version](https://img.shields.io/badge/python-%3E%3D3.8-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/github/license/Morteza-Khazaei/PySDS)](https://github.com/Morteza-Khazaei/PySDS/blob/main/LICENSE)
+
+> An implementation of the Temperature-Dependent Multi-Relaxation Spectroscopic Dielectric Model for thawed and frozen organic soils.
+
+---
+
+## About The Project
+
+PySDS is a Python package designed to simulate the complex dielectric permittivity of thawed and frozen soils. It implements the Temperature-Dependent Multi-Relaxation Spectroscopic Dielectric Model (TD-MRSDM) developed by Mironov and Savin (2015), enabling the generation of synthetic datasets that are valuable for research in soil science, remote sensing, and related fields.  These datasets can be used to train and evaluate machine learning models, study the impact of various soil parameters, and for other applications.
+
+<p align="center">
+  <img src="figures/figure_1.png" alt="PySDS Diagram" width="700">
+</p>
+
+**Reference:**
+> Mironov, V., & Savin, I. (2015). A temperature-dependent multi-relaxation spectroscopic dielectric model for thawed and frozen organic soil at 0.05–15 GHz. *Physics and Chemistry of the Earth, Parts A/B/C*, *83*, 57-64.
+
+### Key Features
+
+*   **Simulates Dielectric Permittivity:** Calculates both the real and imaginary parts of the dielectric permittivity for soil across a specified frequency range.
+*   **Temperature and Moisture Dependence:** Accurately models soil dielectric properties considering variations in temperature and soil moisture content.
+*   **Frozen and Thawed Soil:**  Handles simulations for both frozen and thawed soil conditions.
+*   **SOC Integration:** Incorporates the influence of Soil Organic Carbon (SOC) content on dielectric properties.
+*   **Patch-Based Dataset Generation:** Facilitates the creation of datasets consisting of smaller, spatially coherent patches, suitable for machine learning applications.
+*   **Command-Line Interface:** Offers a convenient command-line interface for running simulations.
+
+---
+
+## Getting Started
+
+This section describes how to get your project installed and running.
+
+### Prerequisites
+
+List any software or tools that users need to have installed *before* they can install and use your project.
+
+*   Python (>=3.8)
+*   `pip` package installer
+*   `git` (for installing directly from the repository)
+*   `tdmrsdm` **developed by Morteza Khazaei**
+
+### Installation
+
+Provide clear, step-by-step instructions on how to install your package.
+
+1.  **Install from PyPI** (once published)
+    ```sh
+    pip install pysdsim
+    ```
+2.  **Install from GitHub** (for the latest version)
+    ```sh
+    pip install "git+https://github.com/Morteza-Khazaei/PySDS.git"
+    ```
+
+---
+
+## Usage
+PySDS can be used as a Python library or via its command-line interface.
+Show users how to use your project with clear code examples. This is one of the most important sections.
+
+### As a Library
+
+Provide a simple, self-contained code snippet that demonstrates the core functionality.
+
+```python
+# Import the main class
+from pysdsim.core import Simulator
+import numpy as np
+import rasterio
+from rasterio.transform import from_origin
+
+# 1. Create a dummy SOC map (replace with your actual data)
+workspace_dir = "./pysds_output"  # You can change this
+soc_map_path = "dummy_soc_map.tif"
+
+dummy_soc_data = np.random.rand(256, 256).astype(np.float32) * 10  # Example SOC data
+profile = {
+    'driver': 'GTiff', 'height': 256, 'width': 256, 'count': 1,
+    'dtype': 'float32', 'crs': 'EPSG:4326', 'transform': from_origin(0, 0, 1, 1)
+}
+with rasterio.open(soc_map_path, 'w', **profile) as dst:
+    dst.write(dummy_soc_data, 1)
+
+# 2. Initialize the Simulator
+sim = Simulator(
+    workspace=workspace_dir,
+    dataset_size=5,            # Number of patches to simulate
+    patch_size=(64, 64),       # Size of each patch
+    soc_path=soc_map_path,     # Path to your SOC map
+    freq_GHz=1.41,             # Frequency in GHz (e.g., L-band)
+    sst_range=(-10, 21, 10),    # Soil surface temperature range (°C) (min, max, step)
+    ssm_range=(0.05, 0.46, 0.2), # Soil surface moisture range (0-1) (min, max, step)
+    no_data_threshold=0.1,     # Max NaN ratio allowed in a patch
+    step=(32, 32),             # Stride for patch extraction (overlap)
+    max_search_distance=10,    # For filling NaN values during patch extraction
+    smoothing_iterations=2     # For smoothing filled values
+)
+
+# 3. Run the simulation
+sim.run()
+
+print(f"Simulation complete. Results are saved in '{workspace_dir}'.")
+```
+
+### From the Command Line
+
+If your project includes a command-line interface (CLI), document its usage. It's great practice to include the output of the `--help` flag.
+
+```sh
+(.venv) debian@User:~/PySDS$ pysdsim --help
+
+usage: pysdsim [-h] [-n DL_DB_NAME] [-w WORKSPACE] [-s NSIZE] [-d DSIZE] [-o OVERLAP] [-p SOC_PATH] [-f FREQUENCY] [-t SST_RANGE] [-m SSM_RANGE] [-l NO_DATA_THRESHOLD]
+             [-b MAX_SEARCH_DISTANCE] [-i SMOOTHING_ITERATIONS] [-v] [--version]
+
+options:
+  -h, --help            show this help message and exit
+  -n DL_DB_NAME, --dl_db_name DL_DB_NAME
+                        Deep Learning database name
+  -w WORKSPACE, --workspace WORKSPACE
+                        PySDS Workspace
+  -s NSIZE, --nsize NSIZE
+                        Number of patches to simulate in the DL database.
+  -d DSIZE, --dsize DSIZE
+                        Patch size of the deep learing databse.
+  -o OVERLAP, --overlap OVERLAP
+                        Define overlap between patches. Defualt is no overlap.
+  -p SOC_PATH, --soc_path SOC_PATH
+                        SOC map file path.
+  -f FREQUENCY, --frequency FREQUENCY
+                        Frequency of the simulation wave. Default is L-band (1.41 GHz)
+  -t SST_RANGE, --sst_range SST_RANGE
+                        Min, Max, and Step of the Soil Surface Temperature in °C.
+  -m SSM_RANGE, --ssm_range SSM_RANGE
+                        Min, Max, and Step of the Soil Surface Moisture in %.
+  -l NO_DATA_THRESHOLD, --no_data_threshold NO_DATA_THRESHOLD
+                        No data limit in finding offsets.
+  -b MAX_SEARCH_DISTANCE, --max_search_distance MAX_SEARCH_DISTANCE
+                        The maximum distance (in pixels) that the algorithm will search out for values to interpolate. The default is 10 pixels.
+  -i SMOOTHING_ITERATIONS, --smoothing_iterations SMOOTHING_ITERATIONS
+                        The number of 3x3 average filter smoothing iterations to run after the interpolation to dampen artifacts. The default is zero smoothing iterations.
+  -v, --verbose         Provides detailed (DEBUG) logging for ssPss. Default is false
+  --version             show program's version number and exit
+
+```
+
+---
+
+## Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+---
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## Citation
+
+If you find the code or datasets generated by PySDS useful, please consider citing this paper:
+
+```bibtex
+@article{khazaei2025pysds,
+  title={An Automatic Framework for Generating 2D Benchmark Datasets of Soil Dielectric Constants},
+  author={Khazaei, Morteza and Magagi, Ramata and Goita, Kalifa and Karavayskiy, Andrey},
+  journal={ESSD},
+  year={2025},
+  publisher={Copernicus}
+}
+```
+
+---
+
+## References
+
+*   Mironov, V., & Savin, I. (2019). Spectroscopic Multirelaxation Dielectric Model of Thawed and Frozen Arctic Soils Considering the Dependence on Temperature and Organic Matter Content. Izvestiya, Atmospheric and Oceanic Physics, 55, 986–995. https://doi.org/10.1134/S0001433819090305
+*   Mironov, V., & Savin, I. (2016). Temperature-Dependent Spectroscopic Dielectric Model at 0.05–16GHz for a Thawed and Frozen Alaskan Organic Soil. In Satellite Soil Moisture Retrieval (pp. 169–186). Elsevier. https://doi.org/10.1016/B978-0-12-803388-3.00009-7
+*   Mironov, V., & Savin, I. (2015). A temperature-dependent multi-relaxation spectroscopic dielectric model for thawed and frozen organic soil at 0.05–15 GHz. Physics and Chemistry of the Earth, Parts A/B/C, 83, 57–64. https://doi.org/10.1016/j.pce.2015.02.011
+
+---
