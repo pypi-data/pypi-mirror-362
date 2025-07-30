@@ -1,0 +1,45 @@
+name: Test Matrix
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: ${{ matrix.platform }} Python ${{ matrix.python-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [windows-latest, macos-latest, ubuntu-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Add requirements
+      run: |
+        python -m pip install --upgrade pip wheel
+
+    - name: Build and install
+      run: pip install --verbose ".[test]"
+
+    - name: Unit test
+      run: |
+        cd tests
+        pytest test_phik.py -v -W ignore::DeprecationWarning
+
+    - name: Integration test
+      run: |
+        cd tests
+        pytest integration -v -W ignore::DeprecationWarning
