@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "VEPmcp"
+version = "0.1.0"
+description = "Model Context Protocol server for interacting with the Variant Effect Prediction (VEP) API from Ensembl."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Jules Kreuer", email = "jules.kreuer@uni-tuebingen.de"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "aiohttp>=3.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio",
+    "aresponses",
+    "build",
+    "psutil",  # For performance testing
+    "ruff",    # For linting
+    "mypy",    # For type checking
+    "pytest-cov",  # For coverage reporting in tests
+]
+
+test = [
+    "pytest>=7.0",
+    "pytest-asyncio",
+    "aresponses",
+    "pytest-cov",  # For coverage reporting in unit tests
+]
+
+[project.scripts]
+VEPmcp = "vep_mcp.main:main"
+
+[project.urls]
+Homepage = "https://github.com/not-a-feature/VEPmcp"
+Repository = "https://github.com/not-a-feature/VEPmcp"
+Documentation = "https://github.com/not-a-feature/VEPmcp#readme"
+Issues = "https://github.com/not-a-feature/VEPmcp/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["vep_mcp*"]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration tests (may be slow)",
+    "performance: marks tests as performance tests",
+    "stress: marks tests as stress tests (very slow)",
+]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
