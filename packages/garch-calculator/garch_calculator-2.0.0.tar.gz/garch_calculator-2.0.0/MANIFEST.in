@@ -1,0 +1,50 @@
+# Include the license and readme
+include LICENSE
+include README.md
+include requirements.txt
+include pyproject.toml
+
+# Include C++ source and header files
+recursive-include include *.h *.hpp
+recursive-include src *.cpp *.c *.h *.hpp
+recursive-include python *.cpp *.h *.hpp
+
+# Include CMake files
+include CMakeLists.txt
+recursive-include cmake *.cmake
+
+# Include Python package files
+recursive-include garch_lib *.py *.pyi
+
+# Include documentation
+recursive-include docs *.md *.rst *.txt *.py *.bat *.yaml *.yml
+prune docs/_build
+
+# Include test files (optional, but good practice)
+recursive-include tests *.py *.cpp *.h *.txt *.csv *.json
+
+# Include examples and validation scripts
+include *.py
+include validate_*.py
+include batch_*.py
+include multi_*.py
+
+# Exclude compiled files and temporary directories
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.so
+global-exclude *.dll
+global-exclude *.dylib
+global-exclude __pycache__
+recursive-exclude build *
+recursive-exclude dist *
+recursive-exclude *.egg-info *
+exclude .gitignore
+exclude .clang-format
+exclude .pre-commit-config.yaml
+
+# Exclude validation results
+exclude *.csv
+exclude *.json
+global-exclude *validation*.csv
+global-exclude *validation*.json 
