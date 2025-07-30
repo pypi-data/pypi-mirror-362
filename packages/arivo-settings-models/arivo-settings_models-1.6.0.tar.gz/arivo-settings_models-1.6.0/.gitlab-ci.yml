@@ -1,0 +1,48 @@
+cache:
+  paths:
+    - ./node_modules
+
+stages:
+  - test
+  - build
+  - deploy
+
+before_script:
+  - mkdir -p .pip
+  - pip install -U pip
+  - pip --cache-dir=.pip --quiet install -U tox twine wheel pbr
+
+test:
+  stage: test
+  tags:
+    - office
+    - shell
+  script:
+    - pip install -U tox
+    - python -m tox
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+\%)$/'
+  artifacts:
+    paths:
+      - htmlcov
+      - schemas.json
+
+
+pypi:
+  dependencies: [ ]
+  stage: deploy
+  tags:
+    - docker
+  only:
+    refs:
+      - tags
+    variables:
+      - $CI_COMMIT_REF_NAME =~ /^v(\d+)(\.[\d\w]+)+?$/
+  variables:
+    TWINE_USERNAME: $PYPI_USERNAME
+    TWINE_PASSWORD: $PYPI_PASSWORD
+    PBR_VERSION: $CI_COMMIT_REF_NAME
+  script:
+    - '[[ -z $TWINE_USERNAME ]] && (echo "\$PYPI_USERNAME is not set" ; exit 1)'
+    - '[[ -z $TWINE_PASSWORD ]] && (echo "\$PYPI_PASSWORD is not set" ; exit 1)'
+    - python setup.py -q sdist bdist_wheel
+    - twine upload dist/*
