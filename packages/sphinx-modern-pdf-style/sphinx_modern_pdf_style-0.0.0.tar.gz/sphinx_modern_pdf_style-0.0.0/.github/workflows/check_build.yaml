@@ -1,0 +1,29 @@
+name: Documentation
+
+on:
+#  pull_request:
+#    branches: [ main ]
+  push:
+    branches:
+      - "main"
+
+  workflow_dispatch:
+
+jobs:
+  sphinx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install requirements
+        working-directory: ./docs
+        run: pip install -r requirements.txt && sudo apt-get install latexmk fonts-freefont-otf texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-font-utils texlive-lang-cjk texlive-xetex plantuml xindy tex-gyre dvipng
+      - name: Build PDF
+        working-directory: ./docs
+        run: make pdf
