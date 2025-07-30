@@ -1,0 +1,91 @@
+stages:
+  download_dataset:
+    cmd: python -m src.pipeline.download_dataset.downloading_dataset
+        --input-dir data/raw_dataset
+        --output-dir data/download_dataset
+    deps:
+      - src/pipeline/download_dataset
+      - data/raw_dataset
+    outs:
+      - data/download_dataset
+
+  preprocess_dataset:
+    cmd: python -m src.pipeline.preprocess_dataset.preprocessing_dataset
+        --input-dir data/download_dataset
+        --output-dir data/preprocess_dataset
+    deps:
+      - src/pipeline/preprocess_dataset
+      - data/download_dataset
+    outs:
+      - data/preprocess_dataset
+
+  create_lightfm_dataset:
+    cmd: python -m src.pipeline.create_lightfm_dataset.creating_lightfm_dataset
+        --input-dir data/preprocess_dataset
+        --output-dir data/create_lightfm_dataset
+    deps:
+      - src/pipeline/create_lightfm_dataset
+      - data/preprocess_dataset
+    outs:
+      - data/create_lightfm_dataset
+
+  train_hybrid_model:
+    cmd: python -m src.pipeline.train_hybrid_model.training_hybrid_model
+        --input-dir data/create_lightfm_dataset
+        --output-dir data/train_hybrid_model
+    deps:
+      - src/pipeline/train_hybrid_model
+      - src/models
+      - data/create_lightfm_dataset
+    params:
+      - params.py:
+        - EPOCHS
+        - LOSS
+        - LEARNING_RATE
+        - NO_COMPONENTS
+        - RANDOM_STATE
+        - WITH_USER_FEATURES
+        - WITH_ITEM_FEATURES
+    outs:
+      - data/train_hybrid_model
+
+  train_baseline_model:
+    cmd: python -m src.pipeline.train_baseline_model.training_baseline_model
+        --input-dir data/create_lightfm_dataset
+        --output-dir data/train_baseline_model
+    deps:
+      - data/create_lightfm_dataset
+      - src/pipeline/train_baseline_model
+      - src/models
+    outs:
+      - data/train_baseline_model
+
+  evaluate_model:
+    cmd: python -m src.pipeline.evaluate_model.evaluating_model
+        --train-baseline-model-dir data/train_baseline_model
+        --train-hybrid-model-dir data/train_hybrid_model
+        --create-lightfm-dataset-dir data/create_lightfm_dataset
+        --output-dir data/evaluate_model
+    deps:
+      - src/pipeline/evaluate_model
+      - data/train_baseline_model
+      - data/train_hybrid_model
+      - data/create_lightfm_dataset
+    params:
+      - params.py:
+        - K
+    metrics:
+      - metrics/metrics.json:
+          cache: false
+
+  analyse_principal_components:
+    cmd: python -m src.pipeline.analyse_principal_components.analysing_principal_components
+        --preprocess-dataset-dir data/preprocess_dataset
+        --train-hybrid-model-dir data/train_hybrid_model
+        --output-dir data/analyse_principal_components
+    deps:
+      - src/pipeline/analyse_principal_components
+      - data/train_hybrid_model
+      - data/preprocess_dataset
+    outs:
+      - data/analyse_principal_components

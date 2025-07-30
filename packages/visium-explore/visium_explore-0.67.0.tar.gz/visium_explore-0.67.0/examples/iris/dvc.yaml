@@ -1,0 +1,50 @@
+stages:
+  download_dataset:
+    cmd: python -m src.pipeline.download_dataset.donwloading_dataset 
+        --output-dir data/download_dataset
+    deps:
+      - src/pipeline/download_dataset
+    outs:
+      - data/download_dataset
+
+  split_dataset:
+    cmd: python -m src.pipeline.split_dataset.splitting_dataset
+        --download-dataset-dir data/download_dataset
+        --output-dir data/split_dataset
+    deps:
+      - src/pipeline/split_dataset
+      - data/download_dataset
+    outs:
+      - data/split_dataset
+    params:
+      - params.py:
+        - TEST_RATIO
+        - SEED
+
+  train_model:
+    cmd: python -m src.pipeline.train_model.training_model
+        --split-dataset-dir data/split_dataset
+        --output-dir data/train_model
+    deps:
+      - src/pipeline/train_model
+      - data/split_dataset
+    outs:
+      - data/train_model
+    params:
+      - params.py:
+        - TrainModelParams
+
+  evaluate_model:
+    cmd: python -m src.pipeline.evaluate_model.evaluating_model
+         --train-model-dir data/train_model
+         --split-dataset-dir data/split_dataset
+         --output-dir data/evaluate_model
+    deps:
+      - src/pipeline/evaluate_model
+      - data/train_model
+      - data/split_dataset
+    outs:
+      - data/evaluate_model
+    metrics:
+      - metrics/metrics.json:
+          cache: false # metrics are not cached - versioned with git

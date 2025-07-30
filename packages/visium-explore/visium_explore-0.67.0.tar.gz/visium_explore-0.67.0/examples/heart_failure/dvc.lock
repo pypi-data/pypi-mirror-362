@@ -1,0 +1,89 @@
+schema: '2.0'
+stages:
+  split:
+    cmd: python -m src.pipeline.split.splitting --input-file-path "data/raw/heart_failure.parquet"
+      --output-folder "data/split"
+    deps:
+    - path: src/pipeline/split
+      hash: md5
+      md5: 54f105a5be7bc858762d5b2e14031635.dir
+      size: 3376
+      nfiles: 4
+    outs:
+    - path: data/split
+      hash: md5
+      md5: b14039acebe548684f8e347addac3f55.dir
+      size: 24641
+      nfiles: 2
+  preprocess:
+    cmd: python -m src.pipeline.preprocess.preprocessing --input-folder "data/split"
+      --output-folder "data/preprocess"
+    deps:
+    - path: data/split
+      hash: md5
+      md5: b14039acebe548684f8e347addac3f55.dir
+      size: 24641
+      nfiles: 2
+    - path: src/pipeline/preprocess
+      hash: md5
+      md5: 7c25acff5643cf4169f5dc424c5974ec.dir
+      size: 7877
+      nfiles: 4
+    outs:
+    - path: data/preprocess
+      hash: md5
+      md5: b88c791e3a361d48e710275738ad919d.dir
+      size: 40048
+      nfiles: 4
+  train:
+    cmd: python -m src.pipeline.train.training --preprocessed-folder "data/preprocess"
+      --output-folder "data/train"
+    deps:
+    - path: data/preprocess
+      hash: md5
+      md5: b88c791e3a361d48e710275738ad919d.dir
+      size: 40048
+      nfiles: 4
+    - path: src/pipeline/train
+      hash: md5
+      md5: 79be11bd27036b4ff0aadbd8e90ca22b.dir
+      size: 3351
+      nfiles: 3
+    outs:
+    - path: data/train
+      hash: md5
+      md5: ff1519a7e0029bc9ea4621a0c5648789.dir
+      size: 121628
+      nfiles: 3
+  evaluate:
+    cmd: python -m src.pipeline.evaluate.evaluating --model-folder "data/train" --preprocessed-folder
+      "data/preprocess" --output-folder "metrics"
+    deps:
+    - path: data/preprocess
+      hash: md5
+      md5: b88c791e3a361d48e710275738ad919d.dir
+      size: 40048
+      nfiles: 4
+    - path: data/train
+      hash: md5
+      md5: ff1519a7e0029bc9ea4621a0c5648789.dir
+      size: 121628
+      nfiles: 3
+    - path: src/pipeline/evaluate
+      hash: md5
+      md5: d8f4b68777522147da34691ccab72360.dir
+      size: 4464
+      nfiles: 3
+    outs:
+    - path: metrics/eval_metrics_decision_tree.json
+      hash: md5
+      md5: 365a3dc397ea4c193cfa06e8198fae20
+      size: 1746
+    - path: metrics/eval_metrics_knn.json
+      hash: md5
+      md5: 9d356b8662750ee28552a17822f082c8
+      size: 1743
+    - path: metrics/eval_metrics_log_reg.json
+      hash: md5
+      md5: 047ac3915f548ff5e2f6c5e990f0db25
+      size: 1743

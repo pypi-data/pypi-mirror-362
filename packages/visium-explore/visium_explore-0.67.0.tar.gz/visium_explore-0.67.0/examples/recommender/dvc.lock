@@ -1,0 +1,232 @@
+schema: '2.0'
+stages:
+  download_dataset:
+    cmd: python -m src.pipeline.download_dataset.downloading_dataset --input-dir data/raw_dataset
+      --output-dir data/download_dataset
+    deps:
+    - path: data/raw_dataset
+      hash: md5
+      md5: b1dd691aba7991ff24e7da70ceb59b58.dir
+      size: 2240164
+      nfiles: 5
+    - path: src/pipeline/download_dataset
+      hash: md5
+      md5: 6d43cd879dae01a81a7438cfb2ef25ac.dir
+      size: 934
+      nfiles: 1
+    outs:
+    - path: data/download_dataset
+      hash: md5
+      md5: a10af92334e50b52dc2f08a0bb11a13d.dir
+      size: 762971
+      nfiles: 5
+  preprocess_dataset:
+    cmd: python -m src.pipeline.preprocess_dataset.preprocessing_dataset --input-dir
+      data/download_dataset --output-dir data/preprocess_dataset
+    deps:
+    - path: data/download_dataset
+      hash: md5
+      md5: a10af92334e50b52dc2f08a0bb11a13d.dir
+      size: 762971
+      nfiles: 5
+    - path: src/pipeline/preprocess_dataset
+      hash: md5
+      md5: cdedbbe204a7cc240c323ee5777b4231.dir
+      size: 2609
+      nfiles: 2
+    outs:
+    - path: data/preprocess_dataset
+      hash: md5
+      md5: 2d0e5b44734ac7d6d50c9f4311b099d2.dir
+      size: 267249
+      nfiles: 4
+  create_lightfm_dataset:
+    cmd: python -m src.pipeline.create_lightfm_dataset.creating_lightfm_dataset --input-dir
+      data/preprocess_dataset --output-dir data/create_lightfm_dataset
+    deps:
+    - path: data/preprocess_dataset
+      hash: md5
+      md5: 2d0e5b44734ac7d6d50c9f4311b099d2.dir
+      size: 267249
+      nfiles: 4
+    - path: src/pipeline/create_lightfm_dataset
+      hash: md5
+      md5: 309adfec6227c634b94dcbbcc72493e3.dir
+      size: 4172
+      nfiles: 2
+    outs:
+    - path: data/create_lightfm_dataset
+      hash: md5
+      md5: 5fecacc2b1226989b1bf27405a8389c8.dir
+      size: 3841464
+      nfiles: 9
+  train_model:
+    cmd: python -m src.pipeline.train_model.training_model --input-dir data/create_lightfm_dataset
+      --output-dir data/train_model
+    deps:
+    - path: data/create_lightfm_dataset
+      hash: md5
+      md5: 144d56cc52a7b3d467265e33a5cc0730.dir
+      size: 3836710
+      nfiles: 9
+    - path: src/pipeline/train_model
+      hash: md5
+      md5: b292ced1374808ef8d2fe088c95edf50.dir
+      size: 5162
+      nfiles: 3
+    params:
+      params.py:
+        EPOCHS: 20
+        LEARNING_RATE: 0.05
+        LOSS: bpr
+        NO_COMPONENTS: 10
+    outs:
+    - path: data/train_model
+      hash: md5
+      md5: 772ec364f27a5ad90a4db56f315ec79b.dir
+      size: 455226
+      nfiles: 3
+  evaluate_model:
+    cmd: python -m src.pipeline.evaluate_model.evaluating_model --train-baseline-model-dir
+      data/train_baseline_model --train-hybrid-model-dir data/train_hybrid_model --create-lightfm-dataset-dir
+      data/create_lightfm_dataset --output-dir data/evaluate_model
+    deps:
+    - path: data/create_lightfm_dataset
+      hash: md5
+      md5: 5fecacc2b1226989b1bf27405a8389c8.dir
+      size: 3841464
+      nfiles: 9
+    - path: data/train_baseline_model
+      hash: md5
+      md5: ffb0d72ab6d08993f3243334bc1ff870.dir
+      size: 6350748
+      nfiles: 1
+    - path: data/train_hybrid_model
+      hash: md5
+      md5: 1f0b4b5a339ba8cb3397edd8a6312fb3.dir
+      size: 6792593
+      nfiles: 3
+    - path: src/pipeline/evaluate_model
+      hash: md5
+      md5: 1c089ee1c82fb9350b2f40a9b153338f.dir
+      size: 3051
+      nfiles: 2
+    params:
+      params.py:
+        K: 10
+    outs:
+    - path: metrics/metrics.json
+      hash: md5
+      md5: 3a3847e3d27dd208a9c012e39dd5b5ec
+      size: 282
+  train_model_with_features:
+    cmd: python -m src.pipeline.train_model_with_features.training_model_with_features
+      --input-dir data/create_lightfm_dataset --output-dir data/train_model_with_features
+    deps:
+    - path: data/create_lightfm_dataset
+      hash: md5
+      md5: 144d56cc52a7b3d467265e33a5cc0730.dir
+      size: 3836710
+      nfiles: 9
+    - path: src/pipeline/train_model_with_features
+      hash: md5
+      md5: ef2481387ede4aa650ac497398f52ace.dir
+      size: 5828
+      nfiles: 3
+    params:
+      params.py:
+        EPOCHS: 20
+        LEARNING_RATE: 0.05
+        LOSS: bpr
+        NO_COMPONENTS: 10
+    outs:
+    - path: data/train_model_with_features
+      hash: md5
+      md5: 9e2815ee37f1013c59bf55bbf7885481.dir
+      size: 458837
+      nfiles: 3
+  analyse_principal_components:
+    cmd: python -m src.pipeline.analyse_principal_components.analysing_principal_components
+      --preprocess-dataset-dir data/preprocess_dataset --train-hybrid-model-dir data/train_hybrid_model
+      --output-dir data/analyse_principal_components
+    deps:
+    - path: data/preprocess_dataset
+      hash: md5
+      md5: 2d0e5b44734ac7d6d50c9f4311b099d2.dir
+      size: 267249
+      nfiles: 4
+    - path: data/train_hybrid_model
+      hash: md5
+      md5: 1f0b4b5a339ba8cb3397edd8a6312fb3.dir
+      size: 6792593
+      nfiles: 3
+    - path: src/pipeline/analyse_principal_components
+      hash: md5
+      md5: 3c58aa689288b39775c9e62397283de4.dir
+      size: 2604
+      nfiles: 1
+    outs:
+    - path: data/analyse_principal_components
+      hash: md5
+      md5: 659b5f3a0cbd5aad410bfc550307617c.dir
+      size: 75275
+      nfiles: 2
+  train_hybrid_model:
+    cmd: python -m src.pipeline.train_hybrid_model.training_hybrid_model --input-dir
+      data/create_lightfm_dataset --output-dir data/train_hybrid_model
+    deps:
+    - path: data/create_lightfm_dataset
+      hash: md5
+      md5: 5fecacc2b1226989b1bf27405a8389c8.dir
+      size: 3841464
+      nfiles: 9
+    - path: src/models
+      hash: md5
+      md5: a86ed44ad93348b54c0c15f3705f3104.dir
+      size: 3449
+      nfiles: 3
+    - path: src/pipeline/train_hybrid_model
+      hash: md5
+      md5: 80e35c38d4791810c34ddb622521c481.dir
+      size: 1592
+      nfiles: 1
+    params:
+      params.py:
+        EPOCHS: 20
+        LEARNING_RATE: 0.05
+        LOSS: warp
+        NO_COMPONENTS: 10
+        RANDOM_STATE: 42
+        WITH_ITEM_FEATURES: false
+        WITH_USER_FEATURES: true
+    outs:
+    - path: data/train_hybrid_model
+      hash: md5
+      md5: 1f0b4b5a339ba8cb3397edd8a6312fb3.dir
+      size: 6792593
+      nfiles: 3
+  train_baseline_model:
+    cmd: python -m src.pipeline.train_baseline_model.training_baseline_model --input-dir
+      data/create_lightfm_dataset --output-dir data/train_baseline_model
+    deps:
+    - path: data/create_lightfm_dataset
+      hash: md5
+      md5: 5fecacc2b1226989b1bf27405a8389c8.dir
+      size: 3841464
+      nfiles: 9
+    - path: src/models
+      hash: md5
+      md5: a86ed44ad93348b54c0c15f3705f3104.dir
+      size: 3449
+      nfiles: 3
+    - path: src/pipeline/train_baseline_model
+      hash: md5
+      md5: c8a5840879a92b343ce4377767a7081f.dir
+      size: 763
+      nfiles: 1
+    outs:
+    - path: data/train_baseline_model
+      hash: md5
+      md5: ffb0d72ab6d08993f3243334bc1ff870.dir
+      size: 6350748
+      nfiles: 1

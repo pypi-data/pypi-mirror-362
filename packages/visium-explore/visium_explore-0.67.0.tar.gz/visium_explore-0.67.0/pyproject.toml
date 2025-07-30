@@ -1,0 +1,63 @@
+[project]
+name = "visium-explore"
+dynamic = ["version"]
+description = "Explore is a Python library to explore the artifacts of your DVC pipeline."
+authors = [{name="Adrien Ruault", email="ar@visium.ch"}]
+dependencies = [
+    "streamlit>=1.35.0", 
+    "plotly", 
+    "pydantic", 
+    "pyyaml", 
+    "dvc", 
+    "mlflow", 
+    "pandera>=0.18.3", 
+    "phik", 
+    "umap-learn", 
+    "watchdog",
+    "protobuf>=3.13.0"
+]
+requires-python = ">=3.7"
+
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+explore = "explore.main:run_explore"
+
+[tool.setuptools_scm]
+
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.pylint.master]
+load-plugins = "pylint.extensions.docparams, pylint.extensions.docstyle"
+ignore="""
+build,
+dist,
+"""
+
+[tool.pylint.messages_control]
+disable = """
+fixme,
+too-few-public-methods,
+"""
+
+[tool.pylint.basic]
+variable-rgx = "^[a-z][a-z0-9_]*$"
+argument-rgx = "^[a-z][a-z0-9_]*$"
+
+[tool.pylint.format]
+max-line-length = "120"
+
+[tool.pydocstyle]
+add-ignore = "D107, D104, D103"
+convention = "google"
+
+[tool.mypy]
+exclude = ["build", "dist"]

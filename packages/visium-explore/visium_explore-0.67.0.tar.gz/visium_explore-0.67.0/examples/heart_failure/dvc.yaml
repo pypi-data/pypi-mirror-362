@@ -1,0 +1,44 @@
+stages:
+  split:
+    cmd: python -m src.pipeline.split.splitting
+      --input-file-path "data/raw/heart_failure.parquet"
+      --output-folder "data/split"
+    deps:
+      - src/pipeline/split
+    outs:
+      - data/split
+
+  preprocess:
+    cmd: python -m src.pipeline.preprocess.preprocessing
+      --input-folder "data/split"
+      --output-folder "data/preprocess"
+    deps:
+      - data/split
+      - src/pipeline/preprocess
+    outs:
+      - data/preprocess
+
+  train:
+    cmd: python -m src.pipeline.train.training
+      --preprocessed-folder "data/preprocess"
+      --output-folder "data/train"
+    deps:
+      - data/preprocess
+      - src/pipeline/train
+    outs:
+      - data/train
+
+  evaluate:
+    cmd: python -m src.pipeline.evaluate.evaluating
+      --model-folder "data/train"
+      --preprocessed-folder "data/preprocess"
+      --output-folder "metrics"
+    deps:
+      - data/preprocess
+      - data/train
+      - src/pipeline/evaluate
+    metrics:
+      - metrics/eval_metrics_knn.json
+      - metrics/eval_metrics_decision_tree.json
+      - metrics/eval_metrics_log_reg.json
+

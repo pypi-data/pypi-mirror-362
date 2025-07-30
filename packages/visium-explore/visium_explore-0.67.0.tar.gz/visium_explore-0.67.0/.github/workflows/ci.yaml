@@ -1,0 +1,91 @@
+
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-explore:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install --dev --deploy
+        shell: bash
+      
+      - name: Check Python Style on Explore with visiumlint
+        run: |
+          pipenv run visiumlint ./src/ --check
+          pipenv run visiumlint ./tests/ --check
+        shell: bash
+      
+      - name: Run tests
+        run: |
+          pipenv run python -m pytest ./tests/
+        shell: bash
+  
+  ci_iris:
+    uses: ./.github/workflows/ci_lint_example.yaml
+    with:
+      example_name: "iris"
+
+  ci_heart_failure:
+    uses: ./.github/workflows/ci_lint_example.yaml
+    with:
+      example_name: "heart_failure"
+
+  ci_recommender:
+    uses: ./.github/workflows/ci_lint_example.yaml
+    with:
+      example_name: "recommender"
+
+  pip-install-locally:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      
+      - name: Install explore
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+        shell: bash
+      
+      - name: Check explore can be run after pip install
+        run: |
+          # Start explore in the background
+          explore &
+
+          # Store the PID of the server process
+          explore_pid=$!
+
+          # Wait for a certain amount of time for explore to start
+          sleep 10
+
+          # Check if explore is still running
+          if ps -p $explore_pid > /dev/null; then
+            echo "explore started successfully"
+          else
+            echo "explore failed to start"
+            exit 1
+          fi
+        shell: bash
