@@ -1,0 +1,114 @@
+# 🍫 cacao-json-viewer
+
+A tiny desktop app to view JSON as an interactive tree using Cacao.
+
+## Installation
+
+```bash
+pip install cacao-json-viewer
+```
+
+## Usage
+
+### Command Line Interface
+
+```bash
+# From a file
+cacao-json-viewer path/to/data.json
+
+# Or via stdin
+cat data.json | cacao-json-viewer
+```
+
+### Programmatic Usage 🍫
+
+Now with simplified imports! Use the package directly in your Python code:
+
+#### Basic Example
+
+```python
+import json
+from cacao_json_viewer import preview_json
+
+def main():
+    # Load your JSON data
+    with open("data.json", "r") as f:
+        data = json.load(f)
+    
+    # Preview it in a desktop window
+    preview_json(data, title="My JSON Data")
+
+if __name__ == "__main__":
+    main()
+```
+
+#### Alternative Import Syntax
+
+```python
+import json
+from cacao_json_viewer import preview  # Even cleaner!
+
+def main():
+    data = {
+        "name": "John Doe",
+        "age": 30,
+        "skills": ["Python", "JavaScript", "SQL"],
+        "address": {
+            "street": "123 Main St",
+            "city": "New York",
+            "zipcode": "10001"
+        }
+    }
+    
+    # Same function, cleaner name
+    preview(data, title="User Profile", width=900, height=700)
+
+if __name__ == "__main__":
+    main()
+```
+
+#### Working with API Data
+
+```python
+import json
+import requests
+from cacao_json_viewer import preview_json
+
+def main():
+    # Fetch data from an API
+    response = requests.get("https://api.example.com/data")
+    data = response.json()
+    
+    # Preview the API response
+    preview_json(data, title="API Response")
+
+if __name__ == "__main__":
+    main()
+```
+
+### Function Parameters
+
+```python
+preview_json(
+    data,                           # Your JSON data (dict, list, or any JSON-serializable object)
+    title="Cacao JSON Viewer",     # Window title
+    width=800,                      # Window width in pixels
+    height=600,                     # Window height in pixels
+)
+```
+
+## Features
+
+- 🍫 **Simple & Clean**: Minimal setup, maximum functionality
+- 🌳 **Interactive Tree View**: Expand/collapse JSON nodes
+- 🖥️ **Desktop Application**: Native desktop window using Cacao
+- 📦 **Easy Import**: Clean import syntax - `from cacao_json_viewer import preview_json`
+
+## Requirements
+
+- Python 3.8+
+- Cacao framework
+
+## License
+
+MIT
