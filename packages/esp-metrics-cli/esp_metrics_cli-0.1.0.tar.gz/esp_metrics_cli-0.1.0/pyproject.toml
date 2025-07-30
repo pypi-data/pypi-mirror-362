@@ -1,0 +1,146 @@
+[build-system]
+    build-backend = "hatchling.build"    # Changed from setuptools.build_meta to hatchling.build for UV compatibility
+    requires      = ["hatchling>=1.0.0"] # Changed from setuptools to hatchling
+
+[project]
+    authors         = [{ name = "Espressif - Aleksei Apaseev", email = "aleksei.apaseev@espressif.com" }]
+    classifiers     = ["Programming Language :: Python :: 3"]
+    description     = "ESP Metrics CLI - Command-line tool for validating and uploading project metrics"
+    dynamic         = ["version"]
+    license         = { text = "Apache-2.0" }
+    name            = "esp-metrics-cli"
+    requires-python = ">=3.10"
+    readme          = "README.md"
+
+    dependencies = [
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.0",
+    "jsonschema>=4.0.0",
+    "minio>=7.0.0",
+    "tomli>=2.0.0", # Required for TOML config file support
+    "tomlkit>=0.13.3",
+    "types-pyyaml>=6.0.12.20250516",
+]
+    optional-dependencies.ci-quality = ["ruff>=0.0.292", "types-requests>=2.32.0.20240712"]
+    optional-dependencies.dev = [
+        "czespressif>=1.2.0",
+        "pre-commit>=4.0.1",
+        "pytest-sugar>=1.0.0",
+        "ruff>=0.0.292",
+        "types-requests>=2.32.0.20240712",
+        "pyinstaller>=6.0.0",
+    ]
+    optional-dependencies.test = [
+        "pytest>=7.4.0",
+        "pytest-asyncio>=0.21.1",
+        "pytest-cov>=4.1.0",
+        "pytest-env>=1.1.3",
+        "pytest-xdist>=3.6.1",
+    ]
+[tool]
+    [tool.codespell]
+        skip = "tests" # Excludes the tests directory from codespell linting
+
+    [tool.ruff]
+        extend-exclude = [] # Exclude specific paths to extend the default Ruff exclusion list
+        format.quote-style = "single" # Specifies the quote style for strings in the codebase
+        line-length = 120 # Specifies the maximum line length for ruff checks
+        lint.exclude = ["tests/**/*"] # Exclude specific paths from linting (only linting, formatting will still work)
+        lint.ignore = [
+            "S603", # BANDIT: Check for execution of untrusted input
+            "S607", # BANDIT: Starting a process with a partial executable path
+        ]
+        lint.isort.force-single-line = true # Forces all imports to be placed on individual lines, improving readability and reducing merge conflicts.
+        lint.isort.lines-between-types = 1 # Ensures there is one blank line between different types of imports (e.g., standard library, third-party, local imports).
+        lint.select = [
+            "A",    # flake8-builtins: Check for python builtins being used as variables or parameters
+            "B",    # Bugbear: Enforces additional linting rules aimed at catching common bugs and design issues.
+            "C4",   # Comprehensions: Checks for issues related to list comprehensions and generator expressions.
+            "C901", # Enables McCabe's complexity checks.
+            "E",    # pycodestyle Error: Enforces PEP 8 error checks related to formatting and code style.
+            "F",    # Pyflakes: Detects common errors like unused imports, undefined variables, and more.
+            "I",    # Isort: Ensures that imports are sorted and grouped correctly.
+            "N",    # Pep8 Naming: Enforces PEP 8 naming conventions.
+            "S",    # Security: Includes security-related linting rules from the Bandit plugin.
+            "UP",   # pyupgrade: Checks for outdated Python syntax and suggests modern replacements.
+            "W",    # pycodestyle Warning: Enforces PEP 8 warnings, such as trailing whitespace or missing newlines.
+        ]
+
+    [tool.mypy]
+        disallow_incomplete_defs = true # Enforces complete type annotations if typing is started
+        disallow_untyped_defs = false # Ignores functions with no type annotations at all
+        exclude = [
+            "^__init__.py$",
+            "^build/.*",
+            "^dist/.*",
+            "^docs/.*",
+            "^tests/.*",
+        ] # NO EFFECT ON PRE-COMMIT HOOK; Excludes specific paths from mypy checks
+        ignore_missing_imports = true # Ignores imports that cannot be resolved
+        packages = "app" # NO EFFECT ON PRE-COMMIT HOOK; The package checked by mypy (recursively, including submodules)
+        pretty = true # More detailed and readable error messages
+        python_version = "3.10" # Target Python version used by mypy to parse the code
+        warn_return_any = true # No functions with return type Any
+
+    [tool.commitizen]
+        annotated_tag              = true                                                              # Use annotated tags instead of lightweight tags when creating new versions
+        bump_message               = 'change(bump): [skip-ci] release $current_version → $new_version' # The commit message format for version bumps
+        changelog_merge_prerelease = true                                                              # Merge pre-release changelog entries when creating a release
+        changelog_start_rev        = "v0.1.0"                                                          # Start the changelog after this revision (this revision excluded)
+        name                       = "czespressif"                                                     # The name of the Commitizen config to use, specific to the czespressif plugin
+        tag_format                 = "v$version"                                                       # The format of the tag created on version bumps (e.g., v1.0.0)
+        update_changelog_on_bump   = true                                                              # Automatically update the changelog during version bumps
+        version                    = "0.1.0"                                                           # The current version of the project
+        version_files              = ["app/__init__.py:__version__"]                                   # Files where the version should be updated during a bump
+        version_provider           = "commitizen"                                                      # The provider responsible for managing the version
+
+    [tool.yamlfix]
+        comments_min_spaces_from_content = 1            # Minimum number of spaces between comments and content
+        line_length                      = 200          # Maximum line length before wrapping
+        preserve_quotes                  = true         # Preserve quotes around string values if they are present
+        section_whitelines               = 1            # Number of blank lines before and after sections
+        sequence_style                   = "keep_style" # Determines how sequences (lists) are formatted: 'flow_style', 'block_style', or 'keep_style'
+        whitelines                       = 1            # Number of blank lines between elements, useful for separating items
+
+    [tool.pytest]
+        ini_options.addopts   = "-s --log-cli-level DEBUG --cov=app --cov-report=term" # Pytest command-line arguments (enabling logging and coverage report for the specified package)
+        ini_options.testpaths = "tests"                                                              # Specifies the directory where tests are located
+
+    [tool.coverage]
+        run.branch   = true    # Enable branch coverage
+        run.parallel = true    # Enable parallel coverage for multi-environment testing
+        run.source   = ["app"] # Only measure coverage for the specified package
+
+    [tool.hatch.version]
+        path = "app/__init__.py" # Path to the file containing the version variable
+
+    [tool.hatch.build.targets.wheel]
+        packages = ["app"] # Specifies the packages to include in the build
+
+    [tool.hatch.build.targets.sdist]
+        include = [
+            "app/**",
+            "LICENSE",
+            "README.md"
+        ]
+        exclude = [
+            "tests/**",
+            "examples/**",
+            "scripts/**",
+            "docs/**",
+            ".gitlab*",
+            ".pre-commit*",
+            ".cursor*"
+        ]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+    "types-pyyaml>=6.0.12.20250516",
+]
+
+[project.scripts]
+esp-metrics-cli = "app.cli:click_cli"
