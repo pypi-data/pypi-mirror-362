@@ -1,0 +1,297 @@
+Metadata-Version: 2.4
+Name: co-datascientist
+Version: 0.3.7
+Summary: A tool for agentic recursive model improvement
+Project-URL: Homepage, https://github.com/TropiFloAI/co-datascientist
+Project-URL: Issues, https://github.com/TropiFloAI/co-datascientist/issues
+Author-email: David Gedalevich <davidgdalevich7@gmail.com>
+License: Copyright (c) 2018 The Python Packaging Authority
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Requires-Python: >=3.12
+Requires-Dist: click>=8.1.8
+Requires-Dist: fastmcp>=2.2.5
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: ipdb>=0.13.13
+Requires-Dist: keyring>=25.6.0
+Requires-Dist: keyrings-alt>=5.0.0
+Requires-Dist: pydantic-settings>=2.9.1
+Requires-Dist: yaspin>=3.1.0
+Description-Content-Type: text/markdown
+
+# Introducing the Co-DataScientist!
+
+<!-- <div align="center">
+  <img src="figures/Co-DataScientist.png" alt="Co-DataScientist Logo" width="420"/>
+</div> -->
+
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version"/>
+  <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"/>
+  <img src="https://img.shields.io/badge/license-EPIC🔥-orange.svg" alt="Epic License"/>
+  <img src="https://img.shields.io/badge/license-ML%20Beast-red.svg" alt="ML Beast License"/>
+</p>
+
+> **Kick back, relax, and tomorrow morning greet a shiny KPI you can parade at ML stand-up. 🎉**
+
+---
+
+## Why is everyone talking about the Co-DataScientist?
+
+- 🧪 **Idea Explosion** — Launches a swarm of models, feature recipes & hyper-parameters you never knew existed.
+- 🌌 **Full-Map Exploration** — Charts the entire optimization galaxy so you can stop guessing and start winning.
+- ☕ **Hands-Free Mode** — Hit *run*, kick back with a latte (or snooze) and let the search party work through the night.
+- 📈 **KPI Fanatic** — Every evolutionary step is laser-focused on cranking that one number sky-high.
+- 🔒 **Data Stays Home** — Your training and testing data **never leaves your server**; everything runs 100 % locally.
+- 🤑 **Zero-Surprise Costs** — Live token & dollar tracking keeps the finance goblins happy.
+
+Fast-track your ML pipelines from 😩 _painful_ to 🏆 _heroic_
+---
+
+## 🔧 Quickstart — ⏱️ *30-Second Setup*
+
+## 1. **Install**
+
+```bash
+pip install co-datascientist
+```
+
+## 2. **Write a tiny script** (e.g. `xor.py`). The _only_ rule: **print your KPI**! 🏷️
+
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+# XOR toy-set
+X = np.array([[0,0],[0,1],[1,0],[1,1]])
+y = np.array([0,1,1,0])
+
+# CO_DATASCIENTIST_BLOCK_START
+
+pipe = Pipeline([
+    ("scale", StandardScaler()),
+    ("clf", LogisticRegression(random_state=0))
+])
+
+pipe.fit(X, y)
+acc = accuracy_score(y, pipe.predict(X))
+
+# CO_DATASCIENTIST_BLOCK_END
+
+
+print(f"KPI: {acc:.4f}")  # 🎯 Tag your metric!
+
+# comments
+# This is the classic XOR problem — it's not linearly separable!
+# A linear model like LogisticRegression can't solve it perfectly,
+# because no straight line can separate the classes in 2D.
+# This makes it a great test for feature engineering or non-linear models.
+```
+
+Sanity check the baseline runs in your environment e.g. (you might need to pip install scikit-learn first!)
+
+```bash
+python xor.py
+```
+
+## 3. **Set your API Token (one time only!)**
+
+Before running any commands, you need to set your Co-DataScientist API token. You only need to do this once per machine.
+
+```bash
+co-datascientist set-token --token <YOUR_TOKEN>
+```
+
+
+## 4. **Run the magic!** ✨
+
+
+Then run the co-datascientist!
+
+```bash
+co-datascientist run --script-path xor.py
+```
+
+Watch accuracy jump from `0.5` 🫠 to `1.0` 🏆! 
+##### (when you get to KPI=1.0 you can stop it)
+
+You will find the new glowed up code in the `co_datascientist_checkpoints` directory.
+
+### Yes, it's that simple.
+
+<h2 align="center"><b>
+Try it on <i>your</i> toughest problem and see how your KPI improves.<br>
+<span style="font-size:2em;">🎯🚀</span><br>
+<b>Co-DataScientist helps you get better results—no matter how big your challenge.</b>
+</b></h2>
+
+---
+
+> **Important Notes About Your Input Script**
+
+
+## 🎯 KPI Tagging
+
+Co-DataScientist scans your stdout for the pattern `KPI: <number>` — that’s the metric it maximizes. Use **anything**: accuracy, F1, revenue per click, unicorns-per-second… you name it!
+
+---
+
+## 📁 Hardcode Your Data Paths
+
+> **Important:** Please hardcode any data file paths directly in your script.  
+> For example, use `data = np.loadtxt("full/path/to/my/my_data.csv")` or similar.  
+> Do **not** use `input()` or command-line arguments to specify file paths.  
+> This ensures Co-DataScientist can run your script automatically without manual intervention.
+
+
+## 🧬 Blocks to evolve
+
+As you will see in the XOR exmaple, Co-DataScientist uses **# CO_DATASCIENTIST_BLOCK_START** and **# CO_DATASCIENTIST_BLOCK_END** tags to identify the parts of the system you want it to improve. Make sure to tag parts of your system you care about improving! It will help to Co-DataScientist stay focused on its job.
+
+---
+
+## 🗂️ One File Only: Self-Contained Scripts Required
+
+> **Note:** Co-DataScientist currently supports only scripts written as a **single, self-contained Python file**. Please put all your code in one `.py` file—multi-file projects are not supported (yet!). Everything your workflow needs should be in that one file.
+
+---
+
+## 📝 Add Domain-Specific Notes for Best Results
+
+After your code, add **comments** with any extra context, known issues, or ideas you have about your problem. This helps Co-DataScientist understand your goals and constraints! The Co-Datascientist UNDERSTANDS your problem. Its not just doing a blind search! 
+
+
+> **Other helpful stuff**
+
+## 💰 Cost Tracking
+
+Stay on budget with one-liners:
+
+```bash
+co-datascientist costs            # summary
+co-datascientist costs --detailed # per-run breakdown
+```
+
+Powered by **LiteLLM**’s real-time pricing.
+
+---
+
+## 📝 Before vs After
+<table>
+<tr>
+<th>📥 "Meh" Pipeline <br><sub>KPI ≈ 0.50</sub></th>
+<th>🚀 Turbocharged by Co-DataScientist <br><sub>KPI 🚀 1.00</sub></th>
+</tr>
+<tr>
+<td>
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+# XOR data
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([0, 1, 1, 0])
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', RandomForestClassifier(n_estimators=10, random_state=0))
+])
+
+pipeline.fit(X, y)
+preds = pipeline.predict(X)
+accuracy = accuracy_score(y, preds)
+print(f'Accuracy: {accuracy:.2f}')
+print(f'KPI: {accuracy:.4f}')
+```
+
+</td>
+<td>
+
+```python
+import numpy as np
+from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score
+from tqdm import tqdm
+
+class ChebyshevPolyExpansion(BaseEstimator, TransformerMixin):
+    def __init__(self, degree=3):
+        self.degree = degree
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X):
+        X = np.asarray(X)
+        X_scaled = 2 * X - 1
+        n_samples, n_features = X_scaled.shape
+        features = []
+        for f in tqdm(range(n_features), desc='Chebyshev features'):
+            x = X_scaled[:, f]
+            T = np.empty((self.degree + 1, n_samples))
+            T[0] = 1
+            if self.degree >= 1:
+                T[1] = x
+            for d in range(2, self.degree + 1):
+                T[d] = 2 * x * T[d - 1] - T[d - 2]
+            features.append(T.T)
+        return np.hstack(features)
+
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([0, 1, 1, 0])
+
+pipeline = Pipeline([
+    ('cheb', ChebyshevPolyExpansion(degree=3)),
+    ('scaler', StandardScaler()),
+    ('clf', RandomForestClassifier(n_estimators=10, random_state=0))
+])
+
+pipeline.fit(X, y)
+preds = pipeline.predict(X)
+accuracy = accuracy_score(y, preds)
+print(f'Accuracy: {accuracy:.2f}')
+print(f'KPI: {accuracy:.4f}')
+```
+
+</td>
+</tr>
+</table>
+
+---
+
+
+## 🙋‍♀️ Need help?
+
+We’d love to chat: [oz.kilim@tropiflo.io](mailto:oz.kilim@tropiflo.io)
+
+---
+
+<p align="center"><strong>All set? Ignite your pipelines and watch them soar! 🚀</strong></p>
+
+<p align="center"><em>⚠️  Disclaimer: Co-DataScientist executes your scripts on your own machine. Make sure you trust the code you feed it!</em></p>
+
+<p align="center">Made with ❤️ by the Tropiflo team</p>
