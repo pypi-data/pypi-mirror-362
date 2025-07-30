@@ -1,0 +1,149 @@
+{% extends 'base.html.j2' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <div class="container grid-lg py-2">
+        <h2>{{ title }}</h2>
+
+        {% if version %}
+            <p>Version: {{ version }}</p>
+        {% endif %}
+
+        {% include 'steps.html.j2' %}
+
+        {% include 'navigation_bar.html.j2' %}
+
+        <form id="checklist_form" method="post" onsubmit="window.removeEventListener('beforeunload', handleBeforeUnload);">
+            {% block form_content %}
+            {% endblock %}
+        </form>
+
+        <p class="d-flex text-gray" aria-hidden="true">
+            Required fields are marked red or with a&nbsp;<i class="fa-solid clf-fa-required"></i>
+        </p>
+
+        {% include 'navigation_bar.html.j2' %}
+    </div>
+
+    <script>
+        /* Script to detect unsaved/local changes to the form and warn the user before navigating away. */
+
+        function saveFormValues(form) {
+            Array.from(form).forEach(element => {
+                if (['INPUT', 'SELECT', 'TEXTAREA'].includes(element.tagName)) {
+                    if (['checkbox', 'radio'].includes(element.type)) {
+                        element.dataset.clfChecked = element.checked;
+                    } else {
+                        element.dataset.clfValue = element.value;
+                    }
+                }
+            });
+        }
+
+        function formChanged(form) {
+            return Array.from(form).some((element) => {
+                if (['INPUT', 'SELECT', 'TEXTAREA'].includes(element.tagName)) {
+                    if (['checkbox', 'radio'].includes(element.type)) {
+                        return element.dataset.clfChecked !== element.checked;
+                    }
+
+                    return element.dataset.clfValue !== element.value;
+                }
+
+                return false;
+            });
+        }
+
+        function handleBeforeUnload(event) {
+            if (formChanged(form)) {
+                event.preventDefault();
+            }
+        }
+
+        const form = document.getElementById('checklist_form');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            saveFormValues(form);
+        });
+    </script>
+    <script>
+        /* Script to inject copy functionality into code block copy buttons. */
+
+        async function copyCode(sender) {
+            const code = sender.parentElement.querySelector('code');
+
+            navigator.clipboard.writeText(code.innerText).then(() => {
+                sender.textContent = 'Copied!';
+
+                setTimeout(() => {
+                    sender.textContent = 'Copy';
+                }, 1200);
+            }).catch((error) => {
+                console.error('Failed to copy code: ', error);
+            });
+
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.clf-code-copy-btn').forEach(
+                (btn) => {
+                    btn.addEventListener('click', (event) => {
+                        event.preventDefault(); // Do not navigate or submit a form when clicking this button.
+                        copyCode(btn);
+                    });
+                },
+            );
+        });
+    </script>
+    <script>
+        /* Heartbeat script to show an error message if disconnected from the server. */
+
+        async function checkHeartBeat(url, server_id) {
+            try {
+                const request = new Request(
+                    url + '/heartbeat',
+                    {
+                        method: 'GET',
+                        headers: {'Accept': 'application/json'},
+                        mode: 'same-origin',
+                    },
+                );
+
+                const response = await fetch(request);
+
+                if (!response.ok) {
+                    return false;
+                }
+
+                const data = await response.json()
+
+                return data.server_id === server_id;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        const server_id = '{{ server_id }}';
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        const heartbeatInterval = setInterval(
+            () => {
+                checkHeartBeat(window.location.origin, server_id).then(
+                    (server_alive) => {
+                        if (!server_alive) {
+                            const warning_toast = document.createElement('div');
+                            warning_toast.classList.add('my-2', 'toast', 'toast-error');
+                            warning_toast.textContent = 'The server has shut down. Some of your changes might not have been saved.';
+
+                            form.parentNode.prepend(warning_toast);
+                            clearInterval(heartbeatInterval);
+                        }
+                    }
+                );
+            },
+            1000,
+        )
+    </script>
+{% endblock %}

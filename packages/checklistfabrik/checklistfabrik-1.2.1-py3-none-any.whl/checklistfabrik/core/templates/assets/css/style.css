@@ -1,0 +1,99 @@
+label:last-child > :last-child {
+  margin-bottom: 0;
+}
+
+div.form-label:last-child > :last-child {
+  margin-bottom: 0;
+}
+
+/*
+Spectre removes the fieldset border, bring it back for the outermost fieldset
+(and also integrate it with Spectre's design).
+*/
+form > fieldset {
+  border: 0.05rem solid rgb(188, 195, 206);
+  border-radius: 0.1rem;
+  padding: 0.4rem;
+}
+
+/* Don't display last hr as it is not needed and only clutters the layout. */
+form > fieldset > hr:last-child {
+  display: none;
+}
+
+form fieldset > legend {
+  padding-inline: 0.4rem;
+}
+
+pre > code:only-child {
+  display: block;
+}
+
+.clf-fa-required {
+  --fa: "\f621";
+  display: flex;
+  align-items: center;
+  font-size: 0.625em;
+  margin-right: 0.3rem;
+}
+
+.clf-code-copy-btn {
+  position: absolute;
+  right: 0.2rem;
+  top: 0.2rem;
+}
+
+/* Move code block language indicator to the left */
+.code::before {
+  left: 0.5rem;
+  top: 0.3rem;
+}
+
+/* Give the code block language indicator more space */
+.code[data-lang] code {
+  padding-top: 1.6rem;
+}
+
+li p {
+  display: inline-flex;
+}
+
+/* This styling is missing from spectre (only implemented for .form-input) */
+:is(
+  .form-checkbox:has(input:invalid) > .form-icon,
+  .form-radio:has(input:invalid) > .form-icon,
+  .form-select:invalid
+) {
+  border-color: #e85600;
+}
+
+/* Style inline code similar to spectre's code blocks. Also fixes low contrast. */
+:not(pre) > code {
+  background-color: #f7f8f9;
+  color: #3b4351;
+  display: inline-block; /* NEVER break inline code (it looks ugly and it is hard to differentiate from two separate inline code blocks */
+  margin-inline: 0.1rem;
+}
+
+pre:has(code) {
+  margin-top: 0;
+}
+
+.step .step-item.skipped a::before {
+  background-color: #bcc3ce;
+}
+
+.step .step-item.skipped a {
+  color: #bcc3ce;
+  text-decoration: line-through;
+}
+
+.toast {
+  margin-block: 0.8rem;
+}
+
+/* Better multiline alignment for (text) lists. */
+:is(ol, ul):not([class]) li {
+  list-style-position: outside;
+  margin-left: 0.8rem;
+}
