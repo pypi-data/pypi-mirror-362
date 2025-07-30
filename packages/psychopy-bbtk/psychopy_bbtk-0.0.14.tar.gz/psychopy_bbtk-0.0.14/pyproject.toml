@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=40.8.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "psychopy-bbtk"
+version = "0.0.14"
+description = "Extension package for adding support for BlackBoxToolkit devices to PsychoPy."
+readme = "README.md"
+requires-python = ">= 3.7"
+license = {text = "GNU General Public License v3 (GPLv3)"}
+authors = [
+  { name = "Jon Peirce", email = "jon@opensceincetools.org" },
+  { name = "Matthew Cutone", email = "mcutone@opensceincetools.org" },
+]
+classifiers = [
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+urls.homepage = "https://github.com/psychopy/psychopy-bbtk"
+urls.changelog = "https://github.com/psychopy/psychopy-bbtk/blob/main/CHANGELOG.txt"
+urls.documentation = "https://pages.github.com/psychopy/psychopy-bbtk"
+urls.repository = "https://github.com/psychopy/psychopy-bbtk"
+dependencies = [
+  "ftd2xx"
+]
+
+[tool.setuptools.packages.find]
+where = ["",]
+
+[project.optional-dependencies]
+# dependencies for building the docs
+docs = [
+  "psychopy",
+  "sphinx",
+  "furo",
+]
+# dependencies for running the test suite
+tests = [
+  "psychopy",
+  "pytest",
+]
+
+[project.entry-points."psychopy.experiment.components"]
+TPadVisualValidatorBackend = "psychopy_bbtk.components.tpad:TPadVisualValidatorBackend"
+TPadAudioValidatorBackend = "psychopy_bbtk.components.tpad:TPadAudioValidatorBackend"
+TPadButtonBoxBackend = "psychopy_bbtk.components.tpad:TPadButtonBoxBackend"
+TPadSoundSensorBackend = "psychopy_bbtk.components.tpad:TPadSoundSensorBackend"
+
+[project.entry-points."psychopy.hardware.bbtk"]
+TPadLightSensorGroup = "psychopy_bbtk.tpad:TPadLightSensorGroup"
+TPadSoundSensorGroup = "psychopy_bbtk.tpad:TPadSoundSensorGroup"
+TPadButtonGroup = "psychopy_bbtk.tpad:TPadButtonGroup"
+TPad = "psychopy_bbtk.tpad:TPad"
+BBTKForcePad = "psychopy_bbtk.forcePad:BBTKForcePad"
