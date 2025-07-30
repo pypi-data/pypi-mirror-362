@@ -1,0 +1,80 @@
+Metadata-Version: 2.1
+Name: phtool
+Version: 0.25.717
+Summary: Photometry Tools
+Home-page: https://github.com/drjiezheng/phtool
+Author: Dr Jie Zheng & Dr Lin-Qiao Jiang
+Author-email: jiezheng@nao.cas.cn
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: MacOS
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Topic :: Scientific/Engineering :: Astronomy
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: astropy
+Requires-Dist: photutils
+Requires-Dist: astroalign
+Requires-Dist: tqdm
+Requires-Dist: qastutil
+Requires-Dist: qmatch
+
+# Photometry Tool
+
+By Dr/Prof Jie Zheng & Dr/Prof LinQiao Jiang
+
+v0.1 2025-06-07
+
+## 综述
+
+编写一个工具，通过命令行可以实现较差测光数据处理的各个步骤。
+
+## 调用模式
+
+根源是提供一个Python包，在py环境中调用函数。通过终端 `py -m phtool command` 加上命令和参数的方式进行终端快捷调用，或者通过 `py -m phtool gui` 的方式调用GUI选择任务和参数（待开发）。
+
+安装后会提供一个终端命令 phtool 直接调用。
+
+## 命令
+
+### biascombine
+
+指定每一幅本底文件，以及合并方式，合并成一个本底文件。
+
+### flatcombine
+
+指定平场文件，以及合并后的本底，可选归一化模式与合并模式，合并成一个平场文件。
+
+### darkcombine
+
+合并暗流，指定每一幅暗流文件，以及合并方式，合并成一个暗流文件。
+
+### imcorr
+
+指定合并后的本底和平场，对科学图像进行改正。如果明确指定平场为1、本底为0，则相应不进行此项改正。可以选择开窗方式。如果不指定暗流，则不进行暗流改正。可以指定坏像元掩码文件。
+
+默认根据头文件中的坐标字段（RA,DEC / CRVAL1,2 ）获得图像中心指向，也可以指定中心关键字，或者直接指定中心赤经赤纬。观测时间根据DATE-OBS和TIME-OBS，曝光时间依据EXPTIME或者EXPOSURE，或者指定时间关键字。然后计算JD/MJD，以及HJD-JD，BJD-TDB。如果fits头已经有JD/MJD/HJD/BJD则不计算。
+
+### find
+
+调用 photutils 进行找源以及FWHM计算，输出星表，按照亮度排序，给出综合的FWHM预估值。
+
+### phot
+
+调用 photutils 进行测光，可选测光模式以及孔径。目标源可以通过直接在图像中指定，或者粗略xy指定，都不指定则根据find给出的结果进行全部测光。
+
+### diffcali
+
+根据phot结果，进行不同指定的较差计算和绘图，可以指定目标。采用全局定标或者指定比较星的方式。
+
+### imgexam
+
+单纯的图像检查工具，展示图像，并且进行等高线、三维图、横截面、纵截面、PSF等绘制。
+
+
