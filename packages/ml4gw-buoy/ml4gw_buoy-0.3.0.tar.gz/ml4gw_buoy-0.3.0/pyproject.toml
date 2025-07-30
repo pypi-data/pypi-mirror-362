@@ -1,0 +1,62 @@
+[project]
+name = "ml4gw-buoy"
+version = "0.3.0"
+description = "Deploy Aframe and AMPLFI models over open data"
+authors = [
+    { name = "Will Benoit", email = "benoi090@umn.edu" },
+]
+requires-python = ">=3.10,<3.13"
+readme = "README.md"
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "amplfi>=0.5.2",
+    "ml4gw>=0.7.4",
+    "jsonargparse~=4.40",
+    "h5py~=3.12",
+    "numpy<2.0.0",
+    "matplotlib==3.9.4",
+    "gwpy==3.0.12",
+    "ligo-skymap>=2.2.2,<3",
+    "huggingface_hub~=0.30",
+]
+
+[project.scripts]
+buoy = "buoy.cli:cli"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2.1,<9",
+    "jupyter>=1.0.0,<2",
+    "pre-commit>=3.7.0,<4",
+]
+
+[tool.uv]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+include = ["buoy"]
+
+[tool.hatch.build.targets.wheel]
+include = ["buoy"]
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+extend-safe-fixes = ["C408"]
+mccabe = {"max-complexity" = 18}
+select = ["B", "C", "E", "F", "W", "B9"]
+# ignore W605 and E203 for consistency with black
+ignore = ["W605", "E203"]
+
+# ignore asterisk imports and unused
+# import errors in __init__ files
+per-file-ignores =  {"**/__init__.py" = ["F401", "F403"]}
