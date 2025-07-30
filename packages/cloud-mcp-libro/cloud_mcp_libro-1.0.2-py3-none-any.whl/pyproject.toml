@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cloud-mcp-libro"  # 更改为更独特的名称
+version = "1.0.2"
+description = "Cloud Platform MCP Server - Provides access to backend APIs through MCP protocol"
+long_description = "A Model Context Protocol (MCP) server for cloud platform backend APIs. Enables seamless integration with AI assistants and tools through standardized MCP protocol."
+long_description_content_type = "text/markdown"
+authors = [
+    {name = "limo", email = "limo.yu@designlibro.com"}  # 请更新为您的真实邮箱
+]
+maintainers = [
+    {name = "limo", email = "limo.yu@designlibro.com"}
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+keywords = ["mcp", "cloud", "api", "server", "ai", "assistant", "protocol"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: System :: Networking",
+]
+dependencies = [
+    "aiohttp>=3.9.0",
+    "mcp>=1.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+cloud-mcp-libro = "server:main_sync"
+
+[project.urls]
+Homepage = "https://github.com/DesignLibro/cloud-mcp-libro"  # 请更新为您的实际GitHub仓库
+Repository = "https://github.com/DesignLibro/cloud-mcp-libro"
+Issues = "https://github.com/DesignLibro/cloud-mcp-libro/issues"
+Documentation = "https://github.com/DesignLibro/cloud-mcp-libro/blob/master/README.md"
+Changelog = "https://github.com/DesignLibro/cloud-mcp-libro/releases"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+include = [
+    "server.py",
+    "config.json",
+    "README.md",
+    "LICENSE"
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "server.py",
+    "config.json", 
+    "README.md",
+    "LICENSE",
+    "requirements.txt"
+] 
