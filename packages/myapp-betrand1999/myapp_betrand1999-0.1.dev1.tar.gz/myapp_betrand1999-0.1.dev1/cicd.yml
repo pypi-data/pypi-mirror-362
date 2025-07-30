@@ -1,0 +1,16 @@
+- stage: DeployToAKS
+  displayName: 'Deploy to AKS Cluster'
+  dependsOn: DockerBuildPush
+  jobs:
+  - deployment: DeployToAKSJob
+    displayName: 'Deploy to AKS'
+    environment: 'AKS'  # 👈 Must match the environment name you created in Azure DevOps
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+
+          - script: |
+              kubectl apply -f src/deployment.yaml
+            displayName: 'Apply deployment.yaml to AKS'

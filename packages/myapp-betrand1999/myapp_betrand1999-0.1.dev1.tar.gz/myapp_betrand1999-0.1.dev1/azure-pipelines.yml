@@ -1,0 +1,137 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  name: default  # Your self-hosted agent with Docker and Minikube
+
+variables:
+  IMAGE_NAME: betrand1997/myapp
+  IMAGE_TAG: $(Build.BuildId)
+
+stages:
+# ---------------------------------------------
+# Stage 1: Build, Publish to PyPI, and Publish Artifact
+# ---------------------------------------------
+- stage: BuildAndPublish
+  displayName: 'Build and Publish Python Artifact'
+  jobs:
+  - job: BuildAndUpload
+    displayName: 'Build and Upload to PyPI'
+    variables:
+      - group: PYPI_API_TOKEN  # Must include PYPI_API_TOKEN secret
+
+    steps:
+    - checkout: self
+
+    - script: |
+        python -m pip install --upgrade pip setuptools wheel build twine
+        rm -rf dist/ build/ src/*.egg-info
+        python -m build
+      displayName: 'Clean and Build Python Artifact (.whl and .tar.gz)'
+
+    - script: |
+        twine check dist/*
+      displayName: 'Verify Artifact Metadata'
+
+    - script: |
+        unzip -l dist/*.whl
+        unzip dist/*.whl -d wheel_contents
+        cat wheel_contents/*.dist-info/METADATA || true
+      displayName: 'Debug: Inspect .whl Metadata'
+
+    - script: |
+        ls -R dist
+        twine upload dist/*.whl dist/*.tar.gz -u __token__ -p "$PYPI_API_TOKEN"
+      displayName: 'Upload to PyPI'
+      env:
+        PYPI_API_TOKEN: $(PYPI_API_TOKEN)
+# ---------------------------------------------
+# Stage 2: Static Analysis with SonarQube
+# ---------------------------------------------
+- stage: StaticAnalysis
+  displayName: 'Static Code Analysis with SonarQube'
+  dependsOn: BuildAndPublish
+  jobs:
+  - job: SonarScan
+    displayName: 'Run SonarQube Analysis'
+    steps:
+    - checkout: self
+
+    - task: SonarQubePrepare@5
+      inputs:
+        SonarQube: 'SonarQubeServiceConnection'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'azure-devops'
+        cliProjectName: 'azure-devops'
+
+    - script: |
+        sonar-scanner \
+          -Dsonar.projectKey=azure-devops \
+          -Dsonar.sources=$(Build.SourcesDirectory)
+      displayName: 'Run SonarQube Scanner'
+
+    - task: SonarQubePublish@5
+      inputs:
+        pollingTimeoutSec: '300'
+# ---------------------------------------------
+# Build And Push Image To Docker Hub
+# ---------------------------------------------
+- stage: DockerBuildPush
+  displayName: 'Build and Push Docker Image to Docker Hub'
+  dependsOn: StaticAnalysis
+  jobs:
+  - job: DockerPush
+    displayName: 'Build and Push to DockerHub'
+    variables:
+      - group: docker-secrets  # 👈 Contains DOCKER_USERNAME and DOCKER_PASSWORD
+
+    steps:
+    - checkout: self
+
+    - script: |
+        docker build -t betrand1997/myapp:latest ./src
+        echo "$(DOCKER_PASSWORD)" | docker login -u "$(DOCKER_USERNAME)" --password-stdin
+        docker push betrand1997/myapp:latest
+      displayName: 'Docker Build and Push'
+      env:
+        DOCKER_USERNAME: $(DOCKER_USERNAME)
+        DOCKER_PASSWORD: $(DOCKER_PASSWORD)
+
+# ---------------------------------------------
+# DeployToMinikube
+# ---------------------------------------------
+# - stage: DeployToMinikube
+#   displayName: 'Deploy to Minikube Cluster'
+#   dependsOn: DockerBuildPush
+#   jobs:
+#   - job: Deploy
+#     displayName: 'kubectl apply'
+#     steps:
+#     - checkout: self
+
+#     - script: |
+#         kubectl apply -f $(Pipeline.Workspace)/python-dist/src/deployment.yaml
+#         kubectl apply -f src/deployment.yaml
+#       displayName: 'Deploy to Minikube'
+
+- stage: DeployToAKS
+  displayName: 'Deploy to AKS Cluster'
+  dependsOn: DockerBuildPush
+  jobs:
+  - deployment: DeployToAKSJob
+    displayName: 'Deploy to AKS'
+    environment: 'AKS.dev'  # 👈 Correct: environment.resourceName
+    pool:
+      vmImage: 'ubuntu-latest'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - script: |
+              kubectl apply -f src/deployment.yaml
+            displayName: 'Apply deployment.yaml to AKS'
+
