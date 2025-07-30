@@ -1,0 +1,458 @@
+{
+    "id": "bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+    "key": "store://demo-etl/run/container+run/bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+    "kind": "container+run",
+    "metadata": {
+      "name": "bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+      "updated_by": "digitalhubdev",
+      "project": "demo-etl",
+      "updated": "2024-11-20T12:49:21.884Z",
+      "created_by": "digitalhubdev",
+      "created": "2024-11-20T11:01:22.675Z"
+    },
+    "name": "bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+    "project": "demo-etl",
+    "spec": {
+      "args": [
+        "main.py"
+      ],
+
+      "image": "debian:1.22.04",
+      "task": "container+job://demo-etl/bbc4c820-6321-4ea8-b57b-85c472cfde09",
+      "base_image": "debian:1.22.04",
+      "fs_group": 1000,
+      "function": "container://demo-etl/func1a:bbc4c820-6321-4ea8-b57b-85c472cfde09",
+      "profile": "1xa100",
+      "source": {
+        "source": "main.py",
+        "handler": "handler",
+        "base64": "ZGVmIGhhbmRsZXIoKToKICAgIHByaW50KCJIZWxsbyB3b3JsZCEiKQ==",
+        "lang": "python"
+      },
+      "backoff_limit": 3,
+      "command": "python",
+      "local_execution": false,
+      "resources": {
+        "cpu": {
+          "requests": "0100m",
+          "limits": "0200m"
+        },
+        "mem": {
+          "requests": "0100Ki",
+          "limits": "0200Ki"
+        },
+        "gpu": {
+          "limits": "01"
+        }
+      },
+      "envs": [
+        {
+          "name": "USER",
+          "value": "test"
+        }
+      ],
+      "secrets": [
+        "secret-key"
+      ],
+      "volumes": [
+        {
+          "name": "volume1",
+          "volume_type": "empty_dir",
+          "mount_path": "/volume1"
+        },
+        {
+          "name": "volume2",
+          "volume_type": "persistent_volume_claim",
+          "mount_path": "/volume2"
+        }
+      ],
+      "node_selector": [
+        {
+          "key": "node1",
+          "value": "value1"
+        }
+      ]
+    },
+    "status": {
+      "state": "RUNNING",
+      "transitions": [
+        {
+          "status": "RUNNING",
+          "message": "cronJob j-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a created",
+          "time": "2024-11-20T11:01:23.036060097Z"
+        },
+        {
+          "status": "READY",
+          "time": "2024-11-20T11:01:22.691888799Z"
+        },
+        {
+          "status": "BUILT",
+          "time": "2024-11-20T11:01:22.680768933Z"
+        }
+      ],
+      "message": "cronJob j-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a created",
+      "k8s": {
+        "cronJob": {
+          "metadata": {
+            "creationTimestamp": 1732100483,
+            "generation": 1,
+            "labels": {
+              "app.kubernetes.io/instance": "dhcore-bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+              "dhcore/framework": "k8scronjob",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "container",
+              "dhcore/template": "1xa100"
+            },
+            "managedFields": [
+              {
+                "apiVersion": "batch/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "Kubernetes Java Client",
+                "operation": "Update",
+                "time": 1732100483
+              }
+            ],
+            "name": "j-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+            "namespace": "digitalhub-tenant1",
+            "resourceVersion": "119276",
+            "uid": "8ee5fc8d-105a-47a3-a05b-a7e9c9047810"
+          },
+          "apiVersion": "batch/v1",
+          "kind": "CronJob",
+          "spec": {
+            "concurrencyPolicy": "Allow",
+            "failedJobsHistoryLimit": 1,
+            "jobTemplate": {
+              "spec": {
+                "activeDeadlineSeconds": 604800,
+                "backoffLimit": 3,
+                "completions": 1,
+                "parallelism": 1,
+                "template": {
+                  "metadata": {
+                    "labels": {
+                      "app.kubernetes.io/instance": "dhcore-bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+                      "app.kubernetes.io/managed-by": "dhcore",
+                      "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                      "app.kubernetes.io/version": "bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+                      "dhcore/framework": "k8scronjob",
+                      "dhcore/project": "demo-etl",
+                      "dhcore/runtime": "container",
+                      "dhcore/template": "1xa100"
+                    },
+                    "name": "j-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                  },
+                  "spec": {
+                    "containers": [
+                      {
+                        "args": [
+                          "main.py"
+                        ],
+                        "command": [
+                          "python"
+                        ],
+                        "env": [
+                          {
+                            "name": "DH_RUN_SECRET_NAME",
+                            "value": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                          },
+                          {
+                            "name": "DHCORE_ACCESS_TOKEN",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_ACCESS_TOKEN",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "DHCORE_REFRESH_TOKEN",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_REFRESH_TOKEN",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "DHCORE_CLIENT_ID",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_CLIENT_ID",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "DHCORE_TOKEN_TYPE",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_TOKEN_TYPE",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "DHCORE_ISSUER",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_ISSUER",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "PROJECT_NAME",
+                            "value": "demo-etl"
+                          },
+                          {
+                            "name": "DHCORE_EXPIRES_IN",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_EXPIRES_IN",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "RUN_ID",
+                            "value": "bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                          }
+                        ],
+                        "envFrom": [
+                          {
+                            "configMapRef": {
+                              "name": "digitalhub-common-env"
+                            }
+                          },
+                          {
+                            "secretRef": {
+                              "name": "digitalhub-common-creds"
+                            }
+                          }
+                        ],
+                        "image": "debian:1.22.04",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "c-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+                        "resources": {
+                          "limits": {
+                            "cpu": {
+                              "number": 5,
+                              "format": "DECIMAL_SI"
+                            },
+                            "nvidia.com/gpu": {
+                              "number": 1,
+                              "format": "DECIMAL_SI"
+                            }
+                          },
+                          "requests": {
+                            "cpu": {
+                              "number": 1,
+                              "format": "DECIMAL_SI"
+                            },
+                            "nvidia.com/gpu": {
+                              "number": 1,
+                              "format": "DECIMAL_SI"
+                            }
+                          }
+                        },
+                        "securityContext": {
+                          "allowPrivilegeEscalation": false,
+                          "privileged": false,
+                          "runAsNonRoot": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                          {
+                            "mountPath": "/shared",
+                            "name": "shared-dir"
+                          },
+                          {
+                            "mountPath": "/init-config-map",
+                            "name": "init-config-map"
+                          }
+                        ]
+                      }
+                    ],
+                    "dnsPolicy": "ClusterFirst",
+                    "imagePullSecrets": [
+                      {
+                        "name": "registry-credentials"
+                      }
+                    ],
+                    "initContainers": [
+                      {
+                        "command": [
+                          "/bin/bash",
+                          "-c",
+                          "/app/builder-tool.sh"
+                        ],
+                        "env": [
+                          {
+                            "name": "DH_RUN_SECRET_NAME",
+                            "value": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                          },
+                          {
+                            "name": "DHCORE_ACCESS_TOKEN",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_ACCESS_TOKEN",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "DHCORE_REFRESH_TOKEN",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_REFRESH_TOKEN",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "DHCORE_CLIENT_ID",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_CLIENT_ID",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "DHCORE_TOKEN_TYPE",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_TOKEN_TYPE",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "DHCORE_ISSUER",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_ISSUER",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "PROJECT_NAME",
+                            "value": "demo-etl"
+                          },
+                          {
+                            "name": "DHCORE_EXPIRES_IN",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "DHCORE_EXPIRES_IN",
+                                "name": "sec-containerjob-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                              }
+                            }
+                          },
+                          {
+                            "name": "RUN_ID",
+                            "value": "bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                          }
+                        ],
+                        "envFrom": [
+                          {
+                            "configMapRef": {
+                              "name": "digitalhub-common-env"
+                            }
+                          },
+                          {
+                            "secretRef": {
+                              "name": "digitalhub-common-creds"
+                            }
+                          }
+                        ],
+                        "image": "ghcr.io/scc-digitalhub/digitalhub-core-builder-tool:latest",
+                        "imagePullPolicy": "Always",
+                        "name": "init-container-bacf2bca-549c-4653-ab5a-b718f5b9be4a",
+                        "resources": {
+                          "limits": {
+                            "cpu": {
+                              "number": 5,
+                              "format": "DECIMAL_SI"
+                            },
+                            "nvidia.com/gpu": {
+                              "number": 1,
+                              "format": "DECIMAL_SI"
+                            }
+                          },
+                          "requests": {
+                            "cpu": {
+                              "number": 1,
+                              "format": "DECIMAL_SI"
+                            },
+                            "nvidia.com/gpu": {
+                              "number": 1,
+                              "format": "DECIMAL_SI"
+                            }
+                          }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                          {
+                            "mountPath": "/shared",
+                            "name": "shared-dir"
+                          },
+                          {
+                            "mountPath": "/init-config-map",
+                            "name": "init-config-map"
+                          }
+                        ]
+                      }
+                    ],
+                    "restartPolicy": "Never",
+                    "schedulerName": "default-scheduler",
+                    "securityContext": {
+                      "fs_group": 1000,
+                      "runAsNonRoot": true
+                    },
+                    "terminationGracePeriodSeconds": 30,
+                    "tolerations": [
+                      {
+                        "effect": "NoSchedule",
+                        "key": "nvidia.com/gpu",
+                        "operator": "Equal",
+                        "value": "a100"
+                      }
+                    ],
+                    "volumes": [
+                      {
+                        "emptyDir": {
+                          "sizeLimit": {
+                            "number": 104857600,
+                            "format": "BINARY_SI"
+                          }
+                        },
+                        "name": "shared-dir"
+                      },
+                      {
+                        "configMap": {
+                          "defaultMode": 420,
+                          "name": "init-config-map-bacf2bca-549c-4653-ab5a-b718f5b9be4a"
+                        },
+                        "name": "init-config-map"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+
+            "successfulJobsHistoryLimit": 3,
+            "suspend": false
+          }
+        }
+      }
+    },
+    "user": "digitalhubdev"
+  }

@@ -1,0 +1,89 @@
+{
+    "id": "dc9637f6-63d9-4109-9b95-b6c1547aa935",
+    "key": "store://demo-etl/run/container+run/dc9637f6-63d9-4109-9b95-b6c1547aa935",
+    "kind": "container+run",
+    "metadata": {
+      "name": "dc9637f6-63d9-4109-9b95-b6c1547aa935",
+      "updated_by": "digitalhubdev",
+      "project": "demo-etl",
+      "updated": "2024-11-20T11:00:29.757Z",
+      "created_by": "digitalhubdev",
+      "created": "2024-11-20T11:00:29.737Z"
+    },
+    "name": "dc9637f6-63d9-4109-9b95-b6c1547aa935",
+    "project": "demo-etl",
+    "spec": {
+      "image": "debian:1.22.04",
+      "fs_group": 1000,
+      "replicas": 2,
+      "profile": "1xa100",
+      "volumes": [
+        {
+          "name": "volume1",
+          "volume_type": "empty_dir",
+          "mount_path": "/volume1"
+        },
+        {
+          "name": "volume2",
+          "volume_type": "persistent_volume_claim",
+          "mount_path": "/volume2"
+        }
+      ],
+      "envs": [
+        {
+          "name": "USER",
+          "value": "test"
+        }
+      ],
+      "resources": {
+        "cpu": {
+          "requests": "0100m",
+          "limits": "0200m"
+        },
+        "mem": {
+          "requests": "0100Ki",
+          "limits": "0200Ki"
+        },
+        "gpu": {
+          "limits": "01"
+        }
+      },
+      "source": {
+        "source": "main.py",
+        "handler": "handler",
+        "base64": "ZGVmIGhhbmRsZXIoKToKICAgIHByaW50KCJIZWxsbyB3b3JsZCEiKQ==",
+        "lang": "python"
+      },
+      "secrets": [
+        "secret-key"
+      ],
+      "command": "python",
+      "local_execution": false,
+      "args": [
+        "main.py"
+      ],
+      "node_selector": [
+        {
+          "key": "node1",
+          "value": "value1"
+        }
+      ],
+      "task": "container+deploy://demo-etl/bbc4c820-6321-4ea8-b57b-85c472cfde09",
+      "base_image": "debian:1.22.04",
+      "function": "container://demo-etl/func1a:bbc4c820-6321-4ea8-b57b-85c472cfde09"
+    },
+    "status": {
+      "transitions": [
+        {
+          "status": "READY",
+          "time": "2024-11-20T11:00:29.756444186Z"
+        },
+        {
+          "status": "BUILT",
+          "time": "2024-11-20T11:00:29.743732431Z"
+        }
+      ],
+      "state": "READY"
+    },
+    "user": "digitalhubdev"
+  }
