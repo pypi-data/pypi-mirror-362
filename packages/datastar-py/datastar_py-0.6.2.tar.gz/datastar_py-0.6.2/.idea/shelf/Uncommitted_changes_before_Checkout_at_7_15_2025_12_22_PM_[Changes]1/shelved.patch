@@ -1,0 +1,84 @@
+Index: src/datastar_py/sanic.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from __future__ import annotations\n\nfrom collections.abc import Awaitable, Collection, Mapping\nfrom functools import wraps\nfrom inspect import isasyncgen, isgenerator\nfrom typing import Any, Callable, ParamSpec\n\nfrom sanic import HTTPResponse, Request\n\nfrom . import _read_signals\nfrom .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator\n\n__all__ = [\n    \"SSE_HEADERS\",\n    \"DatastarResponse\",\n    \"ServerSentEventGenerator\",\n    \"datastar_respond\",\n    \"read_signals\",\n]\n\n\nclass DatastarResponse(HTTPResponse):\n    default_headers: dict[str, str] = SSE_HEADERS.copy()\n\n    def __init__(\n        self,\n        content: DatastarEvent | Collection[DatastarEvent] | None = None,\n        status: int | None = None,\n        headers: Mapping[str, str] | None = None,\n    ) -> None:\n        if not content:\n            status = status or 204\n        super().__init__(\n            content, status=status or 200, headers={**self.default_headers, **(headers or {})}\n        )\n\n    async def send(\n        self,\n        event: DatastarEvent | None = None,\n        end_stream: bool | None = None,\n    ) -> None:\n        if event and self.status == 204:\n            # When the response is created with no content, it's set to a 204 by default\n            # if we end up streaming to it, change the status code to 200 before sending.\n            self.status = 200\n        await super().send(event, end_stream=end_stream)\n\n\nasync def datastar_respond(\n    request: Request, *, status: int = 200, headers: Mapping[str, str] | None = None\n) -> DatastarResponse:\n    return await request.respond(DatastarResponse(status=status, headers=headers))\n\n\nP = ParamSpec(\"P\")\n\n\ndef datastar_response(\n    func: Callable[P, Awaitable[DatastarEvents] | DatastarEvents],\n) -> Callable[P, Awaitable[DatastarResponse | None]]:\n    \"\"\"A decorator which wraps a function result in DatastarResponse.\n\n    Can be used on a sync or async function or generator function.\n    \"\"\"\n\n    @wraps(func)\n    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> DatastarResponse | None:\n        r = func(*args, **kwargs)\n        if isinstance(r, Awaitable):\n            return DatastarResponse(await r)\n        if isasyncgen(r):\n            request = args[0]\n            response = await request.respond(response=DatastarResponse())\n            async for event in r:\n                await response.send(event)\n            await response.eof()\n            return None\n        if isgenerator(r):\n            request = args[0]\n            response = await request.respond(response=DatastarResponse())\n            for event in r:\n                await response.send(event)\n            await response.eof()\n            return None\n        return DatastarResponse(r)\n\n    wrapper.__annotations__[\"return\"] = \"DatastarResponse\"\n    return wrapper\n\n\nasync def read_signals(request: Request) -> dict[str, Any] | None:\n    return _read_signals(request.method, request.headers, request.args, request.body)\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/datastar_py/sanic.py b/src/datastar_py/sanic.py
+--- a/src/datastar_py/sanic.py	(revision 52268261c4254033b7a8e1cb2cb37f3c360e0932)
++++ b/src/datastar_py/sanic.py	(date 1752596366740)
+@@ -30,6 +30,8 @@
+     ) -> None:
+         if not content:
+             status = status or 204
++        elif not isinstance(content, str):
++            content = "".join(content)
+         super().__init__(
+             content, status=status or 200, headers={**self.default_headers, **(headers or {})}
+         )
+Index: examples/sanic/app.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># /// script\n# dependencies = [\n#   \"datastar-py\",\n#   \"sanic\",\n# ]\n# [tool.uv.sources]\n# datastar-py = { path = \"../../../sdk/python\" }\n# ///\n\nimport asyncio\nfrom datetime import datetime\n\nfrom datastar_py.consts import ElementPatchMode, VERSION\nfrom datastar_py.sanic import (\n    DatastarResponse,\n    ServerSentEventGenerator,\n    datastar_respond,\n    read_signals,\n)\n\nfrom sanic import Sanic\nfrom sanic.response import html\n\napp = Sanic(\"DataStarApp\")\n\nHTML = \"\"\"\\\n\t<!DOCTYPE html>\n\t<html lang=\"en\">\n\t\t<head>\n\t\t\t<title>DATASTAR on Sanic</title>\n\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n            <script type=\"module\" src=\"https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js\"></script>\n\t\t\t<style>\n            html, body { height: 100%; width: 100%; }\n            body { background-image: linear-gradient(to right bottom, oklch(0.424958 0.052808 253.972015), oklch(0.189627 0.038744 264.832977)); }\n            .container { display: grid; place-content: center; }\n            .time { padding: 2rem; border-radius: 8px; margin-top: 3rem; font-family: monospace, sans-serif; background-color: oklch(0.916374 0.034554 90.5157); color: oklch(0.265104 0.006243 0.522862 / 0.6); font-weight: 600; }\n            button { padding: 1rem; margin-top:1rem; display: inline-block;}\n\t\t\t</style>\n\t\t</head>\n\t\t<body\n            data-signals=\"{currentTime: 'CURRENT_TIME'}\"\n\t\t>\n        <div\n        id=\"timers\"\n        class=\"container\"\n            data-on-load=\"@get('/updates')\"\n        >\n            <button data-on-click=\"@get('/add_element')\">Add element timer</button>\n            <button data-on-click=\"@get('/add_signal')\">Add signal timer</button>\n            <div class=\"time element\">\n            Current time from element: CURRENT_TIME\n            </div>\n            <div class=\"time signal\" >\n            Current time from signal: <span data-text=\"$currentTime\">CURRENT_TIME</span>\n            </div>\n        </div>\n\t\t</body>\n\t</html>\n\"\"\"\n\n\n@app.get(\"/\")\nasync def hello_world(request):\n    return html(HTML.replace(\"CURRENT_TIME\", f\"{datetime.isoformat(datetime.now())}\"))\n\n\n@app.get(\"/add_signal\")\nasync def add_signal(request):\n    return DatastarResponse(\n        ServerSentEventGenerator.patch_elements(\n            \"\"\"\n            <div class=\"time signal\">\n            Current time from signal: <span data-text=\"$currentTime\">CURRENT_TIME</span>\n            </div>\n            \"\"\",\n            selector=\"#timers\",\n            mode=ElementPatchMode.APPEND,\n        )\n    )\n\n\n@app.get(\"/add_element\")\nasync def add_element(request):\n    return DatastarResponse(\n        ServerSentEventGenerator.patch_elements(\n            f\"\"\"\\\n            <div class=\"time element\">\n            Current time from element: {datetime.now().isoformat()}\n            </div>\n            \"\"\",\n            selector=\"#timers\",\n            mode=ElementPatchMode.APPEND,\n        )\n    )\n\n\n@app.get(\"/updates\")\nasync def updates(request):\n    # Signals can be parsed from the request using the `read_signals` helper\n    signals = await read_signals(request)\n    print(signals)\n\n    response = await datastar_respond(request)\n\n    while True:\n        await response.send(\n            ServerSentEventGenerator.patch_elements(\n                f\"\"\"\n                <div class=\"time element\" >\n                Current time from element: {datetime.now().isoformat()}\n                </div>\n                \"\"\",\n                selector=\".element\",\n            )\n        )\n        await asyncio.sleep(1)\n        await response.send(\n            ServerSentEventGenerator.patch_signals(\n                {\"currentTime\": f\"{datetime.now().isoformat()}\"}\n            )\n        )\n        await asyncio.sleep(1)\n\n\nif __name__ == \"__main__\":\n    app.run(dev=True)\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/examples/sanic/app.py b/examples/sanic/app.py
+--- a/examples/sanic/app.py	(revision 52268261c4254033b7a8e1cb2cb37f3c360e0932)
++++ b/examples/sanic/app.py	(date 1752595878064)
+@@ -122,6 +122,54 @@
+         )
+         await asyncio.sleep(1)
+ 
++from sanic import Request, Sanic
++from sanic.response import html
++
++app = Sanic(__name__)
++
++
++@app.get("/")
++async def home(request: Request):
++    return html(
++        """
++        <!doctype html>
++        <html>
++
++        <head>
++            <meta charset="utf-8">
++            <meta name="viewport" content="width=device-width, initial-scale=1">
++            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
++        </head>
++
++        <body>
++            <button type="button" data-on-click="@get('/populate')">Populate</button>
++            <div id="id1"></div>
++            <div id="id2"></div>
++        </body>
++
++        </html>
++        """
++    )
++
++
++@app.get("/populate")
++async def populate(request: Request):
++    return DatastarResponse(
++        [
++            ServerSentEventGenerator.patch_elements(
++                """
++                <div id="id1">Updated!</div>
++                """,
++                selector="#id1",
++            ),
++            ServerSentEventGenerator.patch_elements(
++                """
++                <div id="id2">Updated!</div>
++                """,
++                selector="#id2",
++            ),
++        ]
++    )
+ 
+ if __name__ == "__main__":
+     app.run(dev=True)
