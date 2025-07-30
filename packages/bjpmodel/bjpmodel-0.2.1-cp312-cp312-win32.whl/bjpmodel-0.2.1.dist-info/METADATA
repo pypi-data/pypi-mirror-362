@@ -1,0 +1,97 @@
+Metadata-Version: 2.4
+Name: bjpmodel
+Version: 0.2.1
+Summary: BJP (Bayesian Joint Probability)
+Author-email: Andrew Schepen <andrew.schepen@csiro.au>
+License: MIT
+Requires-Python: <3.14,>=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: cython>=3.0.12
+Requires-Dist: setuptools>=79.0.1
+Requires-Dist: pytest<9.0.0,>=8.3.5
+Requires-Dist: twine<7.0.0,>=6.1.0
+Requires-Dist: cibuildwheel<3.0.0,>=2.23.3
+Requires-Dist: normtransform<0.3.0,>=0.2.0
+
+# Bayesian Joint Probability (BJP)
+[![Publish BJP](https://github.com/csiro-internal/py-bjp/actions/workflows/release.yml/badge.svg)](https://github.com/csiro-internal/py-bjp/actions/workflows/release.yml)
+[![Build and Test BJP](https://github.com/csiro-internal/py-bjp/actions/workflows/ci_dev.yml/badge.svg?branch=master)](https://github.com/csiro-internal/py-bjp/actions/workflows/ci_dev.yml)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
+![status](https://img.shields.io/badge/status-alpha-blue.svg) 
+
+## Table of Contents
+- [Overview](#overview)
+  - [Installation](#installation)
+  - [Usage](#example-usage)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Contact](#contact)
+
+---
+## Overview
+
+**BJP** is a high-performance Python package (with Cython/C++ backend) for fitting multivariate normal distributions using Gibbs sampling, with support for left and right censoring. 
+Typically, BJP is used for modelling with transformed variables using the norm-transform package. Therefore, it is designed for statistical modeling and forecasting in scenarios where data may be treated as partially observed (e.g. rainfall).
+
+---
+
+## Features
+
+- Fast Gibbs sampling for multivariate normal distributions
+- Handles left and right censoring (if required)
+- Generates ensemble predictions with posterior predictive sampling
+- Cython/C++ backend for performance
+
+---
+
+## Installation
+
+**Recommended**: Using a virtual environment and installing into. A [python virtual environment](https://packaging.python.org/en/latest/specifications/virtual-environments/) is a self-contained directory that contains a Python installation for a particular version, along with additional packages. It allows you to isolate dependencies for different projects.
+
+Use the package manager pip to install normtransform.
+
+```bash
+python -m venv venv # Create a virtual environment
+source venv/bin/activate  # Activate the virtual enviroment, on Windows use `venv\Scripts\activate`
+pip install bjpmodel #install bjpmodel
+```
+
+> Note: See compatible versions
+
+---
+
+## Example Usage
+
+This [demo.py](./bjpmodel/demo.py) can be used as example for BJP.
+Once a python environment has been build and activated you can run `demo.py` from the commandline with `python ./bjpmodel/demo.py`
+
+```cmd
+python ./bjpmodel/demo.py
+[-1.30846209 -1.1149359 ] [2.31631585 0.69101736]
+iterations: 1240
+iterations: 1363
+        The number of variables is 2
+        The length of the Markov chain is 5000
+        Sampling using 1000 time periods
+Warning: Predictor is NaN or missing
+--- Left and right censoring ---
+Mean Data: [ 0.48266767 -0.19992095] Std Data: [1.17708839 0.57420349]
+Mean Predictions: [ 0.4721382  -0.19274477] Std Predictions: [1.16840932 0.57216459]
+```
+---
+## Contributing
+
+Requests are welcome. Please contact the authors below.
+
+---
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/) 
+
+---
+## Contact
+
+- Andrew Schepen - andrew.schepen@csiro.au
+- David Robertson - david.robertson@csiro.au
+
