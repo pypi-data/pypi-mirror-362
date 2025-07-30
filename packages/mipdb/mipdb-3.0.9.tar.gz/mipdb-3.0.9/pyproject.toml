@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "mipdb"
+version = "3.0.9"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python            = "~3.10"
+SQLAlchemy        = "~2"
+sqlalchemy_monetdb = "~2"
+pymonetdb         = "~1"
+pandas            = "~2"
+pandera           = "~0"
+click             = "~8"
+toml              = "~0"
+numpy             = "~2"
+setuptools        = "~80"
+
+[tool.poetry.dev-dependencies]
+pytest            = "~8"
+pytest-xdist      = "~3"
+ipython           = "~8"
+pdbpp             = "~0"
+black             = "~25"
+pre-commit        = "~4"
+coverage          = {extras = ["toml"], version = "~7"}
+pytest-cov        = "~6"
+pylint            = "~3"
+rope              = "~1"
+docker            = "~7"
+
+[tool.poetry.scripts]
+mipdb = "mipdb.commands:entry"
+
+[tool.pytest.ini_options]
+markers = [
+    "database: these tests depend on an external dockerized MonetDB service running (deselect with '-m \"not database\"')",
+]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ['mipdb']
+dynamic_context = 'test_function'
+
+[tool.coverage.report]
+exclude_lines = ['def __repr__', 'raise NotImplementedError', 'pragma: no cover', 'pass']
+show_missing = true
+
+[tool.coverage.html]
+show_contexts = true
