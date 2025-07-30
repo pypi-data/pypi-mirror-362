@@ -1,0 +1,119 @@
+Metadata-Version: 2.1
+Name: imgalz
+Version: 0.0.7.3
+Summary: onnx pipline
+License: MIT
+Keywords: onnx,YOLOv5,YOLOv8,mmpose
+Classifier: Development Status :: 1 - Planning
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Image Recognition
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: opencv-python >=4.6.0
+Requires-Dist: numpy >=1.22.2
+Requires-Dist: imagehash
+Requires-Dist: pillow
+Provides-Extra: all
+Requires-Dist: onnxruntime-gpu ; extra == 'all'
+Requires-Dist: huggingface-hub ; extra == 'all'
+Requires-Dist: norfair ; extra == 'all'
+Requires-Dist: Motpy ; extra == 'all'
+Requires-Dist: lap ; extra == 'all'
+Requires-Dist: filterpy ; extra == 'all'
+Provides-Extra: docs
+Requires-Dist: sphinx ; extra == 'docs'
+Requires-Dist: sphinx-rtd-theme ; extra == 'docs'
+Requires-Dist: onnxruntime-gpu ; extra == 'docs'
+Requires-Dist: huggingface-hub ; extra == 'docs'
+Requires-Dist: norfair ; extra == 'docs'
+Requires-Dist: Motpy ; extra == 'docs'
+Requires-Dist: lap ; extra == 'docs'
+Requires-Dist: filterpy ; extra == 'docs'
+
+# imgalz: A Modular Library for Image Analysis by onnx
+
+![img](https://cdn.jsdelivr.net/gh/pleb631/ImgManager@main/img/2024-01-24-14-31-32.png)
+
+## Usage
+
+See below for quickstart installation and usage examples.
+All guidance can refer to full [imgalz docs](https://pleb631.github.io/imgalz)
+
+### Installation
+
+```bash
+pip install .[all]
+# or
+pip install imgalz[all]
+```
+
+### example
+
+```python
+import cv2
+import numpy as np
+
+import imgalz
+from imgalz.models.detector import YOLOv5
+
+# Use local path if available, otherwise download from Hugging Face
+model = YOLOv5(model_path = "yolov5n.onnx")
+# model = YOLOv5("yolov6n.onnx")
+im = imgalz.imread("resources/bus.jpg",1)
+bboxes = model.detect(im, aug=True)
+# plot box on img
+for box in bboxes:
+    cv2.rectangle(
+        im, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 0, 255), 2
+    )
+
+imgalz.cv_imshow("yolov5-det", im)
+
+```
+
+You can refer to the specific usage by [demo](https://github.com/pleb631/imgalz/tree/main/demo)
+
+## Optional Models
+
+### Detector
+
+- YOLOv5/6
+- YOLOv8/11
+- YOLOv8pose
+- YOLOv8seg
+
+### Tracker
+
+- ByteTrack
+- Motpy
+- NorFair
+- OCSort
+
+### Pose
+
+- ViT-Pose
+
+## todo
+
+- add mmpose inference code
+- add more tool for image processing
+- add more tracker and refact code
+
+## Weights
+
+The ONNX model in the example is exported directly from the official code and can be obtained from the [huggingface](https://huggingface.co/pleb631/onnxmodel).
