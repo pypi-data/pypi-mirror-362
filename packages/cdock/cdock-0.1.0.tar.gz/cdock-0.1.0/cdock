@@ -1,0 +1,281 @@
+#!/bin/bash
+# cdock - Docker-based Claude Code runner with orchestration support
+# Version: 1.0
+
+set -e
+
+# Configuration
+DOCKER_IMAGE="claude-code"
+DEFAULT_SSH_KEY="$HOME/.ssh/cdock"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Helper functions
+error() {
+    echo -e "${RED}Error: $1${NC}" >&2
+    exit 1
+}
+
+success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+# Dangerous directory detection
+check_dangerous_directory() {
+    local current_dir="$(pwd)"
+    if [[ "$current_dir" == "$HOME" ]] || [[ "$current_dir" == "/" ]] || [[ "$current_dir" == "/root" ]]; then
+        warning "Running cdock in sensitive directory: $current_dir"
+        echo "This could give Claude access to your entire system."
+        read -p "Continue? (y/N): " -n 1 -r
+        echo
+        [[ ! $REPLY =~ ^[Yy]$ ]] && exit 1
+    fi
+}
+
+# Docker container runner
+run_container() {
+    check_dangerous_directory
+    
+    # Better worktree naming - use full path hash for uniqueness
+    local full_path="$(realpath $(pwd))"
+    local path_hash="$(echo "$full_path" | sha256sum | cut -c1-8)"
+    local repo_name="$(basename "$full_path")"
+    local vol_name="claude-venv-${repo_name}-${path_hash}"
+    local username=$(whoami)
+    
+    # SSH key handling
+    local ssh_args=""
+    local ssh_key="${CDOCK_SSH_KEY:-$DEFAULT_SSH_KEY}"
+    
+    if [[ -f "$ssh_key" ]]; then
+        ssh_args="-v $ssh_key:/root/.ssh/id_rsa:ro"
+        if [[ -f "$ssh_key.pub" ]]; then
+            ssh_args="$ssh_args -v $ssh_key.pub:/root/.ssh/id_rsa.pub:ro"
+        fi
+    else
+        warning "SSH key not found at $ssh_key"
+        echo "SSH operations may fail. Create key or set CDOCK_SSH_KEY"
+    fi
+    
+    # Current directory
+    local current_dir="$(pwd)"
+    
+    # Check if we have a TTY, if not run without -it flags
+    local docker_flags="--rm"
+    if [ -t 0 ] && [ -t 1 ]; then
+        docker_flags="-it --rm"
+    fi
+    
+    docker run $docker_flags \
+        -v "$current_dir":/home/${username}/git/${repo_name} \
+        -v $vol_name:/home/${username}/git/${repo_name}/.venv \
+        $ssh_args \
+        -v ~/.claude:/host-claude-dir:ro \
+        -v ~/.claude.json:/host-claude-file:ro \
+        -v uv-global-cache:/home/${username}/.cache/uv \
+        -v claude-home-auth:/home/${username}/.claude-auth \
+        -e HOST_UID=$(id -u) \
+        -e HOST_GID=$(id -g) \
+        -e HOST_USERNAME=${username} \
+        -e UV_LINK_MODE=copy \
+        $DOCKER_IMAGE "$@"
+}
+
+# Subcommands
+cmd_help() {
+    cat << EOF
+cdock - Docker-based Claude Code runner with orchestration support
+
+Usage:
+  cdock [args]                 Run Claude Code in container
+  cdock bash [args]            Open interactive bash shell
+  cdock init                   Initialize repo for orchestration
+  cdock clean                  Clean local project volumes
+  cdock clean --all            Clean all cdock volumes
+  cdock nuke                   Remove all volumes and images
+  cdock --help                 Show this help
+
+Environment Variables:
+  CDOCK_SSH_KEY               Path to SSH key (default: ~/.ssh/cdock)
+
+Examples:
+  cdock                       # Run Claude Code
+  cdock -p "Build auth system" # Run with prompt
+  cdock bash                  # Interactive shell
+  cdock init                  # Setup orchestrator
+  cdock clean                 # Clean current project
+  cdock nuke                  # Nuclear cleanup
+
+Requirements:
+  - Docker
+  - jq (for orchestrator hooks)
+  - SSH key at ~/.ssh/cdock (or set CDOCK_SSH_KEY)
+EOF
+}
+
+cmd_bash() {
+    run_container bash "$@"
+}
+
+cmd_clean() {
+    if [[ "$1" == "--all" ]]; then
+        echo "Cleaning all cdock volumes..."
+        docker volume ls -q | grep "^claude-venv-" | xargs -r docker volume rm
+        success "All cdock volumes cleaned"
+    else
+        echo "Cleaning local project volumes..."
+        local full_path="$(realpath $(pwd))"
+        local path_hash="$(echo "$full_path" | sha256sum | cut -c1-8)"
+        local repo_name="$(basename "$full_path")"
+        local vol_name="claude-venv-${repo_name}-${path_hash}"
+        docker volume rm "$vol_name" 2>/dev/null || echo "Volume $vol_name not found"
+        success "Local project volumes cleaned"
+    fi
+}
+
+cmd_nuke() {
+    echo "Nuclear cleanup: removing all cdock volumes and images..."
+    docker volume ls -q | grep "^claude-venv-" | xargs -r docker volume rm
+    docker volume rm uv-global-cache claude-home-auth 2>/dev/null || true
+    docker rmi $DOCKER_IMAGE 2>/dev/null || true
+    success "Nuclear cleanup complete"
+}
+
+cmd_init() {
+    echo "Initializing repository for cdock orchestration..."
+    
+    # Create worktrees directory
+    mkdir -p worktrees
+    success "Created worktrees/ directory"
+    
+    # Add to .gitignore if not already there
+    if ! grep -q "^worktrees/" .gitignore 2>/dev/null; then
+        echo "worktrees/" >> .gitignore
+        success "Added worktrees/ to .gitignore"
+    fi
+    
+    # Create .claude directory
+    mkdir -p .claude
+    
+    # Copy hook from cdock installation (resolve symlink to actual script)
+    local cdock_script="$(readlink -f "$0")"
+    local cdock_dir="$(dirname "$cdock_script")"
+    cp "$cdock_dir/orchestrator-security-hook.sh" .claude/
+    chmod +x .claude/orchestrator-security-hook.sh
+    success "Installed security hook"
+    
+    # Create or update settings.json with correct hook format
+    if [[ -f .claude/settings.json ]]; then
+        warning ".claude/settings.json already exists. Add these hooks to your existing config:"
+        echo ""
+        echo "Add this to your \"hooks\" section:"
+        echo "\"PreToolUse\": ["
+        echo "  {"
+        echo "    \"matcher\": \"Bash\","
+        echo "    \"hooks\": [{"
+        echo "      \"type\": \"command\","
+        echo "      \"command\": \".claude/orchestrator-security-hook.sh\""
+        echo "    }]"
+        echo "  },"
+        echo "  {"
+        echo "    \"matcher\": \"Write\","
+        echo "    \"hooks\": [{"
+        echo "      \"type\": \"command\","
+        echo "      \"command\": \".claude/orchestrator-security-hook.sh\""
+        echo "    }]"
+        echo "  },"
+        echo "  {"
+        echo "    \"matcher\": \"Edit\","
+        echo "    \"hooks\": [{"
+        echo "      \"type\": \"command\","
+        echo "      \"command\": \".claude/orchestrator-security-hook.sh\""
+        echo "    }]"
+        echo "  }"
+        echo "]"
+        echo ""
+    else
+        # Use absolute path for hook
+        local abs_hook_path="$(pwd)/.claude/orchestrator-security-hook.sh"
+        cat > .claude/settings.json << EOF
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$abs_hook_path"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command", 
+            "command": "$abs_hook_path"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$abs_hook_path"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+        success "Created .claude/settings.json with orchestrator hooks"
+    fi
+    
+    echo ""
+    success "Repository initialized for cdock orchestration!"
+    echo "📝 Run 'claude' to start orchestrating with security hooks"
+}
+
+# Main command dispatcher
+main() {
+    # Handle help flags first, before case statement
+    if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "help" ]]; then
+        cmd_help
+        return
+    fi
+    
+    case "${1:-}" in
+        "bash")
+            shift
+            cmd_bash "$@"
+            ;;
+        "clean")
+            shift
+            cmd_clean "$@"
+            ;;
+        "nuke")
+            cmd_nuke
+            ;;
+        "init")
+            cmd_init
+            ;;
+        *)
+            # Default: run claude in container
+            run_container "$@"
+            ;;
+    esac
+}
+
+# Run main function
+main "$@"
