@@ -1,0 +1,1202 @@
+{
+    "id": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+    "key": "store://demo-etl/run/dbt+run/0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+    "kind": "dbt+run",
+    "metadata": {
+      "name": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+      "updated_by": "digitalhubdev",
+      "project": "demo-etl",
+      "updated": "2024-11-20T11:15:27.947Z",
+      "created_by": "digitalhubdev",
+      "created": "2024-11-20T11:14:18.679Z"
+    },
+    "name": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+    "project": "demo-etl",
+    "spec": {
+      "outputs": {
+        "output": "output"
+      },
+      "task": "dbt+transform://demo-etl/74d91e86-1b69-4e85-bb63-da4345f4ea04",
+      "inputs": {
+        "employees": "store://demo-etl/dataitem/dataitem/dataitem1:fd83dqa7vnh-73e45-m3pqawew"
+      },
+      "function": "dbt://demo-etl/func6:74d91e86-1b69-4e85-bb63-da4345f4ea04",
+      "profile": "1xa100",
+      "source": {
+        "base64": "V0lUSCB0YWIgQVMgKAogICAgU0VMRUNUICAqCiAgICBGUk9NICAgIHt7IHJlZignZW1wbG95ZWVzJykgfX0KKQpTRUxFQ1QgICoKRlJPTSAgICB0YWIKV0hFUkUgICB0YWIuIkRFUEFSVE1FTlRfSUQiID0gJzYwJw==",
+        "lang": "sql"
+      },
+      "parameters": {},
+      "local_execution": false,
+      "resources": {
+        "cpu": {
+          "requests": "0100m",
+          "limits": "0200m"
+        },
+        "mem": {
+          "requests": "0100Ki",
+          "limits": "0200Ki"
+        },
+        "gpu": {
+          "limits": "01"
+        }
+      },
+      "envs": [
+        {
+          "name": "USER",
+          "value": "test"
+        }
+      ],
+      "secrets": [
+        "secret-key"
+      ],
+      "volumes": [
+        {
+          "name": "volume1",
+          "volume_type": "empty_dir",
+          "mount_path": "/volume1"
+        },
+        {
+          "name": "volume2",
+          "volume_type": "persistent_volume_claim",
+          "mount_path": "/volume2"
+        }
+      ],
+      "node_selector": [
+        {
+          "key": "node1",
+          "value": "value1"
+        }
+      ]
+    },
+    "status": {
+      "state": "ERROR",
+      "transitions": [
+        {
+          "status": "ERROR",
+          "message": "Job failed: 3",
+          "time": "2024-11-20T11:15:27.874388072Z"
+        },
+        {
+          "status": "RUNNING",
+          "message": "job j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de created",
+          "time": "2024-11-20T11:14:18.747933828Z"
+        },
+        {
+          "status": "READY",
+          "time": "2024-11-20T11:14:18.69615452Z"
+        },
+        {
+          "status": "BUILT",
+          "time": "2024-11-20T11:14:18.685174371Z"
+        }
+      ],
+      "message": "Job failed: 3",
+      "k8s": {
+        "job": {
+          "metadata": {
+            "creationTimestamp": 1732101258,
+            "generation": 1,
+            "labels": {
+              "app.kubernetes.io/instance": "dhcore-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+              "app.kubernetes.io/managed-by": "dhcore",
+              "app.kubernetes.io/part-of": "dhcore-demo-etl",
+              "app.kubernetes.io/version": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+              "dhcore/framework": "k8sjob",
+              "dhcore/project": "demo-etl",
+              "dhcore/runtime": "dbt"
+            },
+            "managedFields": [
+              {
+                "apiVersion": "batch/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "Kubernetes Java Client",
+                "operation": "Update",
+                "time": 1732101258
+              },
+              {
+                "apiVersion": "batch/v1",
+                "fieldsType": "FieldsV1",
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "subresource": "status",
+                "time": 1732101320
+              }
+            ],
+            "name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+            "namespace": "digitalhub-tenant1",
+            "resourceVersion": "133143",
+            "uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f"
+          },
+          "apiVersion": "batch/v1",
+          "kind": "Job",
+          "spec": {
+            "activeDeadlineSeconds": 604800,
+            "backoffLimit": 3,
+            "completionMode": "NonIndexed",
+            "completions": 1,
+            "manualSelector": false,
+            "parallelism": 1,
+            "podReplacementPolicy": "TerminatingOrFailed",
+            "selector": {
+              "matchLabels": {
+                "batch.kubernetes.io/controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f"
+              }
+            },
+            "suspend": false,
+            "template": {
+              "metadata": {
+                "labels": {
+                  "app.kubernetes.io/instance": "dhcore-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "app.kubernetes.io/managed-by": "dhcore",
+                  "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                  "app.kubernetes.io/version": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "batch.kubernetes.io/controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f",
+                  "batch.kubernetes.io/job-name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f",
+                  "dhcore/framework": "k8sjob",
+                  "dhcore/project": "demo-etl",
+                  "dhcore/runtime": "dbt",
+                  "job-name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                },
+                "name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "args": [
+                      "wrapper.py"
+                    ],
+                    "command": [
+                      "python"
+                    ],
+                    "env": [
+                      {
+                        "name": "DH_RUN_SECRET_NAME",
+                        "value": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                      },
+                      {
+                        "name": "DHCORE_ACCESS_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ACCESS_TOKEN",
+                            "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_REFRESH_TOKEN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_REFRESH_TOKEN",
+                            "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_CLIENT_ID",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_CLIENT_ID",
+                            "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_TOKEN_TYPE",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_TOKEN_TYPE",
+                            "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                          }
+                        }
+                      },
+                      {
+                        "name": "DHCORE_ISSUER",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_ISSUER",
+                            "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                          }
+                        }
+                      },
+                      {
+                        "name": "PROJECT_NAME",
+                        "value": "demo-etl"
+                      },
+                      {
+                        "name": "DHCORE_EXPIRES_IN",
+                        "valueFrom": {
+                          "secretKeyRef": {
+                            "key": "DHCORE_EXPIRES_IN",
+                            "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                          }
+                        }
+                      },
+                      {
+                        "name": "RUN_ID",
+                        "value": "0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                      }
+                    ],
+                    "envFrom": [
+                      {
+                        "configMapRef": {
+                          "name": "digitalhub-common-env"
+                        }
+                      },
+                      {
+                        "secretRef": {
+                          "name": "digitalhub-common-creds"
+                        }
+                      }
+                    ],
+                    "image": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt:latest",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "c-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                    "securityContext": {
+                      "allowPrivilegeEscalation": false,
+                      "privileged": false,
+                      "runAsNonRoot": true
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File"
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "imagePullSecrets": [
+                  {
+                    "name": "registry-credentials"
+                  }
+                ],
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                  "runAsNonRoot": true
+                },
+                "terminationGracePeriodSeconds": 30
+              }
+            }
+          },
+          "status": {
+            "failed": 3,
+            "ready": 0,
+            "startTime": 1732101258,
+            "terminating": 0
+          }
+        },
+        "pods": [
+          {
+            "metadata": {
+              "creationTimestamp": 1732101314,
+              "generateName": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "batch.kubernetes.io/controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f",
+                "batch.kubernetes.io/job-name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f",
+                "dhcore/framework": "k8sjob",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "dbt",
+                "job-name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101314
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kubelet",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732101319
+                }
+              ],
+              "name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de-hnxws",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "batch/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "Job",
+                  "name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f"
+                }
+              ],
+              "resourceVersion": "133142",
+              "uid": "ce228b20-a082-43b2-a73f-22b048707c31"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "wrapper.py"
+                  ],
+                  "command": [
+                    "python"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt:latest",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-b8h76",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "nodeName": "digitalhub-dev-md-0-jkh8r-snphp",
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Never",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "name": "kube-api-access-b8h76",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101319,
+                  "status": "False",
+                  "type": "PodReadyToStartContainers"
+                },
+                {
+                  "lastTransitionTime": 1732101314,
+                  "status": "True",
+                  "type": "Initialized"
+                },
+                {
+                  "lastTransitionTime": 1732101317,
+                  "reason": "PodFailed",
+                  "status": "False",
+                  "type": "Ready"
+                },
+                {
+                  "lastTransitionTime": 1732101317,
+                  "reason": "PodFailed",
+                  "status": "False",
+                  "type": "ContainersReady"
+                },
+                {
+                  "lastTransitionTime": 1732101314,
+                  "status": "True",
+                  "type": "PodScheduled"
+                }
+              ],
+              "containerStatuses": [
+                {
+                  "containerID": "containerd://f309d1822846de95ebf004048fcd86d5ad921c3488ecddaa7807a39cd2b6f86f",
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt:latest",
+                  "imageID": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt@sha256:14734b71f525e4d0b5d8354a9e28fd357c696f78a1b56549205e0e492c33def8",
+                  "name": "c-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "ready": false,
+                  "restartCount": 0,
+                  "started": false,
+                  "state": {
+                    "terminated": {
+                      "containerID": "containerd://f309d1822846de95ebf004048fcd86d5ad921c3488ecddaa7807a39cd2b6f86f",
+                      "exitCode": 1,
+                      "finishedAt": 1732101316,
+                      "reason": "Error",
+                      "startedAt": 1732101314
+                    }
+                  }
+                }
+              ],
+              "hostIP": "10.1.0.4",
+              "hostIPs": [
+                {
+                  "ip": "10.1.0.4"
+                }
+              ],
+              "phase": "Failed",
+              "podIP": "192.168.1.128",
+              "podIPs": [
+                {
+                  "ip": "192.168.1.128"
+                }
+              ],
+              "qosClass": "BestEffort",
+              "startTime": 1732101314
+            }
+          },
+          {
+            "metadata": {
+              "creationTimestamp": 1732101291,
+              "generateName": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "batch.kubernetes.io/controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f",
+                "batch.kubernetes.io/job-name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f",
+                "dhcore/framework": "k8sjob",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "dbt",
+                "job-name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101291
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kubelet",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732101297
+                }
+              ],
+              "name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de-rvgzz",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "batch/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "Job",
+                  "name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f"
+                }
+              ],
+              "resourceVersion": "132770",
+              "uid": "2f6a3abf-6c46-49d8-a900-aa33fd7769dc"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "wrapper.py"
+                  ],
+                  "command": [
+                    "python"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt:latest",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-cm6w9",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "nodeName": "digitalhub-dev-md-0-jkh8r-snphp",
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Never",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "name": "kube-api-access-cm6w9",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101297,
+                  "status": "False",
+                  "type": "PodReadyToStartContainers"
+                },
+                {
+                  "lastTransitionTime": 1732101291,
+                  "status": "True",
+                  "type": "Initialized"
+                },
+                {
+                  "lastTransitionTime": 1732101295,
+                  "reason": "PodFailed",
+                  "status": "False",
+                  "type": "Ready"
+                },
+                {
+                  "lastTransitionTime": 1732101295,
+                  "reason": "PodFailed",
+                  "status": "False",
+                  "type": "ContainersReady"
+                },
+                {
+                  "lastTransitionTime": 1732101291,
+                  "status": "True",
+                  "type": "PodScheduled"
+                }
+              ],
+              "containerStatuses": [
+                {
+                  "containerID": "containerd://1bbd9ccbc92f5e0f66184b74ddccda01175040c8aafa88a8f87a87b9d64aefc8",
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt:latest",
+                  "imageID": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt@sha256:14734b71f525e4d0b5d8354a9e28fd357c696f78a1b56549205e0e492c33def8",
+                  "name": "c-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "ready": false,
+                  "restartCount": 0,
+                  "started": false,
+                  "state": {
+                    "terminated": {
+                      "containerID": "containerd://1bbd9ccbc92f5e0f66184b74ddccda01175040c8aafa88a8f87a87b9d64aefc8",
+                      "exitCode": 1,
+                      "finishedAt": 1732101294,
+                      "reason": "Error",
+                      "startedAt": 1732101292
+                    }
+                  }
+                }
+              ],
+              "hostIP": "10.1.0.4",
+              "hostIPs": [
+                {
+                  "ip": "10.1.0.4"
+                }
+              ],
+              "phase": "Failed",
+              "podIP": "192.168.1.110",
+              "podIPs": [
+                {
+                  "ip": "192.168.1.110"
+                }
+              ],
+              "qosClass": "BestEffort",
+              "startTime": 1732101291
+            }
+          },
+          {
+            "metadata": {
+              "creationTimestamp": 1732101258,
+              "generateName": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de-",
+              "labels": {
+                "app.kubernetes.io/instance": "dhcore-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "app.kubernetes.io/version": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "batch.kubernetes.io/controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f",
+                "batch.kubernetes.io/job-name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "controller-uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f",
+                "dhcore/framework": "k8sjob",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "dbt",
+                "job-name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+              },
+              "managedFields": [
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kube-controller-manager",
+                  "operation": "Update",
+                  "time": 1732101258
+                },
+                {
+                  "apiVersion": "v1",
+                  "fieldsType": "FieldsV1",
+                  "manager": "kubelet",
+                  "operation": "Update",
+                  "subresource": "status",
+                  "time": 1732101291
+                }
+              ],
+              "name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de-wmv6z",
+              "namespace": "digitalhub-tenant1",
+              "ownerReferences": [
+                {
+                  "apiVersion": "batch/v1",
+                  "blockOwnerDeletion": true,
+                  "controller": true,
+                  "kind": "Job",
+                  "name": "j-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "uid": "4a3e4bf0-b519-4904-933f-e57d8c12313f"
+                }
+              ],
+              "resourceVersion": "132657",
+              "uid": "149ce935-a8e6-48fc-ab94-b89c7f20dfa4"
+            },
+            "spec": {
+              "containers": [
+                {
+                  "args": [
+                    "wrapper.py"
+                  ],
+                  "command": [
+                    "python"
+                  ],
+                  "env": [
+                    {
+                      "name": "DH_RUN_SECRET_NAME",
+                      "value": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                    },
+                    {
+                      "name": "DHCORE_ACCESS_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ACCESS_TOKEN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_REFRESH_TOKEN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_REFRESH_TOKEN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_CLIENT_ID",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_CLIENT_ID",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_TOKEN_TYPE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_TOKEN_TYPE",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "DHCORE_ISSUER",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_ISSUER",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "PROJECT_NAME",
+                      "value": "demo-etl"
+                    },
+                    {
+                      "name": "DHCORE_EXPIRES_IN",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "DHCORE_EXPIRES_IN",
+                          "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                        }
+                      }
+                    },
+                    {
+                      "name": "RUN_ID",
+                      "value": "0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+                    }
+                  ],
+                  "envFrom": [
+                    {
+                      "configMapRef": {
+                        "name": "digitalhub-common-env"
+                      }
+                    },
+                    {
+                      "secretRef": {
+                        "name": "digitalhub-common-creds"
+                      }
+                    }
+                  ],
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt:latest",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "c-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "privileged": false,
+                    "runAsNonRoot": true
+                  },
+                  "terminationMessagePath": "/dev/termination-log",
+                  "terminationMessagePolicy": "File",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                      "name": "kube-api-access-trssp",
+                      "readOnly": true
+                    }
+                  ]
+                }
+              ],
+              "dnsPolicy": "ClusterFirst",
+              "enableServiceLinks": true,
+              "imagePullSecrets": [
+                {
+                  "name": "registry-credentials"
+                }
+              ],
+              "nodeName": "digitalhub-dev-md-0-jkh8r-snphp",
+              "preemptionPolicy": "PreemptLowerPriority",
+              "priority": 0,
+              "restartPolicy": "Never",
+              "schedulerName": "default-scheduler",
+              "securityContext": {
+                "runAsNonRoot": true
+              },
+              "serviceAccount": "default",
+              "serviceAccountName": "default",
+              "terminationGracePeriodSeconds": 30,
+              "tolerations": [
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/not-ready",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                },
+                {
+                  "effect": "NoExecute",
+                  "key": "node.kubernetes.io/unreachable",
+                  "operator": "Exists",
+                  "tolerationSeconds": 300
+                }
+              ],
+              "volumes": [
+                {
+                  "name": "kube-api-access-trssp",
+                  "projected": {
+                    "defaultMode": 420,
+                    "sources": [
+                      {
+                        "serviceAccountToken": {
+                          "expirationSeconds": 3607,
+                          "path": "token"
+                        }
+                      },
+                      {
+                        "configMap": {
+                          "items": [
+                            {
+                              "key": "ca.crt",
+                              "path": "ca.crt"
+                            }
+                          ],
+                          "name": "kube-root-ca.crt"
+                        }
+                      },
+                      {
+                        "downwardAPI": {
+                          "items": [
+                            {
+                              "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                              },
+                              "path": "namespace"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": 1732101291,
+                  "status": "False",
+                  "type": "PodReadyToStartContainers"
+                },
+                {
+                  "lastTransitionTime": 1732101258,
+                  "status": "True",
+                  "type": "Initialized"
+                },
+                {
+                  "lastTransitionTime": 1732101289,
+                  "reason": "PodFailed",
+                  "status": "False",
+                  "type": "Ready"
+                },
+                {
+                  "lastTransitionTime": 1732101289,
+                  "reason": "PodFailed",
+                  "status": "False",
+                  "type": "ContainersReady"
+                },
+                {
+                  "lastTransitionTime": 1732101258,
+                  "status": "True",
+                  "type": "PodScheduled"
+                }
+              ],
+              "containerStatuses": [
+                {
+                  "containerID": "containerd://d76cc5653de8cc5d830cf3266e27ba40234205285cf7166879495b6456b15309",
+                  "image": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt:latest",
+                  "imageID": "ghcr.io/scc-digitalhub/digitalhub-sdk/wrapper-dbt@sha256:14734b71f525e4d0b5d8354a9e28fd357c696f78a1b56549205e0e492c33def8",
+                  "name": "c-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                  "ready": false,
+                  "restartCount": 0,
+                  "started": false,
+                  "state": {
+                    "terminated": {
+                      "containerID": "containerd://d76cc5653de8cc5d830cf3266e27ba40234205285cf7166879495b6456b15309",
+                      "exitCode": 1,
+                      "finishedAt": 1732101279,
+                      "reason": "Error",
+                      "startedAt": 1732101277
+                    }
+                  }
+                }
+              ],
+              "hostIP": "10.1.0.4",
+              "hostIPs": [
+                {
+                  "ip": "10.1.0.4"
+                }
+              ],
+              "phase": "Failed",
+              "podIP": "192.168.1.201",
+              "podIPs": [
+                {
+                  "ip": "192.168.1.201"
+                }
+              ],
+              "qosClass": "BestEffort",
+              "startTime": 1732101258
+            }
+          }
+        ],
+        "secret": {
+          "secret": {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+              "labels": {
+                "dhcore/framework": "k8sjob",
+                "app.kubernetes.io/managed-by": "dhcore",
+                "app.kubernetes.io/part-of": "dhcore-demo-etl",
+                "dhcore/project": "demo-etl",
+                "dhcore/runtime": "dbt",
+                "app.kubernetes.io/version": "0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+                "app.kubernetes.io/instance": "dhcore-0bb7ac49-c27f-4a90-ab76-edd5048b35de"
+              },
+              "name": "sec-dbttransform-0bb7ac49-c27f-4a90-ab76-edd5048b35de",
+              "namespace": "digitalhub-tenant1"
+            }
+          }
+        }
+      }
+    },
+    "user": "digitalhubdev"
+  }
