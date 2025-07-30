@@ -1,0 +1,169 @@
+Metadata-Version: 2.4
+Name: mbxai
+Version: 1.4.0
+Summary: MBX AI SDK
+Project-URL: Homepage, https://www.mibexx.de
+Project-URL: Documentation, https://www.mibexx.de
+Project-URL: Repository, https://github.com/yourusername/mbxai.git
+Author: MBX AI
+License: MIT
+License-File: LICENSE
+Classifier: Development Status :: 4 - Beta
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.12
+Requires-Dist: fastapi>=0.115.12
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: mcp>=1.7.1
+Requires-Dist: openai>=1.77.0
+Requires-Dist: pydantic-settings>=2.9.1
+Requires-Dist: pydantic>=2.9.1
+Requires-Dist: python-multipart>=0.0.20
+Requires-Dist: sse-starlette>=2.3.4
+Requires-Dist: starlette>=0.46.2
+Requires-Dist: typing-inspection<=0.4.0
+Requires-Dist: uvicorn>=0.34.2
+Provides-Extra: dev
+Requires-Dist: black>=24.3.0; extra == 'dev'
+Requires-Dist: isort>=5.13.2; extra == 'dev'
+Requires-Dist: mypy>=1.8.0; extra == 'dev'
+Requires-Dist: pytest-asyncio>=0.26.0; extra == 'dev'
+Requires-Dist: pytest-cov>=6.1.1; extra == 'dev'
+Requires-Dist: pytest>=8.3.5; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# MBX AI
+
+A Python library for building AI applications with LLMs.
+
+## Features
+
+- **OpenRouter Integration**: Connect to various LLM providers through OpenRouter
+- **Tool Integration**: Easily integrate tools with LLMs using the Model Context Protocol (MCP)
+- **Structured Output**: Get structured, typed responses from LLMs
+- **Chat Interface**: Simple chat interface for interacting with LLMs
+- **FastAPI Server**: Built-in FastAPI server for tool integration
+
+## Installation
+
+```bash
+pip install mbxai
+```
+
+## Quick Start
+
+### Basic Usage
+
+```python
+from mbxai import OpenRouterClient
+
+# Initialize the client
+client = OpenRouterClient(api_key="your-api-key")
+
+# Chat with an LLM
+response = await client.chat([
+    {"role": "user", "content": "Hello, how are you?"}
+])
+print(response.choices[0].message.content)
+```
+
+### Using Tools
+
+```python
+from mbxai import OpenRouterClient, ToolClient
+from pydantic import BaseModel
+
+# Define your tool's input and output models
+class CalculatorInput(BaseModel):
+    a: float
+    b: float
+
+class CalculatorOutput(BaseModel):
+    result: float
+
+# Create a calculator tool
+async def calculator(input: CalculatorInput) -> CalculatorOutput:
+    return CalculatorOutput(result=input.a + input.b)
+
+# Initialize the client with tools
+client = ToolClient(OpenRouterClient(api_key="your-api-key"))
+client.add_tool(calculator)
+
+# Use the tool in a chat
+response = await client.chat([
+    {"role": "user", "content": "What is 2 + 3?"}
+])
+print(response.choices[0].message.content)
+```
+
+### Using MCP (Model Context Protocol)
+
+```python
+from mbxai import OpenRouterClient, MCPClient
+from mbxai.mcp import MCPServer
+from mcp.server.fastmcp import FastMCP
+from pydantic import BaseModel
+
+# Define your tool's input and output models
+class CalculatorInput(BaseModel):
+    a: float
+    b: float
+
+class CalculatorOutput(BaseModel):
+    result: float
+
+# Create a FastMCP instance
+mcp = FastMCP("calculator-service")
+
+# Create a calculator tool
+@mcp.tool()
+async def calculator(argument: CalculatorInput) -> CalculatorOutput:
+    return CalculatorOutput(result=argument.a + argument.b)
+
+# Start the MCP server
+server = MCPServer("calculator-service")
+await server.add_tool(calculator)
+await server.start()
+
+# Initialize the MCP client
+client = MCPClient(OpenRouterClient(api_key="your-api-key"))
+await client.register_mcp_server("calculator-service", "http://localhost:8000")
+
+# Use the tool in a chat
+response = await client.chat([
+    {"role": "user", "content": "What is 2 + 3?"}
+])
+print(response.choices[0].message.content)
+```
+
+## Development
+
+### Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/mbxai.git
+cd mbxai
+```
+
+2. Create a virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -e ".[dev]"
+```
+
+### Running Tests
+
+```bash
+pytest tests/
+```
+
+## License
+
+MIT License
