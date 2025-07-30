@@ -1,0 +1,31 @@
+[project]
+name = "llm-mistral"
+version = "0.15"
+description = "LLM plugin providing access to Mistral models using the Mistral API"
+readme = "README.md"
+authors = [{name = "Simon Willison"}]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License"
+]
+dependencies = [
+    "llm>=0.26",
+    "httpx",
+    "httpx-sse",
+]
+
+[project.urls]
+Homepage = "https://github.com/simonw/llm-mistral"
+Changelog = "https://github.com/simonw/llm-mistral/releases"
+Issues = "https://github.com/simonw/llm-mistral/issues"
+CI = "https://github.com/simonw/llm-mistral/actions"
+
+[project.entry-points.llm]
+mistral = "llm_mistral"
+
+[project.optional-dependencies]
+test = ["cogapp", "pytest", "pytest-httpx", "pytest-asyncio"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
