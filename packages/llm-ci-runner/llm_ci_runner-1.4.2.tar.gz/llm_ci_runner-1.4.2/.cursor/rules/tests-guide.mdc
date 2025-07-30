@@ -1,0 +1,288 @@
+---
+description: Tests
+globs: tests/*,tests/**/*.py
+alwaysApply: false
+---
+# Testing Guide 
+
+## Directory Structure & Organization
+
+```
+tests/
+├── unit/                    # Unit tests with heavy mocking
+│   └── somedirectory/           # Mirror source code structure
+│       ├── langchain_related/
+│       ├── user_client/
+│       └── ...
+└── integration/            # Integration tests with mocking of external dependencies / APIs only
+```
+
+**File Naming**: Test files prefixed with `test_` and mirror source structure:
+- Source: `somedirectory/langchain_related/tools/planer.py`
+- Test: `tests/unit/somedirectory/langchain_related/tools/test_planer.py`
+
+## Running Tests
+
+### Direct UV Execution
+```bash
+uv run pytest tests/unit/ -v
+uv run pytest tests/unit/path/to/test.py::TestClass::test_method -v
+```
+
+## Test Structure Patterns
+
+### Test Organization
+```python
+class TestPlanModel:
+    """Tests for PlanModel class."""
+    
+    def test_valid_model(self):
+        """Test creating a valid PlanModel."""
+        # given
+        data = {"selected_tool_names": ["Tool1"], "main_goal": "Test"}
+        
+        # when
+        model = PlanModel(**data)
+        
+        # then
+        assert model.selected_tool_names == ["Tool1"]
+        assert model.main_goal == "Test"
+
+    @pytest.mark.parametrize("input_data, expected", [
+        pytest.param("input1", "output1", id="scenario1"),
+        pytest.param("input2", "output2", id="scenario2"),
+    ])
+    def test_multiple_scenarios(self, input_data, expected):
+        """Test multiple scenarios with different inputs."""
+        # given
+        component = ComponentUnderTest()
+        
+        # when
+        result = component.process(input_data)
+        
+        # then
+        assert result == expected
+```
+
+### Given-When-Then Pattern (Required)
+```python
+def test_feature_functionality(self):
+    """Test description of what this validates."""
+    # given: setup test conditions
+    mock_data = {"key": "value"}
+    component = ComponentUnderTest()
+    
+    # when: execute the action being tested
+    result = component.method_under_test(mock_data)
+    
+    # then: verify expected outcomes
+    assert result == "expected_result"
+    assert component.state == "expected_state"
+```
+
+### Async Testing
+```python
+@pytest.mark.asyncio
+async def test_async_functionality(self):
+    """Test async operations."""
+    # given
+    mock_service = AsyncMock()
+    mock_service.process.return_value = "async_result"
+    
+    # when
+    result = await component.async_method()
+    
+    # then
+    assert result == "async_result"
+    mock_service.process.assert_called_once()
+```
+
+## Common Test Patterns
+
+### Unit Test Template
+```python
+class TestMyComponent:
+    """Tests for MyComponent class."""
+    
+    @pytest.fixture
+    def component(self):
+        """Create component instance for testing."""
+        return MyComponent()
+    
+    def test_basic_functionality(self, component):
+        """Test basic component functionality."""
+        # given
+        input_data = "test input"
+        
+        # when
+        result = component.process(input_data)
+        
+        # then
+        assert result == "expected output"
+```
+
+
+## Best Practices
+
+1. **Use Given-When-Then structure** - Always structure tests with these comments
+2. **Group tests in classes** - Organize related tests together
+3. **Use descriptive test names** - Test name should explain what is being tested
+4. **Leverage autouse fixtures** - Don't manually mock what's auto-mocked
+5. **Test both success and error paths** - Include error handling tests
+6. **Use parametrization** - Test multiple scenarios efficiently
+7. **Keep tests focused** - One assertion per test concept
+8. **Use appropriate markers** - `@pytest.mark.asyncio`, `@pytest.mark.essential`
+
+## 🎯 **CRITICAL: Test BEHAVIOR, Not IMPLEMENTATION**
+
+*The most important testing principle for maintainable, refactoring-safe tests*
+
+### **Why This Matters**
+
+**✅ GOOD - Behavior-Focused Tests:**
+```python
+@pytest.mark.asyncio
+async def test_execute_llm_task_structured_mode(self, mock_kernel):
+    """Test executing LLM task in structured mode (with schema)."""
+    # given
+    kernel = mock_kernel
+    chat_history = [{"role": "user", "content": "Hello"}]
+    schema_file = "mock_schema_file"
+    
+    # when - Testing PUBLIC interface
+    result = await execute_llm_task(kernel, chat_history, schema_file)
+    
+    # then - Verifying BEHAVIOR/OUTCOMES
+    assert result["mode"] == "structured"
+    assert result["schema_enforced"] == True
+    # ✅ Tests WHAT the function does, not HOW
+```
+
+**❌ BAD - Implementation-Focused Tests:**
+```python
+async def test_execute_llm_task_internal_details(self):
+    """DON'T DO THIS - Testing internal implementation."""
+    # ❌ Testing internal function calls
+    with patch("module._internal_helper_function") as mock_helper:
+        # ❌ Testing how schema loading works internally
+        with patch("module._load_schema_internal") as mock_schema:
+            result = await execute_llm_task(...)
+            # ❌ Verifying internal call patterns
+            mock_helper.assert_called_with_specific_params()
+            mock_schema.assert_called_once()
+```
+
+### **Real-World Success Example**
+
+**Phase 2 Refactoring Proof**: During our major architecture refactoring from parameter pollution to class-based design:
+
+**BEFORE (Internal Complexity):**
+```python
+async def execute_llm_task(...):
+    schema_model = None
+    schema_dict = None
+    if schema_file:
+        schema_result = load_schema_file(...)
+        # 50+ lines of complex internal logic
+    enhanced_history = _enhance_prompt_with_one_shot_example(...)
+    result = await _execute_semantic_kernel_with_schema(...)
+```
+
+**AFTER (Clean Class Architecture):**
+```python
+async def execute_llm_task(...):
+    executor = LLMExecutor(kernel=kernel, schema_file=schema_file, output_file=output_file)
+    return await executor.execute(chat_history)
+```
+
+**Test Results**: **209/209 tests passed** with **ZERO test changes** because tests focused on behavior, not implementation!
+
+### **Behavior vs Implementation Guidelines**
+
+| ✅ **Test This (BEHAVIOR)**    | ❌ **Don't Test This (IMPLEMENTATION)** |
+| ----------------------------- | -------------------------------------- |
+| Function return values        | Internal function calls                |
+| Error conditions and messages | How errors are generated internally    |
+| State changes in the system   | Which internal methods are called      |
+| Public API contracts          | Private method implementations         |
+| Input validation rules        | How validation is implemented          |
+| Business logic outcomes       | Code organization patterns             |
+
+### **Benefits of Behavior-Focused Testing**
+
+1. **🔄 Refactoring Safety** - Tests survive major internal changes
+2. **📈 Maintenance** - Tests remain stable during code evolution  
+3. **🎯 Focus** - Tests verify what users/consumers actually care about
+4. **⚡ Speed** - Less brittle tests mean fewer test maintenance cycles
+5. **🧠 Clarity** - Tests document actual requirements, not implementation details
+
+### **Practical Application**
+
+**When writing tests, ask:**
+- ❓ "If I completely rewrote this function's internals, should this test still pass?"
+- ❓ "Does this test verify what a user of this function cares about?"
+- ❓ "Would this test help me catch a bug that affects the end user?"
+
+**If the answer is YES → You're testing behavior ✅**  
+**If the answer is NO → You're testing implementation ❌**
+
+This principle is the foundation of maintainable test suites that survive architectural changes.
+
+## Adding New Tests
+
+1. **Create test file** mirroring source structure with `test_` prefix
+2. **Import necessary modules** and fixtures
+3. **Organize tests in classes** by functionality
+4. **Use Given-When-Then pattern** for all tests
+5. **Add fixtures** in local `conftest.py` if needed
+6. **Run tests locally** before committing: `./run_tests.sh unit/path/to/test.py`
+
+## 🛠️ **SYSTEMATIC TEST FAILURE RESOLUTION FOR CURSOR**
+
+*Advanced debugging methodology for large-scale test failures during refactoring*
+
+### **When to Use Systematic Approach**
+
+Use this methodology when facing:
+- **Large refactoring impacts** (20+ failing tests)
+- **Architectural changes** (module moves, domain model evolution)
+- **Infrastructure updates** (Pydantic adoption, API changes)
+- **Multiple failure categories** (imports, types, business logic)
+
+### **Phase-Based Debugging Strategy**
+
+#### **🚨 Phase 1: Import/Module Errors (Fix First)**
+```python
+# Common pattern: Module refactoring breaks imports
+# ❌ OLD: from handlers.google_calendar_handler import Handler
+# ✅ NEW: from langchain_related.tools.google_calendar_tool import Tool
+
+# Strategy: Update import paths systematically
+# 1. Fix conftest.py fixtures first (prevents cascade failures)
+# 2. Update patch targets to match new module structure
+# 3. Create import mapping for large refactors
+```
+
+#### **🔧 Phase 2: Domain Model Evolution (High Impact)**
+```python
+# Common pattern: Business logic changes break tests
+# ❌ OLD: consent.category == ConsentCategory.BASIC_TERMS
+# ✅ NEW: consent.category == ConsentCategory.BASIC_DATA_PROCESSING
+
+# Strategy: Understand business changes before fixing
+# 1. Analyze current domain model structure
+# 2. Add delegation methods for backward compatibility
+# 3. Update test expectations to match new business rules
+```
+
+#### **🔒 Phase 3: Type Safety Migration (Pydantic Focus)**
+```python
+# Common pattern: Dict access → Pydantic attribute access
+# ❌ OLD: result['allowed'], limits['minute_limit']
+# ✅ NEW: result.allowed, limits.minute_limit
+
+# Strategy: Systematic type safety conversion
+# 1. Find all dictionary access patterns
+# 2. Convert to attribute access systematically
+# 3. Update all related assertions
+```
