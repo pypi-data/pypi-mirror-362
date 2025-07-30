@@ -1,0 +1,131 @@
+name: Semantic Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+    
+    - name: Set up Python
+      run: uv python install 3.12
+    
+    - name: Install dependencies
+      run: uv sync --all-extras
+    
+    - name: Run tests
+      run: uv run python tests/test_validation.py
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    
+    - name: Run quality checks
+      run: |
+        uvx ruff check claude_code_adk_validator/
+        uvx mypy claude_code_adk_validator/
+        uvx black --check claude_code_adk_validator/
+    
+    - name: Determine version bump
+      id: bump
+      run: |
+        # Get commit messages since last tag
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        
+        if [[ -z "$LAST_TAG" ]]; then
+          echo "version_bump=patch" >> $GITHUB_OUTPUT
+          echo "No previous tags found, defaulting to patch"
+          exit 0
+        fi
+        
+        COMMITS=$(git log $LAST_TAG..HEAD --oneline)
+        
+        if echo "$COMMITS" | grep -qE "BREAKING CHANGE|feat!:|fix!:"; then
+          echo "version_bump=major" >> $GITHUB_OUTPUT
+          echo "Breaking changes detected, bumping major version"
+        elif echo "$COMMITS" | grep -qE " feat:"; then
+          echo "version_bump=minor" >> $GITHUB_OUTPUT
+          echo "New features detected, bumping minor version"
+        elif echo "$COMMITS" | grep -qE " fix:| perf:| refactor:"; then
+          echo "version_bump=patch" >> $GITHUB_OUTPUT
+          echo "Bug fixes/improvements detected, bumping patch version"
+        else
+          echo "version_bump=none" >> $GITHUB_OUTPUT
+          echo "No significant changes detected, skipping release"
+        fi
+    
+    - name: Calculate new version
+      id: version
+      if: steps.bump.outputs.version_bump != 'none'
+      run: |
+        CURRENT_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+        
+        IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+        
+        case "${{ steps.bump.outputs.version_bump }}" in
+          major) NEW_VERSION="$((major + 1)).0.0" ;;
+          minor) NEW_VERSION="$major.$((minor + 1)).0" ;;
+          patch) NEW_VERSION="$major.$minor.$((patch + 1))" ;;
+        esac
+        
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        echo "Calculated new version: $NEW_VERSION"
+    
+    - name: Update version files
+      if: steps.bump.outputs.version_bump != 'none'
+      run: |
+        NEW_VERSION="${{ steps.version.outputs.new_version }}"
+        
+        sed -i "s/^version = .*/version = \"$NEW_VERSION\"/" pyproject.toml
+        sed -i "s/__version__ = .*/__version__ = \"$NEW_VERSION\"/" claude_code_adk_validator/__init__.py
+    
+    - name: Build package
+      if: steps.bump.outputs.version_bump != 'none'
+      run: uv build
+    
+    - name: Create release commit and tag
+      if: steps.bump.outputs.version_bump != 'none'
+      run: |
+        NEW_VERSION="${{ steps.version.outputs.new_version }}"
+        
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git add pyproject.toml claude_code_adk_validator/__init__.py
+        git commit -m "bump: version $NEW_VERSION [skip ci]"
+        git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+        git push origin main --follow-tags
+    
+    - name: Publish to PyPI
+      if: steps.bump.outputs.version_bump != 'none'
+      uses: pypa/gh-action-pypi-publish@release/v1
+    
+    - name: Create GitHub Release
+      if: steps.bump.outputs.version_bump != 'none'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.version.outputs.new_version }}
+        files: dist/*
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

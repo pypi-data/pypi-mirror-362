@@ -1,0 +1,114 @@
+name: Release and Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+      version:
+        description: 'Specific version (optional, overrides version_type)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+    
+    - name: Set up Python
+      run: uv python install 3.12
+    
+    - name: Install dependencies
+      run: uv sync --all-extras
+    
+    - name: Run tests
+      run: uv run python tests/test_validation.py
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    
+    - name: Run quality checks
+      run: |
+        uvx ruff check claude_code_adk_validator/
+        uvx mypy claude_code_adk_validator/
+        uvx black --check claude_code_adk_validator/
+    
+    - name: Determine new version
+      id: version
+      run: |
+        CURRENT_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+        echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        
+        if [[ -n "${{ github.event.inputs.version }}" ]]; then
+          NEW_VERSION="${{ github.event.inputs.version }}"
+        else
+          # Auto-increment based on type
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          case "${{ github.event.inputs.version_type }}" in
+            major) NEW_VERSION="$((major + 1)).0.0" ;;
+            minor) NEW_VERSION="$major.$((minor + 1)).0" ;;
+            patch) NEW_VERSION="$major.$minor.$((patch + 1))" ;;
+          esac
+        fi
+        
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "Bumping version from $CURRENT_VERSION to $NEW_VERSION"
+    
+    - name: Update version in files
+      run: |
+        NEW_VERSION="${{ steps.version.outputs.new_version }}"
+        
+        # Update pyproject.toml
+        sed -i "s/^version = .*/version = \"$NEW_VERSION\"/" pyproject.toml
+        
+        # Update __init__.py
+        sed -i "s/__version__ = .*/__version__ = \"$NEW_VERSION\"/" claude_code_adk_validator/__init__.py
+    
+    - name: Commit and tag
+      run: |
+        NEW_VERSION="${{ steps.version.outputs.new_version }}"
+        
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git add pyproject.toml claude_code_adk_validator/__init__.py
+        git commit -m "bump: version $NEW_VERSION"
+        git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+        git push origin main
+        git push origin "v$NEW_VERSION"
+    
+    - name: Build package
+      run: uv build
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.version.outputs.new_version }}
+        files: dist/*
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
