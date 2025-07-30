@@ -1,0 +1,90 @@
+Metadata-Version: 2.1
+Name: juice-simphony
+Version: 0.1.1
+Summary: JUICE Scenario Generator
+License: ESA
+Author: JUICE SOC Team
+Requires-Python: >=3.10
+Classifier: License :: Other/Proprietary License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Dist: jinja2 (>=3.1.6,<4.0.0)
+Requires-Dist: python-dotenv (>=1.1.0,<2.0.0)
+Requires-Dist: requests (>=2.32.3,<3.0.0)
+Requires-Dist: setuptools (>=80.3.1,<81.0.0)
+Description-Content-Type: text/markdown
+
+# JUICE Symphony
+
+
+## Getting started
+
+
+## Project requirements
+
+- Python 3.10
+
+## Install the package
+
+```
+pip install juice-simphony
+```
+
+## Check spice kernels (for MAPPS products)
+
+Ensure that the spice meta-kernel is aligned with that of the segmentation. 
+If not, perform a git checkout accordingly.
+
+
+## Run the script
+
+Start by running the script with the -h option
+
+```
+juice-simphony -h
+```
+the following output is expected
+```
+usage: juice-simphony [-h] [--config CONFIG] [--template] [--mapps]
+
+Standalone Simphony Scenario Generator
+
+options:
+  -h, --help       show this help message and exit
+  --config CONFIG  Path to JSON config file
+  --template       Optional flag to dump template and exit
+  --mapps          Enable MAPPS-specific behaviour
+  --zip            Save the output as a ZIP file
+```
+
+Get the template configuration file by executing
+```
+juice-simphony --template
+```
+which prints the configuration file in data/config_scenario.json.
+
+```
+{
+  "juice_conf": "$HOME/juice_conf",
+  "output_folder": "$HOME/JUICE_PREOPS/PLANNING",
+  "kernel_abs_path": "$HOME/juice/kernels",
+  "scenario_id": "S008_01",
+  "shortDesc": "ORB17",
+  "trajectory": "CREMA_5_1_150lb_23_1_a3",
+  "mnemonic": "S008_ORB17_S13P00",
+  "startTime": "2032-12-18T17:32:33",
+  "endTime": "2033-01-08T21:05:31",
+  "main_target": "Jupiter",
+  "iniAbsolutePath": "SOFTWARE/MAPPS"
+}
+```
+Execute the package via 
+```
+juice-simphony --config yourpath/config_scenario.json (--mapps --zip)
+```
+where the --mapps option allows the generation of MAPPS specific outputs, and the --zip option can be used to zip the output folder.
+
+The output is folder created generated in the directory provided above in the configuration. 
+
