@@ -1,0 +1,64 @@
+<section id="cta" class="py-16 bg-gradient-to-r from-blue-100 to-blue-200">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="space-y-6" data-aos="fade-up">
+      {% if sections.cta.badge %}
+      <div class="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-sm">
+        <span class="text-base mr-2">🎯</span>
+        <span class="font-semibold text-gray-900">{{ sections.cta.badge }}</span>
+      </div>
+      {% endif %}
+      
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+        {{ sections.cta.title }}
+        {% if sections.cta.highlight %}
+        <span class="block text-blue-600">{{ sections.cta.highlight }}</span>
+        {% endif %}
+      </h2>
+      
+      <p class="text-base text-gray-600 max-w-2xl mx-auto">
+        {{ sections.cta.description }}
+      </p>
+      
+      {% if sections.cta.buttons %}
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        {% for button in sections.cta.buttons %}
+        <a href="{{ button.url }}" 
+           class="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 inline-flex items-center justify-center gap-2">
+          {% if button.icon %}
+          <i class="{{ button.icon | default('ri-arrow-right-line') }} text-lg"></i>
+          {% endif %}
+          {{ button.label }}
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if sections.cta.trustIndicators %}
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8">
+        {% for indicator in sections.cta.trustIndicators %}
+        <div class="text-center p-4 bg-white rounded-lg shadow-sm">
+          <div class="text-2xl font-semibold text-blue-600">{{ indicator.value }}</div>
+          <div class="text-sm text-gray-600">{{ indicator.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if sections.cta.guarantees %}
+      <div class="grid md:grid-cols-3 gap-6 pt-8">
+        {% for guarantee in sections.cta.guarantees %}
+        <div class="flex items-center gap-3 justify-center p-4 bg-white rounded-lg shadow-sm">
+          <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <i class="{{ guarantee.icon | default('ri-shield-check-line') }} text-blue-600"></i>
+          </div>
+          <div class="text-left">
+            <div class="font-semibold text-gray-900">{{ guarantee.title }}</div>
+            <div class="text-gray-600 text-sm">{{ guarantee.description }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

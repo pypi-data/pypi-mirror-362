@@ -1,0 +1,82 @@
+<section id="testimonials" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.testimonials.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.testimonials.subtitle }}
+      </p>
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    {% if sections.testimonials.featured %}
+    <div
+      class="bg-gray-50 p-8 rounded-2xl mb-12 max-w-4xl mx-auto"
+      data-aos="fade-up"
+    >
+      <div class="flex flex-col md:flex-row items-center gap-6">
+        {% if sections.testimonials.featured.avatar %}
+        <img
+          src="{{ sections.testimonials.featured.avatar.src }}"
+          alt="{{ sections.testimonials.featured.name }}"
+          class="w-16 h-16 rounded-full object-cover"
+        />
+        {% endif %}
+        <div class="flex-1 text-center md:text-left">
+          <blockquote class="text-lg text-gray-700 mb-4">
+            "{{ sections.testimonials.featured.quote }}"
+          </blockquote>
+          <div class="font-semibold text-gray-900">
+            {{ sections.testimonials.featured.name }}
+          </div>
+          <div class="text-sm text-gray-600">
+            {{ sections.testimonials.featured.title }}
+          </div>
+          {% if sections.testimonials.featured.rating %}
+          <div class="flex justify-center md:justify-start mt-2">
+            {% for i in range(5) %}
+            <i class="ri-star-fill text-yellow-400 text-sm"></i>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for testimonial in sections.testimonials.items %}
+      <div
+        class="bg-gray-50 p-6 rounded-xl"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        <div class="flex items-center gap-3 mb-4">
+          {% if testimonial.avatar %}
+          <img
+            src="{{ testimonial.avatar.src }}"
+            alt="{{ testimonial.name }}"
+            class="w-10 h-10 rounded-full object-cover"
+          />
+          {% endif %}
+          <div>
+            <div class="font-medium text-gray-900">{{ testimonial.name }}</div>
+            <div class="text-sm text-gray-600">{{ testimonial.title }}</div>
+          </div>
+        </div>
+        <blockquote class="text-gray-700 mb-3">
+          "{{ testimonial.quote }}"
+        </blockquote>
+        {% if testimonial.rating %}
+        <div class="flex">
+          {% for i in range(testimonial.rating) %}
+          <i class="ri-star-fill text-yellow-400 text-sm"></i>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

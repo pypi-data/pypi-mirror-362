@@ -1,0 +1,53 @@
+<section id="portfolio" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ sections.portfolio.title }}</h2>
+      {% if sections.portfolio.subtitle %}
+      <p class="text-lg text-gray-600">{{ sections.portfolio.subtitle }}</p>
+      {% endif %}
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+    
+    {% if sections.portfolio.categories %}
+    <div class="flex flex-wrap justify-center gap-4 mb-12">
+      <button class="px-4 py-2 bg-primary text-white rounded-lg font-medium">All</button>
+      {% for category in sections.portfolio.categories %}
+      <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+        {{ category }}
+      </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for item in sections.portfolio.items %}
+      <div class="group relative overflow-hidden rounded-xl bg-gray-100" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        {% if item.image %}
+        <img src="{{ item.image.src }}" 
+             alt="{{ item.image.alt }}" 
+             class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500">
+        {% endif %}
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+            <h3 class="text-lg font-semibold mb-2">{{ item.title }}</h3>
+            {% if item.category %}
+            <p class="text-sm text-white/80 mb-3">{{ item.category }}</p>
+            {% endif %}
+            {% if item.description %}
+            <p class="text-sm text-white/90">{{ item.description }}</p>
+            {% endif %}
+            
+            {% if item.link %}
+            <a href="{{ item.link.url }}" 
+               class="inline-block mt-3 text-white font-medium hover:text-white/80 transition-colors">
+              {{ item.link.label }} →
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

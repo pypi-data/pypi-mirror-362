@@ -1,0 +1,55 @@
+<section id="pricing" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.pricing.title }}
+      </h2>
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      {% for plan in sections.pricing.plans %}
+      <div
+        class="{% if plan.highlighted %}bg-primary text-white{% else %}bg-white border border-gray-200{% endif %} p-8 rounded-2xl relative"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        {% if plan.highlighted %}
+        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <span
+            class="bg-secondary text-white px-4 py-1 rounded-full text-sm font-medium"
+            >Most Popular</span
+          >
+        </div>
+        {% endif %}
+
+        <div class="text-center mb-6">
+          <h3 class="text-xl font-bold mb-2">{{ plan.name }}</h3>
+          <div class="text-3xl font-bold mb-1">{{ plan.price }}</div>
+          {% if sections.pricing.currency and plan.price != 'Custom' %}
+          <div class="text-sm opacity-75">per month</div>
+          {% endif %}
+        </div>
+
+        <ul class="space-y-3 mb-8">
+          {% for feature in plan.features %}
+          <li class="flex items-start gap-2">
+            <i
+              class="ri-check-line {% if plan.highlighted %}text-white{% else %}text-primary{% endif %} mt-0.5"
+            ></i>
+            <span class="text-sm">{{ feature }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        <a
+          href="{{ plan.cta.url }}"
+          class="{% if plan.highlighted %}bg-white text-primary hover:bg-gray-100{% else %}bg-primary text-white hover:bg-primary/90{% endif %} w-full py-3 rounded-lg font-medium transition-colors text-center block"
+        >
+          {{ plan.cta.label }}
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

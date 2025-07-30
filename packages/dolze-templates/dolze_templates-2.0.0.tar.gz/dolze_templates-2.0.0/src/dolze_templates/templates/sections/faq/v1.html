@@ -1,0 +1,31 @@
+<section id="faq" class="py-24 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <span class="inline-block text-xs uppercase tracking-widest text-gray-500 mb-3">
+        {{ sections.faq.title }}
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-light text-gray-900 mb-4">
+        {{ sections.faq.subtitle }}
+      </h2>
+      <div class="w-16 h-px bg-gray-300 mx-auto mb-6"></div>
+    </div>
+    
+    <div class="space-y-6">
+      {% for item in sections.faq.items %}
+      <div class="bg-white border border-gray-100 hover:shadow-sm transition-shadow duration-300" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <button class="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-300" 
+                onclick="toggleFaq({{ loop.index0 }})">
+          <span class="text-lg font-light text-gray-900 pr-4">{{ item.question }}</span>
+          <span class="text-gray-400 font-light" id="faq-icon-{{ loop.index0 }}">+</span>
+        </button>
+        
+        <div class="{% if not item.expanded %}hidden{% endif %} px-8 pb-6 border-t border-gray-100" id="faq-content-{{ loop.index0 }}">
+          <div class="pt-6">
+            <p class="text-gray-700 font-light leading-relaxed">{{ item.answer }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

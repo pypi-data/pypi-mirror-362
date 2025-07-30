@@ -1,0 +1,45 @@
+<section id="team" class="py-32 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <h2 class="text-5xl font-bold text-gray-900 mb-6">
+        {{ sections.team.title }}
+      </h2>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+      {% for member in sections.team.members %}
+      <div class="group text-center" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="bg-gradient-to-br from-gray-50 to-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100">
+          <div class="relative mb-8">
+            <div class="absolute -inset-4 bg-gradient-to-r from-primary/20 to-secondary/20 blur-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
+            <img src="{{ member.photo }}" 
+                 alt="{{ member.name }}" 
+                 class="relative w-28 h-28 rounded-2xl object-cover mx-auto border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-500">
+          </div>
+          
+          <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors duration-300">
+            {{ member.name }}
+          </h3>
+          <p class="text-primary font-semibold mb-4">{{ member.role }}</p>
+          
+          {% if member.bio %}
+          <p class="text-gray-600 text-sm leading-relaxed mb-6">{{ member.bio }}</p>
+          {% endif %}
+          
+          {% if member.socialLinks %}
+          <div class="flex justify-center gap-3">
+            {% for social in member.socialLinks %}
+            <a href="{{ social.url }}" 
+               class="w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gradient-to-br hover:from-primary hover:to-secondary hover:text-white transition-all duration-300 hover:scale-110 shadow-sm"
+               target="_blank" rel="noopener">
+              <i class="ri-{{ social.platform }}-line text-sm"></i>
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

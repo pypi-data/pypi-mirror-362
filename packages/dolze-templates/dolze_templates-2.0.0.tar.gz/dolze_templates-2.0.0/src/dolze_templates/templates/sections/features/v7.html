@@ -1,0 +1,62 @@
+<section id="features" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.features.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.features.subtitle }}
+      </p>
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for feature in sections.features.items %}
+      <div
+        class="bg-gray-50 p-6 rounded-xl hover:shadow-md transition-shadow"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        <div
+          class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
+        >
+          <i class="{{ feature.icon }} text-primary text-xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">
+          {{ feature.title }}
+        </h3>
+        <p class="text-gray-600 mb-4">{{ feature.subtitle }}</p>
+
+        {% if feature.badge %}
+        <span
+          class="inline-block px-2 py-1 text-xs font-medium bg-primary/10 text-primary rounded mb-3"
+        >
+          {{ feature.badge }}
+        </span>
+        {% endif %} {% if feature.status %}
+        <div class="text-sm text-green-600 font-medium mb-3">
+          {{ feature.status }}
+        </div>
+        {% endif %} {% if feature.benefits %}
+        <ul class="space-y-1 mb-4">
+          {% for benefit in feature.benefits %}
+          <li class="flex items-start gap-2 text-sm text-gray-600">
+            <i class="ri-check-line text-primary mt-0.5 flex-shrink-0"></i>
+            <span>{{ benefit }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %} {% if feature.media %}
+        <div class="mt-4">
+          <img
+            src="{{ feature.media.src }}"
+            alt="{{ feature.media.alt }}"
+            class="w-full h-32 object-cover rounded-lg"
+          />
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

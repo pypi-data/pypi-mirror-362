@@ -1,0 +1,224 @@
+<section id="features" aria-label="{{sections.features.title}}">
+  <div class="relative overflow-hidden bg-blue-600 pt-20 pb-28 sm:py-32">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+      <div class="max-w-2xl md:mx-auto md:text-center xl:max-w-none">
+        <h2
+          class="font-display text-3xl tracking-tight text-white sm:text-4xl md:text-5xl"
+        >
+          {{sections.features.title}}
+        </h2>
+        <p class="mt-6 text-lg tracking-tight text-blue-100">
+          {{sections.features.subtitle}}
+        </p>
+      </div>
+      <div
+        class="mt-16 grid grid-cols-1 items-center gap-y-2 pt-10 sm:gap-y-6 md:mt-20 lg:grid-cols-12 lg:pt-0"
+      >
+        <div
+          class="-mx-4 flex overflow-x-auto pb-4 sm:mx-0 sm:overflow-visible sm:pb-0 lg:col-span-5"
+        >
+          <div
+            class="relative z-10 flex gap-x-4 px-4 whitespace-nowrap sm:mx-auto sm:px-0 lg:mx-0 lg:block lg:gap-x-0 lg:gap-y-1 lg:whitespace-normal"
+            role="tablist"
+            aria-orientation="vertical"
+          >
+            {% for feature in sections.features.items %}
+            <div
+              class="group relative rounded-full px-4 py-1 lg:rounded-l-xl lg:rounded-r-none lg:p-6 {% if loop.index0 == 2 %}bg-white lg:bg-white/10 lg:ring-1 lg:ring-white/10 lg:ring-inset{% else %}hover:bg-white/10 lg:hover:bg-white/5{% endif %}"
+            >
+              <h3>
+                <button
+                  class="font-display text-lg data-selected:not-data-focus:outline-hidden {% if loop.index0 == 2 %}text-blue-600 lg:text-white{% else %}text-blue-100 hover:text-white lg:text-white{% endif %}"
+                  id="headlessui-tabs-tab-:R{{ loop.index }}d9afja:"
+                  role="tab"
+                  type="button"
+                  aria-selected="{% if loop.index0 == 2 %}true{% else %}false{% endif %}"
+                  tabindex="{% if loop.index0 == 2 %}0{% else %}-1{% endif %}"
+                  data-headlessui-state="{% if loop.index0 == 2 %}selected{% else %}{% endif %}"
+                  aria-controls="headlessui-tabs-panel-:R{{ loop.index }}l9afja:"
+                  {% if loop.index0 == 2 %}data-selected=""{% endif %}
+                  onclick="showTab({{ loop.index0 }})"
+                >
+                  <span
+                    class="absolute inset-0 rounded-full lg:rounded-l-xl lg:rounded-r-none"
+                  ></span
+                  >{{ feature.title }}
+                </button>
+              </h3>
+              <p
+                class="mt-2 hidden text-sm lg:block {% if loop.index0 == 2 %}text-white{% else %}text-blue-100 group-hover:text-white{% endif %}"
+              >
+                {{ feature.subtitle }}
+              </p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="lg:col-span-7">
+          {% for feature in sections.features.items %}
+          <div
+            id="headlessui-tabs-panel-:R{{ loop.index }}l9afja:"
+            role="tabpanel"
+            tabindex="{% if loop.index0 == 2 %}0{% else %}-1{% endif %}"
+            data-headlessui-state="{% if loop.index0 == 2 %}selected{% else %}{% endif %}"
+            aria-labelledby="headlessui-tabs-tab-:R{{ loop.index }}d9afja:"
+            style="display: {% if loop.index0 == 2 %}block{% else %}none{% endif %}"
+            {% if loop.index0 != 2 %}hidden=""{% endif %}
+            class="feature-panel"
+            data-tab-index="{{ loop.index0 }}"
+          >
+            <div class="relative sm:px-6 lg:hidden">
+              <div
+                class="absolute -inset-x-4 top-[-6.5rem] bottom-[-4.25rem] bg-white/10 ring-1 ring-white/10 ring-inset sm:inset-x-0 sm:rounded-t-xl"
+              ></div>
+              <p
+                class="relative mx-auto max-w-2xl text-base text-white sm:text-center"
+              >
+                {{ feature.subtitle }}
+              </p>
+            </div>
+            <div
+              class="mt-10 w-180 overflow-hidden rounded-xl bg-slate-50 shadow-xl shadow-blue-900/20 sm:w-auto lg:mt-0 lg:w-271.25"
+            >
+              <img
+                alt="{{ feature.media.alt }}"
+                fetchpriority="{% if loop.index0 == 2 %}high{% else %}low{% endif %}"
+                width="2174"
+                height="1464"
+                decoding="async"
+                data-nimg="1"
+                class="w-full"
+                style="color: transparent"
+                src="{{ feature.media.src }}"
+              />
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+    <div class="mx-auto max-w-2xl lg:max-w-4xl text-center">
+      <h2 class="text-base font-semibold leading-7 text-blue-600">
+        {{sections.cta.badge}}
+      </h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+        {{sections.cta.title}}
+      </p>
+      <p class="mt-6 text-lg leading-8 text-slate-600">
+        {{sections.cta.description}}
+      </p>
+    </div>
+    
+    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+      <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        {% for feature in sections.cta.features %}
+        <div class="flex flex-col rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-900/5 hover:shadow-md transition-all duration-200">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600">
+            <i class="{{ feature.icon | default('ri-service-line') }} text-white text-xl"></i>
+          </div>
+          <h3 class="mt-6 text-lg font-semibold leading-8 tracking-tight text-slate-900">
+            {{ feature.title }}
+          </h3>
+          <p class="mt-2 text-base leading-7 text-slate-600">
+            {{ feature.description }}
+          </p>
+          {% if feature.link %}
+          <div class="mt-4">
+            <a href="{{ feature.link.url }}" class="text-sm font-semibold leading-6 text-blue-600 hover:text-blue-500">
+              {{ feature.link.text }} <span aria-hidden="true">→</span>
+            </a>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="relative mt-16 sm:mt-20 lg:mt-24">
+      <div class="absolute -top-8 left-1/2 -z-10 flex w-full -translate-x-1/2 justify-center sm:-top-12">
+        <div class="h-56 w-full bg-slate-50 sm:h-72 md:h-96 lg:h-[32rem] xl:h-[36rem]"></div>
+      </div>
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-4xl">
+          <div class="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-900/5">
+            <img
+              class="w-full object-cover"
+              src="{{ sections.hero.heroImage.src }}"
+              alt="{{ sections.hero.heroImage.alt }}"
+              width="1688"
+              height="856"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function showTab(tabIndex) {
+      // Hide all panels
+      const panels = document.querySelectorAll('.feature-panel');
+      panels.forEach(panel => {
+        panel.style.display = 'none';
+        panel.setAttribute('hidden', '');
+        panel.setAttribute('tabindex', '-1');
+        panel.setAttribute('data-headlessui-state', '');
+        panel.removeAttribute('data-selected');
+      });
+      
+      // Show the selected panel
+      const selectedPanel = document.querySelector(`.feature-panel[data-tab-index="${tabIndex}"]`);
+      if (selectedPanel) {
+        selectedPanel.style.display = 'block';
+        selectedPanel.removeAttribute('hidden');
+        selectedPanel.setAttribute('tabindex', '0');
+        selectedPanel.setAttribute('data-headlessui-state', 'selected');
+        selectedPanel.setAttribute('data-selected', '');
+      }
+      
+      // Update tab buttons
+      const buttons = document.querySelectorAll('[role="tab"]');
+      buttons.forEach((button, index) => {
+        const buttonParent = button.closest('.group');
+        
+        if (index === tabIndex) {
+          button.setAttribute('aria-selected', 'true');
+          button.setAttribute('tabindex', '0');
+          button.setAttribute('data-headlessui-state', 'selected');
+          button.setAttribute('data-selected', '');
+          button.classList.remove('text-blue-100');
+          button.classList.add('text-blue-600', 'lg:text-white');
+          
+          buttonParent.classList.add('bg-white', 'lg:bg-white/10', 'lg:ring-1', 'lg:ring-white/10', 'lg:ring-inset');
+          buttonParent.classList.remove('hover:bg-white/10', 'lg:hover:bg-white/5');
+          
+          const description = buttonParent.querySelector('p');
+          if (description) {
+            description.classList.remove('text-blue-100', 'group-hover:text-white');
+            description.classList.add('text-white');
+          }
+        } else {
+          button.setAttribute('aria-selected', 'false');
+          button.setAttribute('tabindex', '-1');
+          button.setAttribute('data-headlessui-state', '');
+          button.removeAttribute('data-selected');
+          button.classList.remove('text-blue-600', 'lg:text-white');
+          button.classList.add('text-blue-100', 'hover:text-white', 'lg:text-white');
+          
+          buttonParent.classList.remove('bg-white', 'lg:bg-white/10', 'lg:ring-1', 'lg:ring-white/10', 'lg:ring-inset');
+          buttonParent.classList.add('hover:bg-white/10', 'lg:hover:bg-white/5');
+          
+          const description = buttonParent.querySelector('p');
+          if (description) {
+            description.classList.add('text-blue-100', 'group-hover:text-white');
+            description.classList.remove('text-white');
+          }
+        }
+      });
+    }
+  </script>
+</section>

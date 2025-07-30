@@ -1,0 +1,64 @@
+<section id="community" class="py-24 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16" data-aos="fade-up">
+      <div class="w-12 h-px bg-primary mx-auto mb-6"></div>
+      <h2 class="text-4xl font-light text-gray-900 mb-4">
+        {{ sections.community.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.community.subtitle }}
+      </p>
+    </div>
+    
+    {% if sections.community.liveActivity %}
+    <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-100 mb-16 text-center max-w-2xl mx-auto" data-aos="fade-up">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+        <span class="font-medium text-gray-900">{{ sections.community.liveActivity.onlineMembers }} members online</span>
+      </div>
+      <p class="text-gray-600">{{ sections.community.liveActivity.recentJoiner }} from {{ sections.community.liveActivity.location }} just joined</p>
+    </div>
+    {% endif %}
+    
+    {% if sections.community.stats %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+      {% for stat in sections.community.stats %}
+      <div class="text-center p-8 bg-white rounded-lg shadow-sm border border-gray-100" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-6">
+          <i class="{{ stat.icon | default('ri-user-line') }} text-primary"></i>
+        </div>
+        
+        <div class="text-3xl font-light text-gray-900 mb-2">{{ stat.value }}</div>
+        <div class="text-sm font-medium text-gray-900 mb-1 uppercase tracking-wide">{{ stat.label }}</div>
+        <p class="text-xs text-gray-600">{{ stat.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if sections.community.highlights %}
+    <div class="grid md:grid-cols-3 gap-8 mb-16">
+      {% for highlight in sections.community.highlights %}
+      <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-100" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+          <i class="{{ highlight.icon | default('ri-chat-3-line') }} text-primary"></i>
+        </div>
+        
+        <h3 class="text-xl font-medium text-gray-900 mb-4">{{ highlight.title }}</h3>
+        <p class="text-gray-600 mb-4 leading-relaxed">{{ highlight.description }}</p>
+        <div class="text-sm text-primary font-medium">{{ highlight.members }} members</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if sections.community.cta %}
+    <div class="text-center" data-aos="fade-up">
+      <a href="{{ sections.community.cta.url }}" 
+         class="{% if sections.community.cta.style == 'filled' %}bg-primary text-white hover:bg-primary/90{% else %}bg-white text-primary border border-primary hover:bg-primary/5{% endif %} px-8 py-4 rounded-lg font-medium transition-colors duration-300 inline-block">
+        {{ sections.community.cta.label }}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>

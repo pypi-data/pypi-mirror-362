@@ -1,0 +1,63 @@
+<section id="blog" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.blog.title }}
+      </h2>
+      {% if sections.blog.subtitle %}
+      <p class="text-lg text-gray-600">{{ sections.blog.subtitle }}</p>
+      {% endif %}
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for post in sections.blog.posts %}
+      <article
+        class="bg-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        {% if post.image %}
+        <img
+          src="{{ post.image.src }}"
+          alt="{{ post.image.alt }}"
+          class="w-full h-48 object-cover"
+        />
+        {% endif %}
+
+        <div class="p-6">
+          {% if post.category %}
+          <span
+            class="inline-block px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded mb-3"
+          >
+            {{ post.category }}
+          </span>
+          {% endif %}
+
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            {{ post.title }}
+          </h3>
+          <p class="text-gray-600 text-sm mb-4">{{ post.excerpt }}</p>
+
+          <div class="flex items-center justify-between text-sm text-gray-500">
+            {% if post.author %}
+            <span>By {{ post.author }}</span>
+            {% endif %} {% if post.date %}
+            <span>{{ post.date }}</span>
+            {% endif %}
+          </div>
+
+          {% if post.readMore %}
+          <a
+            href="{{ post.readMore.url }}"
+            class="inline-block mt-4 text-primary font-medium hover:text-primary/80 transition-colors"
+          >
+            {{ post.readMore.label }} →
+          </a>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>

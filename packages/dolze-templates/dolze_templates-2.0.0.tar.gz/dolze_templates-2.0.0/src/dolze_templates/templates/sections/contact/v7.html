@@ -1,0 +1,140 @@
+<section id="contact" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-12">
+      <div class="space-y-8" data-aos="fade-up">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            {{ sections.contact.title }}
+          </h2>
+          <p class="text-lg text-gray-600">{{ sections.contact.subtitle }}</p>
+          <div class="w-16 h-1 bg-primary rounded-full mt-4"></div>
+        </div>
+
+        {% if sections.contact.contactMethods %}
+        <div class="space-y-4">
+          {% for method in sections.contact.contactMethods %}
+          <div
+            class="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm"
+          >
+            <div
+              class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center"
+            >
+              <i class="{{ method.icon }} text-primary text-xl"></i>
+            </div>
+            <div>
+              <div class="font-medium text-gray-900">{{ method.title }}</div>
+              <div class="text-sm text-gray-600">{{ method.description }}</div>
+              <div class="text-sm font-medium text-primary">
+                {{ method.value }}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% if sections.contact.info %}
+        <div class="grid sm:grid-cols-2 gap-6">
+          {% for info in sections.contact.info %}
+          <div class="bg-white p-6 rounded-xl shadow-sm">
+            <div
+              class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
+            >
+              <i class="{{ info.icon }} text-primary text-xl"></i>
+            </div>
+            <h3 class="font-medium text-gray-900 mb-2">{{ info.title }}</h3>
+            {% for detail in info.details %}
+            <p class="text-sm text-gray-600">{{ detail }}</p>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div data-aos="fade-up" data-aos-delay="200">
+        <div class="bg-white p-8 rounded-2xl shadow-sm">
+          <h3 class="text-xl font-semibold text-gray-900 mb-6">
+            Send us a message
+          </h3>
+
+          {% if sections.contact.form %}
+          <form class="space-y-6">
+            {% for field in sections.contact.form.fields %}
+            <div>
+              <label
+                for="{{ field.name }}"
+                class="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {{ field.label }}{% if field.required %}
+                <span class="text-red-500">*</span>{% endif %}
+              </label>
+
+              {% if field.type == 'textarea' %}
+              <textarea
+                id="{{ field.name }}"
+                name="{{ field.name }}"
+                rows="4"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                placeholder="{{ field.placeholder }}"
+                {%
+                if
+                field.required
+                %}required{%
+                endif
+                %}
+                {%
+                if
+                field.maxLength
+                %}maxlength="{{ field.maxLength }}"
+                {%
+                endif
+                %}
+              ></textarea>
+
+              {% elif field.type == 'select' %}
+              <select
+                id="{{ field.name }}"
+                name="{{ field.name }}"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                {%
+                if
+                field.required
+                %}required{%
+                endif
+                %}
+              >
+                {% for option in field.options %}
+                <option value="{{ option.value }}">{{ option.label }}</option>
+                {% endfor %}
+              </select>
+
+              {% else %}
+              <input
+                type="{{ field.type }}"
+                id="{{ field.name }}"
+                name="{{ field.name }}"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                placeholder="{{ field.placeholder }}"
+                {%
+                if
+                field.required
+                %}required{%
+                endif
+                %}
+              />
+              {% endif %}
+            </div>
+            {% endfor %}
+
+            <button
+              type="submit"
+              class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            >
+              {{ sections.contact.form.submitText }}
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

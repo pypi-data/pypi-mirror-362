@@ -1,0 +1,120 @@
+<section id="menu" class="relative py-32 bg-gradient-to-b from-amber-50 to-white overflow-hidden">
+  <!-- Decorative elements -->
+  <div class="absolute inset-0 opacity-20">
+    <div class="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTIgMmg0djRIMnptNiAwaDR2NEg4em02IDBoNHY0aC00em02IDBoNHY0aC00em02IDBoNHY0aC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
+  </div>
+  
+  <div class="absolute top-20 right-10 w-64 h-64 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+  <div class="absolute bottom-20 left-10 w-72 h-72 bg-rose-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+  
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+    <!-- Elegant header -->
+    <div class="text-center mb-20" data-aos="fade-up">
+      <span class="inline-block px-4 py-1.5 bg-amber-100 text-amber-800 rounded-full text-sm font-medium tracking-wide mb-4">
+        Culinary Excellence
+      </span>
+      <h2 class="text-5xl font-serif font-bold text-gray-900 mb-6 relative inline-block">
+        {{ sections.menu.title }}
+        <span class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-amber-400 rounded-full"></span>
+      </h2>
+      <p class="max-w-2xl mx-auto text-gray-600 text-lg">
+        Indulge in our carefully crafted selection of dishes, prepared with the finest ingredients
+      </p>
+    </div>
+
+    <!-- Menu categories -->
+    <div class="space-y-24">
+      {% for category in sections.menu.categories %}
+      <div data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+        <!-- Category header with decorative elements -->
+        <div class="relative mb-12 flex items-center">
+          <div class="flex-grow h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent"></div>
+          <h3 class="text-3xl font-serif text-gray-800 px-8 relative">
+            {{ category.name }}
+            <span class="absolute -bottom-2 left-8 right-8 h-0.5 bg-amber-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+          </h3>
+          <div class="flex-grow h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent"></div>
+        </div>
+
+        <!-- Menu items grid with hover effects -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          {% for item in category.items %}
+          <div class="group">
+            <div class="relative bg-white rounded-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl">
+              <!-- Fancy border gradient on hover -->
+              <div class="absolute inset-0 bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 opacity-0 group-hover:opacity-100 rounded-xl -z-10 blur transition-opacity duration-300"></div>
+              
+              <div class="relative p-1 rounded-xl overflow-hidden">
+                <div class="bg-white p-6 rounded-lg h-full">
+                  {% if item.media %}
+                  <div class="relative mb-6 overflow-hidden rounded-lg">
+                    <img
+                      src="{{ item.media.src }}"
+                      alt="{{ item.media.alt }}"
+                      class="h-48 w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <!-- Overlay gradient on hover -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  </div>
+                  {% endif %}
+                  
+                  <div class="flex justify-between items-start mb-3">
+                    <h4 class="text-xl font-serif font-bold text-gray-900 group-hover:text-amber-600 transition-colors">
+                      {{ item.name }}
+                    </h4>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full font-medium">
+                      {{ item.price }}
+                    </span>
+                  </div>
+                  
+                  <p class="text-gray-600 text-sm">{{ item.description }}</p>
+                  
+                  <!-- Order button that appears on hover -->
+                  <div class="mt-4 overflow-hidden h-0 group-hover:h-10 transition-all duration-300">
+                    <button class="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-md font-medium transform transition hover:shadow-md hover:scale-[1.02]">
+                      Add to Order
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- View full menu button -->
+    <div class="text-center mt-20">
+      <a href="#full-menu" class="group relative inline-flex items-center justify-center">
+        <span class="absolute inset-0 w-full h-full transition duration-300 ease-out transform translate-x-1 translate-y-1 bg-amber-500 group-hover:translate-x-0 group-hover:translate-y-0 rounded-md"></span>
+        <span class="absolute inset-0 w-full h-full bg-white border-2 border-amber-500 group-hover:bg-amber-500 rounded-md"></span>
+        <span class="relative px-8 py-3 text-amber-600 group-hover:text-white transition-colors flex items-center space-x-2 font-medium">
+          <span>View Full Menu</span>
+          <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </div>
+  
+  <style>
+    /* Custom animations */
+    @keyframes blob {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(20px, -20px) scale(1.1); }
+      50% { transform: translate(-20px, 20px) scale(0.9); }
+      75% { transform: translate(20px, 20px) scale(1.05); }
+    }
+    
+    .animate-blob {
+      animation: blob 15s infinite ease-in-out;
+    }
+    
+    .animation-delay-4000 {
+      animation-delay: 4s;
+    }
+  </style>
+</section>

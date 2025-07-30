@@ -1,0 +1,461 @@
+<section id="events" class="py-24 bg-white relative overflow-hidden">
+  <!-- Background elements -->
+  <div class="absolute inset-0 bg-gradient-to-br from-pink-50 to-orange-50 opacity-30"></div>
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="events-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M0 0h40v40H0z" fill="none" />
+            <path d="M0 0h1v40H0zm40 0v1H0V0zm0 40h-1V0h1zM0 40v-1h40v1z" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#events-grid)" />
+      </svg>
+    </div>
+  </div>
+  
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+      {% if sections.events.badge %}
+      <span class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-pink-100 text-pink-700 mb-4">
+        {{ sections.events.badge }}
+      </span>
+      {% endif %}
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">
+        {{ sections.events.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.events.subtitle }}
+      </p>
+    </div>
+    
+    <!-- Filter categories if available -->
+    {% if sections.events.categories %}
+    <div class="flex flex-wrap justify-center gap-4 mb-12" data-aos="fade-up" data-aos-delay="100">
+      <button class="px-6 py-2 rounded-full text-sm font-medium bg-pink-600 text-white" data-filter="all">
+        All Events
+      </button>
+      {% for category in sections.events.categories %}
+      <button class="px-6 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-300" data-filter="{{ category.value }}">
+        {{ category.label }}
+      </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Featured event if available -->
+    {% if sections.events.featured_event %}
+    <div class="mb-16" data-aos="fade-up" data-aos-delay="100">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:border-pink-200">
+        <div class="grid lg:grid-cols-2 items-center">
+          <!-- Featured event image -->
+          <div class="aspect-[16/9] w-full h-full relative overflow-hidden">
+            <img 
+              src="{{ sections.events.featured_event.image }}" 
+              alt="{{ sections.events.featured_event.title }}" 
+              class="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+              loading="lazy"
+            >
+            
+            <!-- Status badge -->
+            {% if sections.events.featured_event.status %}
+            <div class="absolute top-4 left-4">
+              <span class="inline-block px-4 py-1 rounded-full text-sm font-medium 
+                {% if sections.events.featured_event.status == 'upcoming' %}bg-green-500 text-white
+                {% elif sections.events.featured_event.status == 'ongoing' %}bg-blue-500 text-white
+                {% elif sections.events.featured_event.status == 'past' %}bg-gray-500 text-white
+                {% else %}bg-pink-600 text-white{% endif %}">
+                {{ sections.events.featured_event.status_label|default(sections.events.featured_event.status|title) }}
+              </span>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Featured event content -->
+          <div class="p-8 lg:p-12">
+            <h3 class="text-3xl font-bold text-gray-900 mb-4">
+              {{ sections.events.featured_event.title }}
+            </h3>
+            
+            <!-- Event details -->
+            <div class="space-y-4 mb-6">
+              <!-- Date and time -->
+              <div class="flex items-start">
+                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 mr-3">
+                  <i class="ri-calendar-line" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <p class="text-gray-700">
+                    <span class="font-medium">Date & Time:</span> {{ sections.events.featured_event.date_time }}
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Location -->
+              <div class="flex items-start">
+                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 mr-3">
+                  <i class="ri-map-pin-line" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <p class="text-gray-700">
+                    <span class="font-medium">Location:</span> {{ sections.events.featured_event.location }}
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Organizer if available -->
+              {% if sections.events.featured_event.organizer %}
+              <div class="flex items-start">
+                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 mr-3">
+                  <i class="ri-user-line" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <p class="text-gray-700">
+                    <span class="font-medium">Organizer:</span> {{ sections.events.featured_event.organizer }}
+                  </p>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            
+            <p class="text-lg text-gray-600 mb-8">{{ sections.events.featured_event.description }}</p>
+            
+            <!-- CTA buttons -->
+            <div class="flex flex-wrap gap-4">
+              {% if sections.events.featured_event.register_url %}
+              <a 
+                href="{{ sections.events.featured_event.register_url }}" 
+                class="inline-flex items-center px-6 py-3 bg-pink-600 text-white font-medium rounded-lg hover:bg-pink-700 transition-colors duration-300"
+                target="_blank"
+                rel="noopener"
+              >
+                {{ sections.events.featured_event.register_text|default('Register Now') }}
+              </a>
+              {% endif %}
+              
+              {% if sections.events.featured_event.details_url %}
+              <a 
+                href="{{ sections.events.featured_event.details_url }}" 
+                class="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors duration-300"
+                target="_blank"
+                rel="noopener"
+              >
+                View Details
+                <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Events layout options -->
+    {% if sections.events.layout == 'calendar' %}
+    <!-- Calendar layout -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-16" data-aos="fade-up" data-aos-delay="200">
+      <!-- Calendar header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <button class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300">
+          <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h3 class="text-lg font-bold text-gray-900">{{ sections.events.calendar_month|default('Current Month') }}</h3>
+        <button class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300">
+          <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Calendar grid -->
+      <div class="grid grid-cols-7 text-center">
+        <!-- Day headers -->
+        <div class="py-2 font-medium text-gray-500 border-b border-gray-100">Sun</div>
+        <div class="py-2 font-medium text-gray-500 border-b border-gray-100">Mon</div>
+        <div class="py-2 font-medium text-gray-500 border-b border-gray-100">Tue</div>
+        <div class="py-2 font-medium text-gray-500 border-b border-gray-100">Wed</div>
+        <div class="py-2 font-medium text-gray-500 border-b border-gray-100">Thu</div>
+        <div class="py-2 font-medium text-gray-500 border-b border-gray-100">Fri</div>
+        <div class="py-2 font-medium text-gray-500 border-b border-gray-100">Sat</div>
+        
+        <!-- Calendar days -->
+        {% for i in range(1, 36) %}
+        <div class="h-32 p-1 border-b border-r border-gray-100 {% if i <= 7 %}border-t{% endif %} {% if i % 7 == 1 %}border-l{% endif %}">
+          <div class="h-full p-2">
+            <!-- Day number -->
+            <div class="text-sm text-gray-500 mb-1">
+              {% if i > 3 and i < 34 %}{{ i - 3 }}{% endif %}
+            </div>
+            
+            <!-- Event indicators -->
+            {% for event in sections.events.calendar_events %}
+              {% if event.day == i - 3 %}
+              <div class="bg-pink-100 text-pink-700 text-xs p-1 rounded mb-1 truncate cursor-pointer" data-event-id="{{ event.id }}">
+                {{ event.title }}
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    
+    {% elif sections.events.layout == 'timeline' %}
+    <!-- Timeline layout -->
+    <div class="relative" data-aos="fade-up" data-aos-delay="200">
+      <!-- Timeline line -->
+      <div class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 h-full w-0.5 bg-pink-200"></div>
+      
+      <div class="space-y-16">
+        {% for event in sections.events.items %}
+        <div class="relative">
+          <!-- Timeline dot -->
+          <div class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-4 border-pink-200 bg-white"></div>
+          
+          <!-- Event card -->
+          <div class="grid md:grid-cols-2 gap-8 items-center pl-10 md:pl-0 {% if loop.index is even %}md:flex-row-reverse{% endif %}">
+            <!-- Date column -->
+            <div class="{% if loop.index is even %}md:text-right md:pr-12{% else %}md:text-left md:pl-12{% endif %}">
+              <div class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-pink-100 text-pink-700">
+                {{ event.date }}
+              </div>
+              
+              {% if event.status %}
+              <div class="mt-2">
+                <span class="inline-block px-3 py-1 text-xs font-medium rounded-full 
+                  {% if event.status == 'upcoming' %}bg-green-500 text-white
+                  {% elif event.status == 'ongoing' %}bg-blue-500 text-white
+                  {% elif event.status == 'past' %}bg-gray-500 text-white
+                  {% else %}bg-pink-600 text-white{% endif %}">
+                  {{ event.status_label|default(event.status|title) }}
+                </span>
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Content column -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-pink-200 {% if loop.index is even %}md:order-first{% endif %}">
+              <!-- Event image if available -->
+              {% if event.image %}
+              <div class="aspect-[16/9] w-full relative overflow-hidden">
+                <img 
+                  src="{{ event.image }}" 
+                  alt="{{ event.title }}" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                >
+              </div>
+              {% endif %}
+              
+              <!-- Event info -->
+              <div class="p-6">
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-gray-900 mb-2">
+                  {{ event.title }}
+                </h3>
+                
+                <!-- Event details -->
+                <div class="space-y-3 mb-4">
+                  <!-- Time -->
+                  <div class="flex items-center text-sm text-gray-600">
+                    <i class="ri-time-line mr-2" aria-hidden="true"></i>
+                    <span>{{ event.time }}</span>
+                  </div>
+                  
+                  <!-- Location -->
+                  <div class="flex items-center text-sm text-gray-600">
+                    <i class="ri-map-pin-line mr-2" aria-hidden="true"></i>
+                    <span>{{ event.location }}</span>
+                  </div>
+                </div>
+                
+                <!-- Description -->
+                <p class="text-gray-600 mb-6">{{ event.description }}</p>
+                
+                <!-- CTA buttons -->
+                <div class="flex flex-wrap gap-3">
+                  {% if event.register_url %}
+                  <a 
+                    href="{{ event.register_url }}" 
+                    class="inline-flex items-center px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition-colors duration-300"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {{ event.register_text|default('Register') }}
+                  </a>
+                  {% endif %}
+                  
+                  {% if event.details_url %}
+                  <a 
+                    href="{{ event.details_url }}" 
+                    class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors duration-300"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Details
+                    <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    
+    {% else %}
+    <!-- Default cards layout -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="200">
+      {% for event in sections.events.items %}
+      <div 
+        class="event-item bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-pink-200 flex flex-col"
+        data-category="{{ event.category|default('') }}"
+      >
+        <!-- Event image -->
+        <div class="aspect-[16/9] w-full relative overflow-hidden">
+          <img 
+            src="{{ event.image }}" 
+            alt="{{ event.title }}" 
+            class="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+            loading="lazy"
+          >
+          
+          <!-- Status badge -->
+          {% if event.status %}
+          <div class="absolute top-4 left-4">
+            <span class="inline-block px-3 py-1 text-xs font-medium rounded-full 
+              {% if event.status == 'upcoming' %}bg-green-500 text-white
+              {% elif event.status == 'ongoing' %}bg-blue-500 text-white
+              {% elif event.status == 'past' %}bg-gray-500 text-white
+              {% else %}bg-pink-600 text-white{% endif %}">
+              {{ event.status_label|default(event.status|title) }}
+            </span>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Event content -->
+        <div class="p-6 flex-grow">
+          <h3 class="text-xl font-bold text-gray-900 mb-3">
+            {{ event.title }}
+          </h3>
+          
+          <!-- Event details -->
+          <div class="space-y-3 mb-4">
+            <!-- Date -->
+            <div class="flex items-center text-sm text-gray-600">
+              <i class="ri-calendar-line mr-2" aria-hidden="true"></i>
+              <span>{{ event.date }}</span>
+            </div>
+            
+            <!-- Time -->
+            <div class="flex items-center text-sm text-gray-600">
+              <i class="ri-time-line mr-2" aria-hidden="true"></i>
+              <span>{{ event.time }}</span>
+            </div>
+            
+            <!-- Location -->
+            <div class="flex items-center text-sm text-gray-600">
+              <i class="ri-map-pin-line mr-2" aria-hidden="true"></i>
+              <span>{{ event.location }}</span>
+            </div>
+          </div>
+          
+          <p class="text-gray-600 mb-6">{{ event.description }}</p>
+        </div>
+        
+        <!-- Event actions -->
+        <div class="px-6 pb-6 mt-auto">
+          <div class="flex flex-wrap gap-3">
+            {% if event.register_url %}
+            <a 
+              href="{{ event.register_url }}" 
+              class="inline-flex items-center px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition-colors duration-300"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ event.register_text|default('Register') }}
+            </a>
+            {% endif %}
+            
+            {% if event.details_url %}
+            <a 
+              href="{{ event.details_url }}" 
+              class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors duration-300"
+              target="_blank"
+              rel="noopener"
+            >
+              Details
+              <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+            {% endif %}
+            
+            {% if event.add_to_calendar_url %}
+            <a 
+              href="{{ event.add_to_calendar_url }}" 
+              class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors duration-300"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="ri-calendar-line mr-1" aria-hidden="true"></i>
+              Add to Calendar
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Load more button if available -->
+    {% if sections.events.load_more %}
+    <div class="mt-16 text-center" data-aos="fade-up" data-aos-delay="300">
+      <button 
+        class="inline-flex items-center px-8 py-3 bg-pink-600 text-white font-medium rounded-lg hover:bg-pink-700 transition-colors duration-300"
+        id="load-more-events"
+      >
+        {{ sections.events.load_more.label }}
+        <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </div>
+    {% endif %}
+    
+    <!-- Events CTA if available -->
+    {% if sections.events.cta %}
+    <div class="mt-24 text-center" data-aos="fade-up" data-aos-delay="300">
+      <h3 class="text-3xl font-bold text-gray-900 mb-4">{{ sections.events.cta.title }}</h3>
+      <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">{{ sections.events.cta.description }}</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        {% for button in sections.events.cta.buttons %}
+        <a 
+          href="{{ button.url }}" 
+          class="inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-all duration-300 {% if button.style == 'primary' %}bg-pink-600 text-white hover:bg-pink-700{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}"
+        >
+          {% if button.icon %}
+          <i class="{{ button.icon }} mr-2" aria-hidden="true"></i>
+          {% endif %}
+          {{ button.label }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>

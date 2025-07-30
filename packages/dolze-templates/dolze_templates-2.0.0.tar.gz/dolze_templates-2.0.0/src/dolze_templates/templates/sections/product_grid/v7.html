@@ -1,0 +1,61 @@
+<section id="product_grid" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.product_grid.title }}
+      </h2>
+      {% if sections.product_grid.subheading %}
+      <p class="text-lg text-gray-600">
+        {{ sections.product_grid.subheading }}
+      </p>
+      {% endif %}
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for item in sections.product_grid.items %}
+      <div
+        class="bg-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        {% if item.image %}
+        <img
+          src="{{ item.image.src }}"
+          alt="{{ item.image.alt }}"
+          class="w-full h-48 object-cover"
+        />
+        {% endif %}
+
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            {{ item.name }}
+          </h3>
+          <p class="text-gray-600 text-sm mb-4">{{ item.description }}</p>
+
+          {% if item.price %}
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-2xl font-bold text-primary">
+              ${{ item.price.amount }}
+            </span>
+            {% if item.offer %}
+            <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">
+              {{ item.offer.discount }} off
+            </span>
+            {% endif %}
+          </div>
+          {% endif %} {% if item.offer and item.offer.description %}
+          <p class="text-xs text-gray-500 mb-4">{{ item.offer.description }}</p>
+          {% endif %}
+
+          <button
+            class="w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+          >
+            Add to Cart
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

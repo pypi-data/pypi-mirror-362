@@ -1,0 +1,27 @@
+<section id="community" class="py-24 bg-white">
+  <div class="max-w-4xl mx-auto px-4">
+    <h2 class="text-4xl font-light text-gray-900 text-center mb-16" data-aos="fade-up">
+      {{ sections.community.title }}
+    </h2>
+    
+    {% if sections.community.stats %}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+      {% for stat in sections.community.stats %}
+      <div class="text-center" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="text-3xl font-light text-gray-900 mb-2">{{ stat.value }}</div>
+        <div class="text-sm text-gray-600">{{ stat.label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if sections.community.cta %}
+    <div class="text-center" data-aos="fade-up">
+      <a href="{{ sections.community.cta.url }}" 
+         class="bg-gray-900 text-white px-8 py-3 text-sm font-medium hover:opacity-80 transition-opacity">
+        {{ sections.community.cta.label }}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
