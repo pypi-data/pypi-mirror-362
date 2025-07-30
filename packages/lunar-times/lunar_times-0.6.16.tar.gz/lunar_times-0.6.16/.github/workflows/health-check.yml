@@ -1,0 +1,57 @@
+# Lunar Times Health Check
+# Weekly verification that external APIs are working
+
+name: Health Check
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  api-health:
+    name: API Health Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install uv
+      run: pip install uv
+
+    - name: Install dependencies
+      run: uv sync
+
+    - name: Test API connectivity
+      run: |
+        echo "Testing Nominatim API..."
+        curl -f "https://nominatim.openstreetmap.org/search?q=Austin,TX&format=json&limit=1" || exit 1
+        
+        echo "Testing USNO API..."
+        curl -f "https://aa.usno.navy.mil/api/rstt/oneday?date=today&coords=30.2672,-97.7431" || exit 1
+
+    - name: Test debug mode functionality
+      timeout-minutes: 2
+      run: uv run lunar-times -d
+
+    - name: Create issue on failure
+      if: failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: 'Health Check Failed - External APIs Down',
+            body: 'The weekly health check detected issues with external APIs. Please investigate.\n\n' +
+                  'Workflow: ${{ github.workflow }}\n' +
+                  'Run: ${{ github.run_id }}',
+            labels: ['bug', 'external-api']
+          }) 
