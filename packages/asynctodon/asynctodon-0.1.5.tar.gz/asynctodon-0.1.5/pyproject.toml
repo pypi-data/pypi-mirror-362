@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools >= 69.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asynctodon"
+version = "0.1.5"
+authors = [{name = "Zoey Mae", email = "admin@barkshark.xyz"}]
+description = "Async client for the Mastodon API"
+license = {file = "LICENSE"}
+keywords = [
+	"activitypub",
+	"asyncio",
+	"http",
+	"mastodon",
+	"python"
+]
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"Intended Audience :: Developers",
+	"License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+	"Programming Language :: Python",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
+	"Typing :: Typed"
+]
+requires-python = ">= 3.10"
+dependencies = [
+	"httpx[http2] == 0.27.0",
+	"barkshark-lib >= 0.2.3, < 0.3.0"
+]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown; charset=UTF-8"
+
+[project.urls]
+Documentation = "https://docs.barkshark.xyz/asynctodon"
+Source = "https://codeberg.org/barkshark/asynctodon"
+
+[project.optional-dependencies]
+docs = [
+    "furo == 2024.1.29",
+    "sphinx == 7.2.6",
+    "sphinx-external-toc == 1.0.1",
+]
+dev = [
+    "mypy == 1.9.0",
+    "flake8 == 7.0.0",
+    "typing_extensions >= 4.10.0; python_version < '3.11.0'"
+]
+
+[tool.setuptools]
+include-package-data = true
+packages = [
+	"asynctodon",
+	"asynctodon.api"
+]
+platforms = ["any"]
+
+[tool.distutils.bdist_wheel]
+universal = false
+
+[tool.distutils.sdist]
+formats = "zip, gztar"
+
+[tool.mypy]
+show_traceback = true
+install_types = true
+pretty = true
+disallow_untyped_decorators = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_ignores = true
+strict = true
+implicit_reexport = true
