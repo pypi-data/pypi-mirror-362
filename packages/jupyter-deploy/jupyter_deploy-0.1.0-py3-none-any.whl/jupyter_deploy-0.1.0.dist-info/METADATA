@@ -1,0 +1,69 @@
+Metadata-Version: 2.4
+Name: jupyter-deploy
+Version: 0.1.0
+Summary: CLI based tool to deploy Jupyter application that integrates with infrastructure as code frameworks.
+Author-email: Jonathan Guinegagne <jggg@amazon.com>, Michael Chin <chnmch@amazon.com>, Brian Granger <brgrange@amazon.com>
+License-File: LICENSE
+Requires-Python: >=3.12
+Requires-Dist: click<8.2.0
+Requires-Dist: decorator>=5.2.1
+Requires-Dist: jupyter-core>=5.0.0
+Requires-Dist: jupyter-deploy-tf-aws-ec2-base
+Requires-Dist: packaging>=25.0
+Requires-Dist: pydantic>=2.11.5
+Requires-Dist: python-hcl2>=7.2.1
+Requires-Dist: pyyaml>=6.0.2
+Requires-Dist: typer>=0.15.4
+Requires-Dist: types-pyyaml>=6.0.12.20250516
+Provides-Extra: aws
+Requires-Dist: boto3-stubs>=1.38.23; extra == 'aws'
+Requires-Dist: boto3>=1.38.23; extra == 'aws'
+Requires-Dist: mypy-boto3-ssm>=1.38.5; extra == 'aws'
+Description-Content-Type: text/markdown
+
+# JupyterDeploy
+
+Jupyter deploy provides a command line interface tool (CLI) that you can
+use to deploy a Jupyter Server container to a remote compute provided by a Cloud provider.
+
+### Install Terraform
+
+Terraform from HashiCorp is the default deployment engine. To use it, you must set it up in your system.
+Refer to Terraform installation [guide](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli).
+
+Verify installation by running
+```bash
+terraform --version
+```
+
+## Install jupyter-deploy dependencies
+
+From the repository root, run:
+
+```bash
+# Sync all dependencies
+uv sync
+```
+
+## The CLI
+
+To get started, open a terminal, cd to the repository root, and run:
+
+```bash
+uv run jupyter-deploy --help
+```
+
+## Templates
+
+To use a template to initialize a new project, first create a new project directory:
+
+```bash
+mkdir my-jupyter-deployment
+cd my-jupyter-deployment
+```
+
+Then, run the `init` command.
+
+```bash
+uv run jupyter-deploy init -E terraform -P aws -I ec2 -T base .
+```
