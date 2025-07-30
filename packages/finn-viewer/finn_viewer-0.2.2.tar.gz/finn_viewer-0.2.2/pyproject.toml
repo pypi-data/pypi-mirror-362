@@ -1,0 +1,524 @@
+[build-system]
+requires = [
+  "setuptools >= 69",
+  "setuptools_scm[toml]>=8"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finn-viewer"
+description = "n-dimensional array viewer for cell tracking data in Python"
+authors = [
+    { name = "Caroline Malin-Mayor", email = "malinmayorc@janelia.hhmi.org" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: C",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Utilities",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "appdirs>=1.4.4",
+    "app-model>=0.3.0,<0.4.0",
+    "cachey>=0.2.1",
+    "certifi>=2018.1.18",
+    "dask[array]>=2021.10.0",
+    "imageio>=2.20,!=2.22.1",
+    "jsonschema>=3.2.0",
+    "lazy_loader>=0.2",
+    "magicgui>=0.7.0",
+    "napari-console>=0.1.1",
+    "napari-plugin-engine>=0.1.9",
+    "napari-svg>=0.1.8",
+    "npe2>=0.7.6",
+    "numpy>=1.22.2",
+    "numpydoc>=0.9.2",
+    "pandas>=1.3.0",
+    "Pillow>=9.0",
+    "pint>=0.17",
+    "psutil>=5.0",
+    "psygnal>=0.5.0",
+    "pydantic>=1.9.0",
+    "pygments>=2.6.0",
+    "PyOpenGL>=3.1.0",
+    "pywin32 ; platform_system == 'Windows'",
+    "PyYAML>=5.1",
+    "qtpy>=2.3.1",
+    "scikit-image[data]>=0.19.1",
+    "scipy>=1.5.4",
+    "superqt>=0.6.7",
+    "tifffile>=2022.7.28",
+    "toolz>=0.10.0",
+    "tqdm>=4.56.0",
+    "typing_extensions>=4.2.0",
+    "vispy>=0.14.1,<0.15",
+    "wrapt>=1.11.1",
+    "funtracks",
+    "pyqtgraph",
+    "fonticon-fontawesome6",
+    "zarr<3",
+    "imagecodecs", # for unzipping sample data
+]
+dynamic = [
+    "version",
+]
+
+[project.license]
+text = "BSD 3-Clause"
+
+[project.scripts]
+finn = "finn.__main__:main"
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.urls]
+Download = "https://github.com/funkelab/finn"
+"Bug Tracker" = "https://github.com/funkelab/finn/issues"
+"Source Code" = "https://github.com/funkelab/finn"
+
+[project.optional-dependencies]
+pyside2 = [
+    "PySide2>=5.13.2,!=5.15.0 ; python_version < '3.11' and platform_machine != 'arm64'",
+]
+pyside6_experimental = [
+    "PySide6 < 6.5 ; python_version < '3.12'"
+]
+pyqt6 = [
+    "PyQt6 > 6.5",
+    "PyQt6 != 6.6.1 ; platform_system == 'Darwin'"
+]
+pyside = [
+    "finn-viewer[pyside2]"
+]
+pyqt5 = [
+    "PyQt5>=5.13.2,!=5.15.0",
+]
+pyqt = [
+    "finn-viewer[pyqt5]"
+]
+qt = [
+    "finn-viewer[pyqt]"
+]
+all = [
+    "finn-viewer[pyqt,optional]"
+]
+optional-base = [
+    "zarr>=2.12.0", # needed by `builtins` (dask.array.from_zarr) to open zarr
+]
+optional-numba = [
+    "numba>=0.57.1",
+    "finn-viewer[pyqt,optional]",
+]
+optional = [
+    "finn-viewer[optional-base,optional-numba]",
+    "triangle",
+    "PartSegCore-compiled-backend>=0.15.8",
+]
+testing = [
+    "babel>=2.9.0",
+    "fsspec>=2023.10.0",
+    "hypothesis>=6.8.0",
+    "lxml[html_clean]>5",
+    "matplotlib >= 3.6.1",
+    "pooch>=1.6.0",
+    "pytest-cov",
+    "docstring_parser>=0.15",
+    "pretend>=1.0.9",
+    "pyautogui>=0.9.54",
+    "pytest-qt>=4.3.1",
+    "pytest-pretty>=1.1.0",
+    "pytest>=8.1.0",
+    "tensorstore>=0.1.13,!=0.1.72",
+    "virtualenv>=20.17",
+    "xarray>=0.16.2",
+    "IPython>=7.25.0",
+    "qtconsole>=4.5.1",
+    "rich>=12.0.0",
+    "finn-viewer[optional-base]",
+]
+testing_extra = [
+    "torch>=1.7",
+]
+release = [
+    "PyGithub>=1.44.1",
+    "twine>=3.1.1",
+    "gitpython>=3.1.0",
+    "requests-cache>=0.9.2",
+]
+dev = [
+    "ruff",
+    "check-manifest>=0.42",
+    "pre-commit>=2.9.0",
+    "pydantic",
+    "python-dotenv",
+    "finn[testing]",
+    "mypy"
+]
+build = [
+    "ruff",
+    "pyqt5",
+]
+
+[project.entry-points.pytest11]
+finn = "finn.utils._testsupport"
+
+[project.entry-points."napari.manifest"]
+finn_builtins = "finn_builtins:builtins.yaml"
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+license-files = [
+    "LICENSE",
+]
+
+[tool.setuptools.packages.find]
+namespaces = false
+
+[tool.setuptools.package-data]
+"*" = [
+    "*.pyi",
+]
+finn_builtins = [
+    "builtins.yaml",
+]
+
+
+[tool.setuptools_scm]
+write_to = "finn/_version.py"
+
+[tool.check-manifest]
+ignore = [
+  ".cirrus.yml",
+  ".pre-commit-config.yaml",
+  "asv.conf.json",
+  "codecov.yml",
+  "Makefile",
+  "finn/_version.py",  # added during build by setuptools_scm
+  "tools/minreq.py",
+  "finn/_qt/qt_resources/_qt_resources_*.py",
+  "*.pyi",  # added by make typestubs
+  "binder/*",
+  ".env_sample",
+  ".devcontainer/*",
+  "finn/resources/icons/_themes/*/*.svg"
+]
+
+[tool.ruff]
+line-length = 90
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".mypy_cache",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "*vendored*",
+    "*_vendor*",
+]
+
+fix = true
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W", #flake8
+    "UP", # pyupgrade
+    "I", # isort
+    "YTT", #flake8-2020
+    "TC", # flake8-type-checing
+    "BLE", # flake8-blind-exception
+    "B", # flake8-bugbear
+    "A", # flake8-builtins
+    "C4", # flake8-comprehensions
+    "ISC", # flake8-implicit-str-concat
+    "G", # flake8-logging-format
+    "PIE", # flake8-pie
+    "COM", # flake8-commas
+    "SIM", # flake8-simplify
+    "INP", # flake8-no-pep420
+    "PYI", # flake8-pyi
+    "Q", # flake8-quotes
+    "RSE", # flake8-raise
+    "RET", # flake8-return
+    "TID",  # flake8-tidy-imports # replace absolutify import
+    "TRY", # tryceratops
+    "ICN", # flake8-import-conventions
+    "RUF", # ruff specyfic rules
+    "NPY201", # checks compatibility with numpy version 2.0
+    "ASYNC", # flake8-async
+    "EXE", # flake8-executable
+    "FA", # flake8-future-annotations
+    "LOG", # flake8-logging
+    "SLOT", # flake8-slots
+    "PT", # flake8-pytest-style
+    "T20", # flake8-print
+]
+ignore = [
+    "TC001", "TC002", "TC003",
+    "A003", # flake8-builtins - we have class attributes violating these rule
+    "COM812", # flake8-commas - we don't like adding comma on single line of arguments
+    "COM819", # conflicts with ruff-format
+    "SIM117", # flake8-simplify - we some of merged with statements are not looking great with black, reanble after drop python 3.9
+    "RET504", # not fixed yet https://github.com/charliermarsh/ruff/issues/2950
+    "TRY003", # require implement multiple exception class
+    "RUF005", # problem with numpy compatybility, see https://github.com/charliermarsh/ruff/issues/2142#issuecomment-1451038741
+    "B028", # need to be fixed
+    "PYI015", # it produces bad looking files (@jni opinion)
+    "W191", "Q000", "Q001", "Q002", "Q003", "ISC001", # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = [
+    "INP001", # implicit namespace
+]
+# ignoring a lot of napari debt so that we can continue to check in new code
+"finn/_app_model/*" = [
+    "E501", # line too long
+    "UP007", # update type annotations to native symbols after 3.10
+]
+"finn/_qt/*" = [
+    "E501", # line too long
+    "UP007", "UP038", # update type annotations to native symbols after 3.10
+]
+"finn_builtins/*" = [
+    "UP007", # update type annotations to native symbols after 3.10
+]
+"finn/utils/*" = [
+    "E501",  # line too long
+    "UP007", "UP038", # update type annotations to native symbols after 3.10
+    "SIM108",  # ternary operator
+    ]
+"finn/types.py" = [
+    "E501",  # line too long
+    "UP007", # update type annotations to native symbols after 3.10
+    ]
+"finn/settings/*" = [
+    "E501",  # line too long
+    "UP007", # update type annotations to native symbols after 3.10
+    ]
+"finn/plugins/*" = [
+    "E501",  # line too long
+    "UP007", # update type annotations to native symbols after 3.10
+    ]
+
+"finn/layers/*" = [
+    "E501",  # line too long
+    "UP007", # update type annotations to native symbols after 3.10
+    ]
+"finn/conftest.py" = ["E501"]
+"finn/components/*" = [
+    "E501",  # line too long
+    "UP007", # update type annotations to native symbols after 3.10
+    ]
+"finn/_vispy/*" = [
+    "E501",  # line too long
+    "UP007", # update type annotations to native symbols after 3.10
+    "SIM108",  # ternary operator
+    ]
+"finn/__main__.py" = [
+    "E501",  # line too long
+    ]
+# original napari ignores
+"finn/_vispy/__init__.py" = ["E402"]
+"**/_tests/*.py" = ["B011", "INP001", "TRY301", "B018", "RUF012", "E501"]
+"finn/utils/_testsupport.py" = ["B011"]
+"tools/validate_strings.py" = ["F401"]
+"tools/**" = ["INP001", "T20", "E501"]
+"examples/**" = ["ICN001", "INP001", "T20"]
+"**/vendored/**" = ["TID"]
+"finn/benchmarks/**" = ["RUF012", "TID252", "E501"]
+
+[tool.ruff.lint.flake8-builtins]
+builtins-allowed-modules = ["io", "types", "threading"]
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "double"
+multiline-quotes = "double"
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Disallow all relative imports.
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+known-first-party=['finn']
+combine-as-imports = true
+
+[tool.ruff.lint.flake8-import-conventions]
+[tool.ruff.lint.flake8-import-conventions.extend-aliases]
+# Declare a custom alias for the `matplotlib` module.
+"dask.array" = "da"
+xarray = "xr"
+
+[tool.pytest.ini_options]
+# These follow standard library warnings filters syntax.  See more here:
+# https://docs.python.org/3/library/warnings.html#describing-warning-filters
+addopts = ["--maxfail=5",  "--durations=10",  "-ra", "--strict-markers", "--strict-config"]
+console_output_style = "count"
+minversion = "8"
+# log_cli_level = "INFO"
+xfail_strict = true
+qt_api = "pyqt5"
+testpaths = ["finn", "finn_builtins"]
+
+# NOTE: only put things that will never change in here.
+# napari deprecation and future warnings should NOT go in here.
+# instead... assert the warning with `pytest.warns()` in the relevant test,
+# That way we can clean them up when no longer necessary
+filterwarnings = [
+  "error:::finn", # turn warnings from finn into errors
+  "error:::test_.*", # turn warnings in our own tests into errors
+  "default:::finn.+vendored.+",  # just print warnings inside vendored modules
+  "ignore::DeprecationWarning:shibokensupport",
+  "ignore::DeprecationWarning:ipykernel",
+  "ignore::DeprecationWarning:tensorstore",
+  "ignore:Accessing zmq Socket:DeprecationWarning:jupyter_client",
+  "ignore:pythonw executable not found:UserWarning:",
+  "ignore:data shape .* exceeds GL_MAX_TEXTURE_SIZE:UserWarning",
+  "ignore:For best performance with Dask arrays in napari:UserWarning:",
+  "ignore:numpy.ufunc size changed:RuntimeWarning",
+  "ignore:Multiscale rendering is only supported in 2D. In 3D, only the lowest resolution scale is displayed",
+  "ignore:Alternative shading modes are only available in 3D, defaulting to none",
+  "ignore:distutils Version classes are deprecated::",
+  "ignore:There is no current event loop:DeprecationWarning:",
+  "ignore:(?s).*Pyarrow will become a required dependency of pandas:DeprecationWarning",  # pandas pyarrow (pandas<3.0),
+  # TODO: remove once xarray is updated to avoid this warning
+  # https://github.com/pydata/xarray/blame/b1f3fea467f9387ed35c221205a70524f4caa18b/pyproject.toml#L333-L334
+  # https://github.com/pydata/xarray/pull/8939
+  "ignore:__array__ implementation doesn't accept a copy keyword, so passing copy=False failed.",
+  "ignore:pkg_resources is deprecated",
+  "ignore:Deprecated call to `pkg_resources.declare_namespace",
+  "ignore:Use Group.create_array instead."
+]
+markers = [
+    "examples: Test of examples",
+    "disable_qthread_start: Disable thread start in this Test",
+    "disable_qthread_pool_start: Disable strarting QRunnable using QThreadPool start in this Test",
+    "disable_qtimer_start: Disable timer start in this Test",
+    "disable_qanimation_start: Disable animation start in this Test",
+    "enable_console: Don't mock the IPython console (in QtConsole) in this Test",
+    # mark slow tests, so they can be skipped using: pytest -m "not slow"
+    "slow: mark a test as slow",
+    "key_bindings: Test of keybindings",
+]
+
+[tool.mypy]
+# We are only checking the code we write, not napari inherited code, becuase the debt
+# was too large
+files = [
+    "finn/track_data_views",
+    "finn/track_application_menus",
+    "finn/track_import_export"
+    ]
+follow_imports = "silent"
+ignore_missing_imports = true
+# hide_error_codes = false
+# warn_redundant_casts = true
+# disallow_incomplete_defs = true
+# disallow_untyped_calls = true
+# disallow_untyped_defs = true
+# warn_unused_ignores = true
+# check_untyped_defs = true
+# no_implicit_optional = true
+
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+    "raise NotImplementedError()",
+    "except ImportError:",
+    "^ +\\.\\.\\.$",
+]
+
+[tool.coverage.run]
+omit = [
+    "*/_vendor/*",
+    "*/_version.py",
+    "*/benchmarks/*",
+    "finn/utils/indexing.py",
+    "**/add_layer.py_tmpl"
+]
+source = [
+    "finn",
+    "finn_builtins",
+]
+
+[tool.coverage.paths]
+source = [
+    "finn/",
+]
+builtins = [
+    "finn_builtins/",
+]
+
+[tool.importlinter]
+root_package = "finn"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Forbid import PyQt and PySide"
+type = "forbidden"
+source_modules = "finn"
+forbidden_modules = ["PyQt5", "PySide2", "PyQt6", "PySide6"]
+ignore_imports = [
+    "finn._qt -> PySide2",
+    "finn.plugins._npe2 -> finn._qt._qplugins",
+]
+
+[[tool.importlinter.contracts]]
+name = "Block import from qt module in finn.layers"
+type = "layers"
+layers = ["finn.qt","finn.layers"]
+ignore_imports = [
+    "finn.plugins._npe2 -> finn._qt._qplugins",
+    # TODO: remove once npe1 deprecated
+    "finn._qt.qt_main_window -> finn._qt._qplugins",
+]
+
+[[tool.importlinter.contracts]]
+name = "Block import from qt module in finn.components"
+type = "layers"
+layers = ["finn.qt","finn.components"]
+ignore_imports = [
+    "finn.plugins._npe2 -> finn._qt._qplugins",
+    # TODO: remove once npe1 deprecated
+    "finn._qt.qt_main_window -> finn._qt._qplugins",
+]
