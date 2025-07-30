@@ -1,0 +1,42 @@
+[project]
+name = "pretix-pridepopup"
+dynamic = ["version"]
+description = "Display the Pride Pop-up (https://www.accep.lgbt/) on your pretix shop"
+readme = "README.rst"
+license = {text = "Apache"}
+keywords = ["pretix"]
+authors = [
+    {name = "Martin Gross", email = "martin@pc-coholic.de"},
+]
+maintainers = [
+    {name = "Martin Gross", email = "martin@pc-coholic.de"},
+]
+
+dependencies = [
+]
+
+[project.entry-points."pretix.plugin"]
+pretix_pridepopup = "pretix_pridepopup:PretixPluginMeta"
+
+[project.entry-points."distutils.commands"]
+build = "pretix_plugin_build.build:CustomBuild"
+
+[build-system]
+requires = [
+    "setuptools",
+    "pretix-plugin-build",
+]
+
+[project.urls]
+homepage = "https://github.com/pc-coholic/pretix-pridepopup/"
+repository = "https://github.com/pc-coholic/pretix-pridepopup/"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "pretix_pridepopup.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["pretix*"]
+namespaces = false
