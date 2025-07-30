@@ -1,0 +1,96 @@
+name: Release and Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+  
+  release:
+    needs: [ci]
+    runs-on: ubuntu-latest
+    name: "Create release and publish"
+
+    permissions:
+      contents: write
+      id-token: write
+    
+    steps:
+    - name: Checkout repository with full history
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Install uv with Python
+      uses: astral-sh/setup-uv@v6
+      with:
+        python-version: "3.10" 
+    
+    - name: Install dependencies
+      run: uv sync --extra dev
+    
+    - name: Extract version from tag
+      id: version
+      run: |
+        TAG_NAME="${{ github.ref_name }}"
+        VERSION_NUMBER="${TAG_NAME#v}"
+        echo "number=$VERSION_NUMBER" >> $GITHUB_OUTPUT
+    
+    - name: Extract release notes from CHANGELOG.md
+      id: changelog
+      env:
+        RELEASE_VERSION: ${{ steps.version.outputs.number }}
+      run: |
+        .venv/bin/python -c "
+        import os
+        import re
+
+        version = os.environ['RELEASE_VERSION']
+        changelog_content = ''
+
+        with open('CHANGELOG.md', 'r') as f:
+            content = f.read()
+
+        # This regex correctly finds the section for the specific version
+        # It looks for '## [version] - date' and captures everything until the next '## ['
+        # The re.DOTALL flag allows '.' to match newlines.
+        pattern = re.compile(r'## \[' + re.escape(version) + r'\].*?\n(.*?)(?=\n## \[|\Z)', re.DOTALL)
+        match = pattern.search(content)
+
+        if match:
+            changelog_content = match.group(1).strip()
+        else:
+            changelog_content = 'No changelog found for this version'
+
+        # This is the standard way to set a multi-line output for a later step
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write(f'content<<EOF\n{changelog_content}\nEOF\n')
+        "
+      
+    - name: Build package
+      run: uv build
+
+    - name: Verify package with Twine
+      run: uv run twine check dist/*
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
+        body: ${{ steps.changelog.outputs.content }}
+        draft: false
+        prerelease: ${{ contains(github.ref_name, '-') }}
+        files: dist/*
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        skip-existing: true
