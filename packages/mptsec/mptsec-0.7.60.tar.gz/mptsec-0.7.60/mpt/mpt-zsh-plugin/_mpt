@@ -1,0 +1,40 @@
+#compdef mpt
+#autoload
+
+# in order to make this work, you will need to have mpt
+
+# mpt (mobile-pentest-toolkit) zsh completion, based on homebrew completion
+
+local -a _1st_arguments
+_1st_arguments=(
+'--help  Show this help message and exit'
+'--setup [APK]  Setup pentest environment'
+'--config  Show current pentest config'
+'--update  Update MPT to the latest version'
+'--install [tools|apps]  Install required packages'
+'--adb-run  Start adb server'
+'--list-packages [all]  Show all installed packages (use option 'all' to display system apps)'
+'--pidcat [package-name]  Show colored logcat for a specific application (<package name> optional)'
+'--fridump  Dump application memory'
+'--backup [package-name]  Backup an android application (<package name> optional)'
+'--decompile [decompiler]  Start java decompiler for course code analysis (<decompiler> optional): jadx(default), jd-gui, luyten'
+'--frida  Run frida server on the device'
+'--tool tool [tool <param>]  Run selected tool with <arguments> (use option 'list' to display all tools)'
+'--wifi-proxy [host:port]  Enable/Disable WiFi Proxy (optional <host:port>)'
+'--ssl-pinning [package-name]  Disable SSL Pinning (<package name> optional)'
+'--root-detection [package-name]  Disable Root Detection (<package name> optional)'
+)
+
+local expl
+local -a pkgs installed_pkgs
+
+_arguments \
+	'*:: :->subcmds' && return 0
+
+
+if (( CURRENT == 1 )); then
+	_describe -t commands "mpt subcommand" _1st_arguments
+	return
+fi
+
+_files
