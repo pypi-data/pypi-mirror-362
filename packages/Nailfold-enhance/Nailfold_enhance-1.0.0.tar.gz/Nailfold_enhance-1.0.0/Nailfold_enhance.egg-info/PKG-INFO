@@ -1,0 +1,190 @@
+Metadata-Version: 2.1
+Name: Nailfold-enhance
+Version: 1.0.0
+Summary: Nailfold images and videos enhance
+Author: ZhouBin_FOSU
+Author-email: wuyanxiong@fosu.edu.cn
+License: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Healthcare Industry
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Topic :: Scientific/Engineering :: Image Processing
+Classifier: Topic :: Multimedia :: Video :: Conversion
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+License-File: LICENSE.txt
+
+# Nailfold Enhance SDK
+
+**中文版** | [English Version](#english-version)
+
+
+## 项目简介
+Nailfold Enhance SDK 是一款专注于甲襞微循环医学影像增强的工具包，通过优化的图像处理算法提升甲襞血管清晰度，辅助医学诊断与研究。
+
+
+## 核心功能
+- 单张/批量处理甲襞图像，支持主流格式（JPG/PNG/BMP等）
+- 逐帧增强甲襞视频，保留动态微循环特征
+- 递归处理文件夹内影像，保持原始目录结构
+- 自定义增强参数，适配不同质量的原始影像
+- 实时进度追踪，支持回调函数监控处理状态
+
+
+## 安装方法
+通过 pip 安装 SDK 及依赖：
+```bash
+pip install opencv-python numpy
+pip install nailfold-image-enhance-1.0.0-py3-none-any.whl
+pip install nailfold-image-enhance-1.0.0.tar.gz
+```
+
+
+## 快速开始
+### 1. 增强单张甲襞图像
+```python
+from nailfold_image_enhance import enhance_image
+
+# 使用默认配置增强图像
+enhance_image(
+    input_path="path/to/nailfold_image.jpg",
+    output_path="path/to/enhanced_image.jpg"
+)
+```
+
+### 2. 增强甲襞视频（带进度追踪）
+```python
+from nailfold_image_enhance import enhance_video
+
+def progress_callback(percent):
+    print(f"处理进度：{percent}%", end="\r")
+
+# 增强视频并显示实时进度
+enhance_video(
+    input_path="path/to/nailfold_video.mp4",
+    output_path="path/to/enhanced_video.mp4",
+    progress_callback=progress_callback
+)
+```
+
+### 3. 批量处理图像文件夹
+```python
+from nailfold_image_enhance import enhance_images_in_folder
+
+# 批量处理整个文件夹
+enhance_images_in_folder(
+    input_path="path/to/input_images",
+    output_path="path/to/output_images",
+    suffix="_enhanced"
+)
+```
+
+
+## 关键特性
+- 算法针对甲襞血管特征优化，避免过度增强导致的伪影
+- 支持医学影像格式及主流视频格式（MP4/AVI 等）
+- 自动创建输出目录，保持原始文件结构
+- 可通过配置类调整增强强度，适配低光照、高噪声场景
+
+
+## 文档资源
+- 使用指南：详细示例与操作步骤
+- API 参考：完整接口与参数说明
+
+
+## 系统要求
+- Python 3.8+
+- 依赖库：OpenCV (4.5+)、NumPy (1.21+)
+- 支持 Windows/macOS/Linux 系统
+
+
+<a id="english-version"></a>
+# Nailfold Enhance SDK
+
+[中文版](#nailfold-enhance-sdk) | **English Version**
+
+
+## Project Introduction
+Nailfold Enhance SDK is a toolkit focused on enhancing nailfold microcirculation medical images. It improves clarity and detail recognition of nailfold blood vessels through optimized image processing algorithms, assisting in medical diagnosis and research.
+
+
+## Core Features
+- Enhance single/batch nailfold images, supporting mainstream formats (JPG/PNG/BMP, etc.)
+- Enhance nailfold videos frame by frame, preserving dynamic microcirculation features
+- Recursively process images in folders, maintaining original directory structure
+- Customize enhancement parameters to adapt to raw images of different quality
+- Real-time progress tracking, supporting callback functions to monitor processing status
+
+
+## Quick Installation
+Install the SDK and dependencies via pip:
+```bash
+pip install opencv-python numpy
+pip install nailfold-image-enhance-1.0.0-py3-none-any.whl
+pip install nailfold-image-enhance-1.0.0.tar.gz
+```
+
+
+## Quick Start
+### 1. Enhance a Single Nailfold Image
+```python
+from nailfold_image_enhance import enhance_image
+
+# Enhance image with default configuration
+enhance_image(
+    input_path="path/to/nailfold_image.jpg",
+    output_path="path/to/enhanced_image.jpg"
+)
+```
+
+### 2. Enhance Nailfold Video (with Progress Tracking)
+```python
+from nailfold_image_enhance import enhance_video
+
+def progress_callback(percent):
+    print(f"Processing progress: {percent}%", end="\r")
+
+# Enhance video and display real-time progress
+enhance_video(
+    input_path="path/to/nailfold_video.mp4",
+    output_path="path/to/enhanced_video.mp4",
+    progress_callback=progress_callback
+)
+```
+
+### 3. Batch Process Image Folder
+```python
+from nailfold_image_enhance import enhance_images_in_folder
+
+# Batch process the entire folder
+enhance_images_in_folder(
+    input_path="path/to/input_images",
+    output_path="path/to/output_images",
+    suffix="_enhanced"
+)
+```
+
+
+## Key Features
+- Algorithms optimized for nailfold vessel features to avoid artifacts from over-enhancement
+- Supports medical imaging formats and mainstream video formats (MP4/AVI, etc.)
+- Automatically creates output directories, maintaining original file structure
+- Adjustable enhancement intensity via configuration class, adapting to low-light, high-noise scenarios
+
+
+## Documentation Resources
+- User Guide: Detailed examples and operation steps
+- API Reference: Complete interface and parameter descriptions
+
+
+## System Requirements
+- Python 3.7+
+- Dependencies: OpenCV (4.12+), NumPy (1.21+)
+- Supports Windows/macOS/Linux systems
+```
