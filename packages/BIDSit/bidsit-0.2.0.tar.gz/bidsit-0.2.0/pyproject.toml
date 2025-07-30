@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "BIDSit"
+description='A BIDS conversion tool for fMRI data'
+authors = [{name = 'Jen Burrell', email = 'jenbur@psych.ubc.ca'}]
+requires-python = '>=3.9'
+dynamic = ["version", "readme"]
+dependencies = [
+    'PySimpleGUI<=5.0.0',
+    'natsort>=8.3.1',
+]
+
+[project.scripts]
+BIDSit = "BIDSit.go:DOit"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.rst"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["BIDSit*"]
+
+[project.optional-dependencies]
+dev = ["pytest>=3.7",]
