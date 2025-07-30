@@ -1,0 +1,37 @@
+name: Publish to PyPI (uv)
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  run-tests:
+    uses: ./.github/workflows/tests.yaml
+
+  publish:
+    needs: run-tests  # only run publish if tests passed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Create virtual environment
+        run: uv venv
+      
+      - name: Install build tool
+        run: uv pip install build
+      
+      - name: Build the package
+        run: |
+          source .venv/bin/activate
+          python -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
