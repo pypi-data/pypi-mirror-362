@@ -1,0 +1,114 @@
+Metadata-Version: 2.1
+Name: dnc_crypto
+Version: 1.0.6
+Summary: A high-performance, industrial-grade cipher with optional GPU acceleration.
+Author: Mohammadmoein Pisoude
+Author-email: mmoeinp3@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Security :: Cryptography
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: cryptography
+Requires-Dist: networkx
+Requires-Dist: pynacl
+Provides-Extra: gpu
+Requires-Dist: cupy-cuda12x ; extra == 'gpu'
+
+# DNC-Crypto: A New Generation of Encryption
+
+![PyPI Version](https://img.shields.io/pypi/v/dnc-crypto)
+![Python Support](https://img.shields.io/pypi/pyversions/dnc-crypto)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![License](https://img.shields.io/pypi/l/dnc-crypto)
+
+Hey everyone! This is **DNC-Crypto**, a project I've been passionately working on to explore a fresh approach to encryption. My goal was to build something from the ground up that was not only unique but also incredibly resilient, designed to meet tomorrow's security challenges today.
+
+This library is the result of that journey—a powerful, multi-layered encryption tool with a clean, simple API.
+
+
+## Security Features & Design Philosophy
+
+I designed DNC-Crypto with a "paranoid-first" mindset. Here’s what makes it stand out:
+
+*   **Deeply Layered "Defense-in-Depth":** Your data isn't just encrypted once. It's processed through an **8-layer cascade**, with each layer using a unique, independently derived key. This exponentially increases the work required for brute-force attacks.
+
+*   **Quantum-Ready Security:** With support for **256-bit** and **512-bit** keys, this library is built for the long term. A 512-bit key provides a theoretical security level of 256 bits against quantum computers using Grover's algorithm, far exceeding current standards.
+
+*   **Authenticated & Tamper-Proof Payloads:** DNC-Crypto provides **Authenticated Encryption**. Every encrypted message is sealed in a "secure envelope" and signed with a strong **HMAC-SHA256**. This means you get two guarantees:
+    1.  **Confidentiality:** No one can read your data.
+    2.  **Integrity & Authenticity:** You can be 100% sure the data hasn't been modified or corrupted in transit.
+
+*   **Resilience Through Dynamic Structure:** The core DNC engine is designed to be a "moving target." Unlike traditional ciphers with fixed steps, its internal operations change dynamically in every round, based on the secret key. This makes it theoretically highly resistant to standard cryptanalysis techniques like differential and linear attacks.
+
+## Installation
+
+Getting started is easy. Just grab it from PyPI:
+```bash
+pip install dnc-crypto
+```
+
+## Quick Start Guide
+
+Here’s how you can put DNC-Crypto to work right away.
+
+```python
+from dnc_crypto import DNCCrypto, DecryptionError
+import os
+
+# Let's define a name for our key file
+KEY_FILE = "my_secret.key"
+
+# 1. Generate and Load Your Key
+# The library handles the heavy lifting of key management.
+try:
+    crypto = DNCCrypto(key_path=KEY_FILE)
+    print("✅ Key loaded successfully!")
+except FileNotFoundError:
+    print(f"⚠️ Key file not found. Let's create a new 512-bit key...")
+    # Generate a powerful 512-bit key for maximum, long-term security.
+    DNCCrypto.generate_key(key_path=KEY_FILE, key_size_bits=512)
+    crypto = DNCCrypto(key_path=KEY_FILE)
+    print(f"✅ New 512-bit key created and loaded from '{KEY_FILE}'.")
+
+# 2. Encrypt Something
+plaintext = b"This is a secret I'm protecting with my own crypto."
+print(f"\nOriginal message: {plaintext}")
+
+encrypted_data = crypto.encrypt(plaintext)
+print(f"Encrypted (hex): {encrypted_data.hex()}")
+
+# 3. Decrypt It Back
+try:
+    # The decrypt method automatically verifies the data's authenticity before decryption.
+    decrypted_text = crypto.decrypt(encrypted_data)
+    print(f"\nDecrypted message: {decrypted_text}")
+
+    # Let's make sure it's perfect
+    assert plaintext == decrypted_text
+    print("\n🎉 Success! The message is back, safe and sound.")
+
+except DecryptionError as e:
+    # This will catch errors from a wrong key or tampered data.
+    print(f"\n❌ Oops! Decryption failed: {e}")
+
+finally:
+    # Just cleaning up the key file for this example
+    if os.path.exists(KEY_FILE):
+        os.remove(KEY_FILE)
+```
+
+## License
+
+This project is shared under the MIT License. Feel free to use it in your own projects!
+
+## Feedback & Collaboration
+
+This project is a labor of love. If you're interested in cryptography, find a bug, or have ideas for improvement, feel free to open an issue on the [GitHub repository](https://github.com/your_username/dnc_crypto).
+
+---
+
+Hope you enjoy using it as much as I enjoyed building it!
