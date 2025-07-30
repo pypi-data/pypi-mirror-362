@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sleepy-driver"
+version = "1.1.6"
+description = "AI-powered drowsiness detection library for driver safety"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+    {name = "SleepyDriver Team", email = "sleepy.driver@example.com"},
+]
+keywords = ["drowsiness", "detection", "ai", "computer-vision", "safety", "driver"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "opencv-python>=4.5.0",
+    "mediapipe>=0.10.0",
+    "numpy>=1.21.0",
+]
+
+[project.optional-dependencies]
+ml = [
+    "joblib>=1.0.0",
+    "scikit-learn>=1.0.0",
+]
+dl = [
+    "torch>=1.9.0",
+    "torchvision>=0.10.0",
+]
+all = [
+    "joblib>=1.0.0",
+    "scikit-learn>=1.0.0",
+    "torch>=1.9.0",
+    "torchvision>=0.10.0",
+]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "twine",
+    "build",
+    "joblib>=1.0.0",
+    "scikit-learn>=1.0.0",
+    "torch>=1.9.0",
+    "torchvision>=0.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sleepy-driver/sleepy-driver"
+Documentation = "https://sleepy-driver.readthedocs.io/"
+Repository = "https://github.com/sleepy-driver/sleepy-driver.git"
+"Bug Tracker" = "https://github.com/sleepy-driver/sleepy-driver/issues"
+
+[project.scripts]
+sleepy-driver-demo = "sleepy_driver.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["sleepy_driver*"]
+exclude = ["tests*", "_legacy*"]
+
+[tool.setuptools.package-data]
+sleepy_driver = ["models/*.pkl", "models/*.pth"] 
