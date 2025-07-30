@@ -1,0 +1,369 @@
+# Copyright (c) {{ year }} {{ author }}. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import json
+{% if "pal_arch" in features %}
+import time
+{% else %}
+from functools import partial
+{% endif %}
+
+from rclpy.lifecycle import Node
+from rclpy.lifecycle import State
+from rclpy.lifecycle import TransitionCallbackReturn
+from rcl_interfaces.msg import ParameterDescriptor
+from rclpy.action import ActionServer, GoalResponse
+from hri_actions_msgs.msg import Intent
+from i18n_msgs.action import SetLocale
+from i18n_msgs.srv import GetLocales
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
+{% if "pal_arch" in features %}
+from chatbot_msgs.action import Dialogue
+from chatbot_msgs.srv import DialogueInteraction
+from rclpy.action import CancelResponse
+from rclpy.action.server import ServerGoalHandle
+from rclpy.callback_groups import ReentrantCallbackGroup
+{% else %}
+from hri import HRIListener
+{% endif %}
+
+
+class BasicChatbot(Node):
+    """
+    Implementation of {{id}}.
+
+    This is the main class for the node. It is a ROS2  node that uses the
+    lifecycle feature of ROS 2 to manage its states.
+
+    The purpose of this node is to recognise *user intents* using a chatbot.
+    This template is very simple, and should be used as a starting point to
+    integrate your own chatbot system.
+    """
+
+    def __init__(self) -> None:
+        """Construct the node."""
+        super().__init__('intent_extractor_{{ id }}')
+
+        # Declare ROS parameters. Should mimick the one listed in config/00-defaults.yaml
+        self.declare_parameter(
+          'my_parameter', "my_default_value.",
+          ParameterDescriptor(description='Important parameter for my chatbot')
+        )
+
+        self.get_logger().info("Initialising...")
+
+{% if "pal_arch" in features %}
+        self._dialogue_start_action = None
+        self._dialogue_interaction_srv = None
+{% else %}
+        self._hri_listener = None
+        self._intent_pub = None
+{% endif %}
+        self._get_supported_locales_server = None
+        self._set_default_locale_server = None
+
+        self._timer = None
+        self._diag_pub = None
+        self._diag_timer = None
+
+        self._nb_requests = 0
+{% if "pal_arch" in features %}
+        self._dialogue_id = None
+        self._dialogue_result = None
+{% endif %}
+
+        self.get_logger().info('Chatbot {{id}} started, but not yet configured.')
+
+{% if "pal_arch" in features %}
+    def on_dialog_goal(self, goal: Dialogue.Goal):
+        # Here we check if the goal is valid and the node is able to accept it
+        #
+        # For simplicity, we allow only one dialogue at a time.
+        # You might want to change this to allow multiple dialogues at the same time.
+        #
+        # We also check if the dialogue role is supported by the chatbot.
+        # In this example, we only support only the "__default__" role.
+
+        if self._dialogue_id or goal.role.name != '__default__':
+            return GoalResponse.REJECT
+        return GoalResponse.ACCEPT
+
+    def on_dialog_accept(self, handle: ServerGoalHandle):
+        self._dialogue_id = tuple(handle.goal_id.uuid)
+        self._dialogue_result = None
+        handle.execute()
+
+    def on_dialog_cancel(self, handle: ServerGoalHandle):
+        if self._dialogue_id:
+            return CancelResponse.ACCEPT
+        else:
+            return CancelResponse.REJECT
+
+    def on_dialog_execute(self, handle: ServerGoalHandle):
+        id = tuple(handle.goal_id.uuid)
+        self.get_logger().warn(f"Starting '{handle.request.role.name}' dialogue with id {id}")
+
+        try:
+            while handle.is_active:
+                if handle.is_cancel_requested:
+                    handle.canceled()
+                    return Dialogue.Result(error_msg='Dialogue cancelled')
+                elif self._dialogue_result:
+                    if self._dialogue_result.error_msg:
+                        handle.abort()
+                    else:
+                        handle.succeed()
+                    return self._dialogue_result
+                time.sleep(1e-2)
+            return Dialogue.Result(error_msg='Dialogue execution interrupted')
+        finally:
+            self.get_logger().warn(f"Dialogue with id {id} finished")
+            self._dialogue_id = None
+            self._dialogue_result = None
+{% endif %}
+{% if "pal_arch" in features %}
+
+    def on_dialogue_interaction(self,
+                                request: DialogueInteraction.Request,
+                                response: DialogueInteraction.Response):
+{% else %}
+    def on_user_input(self, input, user_id):
+{% endif %}
+        """
+        Implement here the logic to process the natural text input.
+
+        You might want to:
+        - recognize and return the user intent (if any), and map it to the
+          Intent.msg semantics.
+        - return a suggested response to the user (if any)
+        - return a result (if the discussion has come to a close), which
+          effectively terminates the dialogue
+{% if "pal_arch" in features %}
+
+        For now, we just try to recognize a greeting, and close the dialogue
+        if requested.
+        """
+        # we can have multiple dialogues: we use the dialogue_id to
+        # identify to which conversation this new input belongs
+        target_dialogue_id = request.dialogue_id
+
+        user_id = request.user_id
+        input = request.input
+        response_expected = request.response_expected
+        stop = False
+{% else %}
+        """
+{% endif %}
+        suggested_response = ""
+        intents = []
+
+{% if "pal_arch" in features %}
+        self.get_logger().info(f"input from {user_id} to dialogue {target_dialogue_id}: {input}")
+{% else %}
+        self.get_logger().info(f"input from {user_id}: {input}")
+{% endif %}
+        self._nb_requests += 1
+
+        if "hello" in input.lower() or "hi" in input.lower():
+            self.get_logger().warn("I think the user want to greet me. Sending a GREET intent")
+            intents.append(Intent(intent=Intent.GREET,
+                                  source=user_id,
+                                  modality=Intent.MODALITY_SPEECH,
+                                  confidence=.8))
+            suggested_response = "Hello! How can I help you?"
+        elif "stop" in input.lower() or "shut up" in input.lower():
+            self.get_logger().warn("I think the user wants me to stop this interaction."
+                                   " Closing the dialogue")
+            intents.append(Intent(intent=Intent.STOP_ACTIVITY,
+                                  source=user_id,
+                                  modality=Intent.MODALITY_SPEECH,
+                                  confidence=1.0,
+                                  data=json.dumps({"object": "dialogue"})))
+            suggested_response = "Ok, I will stop talking now."
+{% if "pal_arch" in features %}
+            stop = True
+{% endif %}
+        else:
+            self.get_logger().warn("Unable to recognise a particular intent! "
+                                   "forwarding a 'RAW_USER_INPUT'")
+            intents.append(Intent(intent=Intent.RAW_USER_INPUT,
+                                  source=user_id,
+                                  modality=Intent.MODALITY_SPEECH,
+                                  confidence=1.0,
+                                  data=json.dumps({"input": input})))
+            suggested_response = "I'm sorry, I did not understand. " \
+                                 "My basic chatbot is not very smart yet."
+
+            suggested_response += " However, I can tell you about my last holidays:"
+            suggested_response += [
+                " I went to the beach and had a great time!",
+                " I visited my family and we had a great dinner together.",
+                " I stayed at home and watched movies all day.",
+                " I went to the mountains and did some hiking.",
+                " I went to the city and visited a museum."][self._nb_requests % 5]
+
+{% if "pal_arch" in features %}
+        if response_expected:
+            response.response = suggested_response
+        response.intents = intents
+        if stop:
+            self._dialogue_result = Dialogue.Result()
+        return response
+{% else %}
+        for intent in intents:
+            self._intent_pub.publish(intent)
+{% endif %}
+
+    def on_get_supported_locales(self, request, response):
+        response.locales = []  # list of supported locales; empty means any
+        return response
+
+    def on_set_default_locale_goal(self, goal_request):
+        return GoalResponse.ACCEPT
+
+    def on_set_default_locale_exec(self, goal_handle):
+        """Change here the default locale of the chatbot."""
+        result = SetLocale.Result()
+        goal_handle.succeed()
+        return result
+
+    #################################
+    #
+    # Lifecycle transitions callbacks
+    #
+    def on_configure(self, state: State) -> TransitionCallbackReturn:
+
+{% if "pal_arch" not in features %}
+        self._intent_pub = self.create_publisher(Intent, '/intents', 1)
+{% endif %}
+        # configure and start diagnostics publishing
+        self._nb_requests = 0
+        self._diag_pub = self.create_publisher(DiagnosticArray, '/diagnostics', 1)
+        self._diag_timer = self.create_timer(1., self.publish_diagnostics)
+
+        # start advertising supported locales
+        self._get_supported_locales_server = self.create_service(
+            GetLocales, "~/get_supported_locales", self.on_get_supported_locales)
+
+        self._set_default_locale_server = ActionServer(
+            self, SetLocale, "~/set_default_locale",
+            goal_callback=self.on_set_default_locale_goal,
+            execute_callback=self.on_set_default_locale_exec)
+
+        self.get_logger().info("Chatbot {{id}} is configured, but not yet active")
+        return TransitionCallbackReturn.SUCCESS
+
+    def on_activate(self, state: State) -> TransitionCallbackReturn:
+        """
+        Activate the node.
+
+        You usually want to do the following in this state:
+        - Create and start any timers performing periodic tasks
+        - Start processing data, and accepting action goals, if any
+
+        """
+{% if "pal_arch" in features %}
+        self._dialogue_start_action = ActionServer(
+            self, Dialogue, '/chatbot/start_dialogue',
+            execute_callback=self.on_dialog_execute,
+            goal_callback=self.on_dialog_goal,
+            handle_accepted_callback=self.on_dialog_accept,
+            cancel_callback=self.on_dialog_cancel,
+            callback_group=ReentrantCallbackGroup())
+
+        self._dialogue_interaction_srv = self.create_service(
+            DialogueInteraction, '/chatbot/dialogue_interaction', self.on_dialogue_interaction)
+{% else %}
+        self._hri_listener = HRIListener("__internal_{{id}}_hri__")
+        self._hri_listener.on_voice(lambda voice:
+                                    voice.on_speech(partial(self.on_user_input, user_id=voice.id))
+                                    )
+{% endif %}
+
+        # Define a timer that fires every second to call the run function
+        timer_period = 1  # in sec
+        self._timer = self.create_timer(timer_period, self.run)
+
+        self.get_logger().info("Chatbot {{id}} is active and running")
+        return super().on_activate(state)
+
+    def on_deactivate(self, state: State) -> TransitionCallbackReturn:
+        """Stop the timer to stop calling the `run` function (main task of your application)."""
+        self.get_logger().info("Stopping chatbot...")
+
+        self.destroy_timer(self._timer)
+{% if "pal_arch" in features %}
+        self._dialogue_start_action.destroy()
+        self.destroy_service(self._dialogue_interaction_srv)
+{% else %}
+        self._hri_listener = None
+        self.destroy_publisher(self._intent_pub)
+{% endif %}
+
+        self.get_logger().info("Chatbot {{id}} is stopped (inactive)")
+        return super().on_deactivate(state)
+
+    def on_shutdown(self, state: State) -> TransitionCallbackReturn:
+        """
+        Shutdown the node, after a shutting-down transition is requested.
+
+        :return: The state machine either invokes a transition to the
+            "finalized" state or stays in the current state depending on the
+            return value.
+            TransitionCallbackReturn.SUCCESS transitions to "finalized".
+            TransitionCallbackReturn.FAILURE remains in current state.
+            TransitionCallbackReturn.ERROR or any uncaught exceptions to
+            "errorprocessing"
+        """
+        self.get_logger().info('Shutting down {{id}} node.')
+        self.destroy_timer(self._diag_timer)
+        self.destroy_publisher(self._diag_pub)
+
+        self.destroy_service(self._get_supported_locales_server)
+        self._set_default_locale_server.destroy()
+
+        self.get_logger().info("Chatbot {{id}} finalized.")
+        return TransitionCallbackReturn.SUCCESS
+
+    #################################
+
+    def publish_diagnostics(self):
+
+        arr = DiagnosticArray()
+        msg = DiagnosticStatus(
+            level=DiagnosticStatus.OK,
+            name="/intent_extractor_{{ id }}",
+            message="chatbot {{id}} is running",
+            values=[
+                KeyValue(key="Module name", value="{{ id }}"),
+                KeyValue(key="Current lifecycle state",
+                         value=self._state_machine.current_state[1]),
+                KeyValue(key="# requests since start", value=str(self._nb_requests)),
+            ],
+        )
+
+        arr.header.stamp = self.get_clock().now().to_msg()
+        arr.status = [msg]
+        self._diag_pub.publish(arr)
+
+    def run(self) -> None:
+        """
+        Background task of the chatbot.
+
+        For now, we do not need to do anything here, as the chatbot is
+        event-driven, and the `on_user_input` callback is called when a new
+        user input is received.
+        """
+        pass
+
