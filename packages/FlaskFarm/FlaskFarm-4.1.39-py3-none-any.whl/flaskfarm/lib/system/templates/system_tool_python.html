@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+
+{{ macros.m_button_group([['all_upgrade_btn', '모두 업그레이드'], ['refresh_btn', '새로고침']])}}
+{{ macros.m_row_start('5') }}
+{{ macros.m_row_end() }}
+
+{{ macros.setting_input_text_and_buttons('pip', 'pip 패키지 설치', [['install_btn', '설치 & 업그레이드']], value=arg['tool_python_name'], desc=None) }}
+
+
+<div id="list_div"></div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  refresh();
+});
+
+function refresh() {
+  globalSendCommandPage('get_freeze', null, null, null, function(ret){
+    make_list(ret.data);
+  });
+}
+
+$("body").on('click', '#install_btn', function(e){
+  e.preventDefault();
+  name = $('#pip').val();
+  if (name == '') {
+    notify("package 명을 입력하세요.", 'danger');
+    return
+  }
+  upgrade(name);
+});
+
+$("body").on('click', '#upgrade_btn', function(e){
+  e.preventDefault();
+  upgrade($(this).data('name'));
+});
+
+
+function upgrade(name) {
+  globalSendCommandPage('upgrade', name);
+}
+
+$("body").on('click', '#remove_btn', function(e){
+  e.preventDefault();
+  remove_confirm($(this).data('name'));
+});
+
+function remove(name) {
+  globalSendCommandPage('remove', name);
+}
+
+function remove_confirm(name) {
+  $("#confirm_title").html("삭제 확인");
+  $("#confirm_body").html(name + "패키지를<br>삭제 하시겠습니까?");
+  $('#confirm_button').attr('onclick', "remove('"+name+"');");
+  $("#confirm_modal").modal();
+}
+
+$("body").on('click', '#refresh_btn', function(e){
+  e.preventDefault();
+  refresh();
+});
+
+function make_list(data) {
+  current_data = data;
+  str = '';
+  str = '<table id="result_table" class="table table-sm"  ><thead class="thead-dark"><tr> \
+    <th style="width:10%; text-align:center;">ID</th> \
+    <th style="width:30%; text-align:center;">Name</th> \
+    <th style="width:30%; text-align:center;">Version</th> \
+    <th style="width:30%; text-align:center;">Action</th> \
+    </tr></thead><tbody id="list">';
+  if (data.length == 0) str += '<tr><td colspan="6"><h4>Empty</h4></td></tr>';
+  for(i in data) {
+    //console.log(data[i]);
+    str += '<tr class="chover" style="cursor: pointer;">';
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ (parseInt(i)+1) + '</td>';
+    str += '<td scope="col" style="width:30%; text-align:center;">'+ data[i][0] + '</td>';
+    str += '<td scope="col" style="width:30%; text-align:center;">'+ data[i][1] + '</td>';
+    tmp = j_button('upgrade_btn', 'Upgrade', {'name':data[i][0]}, 'primary', true, false);
+    tmp += j_button('remove_btn', '삭제', {'name':data[i][0]}, 'danger', true, false);
+    tmp = j_button_group(tmp);
+    str += '<td scope="col" style="width:30%; text-align:center;">'+ tmp + '</td>';
+    str += '</tr>'
+  }
+  str += '</table>';
+  document.getElementById("list_div").innerHTML = str;
+}
+</script>    
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+</style>
+<div>
+  {{ macros.setting_select_empty('log_select1', '로그 파일 선택 (.log)') }}
+  <div id="log_div" class="bg-dark" style="overflow:auto; border-color: blue; border: solid 1px;">
+  </div>
+</div>
+
+<script type="text/javascript">
+var log_list = "{{arg['log_list']}}";
+var all_list = "{{arg['all_list']}}";
+
+var protocol = window.location.protocol;
+var socket = io.connect(protocol + "//" + document.domain + ":" + location.port + "/log");
+var current_filename = '';
+var start_filename = "{{arg['filename']}}";
+
+$(document).ready(function() {
+  $('#main_container').attr('class', 'container-fluid');
+  ResizeTextAreaAllLog()
+  make_form()
+  if (start_filename != '')
+    document.getElementById('log_select').value = start_filename;
+    $('#log_select').change();
+})
+
+function make_form() {
+  str = '<select id="log_select" name="log_select" class="form-control form-control-sm">';
+  data = log_list.split('|')
+  for(var i in data) {
+    str += '<option value="' + data[i] + '">' + data[i] + '</option>';
+  }
+  $("#log_select1_div").html(str);
+}
+
+$("body").on('change', '#log_select', function(e){
+  e.preventDefault();
+  filename = $(this)[0].value;
+  current_filename = filename;
+  $('#loading').show();
+  $("#add").html('');
+  socket.emit("start", {'filename':filename} );
+});
+
+function ResizeTextAreaAllLog() {
+  ClientHeight = window.innerHeight
+  $("#log_div").height(ClientHeight-180);
+}
+
+$(window).resize(function() {
+  ResizeTextAreaAllLog();
+});
+
+
+socket.on('on_start', function(data){
+  lines = splitLines(data.data);
+  var html = '';
+  for (i in lines) {
+    html += logline(lines[i]);
+  }
+  $('#log_div').html(html)
+  document.getElementById("log_div").scrollTop = document.getElementById("log_div").scrollHeight;
+  $('#loading').hide();
+});
+
+socket.on('add', function(data){
+  if (data.filename == current_filename) {
+    $('#log_div').append(logline(data.data.trim()));
+    document.getElementById("log_div").scrollTop = document.getElementById("log_div").scrollHeight;
+  }
+});
+
+$("#clear").click(function(e) {
+  e.preventDefault(); 
+  document.getElementById("add").innerHTML = '';
+});
+
+$("#auto_scroll").click(function(){
+  var chk = $(this).is(":checked");//.attr('checked');
+});
+  
+</script>    
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  <div id="log_div" class="bg-dark" style="overflow:auto; border-color: blue; border: solid 1px;">
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  setWide();
+  $('#loading').show();
+  ResizeTextAreaLog()
+})
+
+function ResizeTextAreaLog() {
+  ClientHeight = window.innerHeight
+  $("#log_div").height(ClientHeight-130);
+}
+
+$(window).resize(function() {
+  ResizeTextAreaLog();
+});
+
+
+var protocol = window.location.protocol;
+var socket = io.connect(protocol + "//" + document.domain + ":" + location.port + "/log");
+
+socket.emit("start", {'package':'{{package}}'} );
+socket.on('on_start', function(data){
+  lines = splitLines(data.data);
+  var html = '';
+  for (i in lines) {
+    html += logline(lines[i]);
+  }
+  $('#log_div').html(html)
+  document.getElementById("log_div").scrollTop = document.getElementById("log_div").scrollHeight;
+  $('#loading').hide();
+});
+
+socket.on('add', function(data){
+  console.log(data.data)
+  if (data.package == "{{package}}") {
+    $('#log_div').append(logline(data.data.trim()));
+    document.getElementById("log_div").scrollTop = document.getElementById("log_div").scrollHeight;
+  }
+});
+
+$("#clear").click(function(e) {
+  e.preventDefault(); 
+  document.getElementById("log").innerHTML = '';
+});
+
+$("#auto_scroll").click(function(){
+  var chk = $(this).is(":checked");//.attr('checked');
+});
+  
+</script>    
+
+{% endblock %}
