@@ -1,0 +1,53 @@
+<odoo>
+    <!-- Product tags -->
+    <record id="view_product_tags_tree" model="ir.ui.view">
+        <field name="name">product.tag.tree</field>
+        <field name="model">product.template.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Etiquetas de producto" editable="bottom">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_product_tag_form" model="ir.ui.view">
+        <field name="name">product.tag.form</field>
+        <field name="model">product.template.tag</field>
+        <field name="arch" type="xml">
+            <form string="Etiquetas de producto">
+                <sheet>
+                    <group col="4">
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_product_tag_form" model="ir.actions.act_window">
+        <field name="name">Etiquetas de producto</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template.tag</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+
+    <menuitem id="editorial_main_item_product_menu"
+        name="Productos"
+        action="sale.product_template_action"
+        parent="main_menu_product"
+        sequence="10"/>
+
+    <menuitem id="editorial_product_config_menu"
+        name="Configuración"
+        parent="main_menu_product"
+        groups="base.group_system"
+        sequence="20"/>
+
+    <menuitem id="editorial_product_tags_menu"
+        name="Etiquetas"
+        action="action_product_tag_form"
+        parent="editorial_product_config_menu"
+        groups="base.group_system"
+        sequence="10"/>
+
+</odoo>
