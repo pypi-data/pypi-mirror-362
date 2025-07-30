@@ -1,0 +1,98 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "ibis-ml"
+authors = [{name = "Ibis Maintainers", email = "maintainers@ibis-project.org"}]
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: Apache Software License"]
+dependencies = ["ibis-framework"]
+dynamic = ["version", "description"]
+
+[project.optional-dependencies]
+dask = ["dask[dataframe]"]
+doc = [
+  "clickhouse-connect",
+  "ibis-framework[bigquery,clickhouse,dask,datafusion,druid,duckdb,examples,exasol,flink,impala,mssql,mysql,oracle,pandas,polars,postgres,pyspark,risingwave,snowflake,sqlite,trino] >=9.1",
+  "itables",
+  "jupyter",
+  "quartodoc", 
+  "scikit-learn<1.6.0",
+  "skorch", 
+  "torch",
+  "xgboost",
+]
+dev = ["ibis-framework[duckdb,examples]", "polars", "pytest", "pytest-cov", "scikit-learn", "skorch", "torch", "xgboost"]
+
+[project.urls]
+Home = "https://ibis-project.github.io/ibis-ml/"
+
+[tool.coverage.report]
+exclude_also = ["if TYPE_CHECKING:"]
+
+[tool.ruff.lint]
+select = [
+  "F",    # Pyflakes
+  "E",    # pycodestyle: Error
+  "W",    # pycodestyle: Warning
+  "I",    # isort
+  # "D",  # pydocstyle # TODO(deepyaman): Add missing docstrings.
+  "UP",   # pyupgrade
+  # "S",  # flake8-bandit # TODO(deepyaman): Remove assert and ignore tests.
+  "BLE",  # flake8-blind-except
+  "B",    # flake8-bugbear
+  # "A",  # flake8-builtins # TODO(deepyaman): Rename variables.
+  "COM",  # flake8-commas
+  "C4",   # flake8-comprehensions
+  "T10",  # flake8-debugger
+  "FA",   # flake8-future-annotations
+  "ISC",  # flake8-implicit-str-concat
+  "ICN",  # flake8-import-conventions
+  "G",    # flake8-logging-format
+  "INP",  # flake8-no-pep420
+  "PIE",  # flake8-pie
+  "T20",  # flake8-print
+  "PT",   # flake8-pytest-style
+  "Q",    # flake8-quotes
+  "RET",  # flake8-return
+  "SLF",  # flake8-self
+  "SIM",  # flake8-simplify
+  "TID",  # flake8-tidy-imports
+  "TCH",  # flake8-type-checking
+  "PTH",  # flake8-use-pathlib
+  "TD",   # flake8-todos
+  "ERA",  # eradicate
+  "PD",   # pandas-vet
+  # "PGH",# pygrep-hooks # TODO(deepyaman): Use specific rule codes when ignoring type issues.
+  "FLY",  # flynt
+  "NPY",  # NumPy-specific rules
+  "PERF", # Perflint
+  "LOG",  # flake8-logging
+  "RUF",  # Ruff-specific rules
+]
+ignore = [
+  "UP038",  # non-pep604-isinstance, results in slower code
+  "B905",   # zip-without-explicit-strict, stylistic choice
+  "COM812", # missing-trailing-comma
+  "ISC001", # single-line-implicit-string-concatenation
+  "RET505", # superfluous-else-return, stylistic choice
+  "TD003",  # missing-todo-link
+  "PD901",  # pandas-df-variable-name, stylistic choice
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"docs/**/*.py" = ["INP001"]
+"examples/*.ipynb" = ["E501", "ERA001", "I001", "T201"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
+[tool.mypy]
+ignore_missing_imports = true
