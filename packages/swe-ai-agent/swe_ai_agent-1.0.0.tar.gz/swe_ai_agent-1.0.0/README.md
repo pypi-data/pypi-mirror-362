@@ -1,0 +1,108 @@
+# SWE Agent
+
+An AI-powered development assistant that helps you build, analyze, and edit code across all programming languages. Think of it as your intelligent pair programming partner.
+
+## Installation
+
+```bash
+pip install swe-ai-agent
+```
+
+## Quick Start
+
+```bash
+# Set your API key
+export ANTHROPIC_API_KEY="your_api_key_here"
+
+# Start interactive mode
+swe-agent --interactive
+
+# Start pair programming interface (recommended)
+swe-agent --pair
+
+# Execute a specific task
+swe-agent --task "Create a Python calculator"
+```
+
+## How to Use
+
+### Interactive Mode
+```bash
+swe-agent --interactive
+```
+- Type your requests in plain English
+- The agent will analyze, plan, and execute the task
+- View results and continue with more tasks
+
+### Pair Programming Mode
+```bash
+swe-agent --pair
+```
+- Natural conversation with the AI
+- Real-time code assistance
+- File context management
+- Git integration
+
+**Available commands in pair mode:**
+- `/help` - Show help message
+- `/status` - Show system status
+- `/files` - Show files in context
+- `/git` - Show git status
+- `/add <file>` - Add file to context
+- `/remove <file>` - Remove file from context
+- `/clear` - Clear screen
+- `/exit` - Exit interface
+
+### One-off Tasks
+```bash
+swe-agent --task "Fix the bug in main.py"
+swe-agent --task "Add error handling to the API"
+swe-agent --task "Create unit tests for the User class"
+```
+
+### Advanced Options
+```bash
+# Use planner for complex tasks
+swe-agent --task "Build a web application" --use-planner
+
+# Set custom directory
+swe-agent --repo-path /path/to/project --interactive
+
+# Enable debug logging
+swe-agent --pair --log-level DEBUG
+```
+
+## What It Can Do
+
+- **Code Analysis**: Understand code structure, find bugs, suggest improvements
+- **Code Generation**: Create new files, functions, and classes
+- **Code Editing**: Fix bugs, refactor code, add features
+- **Testing**: Generate unit tests and integration tests
+- **Documentation**: Create and update documentation
+- **Git Operations**: Manage version control tasks
+- **Universal Language Support**: Works with Python, JavaScript, Go, Rust, Java, C++, and more
+
+## Examples
+
+```bash
+# Create a new project
+swe-agent --task "Create a Flask web app with user authentication"
+
+# Fix existing code
+swe-agent --task "Fix the memory leak in the data processing module"
+
+# Add features
+swe-agent --task "Add pagination to the user list endpoint"
+
+# Generate tests
+swe-agent --task "Create comprehensive tests for the payment processing system"
+```
+
+## Requirements
+
+- Python 3.8+
+- Anthropic API key
+
+## License
+
+MIT License - see LICENSE file for details.
