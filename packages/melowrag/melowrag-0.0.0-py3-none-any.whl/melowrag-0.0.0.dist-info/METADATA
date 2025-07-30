@@ -1,0 +1,107 @@
+Metadata-Version: 2.3
+Name: melowrag
+Version: 0.0.0
+Summary: a modular Python framework for semantic search, vector indexing, and retrieval-augmented generation
+License: Apache-2.0
+Keywords: Deep Learning,Machine Learning
+Author: Erfan Zare Chavoshi
+Author-email: Erfanzare810@gmail.com
+Requires-Python: >=3.10,<3.14
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Provides-Extra: all
+Provides-Extra: databases
+Provides-Extra: dev
+Provides-Extra: graph-algorithms
+Provides-Extra: modeling
+Provides-Extra: pipelines
+Provides-Extra: pipelines-audio
+Provides-Extra: pipelines-data
+Provides-Extra: pipelines-image
+Provides-Extra: pipelines-text
+Provides-Extra: remote-storage
+Provides-Extra: score-functions
+Provides-Extra: similarity
+Provides-Extra: vector-embeddings
+Provides-Extra: vector-index
+Provides-Extra: workflow-engine
+Requires-Dist: azure-storage-blob (==12.24.1)
+Requires-Dist: boto3 (==1.35.53)
+Requires-Dist: duckdb ; extra == "databases"
+Requires-Dist: google-cloud-storage (==2.19.0)
+Requires-Dist: hnswlib ; extra == "vector-index"
+Requires-Dist: huggingface-hub (==0.32.4)
+Requires-Dist: msgpack (==1.1.0)
+Requires-Dist: networkx (==3.4.2) ; extra == "graph-algorithms"
+Requires-Dist: numpy (==1.26.4)
+Requires-Dist: onnxruntime (==1.20.1) ; extra == "modeling" or extra == "pipelines-audio"
+Requires-Dist: pandas (==2.2.3) ; extra == "pipelines-data" or extra == "workflow-engine"
+Requires-Dist: peewee (==3.18.1)
+Requires-Dist: psycopg2-binary (==2.9.9)
+Requires-Dist: pyyaml (==6.0.2)
+Requires-Dist: requests (==2.32.4) ; extra == "workflow-engine"
+Requires-Dist: scikit-learn (==1.6.1) ; extra == "vector-index" or extra == "vector-embeddings"
+Requires-Dist: scipy (==1.15.2) ; extra == "vector-index" or extra == "pipelines-audio" or extra == "vector-embeddings"
+Requires-Dist: sentence-transformers (==4.1.0) ; extra == "vector-embeddings"
+Requires-Dist: skops ; extra == "vector-embeddings"
+Requires-Dist: soundfile (==0.13.1) ; extra == "pipelines-audio"
+Requires-Dist: sqlalchemy (==2.0.38) ; extra == "vector-index" or extra == "databases" or extra == "graph-algorithms" or extra == "score-functions"
+Requires-Dist: torchaudio (==2.6.0)
+Requires-Dist: tqdm (==4.67.1)
+Requires-Dist: transformers (==4.51.0)
+Project-URL: Documentation, https://melowrag.readthedocs.io/en/latest/
+Project-URL: Homepage, https://github.com/erfanzar/melowrag
+Project-URL: Repository, https://github.com/erfanzar/melowrag
+Description-Content-Type: text/markdown
+
+# MelowRAG
+
+MelowRAG is a modular Python framework for semantic search, vector indexing, and retrieval-augmented generation (RAG). It provides a unified interface for embedding, indexing, searching, and managing data using dense, sparse, and hybrid vector models.
+
+## Features
+
+- **Embeddings Management**: Transform data into embeddings using various backends.
+- **Flexible Indexing**: Build, update, and search indexes with support for dense, sparse, and hybrid models.
+- **Database Integration**: Store and retrieve content using pluggable database backends.
+- **Graph Algorithms**: Advanced graph-based search and topic modeling.
+- **Pipelines**: Modular pipelines for text, audio, and image processing.
+- **Remote Storage**: Archive and load indexes from local or cloud storage.
+- **Extensible**: Easily add new models, scoring functions, or storage backends.
+
+## Quick Start
+
+```python
+from melowrag import Embeddings
+
+# Initialize embeddings
+embedding = Embeddings()
+
+# Index some texts
+texts = ["The cat sat on the mat.", "Dogs are wonderful companions."]
+embedding.index(texts)
+
+# Search for similar content
+results = embedding.search("animal companions", 1)
+for result in results:
+    print(f"Index: {result.index}, Score: {result.score}")
+```
+ 
+
+## Installation
+
+```bash
+pip install -e .
+```
+
+## License
+
+This project is licensed under the terms of the MIT license.
+
