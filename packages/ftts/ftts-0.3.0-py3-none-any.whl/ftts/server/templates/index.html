@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashTTS语音合成与克隆平台</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #202124;
+            --border-color: #dadce0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .subtitle {
+            margin-top: 10px;
+            margin-bottom: 0;
+            opacity: 0.9;
+        }
+
+        .github-link {
+            margin-top: 15px;
+            margin-left: 20px;
+        }
+
+        .github-button {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .github-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .github-button i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .github-link {
+                margin-left: 0;
+                align-self: flex-start;
+            }
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            text-align: center;
+            font-size: 2.2em;
+        }
+
+        header p {
+            text-align: center;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background-color: #e8eaed;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border: none;
+            outline: none;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h3 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-size: 1.5em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .range-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .range-control input[type="range"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .range-control span {
+            min-width: 50px;
+            text-align: right;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background-color: #3367d6;
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .upload-container {
+            border: 2px dashed var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .upload-container:hover {
+            border-color: var(--primary-color);
+        }
+
+        .upload-container input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 2em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            margin-bottom: 10px;
+            color: #5f6368;
+        }
+
+        .file-name {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .upload-container.has-file {
+            border-color: var(--secondary-color);
+            background-color: rgba(52, 168, 83, 0.05);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .alert-success {
+            background-color: rgba(52, 168, 83, 0.15);
+            border: 1px solid rgba(52, 168, 83, 0.3);
+            color: #2e7d32;
+        }
+
+        .alert-error {
+            background-color: rgba(234, 67, 53, 0.15);
+            border: 1px solid rgba(234, 67, 53, 0.3);
+            color: #c62828;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .advanced-options {
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .advanced-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .advanced-content {
+            display: none;
+        }
+
+        .advanced-content.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            color: #5f6368;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        .timer-container {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(66, 133, 244, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--primary-color);
+            border: 1px solid rgba(66, 133, 244, 0.3);
+        }
+
+        .timer-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .timer-display {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 500;
+        }
+
+        .processing-time {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #5f6368;
+            text-align: center;
+            padding: 8px;
+            background-color: rgba(0, 0, 0, 0.03);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .processing-time-highlight {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .multi-role-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        .multi-role-list-item {
+            background-color: #f1f3f4;
+            border: 1px solid #dadce0;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 14px;
+            color: #202124;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .multi-role-list-item:hover {
+            background-color: #e8eaed;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .recording-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+        }
+
+        .recording-btn:hover {
+            background-color: #3367d6;
+        }
+
+        .recording-btn i {
+            margin-right: 8px;
+        }
+
+        .recording-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .audio-preview {
+            background-color: rgba(66, 133, 244, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .audio-preview h5 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-content">
+        <div class="header-text">
+            <h1>FlashTTS语音合成与克隆平台</h1>
+            <p class="subtitle">提供高质量语音合成与声音克隆服务</p>
+        </div>
+        <div class="github-link">
+            <a href="https://github.com/HuiResearch/Fast-Spark-TTS" target="_blank" class="github-button">
+                <i class="fab fa-github"></i>
+                <span>GitHub 仓库</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('clone')" data-tab="clone">
+            <i class="fas fa-copy"></i> 声音克隆
+        </button>
+        <button class="tab" onclick="switchTab('clone_role')" data-tab="clone_role">
+            <i class="fas fa-user"></i> 角色语音
+        </button>
+        <button class="tab" onclick="switchTab('multi_role')" data-tab="multi_role">
+            <i class="fas fa-users"></i> 多角色合成
+        </button>
+    </div>
+    <!-- 声音克隆 -->
+    <div id="clone-tab" class="tab-content active">
+        <div class="card">
+            <h3>声音克隆</h3>
+            <div id="clone-alert" class="alert"></div>
+            <form id="clone-form">
+                <div class="form-group">
+                    <label for="clone-text">目标文本</label>
+                    <textarea id="clone-text" name="text" placeholder="请输入要用克隆声音说出的文本内容..." required>身临其境，换新体验。塑造开源语音合成新范式，让智能语音更自然。</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="clone-reference-text">参考音频文本内容(可选填)</label>
+                    <textarea id="clone-reference-text" name="reference_text"
+                              placeholder="请输入参考音频的文本内容..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>参考音频文件</label>
+                    <div id="clone-reference-upload" class="upload-container">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p class="upload-text">点击或拖拽文件到此处上传参考音频文件（WAV格式）</p>
+                        <input type="file"
+                               id="clone-reference-audio"
+                               name="reference_audio"
+                               accept=".wav"
+                               required
+                               onchange="handleFileSelect(this)">
+                        <p id="clone-reference-file-name" class="file-name"></p>
+                    </div>
+                    <div class="recording-container" style="margin-top: 15px; text-align: center;">
+                        <button type="button" id="start-recording" class="recording-btn">
+                            <i class="fas fa-microphone"></i> 开始录音
+                        </button>
+                        <button type="button" id="stop-recording" class="recording-btn" style="display: none;">
+                            <i class="fas fa-stop"></i> 停止录音
+                        </button>
+                        <div id="recording-status" style="margin-top: 10px; display: none;">
+                            <i class="fas fa-circle" style="color: red; animation: pulse 1s infinite;"></i>
+                            <span>正在录音...</span>
+                        </div>
+                    </div>
+                    <div id="reference-audio-preview" class="audio-preview" style="display: none; margin-top: 15px;">
+                        <h5>参考音频预览</h5>
+                        <audio id="reference-audio-player" controls style="width: 100%;"></audio>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>参考 latent 文件 (仅MegaTTS需要)</label>
+                    <div id="clone-latent-upload" class="upload-container">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p class="upload-text">点击或拖拽文件到此处上传 latent 文件（.npy 格式）</p>
+                        <input type="file"
+                               id="clone-latent-file"
+                               name="latent_file"
+                               accept=".npy"
+                               onchange="handleFileSelect(this)">
+                        <p id="clone-latent-file-name" class="file-name"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="clone-pitch">音调 (仅支持SparkTTS)</label>
+                    <select id="clone-pitch" name="pitch">
+                        <option value="very_low">极低</option>
+                        <option value="low">低</option>
+                        <option value="moderate" selected>中</option>
+                        <option value="high">高</option>
+                        <option value="very_high">极高</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="clone-speed">语速 (仅支持SparkTTS)</label>
+                    <select id="clone-speed" name="speed">
+                        <option value="very_low">极慢</option>
+                        <option value="low">慢</option>
+                        <option value="moderate" selected>中</option>
+                        <option value="high">快</option>
+                        <option value="very_high">极快</option>
+                    </select>
+                </div>
+                <div class="advanced-options">
+                    <div class="advanced-header" onclick="toggleAdvanced('clone-advanced')">
+                        <h4>生成参数设置</h4>
+                        <i id="clone-advanced-icon" class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="clone-advanced" class="advanced-content">
+                        <div class="form-group">
+                            <label for="clone-temperature">Temperature</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-temperature" name="temperature" min="0" max="1" step="0.1"
+                                       value="0.9" oninput="updateRangeValue(this)">
+                                <span id="clone-temperature-value">0.9</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clone-top-p">Top P</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-top-p" name="top_p" min="0" max="1" step="0.05"
+                                       value="0.95" oninput="updateRangeValue(this)">
+                                <span id="clone-top-p-value">0.95</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clone-top-k">Top K</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-top-k" name="top_k" min="1" max="100" step="1" value="50"
+                                       oninput="updateRangeValue(this)">
+                                <span id="clone-top-k-value">50</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clone-repetition-penalty">Repetition Penalty</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-repetition-penalty" name="repetition_penalty" min="0"
+                                       max="2" step="0.01"
+                                       value="1.0" oninput="updateRangeValue(this)">
+                                <span id="clone-repetition-penalty-value">1.0</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clone-max-tokens">Max Tokens</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-max-tokens" name="max_tokens" min="64" max="8192"
+                                       step="32"
+                                       value="4096" oninput="updateRangeValue(this)">
+                                <span id="clone-max-tokens-value">4096</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="clone-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>正在克隆声音，请稍候...</p>
+                    <div class="timer-container">
+                        <i class="fas fa-clock timer-icon"></i>
+                        <span id="clone-timer" class="timer-display">00:00:00</span>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button type="submit">
+                        <i class="fas fa-copy"></i> 克隆声音
+                    </button>
+                </div>
+            </form>
+            <div id="clone-result" class="result-container">
+                <h4>克隆结果</h4>
+                <div id="clone-process-time" class="processing-time"></div>
+                <audio id="clone-audio" class="audio-player" controls autoplay></audio>
+                <div class="button-container" style="margin-top: 15px;">
+                    <button id="clone-download" class="download-btn">
+                        <i class="fas fa-download"></i> 下载音频
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 角色克隆 -->
+    <div id="clone_role-tab" class="tab-content">
+        <div class="card">
+            <h3>角色语音</h3>
+            <div id="clone-role-alert" class="alert"></div>
+            <form id="clone-role-form">
+                <div class="form-group">
+                    <label for="clone-role-text">目标文本</label>
+                    <textarea id="clone-role-text" name="text" placeholder="请输入目标文本..." required>身临其境，换新体验。塑造开源语音合成新范式，让智能语音更自然。</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="clone-role-select">选择音频角色</label>
+                    <select id="clone-role-select" name="role_id" required>
+                        <option value="">加载中...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="clone-role-pitch">音调 (仅支持SparkTTS)</label>
+                    <select id="clone-role-pitch" name="pitch">
+                        <option value="very_low">极低</option>
+                        <option value="low">低</option>
+                        <option value="moderate" selected>中</option>
+                        <option value="high">高</option>
+                        <option value="very_high">极高</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="clone-role-speed">语速 (仅支持SparkTTS)</label>
+                    <select id="clone-role-speed" name="speed">
+                        <option value="very_low">极慢</option>
+                        <option value="low">慢</option>
+                        <option value="moderate" selected>中</option>
+                        <option value="high">快</option>
+                        <option value="very_high">极快</option>
+                    </select>
+                </div>
+                <div class="advanced-options">
+                    <div class="advanced-header" onclick="toggleAdvanced('clone-role-advanced')">
+                        <h4>生成参数设置</h4>
+                        <i id="clone-role-advanced-icon" class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="clone-role-advanced" class="advanced-content">
+                        <div class="form-group">
+                            <label for="clone-role-temperature">Temperature</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-role-temperature" name="temperature" min="0" max="1"
+                                       step="0.1" value="0.9" oninput="updateRangeValue(this)">
+                                <span id="clone-role-temperature-value">0.9</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clone-role-top-p">Top P</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-role-top-p" name="top_p" min="0" max="1" step="0.05"
+                                       value="0.95" oninput="updateRangeValue(this)">
+                                <span id="clone-role-top-p-value">0.95</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clone-role-top-k">Top K</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-role-top-k" name="top_k" min="1" max="100" step="1"
+                                       value="50" oninput="updateRangeValue(this)">
+                                <span id="clone-role-top-k-value">50</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clone-role-repetition-penalty">Repetition Penalty</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-role-repetition-penalty" name="repetition_penalty" min="0"
+                                       max="2" step="0.01"
+                                       value="1" oninput="updateRangeValue(this)">
+                                <span id="clone-role-repetition-penalty-value">1</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clone-role-max-tokens">Max Tokens</label>
+                            <div class="range-control">
+                                <input type="range" id="clone-role-max-tokens" name="max_tokens" min="64" max="8192"
+                                       step="32" value="4096" oninput="updateRangeValue(this)">
+                                <span id="clone-role-max-tokens-value">4096</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="clone-role-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>正在克隆声音，请稍候...</p>
+                    <div class="timer-container">
+                        <i class="fas fa-clock timer-icon"></i>
+                        <span id="clone-role-timer" class="timer-display">00:00:00</span>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button type="submit">
+                        <i class="fas fa-copy"></i> 角色克隆
+                    </button>
+                </div>
+            </form>
+            <div id="clone-role-result" class="result-container">
+                <h4>克隆结果</h4>
+                <div id="clone-role-process-time" class="processing-time"></div>
+                <audio id="clone-role-audio" class="audio-player" controls autoplay></audio>
+                <div class="button-container" style="margin-top: 15px;">
+                    <button id="clone-role-download" class="download-btn">
+                        <i class="fas fa-download"></i> 下载音频
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 多角色语音合成 -->
+    <div id="multi_role-tab" class="tab-content">
+        <div class="card">
+            <h3>多角色语音合成</h3>
+            <div id="multi-role-alert" class="alert"></div>
+            <form id="multi-role-form">
+                <div class="form-group">
+                    <label for="multi-role-text">输入文本</label>
+                    <textarea id="multi-role-text" name="text"
+                              placeholder="请输入文本，格式示例：&lt;role:角色1&gt;你好，&lt;role:角色2&gt;早上好"
+                              required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>支持的角色列表 (点击可在输入文本中添加角色)</label>
+                    <div id="multi-role-supported">
+                        <p>加载中...</p>
+                    </div>
+                </div>
+                <div class="advanced-options">
+                    <div class="advanced-header" onclick="toggleAdvanced('multi-role-advanced')">
+                        <h4>生成参数设置</h4>
+                        <i id="multi-role-advanced-icon" class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="multi-role-advanced" class="advanced-content">
+                        <div class="form-group">
+                            <label for="multi-role-temperature">Temperature</label>
+                            <div class="range-control">
+                                <input type="range" id="multi-role-temperature" name="temperature" min="0" max="1"
+                                       step="0.1" value="0.9" oninput="updateRangeValue(this)">
+                                <span id="multi-role-temperature-value">0.9</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="multi-role-top-p">Top P</label>
+                            <div class="range-control">
+                                <input type="range" id="multi-role-top-p" name="top_p" min="0" max="1" step="0.05"
+                                       value="0.95" oninput="updateRangeValue(this)">
+                                <span id="multi-role-top-p-value">0.95</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="multi-role-top-k">Top K</label>
+                            <div class="range-control">
+                                <input type="range" id="multi-role-top-k" name="top_k" min="1" max="100" step="1"
+                                       value="50" oninput="updateRangeValue(this)">
+                                <span id="multi-role-top-k-value">50</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="multi-role-repetition-penalty">Repetition Penalty</label>
+                            <div class="range-control">
+                                <input type="range" id="multi-role-repetition-penalty" name="repetition_penalty" min="0"
+                                       max="2" step="0.01"
+                                       value="1.0" oninput="updateRangeValue(this)">
+                                <span id="multi-role-repetition-penalty-value">1.0</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="multi-role-max-tokens">Max Tokens</label>
+                            <div class="range-control">
+                                <input type="range" id="multi-role-max-tokens" name="max_tokens" min="64" max="8192"
+                                       step="32" value="4096" oninput="updateRangeValue(this)">
+                                <span id="multi-role-max-tokens-value">4096</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="multi-role-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>正在生成语音，请稍候...</p>
+                    <div class="timer-container">
+                        <i class="fas fa-clock timer-icon"></i>
+                        <span id="multi-role-timer" class="timer-display">00:00:00</span>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button type="submit">
+                        <i class="fas fa-play"></i> 生成语音
+                    </button>
+                </div>
+            </form>
+            <div id="multi-role-result" class="result-container">
+                <h4>生成结果</h4>
+                <div id="multi-role-process-time" class="processing-time"></div>
+                <audio id="multi-role-audio" class="audio-player" controls autoplay></audio>
+                <div class="button-container" style="margin-top: 15px;">
+                    <button id="multi-role-download" class="download-btn">
+                        <i class="fas fa-download"></i> 下载音频
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <p>© 2025 AI语音合成与克隆平台 | 高品质语音技术服务</p>
+    </div>
+</footer>
+<script>
+    // 录音相关变量
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let audioStream = null;
+
+    // 切换标签页（支持四个模块）
+    function switchTab(tabName) {
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            if (tab.dataset.tab === tabName) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+
+        tabContents.forEach(content => {
+            if (content.id === `${tabName}-tab`) {
+                content.classList.add('active');
+            } else {
+                content.classList.remove('active');
+            }
+        });
+
+        // 若切换到角色克隆模块，则加载可用音频角色
+        if (tabName === 'clone_role') {
+            fetchAudioRoles();
+        }
+        if (tabName === 'multi_role') {
+            fetchMultiRoleSupported();
+        }
+    }
+
+    // 更新滑块值显示
+    function updateRangeValue(input) {
+        document.getElementById(`${input.id}-value`).textContent = input.value;
+    }
+
+    // 切换高级选项显示
+    function toggleAdvanced(id) {
+        const content = document.getElementById(id);
+        const icon = document.getElementById(`${id}-icon`);
+        content.classList.toggle('show');
+        if (content.classList.contains('show')) {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+
+    // 文件选择处理
+    function handleFileSelect(input) {
+        // 例如 input.id === "clone-reference-audio" 或 "clone-latent-file"
+        const segments = input.id.split('-');
+        // 去掉最后一段，如 ["clone","reference","audio"] -> ["clone","reference"]
+        const prefix = segments.slice(0, -1).join('-');
+
+        const fileName = input.files[0]?.name || '';
+        const fileNameElem = document.getElementById(`${prefix}-file-name`);
+        const uploadContainer = document.getElementById(`${prefix}-upload`);
+
+        if (fileName) {
+            fileNameElem.textContent = `已选择: ${fileName}`;
+            uploadContainer.classList.add('has-file');
+        } else {
+            fileNameElem.textContent = '';
+            uploadContainer.classList.remove('has-file');
+        }
+    }
+
+    // 显示提示信息
+    function showAlert(idPrefix, message, type) {
+        const alert = document.getElementById(`${idPrefix}-alert`);
+        alert.textContent = message;
+        alert.className = `alert alert-${type}`;
+        alert.style.display = 'block';
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    document.getElementById('start-recording').addEventListener('click', async function () {
+        try {
+            // 设置音频参数
+            const constraints = {
+                audio: {
+                    sampleRate: 16000,
+                    channelCount: 1,
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            };
+
+            audioStream = await navigator.mediaDevices.getUserMedia(constraints);
+            // 创建MediaRecorder时指定正确的MIME类型
+            const options = {
+                mimeType: 'audio/webm;codecs=opus',
+                audioBitsPerSecond: 16000
+            };
+
+            mediaRecorder = new MediaRecorder(audioStream, options);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, {type: 'audio/webm'});
+
+                // 将webm转换为wav
+                const audioContext = new AudioContext({sampleRate: 16000});
+                const arrayBuffer = await audioBlob.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                // 创建WAV文件
+                const wavBlob = await convertToWav(audioBuffer);
+                const audioUrl = URL.createObjectURL(wavBlob);
+
+                // 更新预览播放器
+                const audioPlayer = document.getElementById('reference-audio-player');
+                audioPlayer.src = audioUrl;
+                document.getElementById('reference-audio-preview').style.display = 'block';
+
+                // 将转换后的WAV文件填充到文件上传区域
+                const file = new File([wavBlob], 'recording.wav', {type: 'audio/wav'});
+                const fileInput = document.getElementById('clone-reference-audio');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+
+                // 更新文件名显示
+                document.getElementById('clone-reference-file-name').textContent = `已选择: ${file.name}`;
+                document.getElementById('clone-reference-upload').classList.add('has-file');
+            };
+
+            mediaRecorder.start();
+            document.getElementById('start-recording').style.display = 'none';
+            document.getElementById('stop-recording').style.display = 'inline-block';
+            document.getElementById('recording-status').style.display = 'block';
+            document.getElementById('reference-audio-preview').style.display = 'none';
+        } catch (error) {
+            showAlert('clone', `录音失败: ${error.message}`, 'error');
+        }
+    });
+    // 停止录音
+    document.getElementById('stop-recording').addEventListener('click', function () {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            audioStream.getTracks().forEach(track => track.stop());
+
+            document.getElementById('start-recording').style.display = 'inline-block';
+            document.getElementById('stop-recording').style.display = 'none';
+            document.getElementById('recording-status').style.display = 'none';
+        }
+    });
+
+    // 文件上传时清空录音
+    document.getElementById('clone-reference-audio').addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            const audioUrl = URL.createObjectURL(file);
+
+            // 更新预览播放器
+            const audioPlayer = document.getElementById('reference-audio-player');
+            audioPlayer.src = audioUrl;
+            document.getElementById('reference-audio-preview').style.display = 'block';
+        } else {
+            document.getElementById('reference-audio-preview').style.display = 'none';
+        }
+    });
+
+    // 将AudioBuffer转换为WAV格式
+    function convertToWav(audioBuffer) {
+        const numChannels = 1;
+        const sampleRate = 16000;
+        const format = 1; // PCM
+        const bitDepth = 16;
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numChannels * bytesPerSample;
+
+        const wavData = new Uint8Array(44 + audioBuffer.length * blockAlign);
+        const view = new DataView(wavData.buffer);
+
+        // 写入WAV头部
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + audioBuffer.length * blockAlign, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, audioBuffer.length * blockAlign, true);
+
+        // 写入音频数据
+        const offset = 44;
+        const channelData = audioBuffer.getChannelData(0);
+        for (let i = 0; i < channelData.length; i++) {
+            const sample = Math.max(-1, Math.min(1, channelData[i]));
+            const value = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+            view.setInt16(offset + i * 2, value, true);
+        }
+
+        return new Blob([wavData], {type: 'audio/wav'});
+    }
+
+    function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    }
+
+    // 声音克隆表单提交（始终采用非流式方式）
+    document.getElementById('clone-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const loading = document.getElementById('clone-loading');
+        const result = document.getElementById('clone-result');
+        loading.style.display = 'block';
+        result.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('text', document.getElementById('clone-text').value);
+        formData.append('reference_text', document.getElementById('clone-reference-text').value);
+        formData.append('pitch', document.getElementById('clone-pitch').value);
+        formData.append('speed', document.getElementById('clone-speed').value)
+        formData.append('response_format', 'mp3');
+        formData.append('temperature', document.getElementById('clone-temperature').value);
+        formData.append('top_p', document.getElementById('clone-top-p').value);
+        formData.append('top_k', document.getElementById('clone-top-k').value);
+        formData.append('max_tokens', document.getElementById('clone-max-tokens').value);
+        formData.append('repetition_penalty', document.getElementById('clone-repetition-penalty').value);
+
+        // ===== 直接上传参考音频文件（二进制） =====
+        const audioInput = document.getElementById('clone-reference-audio');
+        if (audioInput.files && audioInput.files[0]) {
+            const file = audioInput.files[0];
+            // 直接 append File，浏览器处理为 multipart/form-data 二进制上传
+            formData.append('reference_audio_file', file, file.name);
+        } else {
+            showAlert('clone', '请上传参考音频文件', 'warning');
+            loading.style.display = 'none';
+            return;
+        }
+
+        // 直接上传 latent 文件
+        const latentInput = document.getElementById('clone-latent-file');
+        if (latentInput.files && latentInput.files[0]) {
+            formData.append('latent_file', latentInput.files[0]);
+        }
+
+        const startTime = startTimer('clone');
+        try {
+            const response = await fetch('/clone_voice', {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || '声音克隆失败');
+            }
+            const blob = await response.blob();
+            stopTimer('clone', startTime);
+            showAlert('clone', '声音克隆成功', 'success');
+
+            const audio = document.getElementById('clone-audio');
+            audio.src = URL.createObjectURL(blob);
+            document.getElementById('clone-download').onclick = function () {
+                const link = document.createElement('a');
+                link.href = audio.src;
+                link.download = 'cloned_voice.mp3';
+                link.click();
+            };
+            result.style.display = 'block';
+        } catch (error) {
+            stopTimer('clone', startTime);
+            showAlert('clone', `声音克隆失败: ${error.message}`, 'error');
+        } finally {
+            loading.style.display = 'none';
+        }
+    });
+
+
+    // 角色克隆表单提交（始终采用非流式方式）
+    document.getElementById('clone-role-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        data.name = data.role_id;
+        delete data.role_id;
+        data.response_format = "mp3";
+
+        const loading = document.getElementById('clone-role-loading');
+        const result = document.getElementById('clone-role-result');
+        loading.style.display = 'block';
+        result.style.display = 'none';
+        const startTime = startTimer('clone-role');
+
+        try {
+            const response = await fetch('/speak', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || '角色语音生成失败');
+            }
+            const blob = await response.blob();
+            stopTimer('clone-role', startTime);
+            showAlert('clone-role', '角色语音生成成功', 'success');
+            const audio = document.getElementById('clone-role-audio');
+            audio.src = URL.createObjectURL(blob);
+            document.getElementById('clone-role-download').onclick = function () {
+                const link = document.createElement('a');
+                link.href = audio.src;
+                link.download = 'role_voice.mp3';
+                link.click();
+            };
+            result.style.display = 'block';
+        } catch (error) {
+            stopTimer('clone-role', startTime);
+            showAlert('clone-role', `角色语音生成失败: ${error.message}`, 'error');
+        } finally {
+            loading.style.display = 'none';
+        }
+    });
+
+    // 多角色语音合成表单提交（始终采用非流式方式）
+    document.getElementById('multi-role-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        data.response_format = "mp3";
+
+        const loading = document.getElementById('multi-role-loading');
+        const result = document.getElementById('multi-role-result');
+        loading.style.display = 'block';
+        result.style.display = 'none';
+
+        const startTime = startTimer('multi-role');
+        try {
+            const response = await fetch('/multi_speak', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || '多角色语音合成失败');
+            }
+            const blob = await response.blob();
+            stopTimer('multi-role', startTime);
+            showAlert('multi-role', '语音生成成功', 'success');
+            const audio = document.getElementById('multi-role-audio');
+            audio.src = URL.createObjectURL(blob);
+            document.getElementById('multi-role-download').onclick = function () {
+                const link = document.createElement('a');
+                link.href = audio.src;
+                link.download = 'multi_role_voice.mp3';
+                link.click();
+            };
+            result.style.display = 'block';
+        } catch (error) {
+            stopTimer('multi-role', startTime);
+            showAlert('multi-role', `生成失败: ${error.message}`, 'error');
+        } finally {
+            loading.style.display = 'none';
+        }
+    });
+
+    // 加载音频角色列表
+    function fetchAudioRoles() {
+        fetch('/audio_roles')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const select = document.getElementById('clone-role-select');
+                    select.innerHTML = '';
+                    data.roles.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role;
+                        option.textContent = role;
+                        select.appendChild(option);
+                    });
+                } else {
+                    showAlert('clone-role', '无法加载音频角色', 'error');
+                }
+            })
+            .catch(error => {
+                showAlert('clone-role', `加载音频角色失败: ${error.message}`, 'error');
+            });
+    }
+
+    // 获取多角色支持列表，并支持点击插入角色标签
+    function fetchMultiRoleSupported() {
+        fetch('/audio_roles')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('multi-role-supported');
+                if (data.success) {
+                    container.innerHTML = '';
+                    const list = document.createElement('div');
+                    list.className = 'multi-role-list';
+                    data.roles.forEach(role => {
+                        const item = document.createElement('div');
+                        item.className = 'multi-role-list-item';
+                        item.textContent = role;
+                        item.addEventListener('click', () => {
+                            const textarea = document.getElementById('multi-role-text');
+                            const roleTag = `<role:${role}>`;
+                            if (textarea) {
+                                if (textarea.value && !textarea.value.endsWith(' ')) {
+                                    textarea.value += ' ';
+                                }
+                                textarea.value += roleTag;
+                                textarea.focus();
+                            }
+                        });
+                        list.appendChild(item);
+                    });
+                    container.appendChild(list);
+                } else {
+                    container.innerHTML = '<p>加载角色失败</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('multi-role-supported').innerHTML = '<p>加载角色失败</p>';
+            });
+    }
+
+    // 页面加载时初始化所有滑块值显示
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('input[type="range"]').forEach(input => {
+            updateRangeValue(input);
+        });
+    });
+    // 计时器相关函数
+    let timerIntervals = {};
+
+    function startTimer(prefix) {
+        const timerElement = document.getElementById(`${prefix}-timer`);
+        let seconds = 0;
+        if (timerIntervals[prefix]) {
+            clearInterval(timerIntervals[prefix]);
+        }
+        timerElement.textContent = '00:00:00';
+        const startTime = new Date().getTime();
+        timerIntervals[prefix] = setInterval(() => {
+            seconds++;
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            timerElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }, 1000);
+        return startTime;
+    }
+
+    function stopTimer(prefix, startTime) {
+        if (timerIntervals[prefix]) {
+            clearInterval(timerIntervals[prefix]);
+            delete timerIntervals[prefix];
+        }
+        const endTime = new Date().getTime();
+        const totalTime = (endTime - startTime) / 1000;
+        const hours = Math.floor(totalTime / 3600);
+        const minutes = Math.floor((totalTime % 3600) / 60);
+        const seconds = Math.floor(totalTime % 60);
+        const milliseconds = Math.floor((totalTime - Math.floor(totalTime)) * 1000);
+        let timeString = '';
+        if (hours > 0) {
+            timeString += `${hours}小时`;
+        }
+        if (minutes > 0 || hours > 0) {
+            timeString += `${minutes}分`;
+        }
+        timeString += `${seconds}.${milliseconds.toString().padStart(3, '0')}秒`;
+        const timeElement = document.getElementById(`${prefix}-process-time`);
+        timeElement.innerHTML = `处理耗时: <span class="processing-time-highlight">${timeString}</span>`;
+        return timeString;
+    }
+</script>
+</body>
+</html>
