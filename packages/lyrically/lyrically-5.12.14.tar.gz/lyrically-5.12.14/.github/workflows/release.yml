@@ -1,0 +1,94 @@
+name: Release and Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+  
+  release:
+    needs: [ci]
+    runs-on: ubuntu-latest
+    name: "Create release and publish"
+
+    permissions:
+      contents: write
+      id-token: write
+    
+    steps:
+    - name: Checkout repository with full history
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Install uv with Python
+      uses: astral-sh/setup-uv@v6
+      with:
+        python-version: "3.10" 
+    
+    - name: Install dependencies
+      run: uv sync --extra dev
+    
+    - name: Extract version from tag
+      id: version
+      run: |
+        TAG_NAME="${{ github.ref_name }}"
+        VERSION_NUMBER="${TAG_NAME#v}"
+        echo "number=$VERSION_NUMBER" >> $GITHUB_OUTPUT
+    
+    - name: Extract release notes from CHANGELOG.md
+      id: changelog
+      run: |
+        # This robust shell script extracts the content for the current version from CHANGELOG.md
+        # It finds the line number of the current version and the next version, then prints the lines between them.
+        VERSION_TAG="[${{ steps.version.outputs.number }}]"
+        CHANGELOG_FILE="CHANGELOG.md"
+        
+        # Get the line number of the current version's heading
+        START_LINE=$(grep -n -m 1 "^## $VERSION_TAG" "$CHANGELOG_FILE" | cut -d: -f1)
+        
+        # Get the line number of the next version's heading (if it exists)
+        # We search for any '## [' pattern that comes after our start line.
+        END_LINE=$(tail -n +$((START_LINE + 1)) "$CHANGELOG_FILE" | grep -n -m 1 "^## \[" | cut -d: -f1)
+        
+        if [ -n "$END_LINE" ]; then
+          # If a next version exists, calculate the number of lines to print
+          NUM_LINES=$((END_LINE - 1))
+          CHANGELOG_CONTENT=$(tail -n +$((START_LINE + 1)) "$CHANGELOG_FILE" | head -n "$NUM_LINES")
+        else
+          # If no next version exists, just print everything after our version
+          CHANGELOG_CONTENT=$(tail -n +$((START_LINE + 1)) "$CHANGELOG_FILE")
+        fi
+
+        # This is the standard way to set a multi-line output variable
+        echo "content<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+      
+    - name: Build package
+      run: uv build
+
+    - name: Verify package with Twine
+      run: uv run twine check dist/*
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
+        body: ${{ steps.changelog.outputs.content }}
+        draft: false
+        prerelease: ${{ contains(github.ref_name, '-') }}
+        files: dist/*
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        skip-existing: true
