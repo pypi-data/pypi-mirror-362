@@ -1,0 +1,2115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<meta name="author" content="Ralf Schlatterbeck &lt;rsc&#64;runtux.com&gt;" />
+<title>PGAPy: Python Wrapper for PGAPack Parallel Genetic Algorithm Library</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger
+:Contact: goodger@users.sourceforge.net
+:Date: $Date: 2007-12-21 16:51:22 +0100 (Fri, 21 Dec 2007) $
+:Version: $Revision: 4316 $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+*/
+
+/* "! important" is used here to override other ``margin-top`` and
+   ``margin-bottom`` styles that are later in the stylesheet or 
+   more specific.  See <http://www.w3.org/TR/CSS1#the-cascade>. */
+.first {
+  margin-top: 0 ! important }
+
+.last {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+a.reference img {
+  border-width: 0px ;
+  }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em }
+
+div.footer, div.header {
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin-left: 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.line-block {
+  font-family: serif ;
+  font-size: 100% }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em ;
+  background-color: #eeeeee }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+table.citation {
+  border-left: solid thin gray }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid thin black }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+th.docinfo-name, th.field-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+tt.docutils {
+  background-color: #eeeeee }
+
+ul.auto-toc {
+  list-style-type: none }
+
+body {
+  background-color: #F0F0FF }
+
+p img {
+  vertical-align: text-top }
+
+
+</style>
+</head>
+<body>
+<div class="document" id="pgapy-python-wrapper-for-pgapack-parallel-genetic-algorithm-library">
+<h1 class="title">PGAPy: Python Wrapper for PGAPack Parallel Genetic Algorithm Library</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Author:</th>
+<td>Ralf Schlatterbeck &lt;<a class="reference external" href="mailto:rsc&#64;runtux.com">rsc&#64;runtux.com</a>&gt;</td></tr>
+</tbody>
+</table>
+<div class="section" id="news">
+<h1>News</h1>
+<p>News May 2025:</p>
+<ul class="simple">
+<li>Implement permutation preserving crossover and mutation operators.</li>
+<li>Bug-Fixes (most notably a feature interaction between hillclimber
+released in April and duplicate checking)</li>
+<li>Fix off-by-one error in two new crossover operators (2.7.2)</li>
+</ul>
+<p>News April 2025:</p>
+<ul class="simple">
+<li>Add an optional hillclimb method that is called for all new
+individuals in the current generation. It can perform a hillclimbing
+heuristics that runs in parallel when a parallel version is in use</li>
+<li>Add a new constructor parameter <tt class="docutils literal">random_deterministic</tt> that tells
+the framework to use an random number generator seeded from the rank-0
+random number generator for each individual evaluated. This allows use
+of random numbers during hillclimbing or evaluation but still produces
+random numbers that are reproduceable across runs (with the same
+random seed, of course).</li>
+</ul>
+<p>News Oct 2023:</p>
+<ul class="simple">
+<li>Add Differential Evolution for integer</li>
+<li>Add Negative Assortative Mating option</li>
+</ul>
+<p>News 04-2023:</p>
+<ul>
+<li><p class="first">The last build on PyPi was broken for serial installs, it was missing
+the <tt class="docutils literal">mpi_stub.c</tt> needed for the serial version. Parallel installs
+were still possible so I didn't notice, sorry!</p>
+</li>
+<li><p class="first">Add MPI_Abort to the wrapper, it is called with:</p>
+<pre class="literal-block">
+pga.MPI_Abort (errcode)
+</pre>
+<p>See below in secion <a class="reference internal" href="#running-with-mpi">Running with MPI</a> how this can be used to abort
+the MPI run in case of exception in the <tt class="docutils literal">evaluate</tt> method.</p>
+</li>
+</ul>
+<p>News 12-2022: Add regression test and update to new upstream with
+several bug-fixes. Includes also some bug fixes in wrapper.</p>
+<p>News 10-2022: Add user defined datatypes. Example in <tt class="docutils literal">examples/gp</tt> use
+user defined data types to implement genetic programming (we represent
+expressions by a tree data structure). This uses the new serialization
+API in pgapack to transfer a Python pickle representation to peer MPI
+processes. Also incorporate the latest changes in pgapack which
+optimizes duplicate checking. This is of interest for large population
+sizes in the genetic programming examples. Note that the
+<tt class="docutils literal">gene_difference</tt> method has been renamed to <tt class="docutils literal">gene_distance</tt>.</p>
+<p>News 08-2022: Epsilon-constrained optimization and a crossover variant
+that preserves permutations (so with integer genes the gene can represent
+a permutation).</p>
+<p>News 03-2022: Attempt to make this installable on Windows. This involves
+some workaround in the code because the visual compiler does not support
+certain C99 constructs.</p>
+<p>News 01-2022: This version wraps multiple evaluation with NSGA-III (note
+the additional 'I').</p>
+<p>News 12-2021: This version wraps multiple evaluation values from your
+objective function: Now you can return more than one value to either use
+it for constraints (that must be fulfilled before the objective is
+optimized) or for multi-objective optimization with the Nondominated
+Sorting Genetic Algorithm V.2 (NSGA-II). You can combine both,
+multi-objective optimization and constraints.</p>
+<p>News: This version wraps the Differential Evolution method (that's quite
+an old method but is newly implemented in pgapack).</p>
+</div>
+<div class="section" id="introduction">
+<h1>Introduction</h1>
+<p>PGAPy is a wrapper for PGAPack, the parallel genetic algorithm library
+(see <a class="reference external" href="https://github.com/schlatterbeck/pgapack/blob/master/README.rst">PGAPack Readme</a>), a powerfull genetic algorithm library by
+D. Levine, Mathematics and Computer Science Division Argonne National
+Laboratory. The library is written in C. PGAPy wraps this library for
+use with Python. The original PGAPack library is already quite old but
+is one of the most complete and accurate (and fast, although this is not
+my major concern when wrapping it to python) genetic algorithm
+implementations out there with a lot of bells and whistles for
+experimentation. It also has shown a remarkably small number of bugs
+over the years. It supports parallel execution via the message
+passing interface <a class="reference external" href="http://mpi-forum.org/">MPI</a> in addition to a normal &quot;serial&quot; version. That's
+why I wanted to use it in Python, too.</p>
+<p>To get started you need the PGAPack library, although
+it now comes bundled with PGApy, to install a <em>parallel</em> version you
+currently need a pre-installed <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> compiled for the MPI library of
+choice. See <a class="reference internal" href="#installation">Installation</a> section for details.</p>
+<p>There currently is not much documentation for PGAPy.
+You really, absolutely need to read the documentation that comes
+with PGAPack.
+The PGAPack user guide is now shipped together with PGAPy. It is
+installed together with some examples in share/pgapy, wherever the
+Python installer decides to place this in the final installation
+(usually <tt class="docutils literal">/usr/local/share</tt> on Linux).</p>
+<p>The original PGAPack library can still be downloaded from the <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a>
+ftp site, it is written in ANSI C but will probably not compile against
+a recent version of <a class="reference external" href="http://mpi-forum.org/">MPI</a>. It will also not work with recent versions of
+PGAPy. Note that this version is not actively maintained. I've started a
+<a class="reference external" href="https://github.com/schlatterbeck/pgapack">PGAPack fork on github</a> where I've ported the library to the latest
+version of the <a class="reference external" href="http://mpi-forum.org/">MPI</a> standard and have fixed some minor inconsistencies
+in the documentation. I've also implemented some new features, notably
+enhancements in selection schemes, a new replacement strategy called
+<em>restricted tournament replacement</em> <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a>, <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a>, <a class="footnote-reference" href="#footnote-4" id="footnote-reference-3">[4]</a> and, more recently,
+the differential evolution strategy <a class="footnote-reference" href="#footnote-5" id="footnote-reference-4">[5]</a>, <a class="footnote-reference" href="#footnote-6" id="footnote-reference-5">[6]</a>. In addition this version
+now supports multi objective optimization with NSGA-II <a class="footnote-reference" href="#footnote-7" id="footnote-reference-6">[7]</a> and
+many-objective optimization with NSGA-III <a class="footnote-reference" href="#footnote-8" id="footnote-reference-7">[8]</a>, <a class="footnote-reference" href="#footnote-9" id="footnote-reference-8">[9]</a>. It also supports
+the Epsilon Constraint method <a class="footnote-reference" href="#footnote-10" id="footnote-reference-9">[10]</a>.</p>
+<p>Note: When using NSGA_III replacement for multi (or many-) objective
+optimization you need to either</p>
+<ul>
+<li><p class="first">set reference points on the hyperplane intersecting all axes at
+offset 1. These reference points can be obtained with the convenience
+function <tt class="docutils literal">pga.das_dennis</tt>, it creates a regular set of reference points
+using an algorithm originally publised by I. Das and J. E. Dennis <a class="footnote-reference" href="#footnote-12" id="footnote-reference-10">[12]</a>.
+These points are then passed as the parameter <tt class="docutils literal">reference_points</tt> to
+the <tt class="docutils literal">PGA</tt> constructor.</p>
+<p>See <tt class="docutils literal">examples/dtlz2.py</tt> for a usage example and the user guide for
+the bibliographic reference. The function gets the dimensionality of
+the objective space (<tt class="docutils literal">num_eval</tt> minus <tt class="docutils literal">num_constraint</tt>) and the
+number of partition to use.</p>
+</li>
+<li><p class="first">Or set reference directions (in the objective space) with the
+<tt class="docutils literal">reference_directions</tt> parameter, number of partitions for these
+directions with the <tt class="docutils literal">refdir_partitions</tt> parameter (see
+<tt class="docutils literal">das_dennis</tt> above, this uses Das/Dennis points internally), and a
+scale factor with the parameter <tt class="docutils literal">refdir_scale</tt>.</p>
+</li>
+</ul>
+<p>You can set both, these parameters are not mutually exclusive.</p>
+<p>I'm mainly testing pgapy on Linux. But I've recently made it run on
+Windows, too but I'm not very actively testing on Windows. Let me know
+if you run it on Windows, sucessfully or not sucessfully.</p>
+<p>As mentioned above, you can find my <a class="reference external" href="https://github.com/schlatterbeck/pgapack">PGAPack fork on github</a>, this
+repository has the three upstream releases as versions in git and
+contains some updates concerning support of newer <a class="reference external" href="http://mpi-forum.org/">MPI</a> versions and
+documentation updates.  I've also included patches in the git repository
+of the Debian maintainer of the package, Dirk Eddelbuettel.
+I'm actively maintaining that branch, adding new features and bug-fixes.</p>
+<p>To get you started, I've included some very simple examples in
+<tt class="docutils literal">examples</tt>, e.g., <tt class="docutils literal"><span class="pre">one-max.py</span></tt> implements the &quot;Maxbit&quot; example
+similar to one in the PGAPack documentation. The examples were inspired
+by the book &quot;Genetic Algorithms in Python&quot; but are written from scratch
+and don't include any code from the book. The examples illustrates
+several points:</p>
+<ul class="simple">
+<li>Your class implementing the genetic algorithm needs to inherit from
+pga.PGA (pga is the PGAPy wrapper module).</li>
+<li>You need to define an evaluation function called <tt class="docutils literal">evaluate</tt> that
+returns a sequence of numbers indicating the fitness of the gene given.
+It gets the parameters <tt class="docutils literal">p</tt> and <tt class="docutils literal">pop</tt> that can be used to fetch allele
+values from the gene using the <tt class="docutils literal">get_allele</tt> method, for more details
+refer to the PGAPack documentation. The number of evaluations returned
+by your function is defined with the constructor parameter
+<tt class="docutils literal">num_eval</tt>, the default for this parameter is 1. If your evaluation
+function does not return multiple evaluations (with the default
+setting of <tt class="docutils literal">num_eval</tt>) you can either return a one-element sequence
+or a single return value.</li>
+<li>When using multiple evaluations, these can either be used for
+constraints (the default) or for multi-objective optimization. In the
+latter case, the number of constraints (which by default is one less
+than the number of evaluations set with the parameter <tt class="docutils literal">num_eval</tt>)
+must be set to a number that leaves at least two evaluations for
+objectives. The number of constraints can be set with the parameter
+<tt class="docutils literal">num_constraint</tt>. When using multi-objective optimization, you need
+one of the two replacement-types <tt class="docutils literal">PGA_POPREPL_NSGA_II</tt> or
+<tt class="docutils literal">PGA_POPREPL_NSGA_III</tt>, set this with the <tt class="docutils literal">pop_replace_type</tt> parameter.</li>
+<li>You <em>can</em> define additional functions overriding built-in functions
+of the PGAPack library, illustrated by the example of
+<tt class="docutils literal">print_string</tt>.  Note that we could call the original print_string
+method of our PGA superclass.  In the same way you can implement,
+e.g., your own crossover method.</li>
+<li>The constructor of the class needs to define the Gene type, in the
+examples we use int and bool built-in datatypes.</li>
+<li>The length of the gene needs to be given in the constructor.</li>
+<li>We often want to maximize the numbers returned by our evaluation
+function, set the parameter <tt class="docutils literal">maximize</tt> to False if you want to
+minimize.</li>
+<li>For non-binary genes we can define an array of init values, each entry
+containing a sequence with lower and upper bound. The array has to
+have the length of the gene. Note that the upper bound is <em>included</em>
+in the range of possible values (unlike the python range operator but
+compatible with the PGAPack definition).</li>
+<li>In the constructor of the class we can add parameters of the genetic
+algorithm. Not all parameters of PGAPack are wrapped yet, currently
+you would need to consult the sourcecode of PGAPy to find out which
+parameters are wrapped. In the example we define several print
+options.</li>
+<li>Finally the genetic algorithm is started with the <tt class="docutils literal">run</tt> method.</li>
+</ul>
+</div>
+<div class="section" id="naming-conventions-in-pgapy">
+<h1>Naming conventions in PGAPy</h1>
+<p>When you extend PGAPy – remember not all functions of PGAPack are
+wrapped yet and you may need additional functions – you should stick to
+my naming conventions when making changes.
+The following naming conventions were used for the wrapper:</p>
+<ul class="simple">
+<li>Constants of PGAPack like <tt class="docutils literal">PGA_REPORT_STRING</tt> are used as-is in
+uppercase. These constants can be directly imported from the wrapper
+module. Not all constants are wrapped so far, if you need more, add
+them to the constdef array in pgamodule.c and <a class="reference external" href="mailto:rsc&#64;runtux.com">send</a> me a patch.</li>
+<li>For methods of the pga.PGA class I've removed the <tt class="docutils literal">PGA</tt> prefix used
+throughout PGAPack and converted the method to lowercase with
+underscores between uppercase words in the original function name, so
+<tt class="docutils literal">PGARun</tt> becomes <tt class="docutils literal">run</tt>, <tt class="docutils literal">PGACheckStoppingConditions</tt> becomes
+<tt class="docutils literal">check_stopping_conditions</tt>. An exception of the lowercase-rule is
+whenever a name contains &quot;GA&quot; (for &quot;genetic algorithm&quot;), So
+<tt class="docutils literal">PGASetMaxGAIterValue</tt> becomes <tt class="docutils literal">max_GA_iter</tt>.</li>
+<li>Where possible I've made a single class method where PGAPack needs a
+separate function for each datatype, so <tt class="docutils literal">PGAGetBinaryAllele</tt>,
+<tt class="docutils literal">PGAGetCharacterAllele</tt>, <tt class="docutils literal">PGAGetIntegerAllele</tt>, <tt class="docutils literal">PGAGetRealAllele</tt> all
+become <tt class="docutils literal">get_allele</tt>. Same holds true for <tt class="docutils literal">set_allele</tt>.</li>
+<li>Whenever a name in PGAPack has a &quot;Value&quot; or &quot;Flag&quot; suffix, I've left
+this out, so <tt class="docutils literal">PGAGetFitnessCmaxValue</tt> becomes <tt class="docutils literal">fitness_cmax</tt>
+and <tt class="docutils literal">PGAGetMutationAndCrossoverFlag</tt> becomes
+<tt class="docutils literal">mutation_and_crossover</tt>, the only exception to this rule is for the
+two functions <tt class="docutils literal">PGAGetMutationRealValue</tt> and
+<tt class="docutils literal">PGAGetMutationIntegerValue</tt> which become <tt class="docutils literal">mutation_value</tt> not
+just <tt class="docutils literal">mutation</tt>.</li>
+<li>Some fields can take multiple values (they are implemented by ORing
+integer constants, in python they are specified as a list or tuple of
+constants). These are converted to plural (if not already plural in
+PGAPack), e.g., <tt class="docutils literal">PGASetStoppingRuleType</tt> becomes <tt class="docutils literal">stopping_rule_types</tt>.</li>
+<li>Internal method names in the wrapper program have a leading PGA_ – so
+the class method <tt class="docutils literal">set_allele</tt> is implemented by the C-function
+<tt class="docutils literal">PGA_set_allele</tt> in <tt class="docutils literal">pgamodule.c</tt>.</li>
+</ul>
+</div>
+<div class="section" id="constructor-parameters">
+<h1>Constructor Parameters</h1>
+<p><a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> has a lot of <tt class="docutils literal">PGASet</tt> and <tt class="docutils literal">PGAGet</tt> functions for setting
+parameters. These are reflected in constructor parameters on the one hand
+and in (typically read-only, but see below) properties of a <tt class="docutils literal">PGA</tt>
+object on the other hand. The
+following table gives an overview of all the original <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> names and
+the names of the python wrapper. For the <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> name I've only listed
+the <tt class="docutils literal">PGASet</tt> function, in many cases there is a corresponding
+<tt class="docutils literal">PGAGet</tt> function. If a corresponding read-only property exists for a
+constructor parameter this is indicated in the &quot;Prop&quot; column. In some
+cases properties are missing because no corresponding <tt class="docutils literal">PGAGet</tt> function
+is implemented in <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a>, in other cases returning a numeric value that
+has a symbolic constant in PGApy doesn't make much sense.</p>
+<p>The properties have the same name as the constructor parameter.
+There are Properties that don't have a corresponding constructor
+parameter, namely the <tt class="docutils literal">eval_count</tt> property (returning the count of
+function evaluations), the
+<tt class="docutils literal">GA_iter</tt> property that returns the current GA generation, and the
+<tt class="docutils literal">mpi_rank</tt> property that returns the MPI rank of the current process
+(this is sorted under PGAGetRank).</p>
+<p>In the type
+column I'm listing the Python type. If the type is followed by a number,
+more than one item of that type is specified (a sequence in Python). Some
+entries contain &quot;sym&quot;, these are integer values with a symbolic constant,
+the value &quot;msym&quot; indicates that several values denoted by a list of
+symbolic constants can be given. A special case are the
+<tt class="docutils literal">PGASetRealInitRange</tt>, <tt class="docutils literal">PGASetRealInitPercent</tt>,
+<tt class="docutils literal">PGASetIntegerInitRange</tt> functions. These take two values for <em>each
+allele</em> of the gene. In python this is a sequence of 2-tuples.
+Note that this means that you can have different ranges of allowed values
+for each allele.</p>
+<p>The <tt class="docutils literal">num_eval</tt> property is special: Due to limitations of the C
+programming language, for multiple evaluations in C the first evaluation
+is returned as the function return-value of the <tt class="docutils literal">evaluate</tt> function
+and all other parameters are returned in an auxiliary array. <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a>
+specifies the number of auxiliary evaluations to be returned. In Python
+the evaluation function can always return a sequence of evaluation
+values and the <tt class="docutils literal">num_eval</tt> is one more than <tt class="docutils literal">PGAGetNumAuxEval</tt> would
+return. The default for <tt class="docutils literal">num_eval</tt> is 1.</p>
+<p>The first two (mandatory) constructor parameters are the type of the gene
+(this takes a Python type, e.g., <tt class="docutils literal">bool</tt> for a binary genome or <tt class="docutils literal">int</tt>
+for an integer genome) and the length. Note that the <tt class="docutils literal">string_length</tt> is
+implicitly set with the <tt class="docutils literal">length</tt> parameter. The <tt class="docutils literal">string_length</tt> is
+also available as the length of the <tt class="docutils literal">PGA</tt> object using the Python
+built-in <tt class="docutils literal">len</tt> function.</p>
+<p>Some properties can now also be set <em>during</em> the run of the optimizer.
+These currently are <tt class="docutils literal">crossover_prob</tt>, <tt class="docutils literal">epsilon_exponent</tt>,
+<tt class="docutils literal">multi_obj_precision</tt>, <tt class="docutils literal">p_tournament_prob</tt>, and
+<tt class="docutils literal">uniform_crossover_prob</tt>. Just assign to the member variable of
+the optimizer (child of PGA.pga) object.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="42%" />
+<col width="8%" />
+<col width="5%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">PGAPack name</th>
+<th class="head">Constructor parameter</th>
+<th class="head">Type</th>
+<th class="head">Prop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal">PGASetCharacterInitType</tt></td>
+<td><tt class="docutils literal">char_init_type</tt></td>
+<td>int</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetCrossoverBoundedFlag</tt></td>
+<td><tt class="docutils literal">crossover_bounded</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetCrossoverBounceBackFlag</tt></td>
+<td><tt class="docutils literal">crossover_bounce_back</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetCrossoverSBXEta</tt></td>
+<td><tt class="docutils literal">crossover_SBX_eta</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetCrossoverSBXOncePerString</tt></td>
+<td><tt class="docutils literal">crossover_SBX_once_per_string</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetCrossoverProb</tt></td>
+<td><tt class="docutils literal">crossover_prob</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetCrossoverType</tt></td>
+<td><tt class="docutils literal">crossover_type</tt></td>
+<td>sym</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetCrowdingMethod</tt></td>
+<td><tt class="docutils literal">crowding_method</tt></td>
+<td>int</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDEAuxFactor</tt></td>
+<td><tt class="docutils literal">DE_aux_factor</tt></td>
+<td>double</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDECrossoverProb</tt></td>
+<td><tt class="docutils literal">DE_crossover_prob</tt></td>
+<td>double</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDECrossoverType</tt></td>
+<td><tt class="docutils literal">DE_crossover_type</tt></td>
+<td>sym</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDEDither</tt></td>
+<td><tt class="docutils literal">DE_dither</tt></td>
+<td>double</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDEDitherPerIndividual</tt></td>
+<td><tt class="docutils literal">DE_dither_per_individual</tt></td>
+<td>bool</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDEJitter</tt></td>
+<td><tt class="docutils literal">DE_jitter</tt></td>
+<td>double</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDENumDiffs</tt></td>
+<td><tt class="docutils literal">DE_num_diffs</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDEProbabilityEO</tt></td>
+<td><tt class="docutils literal">DE_probability_EO</tt></td>
+<td>double</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDEScaleFactor</tt></td>
+<td><tt class="docutils literal">DE_scale_factor</tt></td>
+<td>double</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetDEVariant</tt></td>
+<td><tt class="docutils literal">DE_variant</tt></td>
+<td>sym</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetEpsilonExponent</tt></td>
+<td><tt class="docutils literal">epsilon_exponent</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetEpsilonGeneration</tt></td>
+<td><tt class="docutils literal">epsilon_generation</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetEpsilonTheta</tt></td>
+<td><tt class="docutils literal">epsilon_theta</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGAGetEvalCount</tt></td>
+<td><tt class="docutils literal">eval_count</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetFitnessCmaxValue</tt></td>
+<td><tt class="docutils literal">fitness_cmax</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetFitnessMinType</tt></td>
+<td><tt class="docutils literal">fitness_min_type</tt></td>
+<td>sym</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetFitnessType</tt></td>
+<td><tt class="docutils literal">fitness_type</tt></td>
+<td>sym</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGAIntegerSetFixedEdges</tt></td>
+<td><tt class="docutils literal">fixed_edges</tt></td>
+<td>&nbsp;</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGAIntegerSetFixedEdges</tt></td>
+<td><tt class="docutils literal">fixed_edges_symmetric</tt></td>
+<td>bool</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGAGetGAIterValue</tt></td>
+<td><tt class="docutils literal">GA_iter</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetIntegerInitPermute</tt></td>
+<td><tt class="docutils literal">integer_init_permute</tt></td>
+<td>int2</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetIntegerInitRange</tt></td>
+<td><tt class="docutils literal">init</tt></td>
+<td>&nbsp;</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMaxFitnessRank</tt></td>
+<td><tt class="docutils literal">max_fitness_rank</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMaxGAIterValue</tt></td>
+<td><tt class="docutils literal">max_GA_iter</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMaxNoChangeValue</tt></td>
+<td><tt class="docutils literal">max_no_change</tt></td>
+<td>int</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMaxSimilarityValue</tt></td>
+<td><tt class="docutils literal">max_similarity</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMixingType</tt></td>
+<td><tt class="docutils literal">mixing_type</tt></td>
+<td>sym</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMultiObjPrecision</tt></td>
+<td><tt class="docutils literal">multi_obj_precision</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationAndCrossoverFlag</tt></td>
+<td><tt class="docutils literal">mutation_and_crossover</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationBounceBackFlag</tt></td>
+<td><tt class="docutils literal">mutation_bounce_back</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationBoundedFlag</tt></td>
+<td><tt class="docutils literal">mutation_bounded</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationIntegerValue</tt></td>
+<td><tt class="docutils literal">mutation_value</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationOnlyFlag</tt></td>
+<td><tt class="docutils literal">mutation_only</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationOrCrossoverFlag</tt></td>
+<td><tt class="docutils literal">mutation_or_crossover</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationPolyEta</tt></td>
+<td><tt class="docutils literal">mutation_poly_eta</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationPolyValue</tt></td>
+<td><tt class="docutils literal">mutation_poly_value</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationProb</tt></td>
+<td><tt class="docutils literal">mutation_prob</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationRealValue</tt></td>
+<td><tt class="docutils literal">mutation_value</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationScrambleMax</tt></td>
+<td><tt class="docutils literal">mutation_scramble_max</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetMutationType</tt></td>
+<td><tt class="docutils literal">mutation_type</tt></td>
+<td>sym</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetNAMWindowSize</tt></td>
+<td><tt class="docutils literal">nam_window_size</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetNoDuplicatesFlag</tt></td>
+<td><tt class="docutils literal">no_duplicates</tt></td>
+<td>int</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetNumAuxEval</tt></td>
+<td><tt class="docutils literal">num_eval</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetNumConstraint</tt></td>
+<td><tt class="docutils literal">num_constraint</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetNumReplaceValue</tt></td>
+<td><tt class="docutils literal">num_replace</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetOutputFile</tt></td>
+<td><tt class="docutils literal">output_file</tt></td>
+<td>str</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetPopSize</tt></td>
+<td><tt class="docutils literal">pop_size</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetPopReplaceType</tt></td>
+<td><tt class="docutils literal">pop_replace_type</tt></td>
+<td>sym</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetPrintFrequencyValue</tt></td>
+<td><tt class="docutils literal">print_frequency</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetPrintOptions</tt></td>
+<td><tt class="docutils literal">print_options</tt></td>
+<td>msym</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetPTournamentProb</tt></td>
+<td><tt class="docutils literal">p_tournament_prob</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetRandomizeSelect</tt></td>
+<td><tt class="docutils literal">randomize_select</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetRandomDeterministic</tt></td>
+<td><tt class="docutils literal">random_deterministic</tt></td>
+<td>bool</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetRandomSeed</tt></td>
+<td><tt class="docutils literal">random_seed</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGAGetRank</tt></td>
+<td><tt class="docutils literal">mpi_rank</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetRealInitRange</tt></td>
+<td><tt class="docutils literal">init</tt></td>
+<td>&nbsp;</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetRealInitPercent</tt></td>
+<td><tt class="docutils literal">init_percent</tt></td>
+<td>&nbsp;</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetReferenceDirections</tt></td>
+<td><tt class="docutils literal">refdir_partitions</tt></td>
+<td>int</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetReferenceDirections</tt></td>
+<td><tt class="docutils literal">refdir_scale</tt></td>
+<td>double</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetReferenceDirections</tt></td>
+<td><tt class="docutils literal">reference_directions</tt></td>
+<td>&nbsp;</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetReferencePoints</tt></td>
+<td><tt class="docutils literal">reference_points</tt></td>
+<td>&nbsp;</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetRestartFlag</tt></td>
+<td><tt class="docutils literal">restart</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetRestartFrequencyValue</tt></td>
+<td><tt class="docutils literal">restart_frequency</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetRTRWindowSize</tt></td>
+<td><tt class="docutils literal">rtr_window_size</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetSelectType</tt></td>
+<td><tt class="docutils literal">select_type</tt></td>
+<td>sym</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetSortND</tt></td>
+<td><tt class="docutils literal">sort_nd</tt></td>
+<td>int</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetStoppingRuleType</tt></td>
+<td><tt class="docutils literal">stopping_rule_types</tt></td>
+<td>msym</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetStringLength</tt></td>
+<td><tt class="docutils literal">string_length</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetSumConstraintsFlag</tt></td>
+<td><tt class="docutils literal">sum_constraints</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetTournamentSize</tt></td>
+<td><tt class="docutils literal">tournament_size</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetTournamentWithReplacement</tt></td>
+<td><tt class="docutils literal">tournament_with_replacement</tt></td>
+<td>int</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetTruncationProportion</tt></td>
+<td><tt class="docutils literal">truncation_proportion</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+<tr><td><tt class="docutils literal">PGASetUniformCrossoverProb</tt></td>
+<td><tt class="docutils literal">uniform_crossover_prob</tt></td>
+<td>float</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>Note: The mutation_or_crossover and mutation_and_crossover parameters are
+deprecated, use mixing_type instead!</p>
+</div>
+<div class="section" id="pga-object-methods">
+<h1>PGA Object Methods</h1>
+<p>The following are the methods that can be used during the run of the
+genetic search. The <tt class="docutils literal">run</tt> method is used to start the search. This can
+be used, to, e.g., set an allele during hill-climbing in a custom
+<tt class="docutils literal">endofgen</tt> method. Note that some methods only apply to certain gene
+types, e.g. the <tt class="docutils literal">encode_int_</tt> methods can only be used on binary
+alleles (they encode an integer value as a binary or gray code
+representation into the gene). Other methods take or return different
+types depending on the type of gene, e.g. <tt class="docutils literal">get_allele</tt> or
+<tt class="docutils literal">set_allele</tt>, they call different backend functions depending on the
+gene type. With the <tt class="docutils literal">set_random_seed</tt> method, the random number
+generator can be re-seeded. It is usually best to seed the generator
+once at (before) the beginning by specifying <tt class="docutils literal">random_seed</tt> in the
+constructor. For further details consult the user guide.
+The method <tt class="docutils literal">get_evaluation</tt> will return a double for a single
+evaluation and a tuple of double for multiple evaluations (when num_eval
+is &gt;1)</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="39%" />
+<col width="24%" />
+<col width="36%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Method</th>
+<th class="head">Parameters</th>
+<th class="head">Return</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal">check_stopping_conditions</tt></td>
+<td>&nbsp;</td>
+<td>True if stop should occur</td>
+</tr>
+<tr><td><tt class="docutils literal">encode_int_as_binary</tt></td>
+<td><em>p, pop,</em>
+<em>frm, to, val</em></td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">encode_int_as_gray_code</tt></td>
+<td><em>p, pop,</em>
+<em>frm, to, val</em></td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">encode_real_as_binary</tt></td>
+<td><em>p, pop, frm, to</em>
+<em>l, u, val</em></td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">encode_real_as_gray_code</tt></td>
+<td><em>p, pop, frm, to</em>
+<em>l, u, val</em></td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">euclidian_distance</tt></td>
+<td><em>p1, pop1</em>
+<em>p2, pop2</em></td>
+<td>float</td>
+</tr>
+<tr><td><tt class="docutils literal">fitness</tt></td>
+<td><em>pop</em></td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">get_allele</tt></td>
+<td><em>p, pop, index</em></td>
+<td>allele value</td>
+</tr>
+<tr><td><tt class="docutils literal">get_best_index</tt></td>
+<td><em>pop</em></td>
+<td>index of best string</td>
+</tr>
+<tr><td><tt class="docutils literal">get_best_report_index</tt></td>
+<td><em>pop, idx</em></td>
+<td>index of best eval with idx</td>
+</tr>
+<tr><td><tt class="docutils literal">get_evaluation</tt></td>
+<td><em>p, pop</em></td>
+<td>evaluation of <em>p</em></td>
+</tr>
+<tr><td><tt class="docutils literal">get_evaluation_up_to_date</tt></td>
+<td><em>p, pop</em></td>
+<td>True if up-to-date</td>
+</tr>
+<tr><td><tt class="docutils literal">get_fitness</tt></td>
+<td><em>p, pop</em></td>
+<td>fitness of <em>p</em> (float)</td>
+</tr>
+<tr><td><tt class="docutils literal">get_gene</tt></td>
+<td><em>p, pop</em></td>
+<td>get gene (user data types)</td>
+</tr>
+<tr><td><tt class="docutils literal">get_int_from_binary</tt></td>
+<td><em>p, pop, frm, to</em></td>
+<td>int</td>
+</tr>
+<tr><td><tt class="docutils literal">get_int_from_gray_code</tt></td>
+<td><em>p, pop, frm, to</em></td>
+<td>int</td>
+</tr>
+<tr><td><tt class="docutils literal">get_iteration</tt></td>
+<td>&nbsp;</td>
+<td>deprecated, use <tt class="docutils literal">GA_iter</tt></td>
+</tr>
+<tr><td><tt class="docutils literal">get_real_from_binary</tt></td>
+<td><em>p, pop,</em>
+<em>frm, to, l, u</em></td>
+<td>float</td>
+</tr>
+<tr><td><tt class="docutils literal">get_real_from_gray_code</tt></td>
+<td><em>p, pop,</em>
+<em>frm, to, l, u</em></td>
+<td>float</td>
+</tr>
+<tr><td><tt class="docutils literal">random01</tt></td>
+<td>&nbsp;</td>
+<td>float between 0 and 1</td>
+</tr>
+<tr><td><tt class="docutils literal">random_flip</tt></td>
+<td><em>probability</em></td>
+<td>0 or 1</td>
+</tr>
+<tr><td><tt class="docutils literal">random_gaussian</tt></td>
+<td><em>mean, stddev</em></td>
+<td>float</td>
+</tr>
+<tr><td><tt class="docutils literal">random_interval</tt></td>
+<td><em>l, r</em></td>
+<td>int between l, r</td>
+</tr>
+<tr><td><tt class="docutils literal">random_uniform</tt></td>
+<td><em>l, r</em></td>
+<td>float between l, r</td>
+</tr>
+<tr><td><tt class="docutils literal">run</tt></td>
+<td>&nbsp;</td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">select_next_index</tt></td>
+<td><em>pop</em></td>
+<td>index selected individual</td>
+</tr>
+<tr><td><tt class="docutils literal">set_allele</tt></td>
+<td><em>p, pop, i, value</em></td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">set_evaluation</tt></td>
+<td><em>p, pop, value</em></td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">set_evaluation_up_to_date</tt></td>
+<td><em>p, pop, status</em></td>
+<td>None</td>
+</tr>
+<tr><td><tt class="docutils literal">set_gene</tt></td>
+<td><em>p, pop, gen</em></td>
+<td>set gene (user data types)</td>
+</tr>
+<tr><td><tt class="docutils literal">set_random_seed</tt></td>
+<td><em>seed</em></td>
+<td>None (use constructor!)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="user-methods">
+<h1>User-Methods</h1>
+<p><a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> has the concept of user functions. These allow customization of
+different areas of a genetic algorithm. In Python they are implemented as
+methods that can be changed in a derived class. One of the methods that
+<em>must</em> be implemented in a derived class is the <tt class="docutils literal">evaluate</tt> function
+(although technically it is not a user function in PGAPack). It
+interprets the gene and returns an evaluation value or a sequence of
+evaluation values if you set the <tt class="docutils literal">num_eval</tt> constructor parameter.
+<a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> computes a fitness from the raw evaluation value. For some
+methods an up-call into the PGA class is possible, for some methods this
+is not possible (and in most cases not reasonable). Note that for the
+<tt class="docutils literal">stop_cond</tt> method, the standard check for stopping conditions can be
+called with:</p>
+<pre class="literal-block">
+self.check_stopping_conditions()
+</pre>
+<p>The following table lists the overridable methods with their parameters
+(for the function signature the first parameter <em>self</em> is omitted). Note
+that in <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> there are additional user functions that are needed for
+user-defined data types which are currently not exposed in Python. In the
+function signatures <em>p</em> denotes the index of the individual and <em>pop</em>
+denotes the population. If more than one individual is specified (e.g.,
+for crossover) these can be followed by a number. For crossover <em>c1</em> and
+<em>c2</em> denote the destination individuals (children). The <em>propability</em> for
+the mutation method is a floating-point value between 0 and 1. Remember
+to count the number of mutations that happen, and return that value for
+the mutation method!</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="41%" />
+<col width="23%" />
+<col width="10%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Method</th>
+<th class="head">Call Signature</th>
+<th class="head">Return Value</th>
+<th class="head">Up-Call</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal">check_duplicate</tt></td>
+<td><em>p1, pop1, p2, pop2</em></td>
+<td>True if dupe</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">stop_cond</tt></td>
+<td>&nbsp;</td>
+<td>True to stop</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">crossover</tt></td>
+<td><em>p1, p2, p_pop, c1, c2, c_pop</em></td>
+<td>None</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">endofgen</tt></td>
+<td>&nbsp;</td>
+<td>None</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">evaluate</tt></td>
+<td><em>p, pop</em></td>
+<td>sequence of float</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">gene_distance</tt></td>
+<td><em>p1, pop1, p2, pop2</em></td>
+<td>float</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">hash</tt></td>
+<td><em>p, pop</em></td>
+<td>int</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">hillclimb</tt></td>
+<td><em>p, pop</em></td>
+<td>None</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">initstring</tt></td>
+<td><em>p, pop</em></td>
+<td>None</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">mutation</tt></td>
+<td><em>p, pop, propability</em></td>
+<td>#mutations</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">pre_eval</tt></td>
+<td><em>pop</em></td>
+<td>None</td>
+<td>no</td>
+</tr>
+<tr><td><tt class="docutils literal">print_string</tt></td>
+<td><em>file, p, pop</em></td>
+<td>None</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="constants">
+<h1>Constants</h1>
+<p>The following <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> constants are available:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Constant</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>PGA_CINIT_LOWER</td>
+<td>Character-allele initialization, lowercase</td>
+</tr>
+<tr><td>PGA_CINIT_MIXED</td>
+<td>Character-allele initialization, mixed case</td>
+</tr>
+<tr><td>PGA_CINIT_UPPER</td>
+<td>Character-allele initialization, uppercase</td>
+</tr>
+<tr><td>PGA_CROSSOVER_AEX</td>
+<td>Alternating Edges for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_CYCLE</td>
+<td>Cycle Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_EDGE</td>
+<td>Edge Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_MODIFIED</td>
+<td>Modified Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_NOX</td>
+<td>Non-wrapping Order Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_OBX</td>
+<td>Order Based Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_ONEPT</td>
+<td>One-point Crossover</td>
+</tr>
+<tr><td>PGA_CROSSOVER_ORDER</td>
+<td>Order Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_PBX</td>
+<td>Position Based Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_PMX</td>
+<td>Partially Mapped Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROSSOVER_SBX</td>
+<td>Simulated Binary Crossover</td>
+</tr>
+<tr><td>PGA_CROSSOVER_TWOPT</td>
+<td>Two-point Crossover</td>
+</tr>
+<tr><td>PGA_CROSSOVER_UNIFORM</td>
+<td>Uniform Crossover</td>
+</tr>
+<tr><td>PGA_CROSSOVER_UOX</td>
+<td>Unified Order Based Crossover for permutations</td>
+</tr>
+<tr><td>PGA_CROWDING_CD_PRUNE</td>
+<td>Iterated Crowding-distance pruning</td>
+</tr>
+<tr><td>PGA_CROWDING_ENNS_2NN</td>
+<td>2 nearest neighbors efficient NN</td>
+</tr>
+<tr><td>PGA_CROWDING_ENNS_MNN</td>
+<td>M nearest neighbors efficient NN</td>
+</tr>
+<tr><td>PGA_CROWDING_NSGA_II</td>
+<td>The original NSGA-II crowding metric</td>
+</tr>
+<tr><td>PGA_DE_CROSSOVER_BIN</td>
+<td>Standard DE binomial crossover</td>
+</tr>
+<tr><td>PGA_DE_CROSSOVER_EXP</td>
+<td>Differential evolution exponential crossover</td>
+</tr>
+<tr><td>PGA_DE_VARIANT_BEST</td>
+<td>DE: Derive from best string</td>
+</tr>
+<tr><td>PGA_DE_VARIANT_EITHER_OR</td>
+<td>DE: Either-or variant</td>
+</tr>
+<tr><td>PGA_DE_VARIANT_RAND</td>
+<td>DE: Standard, derive from random string (default)</td>
+</tr>
+<tr><td>PGA_FITNESSMIN_CMAX</td>
+<td>Map fitness by subtracting worst</td>
+</tr>
+<tr><td>PGA_FITNESSMIN_RECIPROCAL</td>
+<td>Map fitness via reciprocal</td>
+</tr>
+<tr><td>PGA_FITNESS_NORMAL</td>
+<td>Linear normalization of fitness</td>
+</tr>
+<tr><td>PGA_FITNESS_RANKING</td>
+<td>Linear fitness ranking</td>
+</tr>
+<tr><td>PGA_FITNESS_RAW</td>
+<td>Identity fitness function</td>
+</tr>
+<tr><td>PGA_MIX_MUTATE_AND_CROSS</td>
+<td>Mixing: Mutation only when crossover</td>
+</tr>
+<tr><td>PGA_MIX_MUTATE_ONLY</td>
+<td>Mixing: Mutation only</td>
+</tr>
+<tr><td>PGA_MIX_MUTATE_OR_CROSS</td>
+<td>Mixing: Mutation only when no crossover</td>
+</tr>
+<tr><td>PGA_MIX_TRADITIONAL</td>
+<td>Mixing: Mutation after crossover</td>
+</tr>
+<tr><td>PGA_MUTATION_CONSTANT</td>
+<td>Mutation by adding/subtracting constant</td>
+</tr>
+<tr><td>PGA_MUTATION_DE</td>
+<td>Differential Evolution (implemented as mutation)</td>
+</tr>
+<tr><td>PGA_MUTATION_GAUSSIAN</td>
+<td>Mutation by selecting from Gaussian distribution</td>
+</tr>
+<tr><td>PGA_MUTATION_PERMUTE</td>
+<td>Mutation swaps two random genes, for permutations</td>
+</tr>
+<tr><td>PGA_MUTATION_POLY</td>
+<td>Polynomial Mutation</td>
+</tr>
+<tr><td>PGA_MUTATION_POSITION</td>
+<td>Position mutation for permutations</td>
+</tr>
+<tr><td>PGA_MUTATION_RANGE</td>
+<td>Replace gene with uniform selection from init range</td>
+</tr>
+<tr><td>PGA_MUTATION_SCRAMBLE</td>
+<td>Scramble mutation for permutations</td>
+</tr>
+<tr><td>PGA_MUTATION_UNIFORM</td>
+<td>Mutation uniform from interval</td>
+</tr>
+<tr><td>PGA_NDSORT_BOTH</td>
+<td>Both non-dominated sorts in comparison</td>
+</tr>
+<tr><td>PGA_NDSORT_JENSEN</td>
+<td>The new optimized non-dominated sorting</td>
+</tr>
+<tr><td>PGA_NDSORT_NSQUARE</td>
+<td>The original O(N**2) non-dominated sorting</td>
+</tr>
+<tr><td>PGA_NEWPOP</td>
+<td>Symbolic constant for new population</td>
+</tr>
+<tr><td>PGA_OLDPOP</td>
+<td>Symbolic constant for old population</td>
+</tr>
+<tr><td>PGA_POPREPL_BEST</td>
+<td>Population replacement best strings</td>
+</tr>
+<tr><td>PGA_POPREPL_NSGA_II</td>
+<td>Use NSGA-II replacement for multi-objective opt.</td>
+</tr>
+<tr><td>PGA_POPREPL_NSGA_III</td>
+<td>Use NSGA-III replacement for multi-objective opt.</td>
+</tr>
+<tr><td>PGA_POPREPL_PAIRWISE_BEST</td>
+<td>Compare same index in old and new population</td>
+</tr>
+<tr><td>PGA_POPREPL_RANDOM_NOREP</td>
+<td>Population replacement random no replacement</td>
+</tr>
+<tr><td>PGA_POPREPL_RANDOM_REP</td>
+<td>Population replacement random with replacement</td>
+</tr>
+<tr><td>PGA_POPREPL_RTR</td>
+<td>Restricted Tournament Replacement</td>
+</tr>
+<tr><td>PGA_REPORT_AVERAGE</td>
+<td>Report average evaluation</td>
+</tr>
+<tr><td>PGA_REPORT_HAMMING</td>
+<td>Report hamming distance</td>
+</tr>
+<tr><td>PGA_REPORT_OFFLINE</td>
+<td>Report offline</td>
+</tr>
+<tr><td>PGA_REPORT_ONLINE</td>
+<td>Report online</td>
+</tr>
+<tr><td>PGA_REPORT_STRING</td>
+<td>Report the string</td>
+</tr>
+<tr><td>PGA_REPORT_WORST</td>
+<td>Report the worst evaluation</td>
+</tr>
+<tr><td>PGA_SELECT_LINEAR</td>
+<td>Return individuals in population order</td>
+</tr>
+<tr><td>PGA_SELECT_PROPORTIONAL</td>
+<td>Fitness-proportional selection</td>
+</tr>
+<tr><td>PGA_SELECT_PTOURNAMENT</td>
+<td>Binary probabilistic tournament selection</td>
+</tr>
+<tr><td>PGA_SELECT_SUS</td>
+<td>Stochastic universal selection</td>
+</tr>
+<tr><td>PGA_SELECT_TOURNAMENT</td>
+<td>Tournament selection</td>
+</tr>
+<tr><td>PGA_SELECT_TRUNCATION</td>
+<td>Truncation selection</td>
+</tr>
+<tr><td>PGA_STOP_MAXITER</td>
+<td>Stop on max iterations</td>
+</tr>
+<tr><td>PGA_STOP_NOCHANGE</td>
+<td>Stop on max number of generations no change</td>
+</tr>
+<tr><td>PGA_STOP_TOOSIMILAR</td>
+<td>Stop when individuals too similar</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="user-defined-data-types">
+<h1>User Defined Data Types</h1>
+<p>The latest version of PGAPy features user defined data types. Just
+define your data type and pass it as the second parameter to the
+<tt class="docutils literal">PGA</tt> constructor. The framework will take care of serializing the
+data when transmitting via <tt class="docutils literal">MPI</tt> (if you're running a parallel
+version).</p>
+<p>If duplicate checking is enabled via the <tt class="docutils literal">no_duplicates</tt> constructor
+parameter, your data type needs to define a <tt class="docutils literal">__hash__</tt> method (unless
+the python default hash method fulfills your requirements).</p>
+<p>User defined data types do not use alleles, so the normal <tt class="docutils literal">get_allele</tt>
+(and <tt class="docutils literal">set_allele</tt>) methods are not available. Instead the full
+individual can be retrieved with the <tt class="docutils literal">get_gene</tt> method and set with
+the <tt class="docutils literal">set_gene</tt> method.</p>
+<p>With user data types you need to define the following methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal">check_duplicate (self, p1, pop1, p2, pop2)</tt> if you enable duplicate
+checking with the crossover parameter <tt class="docutils literal">no_duplicates</tt>. This should
+return True when the two individuals are duplicates. Use <tt class="docutils literal">get_gene</tt>
+to retrieve the genes for the individuals <tt class="docutils literal">p1</tt> and <tt class="docutils literal">p2</tt> in
+populations <tt class="docutils literal">pop1</tt> and <tt class="docutils literal">pop2</tt>.</li>
+<li><tt class="docutils literal">crossover (self, p1, p2, ppop, c1, c2, cpop)</tt> for crossover
+operation, use <tt class="docutils literal">get_gene</tt> for getting the parent genes for the
+parents <tt class="docutils literal">p1</tt> and <tt class="docutils literal">p2</tt> in generation <tt class="docutils literal">ppop</tt> and use <tt class="docutils literal">set_gene</tt>
+for setting the child genes <tt class="docutils literal">c1</tt> and <tt class="docutils literal">c2</tt> in generation <tt class="docutils literal">cpop</tt>.</li>
+<li><tt class="docutils literal">initstring (self, p, pop)</tt> for initializing the given string, use
+<tt class="docutils literal">set_gene</tt> in that method for setting your object as a gene.</li>
+<li><tt class="docutils literal">mutation (self, p, pop, pm)</tt> for the mutation operation. This
+should return the number of mutations performed. If duplicate checking
+is enabled, the framework will repeatedly call the mutation operator
+for mutating a duplicate individual into another individual that is no
+duplicate. This uses the return value of your mutation method. You
+will enter an endless loop if your mutation operator does not
+occasionally return an non-zero number of mutatations performed when
+duplicate checking is enabled. The <tt class="docutils literal">pm</tt> parameter gives the mutation
+probability. Use <tt class="docutils literal">get_gene</tt> for retrieving the individual to be
+mutated and use <tt class="docutils literal">set_gene</tt> to update this individual after mutation.</li>
+<li><tt class="docutils literal">print_string (self, file, p, pop)</tt> to print a gene object, use
+<tt class="docutils literal">get_gene</tt> for retrieving the individual to be printed.</li>
+</ul>
+<p>For these methods it is generally a good idea to never modify an
+individual in-place: This individual may be repeatedly used in genetic
+operations (e.g. mutation and crossover), so when modifying it you will
+produce erroneous results for later genetic operations. To copy a data
+structure, python's <tt class="docutils literal">deepcopy</tt> function in the module <tt class="docutils literal">copy</tt> is
+usually used.</p>
+<p>In addition to the methods above you may want to define a stopping rule
+with a <tt class="docutils literal">stop_cond</tt> method or override the way a hash is computed using
+a <tt class="docutils literal">hash</tt> method. The default for computing a hash is to call
+<tt class="docutils literal">hash (gene)</tt> where gene is an object of the user defined data type.
+Other methods that may be used is an <tt class="docutils literal">endofgen</tt> method, a
+<tt class="docutils literal">gene_distance</tt> method (e.g., when using Restricted Tournament
+Replacement, with <tt class="docutils literal">PGA_POPREPL_RTR</tt>), or a <tt class="docutils literal">pre_eval</tt> method.</p>
+<p>An example with user defined data types is in <tt class="docutils literal">examples/gp</tt>: This
+implements Genetic Programming with a tree data structure. Note that the
+<tt class="docutils literal">Node</tt> class in <tt class="docutils literal">gp.py</tt> has a <tt class="docutils literal">__hash__</tt> method that builds a hash
+over the serialization of the tree (which is the same for individuals
+with the same tree structure).</p>
+</div>
+<div class="section" id="missing-features">
+<h1>Missing Features</h1>
+<p>As already mentioned, not all functions and constants of <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> are
+wrapped yet – still for many applications the given set should be
+enough. If you need additional functions, you may want to wrap these and
+<a class="reference external" href="mailto:rsc&#64;runtux.com">send</a> me a patch.</p>
+</div>
+<div class="section" id="reporting-bugs">
+<h1>Reporting Bugs</h1>
+<p>Please use the <a class="reference external" href="http://sourceforge.net/tracker/?group_id=152022&amp;atid=782852">Sourceforge Bug Tracker</a>  or the <a class="reference external" href="https://github.com/schlatterbeck/pgapy/issues">Github Bug Tracker</a> and</p>
+<ul class="simple">
+<li>give a short description of what you think is the correct behaviour</li>
+<li>give a description of the observed behaviour</li>
+<li>tell me exactly what you did.</li>
+<li>if you can publish your source code this makes it a lot easier to
+debug for me</li>
+</ul>
+</div>
+<div class="section" id="resources">
+<h1>Resources</h1>
+<p>Project information and download from <a class="reference external" href="http://sourceforge.net/projects/pgapy/">Sourceforge main page</a></p>
+<p>or checkout from <a class="reference external" href="http://github.com/schlatterbeck/pgapy">Github</a></p>
+<p>or directly install via pypi.</p>
+</div>
+<div class="section" id="installation">
+<h1>Installation</h1>
+<p>PGApy, as the name suggests, supports parallelizing the evaluation
+function of the genetic algorithm. This uses the Message Passing
+Interface (<a class="reference external" href="http://mpi-forum.org/">MPI</a>) standard.</p>
+<p>To install a <em>serial</em> version (without parallel programming using <a class="reference external" href="http://mpi-forum.org/">MPI</a>)
+you can simply install from pypi using <tt class="docutils literal">pip</tt>. Alternatively when you
+have unpacked or checked out from sources you can install with:</p>
+<pre class="literal-block">
+python3 setup.py install --prefix=/usr/local
+</pre>
+<p>If you want a parallel version using an <a class="reference external" href="http://mpi-forum.org/">MPI</a> (Message-Passing Interface)
+library you will have to install a parallel version of <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> first.
+The easiest way to do this is to use <a class="reference external" href="https://github.com/schlatterbeck/debian-pgapack">my pgapack debian package builder</a>
+from github. Clone this repository, check out the branch <tt class="docutils literal">master</tt>,
+install the build dependencies, they're listed in the file
+<tt class="docutils literal">debian/control</tt> and build the debian packages using:</p>
+<pre class="literal-block">
+dpkg-buildpackage -rfakeroot
+</pre>
+<p>This builds pgapack debian packages for <em>all</em> supported MPI libraries in
+debian, currently these are <tt class="docutils literal">mpich</tt>, <tt class="docutils literal">openmpi</tt>, and <tt class="docutils literal">lam</tt>. In addition
+to the MPI libraries a serial version of the pgapack library is also
+built. Proceed by installing the package pgapack and the MPI backend
+library of choice. If you don't have a preference for an MPI library,
+<tt class="docutils literal"><span class="pre">libpgapack-openmpi</span></tt> is the package that uses the Debians default
+preferences of an MPI library.</p>
+<p>Once a parallel version of <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> is installed, you can install PGApy
+as follows: You set environment variables for the <tt class="docutils literal">PGA_PARALLEL_VARIANT</tt>
+(one of <tt class="docutils literal">mpich</tt>, <tt class="docutils literal">openmpi</tt>, or <tt class="docutils literal">lam</tt>) and set the <tt class="docutils literal">PGA_MODULE</tt> to
+<tt class="docutils literal">module_from_parallel_install</tt>. Finally you envoke the setup, e.g.:</p>
+<pre class="literal-block">
+export PGA_PARALLEL_VARIANT=openmpi
+export PGA_MODULE=module_from_parallel_install
+python3 setup.py install --prefix=/usr/local
+</pre>
+<p>Note that the same works with <tt class="docutils literal">pip install</tt>, i.e., after installation
+of a parallel version of <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> you can directly install with <tt class="docutils literal">pip</tt>:</p>
+<pre class="literal-block">
+export PGA_PARALLEL_VARIANT=openmpi
+export PGA_MODULE=module_from_parallel_install
+pip install pgapy
+</pre>
+<p>or alternatively depending on how pip is installed on your system:</p>
+<pre class="literal-block">
+python3 -m pip install pgapy
+</pre>
+<p>If your MPI library is installed in a different place you should study
+the <em>Extension</em> configurations in <tt class="docutils literal">setup.py</tt> to come up with an
+Extension definition that fits your installation. If your installation
+is interesting to more people, feel free to submit a patch that adds
+your Extension-configuration to the standard <tt class="docutils literal">setup.py</tt>.</p>
+<div class="section" id="note-on-newer-python-versions">
+<h2>Note on newer python versions</h2>
+<p>Newer python versions have deprecated installing into the system python
+version, even in <tt class="docutils literal">/usr/local</tt>. You can still build the pgapy package
+locally and install using the installer. On Debian Linux you need the
+following packages installed:</p>
+<pre class="literal-block">
+apt-get install python3-pip python3-dev python3-toml \
+    python3-build python3-installer python3-venv python3-sphinx
+    netpbm
+</pre>
+<p>Then you can build locally and install:</p>
+<pre class="literal-block">
+python3 -m build
+python3 -m installer dist/*.whl
+</pre>
+<p>Better yet, clone my releasetool package from github:</p>
+<pre class="literal-block">
+git clone https://github.com/schlatterbeck/releasetool.git
+</pre>
+<p>into a directory <em>parallel</em> to pgapy and build using:</p>
+<pre class="literal-block">
+make dist
+</pre>
+<p>This also will generate a Version.py file with the correct version
+number from git. If you want to install a parallel version you should
+set the environment variables:</p>
+<pre class="literal-block">
+export PGA_PARALLEL_VARIANT=openmpi
+export PGA_MODULE=module_from_parallel_install
+</pre>
+<p><em>before</em> building.</p>
+</div>
+</div>
+<div class="section" id="running-with-mpi">
+<h1>Running with MPI</h1>
+<p>To run a parallel version with <a class="reference external" href="http://mpi-forum.org/">MPI</a>, a parallel version must be
+installed, see above in section <a class="reference internal" href="#installation">Installation</a>.</p>
+<p>For a serial version, PGAPy makes sure that the otimization is aborted
+if an exception occurs in the <tt class="docutils literal">evaluate</tt> function. This is currently not
+the case for MPI, because the framework currently does not support
+returning information to the rank-0 MPI leader process. A workaround is
+as follows: Rename your <tt class="docutils literal">evaluate</tt> method to <tt class="docutils literal">_evaluate</tt> and catch
+exceptions in a new <tt class="docutils literal">evaluate</tt> method that wraps <tt class="docutils literal">_evaluate</tt>.
+Call <tt class="docutils literal">MPI_Abort</tt> if an exception occurs:</p>
+<pre class="literal-block">
+import traceback
+import sys
+
+...
+
+def evaluate (self, p, pop):
+    try:
+        return self._evaluate (p, pop)
+    except Exception:
+        # Optionally log exception here
+        print (traceback.format_exc ())
+        pga.MPI_Abort (1)
+        sys.exit (1)
+</pre>
+</div>
+<div class="section" id="testing">
+<h1>Testing</h1>
+<p>For testing – preferrably before installation you can build locally:</p>
+<pre class="literal-block">
+python3 setup.py build_ext --inplace
+</pre>
+<p>After this you have a <tt class="docutils literal"><span class="pre">pga.*.so</span></tt> file in the local directory. Now you
+can run the tests with:</p>
+<pre class="literal-block">
+python3 -m pytest test
+</pre>
+<p>By default all long-running tests are skipped.
+To run <em>all</em> tests, specify the <tt class="docutils literal"><span class="pre">--longrun</span></tt> option:</p>
+<pre class="literal-block">
+python3 -m pytest --longrun test
+</pre>
+<p>This runs all the tests and can take a while. Note that the tests run
+most of the examples in the <tt class="docutils literal">examples</tt> directory with different
+command line parameters where available. To perform several optimization
+runs in a single (Python-) process, we must call <tt class="docutils literal">MPI_Init</tt>
+<em>explicitly</em> (and not relying on <a class="reference external" href="http://ftp.mcs.anl.gov/pub/pgapack/">PGAPack</a> to call it implicitly). This is
+because <tt class="docutils literal">MPI_Init</tt> may be called only once per process. Calling of
+<tt class="docutils literal">MPI_Init</tt> and <tt class="docutils literal">MPI_Finalize</tt> is handled in a fixture in
+<tt class="docutils literal">test/conftest.py</tt></p>
+<div class="section" id="coverage">
+<h2>Coverage</h2>
+<p>For the python examples, the coverage can be computed with:</p>
+<pre class="literal-block">
+python3 -m pytest --longrun --cov examples test
+</pre>
+<p>or more verbose including untested lines with:</p>
+<pre class="literal-block">
+python3 -m pytest --longrun --cov-report term-missing --cov examples test
+</pre>
+<p>Performing a coverage analysis for the C code in <tt class="docutils literal">pgamodule.c</tt> is
+currently possible only on Linux – at least, since I'm developing on
+Linux this is the architecture where I've found out how to perform
+coverage analysis including the C code.
+To compile for coverage analysis:</p>
+<pre class="literal-block">
+export CFLAGS=-coverage
+python3 setup.py build_ext --inplace
+</pre>
+<p>This will create a file ending in <tt class="docutils literal">.gcno</tt> under the <tt class="docutils literal">build</tt> directory,
+typically something like <tt class="docutils literal"><span class="pre">build/temp.linux-x86_64-3.9</span></tt> when using
+<tt class="docutils literal">python3.9</tt> on the <tt class="docutils literal">x86_64</tt> architecture, the extension will be
+different for higher python versions, e.g. for python3.11 on Debian:</p>
+<pre class="literal-block">
+build/temp.linux-x86_64-cpython-311
+</pre>
+<p>Running the tests will create statistics data files with ending
+<tt class="docutils literal">.gcda</tt>. These are data files for the GNU profiler <tt class="docutils literal">gcov</tt>. From
+these, <tt class="docutils literal">.html</tt> files can be generated that can be inspected with a
+browser:</p>
+<pre class="literal-block">
+lcov --capture --directory . --output-file coverage.info
+genhtml coverage.info --output-directory coverage_out
+</pre>
+<p>Note that the <tt class="docutils literal">lcov</tt> program should be part of the linux distribution.
+It is included in Debian Linux in the package <tt class="docutils literal">lcov</tt>.</p>
+</div>
+<div class="section" id="running-under-mpi">
+<h2>Running under MPI</h2>
+<p>The tests can be directly run under MPI. Note that currently the
+<tt class="docutils literal"><span class="pre">--with-mpi</span></tt> option of <tt class="docutils literal">pytest</tt> is <em>not</em> supported. This option
+asumes that the package <tt class="docutils literal">mpi4py</tt> is used. But <tt class="docutils literal">pgapy</tt> uses only
+calls from pgapack, which in turn calls MPI.</p>
+<p>Running under MPI is done using:</p>
+<pre class="literal-block">
+mpirun $MPI_OPTIONS python3 -m pytest test
+</pre>
+<p>The <tt class="docutils literal">MPI_OPTIONS</tt> can be, e.g.:</p>
+<pre class="literal-block">
+MPI_OPTIONS=--machinefile ~/.mpi-openmpi --np 8
+</pre>
+<p>which would use a machine definition file for openmpi in your home
+directory and eight processes.</p>
+<p>Running under MPI is especially useful for determining C code coverage.
+Asuming a parallel version of <tt class="docutils literal">openmpi</tt> is installed, the code can be
+compiled with:</p>
+<pre class="literal-block">
+PGA_PARALLEL_VARIANT=openmpi
+PGA_MODULE=module_from_parallel_install
+export CFLAGS=-coverage
+python3 setup.py build_ext --inplace
+</pre>
+<p>Note that the coverage analysis uses files in the build directory which
+need to be present before a parallel version can be started. Otherwise
+each parallel instance would try to create the coverage files resulting
+in race conditions. Once the coverage files are in place, the coverage
+framework ensures proper locking so that no two processes write
+concurrently to the same coverage files.</p>
+<p>Creating the coverage files is best achieved by running the tests
+without MPI first and then running the same version with a number of
+processes under MPI. Running under MPI shows that the serialization and
+deserialization code in <tt class="docutils literal">pgamodule.c</tt> is called.</p>
+<p>As of this writing we get:</p>
+<pre class="literal-block">
+Lines:      1423    1475    96.5 %
+Functions:   131     133    98.5 %
+</pre>
+</div>
+</div>
+<div class="section" id="references">
+<h1>References</h1>
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[1]</a></td><td>Georges Harik. Finding multiple solutions in problems of bounded
+difficulty. IlliGAL Report 94002, Illinois Genetic Algorithm Lab,
+May 1994.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td>Georges R. Harik. Finding multimodal solutions using restricted
+tournament selection. In Eshelman <a class="footnote-reference" href="#footnote-3" id="footnote-reference-11">[3]</a>, pages 24–31.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-11">[3]</a></td><td>Larry J. Eshelman, editor. <em>Proceedings of the 6th International
+Conference on Genetic Algorithms (ICGA)</em>. Morgan Kaufmann, July 1995.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-3">[4]</a></td><td>Martin Pelikan. <em>Hierarchical Bayesian Optimization Algorithm:
+Toward a New Generation of Evolutionary Algorithms</em>, volume 170 of
+Studies in Fuzziness and Soft Computing.  Springer, 2005.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-4">[5]</a></td><td>Rainer Storn and Kenneth Price. Differential evolution – a simple
+and efficient heuristic for global optimization over continuous
+spaces. <em>Journal of Global Optimization</em>, 11(4):341–359, December
+1997.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-5">[6]</a></td><td>Kenneth V. Price, Rainer M. Storn, and Jouni A. Lampinen.
+<em>Differential Evolution: A Practical Approach to Global
+Optimization.</em>  Springer, Berlin, Heidelberg, 2005.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-6">[7]</a></td><td>Kalyanmoy Deb, Amrit Pratap, Sameer Agarwal, and T. Meyarivan. A
+fast and elitist multiobjective genetic algorithm: NSGA-II. <em>IEEE
+Transactions on Evolutionary Computation</em>, 6(2):182–197, April 2002.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-7">[8]</a></td><td>Kalyanmoy Deb and Himanshu Jain. An evolutionary many-objective
+optimization algorithm using reference-point-based nondominated
+sorting approach, part I: Solving problems with box constraints.
+<em>IEEE Transactions on Evolutionary Computation</em>, 18(4):577–601,
+August 2014.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-8">[9]</a></td><td>Himanshu Jain and Kalyanmoy Deb. An evolutionary many-objective
+optimization algorithm using reference-point-based nondominated
+sorting approach, part II: Handling constraints and extending to
+an adaptive approach. <em>IEEE Transactions on Evolutionary
+Computation</em>, 18(4):602–622, August 2014.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-9">[10]</a></td><td>Tetsuyuki Takahama and Setsuko Sakai. Constrained optimization
+by the ε constrained differential evolution with an
+archive and gradient-based mutation. In <a class="footnote-reference" href="#footnote-11" id="footnote-reference-12">[11]</a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-11" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-12">[11]</a></td><td><em>IEEE Congress on Evolutionary Computation (CEC)</em>. Barcelona,
+Spain, July 2010.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-12" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-10">[12]</a></td><td>Indraneel Das and J. E. Dennis. Normal-boundary intersection: A new
+method for generating the pareto surface in nonlinear multicriteria
+optimization problems. SIAM Journal on Optimization, 8(3):631–657,
+August 1998.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="changes">
+<h1>Changes</h1>
+<p>Version 2.9: New crowding metrics for NSGA-II</p>
+<ul class="simple">
+<li>Implement new crowding metrics for NSGA-II: The original NSGA-II
+algorithm doesn't work well in higher dimensions.</li>
+<li>New crowding metrics are from two papers, one for the two-objective
+case, one for more than two objective functions.</li>
+<li>Crowding metrics can be set with the new constructor option
+crowding_method. It takes the values PGA_CROWDING_CD_PRUNE (the new
+default for 2-objective problems), PGA_CROWDING_ENNS_2NN, and
+PGA_CROWDING_ENNS_MNN (the new default for more than two objectives).
+The original NSGA-II algorithm can be set with PGA_CROWDING_NSGA_II.</li>
+<li>The ENNS methods use an efficient nearest neighbor search (with 2 or M
+neighbors depending on the algorithm) while the prune algorithm uses
+the same metric as the original NSGA-II algorithm but removes crowded
+elements one-by-one updating the metric after each removal.</li>
+</ul>
+<p>Version 2.8: New non-dominated sorting</p>
+<ul class="simple">
+<li>Upstream: New non-dominated sorting algorithm</li>
+<li>Allow switching to original NSGA-II non-dominated sorting or allow to
+run both algorithms with comparison (and assertion if they don't
+agree).</li>
+<li>new constructor parameter sort_nd with values PGA_NDSORT_JENSEN (the
+new algorithm and the default), PGA_NDSORT_NSQUARE (the original
+algorithm with effort O(N**2)) and PGA_NDSORT_BOTH.</li>
+</ul>
+<p>Version 2.7 (and 2.7.1, 2.7.2): New upstream</p>
+<ul class="simple">
+<li>Implement permutation preserving crossover and mutation operators</li>
+<li>Bug Fix of feature interaction hillclimber and duplicate checking</li>
+<li>Bug Fix for RTR, PAIRWISE_BEST, and the two NSGA population
+replacement schemes</li>
+<li>Fix off-by-one error in two new crossover operators (2.7.2)</li>
+</ul>
+<p>Version 2.6: New upstream</p>
+<ul class="simple">
+<li>Add an optional hillclimb method, see <tt class="docutils literal">examples/one_max_hc.py</tt></li>
+<li>Add a new constructor parameter <tt class="docutils literal">random_deterministic</tt> that produces
+reproduceable random numbers in the new hillclimb method (or during
+evaluation) even when running a parallel version</li>
+</ul>
+<p>Version 2.4: New upstream</p>
+<ul class="simple">
+<li>Wrap Negative Assortative Mating</li>
+<li>Allow Differential Evolution for integer genes</li>
+<li>Upstream fixes feature interaction bugs with duplicate avoidance and
+Differential Evolution and RTR population replacement</li>
+<li>Add option to use Negative Assortative Mating in Royal Road example</li>
+</ul>
+<p>Version 2.2.2: Add pyproject.toml</p>
+<ul class="simple">
+<li>Add pyproject.toml -- unfortunately it seems that binary modules
+cannot currently be described in the pyproject.toml, especially not
+the variant selection via the environment that is currently
+implemented in setup.py</li>
+</ul>
+<p>Version 2.2.1: MPI_Abort</p>
+<ul class="simple">
+<li>Add MPI_Abort to the wrapper</li>
+<li>Include <tt class="docutils literal">mpi_stub.c</tt> in the release (this is missing if some env
+variables are set, see above in Installation)</li>
+</ul>
+<p>Version 2.2: Module directory</p>
+<ul class="simple">
+<li>Put the pga C-module inside a pga module</li>
+<li>Add several python-only modules to pga</li>
+<li>pga.__init__ exports everything to this is compatible</li>
+<li>pga.random includes a python Random class based on the pgapack random
+number generator</li>
+</ul>
+<p>Version 2.1: Regression test</p>
+<ul class="simple">
+<li>PGAPack bug-fixes discovered during testing</li>
+<li>Bug-fixes of python wrapper</li>
+<li>Lots of tests with coverage of wrapper C-code &gt; 90%</li>
+</ul>
+<p>Version 2.0: User defined data types</p>
+<ul class="simple">
+<li>Implement user defined data types, note that your data type can be
+variable-size, e.g., a tree data structure. The framework takes care
+of serializing the data type and transmitting it to a remote MPI
+process if using a parallel version.</li>
+<li>When duplicate checking is enabled with the constructor parameter
+<tt class="docutils literal">no_duplicates</tt>, the underlying pgapack code now uses a hash table.
+This means the effort is no longer quadratic in the population size
+but linear.</li>
+<li>Example of Genetic Programming (GP) in the <tt class="docutils literal">examples/gp</tt> directory</li>
+<li>Rename the gene_difference method to gene_distance</li>
+</ul>
+<p>Version 1.8: Epsilon-constrained optimization</p>
+<ul class="simple">
+<li>Epsilon-constrained optimization</li>
+<li>Precision for printing evals in multi-objective optimization, use this
+feature for making regression-test work on AMD where a floating-point
+difference in the 16th or so decimal place made a test fail</li>
+<li>Crossover for permutations</li>
+<li>Version-numbers: try to match pgapack, we might still diverge in the
+last digit, though</li>
+</ul>
+<p>Version 1.2: Many-objective optimization with NSGA-III</p>
+<ul class="simple">
+<li>Implement NSGA-III</li>
+</ul>
+<p>Version 1.1.6: Polynomial mutation and simulated binary crossover (SBX)</p>
+<ul class="simple">
+<li>Simulated binary crossover (SBX)</li>
+<li>Polynomial mutation</li>
+</ul>
+<p>Version 1.1.1-1.1.5: Small PGAPack updates, fixes for non-debian</p>
+<ul class="simple">
+<li>Fix setup.py for non-debian systems</li>
+<li>Update to latest PGAPack with small changes</li>
+</ul>
+<p>Version 1.1: Add multi-objective optimization with NSGA-II</p>
+<ul class="simple">
+<li>Wrap latest pgapack version 1.4</li>
+<li>This add multi-objective optimization using the Nondominated Sorting
+Genetic Algorithm version 2 (NSGA-II) by Deb et. al. This makes use of
+the previously-introduced option to return more than one value in the
+objective function. To use the feature you need to set the
+num_constraint parameter to a value that leave some of the function
+values returned by your evaluation function as objective function
+values (and not as constraints). See example in examples/multi.py.</li>
+</ul>
+<p>Version 1.0: Add constraint handling</p>
+<ul class="simple">
+<li>Wrap latest pgapack version 1.3</li>
+<li>This adds auxiliary evaluations. Now your evaluation function can
+return <em>multiple</em> floating-point values as a sequence if you set the
+num_eval parameter &gt;1 in the constructor. Currently additional
+evaluation values are used for constraint handling. Constraint values
+are minimized.  Once they reach zero or a negative value they no
+longer count: The sum of all positive constraints is the overall
+constraint violation.  For details see paper by Deb, 2000, see user
+guide for citation. If you're not using constraints, nothing in your
+code needs changes.</li>
+<li>This release may change the path an optimization takes. So for the
+same seed of the random number generator you will get a different
+result, at least if during the search there are individuals with the
+same evaluation (and different genetic material). This is due to a
+change of the sort function in pgapack (it switched to a stable sort
+from the C standard library).</li>
+</ul>
+<p>Version 0.9: Allow installation of parallel version</p>
+<ul class="simple">
+<li>Pass argv (or sys.argv) to PGACreate</li>
+<li>Add a stanza to setup.py to allow a parallel installation with a given
+pgapack variant compiled for an MPI library. This currently needs a
+pre-installed pgapack debian package.</li>
+</ul>
+<p>Version 0.8: Bugfix in real mutation</p>
+<ul class="simple">
+<li>Fix a core-dump in the latest pgapack</li>
+</ul>
+<p>Version 0.7: Major changes in wrapping</p>
+<ul class="simple">
+<li>Now Differential Evolution is implemented, see the minfloat example
+and the user guide of pgapack.</li>
+</ul>
+<p>Version 0.6: Major changes in wrapping</p>
+<ul class="simple">
+<li>Now the wrapping uses the standard Python recommendations on how to
+create a custom class.</li>
+<li>Update documentation</li>
+<li>Rename <tt class="docutils literal">fitness_cmax</tt> (from <tt class="docutils literal">fitness_cmax_value</tt>)</li>
+<li>Better error checking of parameters</li>
+</ul>
+<p>Version 0.5: Bug-fix release</p>
+<ul class="simple">
+<li>Now the <tt class="docutils literal">setup.py</tt> works, previous version had an encoding problem</li>
+<li>Wrap some minor new methods</li>
+<li>Bug-fix in PGAPack truncation selection</li>
+</ul>
+<p>Version 0.4: Bundle PGAPack</p>
+<ul class="simple">
+<li>The PGAPack package is now included as a git submodule. By default we
+build against this library</li>
+<li>License fixes: The module long shipped a <tt class="docutils literal">COPYING</tt> file that includes
+the 2-clause BSD license. But the headers of <tt class="docutils literal">setup.py</tt> and <tt class="docutils literal">pgamodule.c</tt>
+still included another license. This has been corrected.</li>
+</ul>
+<p>Version 0.3: Feature enhancements, Bug fixes</p>
+<p>Port to Python3, Python2 is still supported, license change.</p>
+<ul class="simple">
+<li>C-Code of wrapper updated to support both, Python2 and Python3</li>
+<li>Update documentation</li>
+<li>Fix some memory leaks that could result when errors occurred during
+some callback methods</li>
+<li>License change: We now have the 2-clause BSD license (similar to the
+MPICH license of PGAPack), this used to be LGPL.</li>
+</ul>
+<p>Version 0.2: Feature enhancements, Bug fixes</p>
+<p>64 bit support, more PGAPack functions and attributes wrapped,
+Readme-update: Sourceforge logo, Changes chapter.</p>
+<ul class="simple">
+<li>Bug-fixes for 64 bit architectures</li>
+<li>More functions and attributes of PGAPack wrapped</li>
+<li>Add a build-rule to <tt class="docutils literal">setup.py</tt> to allow building for standard-install
+of PGAPack – this currently needs editing of <tt class="docutils literal">setup.py</tt> – should use
+autodetect here but this would require that I set up a machine with
+standard install of PGAPack for testing.</li>
+<li>Add Sourceforge logo as required</li>
+<li>Add Changes chapter for automagic releases</li>
+<li>Add the <tt class="docutils literal">__module__</tt> string to class <tt class="docutils literal">PGA</tt> in module <tt class="docutils literal">pga</tt>. Now
+calling:: <tt class="docutils literal">help (pga)</tt> in python works as expected, previously no
+help-text was given for the included module</li>
+</ul>
+<p>Version 0.1: Initial freshmeat announcement</p>
+<p>PGAPy is a wrapper for PGAPack, the parallel genetic algorithm library,
+a powerful genetic algorithm library. PGAPy wraps this library for use
+with Python. Pgapack is one of the most complete and accurate genetic
+algorithm implementations out there with a lot of features for
+experimentation.</p>
+<ul class="simple">
+<li>Initial Release</li>
+</ul>
+</div>
+</div>
+</body>
+</html>
