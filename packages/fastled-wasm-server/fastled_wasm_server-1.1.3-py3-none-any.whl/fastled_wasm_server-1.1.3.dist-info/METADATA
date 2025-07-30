@@ -1,0 +1,78 @@
+Metadata-Version: 2.4
+Name: fastled_wasm_server
+Version: 1.1.3
+Summary: fastled wasm server
+Home-page: https://github.com/zackees/fastled-wasm-server
+Maintainer: Zachary Vorhies
+License: BSD 3-Clause License
+Keywords: fastled wasm server
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: pydantic>=2.0.0
+Provides-Extra: full
+Requires-Dist: fastled-wasm-compiler>=1.0.89; extra == "full"
+Requires-Dist: fastapi==0.115.11; extra == "full"
+Requires-Dist: uvicorn[standard]==0.34.0; extra == "full"
+Requires-Dist: python-multipart==0.0.20; extra == "full"
+Requires-Dist: disklru>=2.0.4; extra == "full"
+Requires-Dist: psutil==6.1.1; extra == "full"
+Requires-Dist: wormhole-tx; extra == "full"
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: maintainer
+
+# FastLED WASM Server
+
+FastLED WASM Server + Compiler
+
+This will only work in the `niteris/fastled-wasm` container.
+
+## Installation
+
+You can install this package in two modes:
+
+### Minimal Installation (Client Only)
+For applications that only need to use the HTTP clients to communicate with a FastLED WASM server:
+
+```bash
+pip install fastled-wasm-server
+```
+
+This installs only the essential dependencies (`httpx`, `pydantic`) needed for:
+- `ClientAsync` and `ClientSync` classes
+- Model classes for API responses
+- Type definitions
+
+### Full Installation (Server + Client)
+For running the full FastLED WASM server with all functionality:
+
+```bash
+pip install fastled-wasm-server[full]
+```
+
+This installs all dependencies including FastAPI, Uvicorn, and the WASM compiler for:
+- Complete server functionality
+- CLI tools (`fastled-wasm-server`, `fastled-wasm-mcp-server`)
+- All client functionality
+- Development server capabilities
+
+# Develop
+
+At the root execute `./install`
+
+
+#### Lint
+
+`./lint`
+
+#### Test
+
+`./test`
+
+# Windows
+
+This environment requires you to use `git-bash`.
+
