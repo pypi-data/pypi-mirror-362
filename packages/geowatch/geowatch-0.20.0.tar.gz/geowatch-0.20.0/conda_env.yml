@@ -1,0 +1,47 @@
+---
+name: geowatch
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python == 3.9
+  - pip >= 21.0.1
+  - pip:
+    - -r requirements/runtime.txt
+    - -r requirements/development.txt
+    - -r requirements/tests.txt
+
+    # Brings in opencv-python, which conflicts with opencv-python-headless
+    #- imgaug >= 0.4.0
+    # Can conflict with opencv-python
+    - --prefer-binary
+    - opencv_python_headless >= 4.5.2.52
+    # These package specification strings don't play nicely in
+    # requirements/runtime.txt when needed by setup.py
+    #- git+https://github.com/dmjoy/sentinel2_angle_bands.git@54922e8#egg=s2angs
+
+    # find-links applies to everything after it, so make sure this is the last dep
+    # References: https://stackoverflow.com/questions/60410173/find-links-conda-env
+    - --find-links https://girder.github.io/large_image_wheels
+    - GDAL >= 3.4.1
+
+
+# Abuse conda environment spec and YAML notation to make a heredoc for notes
+# and relevant commands
+#variables:
+.__doc__: &__doc__
+  - |
+
+      pip uninstall osgeo GDAL
+      pip install GDAL==3.3.1 --find-links https://girder.github.io/large_image_wheels
+
+      rm -rf ".cache/conda/envs/loose-watch-env"
+      conda env create -f conda_env.yml --prefix ".cache/conda/envs/loose-watch-env" -v -v
+
+      # Note: in the case where an implicit requirement pulls down
+      # opencv-python, run the following command to replace it with
+      # opencv-python-headless
+      pip uninstall opencv-python opencv-python-headless; pip install opencv-python-headless
+
+      # Note: work in dev/make_reqs_from_conda.py has work on doing interesting
+      # things with this file. 
