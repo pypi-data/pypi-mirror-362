@@ -1,0 +1,322 @@
+0.10.3 (July 17, 2025)
+- added error handling to Fileinfo. Fileinfo did badly when pointed at a nonexistent directory. added a check to scan_directory and added testing
+- changed jekyll invocation in cron_jekyll.sh to improve reliability
+- added dev_jekyll.sh and prod_jekyll.sh to do dev and pod pulls from git
+- removed push_website_assets. this is now done in the jekyll scripts
+- Create process_img_log.py script to produce a csv file for use in alt text editing that:
+    - processes an log file from ebookconverter to list every img and src in PG generated html files.
+    - opens every image file referenced, computes a hash, records the dimensions of the file.
+- add forget_book.py and documentation. the process for removing a book from the database has been undocumented and is more complicated than it would seem, resulting in incomplete removals. The forget_book python script does it correctly.
+- moved utility python scripts into ebookconverter/utils
+- corrected test_pgmarc.py
+
+
+0.10.2 (April 8, 2025)
+- in PGMarc.py, don't make an 050 field if no content
+- add file zipping to pgmarc script
+- add push_website_assets.sh script
+
+0.10.1 (March 12, 2025)
+- fix typos in PGMarc.py (wrong subfields) and MARC.md
+
+0.10.0 (March 6, 2025)
+- This version adds a script to make MARC record files.
+    - PGMarc.py from https://github.com/schwartzray/Project-Gutenberg-MARC/
+    - runner scripts and tests
+    - MARC.md has library-specific details and background information https://github.com/gutenbergtools/ebookconverter/blob/v10/MARC.md
+- sync changes to conversion_summary.sh script
+
+0.9.11 (February 11, 2025)
+- utf8 txt files were disfavored sources for generated txt files. Now they are favored. (fix #57)
+- synced jekyll and rebuild files cron scripts
+
+0.9.10 (January 22, 2025)
+- fixed typo in autorebuild 
+
+0.9.9 (January 21, 2025)
+- fixed autorebuild range construction
+
+0.9.8 (January 20, 2025)
+- added scripts to setup.py
+- autorebuild also triggers on author adds and author deletions
+- ebookmaker 0.13.1
+- removed html.noimages and pdf.noimages from the 'all' build
+
+0.9.7 (January 6, 2025)
+- adds BlueskyWriter
+- expunges twitter
+- adds '.utf8' to deprecated file cleanup. fixes #50
+- added AutoRebuild. Checks the database changelog to see if a title has been changed or an author has bees switched in the previous hour. If so, the book is rebuilt. Designed to be run by the cron-dopush script. Fixes #49
+
+0.9.6 (September 18, 2024)
+- fix OpenGraph URLs in html5
+- allow cover jobs for non-text texts (audio, data, etc.)
+
+0.9.5 (April 22, 2024)
+- Change Facebook graph API version to 19.0. No changes affect us.
+- update_from_backup_workflow changed to update_from_workflow to add pubinfo from json files made before version 0.7.0 was turned on (~ August 2021)
+- ReparseCredits looks at books without credits and checks to see if parsing the pg header helps.
+- update libgutenberg to 0.10.24, fixes author ordering
+
+0.9.4 (February 26, 2024)
+- fix bad error handling in FileInfo
+- don't save new credit unless it's new
+- libgutenberg 0.10.22 
+    - fixes bugs that resulted in duplicate credits
+    - fixes a problem that scraped credits overwrote the changes from json file
+
+0.9.3 (February 13, 2024)
+- credits should be changed, not appended. Fixes #35.
+- added a script to remove extraneous credits
+- Ebookmaker 0.12.40, libgutenberg 0.10.20
+
+0.9.2 (December 7, 2023)
+- fix RDFWriter to include the DCMIType ('Text') for books. It does not appear that this ever was done since the advent of EbookConverter. Fixes #42.
+- Ebookmaker 0.12.37
+
+0.9.1 (September 29, 2023)
+- removed the `.utf8` extension from txt, html, and rst generated files
+
+0.9.0 (September 20, 2023)
+- Removed a txt exclusion. Ebookmaker is now putting headers on txt files, but this was not being done for the 20,000 or so books with source named 99999-0.txt due to the obsolete exclusion. 
+- add a script that packages txt files to a tarball
+- add an HTMLWriter that extends Ebookmaker's HTMLWriter to package up a zip file of the html5 with images named pg99999-h.zip Addresses #38
+- don't require a sourcefile for products that are built from the database. Require ebookmaker>0.12.35. Fixes #39.
+- save credit metadata to the database. fixes #28.
+- corrected behavior of source file size limits
+- add ebook number to log even if the source file fails to parse
+
+
+0.8.6 (May 31, 2023)
+- adds MastodonWriter, to replicate TwitterWriter (posting on @gutenberg_new@mastodon.social)
+
+0.8.5 (March 8, 2023)
+- normalize capitalization of "eBook"
+- only send notification for CRITICAL errors #33
+
+0.8.4 (February 15, 2023)
+- notifications, both success and problem alerts, are now sent only to the whitewasher.
+- notification texts have been cleaned up to be more readable and more friendly
+- refactored  PUBLIC, FILES, FTP into libgutenberg>=0.10.15
+- CACHEDIR and FILESDIR now need to be set in ~/.ebookmaker as well as ~/.ebookconverter, Probably these belong in an environment variable.
+
+
+0.8.3 (December 26, 2022)
+- added documentation for commands
+- add checking that a source file exists
+- refactor filesize checking to remove CRITICAL messages when a build is skipped
+- update tests
+
+0.8.2 (September 30, 2022)
+- Adds UpdateWriter. It scans source files for metadata headers and adds to the database. Currently only looks for 'Credit:' or 'Produced by:'.
+- `.xhtml` added to parseable file extensions
+- stop producing kindle.noimages unless asked to
+- add a "generic" file name for Writers that don't write (Twiter, Facebook, Update)
+
+0.8.1 (September 14, 2022)
+- when the html file is large (>16M), in most cases we don't really want to make an EPUB or a MOBI. Making the MOBI can take hours with our current infrastructure. Changed the source file size filters  so these formats are not made.
+- when the source EPUBs are >32M, only old-format MOBIs are not made.
+- add jekyll script
+- stop trying to store qr codes in databaseta from backup workflow files
+- add script to load metadata
+
+0.8.0 (August 18, 2022)
+- production directory moves from ~/converter to ~/ebookconverter to accomplish the python version migration.
+
+0.8.0b2 (August 7, 2022) final candidate
+- `--notify` and `--validate` are now flags that turn on validation and notification
+- use simpler CLI to call Ebookmaker
+- update requirements
+
+0.8.0b1 (August 4, 2022) final candidate?
+- exceptions in notifier would cause stuck pid Files
+
+0.8.0b0 (July 26, 2022) beta
+- now using ebookmaker 0.12 (beta),
+- use new notifier API
+- refactored/added --notify and --validate command-line options
+- add epub3 and kf8 filetypes
+
+0.7.12 (June 7, 2022)
+- added a script to reload a workflow file. Usage: reload_workflow [list of ebook numbers]
+- add requirement for lxml<4.7
+
+0.7.11 (April 28, 2022)
+- update facebook API version
+- update dependencies for last gasp py 3.6 environments; 0.8 will be py 3.7+
+- fix exception handling to be more useful when there's already a pid file
+- fix a test
+- updates for 2022
+
+0.7.10 (November 11, 2021)
+- change build order - epub.images can mess up the nomages and covers builds
+- adjusted logging
+- delint
+- update Ebookmaker to 0.11.26
+
+0.7.9 (October 18, 2021)
+- add ebookmaker CRITICAL notifications to ebookconverter.log
+- in FileInfo, simplify is_readable to align with method used in ebookmaker
+- change coverpage rel to icon to synch with ebookmaker; requires 0.11.16
+
+0.7.8 not deployed
+
+0.7.7 (October 11, 2021)
+- add check for outdated gzip files and remove them
+
+0.7.6 (September 30, 2021)
+- added some testing of candidates
+- check for outdated gz files and remove them
+- updated ebookmaker and libgutenberg requirements
+
+0.7.5 (September 2, 2021)
+- The encoding for all python source files was changed to UTF8. A mis-encoded python file caused a problem with mdashes in titles.
+- multi-line titles had _ instead of \r. This was a relic of the hack needed to pass the title from python to PHP
+- updated ebookmaker and libgutenberg requirements
+
+0.7.4 (August 26, 2021)
+- add cron-csv-catalog.sh
+- updadate cron-dopush.sh to omit redundant sourcing
+- synch shell scripts with production
+- update libgutenberg
+
+0.7.3 (August 24, 2021)
+- improve logging/remove debug statements
+- update libgutenberg
+
+0.7.2 (August 23, 2021)
+- handle bare usernames for pglaf addresses
+
+
+0.7.1 (August 20, 2021)
+- Notify no longer initializes on import. This is because if it tries to log on import, an unwanted StreamHandler is attached to the logger.
+- corrected libgutenberg version requirement
+- as new files are expected to be utf-8 or *maybe* iso-8859-1, support for metadata scanning of new files with other encodings has been removed from fileinfo. Files with other encodings can still be processed if accompanied by a utf8 workflow file.
+- misc bugfixes, delint and logging enhancements
+
+
+0.7.0 (August 18, 2021)
+Big changes
+- using ORM top and bottom, libgutenberg==0.8.x, ebookmaker==0.11.x
+- FileInfo now subsumes all the functionality of pgcat.php. FileInfo used to dump the data it read to a pipe, which autocat.php consumed the stream and generated sql. Now, metadata is persisted into the ORM
+- csv export!
+- with ebookmaker changes, supports generated html for all books
+- pickling of lazy ORM objects necessitated overhaul of job queuing - dc objects are no longer put in job queues
+- added Notifier, allows WWer to register a notification email for an ebook. Also sends CRITICAL notifications to the WWer. If no emails registered, notifications are sent to a file
+- added notifications to send fail conversions to wwer
+- added support in FileInfo for json files from workflow and for txt files generated by dopush(pglaf)
+- added switch to turn on routine notifications.
+- new environment variables needed to support notifications
+    - SMTP_HOST = 'smtp.gmail.com' # default = localhost:25 (default ssl port is 465)
+    - SMTP_USER = 'webmaster@example.com'
+    - SMTP_PASSWORD = 'gmail password' #default = ''
+    - SMTP_SSL = "True" # default = False
+    - REPLY_TO_EMAIL = # default = 'help2021@pglaf.org'
+- new config CLI parameter:
+    - notify (--notify)  turn on SUCCESS and ISSUES notifications. 
+- the following directories should exist:
+    - $PRIVATE/logs
+    - $PRIVATE/logs/json
+    - $PRIVATE/logs/json/backup
+    - $PRIVATE/logs/notifications
+    - $PRIVATE/logs/dopush
+    - $PRIVATE/logs/dopush/backup
+
+
+
+
+0.6.9 (September 15, 2020)
+- assets (covers, rdf, etc.) are built for TeX sourced books
+- FileInfo now sets the ebook number in logs, correctly
+- updated scripts
+- updated Facebook token documentation
+
+0.6.8 (June 10, 2020)
+- QRCode is now just for desktop, and is no longer blurry
+- FileInfo now sets the ebook number in logs
+- Source files up to 32M are now allowed (up from 16M)
+- Added kindlegen and too_deep reports to conversion_summary.sh
+- Bumped the required ebookmaker version
+
+0.6.7 (March 5, 2020)
+- don't make rdf and qrcode for books without source files. This has been an issue for end-of-the-month rebuilds.
+
+0.6.6 (March 4, 2020)
+- added conversion_summary script
+- fixed absence of scaled covers when generating from txt
+- added unittests and test files for fileinfo
+- updated dependencies
+
+0.6.5 (January 20, 2020)
+- added picsdir to summary logging exclusion
+- updated ebookmaker and libgutenberg dependencies
+
+0.6.4 (January 6, 2020)
+- added ebooknumber to job summary logging:
+- updated ebookmaker dependency to 0.7.9
+
+0.6.3 (January 4, 2020)
+- refined build failure messages:
+  - don't report false fails for twitter and facebook
+  - check moddate to see if files have really been built
+- updated ebookmaker and libgutenberg dependencies
+
+0.6.2 (January 3, 2020)
+- added build failure message to log
+- twiddled utility scripts
+
+0.6.1 (December 19, 2019)
+- updated ebookmaker requirement to 0.7.7
+- added cron-dopush-social.sh scripts
+
+0.6.0 (October 29, 2019)
+- incorporated FileInfo.py and AutoDelete.py
+- fixed AutoDelete compatibility
+- added fileinfo, autodelete, and cron-dopush.sh scripts
+- made sample.env bash compatible
+- updated requirements for non pipenv users
+
+0.5.8 (October 22, 2019)
+- updated ebookmaker to 0.7.5
+- updated libgutenberg to 0.5.0
+
+0.5.7 (October 21, 2019)
+- updated ebookmaker to 0.7.4
+- reverted preferred source for covers
+
+0.5.6 (October 9, 2019)
+- updated ebookmaker to 0.7.3, libgutenberg to 0.4.1
+- added rebuild-files scripts
+
+0.5.5 (September 30, 2019)
+- added ability to default cli args with ~/.ebookconverter (same as ebookmaker)
+- added cover-adding whenever an epub is made
+- updated requirements to fix ebookmaker handling of ebookconverter job queues
+- tweaked facebook script
+
+0.5.4 (August 14, 2019)
+- when EbookConverter creates a book directory, it is group-writable
+- begin process of moving to production by adding a dopush script for facebook posting
+- add scripts we've used for posting backlog to facebook
+
+0.5.3 (May 24, 2019)
+- updated Facebook to API version 3.3
+- moved facebook token to a separate file, as it gets expired after 2-3 months
+- simplified post as the bits that can be scraped are no longer needed.
+- added ebookconverter.writers in setup.py
+
+0.5.1 (March 7, 2019)
+
+- added and updated missing dependencies
+- added documentation
+- added 
+
+0.5.0 (January 10, 2019)
+
+- added packaging, with dependencies, including pipfile
+- removed dependence on options hacked into builtins
+- includes scripts used to invoke the converter
+- added a sample .env file
+
+
+0.4.0a3 (most recent changes October 20, 2017)
