@@ -1,0 +1,188 @@
+Metadata-Version: 2.1
+Name: drawio-diagram-generator
+Version: 1.0.1
+Summary: A Python library for generating Draw.io diagrams programmatically
+Home-page: https://github.com/yourusername/drawio-diagram-generator
+Author: Your Name
+Author-email: your.email@example.com
+License: UNKNOWN
+Project-URL: Bug Reports, https://github.com/yourusername/drawio-diagram-generator/issues
+Project-URL: Source, https://github.com/yourusername/drawio-diagram-generator
+Project-URL: Documentation, https://github.com/yourusername/drawio-diagram-generator#readme
+Keywords: drawio,diagram,generator,xml,visualization
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Multimedia :: Graphics :: Graphics Conversion
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: Pillow>=8.0.0
+
+# Draw.io Diagram Generator
+
+A Python library for generating Draw.io diagrams programmatically. This library provides a simple and intuitive API to create complex diagrams that can be opened in Draw.io or any compatible diagram editor.
+
+## Features
+
+- **Component-based architecture**: Create diagrams using reusable components
+- **Flexible layout system**: Arrange components in rows, columns, and groups
+- **Rich styling options**: Customize colors, shapes, and connections
+- **Icon support**: Add icons and images to your diagrams
+- **Export to XML**: Generate Draw.io compatible XML files
+- **Easy to use**: Simple API for quick diagram creation
+
+## Installation
+
+```bash
+pip install drawio-diagram-generator
+```
+
+## Quick Start
+
+```python
+from drawio_diagram_generator import Box, Arrow, Group, Diagram
+
+# Create components
+user = Box("User", style="fillColor=#d5e8d4;strokeColor=#82b366;")
+server = Box("Server", style="fillColor=#dae8fc;strokeColor=#6c8ebf;")
+database = Box("Database", style="fillColor=#fff2cc;strokeColor=#d6b656;")
+
+# Create connections
+user_to_server = Arrow(user, server, "HTTP Request")
+server_to_db = Arrow(server, database, "SQL Query")
+
+# Group components
+components = [user, server, database]
+connections = [user_to_server, server_to_db]
+
+# Create diagram
+diagram = Diagram(Group("System Architecture", components + connections))
+
+# Save to file
+diagram.save("system_architecture.drawio")
+```
+
+## Components
+
+### Basic Components
+
+- **Box**: Rectangular components with text and optional icons
+- **IconBox**: Image-only components
+- **Arrow**: Directed connections between components
+- **Line**: Simple line connections without arrows
+
+### Layout Components
+
+- **Row**: Arrange components horizontally
+- **Column**: Arrange components vertically  
+- **Group**: Container with title and customizable layout
+
+## Examples
+
+### Simple Flow Diagram
+
+```python
+from drawio_diagram_generator import Box, Arrow, Group, Diagram
+
+# Create flow components
+start = Box("Start", style="ellipse;fillColor=#d5e8d4;strokeColor=#82b366;")
+process = Box("Process", style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;")
+end = Box("End", style="ellipse;fillColor=#f8cecc;strokeColor=#b85450;")
+
+# Create flow
+flow = [
+    start,
+    Arrow(start, process),
+    process,
+    Arrow(process, end),
+    end
+]
+
+diagram = Diagram(Group("Simple Flow", flow))
+diagram.save("simple_flow.drawio")
+```
+
+### Network Architecture
+
+```python
+from drawio_diagram_generator import Box, Arrow, Group, Diagram
+
+# Network components
+internet = Box("Internet", style="fillColor=#e1d5e7;strokeColor=#9673a6;")
+firewall = Box("Firewall", style="fillColor=#f8cecc;strokeColor=#b85450;")
+web_server = Box("Web Server", style="fillColor=#dae8fc;strokeColor=#6c8ebf;")
+database = Box("Database", style="fillColor=#fff2cc;strokeColor=#d6b656;")
+
+# Create network layout
+network = Group("Network Architecture", [
+    internet,
+    Arrow(internet, firewall),
+    firewall,
+    Arrow(firewall, web_server),
+    web_server,
+    Arrow(web_server, database),
+    database
+], layout="column", spacing=30)
+
+diagram = Diagram(network)
+diagram.save("network_architecture.drawio")
+```
+
+## API Reference
+
+### Box
+
+```python
+Box(label, width=80, height=80, style=None, image_url=None, image_only=False)
+```
+
+- `label`: Text to display in the box
+- `width`, `height`: Dimensions of the box
+- `style`: Custom CSS-like style string
+- `image_url`: URL or path to an icon/image
+- `image_only`: If True, show only the image without text
+
+### Arrow
+
+```python
+Arrow(source, target, label="", style=None, direction="LR", show_arrow=True)
+```
+
+- `source`, `target`: Source and target components
+- `label`: Text label on the arrow
+- `style`: Custom style string
+- `direction`: Connection direction ("LR", "RL", "TB", "BT", etc.)
+- `show_arrow`: Whether to show arrowhead
+
+### Group
+
+```python
+Group(label, children, layout="column", align="center", spacing=50, padding=50, style_opts=None)
+```
+
+- `label`: Title of the group
+- `children`: List of components in the group
+- `layout`: Layout type ("column", "row")
+- `align`: Alignment within the group
+- `spacing`: Space between components
+- `padding`: Internal padding
+- `style_opts`: Style options for the group container
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details. 
+
