@@ -1,0 +1,217 @@
+# Net Utils KY
+
+一个实用的 Python 网络工具包，提供各种网络相关的功能。
+
+## 功能特性
+
+- 🔗 HTTP 请求工具
+- 🌐 网络连接检测
+- 📡 端口扫描
+- 🔍 DNS 查询
+- 📊 网络状态监控
+- 🛡️ 代理支持
+- ⚡ 异步支持
+
+## 安装
+
+```bash
+pip install net_utils_ky
+```
+
+## 快速开始
+
+### 基本使用
+
+```python
+from net_utils_ky import NetworkUtils
+
+# 创建网络工具实例
+net_utils = NetworkUtils()
+
+# 检查网络连接
+if net_utils.is_connected():
+    print("网络连接正常")
+
+# 发送HTTP请求
+response = net_utils.get("https://api.github.com")
+print(f"状态码: {response.status_code}")
+print(f"响应内容: {response.text[:100]}...")
+```
+
+### 命令行使用
+
+```bash
+# 检查网络连接
+net-utils check-connection
+
+# 发送GET请求
+net-utils get https://api.github.com
+
+# 扫描端口
+net-utils scan-ports example.com 80,443,8080
+```
+
+## 主要功能
+
+### 1. HTTP 请求工具
+
+```python
+from net_utils_ky import HTTPClient
+
+client = HTTPClient()
+
+# GET请求
+response = client.get("https://api.example.com/data")
+
+# POST请求
+data = {"name": "test", "value": 123}
+response = client.post("https://api.example.com/submit", json=data)
+
+# 带认证的请求
+response = client.get("https://api.example.com/private",
+                     auth=("username", "password"))
+```
+
+### 2. 网络连接检测
+
+```python
+from net_utils_ky import NetworkChecker
+
+checker = NetworkChecker()
+
+# 检查基本网络连接
+if checker.is_connected():
+    print("网络连接正常")
+
+# 检查特定网站连接
+if checker.can_reach("https://www.google.com"):
+    print("可以访问Google")
+
+# 检查DNS解析
+if checker.dns_works():
+    print("DNS解析正常")
+```
+
+### 3. 端口扫描
+
+```python
+from net_utils_ky import PortScanner
+
+scanner = PortScanner()
+
+# 扫描单个端口
+if scanner.is_port_open("example.com", 80):
+    print("端口80开放")
+
+# 扫描端口范围
+open_ports = scanner.scan_ports("example.com", range(80, 90))
+print(f"开放的端口: {open_ports}")
+```
+
+### 4. 异步支持
+
+```python
+import asyncio
+from net_utils_ky import AsyncNetworkUtils
+
+async def main():
+    async_utils = AsyncNetworkUtils()
+
+    # 异步HTTP请求
+    response = await async_utils.get("https://api.example.com")
+    print(f"异步响应: {response.status_code}")
+
+    # 并发请求
+    urls = ["https://api1.example.com", "https://api2.example.com"]
+    responses = await async_utils.get_all(urls)
+
+    for url, response in zip(urls, responses):
+        print(f"{url}: {response.status_code}")
+
+asyncio.run(main())
+```
+
+## 配置
+
+### 代理设置
+
+```python
+from net_utils_ky import NetworkUtils
+
+# 设置HTTP代理
+net_utils = NetworkUtils(proxy="http://proxy.example.com:8080")
+
+# 设置SOCKS代理
+net_utils = NetworkUtils(proxy="socks5://proxy.example.com:1080")
+```
+
+### 超时设置
+
+```python
+from net_utils_ky import NetworkUtils
+
+# 设置连接超时和读取超时
+net_utils = NetworkUtils(timeout=(5, 30))  # (连接超时, 读取超时)
+```
+
+## 开发
+
+### 安装开发依赖
+
+```bash
+pip install -e ".[dev]"
+```
+
+### 运行测试
+
+```bash
+pytest
+```
+
+### 代码格式化
+
+```bash
+black .
+```
+
+### 类型检查
+
+```bash
+mypy net_utils_ky
+```
+
+## 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add some amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 打开 Pull Request
+
+## 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 更新日志
+
+### 0.1.0 (2024-01-01)
+
+- 初始版本发布
+- 基本 HTTP 请求功能
+- 网络连接检测
+- 端口扫描功能
+- 异步支持
+
+## 支持
+
+如果您遇到问题或有建议，请：
+
+1. 查看 [文档](https://github.com/yourusername/net_utils_ky#readme)
+2. 搜索 [现有 Issue](https://github.com/yourusername/net_utils_ky/issues)
+3. 创建新的 Issue
+
+## 致谢
+
+感谢所有为这个项目做出贡献的开发者！
