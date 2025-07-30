@@ -1,0 +1,136 @@
+--trees--
+
+tree "Time Plan"
+    field "Project"
+        field-type "node-path"
+        own-fields []
+        child-fields []
+        sibling-fields []
+        parent-fields [1]
+    field "Priority"
+        field-type "mean"
+        own-fields ["priority (0-9)"]
+        child-fields ["Priority"]
+        sibling-fields []
+        parent-fields []
+    field "Status"
+        field-type "node-name"
+        own-fields []
+        child-fields []
+        sibling-fields []
+        parent-fields [2]
+    field "Planned hours"
+        field-type "sum"
+        own-fields ["planned hours"]
+        child-fields ["Planned hours"]
+        sibling-fields []
+        parent-fields []
+    field "Actual hours"
+        field-type "sum"
+        own-fields ["actual hours"]
+        child-fields ["Actual hours"]
+        sibling-fields []
+        parent-fields []
+
+tree "Projects"
+    field "Planning"
+        field-type "node-name"
+        own-fields []
+        child-fields []
+        sibling-fields []
+        parent-fields [0]
+    field "Planned hours"
+        field-type "sum"
+        own-fields ["planned hours"]
+        child-fields ["Planned hours"]
+        sibling-fields []
+        parent-fields []
+    field "Actual hours"
+        field-type "sum"
+        own-fields ["actual hours"]
+        child-fields ["Actual hours"]
+        sibling-fields []
+        parent-fields []
+    field "Priority"
+        field-type "mean"
+        own-fields ["priority (0-9)"]
+        child-fields ["Priority"]
+        sibling-fields []
+        parent-fields []
+    field "Progress"
+        field-type "ratio-percent"
+        own-fields ["Actual hours", "Planned hours"]
+        child-fields []
+        sibling-fields []
+        parent-fields []
+
+tree "Status"
+    field "Actual hours"
+        field-type "sum"
+        own-fields ["actual hours"]
+        child-fields ["Actual hours"]
+        sibling-fields []
+        parent-fields []
+    field "Planned hours"
+        field-type "sum"
+        own-fields ["planned hours"]
+        child-fields ["planned hours"]
+        sibling-fields []
+        parent-fields []
+    field "Priority"
+        field-type "mean"
+        own-fields ["priority (0-9)"]
+        child-fields ["Priority"]
+        sibling-fields []
+        parent-fields []
+    field "Progress"
+        field-type "ratio-percent"
+        own-fields ["Actual hours", "Planned hours"]
+        child-fields []
+        sibling-fields []
+        parent-fields []
+
+--item-types--
+
+item New Task
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [], []]
+
+--item-pool--
+
+item New Child P1
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [0], []]
+
+item New Sibling P1
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [1, 0, 0], []]
+
+item New Parent P1
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [1, 0], []]
+
+item New Child S1
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [], [0]]
+
+item New Parent P2
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [1], []]
+
+item CHild t1
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [3], []]
+
+item CHild t2
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [2], []]
+
+item Child t0
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[], [], []]
+
+item New Task
+    fields {"actual hours": {"content": 0, "type": "integer"}, "planned hours": {"content": 0, "type": "integer"}, "priority (0-9)": {"content": 5, "type": "integer"}, "to do": {"content": "", "type": "text"}, "done": {"content": "", "type": "text"}}
+    trees [[0], [], []]
+
