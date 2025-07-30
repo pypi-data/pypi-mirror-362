@@ -1,0 +1,295 @@
+Metadata-Version: 2.4
+Name: xtgbot
+Version: 0.0.4
+Summary: Low-level Python library for interacting with the Telegram Bot API
+Home-page: https://github.com/vi_is_ramen/xtgbot
+Author: Ivan Chetchasov
+Author-email: Ivan Chetchasov <vi.is.chapmann@gmail.com>
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+Requires-Dist: aiohttp
+Dynamic: license-file
+
+# xtgbot
+
+[Телега по библиотеке](https://t.me/xtgbot_chat)
+
+## Обзор
+
+XTGBot - это низкоуровневая, высокопроизводительная библиотека для работы с Telegram Bot API, обеспечивающая:
+- Полную совместимость с официальной документацией Telegram
+- Минимальные накладные расходы
+- Поддержку фильтров и роутеров
+- Подробные docstring для всех методов и типов
+- Автоматическую генерацию кода методов API
+
+## Ключевые особенности
+
+- Скорость: Оптимизирована для быстрой работы за счет минималистичной реализации
+- Расширяемость: Встроенные роутеры и фильтры для удобной обработки сообщений
+- Автогенерация: Все типы и методы API генерируются автоматически
+- Подробная документация: Все классы и методы содержат детальные docstring
+
+## Установка
+```bash
+pip install xtgbot
+```
+
+## Быстрый старт
+
+### Пример бота
+
+```python
+from xtgbot import Bot, Router, Fs
+from xtgbot.tg.types import Message
+
+# Создаем бота
+bot = Bot("YOUR_BOT_TOKEN")
+
+# Создаем роутер
+router = Router()
+
+@router.connect
+@Fs.on_command("start")
+async def start_handler(message: Message):
+    await bot.do.sendMessage(
+        chat_id=message.chat.id,
+        text="Привет! Я работаю!"
+    )
+
+# Подключаем роутер к боту
+router.connect(bot)
+
+# Запускаем бота
+bot.start_polling()
+```
+
+## Основные компоненты
+
+### 1. Класс Bot
+Центральный класс для управления ботом:
+```python
+class Bot:
+    def __init__(self, token: str)
+    def start_polling(self, timeout: int = 0, allowed_updates: list = [...])
+    async def stop(self)
+    async def pause(self)
+    async def resume(self)
+    def bot_handler(self, fn: Callable[[Update], Any])
+```
+
+#### Пример использования:
+
+```python
+bot = Bot("TOKEN")
+
+@bot.bot_handler
+async def handle_updates(update: Update):
+    print(f"Received update: {update.update_id}")
+
+bot.start_polling()
+```
+
+### 2. Класс Router
+
+Для организации обработчиков:
+
+```python
+class Router:
+    def connect(self, node: Router | Callable | Bot)
+    def connect_hi(self, node: Router | Callable | Bot)
+    def disconnect(self, node: Router | Callable | Bot)
+```
+
+Пример:
+
+```python
+router = Router()
+
+@router.connect
+@Fs.on_message
+async def echo_handler(message: Message):
+    await bot.do.sendMessage(
+        chat_id=message.chat.id,
+        text=message.text
+    )
+
+router.connect(bot)
+```
+
+### 3. Фильтры
+
+Базовые фильтры:
+
+```python
+Filter(**kwargs)
+```
+Встроенные пресеты (Fs):
+```python
+Fs.on_message
+Fs.on_command(command: str)
+Fs.on_any_command
+Fs.on_callback
+```
+AIOgram-like фильтр (F):
+```python
+F  # Магический фильтр в стиле AIOgram
+```
+Пример использования фильтров:
+```python
+@router.connect
+@Fs.on_command("help")
+async def help_handler(message: Message):
+    ...
+
+@router.connect
+@F(F.data == "btn0")
+async def button_handler(callback: CallbackQuery):
+    ...
+```
+
+### 4. User State
+Для управления состоянием:
+
+```python
+class UserState:
+    def __init__(self, user_id: int)
+    def check(self, state: str) -> bool
+    def set(self, state: str) -> None
+    def filter(self, state: str) -> Callable[[Callable[[Update], Any]], Callable[[Update], Any]]
+```
+Пример:
+```python
+@router.connect
+@U.filter("start")
+@Fs.on_message
+async def start_state_handler(message: Message):
+    user_state = UserState(message.chat.id)
+    user_state.set("next_state")
+```
+
+## Структура проекта
+```text
+xtgbot/
+├── bot.py            # Основной класс бота
+├── ext.py            # Расширения (роутеры, фильтры)
+├── gen.py            # Генератор кода для API методов
+└── tg/
+    ├── __init__.py   # Экспорт всех типов и методов
+    ├── base_type.py  # Базовый тип для данных
+    ├── session.py    # Реализация API методов
+    ├── types/        # Все типы Telegram API
+    └── methods/      # Все методы Telegram API
+```
+
+## Генерация кода
+Система автоматически генерирует:
+- Все типы данных Telegram API
+- Все методы Telegram API
+- Сессионный клиент с поддержкой всех методов
+
+> NOTE: Реализация в gen.py гарантирует, что библиотека всегда соответствует последней версии Telegram API.
+
+## Примеры использования
+
+### Обработка сообщений
+
+```python
+@router.connect
+@Fs.on_message
+async def echo(message: Message):
+    if message.text:
+        await bot.do.sendMessage(
+            chat_id=message.chat.id,
+            text=f"Вы сказали: {message.text}"
+        )
+```
+
+### Работа с кнопками
+
+```python
+from xtgbot.tg.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+@router.connect
+@Fs.on_command("start")
+async def start(message: Message):
+    await bot.do.sendMessage(
+        chat_id=message.chat.id,
+        text="Выберите действие:",
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[[
+                InlineKeyboardButton(text="Нажми меня", callback_data="test")
+            ]]
+        )
+    )
+
+@router.connect_hi
+@Fs.on_callback
+@F(F.data == "test")
+async def callback_handler(callback: CallbackQuery):
+    await bot.do.answerCallbackQuery(
+        callback_query_id=callback.id,
+        text="Вы нажали кнопку!"
+    )
+
+@router.connect
+@Fs.on_callback
+async def callback_handler(callback: CallbackQuery):
+    await bot.do.answerCallbackQuery(
+        callback_query_id=callback.id,
+        text="Вы нажали на неизвестную кнопку!"
+    )
+```
+
+## Полная документация
+
+Все классы и методы содержат подробные docstring с описанием параметров и примеров использования. Для просмотра полной документации используйте:
+
+```python
+help(Bot)
+help(Router)
+help(Fs)
+```
+
+## Заключение
+XTGBot предоставляет:
+- Полную и актуальную реализацию Telegram Bot API
+- Высокую производительность
+- Гибкую систему фильтров и роутинга
+- Удобные инструменты для управления состоянием
+- Автоматическую генерацию кода
+
+Библиотека идеально подходит для создания высоконагруженных ботов с минимальными накладными расходами.
+
+# Вклад и поддержка
+
+Для поддержки монетой можете связаться со мной в Telegram [@vi_is_raven](https://t.me/vi_is_raven).
+
+Для вклада, пожалуйста, создавайте issue (GitHub/GitLab/TvoyGit) или pull request (только TvoyGit).
+
+# Последние слова
+
+Методы и типы генерируются с помощью [TgAPIper](https://github.com/vi-is-ramen/tgapiper)
+
+# Ссылки
+
+[Telegram Bot API](https://core.telegram.org/bots/api)
+
+[Telegram](https://t.me/vi_is_raven)
+
+[GitHub](https://github.com/vi_is_ramen/xtgbot)
+
+[GitLab](#)
+
+[TvoyGit](https://tvoygit.ru/vi_is_lonely/xtgbot)
+
+[PyPI](https://pypi.org/project/xtgbot/)
+
+TgAPIper:
+- [GitHub](https://github.com/vi_is_ramen/tgapiper)
+- [TvoyGit](https://tvoygit.ru/vi_is_lonely/tgapiper)
