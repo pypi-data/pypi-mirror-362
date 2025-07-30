@@ -1,0 +1,282 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: langfuse
+  namespace: ai-observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: langfuse
+  template:
+    metadata:
+      labels:
+        app: langfuse
+    spec:
+      containers:
+      - name: langfuse
+        image: langfuse/langfuse:3.79.0  # Updated to latest stable version
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: database-password
+        - name: DATABASE_URL
+          value: "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
+        - name: DIRECT_URL
+          value: "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
+        - name: NEXTAUTH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: NEXTAUTH_URL
+        - name: NEXTAUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: nextauth-secret
+        - name: SALT
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: salt
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: langfuse-secrets
+              key: encryption-key
+        - name: LANGFUSE_INIT_ORG_ID
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_INIT_ORG_ID
+        - name: LANGFUSE_INIT_ORG_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_INIT_ORG_NAME
+        - name: LANGFUSE_INIT_PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_INIT_PROJECT_ID
+        - name: LANGFUSE_INIT_PROJECT_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_INIT_PROJECT_NAME
+        - name: LANGFUSE_INIT_USER_EMAIL
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_INIT_USER_EMAIL
+        - name: LANGFUSE_INIT_USER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_INIT_USER_NAME
+        - name: LANGFUSE_INIT_USER_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_INIT_USER_PASSWORD
+        - name: TELEMETRY_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: TELEMETRY_ENABLED
+        - name: LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES
+        - name: LANGFUSE_AUTO_POSTGRES_MIGRATION_DISABLED
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_AUTO_POSTGRES_MIGRATION_DISABLED
+        - name: HOSTNAME
+          value: "0.0.0.0"
+        # ClickHouse configuration
+        - name: CLICKHOUSE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_URL
+        - name: CLICKHOUSE_USER
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_USER
+        - name: CLICKHOUSE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_PASSWORD
+        - name: CLICKHOUSE_MIGRATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_MIGRATION_URL
+        - name: CLICKHOUSE_DB
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_DB
+        - name: CLICKHOUSE_CLUSTER_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: CLICKHOUSE_CLUSTER_ENABLED
+        # Redis configuration
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: REDIS_PORT
+        - name: REDIS_AUTH
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: REDIS_AUTH
+        - name: REDIS_TLS_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: REDIS_TLS_ENABLED
+        # S3 configuration
+        - name: LANGFUSE_S3_EVENT_UPLOAD_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_BUCKET
+        - name: LANGFUSE_S3_EVENT_UPLOAD_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_PREFIX
+        - name: LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT
+        - name: LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID
+        - name: LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY
+        - name: LANGFUSE_S3_EVENT_UPLOAD_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_REGION
+        - name: LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE
+        - name: SMTP_CONNECTION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: SMTP_CONNECTION_URL
+        - name: EMAIL_FROM_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: langfuse-config
+              key: EMAIL_FROM_ADDRESS
+        # Disable background processing in the main container - let workers handle it
+        - name: LANGFUSE_ENABLE_BACKGROUND_PROCESSING
+          value: "false"
+        - name: LANGFUSE_BACKGROUND_MIGRATIONS_ENABLED
+          value: "true"
+        livenessProbe:
+          httpGet:
+            path: /api/public/health
+            port: 3000
+          initialDelaySeconds: 45
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/public/health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: langfuse
+  namespace: ai-observability
+spec:
+  selector:
+    app: langfuse
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: langfuse-ingress
+  namespace: ai-observability
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: localhost:3000 # Replace with your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: langfuse
+            port:
+              number: 3000 
