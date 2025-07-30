@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name             = "HumanMoveMouse"
+version          = "0.1.5"
+description      = "Human-like mouse automation using statistical models and minimum-jerk interpolation"
+readme           = "README.md"
+requires-python  = ">=3.7"
+license          = { text = "MIT" } # 推荐使用这种更标准的格式
+authors          = [
+  { name = "Tmokotokyoshi"},
+  { email = "heroburnning@gmail.com" },
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "numpy>=1.19.0",         # 用于数值计算与数组操作
+  "pandas>=1.1.0",         # 用于读取 CSV、数据处理
+  "scipy>=1.5.0",          # 用于插值（CubicSpline）等科学计算
+  "scikit-learn>=1.0.0",   # 用于 PCA 与 GMM（GaussianMixture）
+  "pyautogui>=0.9.52",     # 用于模拟鼠标移动与点击
+]
+
+[project.urls]
+Homepage      = "https://github.com/TomokotoKiyoshi/HumanMoveMouse"
+Source        = "https://github.com/TomokotoKiyoshi/HumanMoveMouse"
+Documentation = "https://github.com/TomokotoKiyoshi/HumanMoveMouse#readme"
+
+[tool.setuptools]
+# 将 src/ 目录映射为顶层包目录，这样你的包就是 human_mouse
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+# 在 src 目录下寻找要打包的 Python 包
+where   = ["src"]
+include = ["human_mouse*"]
+
+# ===================================================================
+#  ↓↓↓ 这是最关键的新增部分 ↓↓↓
+#  明确指定要包含哪些数据文件
+[tool.setuptools.package-data]
+# "human_mouse" 是你的包名
+# ["*.pkl"] 是一个匹配规则，表示包含 human_mouse 包内所有的 .pkl 文件
+human_mouse = ["*.pkl"]
+# ===================================================================
