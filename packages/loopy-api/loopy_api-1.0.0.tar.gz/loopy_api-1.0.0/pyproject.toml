@@ -1,0 +1,41 @@
+[project]
+name = "loopy-api"
+version = "1.0.0"
+description = "FastAPI-based backend service for accessing CGM data from MongoDB. Built for DIY diabetes monitoring setups."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "loopy-basic>=0.1.0",
+    "python-dotenv>=1.0.0",
+    "pydantic-settings>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.25.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+select = ["E", "F", "W", "I", "N", "B", "UP"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
