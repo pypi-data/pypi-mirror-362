@@ -1,0 +1,146 @@
+Metadata-Version: 2.4
+Name: logxide
+Version: 0.1.0
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Rust
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Logging
+Classifier: Topic :: System :: Systems Administration
+Classifier: Typing :: Typed
+Requires-Dist: pytest ; extra == 'dev'
+Requires-Dist: pytest-cov ; extra == 'dev'
+Requires-Dist: pyright ; extra == 'dev'
+Requires-Dist: ruff ; extra == 'dev'
+Requires-Dist: pre-commit ; extra == 'dev'
+Requires-Dist: maturin>=1.0,<2.0 ; extra == 'dev'
+Requires-Dist: mkdocs ; extra == 'dev'
+Requires-Dist: mkdocs-material ; extra == 'dev'
+Requires-Dist: mkdocstrings[python] ; extra == 'dev'
+Requires-Dist: pymdown-extensions ; extra == 'dev'
+Requires-Dist: django>=4.2.23 ; extra == 'dev'
+Requires-Dist: fastapi>=0.116.1 ; extra == 'dev'
+Requires-Dist: flask>=3.1.1 ; extra == 'dev'
+Requires-Dist: flask-sqlalchemy>=3.1.1 ; extra == 'dev'
+Requires-Dist: httpx>=0.28.1 ; extra == 'dev'
+Requires-Dist: uvicorn>=0.35.0 ; extra == 'dev'
+Provides-Extra: dev
+License-File: LICENSE
+Summary: High-performance, Rust-powered drop-in replacement for Python's logging module
+Keywords: logging,rust,async,performance,drop-in-replacement,high-performance,thread-safe,structured-logging
+Author-email: Indosaram <freedomzero91@gmail.com>
+Maintainer-email: Indosaram <freedomzero91@gmail.com>
+License: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+Project-URL: Homepage, https://github.com/Indosaram/logxide
+Project-URL: Repository, https://github.com/Indosaram/logxide
+Project-URL: Documentation, https://Indosaram.readthedocs.io/logxide
+Project-URL: Bug Tracker, https://github.com/Indosaram/logxide/issues
+Project-URL: Changelog, https://github.com/Indosaram/logxide/blob/main/CHANGELOG.md
+Project-URL: Source Code, https://github.com/Indosaram/logxide
+
+# LogXide
+
+**High-Performance Rust-Powered Logging for Python**
+
+LogXide is a drop-in replacement for Python's standard logging module, delivering exceptional performance through its async Rust implementation.
+
+## Key Features
+
+- **High Performance**: Rust-powered async logging with exceptional throughput
+- **Drop-in Replacement**: Full compatibility with Python's logging module API
+- **Thread-Safe**: Complete support for multi-threaded applications
+- **Async Processing**: Non-blocking log message processing with Tokio runtime
+- **Rich Formatting**: All Python logging format specifiers with advanced features
+- **Level Filtering**: Hierarchical logger levels with inheritance
+
+## Quick Start
+
+```python
+import logxide
+logxide.install()  # Make logxide the default logging module
+
+# Now use logging as normal
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.info("Hello from LogXide!")
+```
+
+Or use directly:
+
+```python
+from logxide import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+logger = logging.getLogger('myapp')
+logger.info('Hello from LogXide!')
+```
+
+## Installation
+
+```bash
+pip install logxide
+```
+
+## Documentation
+
+- **[Usage Guide](docs/usage.md)** - Complete usage examples and API guide
+- **[Integration Guide](docs/integration.md)** - Flask, Django, and FastAPI integration
+- **[Performance Benchmarks](docs/benchmarks.md)** - Comprehensive performance analysis
+- **[Architecture](docs/architecture.md)** - Technical architecture and design
+- **[Installation](docs/installation.md)** - Installation and setup guide
+- **[Development](docs/development.md)** - Contributing and development guide
+- **[API Reference](docs/reference.md)** - Complete API documentation
+
+## Performance
+
+LogXide delivers exceptional performance through its Rust-powered async architecture. See our [comprehensive benchmarks](docs/benchmarks.md) for detailed performance analysis.
+
+**Key highlights:**
+- **10-50x faster** than other libraries in I/O-heavy scenarios
+- **Async architecture** prevents blocking on log operations
+- **Concurrent handler execution** for maximum throughput
+
+## Compatibility
+
+- **Python**: 3.12+ (3.13+ recommended)
+- **Platforms**: macOS, Linux, Windows
+- **API**: 100% compatible with Python's `logging` module
+- **Dependencies**: None (Rust compiled into native extension)
+
+## Contributing
+
+We welcome contributions! See our [development guide](docs/development.md) for details.
+
+```bash
+# Quick development setup
+git clone https://github.com/Indosaram/logxide
+cd logxide
+pip install maturin
+maturin develop
+pytest tests/
+```
+
+## License
+
+[Add your license information here]
+
+---
+
+**LogXide delivers the performance you need without sacrificing the Python logging API you know.**
+
+*Built with Rust for high-performance Python applications.*
