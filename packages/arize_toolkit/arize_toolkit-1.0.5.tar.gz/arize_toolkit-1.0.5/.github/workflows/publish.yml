@@ -1,0 +1,212 @@
+name: Publish Python Package
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write  # Required for uploading release assets
+  id-token: write  # Required for PyPI publishing
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Required for hatch-vcs to access git history
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Run tests before publishing
+      run: |
+        echo "🧪 Installing dependencies and running tests..."
+        uv venv
+        uv pip install -e ".[dev,prompt_optimizer]"
+        # Use the same test command as our test workflow to avoid plugin issues
+        uv run pytest -v --continue-on-collection-errors -p no:snapshottest
+        echo "✅ All tests passed!"
+
+    - name: Build package
+      run: |
+        echo "🔨 Building package..."
+        uv build
+        echo "📦 Package built successfully!"
+        ls -la dist/
+        
+        # Display the version that was built
+        BUILT_VERSION=$(ls dist/*.whl | head -1 | sed 's/.*-\([0-9][^-]*\)-.*/\1/')
+        echo "📋 Built version: $BUILT_VERSION"
+        echo "🏷️ Release tag: ${{ github.event.release.tag_name }}"
+
+    - name: Publish to PyPI
+      env:
+        PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        echo "🚀 Publishing to PyPI..."
+        # Try trusted publishing first (more secure), fallback to token
+        if uv publish --trusted-publishing automatic 2>/dev/null; then
+          echo "✅ Successfully published using trusted publishing!"
+        elif [ -n "$PYPI_TOKEN" ]; then
+          echo "📝 Trusted publishing not available, using token..."
+          uv publish --token $PYPI_TOKEN
+          echo "✅ Successfully published using token!"
+        else
+          echo "❌ No authentication method available (missing PYPI_API_TOKEN secret)"
+          echo "💡 Consider setting up trusted publishing: https://docs.pypi.org/trusted-publishers/"
+          exit 1
+        fi
+
+    - name: Generate additional release notes
+      id: release_notes
+      run: |
+        # Get build information
+        BUILD_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        UV_VERSION=$(uv --version)
+        BUILT_VERSION=$(ls dist/*.whl | head -1 | sed 's/.*-\([0-9][^-]*\)-.*/\1/')
+        
+        # Safely handle release body (escape any problematic characters)
+        RELEASE_BODY=$(cat << 'RELEASE_BODY_EOF'
+        ${{ github.event.release.body }}
+        RELEASE_BODY_EOF
+        )
+        
+        # Create enhanced release notes file with proper variable expansion
+        cat > enhanced_release_notes.md << NOTES_EOF
+        ## 🚀 Release ${{ github.event.release.tag_name }}
+
+        ### 📦 PyPI Package
+        This release has been published to PyPI: https://pypi.org/project/arize-toolkit/${BUILT_VERSION}/
+
+        ### 🔧 Installation
+        \`\`\`bash
+        pip install arize-toolkit==${BUILT_VERSION}
+        # or
+        uv add arize-toolkit@${BUILT_VERSION}
+        \`\`\`
+
+        ### 📋 Original Release Notes
+        NOTES_EOF
+        
+        # Append the release body safely
+        echo "$RELEASE_BODY" >> enhanced_release_notes.md
+        
+        # Append build information
+        cat >> enhanced_release_notes.md << BUILD_INFO_EOF
+
+        ### 🏗️ Build Information
+        - **Built from commit:** ${{ github.sha }}
+        - **Build date:** ${BUILD_DATE}
+        - **Python version:** 3.10
+        - **uv version:** ${UV_VERSION}
+        - **Package version:** ${BUILT_VERSION}
+        BUILD_INFO_EOF
+        
+        echo "📝 Generated enhanced release notes"
+        echo "built_version=${BUILT_VERSION}" >> $GITHUB_OUTPUT
+
+    - name: Update GitHub release with enhanced notes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "📤 Updating GitHub release with enhanced notes..."
+        if gh release edit "${{ github.event.release.tag_name }}" --notes-file enhanced_release_notes.md; then
+          echo "✅ Successfully updated release notes"
+        else
+          echo "⚠️ Failed to update release notes, but continuing..."
+        fi
+
+    - name: Upload release assets to GitHub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "📎 Uploading release assets..."
+        
+        # Check if distribution files exist
+        if ls dist/*.tar.gz 1> /dev/null 2>&1 && ls dist/*.whl 1> /dev/null 2>&1; then
+          if gh release upload "${{ github.event.release.tag_name }}" dist/*.tar.gz dist/*.whl --clobber; then
+            echo "✅ Successfully uploaded release assets"
+          else
+            echo "❌ Failed to upload release assets"
+            exit 1
+          fi
+        else
+          echo "❌ No distribution files found in dist/"
+          ls -la dist/
+          exit 1
+        fi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: distribution-packages-${{ github.event.release.tag_name }}
+        path: |
+          dist/*.tar.gz
+          dist/*.whl
+        retention-days: 30
+
+    - name: Create changelog entry
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Create or update CHANGELOG.md if it exists
+        if [ -f "CHANGELOG.md" ]; then
+          echo "📚 Updating existing CHANGELOG.md"
+          
+          # Backup existing changelog
+          cp CHANGELOG.md CHANGELOG.md.bak
+          
+          # Get current date and version
+          CURRENT_DATE=$(date -u +"%Y-%m-%d")
+          BUILT_VERSION="${{ steps.release_notes.outputs.built_version }}"
+          
+          # Safely handle release body for changelog
+          RELEASE_BODY_SAFE=$(cat << 'CHANGELOG_BODY_EOF'
+        ${{ github.event.release.body }}
+        CHANGELOG_BODY_EOF
+        )
+          
+          # Create new changelog entry
+          echo "# Changelog" > temp_changelog.md
+          echo "" >> temp_changelog.md
+          echo "## [${{ github.event.release.tag_name }}] - ${CURRENT_DATE}" >> temp_changelog.md
+          echo "" >> temp_changelog.md
+          echo "$RELEASE_BODY_SAFE" >> temp_changelog.md
+          echo "" >> temp_changelog.md
+          echo "**PyPI:** https://pypi.org/project/arize-toolkit/${BUILT_VERSION}/" >> temp_changelog.md
+          echo "" >> temp_changelog.md
+          echo "---" >> temp_changelog.md
+          echo "" >> temp_changelog.md
+          
+          # Append existing changelog content (skip header if it exists)
+          if grep -q "^# Changelog" CHANGELOG.md.bak; then
+            # Skip the first line if it contains the changelog header
+            tail -n +2 CHANGELOG.md.bak >> temp_changelog.md
+          else
+            # Append entire file if no header
+            cat CHANGELOG.md.bak >> temp_changelog.md
+          fi
+          
+          # Replace original with updated version
+          mv temp_changelog.md CHANGELOG.md
+          rm CHANGELOG.md.bak
+          
+          echo "✅ Updated CHANGELOG.md with release ${{ github.event.release.tag_name }}"
+        else
+          echo "ℹ️ No CHANGELOG.md found, skipping changelog update"
+        fi
+
+    - name: Summary
+      run: |
+        BUILT_VERSION="${{ steps.release_notes.outputs.built_version }}"
+        echo "🎉 Release ${{ github.event.release.tag_name }} completed successfully!"
+        echo "📦 PyPI: https://pypi.org/project/arize-toolkit/${BUILT_VERSION}/"
+        echo "🏷️ GitHub: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}"
