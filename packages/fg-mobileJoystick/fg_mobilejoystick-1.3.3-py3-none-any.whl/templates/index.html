@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mobile Joystick</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mobile Joystick</h1>
+    <p>Copyright © 2025 Gordon Zhang</p>
+    <p>Licensed under GNU GPL v3</p>
+    <button id="enableSensors">Enable Motion Sensors</button>
+
+    <script>
+        // Throttle function to limit how often we send data
+        function throttle(func, limit) {
+            let lastCall = 0;
+            return function(...args) {
+                const now = Date.now();
+                if (now - lastCall >= limit) {
+                    func(...args);
+                    lastCall = now;
+                }
+            };
+        }
+
+        // Send orientation data to server (throttled to 50ms)
+        const sendOrientation = throttle((alpha, beta, gamma) => {
+            fetch(`/data/${alpha}/${beta}/${gamma}`)
+                .catch(err => console.error("Failed to send data:", err));
+        }, 50);
+
+        // Handle device orientation updates
+        function handleOrientation(event) {
+            const { alpha, beta, gamma } = event;
+            sendOrientation(alpha, beta, gamma);
+        }
+
+        // Request permission on iOS 13+ (must be triggered by user interaction)
+        document.getElementById("enableSensors").addEventListener("click", () => {
+            if (typeof DeviceOrientationEvent.requestPermission === "function") {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === "granted") {
+                            window.addEventListener("deviceorientation", handleOrientation);
+                            console.log("Motion access granted!");
+                        } else {
+                            console.warn("Motion access denied.");
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Non-iOS 13+ devices
+                window.addEventListener("deviceorientation", handleOrientation);
+            }
+        });
+    </script>
+</body>
+</html>
