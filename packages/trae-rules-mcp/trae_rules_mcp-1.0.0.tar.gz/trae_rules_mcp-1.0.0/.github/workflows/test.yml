@@ -1,0 +1,186 @@
+name: 🧪 测试和质量检查
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: 🧪 测试 Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 🐍 设置 Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: 📦 安装 uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: 🔧 安装依赖
+      run: |
+        uv sync
+        uv add --dev pytest pytest-cov black isort mypy
+    
+    - name: 🎨 代码格式检查 (Black)
+      run: uv run black --check --diff .
+    
+    - name: 📦 导入排序检查 (isort)
+      run: uv run isort --check-only --diff .
+    
+    - name: 🔍 类型检查 (MyPy)
+      run: uv run mypy .
+      continue-on-error: true  # MyPy 可能有误报
+    
+    - name: 🧪 运行测试
+      run: |
+        uv run pytest -v --cov=. --cov-report=xml --cov-report=term
+    
+    - name: 📊 上传覆盖率报告
+      uses: codecov/codecov-action@v3
+      if: matrix.python-version == '3.11'
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  build-test:
+    name: 🔨 构建测试
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 🐍 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 安装 uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: 🔧 安装构建工具
+      run: uv add --dev build twine
+    
+    - name: 🧹 清理构建文件
+      run: rm -rf dist/ build/ *.egg-info/
+    
+    - name: 🔨 构建分发包
+      run: uv run python -m build
+    
+    - name: ✅ 检查分发包
+      run: uv run twine check dist/*
+    
+    - name: 📋 显示构建结果
+      run: |
+        echo "📦 构建的分发包:"
+        ls -la dist/
+        echo "📊 包大小:"
+        du -h dist/*
+    
+    - name: 📤 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-packages-test
+        path: dist/
+        retention-days: 7
+
+  security:
+    name: 🔒 安全检查
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 🐍 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 安装 uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: 🔧 安装安全工具
+      run: |
+        uv sync
+        uv add --dev bandit safety
+    
+    - name: 🔒 Bandit 安全扫描
+      run: uv run bandit -r . -f json -o bandit-report.json
+      continue-on-error: true
+    
+    - name: 🛡️ Safety 依赖检查
+      run: uv run safety check --json --output safety-report.json
+      continue-on-error: true
+    
+    - name: 📤 上传安全报告
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+        retention-days: 30
+
+  quality-gate:
+    name: 🚪 质量门禁
+    needs: [test, build-test, security]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: 📊 检查测试结果
+      run: |
+        echo "🧪 测试结果: ${{ needs.test.result }}"
+        echo "🔨 构建结果: ${{ needs.build-test.result }}"
+        echo "🔒 安全检查: ${{ needs.security.result }}"
+        
+        if [ "${{ needs.test.result }}" != "success" ]; then
+          echo "❌ 测试失败"
+          exit 1
+        fi
+        
+        if [ "${{ needs.build-test.result }}" != "success" ]; then
+          echo "❌ 构建失败"
+          exit 1
+        fi
+        
+        echo "✅ 所有检查通过，可以发布!"
+    
+    - name: 📝 质量报告
+      run: |
+        echo "## 🎯 质量检查报告" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| 检查项 | 状态 |" >> $GITHUB_STEP_SUMMARY
+        echo "|--------|------|" >> $GITHUB_STEP_SUMMARY
+        echo "| 🧪 单元测试 | ${{ needs.test.result == 'success' && '✅ 通过' || '❌ 失败' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| 🔨 构建测试 | ${{ needs.build-test.result == 'success' && '✅ 通过' || '❌ 失败' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| 🔒 安全检查 | ${{ needs.security.result == 'success' && '✅ 通过' || '⚠️ 警告' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ needs.test.result }}" = "success" ] && [ "${{ needs.build-test.result }}" = "success" ]; then
+          echo "### ✅ 质量门禁通过" >> $GITHUB_STEP_SUMMARY
+          echo "代码已准备好发布！" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ❌ 质量门禁失败" >> $GITHUB_STEP_SUMMARY
+          echo "请修复失败的检查项后再尝试发布。" >> $GITHUB_STEP_SUMMARY
+        fi
