@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "common"
+version = "2.12.2"
+description = "Common package used by various Pilot microservices."
+authors = ["Indoc Systems"]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+python-dotenv = ">=0.19.1"
+python-json-logger = ">= 0.1.11, <= 2.02"
+aioboto3 = "^14.3.0"
+xmltodict = "^0.14.2"
+minio = "^7.2.15"
+httpx = "^0.28.1"
+pyjwt = "^2.10.1"
+redis = ">=4.5.0,<7.0.0"
+starlette = ">=0.40.0,<0.47.0"
+cryptography = "^44.0.2"
+pydantic = "^2.10.6"
+opentelemetry-instrumentation-fastapi = "^0.53b1"
+opentelemetry-sdk = "^1.32.1"
+dicttoxml = "^1.7.16"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "8.3.5"
+pytest-asyncio = "0.26.0"
+pytest-cov = "6.1.1"
+pytest-httpx = "0.35.0"
+pytest-mock = "3.14.0"
+testcontainers = "4.10.0"
+Faker = "36.1.1"
+mypy = "1.16.0"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+asyncio_mode = "auto"
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+omit = ["./setup.py"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
