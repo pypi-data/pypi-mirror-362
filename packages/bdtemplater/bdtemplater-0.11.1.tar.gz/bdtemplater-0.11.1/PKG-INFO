@@ -1,0 +1,230 @@
+Metadata-Version: 2.4
+Name: bdtemplater
+Version: 0.11.1
+Summary: A utility for generating templates in a mostly brain-dead way
+Project-URL: Homepage, https://github.com/infrastructurebuilder/bdtemplater
+Project-URL: Repository, https://github.com/infrastructurebuilder/bdtemplater
+Project-URL: Issues, https://github.com/infrastructurebuilder/bdtemplater/issues
+Author-email: Mykel Alvis <mykel.alvis@gmail.com>
+License: Apache-2.0
+License-File: LICENSE
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: System :: Systems Administration
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# bdtemplater
+
+A utility for generating configurations in a brain-dead style using input from properties files.
+
+By default, a `terraform.tfvars` file is used as input, which contains key-value pairs for a Terraform configuration. 
+
+By default, the tool reads a file called `DEFAULT.bdt`
+
+Values are substituted by a key arrangement, where the key is defined as `@key@` in the template file (i.e surrounded by `@` symbols).
+
+## Features
+
+- Parse properties files, like Terraform `.tfvars` files
+- Generate configured output from templates
+- Support for custom post-processing functions
+- Command line interface for easy usage
+
+## Installation
+
+### Using uv (recommended)
+
+```bash
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+uv tool install bdtemplater # This is usually what you want to do
+
+# or install the package
+uv pip install bdtemplater
+
+# Or install in development mode with all dependencies
+uv sync --group dev
+
+```
+
+### Traditional pip
+
+```bash
+pip install bdtemplater
+```
+
+## Usage
+
+### Command Line
+
+#### Basic Usage
+
+```bash
+bdtemplater --help # Show help
+
+bdtemplater # Write output to stdout using terraform.tfvars values and DEFAULT.bdt template
+
+bdtemplater NEWTEMPLATEFILE.bdt # Write output to stdout using terraform.tfvars values
+bdtemplater DEFAULT.bdt mytfvars.tfvars # Write output to stdout using mytfvars.tfvars values
+
+bdtemplater --output myoutputfile.tf # Write DEFAULT.bdt + terraform.tfvars output to myoutputfile.tf 
+
+bdtemplater -k a,b,c # Use only keys a, b, c from terraform.tfvars
+
+# Use a post-processing script. 
+bdtemplater --import-module mymodule --post-process mypostprocess.py --output 
+
+```
+
+#### Using installed command
+
+```bash
+# Generate terraform configuration from terraform.tfvars
+bdtemplater
+
+# Or run directly with uv
+uv run bdtemplater
+```
+
+### Python API
+
+```python
+from bdtemplater.bdtemplatize import generate_template
+
+# Generate configuration
+terraform_template = """
+provider "aws" {
+  region = var.region
+}
+"""
+
+terraform_tfvars = """
+project = "my-project"
+env = "production"
+bucket = "my-terraform-bucket"
+region = "us-west-2"
+lock_table = "my-lock-table"
+databricks_version = "1.25.0"  # optional, defaults to 1.25.0
+"""
+result = generate_template(terraform_template, terraform_tfvars)
+print(result)
+```
+
+## Development
+
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management and building.
+
+### Setup Development Environment
+
+It is highly recommended that you use the devcontainer defined in `.devcontainer` for a consistent development environment.
+
+Otherwise, you will need `uv` and `make` installed.
+
+```bash
+# Install development dependencies
+uv sync --group dev
+```
+
+### Running Tests
+
+```bash
+# Run simple tests (no dependencies required)
+uv run python -m tests.simple_test_bdtemplatize
+
+# Run full test suite
+uv run --group test pytest tests/ -v
+
+# Run tests with coverage
+uv run --group test pytest tests/ --cov=src --cov-report=term-missing
+
+# Or use make commands
+make test
+make test-cov
+```
+
+### Code Quality
+
+```bash
+# Format code
+uv run --group lint black src tests
+uv run --group lint ruff format src tests
+
+# Lint code
+uv run --group lint ruff check src tests
+
+# Type check
+uv run --group lint mypy src
+
+# use make commands
+make format
+make lint
+make type-check
+```
+
+### Building and Publishing
+
+```bash
+# Build the package
+uv build
+
+# Install locally
+uv pip install .
+```
+
+### Makefile Commands
+
+For convenience, use the included Makefile:
+
+```bash
+make help            # Show all available commands
+make dev-install     # Install with development dependencies  
+make test            # Run all tests
+make test-simple     # Run simple tests only
+make test-script     # Test the direct bdtemplater script
+make install-script  # Install bdtemplater script globally
+make uninstall-script # Remove installed script
+make lint            # Run code linting
+make format          # Format code
+make type-check      # Run type checking
+make build           # Build the package
+make clean           # Clean build artifacts
+```
+
+## Configuration
+
+The tool expects a `terraform.tfvars` file with the following variables:
+
+```hcl
+project = "my-project"
+env = "production"
+bucket = "my-terraform-bucket"
+region = "us-west-2"
+lock_table = "my-lock-table"
+databricks_version = "1.25.0"  # optional, defaults to 1.25.0
+```
+
+## License
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+See the [LICENSE](LICENSE) file for full license text.
