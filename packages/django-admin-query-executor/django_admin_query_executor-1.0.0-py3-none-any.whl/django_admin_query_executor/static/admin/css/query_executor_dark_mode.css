@@ -1,0 +1,495 @@
+/* Django Admin Query Executor - Dark Mode Support */
+
+/* CSS Variables for theme colors */
+:root {
+    /* Light mode defaults */
+    --qe-bg-primary: #ffffff;
+    --qe-bg-secondary: #f8f9fa;
+    --qe-bg-tertiary: #e9ecef;
+    --qe-text-primary: #212529;
+    --qe-text-secondary: #6c757d;
+    --qe-text-muted: #999999;
+    --qe-border-color: #dee2e6;
+    --qe-border-hover: #0066cc;
+    --qe-link-color: #0066cc;
+    --qe-link-hover: #0052a3;
+    --qe-button-primary-bg: #0066cc;
+    --qe-button-primary-text: #ffffff;
+    --qe-button-primary-hover: #0052a3;
+    --qe-button-secondary-bg: #f8f9fa;
+    --qe-button-secondary-text: #212529;
+    --qe-button-secondary-border: #dee2e6;
+    --qe-button-secondary-hover: #e9ecef;
+    --qe-success-bg: #d1fae5;
+    --qe-success-text: #059669;
+    --qe-error-bg: #fee2e2;
+    --qe-error-text: #dc2626;
+    --qe-warning-bg: #fef3c7;
+    --qe-warning-text: #d97706;
+    --qe-info-bg: #dbeafe;
+    --qe-info-text: #1e40af;
+    --qe-code-bg: rgba(0, 0, 0, 0.05);
+    --qe-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --qe-focus-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
+    --qe-spinner-track: #e9ecef;
+    --qe-spinner-color: #0066cc;
+    --qe-scrollbar-track: #f1f1f1;
+    --qe-scrollbar-thumb: #888;
+    --qe-scrollbar-thumb-hover: #555;
+}
+
+/* Dark mode colors */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --qe-bg-primary: #1e1e1e;
+        --qe-bg-secondary: #2a2a2a;
+        --qe-bg-tertiary: #3a3a3a;
+        --qe-text-primary: #e0e0e0;
+        --qe-text-secondary: #b0b0b0;
+        --qe-text-muted: #808080;
+        --qe-border-color: #444444;
+        --qe-border-hover: #4dabf7;
+        --qe-link-color: #4dabf7;
+        --qe-link-hover: #74c0fc;
+        --qe-button-primary-bg: #4dabf7;
+        --qe-button-primary-text: #000000;
+        --qe-button-primary-hover: #339af0;
+        --qe-button-secondary-bg: #2a2a2a;
+        --qe-button-secondary-text: #e0e0e0;
+        --qe-button-secondary-border: #444444;
+        --qe-button-secondary-hover: #3a3a3a;
+        --qe-success-bg: rgba(16, 185, 129, 0.1);
+        --qe-success-text: #86efac;
+        --qe-error-bg: rgba(239, 68, 68, 0.1);
+        --qe-error-text: #fca5a5;
+        --qe-warning-bg: rgba(245, 158, 11, 0.1);
+        --qe-warning-text: #fcd34d;
+        --qe-info-bg: rgba(59, 130, 246, 0.1);
+        --qe-info-text: #93bbfc;
+        --qe-code-bg: rgba(255, 255, 255, 0.1);
+        --qe-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        --qe-focus-shadow: 0 0 0 2px rgba(77, 171, 247, 0.25);
+        --qe-spinner-track: #2a2a2a;
+        --qe-spinner-color: #4dabf7;
+        --qe-scrollbar-track: #2a2a2a;
+        --qe-scrollbar-thumb: #555;
+        --qe-scrollbar-thumb-hover: #666;
+    }
+}
+
+/* Django admin dark mode via data-theme attribute */
+html[data-theme="dark"] {
+    --qe-bg-primary: #1e1e1e;
+    --qe-bg-secondary: #2a2a2a;
+    --qe-bg-tertiary: #3a3a3a;
+    --qe-text-primary: #e0e0e0;
+    --qe-text-secondary: #b0b0b0;
+    --qe-text-muted: #808080;
+    --qe-border-color: #444444;
+    --qe-border-hover: #4dabf7;
+    --qe-link-color: #4dabf7;
+    --qe-link-hover: #74c0fc;
+    --qe-button-primary-bg: #4dabf7;
+    --qe-button-primary-text: #000000;
+    --qe-button-primary-hover: #339af0;
+    --qe-button-secondary-bg: #2a2a2a;
+    --qe-button-secondary-text: #e0e0e0;
+    --qe-button-secondary-border: #444444;
+    --qe-button-secondary-hover: #3a3a3a;
+    --qe-success-bg: rgba(16, 185, 129, 0.1);
+    --qe-success-text: #86efac;
+    --qe-error-bg: rgba(239, 68, 68, 0.1);
+    --qe-error-text: #fca5a5;
+    --qe-warning-bg: rgba(245, 158, 11, 0.1);
+    --qe-warning-text: #fcd34d;
+    --qe-info-bg: rgba(59, 130, 246, 0.1);
+    --qe-info-text: #93bbfc;
+    --qe-code-bg: rgba(255, 255, 255, 0.1);
+    --qe-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --qe-focus-shadow: 0 0 0 2px rgba(77, 171, 247, 0.25);
+    --qe-spinner-track: #2a2a2a;
+    --qe-spinner-color: #4dabf7;
+    --qe-scrollbar-track: #2a2a2a;
+    --qe-scrollbar-thumb: #555;
+    --qe-scrollbar-thumb-hover: #666;
+}
+
+/* Django Admin specific dark mode */
+body.django-admin-dark .query-executor-container,
+body.theme-dark .query-executor-container,
+.dark-mode .query-executor-container,
+html[data-theme="dark"] .query-executor-container {
+    --qe-bg-primary: #1e1e1e;
+    --qe-bg-secondary: #2a2a2a;
+    --qe-bg-tertiary: #3a3a3a;
+    --qe-text-primary: #e0e0e0;
+    --qe-text-secondary: #b0b0b0;
+    --qe-text-muted: #808080;
+    --qe-border-color: #444444;
+    --qe-border-hover: #4dabf7;
+    --qe-link-color: #4dabf7;
+    --qe-link-hover: #74c0fc;
+    --qe-button-primary-bg: #4dabf7;
+    --qe-button-primary-text: #000000;
+    --qe-button-primary-hover: #339af0;
+    --qe-button-secondary-bg: #2a2a2a;
+    --qe-button-secondary-text: #e0e0e0;
+    --qe-button-secondary-border: #444444;
+    --qe-button-secondary-hover: #3a3a3a;
+    --qe-success-bg: rgba(16, 185, 129, 0.1);
+    --qe-success-text: #86efac;
+    --qe-error-bg: rgba(239, 68, 68, 0.1);
+    --qe-error-text: #fca5a5;
+    --qe-warning-bg: rgba(245, 158, 11, 0.1);
+    --qe-warning-text: #fcd34d;
+    --qe-info-bg: rgba(59, 130, 246, 0.1);
+    --qe-info-text: #93bbfc;
+    --qe-code-bg: rgba(255, 255, 255, 0.1);
+    --qe-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --qe-focus-shadow: 0 0 0 2px rgba(77, 171, 247, 0.25);
+    --qe-spinner-track: #2a2a2a;
+    --qe-spinner-color: #4dabf7;
+    --qe-scrollbar-track: #2a2a2a;
+    --qe-scrollbar-thumb: #555;
+    --qe-scrollbar-thumb-hover: #666;
+}
+
+/* Apply CSS variables to elements */
+.query-executor-container {
+    background: var(--qe-bg-primary);
+    border-color: var(--qe-border-color);
+    color: var(--qe-text-primary);
+}
+
+.query-executor-header {
+    background: var(--qe-bg-secondary);
+    border-color: var(--qe-border-color);
+    color: var(--qe-text-primary);
+}
+
+.query-executor-header:hover {
+    background: var(--qe-bg-tertiary);
+}
+
+.query-executor-title {
+    color: var(--qe-text-primary);
+}
+
+.query-executor-toggle {
+    color: var(--qe-text-secondary);
+}
+
+.query-executor-content {
+    background: var(--qe-bg-primary);
+}
+
+.query-form-row label {
+    color: var(--qe-text-primary);
+}
+
+.query-textarea {
+    background: var(--qe-bg-primary);
+    color: var(--qe-text-primary);
+    border-color: var(--qe-border-color);
+}
+
+.query-textarea:focus {
+    border-color: var(--qe-border-hover);
+    box-shadow: var(--qe-focus-shadow);
+}
+
+.query-checkbox-label {
+    color: var(--qe-text-primary);
+}
+
+.query-name-input {
+    background: var(--qe-bg-primary);
+    color: var(--qe-text-primary);
+    border-color: var(--qe-border-color);
+}
+
+.query-name-input:focus {
+    border-color: var(--qe-border-hover);
+    box-shadow: var(--qe-focus-shadow);
+}
+
+.query-button-primary {
+    background: var(--qe-button-primary-bg);
+    color: var(--qe-button-primary-text);
+    box-shadow: var(--qe-shadow);
+}
+
+.query-button-primary:hover {
+    background: var(--qe-button-primary-hover);
+}
+
+.query-button-secondary {
+    background: var(--qe-button-secondary-bg);
+    color: var(--qe-button-secondary-text);
+    border-color: var(--qe-button-secondary-border);
+}
+
+.query-button-secondary:hover {
+    background: var(--qe-button-secondary-hover);
+}
+
+.query-error {
+    background: var(--qe-error-bg);
+    color: var(--qe-error-text);
+}
+
+.query-success {
+    background: var(--qe-success-bg);
+    color: var(--qe-success-text);
+}
+
+.query-warning {
+    background: var(--qe-warning-bg);
+    color: var(--qe-warning-text);
+}
+
+.query-info {
+    background: var(--qe-info-bg);
+    color: var(--qe-info-text);
+}
+
+.query-history,
+.query-favorites {
+    background: var(--qe-bg-secondary);
+    border-color: var(--qe-border-color);
+}
+
+.query-history h4,
+.query-favorites h4 {
+    color: var(--qe-text-primary);
+}
+
+.query-item {
+    background: var(--qe-bg-primary);
+    border-color: var(--qe-border-color);
+    color: var(--qe-text-primary);
+}
+
+.query-item:hover {
+    background: var(--qe-bg-tertiary);
+    border-color: var(--qe-border-hover);
+}
+
+.query-item-meta {
+    color: var(--qe-text-muted);
+}
+
+.query-favorite-delete {
+    color: var(--qe-error-text);
+}
+
+.query-favorite-delete:hover {
+    color: #ff6b6b;
+}
+
+.query-examples {
+    background: var(--qe-bg-secondary);
+    border-color: var(--qe-border-color);
+}
+
+.query-examples h4 {
+    color: var(--qe-text-primary);
+}
+
+.query-examples p {
+    color: var(--qe-text-secondary);
+}
+
+.query-example {
+    background: var(--qe-bg-primary);
+    border-color: var(--qe-border-color);
+    color: var(--qe-text-primary);
+}
+
+.query-example:hover {
+    background: var(--qe-bg-tertiary);
+    border-color: var(--qe-border-hover);
+}
+
+.active-query-filter {
+    background: var(--qe-info-bg);
+    color: var(--qe-info-text);
+}
+
+.active-query-filter code {
+    background: var(--qe-code-bg);
+}
+
+.clear-query-filter {
+    color: var(--qe-link-color);
+}
+
+.clear-query-filter:hover {
+    color: var(--qe-link-hover);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.query-loading {
+    color: var(--qe-text-secondary);
+}
+
+.spinner {
+    border-color: var(--qe-spinner-track);
+    border-top-color: var(--qe-spinner-color);
+}
+
+/* Scrollbar styling */
+.query-textarea::-webkit-scrollbar,
+.query-executor-content::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.query-textarea::-webkit-scrollbar-track,
+.query-executor-content::-webkit-scrollbar-track {
+    background: var(--qe-scrollbar-track);
+}
+
+.query-textarea::-webkit-scrollbar-thumb,
+.query-executor-content::-webkit-scrollbar-thumb {
+    background: var(--qe-scrollbar-thumb);
+    border-radius: 4px;
+}
+
+.query-textarea::-webkit-scrollbar-thumb:hover,
+.query-executor-content::-webkit-scrollbar-thumb:hover {
+    background: var(--qe-scrollbar-thumb-hover);
+}
+
+/* Transitions for smooth theme switching */
+.query-executor-container,
+.query-executor-container * {
+    transition: background-color 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .query-executor-container {
+        --qe-border-color: currentColor;
+    }
+
+    .query-button-primary,
+    .query-button-secondary {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .query-executor-container,
+    .query-executor-container * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .query-executor-container {
+        display: none;
+    }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 767px) {
+    .query-executor-content {
+        padding: 15px;
+    }
+
+    .query-textarea {
+        font-size: 14px;
+        min-height: 80px;
+    }
+
+    .query-options {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .query-name-input {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .query-buttons {
+        flex-wrap: wrap;
+    }
+
+    .query-button {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+/* Compatibility with different Django admin themes */
+.grp-dark-theme .query-executor-container,
+.admin-interface-theme-dark .query-executor-container,
+.jazzmin-dark .query-executor-container,
+html[data-theme="dark"] .query-executor-container,
+html[data-color-scheme="dark"] .query-executor-container {
+    /* Force dark mode colors for known dark admin themes */
+    --qe-bg-primary: #1e1e1e;
+    --qe-bg-secondary: #2a2a2a;
+    --qe-bg-tertiary: #3a3a3a;
+    --qe-text-primary: #e0e0e0;
+    --qe-text-secondary: #b0b0b0;
+    --qe-border-color: #444444;
+}
+
+/* Focus styles for accessibility */
+.query-button:focus,
+.query-textarea:focus,
+.query-name-input:focus,
+.query-checkbox-label input:focus {
+    outline: 2px solid var(--qe-border-hover);
+    outline-offset: 2px;
+}
+
+/* Hover effects for interactive elements */
+.query-item,
+.query-example,
+.query-button,
+.query-executor-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Code highlighting in messages */
+.query-success code,
+.query-error code,
+.query-warning code,
+.query-info code,
+.active-query-filter code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    padding: 2px 4px;
+    border-radius: 3px;
+    background: var(--qe-code-bg);
+}
+
+/* Additional classes for new elements */
+.query-toggle-text {
+    font-size: 12px;
+    color: var(--qe-text-secondary);
+}
+
+.query-examples-help {
+    font-size: 12px;
+    color: var(--qe-text-secondary);
+    margin: 5px 0 10px;
+}
+
+.query-examples-help code {
+    background: var(--qe-code-bg);
+    padding: 1px 3px;
+    border-radius: 2px;
+    font-size: 11px;
+}
