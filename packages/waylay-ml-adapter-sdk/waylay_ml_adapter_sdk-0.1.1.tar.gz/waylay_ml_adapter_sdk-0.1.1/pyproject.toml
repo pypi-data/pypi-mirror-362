@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61","wheel","setuptools-git-versioning<2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[project]
+name = "waylay-ml-adapter-sdk"
+description = "ML_adapter plugin for waylay-sdk-py."
+requires-python = ">=3.11"
+authors = [{name = "Waylay", email = "info@waylay.io"}]
+license={file = "LICENSE.txt"}
+readme = "README.md"
+dependencies = [
+  "waylay-ml-adapter-base",
+  "waylay-sdk-registry",
+  "waylay-sdk-rules",
+  "tenacity"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+  "waylay-ml-adapter-base",
+  "urlpath",
+  "waylay-ml-adapter-devtools",
+]
+
+[tool.setuptools.package-data]
+"ml_adapter.sdk" = ["py.typed"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.entry-points.dynamic]
+"waylay_sdk_plugins"= "ml_adapter.sdk:PLUGINS"
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+
+markers = [
+    "exclude_ci: marks tests to exclude for ci (unstable or requires additional config)"
+]
+
+[tool.ruff]
+include = ["pyproject.toml", "src/**/*.py", "test/**/*.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "UP",  "B", "SIM", "I", "D1", "D4"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/*test.py" = ["D"] # no docstyle required
