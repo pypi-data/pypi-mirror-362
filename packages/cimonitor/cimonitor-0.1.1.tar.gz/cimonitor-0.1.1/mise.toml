@@ -1,0 +1,53 @@
+[tools]
+python = "3.13"  # Development version, supports 3.10+
+
+[env]
+_.file = ".env"
+
+[tasks.ci-status]
+description = "Check CI status for the latest commit on current branch"
+run = "uv run cimonitor status"
+
+[tasks.install]
+description = "Install dependencies"
+run = "uv sync"
+
+[tasks.install-dev]
+description = "Install development dependencies"
+run = "uv sync --extra dev"
+
+[tasks.test]
+description = "Run tests"
+run = "uv run pytest"
+
+[tasks.test-cov]
+description = "Run tests with coverage"
+run = "uv run pytest --cov=cimonitor --cov-report=html --cov-report=term"
+
+[tasks.lint]
+description = "Run linting"
+run = "uv run ruff check ."
+
+[tasks.format]
+description = "Format code"
+run = "uv run ruff format ."
+
+[tasks.format-check]
+description = "Check code formatting"
+run = "uv run ruff format --check ."
+
+[tasks.pre-commit-install]
+description = "Install pre-commit hooks"
+run = "uv run pre-commit install"
+
+[tasks.pre-commit]
+description = "Run pre-commit on all files"
+run = "uv run pre-commit run --all-files"
+
+[tasks.watch-ci]
+description = "Watch CI status for current commit"
+run = "uv run cimonitor watch --until-complete --verbose"
+
+[tasks.bump-version]
+description = "Bump version (--patch by default, supports --minor, --major)"
+run = "scripts/bump-version"
