@@ -1,0 +1,67 @@
+Metadata-Version: 2.4
+Name: vbsoundinference
+Version: 1.1.0
+Summary: A python library for wake-word detection on low end devices.
+Author: Samarth Javagal
+Author-email: samarthjavagal@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: sounddevice
+Requires-Dist: torch
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+```vbsoundinference``` is based of an algorithm i invented called VSI for wake work detection on CPUs.
+
+To use ```vbsoundinference```, first collect your custom wake word data using ```vsi.recorder```.
+
+``` python
+from vsi.recorder import Recorder # import the Recorder class
+
+recorder = Recorder() # create the Recorder object
+
+recorder.record_class(n_recordings=10, class_number=0, duration=1, num_samples=512, # record class 0
+                      dataset_file="test_dataset.txt", append=False)
+```
+
+```vbsoundinference``` will store all the training data in one file. e.g-dataset.txt.
+
+The ```append``` argument will append the recorded data to the dataset instead of deleting the previous data.
+
+To train the model, use ```vsi.trainer```.
+
+``` python
+from vsi.trainer import Trainer # import the Trainer class
+
+trainer = Trainer(dataset_file_path="test_dataset.txt") # create the Trainer object
+
+trainer.load_dataset() # load the dataset
+trainer.train(epochs=100, save_path="model.pth") # train and save the model
+```
+
+To use the model, use ```vsi.vsi```.
+
+``` python
+from vsi.vsi import VSI # import the VSI class
+from vsi.recorder import Recorder # import the Recorder class
+
+vsi = VSI() # create the VSI object
+recorder = Recorder() # create the Recorder object
+
+while True: # infinite loop
+    recording = recorder.record_sample() # record a sample
+    
+    prediction = vsi.predict(recording.recording) # get the model's prediction
+    
+    print(prediction)
+```
