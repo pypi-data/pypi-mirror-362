@@ -1,0 +1,17 @@
+#!/bin/bash
+PRESET_NAME=""
+
+if [ "$#" -lt "1" ]; then 
+  echo "MISSING ARG PRESET_NAME"
+  echo "USAGE: $0 PRESET_NAME <PRESET_ARGS>"
+  exit 1
+fi
+PRESET_NAME="$1"
+shift
+PRESET_PATH="$(dirname $(readlink -f "$0"))/devopstestor-$PRESET_NAME"
+if [ ! -f "$PRESET_PATH" ]; then
+  echo "preset $PRESET_NAME does not exist"
+  echo "luncher $PRESET_PATH does not exists !"
+  exit 1
+fi
+"$PRESET_PATH" $ENV_OPTS "$*"
