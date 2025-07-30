@@ -1,0 +1,51 @@
+
+#include <cstdio>
+#include <ctime>
+
+#include "forward.hpp"
+{% for name in inputs_name %}
+#include "data/{{ name }}.h"
+{% endfor %}
+
+{% set printf_formats = {
+    "double": "%lf",
+    "float": "%f",
+    "int8_t": "%hhd",
+    "int16_t": "%hd",
+    "int32_t": "%d",
+    "int64_t": "%lld",
+    "uint8_t": "%hhu",
+    "uint16_t": "%hu",
+    "uint32_t": "%u",
+    "uint64_t": "%llu"
+} %}
+
+int main()
+{
+    // Initialize the output arrays
+    {%- for o in range(outputs_name | length) %}
+    {{ outputs_dtype[o] }}* {{ outputs_name[o] }} = nullptr;
+    {% endfor %}
+    clock_t start;
+    clock_t end;
+    double times[{{ nb_iterations }}] = {0};
+    for (std::size_t i = 0; i < {{ nb_iterations }} + {{ nb_warmup }}; ++i) {
+        if (i < {{ nb_warmup }}) {
+            {{ func_name }}({{ inputs_name|join(", ") }}{% if inputs_name %}, {% endif %}&{{ outputs_name|join(", &") }});
+        } else {
+            start = clock();
+            {{ func_name }}({{ inputs_name|join(", ") }}{% if inputs_name %}, {% endif %}&{{ outputs_name|join(", &") }});
+            {{ func_name }}({{ inputs_name|join(", ") }}{% if inputs_name %}, {% endif %}&{{ outputs_name|join(", &") }});
+            {{ func_name }}({{ inputs_name|join(", ") }}{% if inputs_name %}, {% endif %}&{{ outputs_name|join(", &") }});
+            {{ func_name }}({{ inputs_name|join(", ") }}{% if inputs_name %}, {% endif %}&{{ outputs_name|join(", &") }});
+            end = clock();
+            times[i - {{ nb_warmup }}] = ((double)(end - start)/CLOCKS_PER_SEC)/4.0;
+        }
+    }
+
+    for (std::size_t i = 0; i < {{ nb_iterations }}; ++i) {
+        printf("%.10lf ", times[i]);
+    }
+    printf("\n");
+    return 0;
+}

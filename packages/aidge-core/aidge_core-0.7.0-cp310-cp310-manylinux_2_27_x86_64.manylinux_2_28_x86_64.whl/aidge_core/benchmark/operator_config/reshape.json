@@ -1,0 +1,78 @@
+{
+    "operator": "Reshape",
+    "opset_version": 21,
+    "initializer_rank": 2,
+    "test_meta_data": {
+        "multiple_batchs": true
+    },
+    "base_configuration": {
+        "attributes": {
+            "allowzero": 0
+        },
+        "input_properties": [
+            {
+                "name": "data",
+                "dims": [5, 6, 12, 2],
+                "values": null
+            },
+            {
+                "name": "shape",
+                "dims": null,
+                "values": [5, 6, 12, 2]
+            }
+        ]
+    },
+    "test_configurations": {
+        "expend": {
+            "[_, 2, 3, _, _]": {
+                "input_properties": [
+                    {"name": "shape", "values": [5, 2, 3, 12, 2]}
+                ]
+            },
+            "[_, _, 2, 2, 3, _]": {
+                "input_properties": [
+                    {"name": "shape", "values": [5, 6, 2, 2, 3, 2]}
+                ]
+            },
+            "[_, 2, 3, 2, 2, 3, _]": {
+                "input_properties": [
+                    {"name": "shape", "values": [5, 2, 3, 2, 2, 3, 2]}
+                ]
+            }
+        },
+        "merge": {
+            "[30, 12, 2]": {
+                "input_properties": [
+                    {"name": "shape", "values": [30, 12, 2]}
+                ]
+            },
+            "[5, 72, 2]": {
+                "input_properties": [
+                    {"name": "shape", "values": [5, 72, 2]}
+                ]
+            },
+            "[5, 6, -1]": {
+                "input_properties": [
+                    {"name": "shape", "values": [5, 6, -1]}
+                ]
+            },
+            "[-1]": {
+                "input_properties": [
+                    {"name": "shape", "values": [-1]}
+                ]
+            }
+        },
+        "mix": {
+            "[30, 2, 2, -1]": {
+                "input_properties": [
+                    {"name": "shape", "values": [30, 2, 2, -1]}
+                ]
+            },
+            "[-1, 6, 5]": {
+                "input_properties": [
+                    {"name": "shape", "values": [-1, 6, 5]}
+                ]
+            }
+        }
+    }
+}

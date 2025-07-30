@@ -1,0 +1,6 @@
+{#- For libraries #}
+#include <stdint.h>
+ {# Design header of the array -#}
+static const {{ data_t }} {{ name }}[{{ dims |join("*") }}] __attribute__((section("nn_data"))) = {
+{{ values | map('c_literal') | join(", ") }}
+};

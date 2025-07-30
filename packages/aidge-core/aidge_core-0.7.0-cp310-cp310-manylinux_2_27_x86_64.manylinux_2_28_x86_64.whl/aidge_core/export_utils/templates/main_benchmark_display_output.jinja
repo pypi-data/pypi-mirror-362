@@ -1,0 +1,45 @@
+#include <cstddef>
+#include <cstdio>
+
+#include "forward.hpp"
+{% for name in inputs_name %}
+#include "data/{{ name }}.h"
+{% endfor %}
+
+{% set printf_formats = {
+    "double": "lf",
+    "float": "f",
+    "int8_t": "hhd",
+    "int16_t": "hd",
+    "int32_t": "d",
+    "int64_t": "lld",
+    "uint8_t": "hhu",
+    "uint16_t": "hu",
+    "uint32_t": "u",
+    "uint64_t": "llu"
+} %}
+
+int main()
+{
+    // Initialize the output arrays
+    {%- for o in range(outputs_name | length) %}
+    {{ outputs_dtype[o] }}* {{ outputs_name[o] }} = nullptr;
+    // {{ outputs_dtype[o] }}* results_{{ o }} = new {{ outputs_dtype[o] }}[{{ outputs_size[o] }}];
+    {% endfor %}
+
+    // Call the forward function
+    {{ func_name }}({{ inputs_name|join(", ") }}{% if inputs_name %}, {% endif %}&{{ outputs_name|join(", &") }});
+
+    // Print the results of each output
+    {%- for o in range(outputs_name | length) %}
+    for (std::size_t i = 0; i < {{ outputs_size[o] }}; ++i) {
+    {%- if outputs_dtype[o] in ["double", "float"] %}
+        std::printf("%.10{{ printf_formats[outputs_dtype[o]] }} ", {{ outputs_name[o] }}[i]);
+    {%- else %}
+        std::printf("%{{ printf_formats[outputs_dtype[o]] }} ", {{ outputs_name[o] }}[i]);
+    {%- endif %}
+    }
+    std::printf("\n");
+    {% endfor %}
+    return 0;
+}

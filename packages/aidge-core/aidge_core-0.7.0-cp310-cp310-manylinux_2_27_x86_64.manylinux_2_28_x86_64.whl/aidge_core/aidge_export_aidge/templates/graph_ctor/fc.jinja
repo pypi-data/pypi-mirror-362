@@ -1,0 +1,11 @@
+{% filter indent(width=4, first=False) %}
+/*** {{name|upper}} ***/
+std::shared_ptr<Aidge::Node> {{name}} =
+        Aidge::FC(
+            _{{name|upper}}_IN_CHANNELS,
+            _{{name|upper}}_OUT_CHANNELS,
+            "{{name}}"
+        );
+{% include "./_set_input.jinja" %}
+graph->add({{name}});
+{% endfilter %}
