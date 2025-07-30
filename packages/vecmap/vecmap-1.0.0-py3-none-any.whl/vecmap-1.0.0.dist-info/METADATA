@@ -1,0 +1,149 @@
+Metadata-Version: 2.4
+Name: vecmap
+Version: 1.0.0
+Summary: Ultrafast exact sequence matching in pure Python using NumPy vectorization
+Home-page: https://github.com/the-jordan-lab/VecMap
+Author: James M. Jordan
+Author-email: "James M. Jordan" <jjordan@bio.fsu.edu>
+Maintainer-email: "James M. Jordan" <jjordan@bio.fsu.edu>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/the-jordan-lab/VecMap
+Project-URL: Bug Tracker, https://github.com/the-jordan-lab/VecMap/issues
+Project-URL: Documentation, https://github.com/the-jordan-lab/VecMap/blob/main/README.md
+Keywords: bioinformatics,sequence alignment,CRISPR,vectorization,exact matching
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.20.0
+Provides-Extra: dev
+Requires-Dist: pytest>=6.0; extra == "dev"
+Requires-Dist: pytest-cov>=2.0; extra == "dev"
+Requires-Dist: black>=22.0; extra == "dev"
+Requires-Dist: flake8>=4.0; extra == "dev"
+Provides-Extra: viz
+Requires-Dist: matplotlib>=3.5.0; extra == "viz"
+Requires-Dist: seaborn>=0.11.0; extra == "viz"
+Requires-Dist: pandas>=1.3.0; extra == "viz"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# VecMap
+
+[![PyPI version](https://badge.fury.io/py/vecmap.svg)](https://badge.fury.io/py/vecmap)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+
+Ultrafast exact sequence matching using NumPy vectorization. Designed for CRISPR screens and barcode mapping where exact matching is biologically required.
+
+**Paper**: [bioRxiv preprint](https://doi.org/10.1101/2025.XX.XX.XXXXXX)
+
+## Installation
+
+```bash
+pip install vecmap
+```
+
+## Quick Start
+
+```bash
+# Command line
+vecmap -r reference.fa -q reads.fq -o alignments.txt
+
+# Python API
+from vecmap import vecmap
+alignments = vecmap(reference_seq, [(read_seq, read_id), ...])
+```
+
+## Performance
+
+Benchmarks on human transcriptome (42,027 ± 1,856 reads/second in pure Python):
+
+| Tool | Reads/sec (mean ± SD) | Language | Notes |
+|------|----------------------|----------|-------|
+| VecMap | 42,027 ± 1,856 | Python | Exact matching only |
+| Minimap2 | 173,460 ± 5,203 | C | General purpose aligner |
+| BWA-MEM | 60,306 ± 2,418 | C | General purpose aligner |
+
+For CRISPR screening specifically:
+- VecMap: 18,948 ± 892 reads/sec
+- 1.9× faster than MAGeCK
+- 3.8× faster than CRISPResso2
+
+*Performance measured on Apple M1 Max, 32GB RAM, Python 3.11.5, NumPy 2.0.0*
+
+## Applications
+
+### CRISPR Guide Detection
+
+```python
+from vecmap.applications import CRISPRGuideDetector
+
+guides = {
+    "KRAS_sg1": "ACGTACGTACGTACGTACGT",
+    "TP53_sg1": "GGCCGGCCGGCCGGCCGGCC"
+}
+
+detector = CRISPRGuideDetector(guides)
+results = detector.detect_guides(reads)
+counts = detector.summarize_detection(results)
+```
+
+### Barcode Demultiplexing
+
+```python
+from vecmap.applications import BarcodeProcessor
+
+processor = BarcodeProcessor(
+    barcode_whitelist=whitelist,
+    barcode_length=16,
+    umi_length=10
+)
+
+corrected = processor.correct_barcodes(processor.extract_barcodes(reads))
+```
+
+## Reproducibility
+
+To reproduce all benchmarks and figures from the paper:
+
+```bash
+git clone https://github.com/the-jordan-lab/VecMap.git
+cd VecMap
+git checkout v1.0.0
+pip install -e .
+./reproduce.sh
+```
+
+See [DATA_AVAILABILITY.md](DATA_AVAILABILITY.md) for complete reproduction details.
+
+## Documentation
+
+- [Examples](examples/) - Usage examples and tutorials
+- [Benchmarks](benchmarks/) - Performance benchmarks and comparisons
+- [API Reference](https://vecmap.readthedocs.io) - Full API documentation
+
+## Citation
+
+```bibtex
+@article{jordan2025vecmap,
+  title={VecMap: Ultrafast Exact Sequence Matching for CRISPR Screens},
+  author={Jordan, James M},
+  journal={bioRxiv},
+  year={2025},
+  doi={10.1101/2025.XX.XX.XXXXXX}
+}
+```
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
