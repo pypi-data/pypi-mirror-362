@@ -1,0 +1,78 @@
+Metadata-Version: 2.3
+Name: zelos-sdk
+Version: 0.0.2
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Requires-Dist: colorama
+Requires-Dist: pytest >=8.1.0
+Requires-Dist: rich
+Summary: Use the Zelos SDK to push data into the Zelos App, Zelos Agent or directly to Zelos Cloud.
+Author-email: Zelos Cloud <info@zeloscloud.io>
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+
+# Zelos SDK
+
+Zelos is the data platform for mission‑critical systems. We help teams observe, control, and test their system on a collaborative platform – from prototype to production.
+
+Use the Zelos SDK to push data into the Zelos App, Zelos Agent or directly to Zelos Cloud.
+
+# Example: Logging Random Data
+
+Install `uv` and save the file below as `zelos_random.py` and run `uv run zelos_random.py` to start streaming data live.
+
+```python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [ "zelos-sdk" ]
+# ///
+import random
+import time
+
+import zelos_sdk
+
+zelos_sdk.init()
+
+src = zelos_sdk.TraceSource("example_source")
+while True:
+    src.log_dict("example/message", {"value": random.randint(0, 10)})
+    time.sleep(0.01)
+```
+
+# Example: Logging Thermal Zones on Linux
+
+Linux supports reading temperature sensors via sysfs. On a linux system, install `uv` and save the file below as
+`temp_linux.py` and run `uv run temp_linux.py` to start streaming data live.
+
+```python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [ "zelos-sdk" ]
+# ///
+from pathlib import Path
+import time
+
+import zelos_sdk
+
+zelos_sdk.init()
+
+# Find all of our thermal zones from sysfs
+thermal_zones = list(Path("/sys/class/thermal").glob("thermal_zone*"))
+
+# Once per second, read the zone info and log it
+src = zelos_sdk.TraceSource("linux_thermal")
+while True:
+    for zone_path in thermal_zones:
+        # Read the zone info from sysfs
+        zone_type = (zone_path / "type").read_text().strip()
+        zone_temp_c = int((zone_path / "temp").read_text().strip()) / 1000.0
+
+        # Log to the zelos sdk
+        src.log_dict(zone_path.name, {"type": zone_type, "temp_c": zone_temp_c})
+
+    time.sleep(1)
+```
+
