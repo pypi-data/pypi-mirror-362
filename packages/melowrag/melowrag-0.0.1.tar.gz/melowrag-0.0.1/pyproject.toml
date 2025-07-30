@@ -1,0 +1,176 @@
+[tool.poetry]
+name = "melowrag"
+version = "0.0.1"
+
+description = "a modular Python framework for semantic search, vector indexing, and retrieval-augmented generation"
+authors = ["Erfan Zare Chavoshi <Erfanzare810@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+
+homepage = "https://github.com/erfanzar/melowrag"
+repository = "https://github.com/erfanzar/melowrag"
+documentation = "https://melowrag.readthedocs.io/en/latest/"
+
+keywords = [
+	"Deep Learning",
+	"Machine Learning"
+]
+
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"Intended Audience :: Developers",
+	"Topic :: Scientific/Engineering :: Artificial Intelligence",
+	"License :: OSI Approved :: Apache Software License",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
+	"Programming Language :: Python :: 3.14",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.14"
+
+# Core scientific and ML stack
+numpy = ">=1.26.0"
+scipy = "1.15.2"
+scikit-learn = "1.6.1"
+
+# Transformers and HuggingFace
+transformers = "4.51.0"
+sentence-transformers = "4.1.0"
+huggingface-hub = "0.32.4"
+
+# Database and ORM
+sqlalchemy = "2.0.38"
+duckdb = "*"  
+psycopg2-binary = "2.9.9"
+peewee = "3.18.1"
+
+# Serialization and compression
+msgpack = "1.1.0"
+skops = "*"  
+
+# Graph and network analysis
+networkx = "3.4.2"
+
+# Audio and signal processing
+soundfile = "0.13.1"
+torchaudio = "2.6.0"
+
+# Cloud and remote storage
+boto3 = "1.35.53"
+google-cloud-storage = "2.19.0"
+azure-storage-blob = "12.24.1"
+
+# Utilities
+pandas = "2.2.3"
+pyyaml = "6.0.2"
+requests = "2.32.4"
+tqdm = "4.67.1"
+
+# Optional: for ONNX and fast inference
+onnxruntime = { version = "1.20.1", optional = true }
+
+# Optional: for text extraction and document processing
+pdfminer-six = { version = "20250327", optional = true }
+python-docx = { version = "^1.1.2", optional = true }
+
+# Optional: for fast ANN search
+faiss-cpu = { version = "1.11.0", optional = true }
+hnswlib = { version = "*", optional = true } 
+
+# Optional: for web and API
+fastapi = { version = "0.115.7", optional = true }
+uvicorn = { version = "0.34.2", optional = true }
+
+# Optional: for remote_storage and distributed
+redis = { version = "5.2.1", optional = true }
+ray = { version = "2.34.0", optional = true }
+
+[tool.poetry.extras] 
+dev = [
+    "black",
+    "coverage",
+    "coveralls",
+    "httpx",
+    "mkdocs-material",
+    "mkdocs-redirects",
+    "pre-commit",
+    "pylint"
+]
+vector_index = [
+    "annoy",
+    "scikit-learn",
+    "hnswlib",
+    "pgvector",
+    "scipy",
+    "sqlalchemy",
+    "sqlite-vec"
+]
+remote_storage = [
+    "apache-libcloud",
+    "fasteners"
+]
+databases = ["duckdb", "pillow", "sqlalchemy"]
+graph_algorithms = ["networkx", "sqlalchemy"]
+modeling = ["onnx", "onnxruntime"]
+pipelines_audio = ["onnx", "onnxruntime", "scipy", "soundfile", "ttstokenizer", "webrtcvad-wheels"]
+pipelines_data = ["beautifulsoup4", "nltk", "pandas", "tika"]
+pipelines_image = ["imagehash", "pillow", "timm"]
+pipelines_text = ["gliner", "sentencepiece", "staticvectors"]
+pipelines = [
+    "pipelines_audio",
+    "pipelines_data",
+    "pipelines_image",
+    "pipelines_text"
+]
+score_functions = ["sqlalchemy"]
+vector_embeddings = ["scikit-learn", "scipy", "sentence-transformers", "skops", "staticvectors"]
+workflow_engine = ["apache-libcloud", "croniter", "openpyxl", "pandas", "pillow", "requests", "xmltodict"]
+similarity = ["vector_index", "vector_embeddings"]
+all = [
+    "remote_storage",
+    "databases",
+    "graph_algorithms",
+    "modeling",
+    "pipelines",
+    "score_functions",
+    "similarity",
+    "vector_embeddings",
+    "workflow_engine"
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+"melowrag" = ["py.typed"]
+
+[tool.black]
+line-length = 121
+target-version = ["py310"]
+preview = true
+
+
+[tool.ruff]
+line-length = 121
+target-version = "py310"
+
+
+[tool.ruff.lint]
+select = ["A", "B", "E", "F", "I", "NPY", "RUF", "UP", "W"]
+ignore = ["F722", "B008", "UP015", "A005", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402", "F401"]
+
+[tool.mypy]
+python_version = "3.10"
+
+ignore_missing_imports = true
+exclude = ["melowrag/"]
