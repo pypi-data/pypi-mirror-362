@@ -1,0 +1,35 @@
+[project]
+name = "plsconvert"
+version = "0.1.4"
+description = "Convert any file to any other."
+readme = "README.md"
+authors = [{ name = "ThorTuwy", email = "tuwy@tuwy.win" }]
+requires-python = ">=3.13"
+dependencies = [
+    "halo>=0.0.31",
+    "openpyxl>=3.1.5"
+]
+
+[project.optional-dependencies]
+docs = ["pdf2docx>=0.5.8","pandas>=2.3.1","openpyxl>=3.1.5"]
+
+audio = ["matplotlib>=3.10.3", "scipy>=1.16.0", "pyttsx3>=2.99", "midi2audio>=0.1.1"]
+
+config = ["pyyaml>=6.0.2", "tomlkit>=0.13.3"]
+
+ai = ["rapidocr>=3.2.0", "onnxruntime>=1.22.1", "pillow>=11.3.0"]
+
+noAI = ["plsconvert[docs]", "plsconvert[audio]", "plsconvert[config]"]
+
+all = ["plsconvert[docs]", "plsconvert[audio]", "plsconvert[config]", "plsconvert[ai]"]
+
+[project.urls]
+Homepage = "https://github.com/ThorTuwy/plsconvert"
+"Bug Tracker" = "https://github.com/ThorTuwy/plsconvert/issues"
+
+[project.scripts]
+plsconvert = "plsconvert:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
