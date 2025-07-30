@@ -1,0 +1,143 @@
+Metadata-Version: 2.4
+Name: gama-gymnasium
+Version: 0.1.0
+Summary: A Gymnasium environment for reinforcement learning with GAMA agent-based simulations
+Project-URL: Homepage, https://github.com/gama-platform/gama-gymnasium
+Project-URL: Repository, https://github.com/gama-platform/gama-gymnasium
+Project-URL: Bug Tracker, https://github.com/gama-platform/gama-gymnasium/issues
+Project-URL: Documentation, https://github.com/gama-platform/gama-gymnasium#readme
+Project-URL: GAMA Platform, https://gama-platform.org/
+Author-email: Baptiste Lesquoy <baptiste.lesquoy@ird.fr>, Meritxell Vinyals <meritxell.vinyals@inrae.fr>
+License: MIT License
+        
+        Copyright (c) 2024 IRD - INRAE
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Keywords: agent-based-modeling,gama,gymnasium,reinforcement-learning,rl,simulation
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Requires-Dist: gama-client>=1.2.1
+Requires-Dist: gymnasium>=0.27.0
+Requires-Dist: numpy>=1.21.0
+Provides-Extra: dev
+Requires-Dist: black; extra == 'dev'
+Requires-Dist: flake8; extra == 'dev'
+Requires-Dist: isort; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: pytest>=6.0; extra == 'dev'
+Provides-Extra: examples
+Requires-Dist: matplotlib>=3.3.0; extra == 'examples'
+Requires-Dist: torch>=1.9.0; extra == 'examples'
+Description-Content-Type: text/markdown
+
+# GAMA-Gymnasium Source Code
+
+This directory contains the main source code for the GAMA-Gymnasium package, which provides Gymnasium environment integration with GAMA simulations.
+
+## 📦 Package Structure
+
+```
+src/
+├── pyproject.toml          # Python package configuration
+├── LICENSE                 # Package license
+├── README.md              # This documentation
+└── gama_gymnasium/        # Main Python module
+    ├── __init__.py        # Package initialization
+    ├── exceptions.py      # Custom exception classes
+    ├── gama_client_wrapper.py  # GAMA communication wrapper
+    ├── gama_env.py       # Main Gymnasium environment
+    └── space_converter.py # Gymnasium/GAMA space conversion
+```
+
+## 🧩 Module Components
+
+### `gama_env.py`
+Main Gymnasium environment class that interfaces with GAMA simulations:
+- Implements standard Gymnasium environment API
+- Handles GAMA server communication
+- Manages environment lifecycle (reset, step, close)
+
+### `gama_client_wrapper.py`
+Wrapper around gama-client for robust communication:
+- Manages GAMA server connections
+- Handles error recovery and reconnection
+- Provides simplified API for environment operations
+
+### `space_converter.py`
+Converts between GAMA and Gymnasium space formats:
+- Supports all standard Gymnasium spaces (Box, Discrete, MultiDiscrete, etc.)
+- Handles data type conversions
+- Validates space definitions
+
+### `exceptions.py`
+Custom exception hierarchy for clear error handling:
+- `GamaEnvironmentError`: Base exception class
+- `GamaConnectionError`: Connection-related errors
+- `GamaSpaceError`: Space definition/conversion errors
+
+## 🔗 Related Documentation
+
+- **[Main Project README](../README.md)**: Overall project documentation
+- **[Testing Guide](../tests/README.md)**: How to test the package
+- **[Examples](../examples/)**: Practical usage examples
+- **[Basic Example](../examples/basic_example/README.md)**: Step-by-step tutorial
+
+## 🛠️ Development
+
+### Package Configuration
+The `pyproject.toml` file contains:
+- Package metadata and dependencies
+- Build system configuration
+- Entry points and optional dependencies
+
+### Installation for Development
+```bash
+# From the repository root
+pip install -e src/
+```
+
+### Running Tests
+```bash
+# Run the comprehensive test suite
+python tests/test_manager.py --all
+
+# Test specific components
+python tests/test_manager.py --pattern "space"
+```
+
+## 📚 API Reference
+
+For detailed API documentation, see the docstrings in each module or generate documentation with:
+
+```bash
+python -c "import gama_gymnasium; help(gama_gymnasium)"
+```
