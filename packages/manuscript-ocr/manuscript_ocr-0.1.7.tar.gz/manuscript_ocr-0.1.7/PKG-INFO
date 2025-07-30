@@ -1,0 +1,82 @@
+Metadata-Version: 2.4
+Name: manuscript-ocr
+Version: 0.1.7
+Summary: EAST-based OCR detector API
+Home-page: https://github.com/konstantinkozhin/manuscript-ocr
+Author: 
+Author-email: sherstpasha99@gmail.com
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: torch>=2.7.0
+Requires-Dist: torchvision>=0.22.0
+Requires-Dist: torchaudio>=2.0.2
+Requires-Dist: numpy>=1.23
+Requires-Dist: opencv-python>=4.5
+Requires-Dist: Pillow>=11.1.0
+Requires-Dist: shapely>=2.0
+Requires-Dist: numba>=0.56
+Requires-Dist: tensorboard>=2.10
+Requires-Dist: gdown>=4.4
+Requires-Dist: pydantic[email,timezone]>=2.10.6
+Requires-Dist: pydantic-extra-types>=2.10.3
+Requires-Dist: scikit-image>=0.19
+Requires-Dist: torch-optimizer>=0.1
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+## Installation
+
+```bash
+pip install manuscript-ocr
+````
+
+## Usage Example
+
+```python
+from PIL import Image
+from manuscript.detectors import EASTInfer
+
+# Инициализация
+det = EASTInfer(score_thresh=0.9)
+
+# Инфер с визуализацией
+page, vis_image = det.infer(r"example\ocr_example_image.jpg", vis=True)
+
+print(page)
+
+# Покажет картинку с наложенными боксами
+Image.fromarray(vis_image).show()
+
+# Или сохранить результат на диск:
+Image.fromarray(vis_image).save(r"example\ocr_example_image_infer.png")
+```
+
+### Результат
+
+Текстовые блоки будут выведены в консоль, например:
+
+```
+Page(blocks=[Block(words=[Word(polygon=[(874.1005, 909.1005), (966.8995, 909.1005), (966.8995, 956.8995), (874.1005, 956.8995)]),
+                          Word(polygon=[(849.1234, 810.5678), … ])])])
+```
+
+А визуализация сохранится в файл `example/ocr_example_image_infer.png`:
+
+![OCR Inference Result](example/ocr_example_image_infer.png)
+
+
+pip install -r requirements-gpu.txt --force-reinstall
+
+
+pip install --pre triton --index-url https://download.pytorch.org/whl/nightly/cu118
