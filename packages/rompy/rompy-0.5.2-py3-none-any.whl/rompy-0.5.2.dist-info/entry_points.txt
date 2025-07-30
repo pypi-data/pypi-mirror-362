@@ -1,0 +1,32 @@
+[console_scripts]
+rompy = rompy.cli:main
+
+[intake.catalogs]
+rompy_data = rompy:cat
+
+[intake.drivers]
+netcdf_fcstack = rompy.intake:NetCDFFCStackSource
+
+[rompy.config]
+base = rompy.core.config:BaseConfig
+schism = rompy.schism.config:SCHISMConfig
+schismcsiro = rompy.schism.config:SchismCSIROConfig
+swan = rompy.swan.config:SwanConfig
+swan_components = rompy.swan.config:SwanConfigComponents
+
+[rompy.pipeline]
+local = rompy.pipeline:LocalPipelineBackend
+
+[rompy.postprocess]
+noop = rompy.postprocess:NoopPostprocessor
+
+[rompy.run]
+docker = rompy.run.docker:DockerRunBackend
+local = rompy.run:LocalRunBackend
+
+[rompy.source]
+csv:timeseries = rompy.core.source:SourceTimeseriesCSV
+datamesh = rompy.core.source:SourceDatamesh
+file = rompy.core.source:SourceFile
+intake = rompy.core.source:SourceIntake
+wavespectra = rompy.core.source:SourceWavespectra

@@ -1,0 +1,22 @@
+sources:
+  wavewatch3_nci:
+    args:
+      fmt_fields:
+        output: 
+        - 'spec'
+        grid: 
+        - 'PER'
+        fcdate:
+        - '20210119'
+        - '20210119'
+        hr:
+        - '0000'
+      fn_fmt: '{grid}.{output}.{fcdate}T{hr}Z.nc'
+      hindcast: false
+      url_replace:
+        catalog: dodsC
+      urlpath: 'https://dapds00.nci.org.au/thredds/catalog/rr6/waves/{fcdate}/{hr}/catalog.html'
+    description: BOM Development Wavewatch III forecasts available on NCI
+    driver: rompy.intake.NetCDFFCStackSource
+    metadata:
+      catalog_dir: ''

@@ -1,0 +1,111 @@
+sources:
+  nrt_wave_buoys:
+    args:
+      urlpath: http://geoserver-portal.aodn.org.au/geoserver/ows?typeName=aodn:aodn_wave_nrt_timeseries_data&SERVICE=WFS&outputFormat=csv&REQUEST=GetFeature&VERSION=1.0.0&CQL_FILTER=INTERSECTS(geom,{{ geom }}) AND TIME >= '{{ startdt.strftime("%Y-%m-%dT%H:%M:%SZ") }}' AND TIME <= '{{ enddt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'
+      csv_kwargs:
+        blocksize: 
+    parameters:
+      geom: 
+        description: 'Geometry WKT'
+        type: str
+        default: 'POLYGON ((115.0000000000000000 -33.0000000000000000, 115.0000000000000000 -31.5000000000000000, 115.8000030517578125 -31.5000000000000000, 115.8000030517578125 -33.0000000000000000, 115.0000000000000000 -33.0000000000000000))'
+      startdt:
+        description: Start date
+        type: datetime
+        default: 2021-02-03
+      enddt:
+        description: End date
+        type: datetime
+        default: 2021-02-10
+    description: AODN Near real time wave data
+    driver: csv
+    metadata:
+      catalog_dir: ''
+  nrt_wave_altimetry_points:
+    args:
+       urlpath: http://geoserver-123.aodn.org.au/geoserver/ows?service=WFS&request=GetFeature&version=1.0.0&workspace=imos&typeName=srs_surface_waves_altimetry_map&CQL_FILTER=INTERSECTS(geom,{{ geom|urlencode }})%20AND%20time_coverage_start%20<=%20'{{ enddt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'%20AND%20time_coverage_end%20>=%20'{{ startdt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'
+    parameters:
+      geom: 
+        description: 'Geometry WKT'
+        type: str
+        default: 'POLYGON ((111.0000000000000000 -33.0000000000000000, 111.0000000000000000 -31.5000000000000000, 115.8000030517578125 -31.5000000000000000, 115.8000030517578125 -33.0000000000000000, 111.0000000000000000 -33.0000000000000000))'
+      startdt:
+        description: Start date
+        type: datetime
+        default: 2020-02-03
+      enddt:
+        description: End date
+        type: datetime
+        default: 2021-02-10
+    description: AODN wave altimetry dataframe
+    driver: geojson 
+    metadata:
+      catalog_dir: ''
+  nrt_wave_altimetry:
+    args:
+       urlpath: http://geoserver-123.aodn.org.au/geoserver/ows?service=WFS&request=GetFeature&version=1.0.0&workspace=imos&typeName=srs_surface_waves_altimetry_map&CQL_FILTER=INTERSECTS(geom,{{ geom|urlencode }})%20AND%20time_coverage_start%20<=%20'{{ enddt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'%20AND%20time_coverage_end%20>=%20'{{ startdt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'
+       thredds_prefix: "http://thredds.aodn.org.au/thredds/dodsC/"
+       startdt: "{{startdt}}"
+       enddt: "{{enddt}}"
+       geom: "{{geom}}"
+    parameters:
+      geom: 
+        description: 'Geometry WKT'
+        type: str
+        default: 'POLYGON ((111.0000000000000000 -33.0000000000000000, 111.0000000000000000 -31.5000000000000000, 115.8000030517578125 -31.5000000000000000, 115.8000030517578125 -33.0000000000000000, 111.0000000000000000 -33.0000000000000000))'
+      startdt:
+        description: Start date
+        type: datetime
+        default: 2020-02-03
+      enddt:
+        description: End date
+        type: datetime
+        default: 2021-02-10
+    description: AODN wave altimetry dataframe
+    driver: rompy.intake.NetCDFAODNStackSource
+    metadata:
+      catalog_dir: ''      
+  nrt_wave_sar_points:
+    args:
+      urlpath: http://geoserver-123.aodn.org.au/geoserver/ows?service=WFS&request=GetFeature&version=1.0.0&workspace=imos&typeName=srs_surface_waves_sar_fv00_trajectory_map&CQL_FILTER=INTERSECTS(geom,{{ geom|urlencode }})%20AND%20time_coverage_start%20<=%20'{{ enddt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'%20AND%20time_coverage_end%20>=%20'{{ startdt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'
+    parameters:
+      geom: 
+        description: 'Geometry WKT'
+        type: str
+        default: 'POLYGON ((111.0000000000000000 -33.0000000000000000, 111.0000000000000000 -31.5000000000000000, 115.8000030517578125 -31.5000000000000000, 115.8000030517578125 -33.0000000000000000, 111.0000000000000000 -33.0000000000000000))'
+      startdt:
+        description: Start date
+        type: datetime
+        default: 2020-02-03
+      enddt:
+        description: End date
+        type: datetime
+        default: 2021-02-10    
+    description: AODN wave SAR dataframe
+    driver: geojson 
+    metadata:
+      catalog_dir: ''
+  nrt_wave_sar:
+    args:
+       urlpath: http://geoserver-123.aodn.org.au/geoserver/ows?service=WFS&request=GetFeature&version=1.0.0&workspace=imos&typeName=srs_surface_waves_sar_fv00_trajectory_map&CQL_FILTER=INTERSECTS(geom,{{ geom|urlencode }})%20AND%20time_coverage_start%20<=%20'{{ enddt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'%20AND%20time_coverage_end%20>=%20'{{ startdt.strftime("%Y-%m-%dT%H:%M:%SZ") }}'
+       thredds_prefix: "http://thredds.aodn.org.au/thredds/dodsC/"
+       startdt: "{{startdt}}"
+       enddt: "{{enddt}}"
+       geom: "{{geom}}"
+    parameters:
+      geom: 
+        description: 'Geometry WKT'
+        type: str
+        default: 'POLYGON ((111.0000000000000000 -33.0000000000000000, 111.0000000000000000 -31.5000000000000000, 115.8000030517578125 -31.5000000000000000, 115.8000030517578125 -33.0000000000000000, 111.0000000000000000 -33.0000000000000000))'
+      startdt:
+        description: Start date
+        type: datetime
+        default: 2021-02-01
+      enddt:
+        description: End date
+        type: datetime
+        default: 2021-04-29
+    description: AODN wave SAR dataframe
+    driver: rompy.intake.NetCDFAODNStackSource
+    metadata:
+      catalog_dir: ''         
