@@ -1,0 +1,444 @@
+#!python
+#
+# The Python Imaging Library
+# $Id$
+#
+
+import sys
+import json
+from math import *
+import getopt
+import numpy as np
+try:
+   from tkinter import *
+except:
+   from Tkinter import *
+
+try:
+    from PIL.Image import ANTIALIAS
+except:
+    from PIL.Image import LANCZOS as ANTIALIAS
+    
+
+cam = "lower"
+rev = False
+jsonout = False
+jsonname = None
+
+theta = 0.0
+
+spot = []
+try:
+    from PIL import ImageTk, ImageDraw
+    from PIL import ImageChops
+    from PIL import Image as pImage
+except:
+    import Image as pImage
+    import ImageTk
+    import ImageDraw
+    import ImageChops
+
+import pytangtv
+from pytangtv.check4updates import check4updates
+
+w = 0
+h = 0
+winx = 640
+winy = 860
+
+
+
+options = ['lower', 'upper', 'sas', 'rm2', 'rm1', 'cp', 'cyl',
+           'test', 'rev', 'pix', 'json=', 'width=', 'height=', 'winx=', 'winy=']
+optlist, args = getopt.getopt(sys.argv[1:], 'ulst:w:h:', options)
+optdict = {}
+sys.stderr.write("\n")
+for o in optlist:
+    optdict.update({o[0]: o[1]})
+if '-w' in optdict:
+    w = int(optdict['-w'])
+if '--width' in optdict:
+    w = int(optdict['--width'])
+if '-h' in optdict:
+    h = int(optdict['-h'])
+if '--height' in optdict:
+    h = int(optdict['--height'])
+if '--winx' in optdict:
+    winx = int(optdict['--winx'])
+if '--winy' in optdict:
+    winy = int(optdict['--winy'])
+if '--upper' in optdict or '-u' in optdict:
+    cam = "upper"
+    rev = True
+    sys.stderr.write(" *** Upper cardboard mode ***\n")
+if '--sas' in optdict or '-s' in optdict:
+    cam = "sas"
+    rev = False
+    sys.stderr.write(" *** Sas cardboard mode ***\n")
+if '--lower' in optdict or '-l' in optdict:
+    cam = "lower"
+    sys.stderr.write(" *** Lower cardboard mode ***\n")
+if '--rm2' in optdict:
+    cam = "rm2"
+if '--rm1' in optdict:
+    cam = "rm1"
+if '--pix' in optdict:
+    cam = "pix"
+if '--cyl' in optdict:
+    cam = "cyl"
+if '--cp' in optdict:
+    cam = "cp"
+if '--test' in optdict:
+    cam = "test"
+if '-t' in optdict:
+    theta = float(optdict['-t'])
+    sys.stderr.write(" *** toroidal angle %g ***\n" % theta)
+    theta = theta * pi / 180.0
+if '--rev' in optdict:
+    rev = True
+if '--json' in optdict:
+    jsonname = str(optdict['--json'])
+    jsonout = True
+
+try:
+    from importlib import metadata
+    _version = metadata.version('PyTangtv')
+except:
+    _version = 'Version unknown'
+check4updates('https://pypi.org/pypi/pytangtv/json',thisver=_version)
+
+sys.stderr.write("\n")
+sys.stderr.write(""" Keyboard commands:
+             s - skip this spot location
+             d - redo (delete) last box selection
+             r - record values to standard out (presumably redirected to file)
+             q - quit """)
+sys.stderr.write("\n")
+
+
+if cam == "upper":
+    from pytangtv.picker.spots_upper import *
+elif cam == "lower":
+    from pytangtv.picker.spots_lower import *
+elif cam == "sas":
+    from pytangtv.picker.spots_upper_sas import *
+elif cam == "test":
+    from testspots import *
+elif cam == "pix":
+    spots = [[0, 0]]
+    for i in range(99):
+        spots.append([i+1, i+1])
+elif cam == "rm2":
+    from pytangtv.picker.rm2cracks import *
+    for i in range(len(spots)):
+        spots[i][0] = spots[i][0]*100
+        spots[i][1] = spots[i][1]*100
+elif cam == "rm1":
+    from pytangtv.picker.rm1cracks import *
+    for i in range(len(spots)):
+        spots[i][0] = spots[i][0]*100
+        spots[i][1] = spots[i][1]*100
+elif cam == "cyl":
+    from pytangtv.picker.cylcracks import *
+    # for i in range(len(spots)):
+    #spots[i][0] = spots[i][0]*100
+    #spots[i][1] = spots[i][1]*100
+elif cam == "cp":
+    from pytangtv.picker.cpcracks import *
+    for i in range(len(spots)):
+        spots[i][0] = spots[i][0]*100
+        spots[i][1] = spots[i][1]*100
+
+#
+# an image viewer
+
+
+class UI(Label):
+
+    def __init__(self, master, im, rev=False, winx=800, winy=600, scalew=1.0, scaleh=1.0):
+        self.rev = rev
+        self.window = master
+        self.image = im
+        self.W, self.H = self.image.size
+        self.winx = winx
+        self.winy = winy
+        self.draw = ImageDraw.Draw(self.image)
+        self.bitmap = ImageTk.PhotoImage(im)
+        if self.W > self.winx or self.H > self.winy:
+            self.frame = Frame(master, width=self.winx +
+                               100, height=self.winy+100)
+            self.frame.grid(row=0, column=0)
+            self.canvas = Canvas(self.frame, width=self.winx,
+                                 height=self.winy, scrollregion=(0, 0, self.W, self.H))
+            self.canvas.bind("<Button-1>", self.pick)
+            self.canvas.bind("<ButtonRelease-1>", self.relpick)
+            self.canvas.bind("<B1-Motion>", self.motion)
+            self.hbar = Scrollbar(self.frame, orient=HORIZONTAL)
+            self.hbar.pack(side=TOP, fill=X)
+            self.hbar.config(command=self.scrollx)
+            self.vbar = Scrollbar(self.frame, orient=VERTICAL)
+            self.vbar.pack(side=LEFT, fill=Y)
+            self.vbar.config(command=self.scrolly)
+            self.canvas.config(xscrollcommand=self.hbar.set,
+                               yscrollcommand=self.vbar.set)
+            self.canvas.create_image(0, 0, anchor=NW, image=self.bitmap)
+            self.canvas.pack(side=LEFT, expand=True, fill=BOTH)
+        else:
+            self.canvas = Canvas(master, width=self.W, height=self.H)
+            self.canvas.bind("<Button-1>", self.pick)
+            self.canvas.bind("<ButtonRelease-1>", self.relpick)
+            self.canvas.bind("<B1-Motion>", self.motion)
+            self.canvas.create_image(0, 0, anchor=NW, image=self.bitmap)
+            self.canvas.pack()
+            self.hbar = None
+            self.vbar = None
+
+        self.window.bind("<Key>", self.char)
+        self.im = im
+        self.spotnum = -1
+        self.ax = []
+        self.ay = []
+        self.az = []
+        self.aix = []
+        self.aiy = []
+        self.advance()
+
+    def mapx(self, event):
+        if self.hbar != None:
+            f = self.hbar.get()
+            lx = f[0] * self.W
+            rx = f[1] * self.W
+            return(int(lx + event.x - 1))
+        else:
+            return(event.x)
+
+    def mapy(self, event):
+        if self.vbar != None:
+            f = self.vbar.get()
+            ly = f[0] * self.H
+            ry = f[1] * self.H
+            return(int(ly + event.y - 1))
+        else:
+            return(event.y)
+
+    def char(self, event):
+        if event.char == "s":
+            sys.stderr.write("skipped\n")
+            self.advance()
+        elif event.char == "R":
+            sys.stdout.write("\n")
+            sys.stdout.write("Selection size :")
+            print(self.selshape)
+            sys.stdout.write("Centroid pixel location %g, %g\n" % (self.cx/scalew,self.cy/scaleh))
+            sys.stdout.write("Values min,max,clip %g, %g, %g\n" % (self.imin,self.imax,self.clip))
+            sys.stdout.write("Average, average above clip %g, %g\n" % (self.ravg,self.avg))
+            sys.stdout.write("Mean: %g\n" % (self.mn,))
+            sys.stdout.write("Standard dev : %g\n" % (self.sd,))
+            sys.stdout.write("\n")
+        elif event.char == "r":
+            self.ax.append((spots[self.spotnum][0]*cos(theta)))
+            self.ay.append((spots[self.spotnum][0]*sin(theta)))
+            self.az.append(spots[self.spotnum][1])
+            self.aix.append(self.cx/scalew)
+            self.aiy.append(self.cy/scaleh)
+            sys.stderr.write("recorded\n")
+            if not jsonout:
+                sys.stdout.write("%g %g %g %g %g\n" % 
+                   (spots[self.spotnum][0]*cos(theta), spots[self.spotnum][1], 
+                   spots[self.spotnum][0]*sin(theta), 
+                   self.cx/scalew, self.cy/scaleh))
+                sys.stdout.flush()
+            self.advance()
+        elif event.char == "d":
+            self.canvas.delete(self.box)
+            self.canvas.delete(self.mark)
+        elif event.char == "q":
+            if jsonout:
+                jdict = {"x":self.ax,"y":self.ay,"z":self.az,"ix":self.aix,"iy":self.aiy}
+                jsonString = json.dumps(jdict)
+                jsonFile = open(jsonname,"a")
+                jsonFile.write(jsonString+"\n")
+                jsonFile.close()
+            sys.exit()
+
+    def advance(self):
+        global theta
+        self.spotnum = self.spotnum + 1
+        if self.spotnum == len(spots):
+            sys.exit()
+        try:
+            theta = spots[self.spotnum][2] * pi / 180.0
+            sys.stderr.write("Select spot %d at %g %g and %g\n" % (
+                self.spotnum+1, spots[self.spotnum][0], spots[self.spotnum][1], spots[self.spotnum][2]))
+        except:
+            sys.stderr.write("Select spot %d at %g %g\n" % (
+                self.spotnum+1, spots[self.spotnum][0], spots[self.spotnum][1]))
+
+    def relpick(self, event):
+        self.x2 = self.mapx(event)
+        self.y2 = self.mapy(event)
+        if self.x2 == self.x1:
+            self.x2 = self.x1+1
+        if self.y2 == self.y1:
+            self.y2 = self.y1+1
+        if self.x2 < self.x1:
+           t = self.x1
+           self.x1 = self.x2
+           self.x2 = t
+        if self.y2 < self.y1:
+           t = self.y1
+           self.y1 = self.y2
+           self.y2 = t
+        spot = self.im.crop((self.x1, self.y1, self.x2, self.y2))
+        sdata = spot.load()
+        try:
+            if pImage.VERSION >= '1.1.6':
+                sdata = spot.im.pixel_access()
+        except:
+            pass
+
+        e = spot.getextrema()
+        if self.rev:
+            imin = 255 - e[0]
+            imax = 255 - e[1]
+        else:
+            imin = e[0]
+            imax = e[1]
+
+        clip = (imax - imin)/2 + imin
+        self.imin = imin
+        self.imax = imax
+        self.clip = clip
+        sxi = 0.0
+        syi = 0.0
+        tpix = 0.0
+        rpix = 0.0
+        num = 0.0
+        rnum = 0.0
+        stats = np.zeros((self.x2-self.x1,self.y2-self.y1))
+        self.selshape = stats.shape
+        for i in range(self.x1, self.x2):
+            for j in range(self.y1, self.y2):
+                if self.rev:
+                    pix = 255 - sdata[i-self.x1, j-self.y1]
+                else:
+                    pix = sdata[i-self.x1, j-self.y1]
+                stats[i-self.x1,j-self.y1] = pix
+                rnum = rnum + 1
+                rpix = rpix + pix
+                if pix > clip:
+                    num = num + 1
+                    tpix = tpix + pix
+                    sxi = sxi + pix * i
+                    syi = syi + pix * j
+
+         
+        if num > 0.0:
+            self.avg = tpix / num
+        else:
+            self.avg = 0.0
+        if rnum > 0.0:
+            self.ravg = rpix / rnum
+            self.mn = np.mean(stats)
+            self.sd = np.std(stats)
+        else:
+            self.ravg = 0.0
+            self.mn = 0.0
+            self.sd = 0.0
+
+        if tpix > 0.0:
+            self.cy = syi/tpix
+            self.cx = sxi/tpix
+        else:
+            self.cy = self.y1
+            self.cx = self.x1
+        #sys.stderr.write("%g <= %g <= %g\n" % (self.x1,self.cx,self.x2))
+        #sys.stderr.write("%g <= %g <= %g\n" % (self.y1,self.cy,self.y2))
+
+        if rev:
+            self.mark = self.canvas.create_oval(int(self.cx), int(
+                self.cy), int(self.cx)+1, int(self.cy)+1, outline='white')
+        else:
+            self.mark = self.canvas.create_oval(int(self.cx), int(
+                self.cy), int(self.cx)+1, int(self.cy)+1, outline='black')
+
+    def motion(self, event):
+        if self.box != None:
+            self.canvas.delete(self.box)
+        self.x2 = self.mapx(event)
+        self.y2 = self.mapy(event)
+        if rev:
+            self.box = self.canvas.create_rectangle(
+                self.x1, self.y1, self.x2, self.y2, outline='black')
+        else:
+            self.box = self.canvas.create_rectangle(
+                self.x1, self.y1, self.x2, self.y2, outline='white')
+
+    def pick(self, event):
+        self.box = None
+        self.x1 = self.mapx(event)
+        self.y1 = self.mapy(event)
+        self.x2 = self.x1
+        self.y2 = self.y1
+
+    def scrollx(self, event, step, what=None):
+        if event == "moveto":
+            self.canvas.xview(event, step)
+        if event == "scroll":
+            self.canvas.xview(event, step, what)
+
+    def scrolly(self, event, step, what=None):
+        if event == "moveto":
+            self.canvas.yview(event, step)
+        if event == "scroll":
+            self.canvas.yview(event, step, what)
+
+
+#
+# script interface
+
+if __name__ == "__main__":
+
+    import sys
+
+
+    if not sys.argv[1:]:
+        sys.stderr.write("Syntax: picker imagefile\n")
+        sys.exit(1)
+
+    filename = sys.argv[len(sys.argv)-1]
+
+    root = Tk()
+    root.title(filename)
+
+    sys.stderr.write("%s\n" % (filename))
+    im = pImage.open(filename).convert('L')
+    wi, hi = im.size
+    if w == 0:
+        w = wi
+    if h == 0:
+        h = hi
+    scalew = w / float(wi)
+    scaleh = h / float(hi)
+    im = pImage.open(filename).convert('L').resize((w, h), ANTIALIAS)
+
+    if cam == "upper":
+        UI(root, im, rev=rev, winx=winx, winy=winy)
+    if cam == "sas":
+        UI(root, im, rev=rev, winx=winx, winy=winy, scalew=scalew, scaleh=scaleh)
+    elif cam == "lower":
+        UI(root, im, rev=rev, winx=winx, winy=winy, scalew=scalew, scaleh=scaleh)
+    elif cam == "rm2":
+        UI(root, im, rev=rev, winx=winx, winy=winy, scalew=scalew, scaleh=scaleh)
+    elif cam == "rm1":
+        UI(root, im, rev=rev, winx=winx, winy=winy, scalew=scalew, scaleh=scaleh)
+    elif cam == "cyl":
+        UI(root, im, rev=rev, winx=winx, winy=winy, scalew=scalew, scaleh=scaleh)
+    elif cam == "cp":
+        UI(root, im, rev=rev, winx=winx, winy=winy, scalew=scalew, scaleh=scaleh)
+    elif cam == "test":
+        UI(root, im, rev=rev, winx=winx, winy=winy, scalew=scalew, scaleh=scaleh)
+    elif cam == "pix":
+        UI(root, im, rev=rev, winx=winx, winy=winy, scalew=scalew, scaleh=scaleh)
+
+    root.mainloop()
