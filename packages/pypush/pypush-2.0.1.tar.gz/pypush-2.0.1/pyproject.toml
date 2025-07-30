@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pypush"
+dynamic = ["version"]
+authors = [
+    { name = "JJTech", email = "jjtech@jjtech.dev" },
+]
+description = "Interact with Apple Private API"
+
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 3 - Alpha",
+    "Operating System :: OS Independent",
+    "License :: Other/Proprietary License",
+]
+license = {text = "Server Side Public License (SSPL)"}
+keywords = ["apple", "api", "reverse engineering", "imessage", "apns"]
+
+dependencies = [
+    "anyio",
+    "httpx[http2]",
+    "cryptography",
+    "typing-extensions",
+    "exceptiongroup",
+    'importlib_metadata; python_version>="3.9"',
+]
+
+[project.urls]
+Homepage = "https://github.com/JJTech0130/pypush"
+Issues = "https://github.com/JJTech0130/pypush/issues"
+
+[project.scripts]
+pypush = "pypush.cli:main"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-asyncio",
+]
+cli = [
+    "frida",
+    "rich",
+    "typer"
+]
+
+[tool.setuptools_scm]
+version_file = "pypush/_version.py"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = ["-ra", "-q"]
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "SIM", "I"]
+ignore = ["E501", "B010"]
