@@ -1,0 +1,112 @@
+---
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        exclude: \.png$
+        args: [--maxkb=50]
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+      - id: name-tests-test
+        args: [--pytest-test-first]
+        exclude: helper
+        files: test/.*py
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.2  # Updated to match your pyproject.toml
+    hooks:
+      - id: black
+      - id: black-jupyter
+        types_or: [jupyter]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 6.0.1
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.22
+    hooks:
+      - id: mdformat
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        args: [] #to avoid default --ignore-missing-imports
+        additional_dependencies:
+          - biopython==1.85
+          - numpy==2.0.*
+          - pandas==2.2.*
+          - pandas-stubs
+          - plotly==5.24.*
+          - plotly-stubs
+          - pytest
+          - python-dateutil==2.9.*
+          - pytz==2025.2
+          - six==1.17.*
+          - tzdata==2025.2
+          - webcolors==24.11.*
+          - webcolors-stubs
+
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.9.1
+    hooks:
+      - id: nbqa-black
+      - id: nbqa-isort
+      - id: nbqa-mypy
+        args: [--config-file=mypy.ini, --allow-untyped-defs, --allow-untyped-globals]
+        additional_dependencies:
+          - mypy==1.15.0
+          - biopython==1.85
+          - numpy==2.0.*
+          - pandas==2.2.*
+          - pandas-stubs
+          - plotly==5.24.*
+          - plotly-stubs
+          - pygenomeviz==1.5.*
+          - pytest
+          - python-dateutil==2.9.*
+          - pytz==2025.2
+          - six==1.17.*
+          - tzdata==2025.2
+          - webcolors
+          - webcolors-stubs
+
+  - repo: https://github.com/srstevenson/nb-clean
+    rev: 4.0.1
+    hooks:
+      # https://github.com/srstevenson/nb-clean/issues/323
+      - id: nb-clean
+        entry: nb-clean check --preserve-execution-counts --preserve-notebook-metadata
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.14
+    hooks:
+      - id: vulture
+        args: [--min-confidence, '100', src/]
+
+  - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+    rev: 0.2.3
+    hooks:
+      - id: yamlfmt
+        args: [--offset, '2', --mapping, '2', --sequence, '4', --width, '94']
