@@ -1,0 +1,48 @@
+User visible changes
+--------------------
+
+Moved directory specification from command line to the
+Config.reqs_dir.  This change makes all rmtoo calls (especially in 
+Makefiles) incompatible with the new version.  Adapted man page.
+
+Added range specification for history: now any tag or git version id
+can be used to define the start and the end of the processes files.  A
+special constant 'FILES' allows even to specifies the local (which
+might have changes compared to the last checked in version).
+
+Added analytics mode: 
+o Limits the number of incoming and outgoing links.
+o Checks for good and bad words (en_GB and de_DE - both incomplete).
+o Requirement based topic coherence (based on links)
+o Topic coherence (based on links)
+Add requirements for the analytics.
+Based on the results a major redesign on the rmtoo requirements was
+done.
+Analytics mode is currently in alpha state.
+
+Removed bug in graph2 output which under certain conditions makes dot
+to render one node more than once.
+
+Output (especially of topics) is sorted now by the id / name.  This
+was neccessary because when unsorted results are not comparable for
+black box tests.
+
+Enhanced many man-pages.
+
+Internal Changes
+----------------
+
+Completely rewrote of the interface to a version control system
+o modularized the access: this makes it possible to easily add other
+  version control systems.  The first reference implementation is for
+  git.
+o git-python is currently changing dramatically.  There were API
+  changes from 0.1x to 0.2 and there are also some from 0.2 to
+  0.3.  Because it is much work (especially testing different
+  versions) it was decided to include git-python and the depending
+  libraries into the rmtoo package.  When the interface (API) is
+  fixed, they will removed.
+
+Started to add blackbox tests. This increases the coverage rate from
+56% to about 83%.  Added gnatt project output checks to blackbox
+tests. 

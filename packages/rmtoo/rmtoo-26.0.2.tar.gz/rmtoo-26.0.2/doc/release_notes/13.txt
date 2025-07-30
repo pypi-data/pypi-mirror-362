@@ -1,0 +1,60 @@
+User visible changes
+--------------------
+
+Add version1 output module: writes out the version number of the used
+requirement set to a file.
+
+Output module latex2 is configurable in the way, that it is possible
+to give a list of attributes which are printed in the small table
+beneath the requirement itself.
+
+Output module graph is configurable: it is possible to specify which
+requirement attributes are transposed into node properties.
+
+latex2 output enhancement: comma seperates two requirements - not ends
+them.  There is no additional comma at the end of the list anymore.
+
+oopricing1 enhancements: added supplier column, added result sheet,
+added version information to file properties.  Removed xml formatting
+problem.
+
+graph enhancements: version information was added to the output
+graph. 
+
+Utility added which reads in the csv output of the oopricing1 and
+converts it into a dependency graph.  Nodes include information about
+requirement pricing and dependent pricing.  Also the nodes are colored
+after the compliance: green=fully, orange=partial and red=none
+compliant.
+
+Fix 3052358: a specific error is logged if a topic does not exists at
+all. (This is another case when the requirement is not used because
+the topic is not included - in the later case a debug message is
+logged, because this is seen as a normal use case.)
+
+Add man page for version1 output.
+
+Add man page for rmtoo-pricing-graph.
+
+Fixed bug which made it possible that a requirement references
+itself: self-dependency is excluded now.
+
+
+Internal Changes
+----------------
+
+Blackbox tests comparison enhancement: on different systems /
+different times the XML files were stored in different orders.
+Therefore all XML files are now parsed and the content is compared -
+instead of one seriallized representation.
+
+Changed xml comparison from simple do-it-yourself to xmldiff: the
+later one really works in all cases.  The first one had problems when
+the nodes are sorted in a different order.  This does not solve the
+problem completely: differences are still found where no differences
+should be.
+What DOES fix this (i.e. getting always the same XML document) is
+sorting the styles (which are read from a dictionary) before
+outputting them.
+
+
