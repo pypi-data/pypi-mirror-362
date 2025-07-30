@@ -1,0 +1,26 @@
+terraform {
+  required_providers {
+    databricks = {
+      source  = "databricks/databricks"
+      version = ">=@DATABRICKS_VERSION@"
+    }
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "@bucket@" 
+    key            =  "@key@" 
+    region         = "@region@" 
+    dynamodb_table = "@lock_table@" # this is the lock table
+  }
+}
+data "terrform_remote_state" "project_env_state" {
+   backend = "s3"
+ config = {
+   bucket = "@bucket@"
+   key    = "@key@"
+   region = "@region@"
+ }
+}
