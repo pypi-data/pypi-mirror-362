@@ -1,0 +1,176 @@
+Metadata-Version: 2.4
+Name: biosgen
+Version: 1.0.2
+Summary: Tumor staining using Stable One-step Diffusion for fast neural style transfer
+Project-URL: Homepage, https://github.com/kurosawaxyz/BiOSGen
+Project-URL: Bug Reports, https://github.com/kurosawaxyz/BiOSGen/issues
+Project-URL: Source, https://github.com/kurosawaxyz/BiOSGen
+Author-email: "H. T. Duong Vu" <vuhoang.thduong@gmail.com>, Agustí Alentorn <agusti.alentorn@icm-institute.org>, Tamara Künzle <tamara.kunzle@icm-institute.org>
+Maintainer-email: "H. T. Duong Vu" <vuhoang.thduong@gmail.com>
+License: MIT License
+        
+        Copyright (c) 2025 spinning car
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Keywords: bioinformatics,generative-ai,nst
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Requires-Python: >=3.10
+Requires-Dist: accelerate
+Requires-Dist: clean-fid
+Requires-Dist: diffusers
+Requires-Dist: einops
+Requires-Dist: matplotlib
+Requires-Dist: numpy
+Requires-Dist: omegaconf
+Requires-Dist: opencv-python
+Requires-Dist: pandas
+Requires-Dist: pytorch-fid
+Requires-Dist: pyyaml
+Requires-Dist: requests
+Requires-Dist: scikit-image
+Requires-Dist: scikit-learn
+Requires-Dist: scipy
+Requires-Dist: seaborn
+Requires-Dist: thop
+Requires-Dist: torch
+Requires-Dist: torchinfo
+Requires-Dist: torchvision
+Requires-Dist: torchviz
+Requires-Dist: tqdm
+Requires-Dist: transformers
+Provides-Extra: dev
+Requires-Dist: black; extra == 'dev'
+Requires-Dist: flake8; extra == 'dev'
+Requires-Dist: isort; extra == 'dev'
+Requires-Dist: mypy; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Description-Content-Type: text/markdown
+
+# Clinical Neural Style Transfer for Tumor Staining with Stable Diffusion Models
+## Project structure
+```txt
+BiOSGen/
+│── preprocess/            
+│   ├── __init__.py      
+│   ├── dataloader.py            
+│   ├── patches_utils.py    
+│   ├── tissue_mask.py      
+│── osgen/                   
+│   ├── __init__.py             
+│   ├── base.py
+│   ├── embeddings.py
+│   ├── loss.py
+│   ├── nn.py
+│   ├── pipeline.py         # Main pipeline for OSGen
+│   ├── unet.py
+│   ├── utils.py
+│   ├── vae.py
+│── configs/               
+│   ├── config.yml          
+│── bin/                
+│   ├── train.py  
+│   ├── test.py           
+│   ├── eval.py     
+│── scripts/   
+│   ├── batch_train.sh
+│   ├── data_installer.py
+│   ├── data_installer.sh
+│   ├── setup_env.sh
+│── demo/
+│── docs/
+│── assets/  
+│── requirements.txt
+│── README.md    
+│── LICENSE
+│── setup.py
+│── pyproject.toml
+```
+
+## Users manual
+
+### Quick setup
+```bash
+chmod +x scripts/setup_env.sh
+./scripts/setup_env.sh
+```
+
+#### Important notice
+**Warning**:
+
+1. Environment setup using YAML file removed due to issues with `conda` and `pip` packages. *(Update on 2025-04-26)*
+
+2. Severe issues may arise while building wheels for `flash-attn` due to incomppatibility with Python version >= 3.10. If you encounter this issue, please downgrade your Python version to 3.9 or 3.10.
+```shell
+# Create a new conda environment with Python 3.10
+conda create -n biosgen python=3.10 -y
+
+# Activate the environment
+conda activate biosgen
+
+# Check Python version
+python --version
+
+# Optional: upgrade pip
+pip install --upgrade pip
+
+# Install build tools (needed for compiling flash-attn)
+pip install ninja packaging
+
+# Install PyTorch with CUDA 12.1
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# Now install flash-attn (will compile with correct CUDA/PyTorch setup)
+pip install flash-attn --no-build-isolation -v
+
+# Install other dependencies
+pip install -r requirements.txt
+conda install -c conda-forge python-graphviz -y
+```
+
+>*Note*: `-y` flag is used to automatically confirm the installation of packages without prompting for user input. This is useful when you want to install multiple packages in a single command without having to manually confirm each one.
+
+
+### Data installation
+
+#### Install train-test data
+
+```bash
+chmod +x scripts/data_installer.sh
+./scripts/data_installer.sh
+```
+
+>**Note**: Data installation instruction for the EMPaCT dataset provided by [AI4SCR](https://github.com/AI4SCR/VirtualMultiplexer)
+#### Downloading the EMPaCT dataset 
+
+European Multicenter Prostate Cancer Clinical and Translational Research Group (EMPaCT) [[1](https://www.sciencedirect.com/science/article/pii/S0022534712029710), [2](https://www.sciencedirect.com/science/article/pii/S2405456917300020), [3](https://www.frontiersin.org/journals/oncology/articles/10.3389/fonc.2020.00246/full)] contains prostate cancer tissue microarrays (TMAs) from 210 patients with 4 cores per patient for several clinically relevant markers.
+
+All images from Hematoxylin & Eosin (H&E) and Immunohistochemistry (IHC) stainings are uploaded to Zenodo under a Creative Commons Attribution 4.0 International License and can be dowloaded from this [link](https://zenodo.org/records/10066853).
+
+#### Downloading Masks, Bounding Boxes and Data Splits
+
+AI4SCR uploaded the all relevant information to [Figshare]( https://figshare.com/projects/VirtualMultiplexer/230498) and 
+provide a notebook to demonstrate how to process and plot the data.

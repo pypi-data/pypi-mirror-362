@@ -1,0 +1,102 @@
+# -*- coding: utf-8 -*-
+# @Author: H. T. Duong Vu
+# How to: https://packaging.python.org/en/latest/guides/section-build-and-publish/
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "biosgen"
+version = "1.0.2"
+description = "Tumor staining using Stable One-step Diffusion for fast neural style transfer"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+
+keywords = ["generative-ai", "nst", "bioinformatics"]
+
+authors = [
+    { name = "H. T. Duong Vu", email = "vuhoang.thduong@gmail.com" },
+    { name = "Agustí Alentorn", email = "agusti.alentorn@icm-institute.org" },
+    { name = "Tamara Künzle", email = "tamara.kunzle@icm-institute.org" }
+]
+maintainers = [
+    { name = "H. T. Duong Vu", email = "vuhoang.thduong@gmail.com" },
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "opencv-python",
+    "torch",
+    "torchvision",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "scikit-image",
+    "requests",
+    "scikit-learn",
+    "pyyaml",
+    "tqdm",
+    "transformers",
+    "einops",
+    "diffusers",
+    "accelerate",
+    "thop",
+    "omegaconf",
+    "torchviz",
+    "scipy",
+    "pytorch-fid",
+    "clean-fid",
+    "torchinfo",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "isort",
+    "flake8",
+    "mypy",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/kurosawaxyz/BiOSGen"
+"Bug Reports" = "https://github.com/kurosawaxyz/BiOSGen/issues"
+"Source" = "https://github.com/kurosawaxyz/BiOSGen"
+
+[tool.hatch.build.targets.wheel]
+packages = ["biosgen"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/biosgen",
+    "/README.md",
+    "/LICENSE",
+]
+
+# Development tools configuration
+[tool.black]
+line-length = 88
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
