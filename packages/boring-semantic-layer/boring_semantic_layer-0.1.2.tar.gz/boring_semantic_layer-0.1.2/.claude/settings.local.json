@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest tests/test_semantic_mcp.py -v)",
+      "Bash(pip install:*)",
+      "Bash(grep:*)",
+      "Bash(python -m pytest tests/test_semantic_mcp.py::TestQueryModelTool::test_query_model_invalid_order_by -v)",
+      "mcp__flight_sm__get_time_range",
+      "mcp__flight_sm__query_model",
+      "mcp__flight_sm__list_models",
+      "Bash(mv:*)",
+      "WebFetch(domain:ibis-project.org)",
+      "WebFetch(domain:altair-viz.github.io)",
+      "Bash(rm:*)",
+      "Bash(python test:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(python:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:docs.malloydata.dev)",
+      "mcp__ide__executeCode",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl:*)",
+      "Bash(npm install:*)",
+      "Bash(npm start)",
+      "Bash(npm rebuild:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx tsc:*)",
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(node:*)",
+      "Bash(NODE_PATH=malloy-samples/node_modules node -e \"\nconst fs = require(''fs'');\nconst { Malloy } = require(''./malloy-samples/node_modules/@malloydata/malloy/dist/malloy.js'');\nconst { DuckDBConnection } = require(''./malloy-samples/node_modules/@malloydata/db-duckdb/dist/duckdb_connection.js'');\n\nasync function runMalloyQuery() {\n  console.log(''Starting Malloy query...'');\n  \n  const connection = new DuckDBConnection(''duckdb'', '':memory:'', __dirname);\n  \n  const lookupConnection = async (name) => {\n    if (name === ''duckdb'') {\n      return connection;\n    }\n    throw new Error(\\`No connection ${name}\\`);\n  };\n  \n  const urlReader = {\n    readURL: async (url) => fs.readFileSync(url, ''utf-8''),\n  };\n  \n  const malloySource = \\`\n    source: flights is duckdb.table(''https://pub-a45a6a332b4646f2a6f44775695c64df.r2.dev/flights.parquet'') extend {\n      join_one: carriers is duckdb.table(''https://pub-a45a6a332b4646f2a6f44775695c64df.r2.dev/carriers.parquet'') \n        on carrier = carriers.code\n      measure: \n        flight_count is count()\n        to_sfo_flight_count is flight_count { where: destination = ''SFO'' }\n        to_oak_flight_count is flight_count { where: destination = ''OAK'' }\n        from_sfo_flight_count is flight_count { where: origin = ''SFO'' }\n        from_oak_flight_count is flight_count { where: origin = ''OAK'' }\n        aircraft_count is count(tail_num)\n    }\n\n    run: flights -> {\n      where: destination ? ''SFO'' | ''OAK'' | ''SJC''\n      group_by: carriers.nickname, destination\n      aggregate: flight_count\n    }\n  \\`;\n  \n  try {\n    const parsed = Malloy.parse({ \n      source: malloySource, \n      url: new URL(''file:///tmp/flights_query.malloy'') \n    });\n    \n    const model = await Malloy.compile({\n      urlReader,\n      connections: { lookupConnection },\n      parse: parsed,\n    });\n    \n    const preparedQuery = model.getPreparedQuery();\n    \n    const result = await Malloy.run({\n      connection,\n      preparedResult: preparedQuery.preparedResult\n    });\n    \n    console.log(''Flight Query Results:'');\n    console.log(JSON.stringify(result, null, 2));\n    \n  } catch (error) {\n    console.error(''Error running Malloy query:'', error);\n  }\n}\n\nrunMalloyQuery().catch(console.error);\n\")"
+    ],
+    "deny": []
+  }
+}
