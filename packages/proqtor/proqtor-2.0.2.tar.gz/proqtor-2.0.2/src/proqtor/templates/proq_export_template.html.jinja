@@ -1,0 +1,156 @@
+{%-
+set diff_color = {
+"+ ": "rgba(0,255,0,.2)",
+"- ": "rgba(255,0,0,.2)",
+"? ": "rgba(0,0,255,.2)",
+"  ": "none",
+}
+-%}
+
+{%-macro render_tescases(groupName, depth, testcases)%}
+<div class='no-break' style="flex: content;flex-wrap:wrap;">
+    <h{{depth}}>{{groupName}} Test Cases</h{{depth}}>
+    <table style="width:100%; overflow:hidden;">
+        <thead>
+            <tr>
+                <th>Input</th>
+                <th>Expected Output</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for testcase in testcases %}
+            <tr>
+                <td>
+                    <pre>{{ testcase.input | e }}</pre>
+                </td>
+                <td>
+                    <pre>{{ testcase.output | e }}</pre>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro -%}
+
+{%-macro render_proq(title, proq, depth=1)%}
+<div class="problem">
+    <h{{depth}}>{{ title }}</h{{depth}}>
+    <div class="no-break">
+    <p><b>{{proq.title}}</b></p>
+    <div class="prob-statement">
+        {{ proq.statement | gfm}}
+    </div>
+    </div>
+    <div style="display: flex; flex-direction: row; flex-wrap:wrap; gap: 20px;">
+        {%set has_template = proq.solution.template_code.strip()%}
+        {%if has_template%}
+        <div class='no-break' style="flex: content;">
+            <h{{depth+1}}>Code Template</h{{depth+1}}>
+            <pre class="solution">
+                {%-if proq.solution.prefix.strip() -%}
+                    <code class="dim lang-{{proq.lang}}">
+                    {{- proq.solution.prefix|e -}}
+                    </code>
+                {%- endif -%}
+                <code class="lang-{{proq.lang}}">
+                {{- proq.solution.template | e -}}
+                </code>
+                {%-if proq.solution.suffix.strip() -%}
+                    <code class="dim lang-{{proq.lang}}">
+                    {{-proq.solution.suffix | e -}}
+                    </code>
+                {%- endif -%}
+            </pre>
+        </div>
+        {%endif%}
+        <div class='no-break' style="flex: content;">
+            <h{{depth+1}}>Solution</h{{depth+1}}>
+            <pre class="solution">
+            {%-if proq.solution.prefix.strip() -%}
+                <code class="dim lang-{{proq.lang}}">
+                {{- proq.solution.prefix|e -}}
+                </code>
+            {%- endif -%}
+            <code class="lang-{{proq.lang}}">
+            {{- proq.solution.solution | e -}}
+            </code>
+            {%-if proq.solution.suffix.strip() -%}
+                <code class="dim lang-{{proq.lang}}">
+                {{-proq.solution.suffix | e -}}
+                </code>
+            {%- endif -%}
+        </pre>
+        </div>
+        {%if has_template and not hide_template_diff%}
+        <div class='no-break' style="flex: content;">
+            <h{{depth+1}}>Template - Solution Diff</h{{depth+1}}>
+            <pre class="solution">
+            {%-if proq.solution.prefix.strip() -%}
+                <code class="dim lang-{{proq.lang}}">
+                {{- proq.solution.prefix | e -}}
+                </code>
+            {%- endif -%}
+            <output style="padding-block:1rem">
+            {%- for diff in proq.solution.template_solution_diff -%}
+                <span style="background:{{diff_color[diff[:2]]}};margin-left:15px;">
+                {{- diff[2:]|e -}}
+                </span>
+            {%- endfor -%}
+            </output>
+            {%-if proq.solution.suffix.strip() -%}
+                <code class="dim lang-{{proq.lang}}">
+                {{- proq.solution.suffix | e -}}
+                </code>
+            {%- endif-%}
+            </pre>
+        </div>
+        {%endif%}
+    </div>
+
+    {% if proq.solution.suffix_invisible%}
+    <h{{depth+1}}>Invisible Suffix</h{{depth+1}}>
+    {% if show_hidden_suffix %}
+    <pre class="solution"><code>{{proq.solution.suffix_invisible | e }}</code></pre>
+    {% else %}
+    <p>Invisible Suffix Hidden</p>
+    {% endif %}
+    {% endif %}
+    <div style="display: flex; flex-direction: row; flex-wrap:wrap; gap: 20px;">
+        {{render_tescases('Public', depth+1, proq.public_testcases)}}
+        {%if not hide_private_testcases %}
+        {{render_tescases('Private', depth+1, proq.private_testcases)}}
+        {%endif%}
+    </div>
+</div>
+
+<hr style="margin: 2rem 0 1rem;">
+{%endmacro-%}
+
+{%-macro render_nested_proq(nested_proq, depth=1)%}
+{%if nested_proq.content is sequence%}
+<h{{depth}}>{{nested_proq.title}}</h{{depth}}>
+{%for item in nested_proq.content %}
+{{render_nested_proq(item,depth+1)}}
+{%endfor%}
+{%else %}
+{{render_proq(nested_proq.title, nested_proq.content,depth)}}
+{%endif%}
+{%endmacro-%}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{nested_proq.title}}</title>
+    <style>
+        {% include "./export_style.css" %}
+    </style>
+    {% include "./katex_includes.html" %}
+    {% include "./highlightjs_includes.html" %}
+</head>
+<body>
+    {{render_nested_proq(nested_proq)}}
+</body>
+</html>
