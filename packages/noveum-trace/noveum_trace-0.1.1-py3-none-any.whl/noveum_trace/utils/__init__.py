@@ -1,0 +1,51 @@
+"""
+Utility modules for the Noveum Trace SDK.
+"""
+
+from .exceptions import (
+    AuthenticationError,
+    AuthorizationError,
+    ConfigurationError,
+    ContextError,
+    ElasticsearchError,
+    InstrumentationError,
+    NetworkError,
+    NoveumAPIError,
+    NoveumTracingError,
+    RateLimitError,
+    ResourceError,
+    SamplingError,
+    SerializationError,
+    SinkError,
+    SpanError,
+    TimeoutError,
+    ValidationError,
+    configuration_error,
+    network_error,
+    sink_error,
+    validation_error,
+)
+
+__all__ = [
+    "AuthenticationError",
+    "AuthorizationError",
+    "ConfigurationError",
+    "ContextError",
+    "ElasticsearchError",
+    "InstrumentationError",
+    "NetworkError",
+    "NoveumAPIError",
+    "NoveumTracingError",
+    "RateLimitError",
+    "ResourceError",
+    "SamplingError",
+    "SerializationError",
+    "SinkError",
+    "SpanError",
+    "TimeoutError",
+    "ValidationError",
+    "configuration_error",
+    "network_error",
+    "sink_error",
+    "validation_error",
+]
