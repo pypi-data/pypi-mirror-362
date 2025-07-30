@@ -1,0 +1,26 @@
+
+stuff: out-block
+block->:
+  if: true
+  furry:
+    ->: confirm
+    message: Are our friends furry?
+  friend: dog
+
+# Writes block.beer to public_context
+  stuff: in-block
+  beer:
+    ->: tackle fake-tackle
+
+  things:
+    ->: var "{{ block.beer.things }}"
+
+  test_block:
+    ->: block
+    items:
+      my_dog:
+        ->: var
+        input: block.friend
+        if: block.friend == 'dog'
+
+  foo: bar

@@ -1,0 +1,42 @@
+
+matcher: bock_true
+
+matches_true:
+  ->: match matcher
+  case:
+    bock_true->:
+      if: true
+      value: True
+      stuff: things
+      dict:
+        stuff->: "{{stuff}}"
+      list:
+        - stuff
+        - things
+      hook-expanded:
+        ->: literal expanded
+      hook-compact->: literal compact
+
+
+# This should exist in output as empty key
+matches_false:
+  ->: match matcher
+  case:
+    # This key should not exist
+    bock_true->:
+      if: false
+      value: True
+
+
+expected:
+  value: True
+  stuff: things
+  dict:
+    stuff: things
+  list:
+    - stuff
+    - things
+  hook-expanded: expanded
+  hook-compact: compact
+
+check->: assert "{{matches_true}}" "{{expected}}"
