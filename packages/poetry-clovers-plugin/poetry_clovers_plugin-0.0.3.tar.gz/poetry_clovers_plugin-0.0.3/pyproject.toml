@@ -1,0 +1,27 @@
+[project]
+name = "poetry-clovers-plugin"
+version = "0.0.3"
+description = ""
+authors = [{ name = "KarisAya", email = "karisaya@foxmail.com" }]
+readme = "README.md"
+requires-python = ">=3.12,<4.0.0"
+dependencies = ["poetry (>=2.0.0,<3.0.0)", "clovers (>=0.4.6,<1.0.0)"]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.plugins."poetry.application.plugin"]
+clovers = "poetry_clovers_plugin.plugin:CloversApplicationPlugin"
+
+[tool.poetry.group.dev.dependencies]
+pydantic = "^2.11.7"
+httpx = "^0.28.1"
+websockets = "^15.0.1"
+clovers = { path = "D:/CLOVERS/clovers", develop = true }
+clovers-client = { path = "D:/CLOVERS/clovers-client", develop = true }
+
+
+[tool.poetry.scripts]
+clovers = "poetry_clovers_plugin.scripts:main"
