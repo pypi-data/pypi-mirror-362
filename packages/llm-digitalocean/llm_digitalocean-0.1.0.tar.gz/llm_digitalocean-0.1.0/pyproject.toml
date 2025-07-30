@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-digitalocean"
+version = "0.1.0"
+description = "LLM plugin for models hosted by DigitalOcean AI"
+readme = "README.md"
+authors = [{name = "Rajashekar Chintalapti"}]
+license = "Apache-2.0"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["llm", "ai", "digitalocean", "language-models", "plugin"]
+dependencies = [
+    "llm>=0.23",
+    "httpx",
+    "openai>=1.57.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/rajashekar/llm-digitalocean"
+Changelog = "https://github.com/rajashekar/llm-digitalocean/releases"
+Issues = "https://github.com/rajashekar/llm-digitalocean/issues"
+CI = "https://github.com/rajashekar/llm-digitalocean/actions"
+
+[project.entry-points.llm]
+digitalocean = "llm_digitalocean"
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-recording", "inline-snapshot"]
+lint = ["flake8", "black", "isort"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
