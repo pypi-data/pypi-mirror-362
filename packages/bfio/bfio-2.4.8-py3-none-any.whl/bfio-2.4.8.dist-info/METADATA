@@ -1,0 +1,140 @@
+Metadata-Version: 2.4
+Name: bfio
+Version: 2.4.8
+Summary: Simple reading and writing classes for tiled tiffs using Bio-Formats.
+Author-email: Nick Schaub <nick.schaub@nih.gov>, Sameeul Bashir Samee <sameeul.samee@axleinfo.com>
+Maintainer-email: Sameeul Bashir Samee <sameeul.samee@axleinfo.com>
+License: MIT License
+        
+        Copyright (c) 2023 PolusAI
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Documentation, https://bfio.readthedocs.io/en/latest/
+Project-URL: Repository, https://github.com/PolusAI/bfio
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: imagecodecs>=2021.2.26
+Requires-Dist: numpy
+Requires-Dist: ome-types>=0.4.2
+Requires-Dist: zarr<3,>=2.6.1
+Requires-Dist: scyjava
+Requires-Dist: jpype1
+Requires-Dist: tifffile>=2022.8.12
+Requires-Dist: bfiocpp
+Provides-Extra: dev
+Requires-Dist: ome_zarr; extra == "dev"
+Requires-Dist: pillow; extra == "dev"
+Requires-Dist: requests>=2.26.0; extra == "dev"
+Dynamic: license-file
+
+# **B**io**F**ormats **I**nput/**O**utput utility (bfio 2.4.8)
+
+[![Documentation Status](https://readthedocs.org/projects/bfio/badge/?version=latest)](https://bfio.readthedocs.io/en/latest/?badge=latest)
+[![PyPI](https://img.shields.io/pypi/v/bfio)](https://pypi.org/project/bfio/)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/bfio)
+[![Conda](https://img.shields.io/conda/v/conda-forge/bfio)](https://anaconda.org/conda-forge/bfio)
+[![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/bfio?label=Conda%20downloads)](https://anaconda.org/conda-forge/bfio)
+![Bower](https://img.shields.io/bower/l/MI)
+
+This tool is a simplified but powerful interface to
+[Bio-Formats](https://www.openmicroscopy.org/bio-formats/)
+using jpype for direct access to the library. This tool is designed with
+scalable image analysis in mind, with a simple interface to treat any image
+like a memory mapped array.
+
+Docker containers with all necessary components are available (see
+**Docker Containers** section).
+
+## Summary
+
+- [Installation](#installation)
+- [Docker](#docker)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Versioning](#versioning)
+- [Authors](#authors)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+## Installation
+
+### Setting up Java
+
+**Note:** `bfio` can be used without Java, but only the `python` and `zarr`
+backends will be usable. This means only files in tiled OME Tiff or OME Zarr format can be
+read/written.
+
+In order to use the `bioformats` backend, it is necessary to first install the JDK and Maven.
+The `bfio` package is generally tested with
+[JDK 8](https://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html),
+but JDK 11 and later also appear to work.
+Here are some info on installing Maven on various OS ([Windows](https://phoenixnap.com/kb/install-maven-windows) | [Linux](https://www.digitalocean.com/community/tutorials/install-maven-linux-ubuntu) | [Mac](https://www.digitalocean.com/community/tutorials/install-maven-mac-os))
+
+### Installing bfio
+
+The `bfio` package and the core dependencies (numpy, tifffile, imagecodecs, scyjava) can
+be installed using pip:
+
+`pip install bfio`
+
+## Docker
+
+### polusai/bfio:2.4.8
+
+Ubuntu based container with bfio and all dependencies (including Java).
+
+### polusai/bfio:2.4.8-imagej
+
+Same as above, except comes with ImageJ and PyImageJ.
+
+### polusai/bfio:2.4.8-tensorflow
+
+Tensorflow container with bfio installed.
+
+## Documentation
+
+Documentation and examples are available on
+[Read the Docs](https://bfio.readthedocs.io/en/latest/).
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions
+available, see the [tags on this
+repository](https://github.com/PurpleBooth/a-good-readme-template/tags).
+
+## Authors
+
+Nick Schaub (nick.schaub@nih.gov, nick.schaub@axleinfo.com)
+Sameeul B Samee (sameeul.samee@axleinfo.com)
+
+## License
+
+This project is licensed under the [MIT License](LICENSE)
+Creative Commons License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Parts of this code were written/modified from existing code found in
+    `tifffile`.
