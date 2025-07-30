@@ -1,0 +1,148 @@
+# QAgentLib
+
+A specialized reinforcement learning package inspired by and building upon the core concepts of **Agentic Learn Pro**, with targeted features for specific domains.
+
+## Overview
+
+This library provides a clean, modular, and well-documented implementation of Q-learning with specialized extensions for targeted applications. It demonstrates the influence and advancement inspired by the original Agentic Learn Pro project, while focusing on specific use cases and advanced reinforcement learning techniques.
+
+## Attribution
+
+This package is an independent implementation inspired by the foundational work of **Agentic Learn Pro**, created by Stephanie Ewelu. We acknowledge and appreciate the significant contributions of Agentic Learn Pro to the field of reinforcement learning and agentic AI.
+
+## Installation
+
+```bash
+pip install QAgentLib
+```
+
+## Usage
+
+### Basic Q-Learning
+
+```python
+from QAgentLib.agent import QLearningAgent
+from QAgentLib.environment import SimpleEnv
+
+env = SimpleEnv()
+agent = QLearningAgent(state_space=env.state_space, action_space=env.action_space)
+
+for episode in range(100):
+    state = env.reset()
+    done = False
+    while not done:
+        action = agent.choose_action(state)
+        next_state, reward, done = env.step(action)
+        agent.learn(state, action, reward, next_state)
+        state = next_state
+    agent.decay_exploration()
+print("Q-table after training:", agent.q_table)
+```
+
+### Targeted Q-Learning with Advanced Features
+
+```python
+from QAgentLib.agent import TargetedQLearningAgent
+from QAgentLib.environment import GridWorldEnv
+
+# Create a grid world with obstacles
+env = GridWorldEnv(
+    width=5, 
+    height=5, 
+    start_pos=(0, 0), 
+    goal_pos=(4, 4),
+    obstacles=[(1, 1), (2, 1), (3, 1), (1, 3), (2, 3), (3, 3)]
+)
+
+# Create a targeted agent for grid navigation
+agent = TargetedQLearningAgent(
+    state_space=[(x, y) for x in range(env.width) for y in range(env.height)],
+    action_space=[0, 1, 2, 3],  # up, right, down, left
+    target_domain="grid_navigation"
+)
+
+# Training loop with experience replay
+for episode in range(200):
+    state = env.reset()
+    total_reward = 0
+    done = False
+    
+    while not done:
+        action = agent.choose_action(state)
+        next_state, reward, done, info = env.step(action)
+        agent.learn(state, action, reward, next_state)
+        
+        # Replay experiences periodically
+        if episode > 10 and episode % 5 == 0:
+            agent.replay_experience(batch_size=10)
+            
+        state = next_state
+        total_reward += reward
+        
+    # Adjust learning rate based on performance
+    agent.adaptive_learning_rate()
+    agent.decay_exploration(0.95)
+    
+    if episode % 20 == 0:
+        metrics = agent.get_performance_metrics()
+        print(f"Episode {episode}, Avg Reward: {metrics['avg_reward']:.2f}")
+        print(env.render())
+```
+
+### Multi-Objective Reinforcement Learning
+
+```python
+from QAgentLib.agent import TargetedQLearningAgent
+from QAgentLib.environment import MultiObjectiveEnv
+
+# Create environment with 3 competing objectives
+env = MultiObjectiveEnv(
+    num_objectives=3,
+    objective_weights=[0.5, 0.3, 0.2]  # Prioritize first objective
+)
+
+# Create agent for multi-objective optimization
+agent = TargetedQLearningAgent(
+    state_space=env.state_space,
+    action_space=list(range(env.action_space)),
+    target_domain="multi_objective"
+)
+
+# Training loop
+for episode in range(100):
+    state = env.reset()
+    done = False
+    
+    while not done:
+        action = agent.choose_action(state[0])  # state is (state_index, objective_values)
+        next_state, reward, done, info = env.step(action)
+        agent.learn(state[0], action, reward, next_state[0])
+        state = next_state
+        
+    if episode % 10 == 0:
+        metrics = agent.get_performance_metrics()
+        print(f"Episode {episode}, Performance: {metrics['avg_reward']:.2f}")
+        print(f"Objective values: {info['objective_values']}")
+```
+
+## Development
+
+For development, clone the repository and install in editable mode:
+
+```bash
+git clone https://github.com/your_username/QAgentLib.git
+cd QAgentLib
+pip install -e .
+```
+
+## Testing
+
+To run tests:
+
+```bash
+pytest
+```
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
