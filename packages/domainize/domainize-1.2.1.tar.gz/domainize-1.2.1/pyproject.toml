@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "domainize"
+version = "1.2.1"
+description = "Library for extracting domains."
+authors = ["Data <data@camber.io>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://gitlab.com/rocket-boosters/pipper/domainize"
+repository = "https://gitlab.com/rocket-boosters/pipper/domainize"
+documentation = "https://gitlab.com/rocket-boosters/pipper/domainize"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Typing :: Typed"
+]
+exclude = ["domainize/tests"]
+[tool.poetry.scripts]
+domainize = 'domainize:main_cli'
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+coverage = "*"
+black = { version = "*", allow-prereleases = true }
+pytest-cov = "*"
+flake8 = "*"
+flake8-black = "*"
+mypy = ">=0.900"
+taskipy = ">=1.4.0"
+aok = "*"
+radon = "^5.1.0"
+
+[tool.taskipy.tasks]
+# https://github.com/illBeRoy/taskipy
+black = "black ."
+mypy = "mypy . --install-types --non-interactive --ignore-missing-imports"
+flake8 = "flake8 ."
+radon = "radon cc . && radon mi ."
+test = "pytest . --cov-report=term-missing --cov=."
+lint = "task black && task flake8 && task mypy"
+check = "task black && task flake8 && task mypy && task radon && task test"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
