@@ -1,0 +1,108 @@
+# SPDX-FileCopyrightText: 2024 Georg-August-Universität Göttingen
+#
+# SPDX-License-Identifier: CC0-1.0
+
+[project]
+name = "tgadmin"
+description = "TextGrid repository administration cli tool, based on tgclients"
+
+requires-python = ">= 3.8"
+dynamic = ["version"]
+
+readme = "README.md"
+license = { file = "LICENSE" }
+
+authors = [
+  {name = "Ubbo Veentjer", email = "veentjer@sub.uni-goettingen.de"},
+]
+
+maintainers = [
+  {name = "Ubbo Veentjer", email = "veentjer@sub.uni-goettingen.de"},
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+    "click",
+    "rich-click",
+    "tgclients==0.22.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "reuse",
+    "ruff",
+    "pydoclint",
+    "pip-tools",
+    "pytest",
+    "coverage",
+    "pre-commit",
+]
+
+[project.urls]
+Homepage = "https://textgrid.de"
+Issues = "https://gitlab.gwdg.de/dariah-de/textgridrep/tgadmin/-/issues"
+Source = "https://gitlab.gwdg.de/dariah-de/textgridrep/tgadmin"
+
+[project.scripts]
+tgadmin = "tgadmin.tgadmin:cli"
+
+[tool.setuptools.dynamic]
+version = {attr = "tgadmin.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+tgadmin = ["linkrewrite-specs/*"]
+
+[tool.semantic_release]
+version_variables = ["src/tgadmin/__init__.py:__version__"]
+major_on_zero = false
+# if you want a version without you need to set this option early
+# or rename all the tags done before
+#tag_format = "{version}"
+
+[tool.semantic_release.remote]
+type = "gitlab"
+
+[tool.semantic_release.changelog]
+exclude_commit_patterns = ["Merge branch*"]
+
+[tool.ruff]
+exclude = [
+    "build",
+    "venv",
+]
+
+line-length = 100
+
+[tool.ruff.lint]
+# Enable `pydocstyle` rules, in addition to the defaults.
+select = ["E4", "E7", "E9", "F", "D", "PL"]
+# ignore "Missing docstring in `__init__`" because its opposed to DOC301 from pydocstyle
+ignore = ["D107"]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore `D` rules everywhere except for the `src/` directory.
+"!src/**.py" = ["D"]
+# Allow magic numbers in tests
+"tests/**.py" = ["PLR2004"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.pydoclint]
+style = 'google'
+skip-checking-raises = true
+allow-init-docstring = true
+check-return-types = false # TODO: check auth.py zeep return types

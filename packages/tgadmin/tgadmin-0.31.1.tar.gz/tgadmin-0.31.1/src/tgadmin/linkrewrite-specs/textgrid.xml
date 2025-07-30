@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+SPDX-FileCopyrightText: 2025 TextGrid Consortium (http://www.textgrid.de)
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
+<!-- This is the link rewriter's internal configuration file for XML schemas
+	defined internally by TextGrid. -->
+
+<rw:importSpec xmlns:rw="http://textgrid.info/import"
+	xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://textgrid.info/import ../../xsd/textgrid-import-2010.xsd "
+	xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:md="http://textgrid.info/namespaces/metadata/core/2010">
+
+	<rw:xmlConfiguration xml:id="aggregation"
+		description="TextGrid Aggregations and Editions">
+		<!-- FIXME shouldn't there be some 'rdf:describes' element? -->
+		<rw:element name="ore:aggregates" method="full" />
+		<rw:element name="rdf:Description" method="none">
+			<rw:attribute name="rdf:about" method="full"/>
+		</rw:element>
+		<rw:any-element name="any" method="none">
+			<rw:attribute name="rdf:resource" method="full"/>
+		</rw:any-element>
+
+	</rw:xmlConfiguration>
+
+	<rw:xmlConfiguration xml:id="metadata" description="TextGrid Metadata">
+		<!-- note we never rewrite the identifier! -->
+		<rw:element name="md:isEditionOf" method="full" />
+		<rw:element name="md:isVersionOf" method="full" />
+		<rw:element name="md:isAlternativeFormatOf" method="full" />
+		<rw:element name="md:hasSchema" method="full" />
+		<rw:element name="md:hasAdaptor" method="full" />
+		<rw:any-element name="rw:any" method="none">
+			<rw:attribute name="rdf:resource" method="full" />
+			<rw:attribute name="rdf:about" method="full" />
+		</rw:any-element>
+	</rw:xmlConfiguration>
+
+	<rw:xmlConfiguration xml:id="encoding" description="XML Encoding normalisation only"/>
+
+</rw:importSpec>
