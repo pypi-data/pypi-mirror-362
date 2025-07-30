@@ -1,0 +1,43 @@
+name: Publish Python (MPT) Package
+
+on:
+  push:
+    # branches:
+    #  - main  # Publish only when pushing to the main branch
+    tags:    # Publish when a tag is created
+       - 'v*'  # Trigger for tags starting with 'v'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: PyPI
+
+    steps:
+    # Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Set up Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+
+    # Build the package
+    - name: Build package
+      run: |
+        python -m build
+
+    # Publish to PyPI
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      run: |
+        python -m twine upload dist/*

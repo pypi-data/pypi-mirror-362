@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+requires-python = ">=3.9"
+name = "mptsec"
+dynamic = ["version"]
+description = "Mobile Pentest Toolkit (MPT)"
+authors = [
+    {name = "Alexander Subbotin", email = "dev@bytesnipers.com"},
+]
+readme = "README.md"
+keywords = ["MPT", "Mobile", "Pentesting"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    'Operating System :: OS Independent'
+]
+dependencies = [
+    "GitPython",
+    "colorlog",
+    "colorama",
+    "tabulate",
+    "frida-tools",
+    "simple_term_menu",
+    "netifaces",
+    "poetry"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/ByteSnipers/mobile-pentest-toolkit"
+Repository = "https://github.com/ByteSnipers/mobile-pentest-toolkit"
+Changelog = "https://github.com/ByteSnipers/mobile-pentest-toolkit/blob/master/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = {attr = "mpt.settings.__version__"}
+
+[project.scripts]
+mpt = "mpt.console:cli"
