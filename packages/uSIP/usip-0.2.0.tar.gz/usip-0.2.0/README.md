@@ -1,0 +1,115 @@
+# uSIP - Python SIP Client Library
+
+A comprehensive Python SIP (Session Initiation Protocol) client library with structured logging and professional CLI interface for VoIP communications.
+
+## Features
+
+- 🚀 **Complete SIP Implementation** - REGISTER, INVITE, ACK, BYE, and session management
+- 📊 **Structured Logging** - Rich, JSON, and Plain formats with detailed SIP message tracing
+- 🖥️ **Professional CLI** - Easy-to-use command line interface for quick operations
+- 🔐 **Digest Authentication** - Full support for SIP digest authentication
+- 🔄 **Session Management** - Automatic keepalive and proper call handling
+- 📞 **Real VoIP Integration** - Tested with voip.ms and other SIP providers
+- 🐍 **Modern Python** - Type hints, async support, and Python 3.8+ compatibility
+
+## Installation
+
+```bash
+pip install uSIP
+```
+
+## Quick Start
+
+### CLI Usage
+
+```bash
+# Check your SIP configuration
+usip status
+
+# Register with SIP server
+usip register
+
+# Make a call
+usip call 1234567890
+
+# Debug mode with JSON logging
+usip --debug --log-format json call 1234567890
+```
+
+### Python API Usage
+
+```python
+from sip_client import SimpleSIPClient, setup_logging
+
+# Set up logging
+setup_logging(level="INFO", log_format="rich")
+
+# Create client (reads from environment variables)
+client = SimpleSIPClient()
+
+# Register and make a call
+if client.send_register():
+    if client.make_call("1234567890"):
+        input("Press Enter to hang up...")
+        client.hangup()
+client.cleanup()
+```
+
+## Configuration
+
+Set these environment variables or create a `.env` file:
+
+```bash
+SIP_DOMAIN=your-sip-provider.com    # e.g., newyork1.voip.ms
+SIP_USERNAME=your_username          # Your SIP username
+SIP_PASSWORD=your_password          # Your SIP password
+SIP_PORT=5060                       # SIP port (default: 5060)
+```
+
+## Advanced Features
+
+### Multiple Logging Formats
+
+```bash
+# Rich format (default) - Beautiful console output
+usip --log-format rich status
+
+# JSON format - Machine readable, great for logging systems
+usip --log-format json --log-level DEBUG call 1234567890
+
+# Plain format - Simple text output
+usip --log-format plain register
+```
+
+### Library Components
+
+```python
+from sip_client import SIPTransport, DigestAuth, SIPMessageBuilder
+
+# Use individual components for advanced scenarios
+transport = SIPTransport("sip.example.com", 5060)
+message_builder = SIPMessageBuilder("sip.example.com", "username")
+auth = DigestAuth()
+
+# Build custom SIP messages
+headers = message_builder.create_register_headers(...)
+message = message_builder.create_sip_message("REGISTER", uri, headers)
+```
+
+## Compatibility
+
+- **Python**: 3.8, 3.9, 3.10, 3.11, 3.12+
+- **SIP Providers**: voip.ms, Asterisk, FreeSWITCH, and most RFC 3261 compliant servers
+- **Platforms**: Windows, macOS, Linux
+
+## Development
+
+1. Clone the repository
+2. Install development dependencies: `pip install -e .[dev]`
+3. Run tests: `pytest`
+4. Check types: `mypy src/`
+5. Format code: `black src/ tests/`
+
+## License
+
+MIT License - see LICENSE file for details. 
