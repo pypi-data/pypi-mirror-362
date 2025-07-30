@@ -1,0 +1,123 @@
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .User import User
+from .ChatMember import ChatMember
+from ..base_type import base_type
+from typing import Optional
+
+@base_type
+class ChatMemberAdministrator(ChatMember):
+    '''
+    Represents a chat member that has some additional privileges.
+    '''
+
+    can_delete_stories: bool
+    '''
+    True, if the administrator can delete stories posted by other users
+    '''
+
+    can_edit_stories: bool
+    '''
+    True, if the administrator can edit stories posted by other users, post stories to the chat page, pin chat stories, and access the chat's story archive
+    '''
+
+    can_post_stories: bool
+    '''
+    True, if the administrator can post stories to the chat
+    '''
+
+    can_invite_users: bool
+    '''
+    True, if the user is allowed to invite new users to the chat
+    '''
+
+    can_change_info: bool
+    '''
+    True, if the user is allowed to change the chat title, photo and other settings
+    '''
+
+    can_promote_members: bool
+    '''
+    True, if the administrator can add new administrators with a subset of their own privileges or demote administrators that they have promoted, directly or indirectly (promoted by administrators that were appointed by the user)
+    '''
+
+    can_restrict_members: bool
+    '''
+    True, if the administrator can restrict, ban or unban chat members, or access supergroup statistics
+    '''
+
+    can_manage_video_chats: bool
+    '''
+    True, if the administrator can manage video chats
+    '''
+
+    can_delete_messages: bool
+    '''
+    True, if the administrator can delete messages of other users
+    '''
+
+    can_manage_chat: bool
+    '''
+    True, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages, ignore slow mode, and send messages to the chat without paying Telegram Stars. Implied by any other administrator privilege.
+    '''
+
+    is_anonymous: bool
+    '''
+    True, if the user's presence in the chat is hidden
+    '''
+
+    can_be_edited: bool
+    '''
+    True, if the bot is allowed to edit administrator privileges of that user
+    '''
+
+    user: User
+    '''
+    Information about the user
+    '''
+
+    status: str
+    '''
+    The member's status in the chat, always "administrator"
+    '''
+
+    can_post_messages: bool = False
+    '''
+    Optional. True, if the administrator can post messages in the channel, approve suggested posts, or access channel statistics; for channels only
+    '''
+
+    can_edit_messages: bool = False
+    '''
+    Optional. True, if the administrator can edit messages of other users and can pin messages; for channels only
+    '''
+
+    can_pin_messages: bool = False
+    '''
+    Optional. True, if the user is allowed to pin messages; for groups and supergroups only
+    '''
+
+    can_manage_topics: bool = False
+    '''
+    Optional. True, if the user is allowed to create, rename, close, and reopen forum topics; for supergroups only
+    '''
+
+    custom_title: Optional[str] = None
+    '''
+    Optional. Custom title for this user
+    '''
+
