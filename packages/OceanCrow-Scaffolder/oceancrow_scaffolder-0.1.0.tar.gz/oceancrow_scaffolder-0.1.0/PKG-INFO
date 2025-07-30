@@ -1,0 +1,143 @@
+Metadata-Version: 2.4
+Name: OceanCrow_Scaffolder
+Version: 0.1.0
+Summary: A Python project scaffolding tool by Sheldon Kenny Salmon (@OceanCrowtt)
+Author-email: Sheldon Kenny Salmon <oceancrowtt@gmail.com>
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: click>=8.1.0
+Dynamic: license-file
+
+# OceanCrow_Scaffolder
+
+A Python project scaffolding tool by Sheldon Kenny Salmon (@OceanCrowtt). Create professional Python projects with one command, including folder structure, virtual environment, Git repository, and template files.
+
+## Features
+- Creates a standardized project structure (`src`, `tests`, `docs`, `private`).
+- Sets up a virtual environment for each project.
+- Initializes a Git repository with a `.gitignore`.
+- Includes a `start_project.bat` (Windows) or `start_project.sh` (macOS/Linux) for one-click virtual environment activation.
+- Supports project types: `basic` (simple Python script), `flask` (web app), `datascience` (data analysis).
+- Updates projects with missing files using `scaffold update`.
+- Colorful, user-friendly console output.
+
+## Prerequisites
+Before installing, ensure you have:
+1. **Python 3.12+** (64-bit): Download from [python.org](https://www.python.org/downloads/).
+   - **Windows**: Check "Add Python to PATH" during installation.
+   - **macOS/Linux**: Python is often pre-installed; verify with `python3 --version`.
+2. **Git**: Download from [git-scm.com](https://git-scm.com/download).
+   - **Windows**: Check "Add Git to PATH" during installation.
+3. **Optional Tools** (recommended):
+   - [Notepad++](https://notepad-plus-plus.org) (Windows) or any code editor.
+   - [VS Code](https://code.visualstudio.com).
+   - [7-Zip](https://7-zip.org) (Windows) for file management.
+
+## Installation
+Follow these steps to install and use `OceanCrow_Scaffolder`:
+
+### Step 1: Install Python
+1. Download and install Python 3.12+ from [python.org](https://www.python.org/downloads/).
+2. Verify installation:
+   ```bash
+   python --version # Windows
+   python3 --version # macOS/Linux
+   ```
+   Expected: Python 3.12.x.
+
+### Step 2: Install Git
+1. Download and install Git from git-scm.com.
+2. Verify installation:
+   ```bash
+   git --version
+   ```
+
+### Step 3: Install OceanCrow_Scaffolder
+1. Open a terminal (Command Prompt on Windows, Terminal on macOS/Linux).
+2. Install the package via pip:
+   ```bash
+   pip install OceanCrow_Scaffolder
+   ```
+3. If you get a "pip is not recognized" error, use:
+   ```bash
+   python -m pip install OceanCrow_Scaffolder # Windows
+   python3 -m pip install OceanCrow_Scaffolder # macOS/Linux
+   ```
+
+### Step 4: Create a New Project
+Run the scaffold command to create a project:
+```bash
+scaffold create MyProject --type basic
+```
+- Options for `--type`: `basic` (default, simple script), `flask` (web app), `datascience` (data analysis).
+- Creates a project in `~/OC_Scaffold/Projects/MyProject` (e.g., `C:\Users\YourUsername\OC_Scaffold\Projects\MyProject`).
+- Includes folders: `src`, `tests`, `docs`, `private`, `env` (virtual environment), `.gitignore`, `requirements.txt`, and `commands.txt`.
+
+### Step 5: Start Working
+1. Navigate to your project:
+   ```bash
+   cd ~/OC_Scaffold/Projects/MyProject
+   ```
+2. Activate the virtual environment:
+   - **Windows**:
+     - Double-click `start_project.bat` in the project folder.
+     - Or run:
+       ```bash
+       env\Scripts\activate
+       ```
+   - **macOS/Linux**:
+     ```bash
+     source env/bin/activate
+     ```
+3. Install dependencies (if any):
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Run the project:
+   ```bash
+   python src/main.py # basic
+   python src/app.py # flask
+   python src/notebook.py # datascience
+   ```
+5. Close the terminal to deactivate the virtual environment (no need to run `deactivate`).
+
+### Step 6: Update a Project
+To restore missing files or update dependencies:
+```bash
+scaffold update MyProject
+```
+
+### Step 7: Check Version
+```bash
+scaffold version
+```
+
+## Troubleshooting
+- **"scaffold is not recognized"**:
+  - Ensure the Python Scripts (Windows) or bin (macOS/Linux) directory is in your PATH:
+    - **Windows**: Add `C:\Program Files\Python312\Scripts` (or equivalent) via `sysdm.cpl` > Advanced > Environment Variables > Path.
+    - **macOS/Linux**: Add `~/.local/bin` to PATH by editing `~/.bashrc` or `~/.zshrc`:
+      ```bash
+      export PATH="$PATH:$HOME/.local/bin"
+      ```
+  - Or use:
+    ```bash
+    python -m oceancrow_scaffolder create MyProject # Windows
+    python3 -m oceancrow_scaffolder create MyProject # macOS/Linux
+    ```
+- **"Git not found"**: Install Git from git-scm.com.
+- **Permission errors**: Ensure you have write access to `~/OC_Scaffold` (e.g., `C:\Users\YourUsername\OC_Scaffold`).
+- **Need help?** DM @OceanCrowtt on X for support.
+
+## Contributing
+See `docs/contribution.md` in your project folder for guidelines.
+
+## License
+MIT License. Copyright (c) 2025 Sheldon Kenny Salmon. See `docs/LICENSE` in your project folder.
+
+## Support
+Love this tool? Follow @OceanCrowtt on X to support more projects or DM for custom coding solutions!
