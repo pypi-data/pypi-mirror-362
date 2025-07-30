@@ -1,0 +1,183 @@
+Metadata-Version: 2.1
+Name: azure-mgmt-hardwaresecuritymodules
+Version: 1.0.0
+Summary: Microsoft Azure Hardwaresecuritymodules Management Client Library for Python
+Home-page: https://github.com/Azure/azure-sdk-for-python
+Author: Microsoft Corporation
+Author-email: azpysdkhelp@microsoft.com
+License: MIT License
+Keywords: azure,azure sdk
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: isodate>=0.6.1
+Requires-Dist: typing-extensions>=4.6.0
+Requires-Dist: azure-common>=1.1
+Requires-Dist: azure-mgmt-core>=1.5.0
+
+# Microsoft Azure SDK for Python
+
+This is the Microsoft Azure Hardwaresecuritymodules Management Client Library.
+This package has been tested with Python 3.9+.
+For a more complete view of Azure libraries, see the [azure sdk python release](https://aka.ms/azsdk/python/all).
+
+## _Disclaimer_
+
+_Azure SDK Python packages support for Python 2.7 has ended 01 January 2022. For more information and questions, please refer to https://github.com/Azure/azure-sdk-for-python/issues/20691_
+
+## Getting started
+
+### Prerequisites
+
+- Python 3.9+ is required to use this package.
+- [Azure subscription](https://azure.microsoft.com/free/)
+
+### Install the package
+
+```bash
+pip install azure-mgmt-hardwaresecuritymodules
+pip install azure-identity
+```
+
+### Authentication
+
+By default, [Azure Active Directory](https://aka.ms/awps/aad) token authentication depends on correct configuration of the following environment variables.
+
+- `AZURE_CLIENT_ID` for Azure client ID.
+- `AZURE_TENANT_ID` for Azure tenant ID.
+- `AZURE_CLIENT_SECRET` for Azure client secret.
+
+In addition, Azure subscription ID can be configured via environment variable `AZURE_SUBSCRIPTION_ID`.
+
+With above configuration, client can be authenticated by following code:
+
+```python
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.hardwaresecuritymodules import HardwareSecurityModulesMgmtClient
+import os
+
+sub_id = os.getenv("AZURE_SUBSCRIPTION_ID")
+client = HardwareSecurityModulesMgmtClient(credential=DefaultAzureCredential(), subscription_id=sub_id)
+```
+
+## Examples
+
+Code samples for this package can be found at:
+- [Search Hardwaresecuritymodules Management](https://docs.microsoft.com/samples/browse/?languages=python&term=Getting%20started%20-%20Managing&terms=Getting%20started%20-%20Managing) on docs.microsoft.com
+- [Azure Python Mgmt SDK Samples Repo](https://aka.ms/azsdk/python/mgmt/samples)
+
+
+## Troubleshooting
+
+## Next steps
+
+## Provide Feedback
+
+If you encounter any bugs or have suggestions, please file an issue in the
+[Issues](https://github.com/Azure/azure-sdk-for-python/issues)
+section of the project. 
+
+
+# Release History
+
+## 1.0.0 (2025-07-02)
+
+### Features Added
+
+  - Enum `ProvisioningState` added member `UPDATING`
+  - Model `CloudHsmClusterBackupStatusOperations` added method `begin_get`
+  - Model `CloudHsmClusterRestoreStatusOperations` added method `begin_get`
+
+### Breaking Changes
+
+  - This version introduces new hybrid models which have dual dictionary and model nature. And please follow https://aka.ms/azsdk/python/migrate/hybrid-models for migration. 
+  - Deleted or renamed model `CloudHsmClusterResource`
+  - Deleted or renamed model `IdentityType`
+  - Deleted or renamed model `OutboundEnvironmentEndpointCollection`
+  - Deleted or renamed method `CloudHsmClusterBackupStatusOperations.get`
+  - Deleted or renamed method `CloudHsmClusterRestoreStatusOperations.get`
+  - Method `CloudHsmClustersOperations.begin_create_or_update` inserted a `positional_or_keyword` parameter `body`
+  - Method `CloudHsmClustersOperations.begin_create_or_update` deleted or renamed its parameter `location` of kind `positional_or_keyword`
+  - Method `CloudHsmClustersOperations.begin_create_or_update` deleted or renamed its parameter `tags` of kind `positional_or_keyword`
+  - Method `CloudHsmClustersOperations.begin_create_or_update` deleted or renamed its parameter `identity` of kind `positional_or_keyword`
+  - Method `CloudHsmClustersOperations.begin_create_or_update` deleted or renamed its parameter `sku` of kind `positional_or_keyword`
+  - Method `CloudHsmClustersOperations.begin_create_or_update` deleted or renamed its parameter `properties` of kind `positional_or_keyword`
+  - Method `CloudHsmClustersOperations.begin_update` inserted a `positional_or_keyword` parameter `body`
+  - Method `CloudHsmClustersOperations.begin_update` deleted or renamed its parameter `tags` of kind `positional_or_keyword`
+  - Method `CloudHsmClustersOperations.begin_update` deleted or renamed its parameter `identity` of kind `positional_or_keyword`
+  - Method `CloudHsmClustersOperations.list_by_resource_group` changed its parameter `skiptoken` from `positional_or_keyword` to `keyword_only`
+  - Method `CloudHsmClustersOperations.list_by_subscription` changed its parameter `skiptoken` from `positional_or_keyword` to `keyword_only`
+  - Method `DedicatedHsmOperations.begin_update` inserted a `positional_or_keyword` parameter `parameters`
+  - Method `DedicatedHsmOperations.begin_update` deleted or renamed its parameter `tags` of kind `positional_or_keyword`
+
+## 1.0.0b2 (2025-02-06)
+
+### Features Added
+
+  - Client `HardwareSecurityModulesMgmtClient` added operation group `cloud_hsm_cluster_backup_status`
+  - Client `HardwareSecurityModulesMgmtClient` added operation group `cloud_hsm_cluster_restore_status`
+  - Model `ApiEntityReference` added property `resource_id`
+  - Model `CloudHsmClusterProperties` added property `activation_state`
+  - Model `NetworkInterface` added property `resource_id`
+  - Model `PrivateLinkResourceListResult` added property `next_link`
+  - Added enum `ActionType`
+  - Added enum `ActivationState`
+  - Added enum `AutoGeneratedDomainNameLabelScope`
+  - Added model `BackupRequestProperties`
+  - Added model `BackupRestoreBaseResultProperties`
+  - Added enum `BackupRestoreOperationStatus`
+  - Added model `BackupRestoreRequestBaseProperties`
+  - Added model `BackupResult`
+  - Added model `BackupResultProperties`
+  - Added model `ErrorAdditionalInfo`
+  - Added model `ErrorDetail`
+  - Added model `ErrorResponse`
+  - Added model `Operation`
+  - Added model `OperationDisplay`
+  - Added model `OperationListResult`
+  - Added enum `Origin`
+  - Added enum `PublicNetworkAccess`
+  - Added model `RestoreRequestProperties`
+  - Added model `RestoreResult`
+  - Operation group `CloudHsmClustersOperations` added method `begin_backup`
+  - Operation group `CloudHsmClustersOperations` added method `begin_restore`
+  - Operation group `CloudHsmClustersOperations` added method `begin_validate_backup_properties`
+  - Operation group `CloudHsmClustersOperations` added method `begin_validate_restore_properties`
+  - Added operation group `CloudHsmClusterBackupStatusOperations`
+  - Added operation group `CloudHsmClusterRestoreStatusOperations`
+
+### Breaking Changes
+
+  - Model `ApiEntityReference` deleted or renamed its instance variable `id`
+  - Model `CloudHsmClusterPatchParameters` deleted or renamed its instance variable `sku`
+  - Model `CloudHsmClusterPatchParameters` deleted or renamed its instance variable `properties`
+  - Model `CloudHsmClusterProperties` deleted or renamed its instance variable `security_domain`
+  - Model `CloudHsmClusterProperties` deleted or renamed its instance variable `restore_properties`
+  - Model `CloudHsmClusterProperties` deleted or renamed its instance variable `backup_properties`
+  - Model `NetworkInterface` deleted or renamed its instance variable `id`
+  - Parameter `sku` of model `DedicatedHsm` is now required
+  - Deleted or renamed model `BackupProperties`
+  - Deleted or renamed model `CHsmError`
+  - Deleted or renamed model `CloudHsmClusterError`
+  - Deleted or renamed model `CloudHsmClusterPatchParametersProperties`
+  - Deleted or renamed model `CloudHsmClusterSecurityDomainProperties`
+  - Deleted or renamed model `DedicatedHsmOperation`
+  - Deleted or renamed model `DedicatedHsmOperationDisplay`
+  - Deleted or renamed model `DedicatedHsmResource`
+  - Deleted or renamed model `RestoreProperties`
+  - Deleted or renamed model `SystemDataAutoGenerated`
+  - Method `CloudHsmClustersOperations.begin_update` deleted or renamed its parameter `sku` of kind `positional_or_keyword`
+  - Method `CloudHsmClustersOperations.begin_update` deleted or renamed its parameter `properties` of kind `positional_or_keyword`
+
+## 1.0.0b1 (2024-01-26)
+
+* Initial Release
