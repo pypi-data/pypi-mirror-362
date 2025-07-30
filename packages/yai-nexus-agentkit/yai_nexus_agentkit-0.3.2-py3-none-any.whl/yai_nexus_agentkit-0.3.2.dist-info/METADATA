@@ -1,0 +1,126 @@
+Metadata-Version: 2.4
+Name: yai-nexus-agentkit
+Version: 0.3.2
+Summary: A FastAPI-first AI agent toolkit with AG-UI protocol support for building modern streaming AI applications.
+Project-URL: Homepage, https://github.com/yai-nexus/yai-nexus-agentkit
+Project-URL: Repository, https://github.com/yai-nexus/yai-nexus-agentkit
+Author-email: YAI-Nexus <contact@yai-nexus.com>
+License: MIT License
+        
+        Copyright (c) 2025 yai-nexus
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+License-File: LICENSE
+Classifier: Development Status :: 3 - Alpha
+Classifier: Framework :: FastAPI
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Internet :: WWW/HTTP :: HTTP Servers
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Requires-Python: >=3.9
+Requires-Dist: aerich
+Requires-Dist: ag-ui-protocol
+Requires-Dist: asyncpg
+Requires-Dist: fastapi
+Requires-Dist: langchain
+Requires-Dist: langchain-core
+Requires-Dist: langgraph-checkpoint-postgres
+Requires-Dist: langgraph<0.6.0,>=0.5.2
+Requires-Dist: loguru>=0.7.0
+Requires-Dist: psycopg[binary]
+Requires-Dist: pydantic>=2.0
+Requires-Dist: python-dotenv
+Requires-Dist: sse-starlette
+Requires-Dist: tortoise-orm
+Requires-Dist: uvicorn
+Requires-Dist: yai-nexus-configuration>=0.1.1
+Provides-Extra: all
+Requires-Dist: aerich; extra == 'all'
+Requires-Dist: aiohttp; extra == 'all'
+Requires-Dist: black; extra == 'all'
+Requires-Dist: dashscope; extra == 'all'
+Requires-Dist: dependency-injector; extra == 'all'
+Requires-Dist: httpx; extra == 'all'
+Requires-Dist: langchain-anthropic; extra == 'all'
+Requires-Dist: langchain-community; extra == 'all'
+Requires-Dist: langchain-openai>=0.1.0; extra == 'all'
+Requires-Dist: pre-commit; extra == 'all'
+Requires-Dist: pytest; extra == 'all'
+Requires-Dist: pytest-cov; extra == 'all'
+Requires-Dist: ruff; extra == 'all'
+Requires-Dist: zhipuai; extra == 'all'
+Provides-Extra: anthropic
+Requires-Dist: langchain-anthropic; extra == 'anthropic'
+Provides-Extra: dev
+Requires-Dist: aerich; extra == 'dev'
+Requires-Dist: black; extra == 'dev'
+Requires-Dist: pre-commit; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: ruff; extra == 'dev'
+Provides-Extra: doubao
+Requires-Dist: langchain-openai>=0.1.0; extra == 'doubao'
+Provides-Extra: fastapi
+Requires-Dist: aiohttp; extra == 'fastapi'
+Requires-Dist: dependency-injector; extra == 'fastapi'
+Requires-Dist: httpx; extra == 'fastapi'
+Provides-Extra: openai
+Requires-Dist: langchain-openai>=0.1.0; extra == 'openai'
+Provides-Extra: persistence
+Requires-Dist: redis; extra == 'persistence'
+Provides-Extra: redis
+Requires-Dist: redis; extra == 'redis'
+Provides-Extra: tongyi
+Requires-Dist: dashscope; extra == 'tongyi'
+Requires-Dist: langchain-community; extra == 'tongyi'
+Provides-Extra: zhipu
+Requires-Dist: langchain-community; extra == 'zhipu'
+Requires-Dist: zhipuai; extra == 'zhipu'
+Description-Content-Type: text/markdown
+
+# YAI Nexus AgentKit
+
+A Python toolkit for building AI applications with multi-LLM support and extensible architecture.
+
+## Installation
+
+```bash
+pip install -e ".[all]"
+```
+
+## Usage
+
+```python
+from yai_nexus_agentkit import create_llm, OpenAIModel
+
+config = {
+    "provider": "openai",
+    "model": OpenAIModel.GPT_4O.value,
+    "api_key": "sk-..."
+}
+llm = create_llm(config)
+response = llm.invoke("Hello, world!")
+```
+
+For more details, see the main project documentation.
