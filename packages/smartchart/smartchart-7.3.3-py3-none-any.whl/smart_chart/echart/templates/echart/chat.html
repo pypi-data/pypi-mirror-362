@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>智能问答</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1,IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0"/>
+    <link rel="icon"  href="/static/smartui/img/favicon.ico">
+    <link rel="stylesheet" href="/static/smartchart/icon/iconfont.css?_=2">
+    <script src="/static/smartui/js/vue.min.js"></script>
+    <link rel="stylesheet" href="/static/smartui/elementui/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/smartchart/editor/chat.css?_=2">
+    <link rel="stylesheet" href="/static/smartchart/opt/hljs.css">
+    <script src="/static/smartui/elementui/index.js"></script>
+</head>
+<body>
+<vue id="vue_app">
+  <div class="chat-container">
+    <div class="message-list" ref="messageList">
+      <div class="history-header">
+        <el-switch v-model="history" active-text="历史" size="mini"></el-switch>
+        <el-switch v-model="stream" active-text="流式" size="mini"></el-switch>
+        <el-tooltip content="清空历史" placement="left">
+          <el-button  size="mini"  @click="clearHistory" circle icon="el-icon-delete">
+          </el-button>
+        </el-tooltip>
+      </div>
+      <div v-for="(message, index) in messages" :key="index" class="message-item" :class="{ 'user-message': message.type === 'user' }">
+        <el-avatar v-if="!['sys','user'].includes(message.type)" :icon="dbDict[agentsDict[message.type]]||'el-icon-user-solid'"></el-avatar>
+        <div v-if="message.type === 'sys'" style="width:100%;color:#6f6fb7;text-align:center">{[ message.content ]}</div>
+        <div class="message-content" v-else>
+          <div class="message-text" v-html="messagesDict[message.id]||md2html(message.content)"  @click="copyCode"></div>
+            <div class="message-time" v-if="!['sys'].includes(message.type)">
+                <span>{[ message.time ]}</span>
+                <div class="message-actions">
+                    <i class="el-icon-delete"
+                       @click.stop="deleteMessage(index)"
+                       title="删除"></i>
+                    <i class="el-icon-document-copy"
+                       @click.stop="copyMessage(message.content)"
+                       title="复制"></i>
+                    <i class="el-icon-coin" v-if="message.raw"
+                       @click.stop="copyMessage(message.raw)"
+                       :title="message.raw"></i>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="message-item thinking" v-if="isThinking">
+        <el-avatar icon="el-icon-user-solid"></el-avatar>
+          <div class="message-content">
+          <div class="message-text">
+            <div class="thinking-dots">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 输入区域 -->
+    <div class="input-area">
+      <el-autocomplete v-model="inputMessage" ref="myInput"
+        :fetch-suggestions="querySearch"
+        placeholder="/切换智能体, 请输入您的问题"
+        size="small"
+        :disabled="isThinking"
+        @select="handleSelect"
+        @keyup.enter.native="sendMessage"
+      >
+        <el-button slot="append" icon="el-icon-position" size="small" :loading="isThinking" @click="sendMessage">发送</el-button>
+      </el-autocomplete>
+    </div>
+  </div>
+</vue>
+</body>
+<script src="/static/smartchart/js/jquery-2.2.3.min.js"></script>
+<script src="/static/smartchart/js/fun.js?_=6.4"></script>
+<script src="/static/smartchart/opt/markdownit.js"></script>
+<script src="/static/smartchart/opt/hljs.js"></script>
+<script type="text/javascript" src="/static/smartchart/editor/chat.js?_=1.4"></script>
+</body>
+</html>
