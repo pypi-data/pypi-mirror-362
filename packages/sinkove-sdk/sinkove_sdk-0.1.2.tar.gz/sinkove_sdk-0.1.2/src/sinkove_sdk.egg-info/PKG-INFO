@@ -1,0 +1,81 @@
+Metadata-Version: 2.4
+Name: sinkove-sdk
+Version: 0.1.2
+Summary: A Python SDK for interacting with Sinkove's AI dataset generation API.
+Author-email: Sinkove Engineering Team <eng@sinkove.com>
+Project-URL: homepage, https://cloud.sinkove.com
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.31.0
+Provides-Extra: dev
+Requires-Dist: black>=23.9.1; extra == "dev"
+Requires-Dist: ruff>=0.1.1; extra == "dev"
+Requires-Dist: pytest>=7.2.0; extra == "dev"
+Provides-Extra: packaging
+Requires-Dist: build>=0.10.0; extra == "packaging"
+Requires-Dist: twine>=4.0.2; extra == "packaging"
+
+# Sinkove SDK
+
+[![PyPI version](https://badge.fury.io/py/sinkove-sdk.svg)](https://badge.fury.io/py/sinkove-sdk)
+
+The Sinkove SDK is a Python library designed to facilitate interaction with Sinkove's AI dataset generation API. This library allows seamless integration with Sinkove's services, enabling organizations to create, manage, and download datasets programmatically.
+
+## Features
+
+- Create and manage datasets
+- Download datasets with customizable strategies
+- Monitor dataset generation status
+
+## Getting Started
+
+### Installation
+
+You can install the SDK via pip:
+
+```bash
+pip install sinkove-sdk
+```
+
+### Usage
+
+To use the SDK, you need to set your API key and API URL in the environment variables. Here's a basic example of how to create and download a dataset:
+
+```python
+import uuid
+from sinkove import Client
+
+def main():
+    organization_id = uuid.UUID("your-organization-id")
+    model_id = uuid.UUID("your-model-id")
+
+    dataset = Client(organization_id).datasets.create(
+        model_id, num_samples=2, args={"prompt": "cardiomegaly"}
+    )
+
+    dataset.download("dataset.zip", strategy="skip", wait=True)
+
+if __name__ == "__main__":
+    main()
+```
+
+### API Documentation
+
+For complete API details, visit the [API documentation](https://api.sinkove.com/docs).
+
+### Official Documentation
+
+Find more detailed documentation about the Sinkove services at [Sinkove Docs](https://docs.sinkove.com).
+
+### Sinkove Console
+
+Access your Sinkove dashboard at the [Sinkove Console](https://cloud.sinkove.com).
+
+## Contributing
+
+Contributions are welcome! Please read the contribution guidelines first. You can start by running the project locally using:
+
+```bash
+just build
+just test
+```
