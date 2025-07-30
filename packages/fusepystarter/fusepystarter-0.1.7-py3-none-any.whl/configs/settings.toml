@@ -1,0 +1,43 @@
+dynaconf_merge = true
+
+[default]
+app_name = "MyTEST"
+
+[default.database]
+db_check = "check_db"
+
+[default.logging]
+log_level = "INFO"
+log_format = """{"app":"pyfoundry", "log_level":"%(levelname)s", "timestamp":"%(asctime)s", "timezone":"GMT", "filename":"%(filename)s", "line_number":"%(lineno)d", "message":"%(message)s"}"""
+
+[dev]
+dev_check = "check_db"
+calibration_error = 5
+
+[dev.database]
+name = "app_dev_db"
+host = "localhost"
+
+[dev.logging]
+log_level = "DEBUG"
+
+[stage]
+stage_check = "check_stage"
+
+[stage.database]
+name = "app_stage_db"
+host = "stage.db.example.com"
+
+[stage.logging]
+log_level = "INFO"
+
+[prod]
+prod_check = "check_prod"
+calibration_error = 1
+
+[prod.database]
+name = "app_prod_db"
+host = "prod.db.example.com"
+
+[prod.logging]
+log_level = "ERROR"
