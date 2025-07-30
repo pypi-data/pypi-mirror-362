@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login Stigrock</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <form id="loginForm" class="form" autocomplete="off" onsubmit="return handleLogin(event)">
+    <div class="control">
+      <h1>Sign In</h1>
+    </div>
+
+    <div class="control block-cube block-input">
+      <input id="username" name="username" type="text" placeholder="Username" required />
+      <div class="bg-top"><div class="bg-inner"></div></div>
+      <div class="bg-right"><div class="bg-inner"></div></div>
+      <div class="bg"><div class="bg-inner"></div></div>
+    </div>
+
+    <div class="control block-cube block-input">
+      <input id="password" name="password" type="password" placeholder="Password" required />
+      <div class="bg-top"><div class="bg-inner"></div></div>
+      <div class="bg-right"><div class="bg-inner"></div></div>
+      <div class="bg"><div class="bg-inner"></div></div>
+    </div>
+
+    <button type="submit" class="btn block-cube block-cube-hover">
+      <div class="bg-top"><div class="bg-inner"></div></div>
+      <div class="bg-right"><div class="bg-inner"></div></div>
+      <div class="bg"><div class="bg-inner"></div></div>
+      <div class="text">Log In</div>
+    </button>
+  </form>
+
+  <script>
+    function handleLogin(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // Controllo credenziali (nascondendo la logica a vista)
+      const validUser = 'admin';
+      const validPass = 'admin';
+
+      if (username === validUser && password === validPass) {
+        alert("Grazie per essere entrato dentro il server Stigrock!");
+        // Reindirizza a pagina di benvenuto
+        window.location.href = "welcome.html";
+      } else {
+        alert("Credenziali errate. Riprova.");
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>
