@@ -1,0 +1,188 @@
+Metadata-Version: 2.4
+Name: sniffly
+Version: 0.1.3
+Summary: Claude Code Analytics Dashboard
+Project-URL: Homepage, https://sniffly.dev
+Project-URL: Documentation, https://sniffly.dev/docs
+Project-URL: Repository, https://github.com/chiphuyen/sniffly
+Project-URL: Issues, https://github.com/chiphuyen/sniffly/issues
+Author-email: Chip Huyen <hi@huyenchip.com>
+License-Expression: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Requires-Dist: aiofiles>=23.0.0
+Requires-Dist: boto3>=1.26.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: fastapi>=0.100.0
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: orjson>=3.9.0
+Requires-Dist: python-dateutil>=2.8.2
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: python-multipart>=0.0.6
+Requires-Dist: uvicorn[standard]>=0.23.0
+Requires-Dist: uvloop>=0.17.0
+Description-Content-Type: text/markdown
+
+# Sniffly - Claude Code Analytics Dashboard
+
+Analyze Claude Code logs to help you use Claude Code better.
+
+## 🚀 Quickstart
+- Requirement: Python 3.10+
+
+### With UV (recommended)
+Make sure you have `uv` installed! https://github.com/astral-sh/uv
+
+```bash
+# One-time execution (no installation needed)
+uvx sniffly@latest init
+```
+
+```bash
+# Install the package
+uv tool install sniffly@latest
+sniffly init
+```
+
+After running `sniffly init`, access your dashboard at http://localhost:8081 (or whichever port you choose).
+
+### With pip
+
+```bash
+pip install sniffly
+sniffly init
+```
+
+### From source
+```bash
+git clone https://github.com/chiphuyen/sniffly.git
+cd sniffly
+pip install -e .
+sniffly init
+```
+
+
+## 📊 Features
+### Understanding your usage patterns
+<center>
+<img src="assets/features/stats.png" width="800" />
+</center>
+
+### Error breakdown
+_See where Claude Code makes mistakes so that you avoid these mistakes._
+
+<center>
+<img src="assets/features/error-type.png" width="500" />
+</center>
+
+### Message history analysis
+_Walk through all your instructions and share them with your coworkers if needed._
+
+<center>
+<img src="assets/features/command-walkthrough.png" width="1000" />
+</center>
+
+## 🔧 Configuration
+
+### Common Settings
+
+```bash
+# Change port (default: 8081)
+sniffly config set port 8090
+
+# Disable auto-opening browser
+sniffly config set auto_browser false
+
+# Show current configuration
+sniffly config show
+```
+
+### All Configuration Options
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `port` | 8081 | Server port |
+| `host` | 127.0.0.1 | Server host |
+| `auto_browser` | true | Auto-open browser on start |
+| `cache_max_projects` | 5 | Max projects in memory cache |
+| `cache_max_mb_per_project` | 500 | Max MB per project |
+| `messages_initial_load` | 500 | Initial messages to load |
+| `max_date_range_days` | 30 | Max days for date range selection |
+
+See full [CLI Reference](docs/cli-reference.md) for all options and commands.
+
+
+## 💡 Sharing Your Dashboard
+
+1. Click the "📤 Share" button in your dashboard
+2. Choose privacy options:
+   - **Private**: Only people with the link can view
+   - **Public**: Listed in the public gallery
+   - **Include Commands**: Share your actual command text
+3. Copy and share the generated link
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+```bash
+sniffly help
+```
+
+**Port already in use?**
+```bash
+# Use a different port
+sniffly init --port 8090
+
+# Or change default
+sniffly config set port 8090
+```
+
+**Browser doesn't open?**
+```bash
+# Check setting
+sniffly config show
+
+# Enable auto-browser
+sniffly config set auto_browser true
+
+# Or manually visit http://localhost:8081
+```
+
+**Configuration issues?**
+```bash
+# View all settings and their sources
+sniffly config show
+
+# Reset a setting to default
+sniffly config unset port
+
+# Remove all custom config
+rm ~/.sniffly/config.json
+```
+
+For more issues, see [GitHub Issues](https://github.com/chiphuyen/sniffly/issues).
+
+## 🔐 Privacy
+
+Sniffly runs entirely on your local machine:
+- ✅ All data processing happens locally
+- ✅ No telemetry
+- ✅ Your conversations never leave your computer
+- ✅ Shared dashboards are opt-in only
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file.
+
+## 🔗 Links
+
+- **Homepage**: [sniffly.dev](https://sniffly.dev)
+- **Documentation**: [Full CLI Reference](docs/cli-reference.md)
+- **Issues**: [GitHub Issues](https://github.com/chiphuyen/sniffly/issues)
