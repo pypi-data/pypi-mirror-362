@@ -1,0 +1,42 @@
+[project]
+name = "python-leaky"
+version = "0.5.0"
+requires-python = "~=3.10"
+description = "Finds memory leaks in Python programs"
+dependencies = [
+    "referrers>=0.12",
+    "rich>=13.7",
+    "psutil>=5.9",
+    "pydantic~=2.11",
+    "objsize>=0.7",
+    "networkx>=2.4"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest~=8.4", "mypy~=1.16", "ruff>=0.12", "pre-commit~=4.2", "numpy~=2.2"
+]
+mcp = [
+    "fastmcp~=2.9"
+]
+
+[tool.ruff]
+line-length = 100
+
+lint.select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # Pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["leaky"]
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+
+files = ["src"]
