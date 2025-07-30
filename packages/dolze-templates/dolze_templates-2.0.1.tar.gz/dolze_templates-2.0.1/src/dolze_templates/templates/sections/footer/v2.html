@@ -1,0 +1,80 @@
+<footer id="footer" class="bg-gradient-to-br from-gray-900 via-slate-900 to-black text-white relative overflow-hidden">
+  <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.02"%3E%3Cpath d="M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+  
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div class="space-y-6">
+        {% if sections.footer.brand %}
+        <h3 class="text-2xl font-bold text-white">{{ sections.footer.brand.name }}</h3>
+        {% endif %}
+        
+        <p class="text-gray-300 leading-relaxed">
+          {{ sections.footer.brand.description.text }}
+        </p>
+        
+        {% if sections.footer.brand.socialLinks %}
+        <div class="flex gap-4">
+          {% for social in sections.footer.brand.socialLinks.links %}
+          <a href="{{ social.url }}" 
+             class="group w-12 h-12 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gradient-to-br hover:from-primary hover:to-secondary hover:text-white transition-all duration-300 hover:scale-110"
+             target="_blank" rel="noopener">
+            <i class="{{ social.icon | default('ri-link') }} group-hover:scale-110 transition-transform duration-300"></i>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      
+      {% for nav in sections.footer.navigation %}
+      <div>
+        <h4 class="font-bold text-white mb-6">{{ nav.title }}</h4>
+        <ul class="space-y-3">
+          {% for link in nav.links %}
+          <li>
+            <a href="{{ link.url }}" 
+               class="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block">
+              {{ link.label }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+      
+      {% if sections.footer.subscribe %}
+      <div>
+        <h4 class="font-bold text-white mb-6">{{ sections.footer.subscribe.title }}</h4>
+        <p class="text-gray-300 mb-6">{{ sections.footer.subscribe.description.text }}</p>
+        
+        <form class="space-y-4">
+          <input type="email" 
+                 placeholder="{{ sections.footer.subscribe.input.placeholder }}" 
+                 class="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-4 focus:ring-primary/30 focus:border-primary transition-all duration-300">
+          
+          <button type="submit" 
+                  class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+            {{ sections.footer.subscribe.button.text }}
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    
+    {% if sections.footer.bottom %}
+    <div class="border-t border-white/10 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-gray-400">{{ sections.footer.bottom.copyright }}</p>
+      
+      {% if sections.footer.bottom.links %}
+      <div class="flex gap-6 mt-4 md:mt-0">
+        {% for link in sections.footer.bottom.links.items %}
+        <a href="{{ link.url }}" 
+           class="text-gray-400 hover:text-white transition-colors duration-300">
+          {{ link.label }}
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</footer>

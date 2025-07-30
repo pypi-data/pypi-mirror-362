@@ -1,0 +1,35 @@
+<section id="gallery" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        📸 {{ sections.gallery.title }}
+      </h2>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for item in sections.gallery.items %}
+      <div class="group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="aspect-[4/3] overflow-hidden">
+          <img src="{{ item.src }}" 
+               alt="{{ item.alt }}" 
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        </div>
+        
+        {% if item.caption %}
+        <div class="p-4">
+          <h3 class="font-semibold text-gray-900 text-sm">{{ item.caption }}</h3>
+        </div>
+        {% endif %}
+        
+        {% if item.lightbox %}
+        <div class="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-sm">
+          <i class="ri-zoom-in-line text-gray-700 text-sm"></i>
+        </div>
+        {% endif %}
+        
+        <div class="absolute -top-2 -right-2 w-4 h-4 bg-orange-400 rounded-full"></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

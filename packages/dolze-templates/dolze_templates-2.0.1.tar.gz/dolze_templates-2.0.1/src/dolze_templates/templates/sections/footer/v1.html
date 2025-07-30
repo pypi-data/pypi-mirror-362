@@ -1,0 +1,78 @@
+<footer id="footer" class="bg-gray-900 text-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div class="space-y-6">
+        {% if sections.footer.brand %}
+        <h3 class="text-2xl font-light text-white">{{ sections.footer.brand.name }}</h3>
+        {% endif %}
+        
+        <p class="text-gray-300 font-light leading-relaxed">
+          {{ sections.footer.brand.description.text }}
+        </p>
+        
+        {% if sections.footer.brand.socialLinks %}
+        <div class="flex gap-4">
+          {% for social in sections.footer.brand.socialLinks.links %}
+          <a href="{{ social.url }}" 
+             class="w-10 h-10 border border-gray-700 flex items-center justify-center text-gray-400 hover:border-white hover:text-white transition-colors duration-300"
+             target="_blank" rel="noopener">
+            <i class="{{ social.icon | default('ri-link') }}"></i>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      
+      {% for nav in sections.footer.navigation %}
+      <div>
+        <h4 class="font-light text-white mb-6">{{ nav.title }}</h4>
+        <ul class="space-y-3">
+          {% for link in nav.links %}
+          <li>
+            <a href="{{ link.url }}" 
+               class="text-gray-300 hover:text-white transition-colors duration-300 font-light">
+              {{ link.label }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+      
+      {% if sections.footer.subscribe %}
+      <div>
+        <h4 class="font-light text-white mb-6">{{ sections.footer.subscribe.title }}</h4>
+        <p class="text-gray-300 font-light mb-6">{{ sections.footer.subscribe.description.text }}</p>
+        
+        <form class="space-y-4">
+          <input type="email" 
+                 placeholder="{{ sections.footer.subscribe.input.placeholder }}" 
+                 class="w-full px-4 py-3 bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:border-white focus:outline-none font-light">
+          
+          <button type="submit" 
+                  class="w-full bg-white text-gray-900 py-3 text-sm font-light tracking-widest uppercase hover:bg-gray-100 transition-colors duration-300">
+            {{ sections.footer.subscribe.button.text }}
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    
+    {% if sections.footer.bottom %}
+    <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-gray-400 font-light">{{ sections.footer.bottom.copyright }}</p>
+      
+      {% if sections.footer.bottom.links %}
+      <div class="flex gap-6 mt-4 md:mt-0">
+        {% for link in sections.footer.bottom.links.items %}
+        <a href="{{ link.url }}" 
+           class="text-gray-400 hover:text-white transition-colors duration-300 font-light text-sm">
+          {{ link.label }}
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</footer>

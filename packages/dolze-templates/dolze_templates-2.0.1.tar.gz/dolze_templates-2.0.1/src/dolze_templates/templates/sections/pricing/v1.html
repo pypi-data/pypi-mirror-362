@@ -1,0 +1,43 @@
+<section id="pricing" class="py-24 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <span class="inline-block text-xs uppercase tracking-widest text-gray-500 mb-3">
+        {{ sections.pricing.title }}
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-light text-gray-900 mb-4">
+        Choose Your Plan
+      </h2>
+      <div class="w-16 h-px bg-gray-300 mx-auto mb-6"></div>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      {% for plan in sections.pricing.plans %}
+      <div class="{% if plan.highlighted %}border-2 border-gray-900{% else %}border border-gray-200{% endif %} bg-white p-8 hover:shadow-sm transition-shadow duration-300" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="text-center mb-8">
+          <h3 class="text-xl font-light text-gray-900 mb-4">{{ plan.name }}</h3>
+          <div class="text-4xl font-light text-gray-900 mb-2">{{ plan.price }}</div>
+          {% if sections.pricing.currency and plan.price != 'Custom' %}
+          <div class="text-sm text-gray-500 font-light">per month</div>
+          {% endif %}
+        </div>
+        
+        <div class="w-16 h-px bg-gray-300 mx-auto mb-8"></div>
+        
+        <ul class="space-y-4 mb-8">
+          {% for feature in plan.features %}
+          <li class="flex items-start gap-3">
+            <span class="text-xs text-gray-400 mt-1">—</span>
+            <span class="text-gray-700 font-light">{{ feature }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        
+        <a href="{{ plan.cta.url }}" 
+           class="{% if plan.highlighted %}bg-gray-900 text-white hover:bg-gray-800{% else %}border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white{% endif %} w-full py-3 text-center text-sm font-light tracking-widest uppercase transition-colors duration-300 block">
+          {{ plan.cta.label }}
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

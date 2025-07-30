@@ -1,0 +1,71 @@
+<section id="cta" class="py-32 bg-gradient-to-br from-primary via-primary to-secondary text-white relative overflow-hidden">
+  <div class="absolute inset-0 bg-black/20"></div>
+  <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M40 40c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm20 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+  
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="space-y-12" data-aos="zoom-in">
+      {% if sections.cta.badge %}
+      <div class="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full shadow-lg">
+        <div class="w-2 h-2 bg-white rounded-full mr-3 animate-pulse"></div>
+        <span class="text-white font-semibold">{{ sections.cta.badge }}</span>
+      </div>
+      {% endif %}
+      
+      <div class="space-y-6">
+        <h2 class="text-5xl md:text-7xl font-bold text-white leading-tight">
+          {{ sections.cta.title }}
+          {% if sections.cta.highlight %}
+          <span class="block text-yellow-300">{{ sections.cta.highlight }}</span>
+          {% endif %}
+        </h2>
+        
+        <p class="text-2xl text-white/80 max-w-4xl mx-auto leading-relaxed">
+          {{ sections.cta.description }}
+        </p>
+      </div>
+      
+      {% if sections.cta.buttons %}
+      <div class="flex flex-col sm:flex-row gap-6 justify-center" data-aos="slide-up" data-aos-delay="200">
+        {% for button in sections.cta.buttons %}
+        <a href="{{ button.url }}" 
+           class="group bg-white text-primary px-10 py-5 rounded-2xl font-bold shadow-2xl hover:shadow-white/25 transform hover:scale-105 transition-all duration-300 inline-flex items-center justify-center gap-4">
+          {% if button.icon %}
+          <i class="{{ button.icon | default('ri-arrow-right-line') }} group-hover:translate-x-1 transition-transform duration-300"></i>
+          {% endif %}
+          {{ button.label }}
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if sections.cta.trustIndicators %}
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 pt-16 border-t border-white/10" data-aos="fade-up" data-aos-delay="300">
+        {% for indicator in sections.cta.trustIndicators %}
+        <div class="text-center group">
+          <div class="text-4xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">
+            {{ indicator.value }}
+          </div>
+          <div class="text-white/70">{{ indicator.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if sections.cta.guarantees %}
+      <div class="grid md:grid-cols-3 gap-8 pt-16" data-aos="slide-up" data-aos-delay="400">
+        {% for guarantee in sections.cta.guarantees %}
+        <div class="group flex items-center gap-4 justify-center">
+          <div class="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <i class="{{ guarantee.icon | default('ri-shield-check-line') }} text-white text-xl"></i>
+          </div>
+          <div class="text-left">
+            <div class="font-bold text-white">{{ guarantee.title }}</div>
+            <div class="text-white/70">{{ guarantee.description }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

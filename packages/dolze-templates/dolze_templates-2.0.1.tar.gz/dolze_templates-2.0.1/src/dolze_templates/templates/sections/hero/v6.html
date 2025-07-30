@@ -1,0 +1,22 @@
+<section id="hero" class="h-screen w-full flex items-center justify-center bg-white">
+  <div class="max-w-4xl mx-auto px-4 text-center">
+    <h1 class="text-6xl font-light text-gray-900 mb-8" data-aos="fade-up">
+      {{ sections.hero.title }}
+    </h1>
+    
+    <p class="text-xl text-gray-600 mb-12 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+      {{ sections.hero.description }}
+    </p>
+    
+    {% if sections.hero.ctaButtons %}
+    <div class="space-x-4" data-aos="fade-up" data-aos-delay="200">
+      {% for btn in sections.hero.ctaButtons %}
+      <a href="{{ btn.url }}" 
+         class="{% if btn.style == 'filled' %}bg-black text-white{% else %}border border-gray-300 text-gray-900{% endif %} px-8 py-3 text-sm font-medium hover:opacity-80 transition-opacity">
+        {{ btn.label }}
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>

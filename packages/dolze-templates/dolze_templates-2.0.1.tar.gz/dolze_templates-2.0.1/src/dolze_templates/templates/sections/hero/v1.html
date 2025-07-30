@@ -1,0 +1,63 @@
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50" id="hero" data-aos="fade-in">
+  {% if sections.hero.heroImage %}
+  <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ sections.hero.heroImage.src }}');" loading="lazy"></div>
+  <div class="absolute inset-0 bg-gradient-to-br from-gray-900/70 via-gray-800/50 to-gray-900/30"></div>
+  {% endif %}
+
+  <!-- Main Content Container -->
+  <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="max-w-4xl mx-auto">
+
+      {% if sections.hero.badge or sections.hero.subtitles %}
+      <div class="inline-flex items-center bg-white/10 backdrop-blur-sm border border-white/20 px-4 py-2 mb-8" data-aos="fade-up" data-aos-delay="100">
+        <span class="w-2 h-2 bg-white mr-3"></span>
+        <span class="text-white/90 text-xs uppercase tracking-widest font-light">
+          {{ sections.hero.badge or (sections.hero.subtitles | join(' • ')) }}
+        </span>
+      </div>
+      {% endif %}
+
+      <h1 class="text-5xl sm:text-6xl md:text-7xl font-light {% if sections.hero.heroImage %}text-white{% else %}text-gray-900{% endif %} leading-tight mb-8" data-aos="fade-up" data-aos-delay="200">
+        {{ sections.hero.title }}
+      </h1>
+      
+      <div class="w-16 h-px {% if sections.hero.heroImage %}bg-white/30{% else %}bg-gray-300{% endif %} mx-auto mb-8" data-aos="fade-up" data-aos-delay="300"></div>
+
+      <p class="text-xl sm:text-2xl {% if sections.hero.heroImage %}text-white/80{% else %}text-gray-600{% endif %} mb-12 max-w-3xl mx-auto leading-relaxed font-light" data-aos="fade-up" data-aos-delay="400">
+        {{ sections.hero.description }}
+      </p>
+
+      {% if sections.hero.ctaButtons %}
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-6" data-aos="fade-up" data-aos-delay="500">
+        {% for button in sections.hero.ctaButtons %}
+          {% if button.style == 'filled' %}
+            <a href="{{ button.url }}"
+               class="inline-flex items-center px-8 py-3 {% if sections.hero.heroImage %}bg-white text-gray-900 hover:bg-gray-100{% else %}bg-gray-900 text-white hover:bg-gray-800{% endif %} font-light text-sm tracking-widest uppercase transition-all duration-300"
+               {% if button.ariaLabel %}aria-label="{{ button.ariaLabel }}"{% endif %}>
+              {{ button.label }}
+            </a>
+          {% else %}
+            <a href="{{ button.url }}"
+               class="inline-flex items-center px-8 py-3 bg-transparent border {% if sections.hero.heroImage %}border-white/50 text-white hover:border-white hover:bg-white/10{% else %}border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white{% endif %} font-light text-sm tracking-widest uppercase transition-all duration-300">
+              {{ button.label }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if sections.hero.stats %}
+      <div class="grid grid-cols-3 gap-8 pt-12 border-t {% if sections.hero.heroImage %}border-white/20{% else %}border-gray-200{% endif %} max-w-md mx-auto" data-aos="fade-up" data-aos-delay="600">
+        {% for stat in sections.hero.stats %}
+        <div class="text-center">
+          <div class="text-2xl font-light {% if sections.hero.heroImage %}text-white{% else %}text-gray-900{% endif %} mb-1">{{ stat.value }}</div>
+          <div class="text-xs {% if sections.hero.heroImage %}text-white/60{% else %}text-gray-600{% endif %} uppercase tracking-wide">{{ stat.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+

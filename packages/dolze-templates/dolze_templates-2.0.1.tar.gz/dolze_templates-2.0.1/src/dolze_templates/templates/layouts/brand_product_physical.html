@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="{{ settings.accessibility.lang | default('en') }}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ settings.seo.title }}</title>
+    <meta name="description" content="{{ settings.seo.description }}" />
+    <meta name="keywords" content="{{ settings.seo.keywords | join(', ') }}" />
+    <link rel="canonical" href="{{ settings.seo.canonicalUrl }}" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{{ settings.seo.openGraph.title }}" />
+    <meta
+      property="og:description"
+      content="{{ settings.seo.openGraph.description }}"
+    />
+    <meta property="og:image" content="{{ settings.seo.openGraph.image }}" />
+    <meta property="og:url" content="{{ settings.seo.openGraph.url }}" />
+    <meta property="og:type" content="{{ settings.seo.openGraph.type }}" />
+    <meta property="og:locale" content="{{ settings.seo.openGraph.locale }}" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="{{ settings.seo.twitterCard.card }}" />
+    <meta name="twitter:site" content="{{ settings.seo.twitterCard.site }}" />
+    <meta
+      name="twitter:creator"
+      content="{{ settings.seo.twitterCard.creator }}"
+    />
+    <meta name="twitter:image" content="{{ settings.seo.twitterCard.image }}" />
+
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+
+    <!-- CSS Libraries -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "{{settings.theme.colors.primary}}",
+              secondary: "{{settings.theme.colors.secondary}}",
+              background: "{{settings.theme.colors.background}}",
+            },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Critical CSS -->
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Accessibility improvements */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* Focus styles for accessibility */
+    </style>
+  </head>
+  <body class="bg-white font-sans text-gray-900 antialiased">
+    <!-- Main content -->
+    <main id="main-content">
+      {% for section_name in
+      registry.brand_product_physical.pages[page].sections %} {% if
+      sections[section_name] is defined %} {{ sections[section_name] | safe }}
+      {% endif %} {% endfor %}
+    </main>
+
+    <!-- JavaScript Libraries -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js"
+      defer
+    ></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+      // Initialize AOS (Animate On Scroll)
+      document.addEventListener("DOMContentLoaded", function () {
+        // Ensure all elements are visible first
+        const aosElements = document.querySelectorAll("[data-aos]");
+        aosElements.forEach((el) => {
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        });
+
+        // Then initialize AOS if available
+        if (typeof AOS !== "undefined") {
+          AOS.init({
+            duration: 600,
+            once: true,
+            offset: 50,
+            startEvent: "load",
+          });
+        }
+      });
+
+      // Mobile menu toggle
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        if (menu) {
+          menu.classList.toggle("hidden");
+        }
+      }
+
+      // FAQ toggle functionality
+      function toggleFaq(index) {
+        const content = document.getElementById(`faq-content-${index}`);
+        const icon = document.getElementById(`faq-icon-${index}`);
+
+        if (content && icon) {
+          content.classList.toggle("hidden");
+          icon.classList.toggle("ri-add-line");
+          icon.classList.toggle("ri-subtract-line");
+        }
+      }
+
+      // Smooth scroll for anchor links
+      document.addEventListener("DOMContentLoaded", function () {
+        const links = document.querySelectorAll('a[href^="#"]');
+        links.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (href !== "#" && href.length > 1) {
+              const target = document.querySelector(href);
+              if (target) {
+                e.preventDefault();
+                target.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }
+          });
+        });
+      });
+
+      // Form submission handling
+      document.addEventListener("DOMContentLoaded", function () {
+        const forms = document.querySelectorAll("form");
+        forms.forEach((form) => {
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            // Add your form submission logic here
+            console.log("Form submitted");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

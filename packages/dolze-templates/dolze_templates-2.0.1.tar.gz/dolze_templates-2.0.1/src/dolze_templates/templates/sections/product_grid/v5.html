@@ -1,0 +1,54 @@
+<section id="product_grid" class="py-24 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16" data-aos="fade-up">
+      <div class="w-12 h-px bg-primary mx-auto mb-6"></div>
+      <h2 class="text-4xl font-light text-gray-900 mb-4">
+        {{ sections.product_grid.title }}
+      </h2>
+      {% if sections.product_grid.subheading %}
+      <p class="text-lg text-gray-600">{{ sections.product_grid.subheading }}</p>
+      {% endif %}
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for item in sections.product_grid.items %}
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        {% if item.image %}
+        <div class="relative">
+          <img src="{{ item.image.src }}" 
+               alt="{{ item.image.alt }}" 
+               class="w-full h-48 object-cover">
+          
+          {% if item.offer %}
+          <div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded text-sm font-medium">
+            {{ item.offer.discount }} OFF
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+        
+        <div class="p-6">
+          <h3 class="text-xl font-medium text-gray-900 mb-3">{{ item.name }}</h3>
+          <p class="text-gray-600 mb-4 leading-relaxed">{{ item.description }}</p>
+          
+          {% if item.price %}
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-2xl font-light text-primary">
+              ${{ item.price.amount }}
+            </span>
+          </div>
+          {% endif %}
+          
+          {% if item.offer and item.offer.description %}
+          <p class="text-sm text-gray-500 mb-4 bg-gray-50 p-3 rounded">{{ item.offer.description }}</p>
+          {% endif %}
+          
+          <button class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-300">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

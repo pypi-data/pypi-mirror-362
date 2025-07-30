@@ -1,0 +1,42 @@
+<section id="gallery" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.gallery.title }}
+      </h2>
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for item in sections.gallery.items %}
+      <div
+        class="group relative overflow-hidden rounded-xl"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        <img
+          src="{{ item.src }}"
+          alt="{{ item.alt }}"
+          class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+
+        {% if item.caption %}
+        <div
+          class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4"
+        >
+          <p class="text-white font-medium">{{ item.caption }}</p>
+        </div>
+        {% endif %} {% if item.lightbox %}
+        <div
+          class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center"
+        >
+          <i
+            class="ri-zoom-in-line text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity"
+          ></i>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

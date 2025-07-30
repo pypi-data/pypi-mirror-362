@@ -1,0 +1,38 @@
+<section id="challenges" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ sections.challenges.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.challenges.subtitle }}
+      </p>
+      <div class="w-16 h-1 bg-primary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for item in sections.challenges.items %}
+      <div
+        class="text-center p-6 bg-white rounded-xl shadow-sm"
+        data-aos="fade-up"
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        <div
+          class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="{{ item.icon }} text-primary text-2xl"></i>
+        </div>
+        <div class="text-3xl font-bold text-gray-900 mb-2">
+          {{ item.value }}
+        </div>
+        <div class="text-sm font-medium text-gray-900 mb-1">
+          {{ item.label }}
+        </div>
+        {% if item.description %}
+        <p class="text-xs text-gray-600">{{ item.description }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

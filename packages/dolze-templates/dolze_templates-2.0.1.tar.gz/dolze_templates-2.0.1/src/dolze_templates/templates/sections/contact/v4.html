@@ -1,0 +1,111 @@
+<section id="contact" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {{ sections.contact.title }}
+      </h2>
+      <p class="text-base text-gray-600 max-w-2xl mx-auto">
+        {{ sections.contact.subtitle }}
+      </p>
+    </div>
+    
+    <div class="grid lg:grid-cols-2 gap-12">
+      <div class="space-y-6" data-aos="fade-right">
+        {% if sections.contact.contactMethods %}
+        <div class="space-y-4">
+          {% for method in sections.contact.contactMethods %}
+          <div class="flex items-center gap-4 p-6 bg-white rounded-xl shadow-sm">
+            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+              <i class="{{ method.icon | default('ri-phone-line') }} text-white text-lg"></i>
+            </div>
+            
+            <div>
+              <h3 class="text-base font-semibold text-gray-900">{{ method.title }}</h3>
+              <p class="text-gray-600 text-sm mb-1">{{ method.description }}</p>
+              <div class="font-semibold text-blue-600">{{ method.value }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if sections.contact.info %}
+        <div class="grid gap-4">
+          {% for info in sections.contact.info %}
+          <div class="p-6 bg-white rounded-xl shadow-sm" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <i class="{{ info.icon | default('ri-map-pin-line') }} text-blue-600 text-lg"></i>
+              </div>
+              
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">{{ info.title }}</h3>
+                {% for detail in info.details %}
+                <p class="text-gray-600 text-sm">{{ detail }}</p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      
+      <div data-aos="fade-left">
+        <div class="bg-white p-8 rounded-xl shadow-md">
+          <h3 class="text-xl font-semibold text-gray-900 mb-6">
+            💬 Let's Chat!
+          </h3>
+          
+          {% if sections.contact.form %}
+          <form class="space-y-6" action="{{ sections.contact.form.action }}" method="{{ sections.contact.form.method }}">
+            {% for field in sections.contact.form.fields %}
+            <div>
+              <label for="{{ field.name }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                {{ field.label }}{% if field.required %} <span class="text-red-500">*</span>{% endif %}
+              </label>
+              
+              {% if field.type == 'textarea' %}
+              <textarea 
+                id="{{ field.name }}" 
+                name="{{ field.name }}" 
+                rows="4" 
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-all duration-300"
+                placeholder="{{ field.placeholder }}"
+                {% if field.required %}required{% endif %}
+                {% if field.maxLength %}maxlength="{{ field.maxLength }}"{% endif %}></textarea>
+              
+              {% elif field.type == 'select' %}
+              <select 
+                id="{{ field.name }}" 
+                name="{{ field.name }}" 
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-all duration-300"
+                {% if field.required %}required{% endif %}>
+                {% for option in field.options %}
+                <option value="{{ option.value }}">{{ option.label }}</option>
+                {% endfor %}
+              </select>
+              
+              {% else %}
+              <input 
+                type="{{ field.type }}" 
+                id="{{ field.name }}" 
+                name="{{ field.name }}" 
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-all duration-300"
+                placeholder="{{ field.placeholder }}"
+                {% if field.required %}required{% endif %}>
+              {% endif %}
+            </div>
+            {% endfor %}
+            
+            <button type="submit" 
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+              {{ sections.contact.form.submitText }} 🚀
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

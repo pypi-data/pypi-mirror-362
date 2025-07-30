@@ -1,0 +1,57 @@
+<section id="product_grid" class="py-16 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        🛍️ {{ sections.product_grid.title }}
+      </h2>
+      {% if sections.product_grid.subheading %}
+      <p class="text-base text-gray-600">{{ sections.product_grid.subheading }}</p>
+      {% endif %}
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for item in sections.product_grid.items %}
+      <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        {% if item.image %}
+        <div class="relative">
+          <img src="{{ item.image.src }}" 
+               alt="{{ item.image.alt }}" 
+               class="w-full h-48 object-cover">
+          
+          {% if item.offer %}
+          <div class="absolute top-4 right-4 bg-orange-400 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-sm">
+            {{ item.offer.discount }} OFF
+          </div>
+          {% endif %}
+          
+          <div class="absolute -bottom-4 -left-4 w-6 h-6 bg-blue-400 rounded-full"></div>
+        </div>
+        {% endif %}
+        
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ item.name }}</h3>
+          <p class="text-gray-600 text-sm mb-4">{{ item.description }}</p>
+          
+          {% if item.price %}
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xl font-semibold text-blue-600">
+              ${{ item.price.amount }}
+            </span>
+          </div>
+          {% endif %}
+          
+          {% if item.offer and item.offer.description %}
+          <p class="text-sm text-gray-600 mb-4 bg-blue-50 p-3 rounded-lg border border-blue-200">
+            🎉 {{ item.offer.description }}
+          </p>
+          {% endif %}
+          
+          <button class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+            Add to Cart 🛒
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

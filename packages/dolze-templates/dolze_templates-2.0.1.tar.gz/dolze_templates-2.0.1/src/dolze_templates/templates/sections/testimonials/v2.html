@@ -1,0 +1,90 @@
+<section id="testimonials" class="py-32 bg-white relative">
+  <div class="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent"></div>
+  
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <h2 class="text-5xl font-bold text-gray-900 mb-6">
+        {{ sections.testimonials.title }}
+      </h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        {{ sections.testimonials.subtitle }}
+      </p>
+    </div>
+    
+    {% if sections.testimonials.featured %}
+    <div class="relative mb-20" data-aos="zoom-in">
+      <div class="absolute -inset-8 bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl opacity-50"></div>
+      
+      <div class="relative bg-white p-12 rounded-3xl shadow-xl border border-gray-100 max-w-4xl mx-auto">
+        <div class="flex flex-col lg:flex-row items-center gap-8">
+          {% if sections.testimonials.featured.avatar %}
+          <div class="relative">
+            <div class="absolute -inset-2 bg-gradient-to-r from-primary to-secondary rounded-full blur-sm opacity-30"></div>
+            <img src="{{ sections.testimonials.featured.avatar.src }}" 
+                 alt="{{ sections.testimonials.featured.name }}" 
+                 class="relative w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg">
+          </div>
+          {% endif %}
+          
+          <div class="flex-1 text-center lg:text-left">
+            <blockquote class="text-2xl font-medium text-gray-900 mb-6 leading-relaxed">
+              "{{ sections.testimonials.featured.quote }}"
+            </blockquote>
+            
+            <div class="space-y-1">
+              <div class="text-lg font-bold text-gray-900">{{ sections.testimonials.featured.name }}</div>
+              <div class="text-gray-600">{{ sections.testimonials.featured.title }}</div>
+              
+              {% if sections.testimonials.featured.rating %}
+              <div class="flex justify-center lg:justify-start gap-1 mt-3">
+                {% for i in range(5) %}
+                <i class="ri-star-fill text-yellow-400"></i>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for testimonial in sections.testimonials.items %}
+      <div class="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100" data-aos="slide-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <div class="relative">
+          <div class="flex items-center gap-4 mb-6">
+            {% if testimonial.avatar %}
+            <div class="relative">
+              <div class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-full blur-sm opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+              <img src="{{ testimonial.avatar.src }}" 
+                   alt="{{ testimonial.name }}" 
+                   class="relative w-14 h-14 rounded-full object-cover border-2 border-white shadow-md">
+            </div>
+            {% endif %}
+            
+            <div>
+              <div class="font-bold text-gray-900">{{ testimonial.name }}</div>
+              <div class="text-sm text-gray-600">{{ testimonial.title }}</div>
+            </div>
+          </div>
+          
+          <blockquote class="text-gray-700 mb-4 leading-relaxed">
+            "{{ testimonial.quote }}"
+          </blockquote>
+          
+          {% if testimonial.rating %}
+          <div class="flex gap-1">
+            {% for i in range(testimonial.rating) %}
+            <i class="ri-star-fill text-yellow-400"></i>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

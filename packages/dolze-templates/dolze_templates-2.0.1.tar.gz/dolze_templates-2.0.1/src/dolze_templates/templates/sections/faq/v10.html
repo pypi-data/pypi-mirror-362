@@ -1,0 +1,152 @@
+<section id="faq" class="py-24 bg-white relative overflow-hidden">
+  <!-- Background elements -->
+  <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-indigo-50 opacity-30"></div>
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="faq-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="1" fill="currentColor" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#faq-dots)" />
+      </svg>
+    </div>
+  </div>
+  
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+      {% if sections.faq.badge %}
+      <span class="inline-block px-4 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-700 mb-4">
+        {{ sections.faq.badge }}
+      </span>
+      {% endif %}
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">
+        {{ sections.faq.title }}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        {{ sections.faq.subtitle }}
+      </p>
+    </div>
+    
+    <!-- FAQ layout options -->
+    {% if sections.faq.layout == 'grid' %}
+    <!-- Grid layout -->
+    <div class="grid md:grid-cols-2 gap-8">
+      {% for item in sections.faq.items %}
+      <div 
+        class="bg-white rounded-xl shadow-md p-8 border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-indigo-200"
+        data-aos="fade-up" 
+        data-aos-delay="{{ loop.index0 * 50 }}"
+      >
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">{{ item.question }}</h3>
+        <div class="prose text-gray-600">
+          <p>{{ item.answer }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% elif sections.faq.layout == 'categories' %}
+    <!-- Categories layout -->
+    <div class="grid md:grid-cols-3 gap-8">
+      {% for category in sections.faq.categories %}
+      <div 
+        class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100"
+        data-aos="fade-up" 
+        data-aos-delay="{{ loop.index0 * 100 }}"
+      >
+        <div class="bg-indigo-600 p-6">
+          <h3 class="text-xl font-semibold text-white">{{ category.title }}</h3>
+        </div>
+        <div class="p-6 space-y-6">
+          {% for item in category.items %}
+          <div>
+            <h4 class="text-lg font-medium text-gray-900 mb-2">{{ item.question }}</h4>
+            <p class="text-gray-600">{{ item.answer }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- Default accordion layout -->
+    <div class="max-w-3xl mx-auto space-y-6">
+      {% for item in sections.faq.items %}
+      <div 
+        class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-200"
+        data-aos="fade-up" 
+        data-aos-delay="{{ loop.index0 * 50 }}"
+      >
+        <button 
+          class="w-full flex items-center justify-between p-6 text-left focus:outline-none" 
+          data-accordion-toggle
+          aria-expanded="false"
+          aria-controls="faq-content-{{ loop.index }}"
+        >
+          <span class="text-lg font-medium text-gray-900">{{ item.question }}</span>
+          <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div 
+          id="faq-content-{{ loop.index }}" 
+          class="px-6 pb-6 hidden" 
+          aria-hidden="true"
+        >
+          <div class="prose text-gray-600">
+            <p>{{ item.answer }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Additional help section -->
+    {% if sections.faq.additional_help %}
+    <div class="mt-16 bg-indigo-50 rounded-2xl p-8 md:p-12" data-aos="fade-up" data-aos-delay="300">
+      <div class="max-w-3xl mx-auto text-center">
+        <h3 class="text-2xl font-semibold text-gray-900 mb-4">{{ sections.faq.additional_help.title }}</h3>
+        <p class="text-gray-600 mb-8">{{ sections.faq.additional_help.description }}</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          {% for button in sections.faq.additional_help.buttons %}
+          <a 
+            href="{{ button.url }}" 
+            class="inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-all duration-300 {% if button.style == 'primary' %}bg-indigo-600 text-white hover:bg-indigo-700{% else %}bg-white text-gray-700 border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50{% endif %}"
+          >
+            {% if button.icon %}
+            <i class="{{ button.icon }} mr-2" aria-hidden="true"></i>
+            {% endif %}
+            {{ button.label }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Contact info -->
+    {% if sections.faq.contact_info %}
+    <div class="mt-16 grid md:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="400">
+      {% for contact in sections.faq.contact_info %}
+      <div class="bg-white rounded-xl shadow-md p-6 text-center border border-gray-100">
+        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mx-auto mb-4">
+          <i class="{{ contact.icon }}" aria-hidden="true"></i>
+        </div>
+        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ contact.title }}</h4>
+        <p class="text-gray-600">{{ contact.value }}</p>
+        {% if contact.link_url and contact.link_text %}
+        <a href="{{ contact.link_url }}" class="mt-4 inline-block text-indigo-600 font-medium hover:text-indigo-700">
+          {{ contact.link_text }}
+        </a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>

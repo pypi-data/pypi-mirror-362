@@ -1,0 +1,31 @@
+<section id="faq" class="py-32 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20" data-aos="fade-up">
+      <h2 class="text-5xl font-bold text-gray-900 mb-6">
+        {{ sections.faq.title }}
+      </h2>
+      <p class="text-xl text-gray-600">{{ sections.faq.subtitle }}</p>
+    </div>
+    
+    <div class="space-y-6">
+      {% for item in sections.faq.items %}
+      <div class="group bg-gradient-to-r from-gray-50 to-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100" data-aos="slide-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <button class="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-white/50 transition-colors duration-300 rounded-2xl" 
+                onclick="toggleFaq({{ loop.index0 }})">
+          <span class="text-lg font-semibold text-gray-900 pr-4">{{ item.question }}</span>
+          
+          <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300">
+            <i class="ri-add-line text-white transition-transform duration-300" id="faq-icon-{{ loop.index0 }}"></i>
+          </div>
+        </button>
+        
+        <div class="px-8 pb-6 {% if not item.expanded %}hidden{% endif %} border-t border-gray-100" id="faq-content-{{ loop.index0 }}">
+          <div class="pt-6">
+            <p class="text-gray-700 leading-relaxed">{{ item.answer }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
