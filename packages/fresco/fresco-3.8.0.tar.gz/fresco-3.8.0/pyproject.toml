@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=78.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fresco"
+dynamic = ["version"]
+readme = "README.rst"
+description = "A Web/WSGI micro-framework"
+authors = [
+    {name="Oliver Cope", email="oliver@redgecko.org"}
+]
+keywords = ["wsgi", "web", "www", "framework"]
+license = "Apache-2.0"
+license-files = ["LICENSE.txt"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Internet :: WWW/HTTP :: WSGI",
+]
+
+[project.urls]
+Homepage = "https://ollycope.com/software/fresco/latest/"
+
+[tool.setuptools]
+packages = ["fresco", "fresco.util"]
+package-data = { fresco = ["py.typed"] }
+
+[tool.setuptools.dynamic]
+version = { attr = "fresco.__version__" }
+
+[tool.mypy]
+strict = false
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+ignore_missing_imports = true
+check_untyped_defs = true
+exclude = [
+    "fresco/tests",
+]
+
+[tool.pyright]
+exclude = ["fresco/tests"]
