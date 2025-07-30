@@ -1,0 +1,400 @@
+Metadata-Version: 2.4
+Name: tai-textual
+Version: 1.0.2
+Summary: tAI is a tool that helps you to find the right command.
+Author: Shoaib
+Author-email: shoaib8@gmail.com>
+Project-URL: Bug Tracker, https://github.com/KillerShoaib/tAI/issues
+Project-URL: Source Code, https://github.com/KillerShoaib/tAI
+Classifier: Programming Language :: Python :: 3.12
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Terminals
+Classifier: Topic :: Utilities
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: aiohappyeyeballs==2.6.1
+Requires-Dist: aiohttp==3.12.13
+Requires-Dist: aiosignal==1.3.2
+Requires-Dist: annotated-types==0.7.0
+Requires-Dist: anyio==4.9.0
+Requires-Dist: attrs==25.3.0
+Requires-Dist: cachetools==5.5.2
+Requires-Dist: certifi==2025.1.31
+Requires-Dist: cffi==1.17.1
+Requires-Dist: charset-normalizer==3.4.2
+Requires-Dist: click==8.2.1
+Requires-Dist: cryptography==45.0.5
+Requires-Dist: distro==1.9.0
+Requires-Dist: docutils==0.21.2
+Requires-Dist: evdev==1.9.2
+Requires-Dist: filelock==3.18.0
+Requires-Dist: frozenlist==1.7.0
+Requires-Dist: fsspec==2025.5.1
+Requires-Dist: google-auth==2.40.2
+Requires-Dist: google-genai==1.17.0
+Requires-Dist: h11==0.14.0
+Requires-Dist: hf-xet==1.1.5
+Requires-Dist: httpcore==1.0.8
+Requires-Dist: httpx==0.28.1
+Requires-Dist: huggingface-hub==0.33.1
+Requires-Dist: id==1.5.0
+Requires-Dist: idna==3.10
+Requires-Dist: importlib_metadata==8.7.0
+Requires-Dist: jaraco.classes==3.4.0
+Requires-Dist: jaraco.context==6.0.1
+Requires-Dist: jaraco.functools==4.2.1
+Requires-Dist: jeepney==0.9.0
+Requires-Dist: Jinja2==3.1.6
+Requires-Dist: jiter==0.10.0
+Requires-Dist: jsonschema==4.24.0
+Requires-Dist: jsonschema-specifications==2025.4.1
+Requires-Dist: keyring==25.6.0
+Requires-Dist: linkify-it-py==2.0.3
+Requires-Dist: litellm==1.73.1
+Requires-Dist: markdown-it-py==3.0.0
+Requires-Dist: MarkupSafe==3.0.2
+Requires-Dist: mdit-py-plugins==0.4.2
+Requires-Dist: mdurl==0.1.2
+Requires-Dist: more-itertools==10.7.0
+Requires-Dist: multidict==6.5.1
+Requires-Dist: nh3==0.2.21
+Requires-Dist: openai==1.91.0
+Requires-Dist: ordered-set==4.1.0
+Requires-Dist: packaging==25.0
+Requires-Dist: platformdirs==4.3.7
+Requires-Dist: prompt_toolkit==3.0.51
+Requires-Dist: propcache==0.3.2
+Requires-Dist: pyasn1==0.6.1
+Requires-Dist: pyasn1_modules==0.4.2
+Requires-Dist: pycparser==2.22
+Requires-Dist: pydantic==2.11.5
+Requires-Dist: pydantic_core==2.33.2
+Requires-Dist: Pygments==2.19.1
+Requires-Dist: pynput==1.8.1
+Requires-Dist: python-dotenv==1.1.0
+Requires-Dist: python-xlib==0.33
+Requires-Dist: PyYAML==6.0.2
+Requires-Dist: readme_renderer==44.0
+Requires-Dist: referencing==0.36.2
+Requires-Dist: regex==2024.11.6
+Requires-Dist: requests==2.32.3
+Requires-Dist: requests-toolbelt==1.0.0
+Requires-Dist: rfc3986==2.0.0
+Requires-Dist: rich==14.0.0
+Requires-Dist: rpds-py==0.25.1
+Requires-Dist: rsa==4.9.1
+Requires-Dist: SecretStorage==3.3.3
+Requires-Dist: setuptools==80.9.0
+Requires-Dist: six==1.17.0
+Requires-Dist: sniffio==1.3.1
+Requires-Dist: textual==3.1.0
+Requires-Dist: tiktoken==0.9.0
+Requires-Dist: tokenizers==0.21.2
+Requires-Dist: tqdm==4.67.1
+Requires-Dist: twine==6.1.0
+Requires-Dist: typing-inspection==0.4.1
+Requires-Dist: typing_extensions==4.13.2
+Requires-Dist: uc-micro-py==1.0.3
+Requires-Dist: urllib3==2.4.0
+Requires-Dist: wcwidth==0.2.13
+Requires-Dist: websockets==15.0.1
+Requires-Dist: wheel==0.45.1
+Requires-Dist: yarl==1.20.1
+Requires-Dist: zipp==3.23.0
+Requires-Dist: zstandard==0.23.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# tAI (terminal-AI) 🤖
+
+<p align="center">
+  <img src="https://cdn-uploads.huggingface.co/production/uploads/65ca6f0098a46a56261ac3ac/zbckPsek5KfmLBD-tZ4WY.png"/>
+</p>
+
+**tAI** is a minimal integration of AI inside CLI. No it's neither a `chatting application` and nor a clone of `claude code` or `gemini cli`. **The goal is to have a minimal AI assistant for quick reference of terminal commands.** The project was inspired from the **cursor** AI popup inside the terminal. I wanted to build something similar but outside of cursor where based on natural language it'll generate the command and paste it inside the terminal. No need for fancy `wrap` or other CLI tools. This tool will only generate command based on the natural language and paste it inside the terminal without sharing anything from the terminal.
+
+## Special Thanks
+- **[Textual](https://textual.textualize.io/):** For the amazing TUI framework.
+- **[Litellm](https://www.litellm.ai/):** For the amazing API wrapper for multiple LLMs.
+
+## Features
+
+- 🎯 **Inline TUI Popup**: Small popup overlay that doesn't take over the entire terminal
+- 🖥️ **Fullscreen Mode**: A fullscreen mode for those who want to use it in full screen
+- 🤖 **Powered by 21 LLMs**: Use upto **21 LLMs** including `gemini flash 2.5` and others
+- 🤗 **Free usage**: **8 free models** available to test it out without giving any **API** keys
+- ⚡ **Auto-Paste**: Automatically pastes generated commands to your terminal
+- 🪓 **Auto-execution**: Automatically execute the generated commands (use it with **caution**)
+- 🎨 **Minimal Styling**: Minimalistic design
+- ⌨️ **Simple Controls**: ESC to exit, Enter to generate commands
+- 🔧 **Settings from TUI**: A settings page to change all settings (api key, default model, etc)
+- 📝 **Custom Prompt Config:** Customize prompt for personal usage.
+- 🔐 **Security**: Do not share anything from the terminal while calling the API.
+
+## Demo
+
+### Inline Mode
+
+![](https://cdn-uploads.huggingface.co/production/uploads/65ca6f0098a46a56261ac3ac/CxFXZ84qlzgUma9G6yErO.png)
+
+### Fullscreen mode
+![](https://cdn-uploads.huggingface.co/production/uploads/65ca6f0098a46a56261ac3ac/FoJOmIhm0BBaw0ro46c9q.png)
+
+### Working demo
+
+![](https://cdn-uploads.huggingface.co/production/uploads/65ca6f0098a46a56261ac3ac/PbyNcHXKVSgX7y3uKOJnZ.gif)
+
+## Installation
+
+### Prerequisites
+
+- **Python 3.12** or higher
+
+
+There are multiple ways to install `tAI`. Choose the one that best suits your needs.
+
+### 1. Using pipx (Recommended)
+
+This method installs `tAI` in an isolated environment, making it available globally without interfering with other Python packages.
+
+```bash
+pipx install tai-textual
+```
+
+After installation, you can run the application directly:
+```bash
+tai
+```
+
+> **Note:**
+> If you don't have `pipx` installed, you can install it using your system's package manager (e.g., `sudo apt install pipx` on Debian/Ubuntu) or with `pip`:
+> ```bash
+> python3 -m pip install --user pipx
+> python3 -m pipx ensurepath
+> ```
+
+### 2. Using pip in a global environment (Not recommended)
+
+This method installs `tAI` in the global environment, making it available to all users on the system.
+
+```bash
+pip install tai-textual
+```
+> This is **not recommended** and may cause dependecy conflict.
+
+### 3. Using pip in a Virtual Environment
+
+This method is ideal for keeping dependencies for different projects separate.
+
+1.  **Create and activate a virtual environment**:
+    ```bash
+    python3 -m venv venv
+    source tai-venv/bin/activate
+    ```
+
+2.  **Install the package**:
+    ```bash
+    pip install tai-textual
+    ```
+
+3.  **Run the application**:
+    ```bash
+    tai
+    ```
+
+But this is going to be annoyning cause you need to activate the virtual environment everytime you want to use the application. **There's a neat trick which you can use so that you don't have to activate the virtual environment everytime you want to use `tAI`. You can create a bash function and call the function directly from the terminal**. That function will automatically handle the virtual environment activation. After you've installed the `tAI` package in the virtual env then just copy paste this bash function inside your `.bashrc` file (or `.zshrc` if you're using `zsh`). You'll find this file in the `home` directory (remember this is a hidden file).
+
+
+```bash
+tai() {
+    # Path to the virtual environment's activate script
+    VENV_ACTIVATE="/path_where_you_have_created_the_virtual_env/venv/bin/activate"
+
+    # Check if the activate script exists
+    if [ -f "$VENV_ACTIVATE" ]; then
+        # Activate the virtual environment
+        source "$VENV_ACTIVATE"
+
+        # Run the 'tai' command
+        # The actual 'tai' executable should be in the venv's bin directory
+        command tai
+
+        # Deactivate the virtual environment upon completion
+        deactivate
+    else
+        echo "Error: tAI virtual environment not found at $VENV_ACTIVATE"
+    fi
+}
+```
+
+After pasting this function inside your `.bashrc` file, you need to change the `VENV_ACTIVATE` path to the path where you've created the virtual environment. Then, restart the terminal or run `source ~/.bashrc` to apply the changes. Now you're all set! Just type `tai` in your terminal to use `tAI`.
+
+### 4. From Source
+
+If you want to have the latest development version, you can install it directly from the source code.
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/KillerShoaib/tAI.git
+    cd tAI
+    ```
+
+2.  **Create and activate a virtual environment**:
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Install dependencies**:
+    ```bash
+    pip install -r requirements.txt
+    ```
+4.  **Run as a module**:
+    ```bash
+    python -m tAI
+    ```
+
+## Usage
+
+### Basic Usage
+
+Simply run the application using this command
+```bash
+tai
+```
+
+### Command Line Arguments
+
+| Argument            | Type    | Description                                                                                         | Example Usage                                 |
+|---------------------|---------|-----------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| `--google`          | string  | Set the Google Gemini API key                                                                       | `--google YOUR_GOOGLE_API_KEY`                |
+| `--openai`          | string  | Set the OpenAI API key                                                                              | `--openai YOUR_OPENAI_API_KEY`                |
+| `--anthropic`       | string  | Set the Anthropic API key                                                                           | `--anthropic YOUR_ANTHROPIC_API_KEY`          |
+| `--openrouter`      | string  | Set the OpenRouter API key                                                                          | `--openrouter YOUR_OPENROUTER_API_KEY`        |
+| `--default-model`   | string  | Set the default model for the application (must match an available model identifier)                | `--default-model openai/gpt-4o`               |
+| `--models`          | flag    | List all available models and their identifiers                                                     | `--models`                                    |
+| `--fullscreen`      | string  | Set fullscreen mode (`true` or `false`)                                                             | `--fullscreen true` or `--fullscreen false`   |
+
+**Notes:**
+- You can combine arguments as needed. For example, to set an API key and the default model in one command.
+- Use `tai --models` to see all available model names and identifiers.
+
+### Settings from TUI
+
+#### Default Model
+
+Change the default model from the application itself.
+
+![](https://cdn-uploads.huggingface.co/production/uploads/65ca6f0098a46a56261ac3ac/TWMb8O5VtXTlJozmpQK3m.png)
+
+
+
+#### Setup API Keys
+
+Set the API keys for the models you want to use. Currently supports 4 provider APIs:
+
+- **Google (Gemini)**
+- **OpenAI (GPT)**
+- **Anthropic (Claude)**
+- **OpenRouter (All models)**
+
+![](https://cdn-uploads.huggingface.co/production/uploads/65ca6f0098a46a56261ac3ac/ggxXlEefGquXaVubzvXLD.png)
+
+#### Custom Prompt
+
+Customize the prompt for your personal usage.
+
+![](https://cdn-uploads.huggingface.co/production/uploads/65ca6f0098a46a56261ac3ac/DXGusMbv208fLe33MGtc1.png)
+
+#### Other Settings
+
+- **Fullscreen Mode**: Set the fullscreen mode from the `Others` section.
+
+- **Openrouter For All models**: Set the openrouter for all models. So you can pass only the openrouter API key and it'll be used for all models. **But free openrouter API key then won't work (even for the free model).**
+
+![](https://cdn-uploads.huggingface.co/production/uploads/65ca6f0098a46a56261ac3ac/ecXKLHI00X9VhpNoipiHx.png)
+
+> **Note:** If `Set openrouter for all models` is `true`, then the free `OpenRouter` API key won't work (even for the free model).
+
+## Free OpenRouter API Key
+
+- **Access to free models**: You have access to free models from `OpenRouter` API via free openrouter API key which I intentionally exposed in the `.env`. The reason was to give you a test of the application instantly without worring about setting up the key (Don't worry, it's a free API key so I won't be getting broke).
+- **Limited Usage**: Since this is a free API key therefore it's usage is going to be very very limited because of the rate limits and single API key for every user (variable based on the model) and the performance is going to be very slow.
+
+## Free API Keys (alternative)
+
+- **Google (Gemini)**: If you want more usage, you can get a free API key from [*Google AI Studio*](https://aistudio.google.com/). Just copy the API key and paste it in the `API Keys` section.
+
+
+## Controls
+
+- **Enter**: Generate command from your query
+- **ESC**: Exit the popup or fullscreen mode
+- **Ctrl+c**: Exit the popup or fullscreen mode
+- **Ctrl+e**: Toggle between paste and execute mode.
+
+## Keybindings in terminal
+
+If you want to replicate the similar behavior of `cursor` where you can press `Ctrl+k` to open the AI popup, you can do that by adding the following to your `.bashrc` file:
+
+```bash
+# === tAI Keybinding ===
+ai_helper() {
+    tai
+
+    printf "\r\033[K"
+}
+
+# Bind Ctrl+K to launch the ai_helper function.
+bind -x '"\C-k": ai_helper'
+```
+
+Add the above code to your `.bashrc` file and then run `source ~/.bashrc` to apply the changes.
+
+## Changelog
+
+### Version 1.0.2
+- **Added New Free Model**: Added the latest opensource model `Kimi K2` to the list of free models.
+
+### Version 1.0.1
+- **Fixed**: Updated the model name for `devstral` from `openrouter/mistralai/devstral-small:free` to `openrouter/mistralai/devstral-small-2505:free` to align with OpenRouter's changes.
+
+### Version 1.0.0
+- Initial release of `tAI`.
+
+## TODO List
+
+- [x] Multi model support
+- [x] Settings from TUI
+- [x] Custom prompt configuration
+- [x] Fullscreen mode
+- [x] Command line arguments
+- [x] Bash integration with keybinding
+- [x] Free openrouter API key
+- [x] PyPI package installatio
+- [x] CICD pipelinen
+- [x] Support for Windows, MacOS and other Linux distributions
+- [ ] Integration of Context (current path, previous commands, previous response)
+- [ ] Docker image (or container)
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!
+
+## License
+
+MIT License - feel free to use and modify as needed. 

@@ -1,0 +1,30 @@
+{
+  "default_model": "openrouter/mistralai/devstral-small-2505:free",
+  "set_full_screen": true,
+  "set_openrouter_for_all": false,
+  "models": {
+    "Gemini 2.0 Flash": "gemini/gemini-2.0-flash",
+    "Gemini 2.0 Flash Lite": "gemini/gemini-2.0-flash-lite",
+    "Gemini 2.5 Flash": "gemini/gemini-2.5-flash",
+    "Gemini 2.5 Flash Preview": "gemini/gemini-2.5-flash-preview-05-20",
+    "Gemini 2.5 Flash Lite Preview": "gemini/gemini-2.5-flash-lite-preview-06-17",
+    "GPT-4o Mini": "openai/gpt-4o-mini",
+    "GPT-4o": "openai/gpt-4o",
+    "GPT-4.1": "openai/gpt-4.1",
+    "GPT-4.1 Mini": "openai/gpt-4.1-mini",
+    "GPT-4.1 Nano": "openai/gpt-4.1-nano",
+    "Claude Sonnet 4": "anthropic/claude-sonnet-4",
+    "Claude 3.7 Sonnet": "anthropic/claude-3.7-sonnet",
+    "Claude 3.5 Sonnet": "anthropic/claude-3.5-sonnet",
+    "Deepseek Chat (Free)": "openrouter/deepseek/deepseek-chat:free",
+    "Qwen3 32B (Free)": "openrouter/qwen/qwen3-32b:free",
+    "Mistral Small 3.1 Instruct (Free)": "openrouter/mistralai/mistral-small-3.1-24b-instruct:free",
+    "Mistral Small 3.2 Instruct (Free)": "openrouter/mistralai/mistral-small-3.2-24b-instruct:free",
+    "Devstral Small (Free)": "openrouter/mistralai/devstral-small-2505:free",
+    "Qwen3 14B (Free)": "openrouter/qwen/qwen3-14b:free",
+    "Qwen3 8B (Free)": "openrouter/qwen/qwen3-8b:free",
+    "Gemma-3 27B IT (Free)": "openrouter/google/gemma-3-27b-it:free",
+    "Kimi K2 (Free)": "openrouter/moonshotai/kimi-k2:free"
+  },
+  "prompt": "You are an expert-level AI Linux command assistant. Your sole purpose is to translate a natural language request into a complete, self-contained, and executable command line for a Linux shell.\\n\\n**Core Directives:**\\n1.  **Output Command Block Only:** Return ONLY the raw command block. The output must be a single, copy-pasteable block of text that can be executed directly in a shell. Do not include any explanations, markdown backticks (```), or any other text.\\n\\n2.  **Command Structure and Complexity:**\\n    *   For tasks requiring multiple steps, you MUST use pipelines (`|`) to chain commands together.\\n    *   For long or complex commands, you SHOULD use the backslash (`\\\\`) at the end of a line to break the command into multiple, readable lines. This is highly encouraged for clarity.\\n\\n3.  **Assume Standard Tools:** Generate commands using commonly available POSIX tools (like `find`, `grep`, `awk`, `sed`, `ls`, `xargs`, `cut`) that are present on a standard Linux system.\\n\\n4.  **Prioritize Robustness:** Commands must be robust. For example, use `find ... -print0 | xargs -0 ...` to correctly handle filenames with spaces or special characters.\\n\\n5.  **Efficiency Matters:** Prefer efficient commands. Use built-in shell features or a single-process tools (`awk`) over complex, multi-process pipes when possible, unless clarity dictates otherwise.\\n\\n6.  **Handle Ambiguity:** If a request is ambiguous (e.g., \"find large files\"), make a reasonable and safe assumption (e.g., search in the current directory for files over 100MB). The generated command should reflect this assumption.\\n\\n7.  **Safety First Protocol:**\\n    *   NEVER generate a command with `sudo` unless the request explicitly involves system-level changes that require it (e.g., \"install a package\", \"change system configuration\").\\n    *   For any request that involves deleting or modifying files (`rm`, `mv`), if the scope is not perfectly clear, provide a \"dry-run\" or \"list-only\" command first. For example, for \"delete all .log files\", generate a `find . -name \"*.log\"` command, not a `find ... -delete` command.\\n\\nNow, generate a command for the following user request:"
+}
