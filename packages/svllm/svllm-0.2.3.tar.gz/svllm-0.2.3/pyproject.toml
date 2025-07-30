@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "svllm"
+dynamic = ["version"]
+description = 'serve your llm'
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "netcon", email = "netcon@live.com" },
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "fastapi",
+  "pydantic<3,>=2.0.0",
+  "shortuuid",
+  "uvicorn",
+  "termcolor",
+  "httpx",
+]
+
+[project.scripts]
+svllm = "svllm.main:main"
+svllm-cli = "svllm.client:main"
+
+[project.urls]
+Documentation = "https://github.com/conwnet/svllm#readme"
+Issues = "https://github.com/conwnet/svllm/issues"
+Source = "https://github.com/conwnet/svllm"
+
+[tool.hatch.version]
+path = "src/svllm/__about__.py"
