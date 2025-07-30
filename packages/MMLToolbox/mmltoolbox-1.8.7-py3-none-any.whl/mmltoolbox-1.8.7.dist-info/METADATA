@@ -1,0 +1,652 @@
+Metadata-Version: 2.4
+Name: MMLToolbox
+Version: 1.8.7
+Home-page: https://www.tugraz.at/institute/igte/home/
+Author: Andreas Gschwentner<andreas.gschwentner@tugraz.at>, Elias Alizadeh Saboor<alizadehsaboor@tugraz.at>
+Keywords: data acquisition,measurements
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.9
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: nidmm
+Requires-Dist: nidaqmx
+Requires-Dist: niswitch
+Requires-Dist: h5py
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: serial
+Requires-Dist: pandas
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: requires-dist
+
+This is MMLToolbox!
+===================
+
+.. note::
+
+   The package is currently under development and the documentation is adapted along with the features implemented.
+
+This package is a collection of usefule classes, that help access diffrent API's 
+in ortder to use the diffrent devices of the MML-laboratory.
+It also includes utility classes to enable a easier measurement processes.
+If you use this software, please cite it using the
+metadata.
+
+
+Devices:
+--------
+
+Digitalmultimeter by NI:
+~~~~~~~~~~~~~~~~~~~~~~~~
+The system at IGTE comes with two different models of DMMs: the PXI-4071 and the newer version PXI-4081. 
+There are three DMMs of the model 4071 and one model 4081. The differences in their specifications are
+relatively small and mostly irrelevant when using the MMLToolbox library. However it should be noted, that 
+you should put the specifications of the PXIe-4081 on the beginning of the specification dictionary 
+not doing this has lead to bugs inside the NI python API in the past. 
+
+When using the MMLToolbox library, you have the option to use any number of the available DMMs.
+You can start all connected DMMs at once independently of everything else, or 
+start their acquisitions once the DAQMX card outputs an analog signal. 
+Starting connected DMMs independently of each other is not possible. 
+The measurement mode will always be a voltage waveform acquisition.
+
+
+DAQMX-card by NI:
+~~~~~~~~~~~~~~~~~
+The provided card is the BNC-2110, which has 2 channels that can be used as analog outputs and
+8 channels that can be used as analog inputs. 
+We did not provide any support for its other functionalities.
+
+
+Switch by NI:
+~~~~~~~~~~~~~
+
+The switch is used to synchronize DMMs so that they all start at the same time. To achieve this,
+the switch is given a meaningless task that only takes a short time to finish.
+Once the task is done, the switch sends a signal to the trigger line that the DMMs are connected to.
+This signal starts all DMMs at the same time.
+
+Precsission mesurement tabel by Galil:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The KDT380 by Galil is a can be used to position object in a range of 155*155*155 mm
+on the X Y Z axis. The Coord module of MMLToolbox simplyfies the control of the device 
+through the gclib API. The module also provides a manual posistioning utilityy 
+that lets th euser control the table via keyboard (WASD).
+
+
+
+Usage:
+------
+
+Here you can finde some templates to use for all 4 measurement 
+cicuits, epstein frame, helmholtz frame, rsst-unaxial-BHC, rsst-unaxial-PBHC.
+
+Epstein/Helmholtz:
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+   
+
+   #%% Information
+   # Author: Andreas Gschwentner1
+   # Date: 02.08.2023
+   # Description: Template main script for Epstein-Frame-Measurement
+
+   #%% Import
+   import warnings
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import time
+
+   from MMLToolbox.pxi import  PXIPreProcessing, PXIControl, StoreSetup
+   warnings.simplefilter("ignore", UserWarning)
+
+   #%% Configuration
+   # Info
+   fileName = "Template" #Same as in Material Library
+   description = "Template" #Addional information
+
+
+
+
+   # Sample Info in SI
+   ############## Change by User ##############
+   sample_thickness = 1.1e-3
+   sample_width = 30e-3
+   sample_number = 5       
+   ############################################
+   ss = StoreSetup.StoreSetup(fileName, StoreSetup.MeasType.Epstein,sample_number= sample_number, sample_thickness=sample_thickness, sample_width=sample_thickness)
+
+
+
+   # Signal in SI
+   ############## Change by User ##############
+   #peakIBoundaryU = [2.6,2.4,2.2,2,1.8,1.6,1.4,1.2,1.1,1,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.475,0.45,0.425,0.4,0.375,0.35,0.325,0.3,0.275,0.25,0.225,0.2] # 1,10,50Hz 
+   peakIBoundaryU = [2.6,2.5,2.4,2.3,2.2,2.1,2,1.9,1.8,1.7,1.6,1.5,1.4,1.3,1.2,1.15,1.1,1.05,1,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4] # 100Hz 
+   #peakIBoundaryU = 2.6 # One Specific excitation level
+   peakIBoundaryL = False 
+
+   frequency = 100
+   numPeriods = 3 #5
+   sampleFrequency = frequency*1000
+   if hasattr(peakIBoundaryU, "__len__") and len(peakIBoundaryU)>0: numIntervalls=len(peakIBoundaryU) 
+   else: numIntervalls=1
+   zeroPeriod = 1
+   daqFreqFactor = 10
+   ############################################
+
+   info_dict_signal = {# "peakExcitationUpper": (peakIBoundaryU, "V"),
+                       # "peakExcitationLower": (peakIBoundaryL, "V"),
+                       "frequency": (frequency, "Hz"),
+                       "numPeriods": (numPeriods, "-"),
+                       "sampleFrequency": (sampleFrequency, "Hz"),
+                       "numIntervalls": (numIntervalls, "-"),
+                       "daqFreqFactor":(daqFreqFactor, "-")}
+
+
+   #%% Define Output Signal
+   mainSteps = np.arange(0,numPeriods/frequency,1/sampleFrequency)
+   upSteps = np.arange(0,1/frequency,1/sampleFrequency)
+   downSteps = np.arange(0,1/frequency,1/sampleFrequency)
+   zeroSteps = np.arange(0,zeroPeriod/frequency,1/sampleFrequency)
+
+   mainSignal_x = np.sin(2*np.pi*frequency*mainSteps)
+   upSignal_x = np.concatenate((np.sin(2*np.pi*frequency*zeroSteps)*0, upSteps/max(upSteps)*np.sin(2*np.pi*frequency*upSteps),np.sin(2*np.pi*frequency*upSteps)))
+   downSignal_x = np.concatenate((np.sin(2*np.pi*frequency*downSteps),np.flip(downSteps)/max(downSteps)*np.sin(2*np.pi*frequency*downSteps), np.sin(2*np.pi*frequency*zeroSteps)*0))
+
+   ######################################################
+   # Use when one signal x-direction
+   mainSignal = [mainSignal_x]
+   upSignal = [upSignal_x]
+   downSignal = [downSignal_x]
+   ######################################################
+
+   wavepoints = len(mainSignal_x)+len(upSignal_x)+len(downSignal_x)
+
+   #%% Define PXI-Configuration
+   # Output Signal DAQ-Card
+   ######################################################
+
+   # Use when one signals x-direction
+   NIOutput = {"outx": {"slotName":"PXI1Slot14","channel": "ao1","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True}}
+
+   # Input DMM, B- and H-Coil for both direction
+   NIDMM = {"B": {"slotName": "PXI1Slot17","range": 500,"sampleFreq": sampleFrequency, "wavepoints":wavepoints},
+            "U": {"slotName": "PXI1Slot16","range": 5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints},
+            "I": {"slotName": "PXI1Slot15","range": 5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints},}
+
+   ###################### No further adaption by user necessary ###################### 
+   #%% Define Class
+   infoDict = {"description": (description,"-"), 
+               **info_dict_signal, 
+               "niOutput":NIOutput, 
+               "niDMM":NIDMM,
+               "lenUpSignalDMM": (len(upSignal_x), "-"),
+               "lenMainSignalDMM": (len(mainSignal_x), "-"),
+               "lenDownSignalDMM": (len(downSignal_x), "-"),
+               "tDMM": (mainSteps, "s")}
+
+   ppTool = PXIPreProcessing(peakIBoundaryU,
+                                           peakIBoundaryL,
+                                           frequency,
+                                           numPeriods,
+                                           sampleFrequency,
+                                           numIntervalls,
+                                           mainSignal,
+                                           upSignal,
+                                           downSignal)
+
+   ss.writeInfo(infoDict)
+   pxiHandler = PXIControl()
+
+   #%% To Measurement
+   allMeasurments = []
+   allSignals = []
+
+   for i in range(numIntervalls):
+
+       #connect to pxi devices
+       pxiHandler.connectHardware(dmmDict=NIDMM,analogOutDict=NIOutput,switchSlotName="PXI1Slot13")
+       allSignals = []
+       outputSignal = ppTool.getOutputSignal(i)
+       ######################################################
+       # Use when one signals x-direction
+       allSignals = np.asarray(outputSignal[0])
+       ss.writeOutputSignal(i,"outx",outputSignal[0])
+       ######################################################
+
+       #pxiHandler.startAnalogOutputTask(allSignals)
+
+       #start measurement
+       pxiHandler.triggerDevices(allSignals)
+       dmm_results = pxiHandler.getMeasResults()
+
+
+       pxiHandler.closeAnalogOutputTask()
+
+       ss.writeData(i,NIDMM.keys(),dmm_results)
+       time.sleep(1)
+
+RSST-unaxial-BHC:
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+   
+
+   #%% Information
+   # Author: Andreas Gschwentner
+   # Date: 02.08.2023
+   # Description: Template main script for RSST-Measurement using rotational mode
+
+   #%% Import
+   import warnings
+   import numpy as np
+   import matplotlib.pyplot as plt
+
+   from MMLToolbox.pxi import  PXIPreProcessing, PXIControl, StoreSetup
+   warnings.simplefilter("ignore", UserWarning)
+
+   #%% Configuration
+   # Info
+   fileName = "Temlate" #Same as in Material Library
+   description = "Template" #Addional information
+
+   # Sample Info in SI
+   ############## Change by User ##############
+   sample_thickness = 0.27e-3
+   drill_width_x = 35e-3 #Distance of B-Coil in x-direction
+   drill_width_y = 35e-3 #Distance of B-Coil in y-direction
+   drill_diameter = 1.6 #Diameter of drill holes
+   ############################################
+   ss = StoreSetup.StoreSetup(fileName,StoreSetup.MeasType.RSSTUnaxialBHC,sample_thickness=sample_thickness, drill_width=[drill_width_x,drill_width_y],drill_diameter=drill_diameter)
+
+   # Signal in SI
+   ############## Change by User ##############
+   #peakIBoundaryU = [0.5,0.4,0.3,0.2,0.1,0.09,0.08,0.07,0.06,0.05,0.04,0.03,0.025,0.02,0.016,0.012,0.01,0.008,0.006,0.004,0.002,0.001] #Desid PBHC RSST
+   #peakIBoundaryU = [1.5,1.25,1,0.75,0.5,0.4,0.3,0.28,0.24,0.2,0.18,0.16,0.14,0.12,0.1,0.09,0.08,0.06,0.04,0.02,0.01] #Desid PBHC Helmholtz coil
+   peakIBoundaryU = [0.5]
+   peakIBoundaryL = False #Lower Bound excitation Signal, if only one Measurement is necessary, set peakIBoundaryL=None and numIntervalls=1
+
+   frequency = 10
+   numPeriods = 5
+   sampleFrequency = 1000*frequency
+   # numIntervalls = 15
+   numIntervalls = len(peakIBoundaryU) #Number of signal amplitudes between upper and lower bound, linear distributed
+   zeroLength = 200 #200
+   daqFreqFactor = 10
+   ############################################
+
+   info_dict_signal = {# "peakExcitationUpper": (peakIBoundaryU, "V"),
+                       # "peakExcitationLower": (peakIBoundaryL, "V"),
+                       "frequency": (frequency, "Hz"),
+                       "numPeriods": (numPeriods, "-"),
+                       "sampleFrequency": (sampleFrequency, "Hz"),
+                       "numIntervalls": (numIntervalls, "-"),
+                       "daqFreqFactor":(daqFreqFactor, "-")}
+
+
+   #%% Define Output Signal
+   mainSteps = np.arange(0,numPeriods/frequency,1/sampleFrequency)
+   upSteps = np.arange(0,1/frequency,1/sampleFrequency)
+   downSteps = np.arange(0,1/frequency,1/sampleFrequency)
+
+   mainSignal_x = np.sin(-2*np.pi*frequency*mainSteps)
+   upSignal_x = np.concatenate((np.zeros((zeroLength)), upSteps/max(upSteps)*np.sin(-2*np.pi*frequency*upSteps)))
+   downSignal_x = np.concatenate((np.flip(downSteps)/max(downSteps)*np.sin(-2*np.pi*frequency*downSteps), np.zeros((zeroLength))))
+
+   mainSignal_y = np.cos(-2*np.pi*frequency*mainSteps)
+   upSignal_y = np.concatenate((np.zeros((zeroLength)), upSteps/max(upSteps)*np.cos(-2*np.pi*frequency*upSteps)))
+   downSignal_y = np.concatenate((np.flip(downSteps)/max(downSteps)*np.cos(-2*np.pi*frequency*downSteps), np.zeros((zeroLength))))
+
+   ######################################################
+   # Use when one signal x-direction
+   # mainSignal = [mainSignal_x]
+   # upSignal = [upSignal_x]
+   # downSignal = [downSignal_x]
+   ######################################################
+
+   ######################################################
+   # Use when one signal y-direction
+   mainSignal = [mainSignal_y]
+   upSignal = [upSignal_y]
+   downSignal = [downSignal_y]
+   ######################################################
+
+   ######################################################
+   # Use when two signals
+   # mainSignal = [mainSignal_x,mainSignal_y]
+   # upSignal = [upSignal_x,upSignal_y]
+   # downSignal = [downSignal_x,downSignal_y]
+   ######################################################
+
+
+   wavepoints = len(mainSignal_y)+len(upSignal_y)+len(downSignal_y)
+
+   #%% Define PXI-Configuration
+   # Output Signal DAQ-Card
+   ######################################################
+   # Use when two signals
+   # NIOutput = {"outx": {"slotName":"PXI1Slot14","channel": "ao0","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True},
+   #              "outy": {"slotName":"PXI1Slot14","channel": "ao1","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True}}
+
+   ######################################################
+   # Use when one signals x-direction
+   #NIOutput = {"outx": {"slotName":"PXI1Slot14","channel": "ao0","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True}}
+
+   # Use when one signals y-direction
+   NIOutput = {"outy": {"slotName":"PXI1Slot14","channel": "ao1","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True}}
+
+   # Input DAQ-Card, Voltage/Current from Rohrer
+   # Remark: Max sampling frequency for DAQ-Card is 2000 --> Reduce rate and wavepoints with daqFreqFactor
+   NIInput = {"Ux": {"slotName":"PXI1Slot14","channel": "ai0","minVal":-5,"maxVal":5, "rate":sampleFrequency//daqFreqFactor,"wavepoints": wavepoints//daqFreqFactor,"switchTrigger":True},
+              "Ix": {"slotName":"PXI1Slot14","channel": "ai1","minVal":-5,"maxVal":5, "rate":sampleFrequency//daqFreqFactor,"wavepoints": wavepoints//daqFreqFactor,"switchTrigger":True},
+              "Uy": {"slotName":"PXI1Slot14","channel": "ai2","minVal":-5,"maxVal":5, "rate":sampleFrequency//daqFreqFactor,"wavepoints": wavepoints//daqFreqFactor,"switchTrigger":True},
+              "Iy": {"slotName":"PXI1Slot14","channel": "ai3","minVal":-5,"maxVal":5, "rate":sampleFrequency//daqFreqFactor,"wavepoints": wavepoints//daqFreqFactor,"switchTrigger":True}}
+
+   # Input DMM, B- and H-Coil for both direction
+   NIDMM = {"Hallz": {"slotName": "PXI1Slot18","range": 2.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1.5 Hallz
+            "Hallx": {"slotName": "PXI1Slot17","range": 2.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1.5 Hallx
+            "Hx": {"slotName": "PXI1Slot16","range": 0.3,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1 Bx
+            "Bx": {"slotName": "PXI1Slot15","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints} #1 Hx
+            }
+
+   # NIDMM = {"Hx": {"slotName": "PXI1Slot18","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1.5 Hallz
+   #          "Hy": {"slotName": "PXI1Slot17","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1.5 Hallx
+   #          "By": {"slotName": "PXI1Slot16","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1 Bx
+   #          "Bx": {"slotName": "PXI1Slot15","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints} #1 Hx
+   #          }
+
+   ###################### No further adaption by user necessary ###################### 
+   #%% Define Class
+   infoDict = {"description": (description,"-"), 
+               **info_dict_signal, 
+               "niOutput":NIOutput, 
+               "niInput":NIInput,
+               "niDMM":NIDMM,
+               "lenUpSignalDMM": (len(upSignal_x), "-"),
+               "lenMainSignalDMM": (len(mainSignal_x), "-"),
+               "lenDownSignalDMM": (len(downSignal_x), "-"),
+               "lenUpSignalDAQ": (len(upSignal_x/daqFreqFactor), "-"),
+               "lenMainSignalDAQ": (len(mainSignal_x/daqFreqFactor), "-"),
+               "lenDownSignalDAQ": (len(downSignal_x/daqFreqFactor), "-"),
+               "tDMM": (mainSteps, "s"),
+               "tDAQ": (np.arange(0,numPeriods/frequency,daqFreqFactor/sampleFrequency),"s")}
+
+   ppTool = PXIPreProcessing(peakIBoundaryU,
+                                           peakIBoundaryL,
+                                           frequency,
+                                           numPeriods,
+                                           sampleFrequency,
+                                           numIntervalls,
+                                           mainSignal,
+                                           upSignal,
+                                           downSignal)
+
+
+   ss.writeInfo(infoDict)
+   pxiHandler = PXIControl()
+
+   #%% To Measurement
+   allMeasurments = []
+   allSignals = []
+
+   for i in range(numIntervalls):
+       print("NIOUTPUT:")
+       print(NIOutput)
+       pxiHandler.connectHardware(dmmDict=NIDMM, analogOutDict=NIOutput, anlaogInDict=NIInput,switchSlotName="PXI1Slot13")
+       allSignals = []
+       outputSignal = ppTool.getOutputSignal(i)
+       ######################################################
+       # Use when one signals x-direction
+       # allSignals = np.asarray(outputSignal[0])
+       # ss.writeOutputSignal(i,"outx",outputSignal[0])
+       ######################################################
+
+       ######################################################
+       # Use when one signals y-direction
+       allSignals = np.asarray(outputSignal[0])
+       ss.writeOutputSignal(i,"outy",outputSignal[0])
+       ######################################################
+
+       ######################################################
+       # Use when two signals
+       # allSignals.append(outputSignal[0])
+       # allSignals.append(outputSignal[1])
+       # allSignals = np.asarray(allSignals)
+       # ss.writeOutputSignal(i,"outx",outputSignal[0])
+       # ss.writeOutputSignal(i,"outy",outputSignal[1])
+       ######################################################
+
+       #pxiHandler.startAnalogOutputTask(allSignals)
+       pxiHandler.triggerDevices(allSignals)
+       dmm_results = pxiHandler.getMeasResults()
+       #daq_results = pxiHandler.analogInResults
+       pxiHandler.closeAnalogOutputTask()
+       #pxiHandler.closeAnalogInputTask()
+
+
+       ss.writeData(i,NIDMM.keys(),dmm_results)
+       #ss.writeData(i,NIInput.keys(),daq_results)
+
+RSST-unaxial-PBHC:
+~~~~~~~~~~~~~~~~~~
+.. code-block:: python
+     
+   
+   #%% Information
+   # Author: Andreas Gschwentner
+   # Date: 02.08.2023
+   # Description: Template main script for RSST-Measurement using rotational mode
+   
+   #%% Import
+   import warnings
+   import numpy as np
+   import matplotlib.pyplot as plt
+   
+   from MMLToolbox.pxi import  PXIPreProcessing, PXIControl, StoreSetup
+   warnings.simplefilter("ignore", UserWarning)
+   
+   #%% Configuration
+   # Info
+   fileName = "Temlate" #Same as in Material Library
+   description = "Template" #Addional information
+   
+   # Sample Info in SI
+   ############## Change by User ##############
+   sample_thickness = 1.65e-3
+   drill_width_x = 35e-3 #Distance of B-Coil in x-direction
+   drill_width_y = 35e-3 #Distance of B-Coil in y-direction
+   drill_diameter = 1.6 #Diameter of drill holes
+   ############################################
+   ss = StoreSetup.StoreSetup(fileName,StoreSetup.MeasType.RSSTUnaxialPBHC, sample_thickness=sample_thickness, drill_width=[drill_width_x,drill_width_y], drill_diameter=drill_diameter)
+   # Signal in SI
+   ############## Change by User ##############
+   #peakIBoundaryU = [0.5,0.4,0.3,0.2,0.1,0.09,0.08,0.07,0.06,0.05,0.04,0.03,0.025,0.02,0.016,0.012,0.01,0.008,0.006,0.004,0.002,0.001] #Desid PBHC RSST
+   #peakIBoundaryU = [1.5,1.25,1,0.75,0.5,0.4,0.3,0.28,0.24,0.2,0.18,0.16,0.14,0.12,0.1,0.09,0.08,0.06,0.04,0.02,0.01] #Desid PBHC Helmholtz coil
+   peakIBoundaryU = [1]
+   peakIBoundaryL = False #Lower Bound excitation Signal, if only one Measurement is necessary, set peakIBoundaryL=None and numIntervalls=1
+   
+   frequency = 10
+   numPeriods = 5
+   sampleFrequency = 10000*frequency
+   # numIntervalls = 15
+   numIntervalls = len(peakIBoundaryU) #Number of signal amplitudes between upper and lower bound, linear distributed
+   zeroLength = 400 #200
+   daqFreqFactor = 10
+   ############################################
+   
+   info_dict_signal = {# "peakExcitationUpper": (peakIBoundaryU, "V"),
+                       # "peakExcitationLower": (peakIBoundaryL, "V"),
+                       "frequency": (frequency, "Hz"),
+                       "numPeriods": (numPeriods, "-"),
+                       "sampleFrequency": (sampleFrequency, "Hz"),
+                       "numIntervalls": (numIntervalls, "-"),
+                       "daqFreqFactor":(daqFreqFactor, "-")}
+   
+   
+   #%% Define Output Signal
+   mainSteps = np.arange(0,numPeriods/frequency,1/sampleFrequency)
+   upSteps = np.arange(0,1/frequency,1/sampleFrequency)
+   downSteps = np.arange(0,1/frequency,1/sampleFrequency)
+   
+   # Constant Signal
+   mainSignal_const = np.ones(mainSteps.shape)
+   upSignal_const = np.concatenate((np.zeros((zeroLength)), upSteps/max(upSteps)))
+   downSignal_const = np.concatenate((np.flip(downSteps)/max(downSteps), np.zeros((zeroLength))))
+   
+   # Sinus Signal
+   mainSignal_x = np.sin(-2*np.pi*frequency*mainSteps)
+   upSignal_x = np.concatenate((np.zeros((zeroLength)), upSteps/max(upSteps)*np.sin(-2*np.pi*frequency*upSteps),np.sin(-2*np.pi*frequency*upSteps)))
+   downSignal_x = np.concatenate((np.sin(-2*np.pi*frequency*downSteps),np.flip(downSteps)/max(downSteps)*np.sin(-2*np.pi*frequency*downSteps), np.zeros((zeroLength))))
+   
+   # Cosinus Signal
+   mainSignal_y = np.cos(-2*np.pi*frequency*mainSteps)
+   upSignal_y = np.concatenate((np.zeros((zeroLength)), upSteps/max(upSteps)*np.cos(-2*np.pi*frequency*upSteps),np.cos(-2*np.pi*frequency*upSteps)))
+   downSignal_y = np.concatenate((np.cos(-2*np.pi*frequency*downSteps),np.flip(downSteps)/max(downSteps)*np.cos(-2*np.pi*frequency*downSteps), np.zeros((zeroLength))))
+   
+   ######################################################
+   # Use when one signal x-direction
+   # mainSignal = [mainSignal_x]
+   # upSignal = [upSignal_x]
+   # downSignal = [downSignal_x]
+   ######################################################
+   
+   ######################################################
+   # Use when one signal y-direction
+   mainSignal = [mainSignal_x]
+   upSignal = [upSignal_x]
+   downSignal = [downSignal_x]
+   ######################################################
+   
+   ######################################################
+   # Use when two signals
+   # mainSignal = [mainSignal_x,mainSignal_y]
+   # upSignal = [upSignal_x,upSignal_y]
+   # downSignal = [downSignal_x,downSignal_y]
+   ######################################################
+   
+   
+   wavepoints = len(mainSignal[0])+len(upSignal[0])+len(downSignal[0])
+   
+   #%% Define PXI-Configuration
+   # Output Signal DAQ-Card
+   ######################################################
+   # Use when two signals
+   # NIOutput = {"outx": {"slotName":"PXI1Slot14","channel": "ao0","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True},
+   #              "outy": {"slotName":"PXI1Slot14","channel": "ao1","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True}}
+   
+   ######################################################
+   # Use when one signals x-direction
+   #NIOutput = {"outx": {"slotName":"PXI1Slot14","channel": "ao0","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True}}
+   
+   # Use when one signals y-direction
+   NIOutput = {"outy": {"slotName":"PXI1Slot14","channel": "ao1","minVal":-5,"maxVal":5, "rate":sampleFrequency,"digitalSignal":False,"switchTrigger":True}}
+   
+   # Input DAQ-Card, Voltage/Current from Rohrer
+   # Remark: Max sampling frequency for DAQ-Card is 2000 --> Reduce rate and wavepoints with daqFreqFactor
+   NIInput = {"Ux": {"slotName":"PXI1Slot14","channel": "ai0","minVal":-5,"maxVal":5, "rate":sampleFrequency//daqFreqFactor,"wavepoints": wavepoints//daqFreqFactor,"switchTrigger":True},
+              "Ix": {"slotName":"PXI1Slot14","channel": "ai1","minVal":-5,"maxVal":5, "rate":sampleFrequency//daqFreqFactor,"wavepoints": wavepoints//daqFreqFactor,"switchTrigger":True},
+              "Uy": {"slotName":"PXI1Slot14","channel": "ai2","minVal":-5,"maxVal":5, "rate":sampleFrequency//daqFreqFactor,"wavepoints": wavepoints//daqFreqFactor,"switchTrigger":True},
+              "Iy": {"slotName":"PXI1Slot14","channel": "ai3","minVal":-5,"maxVal":5, "rate":sampleFrequency//daqFreqFactor,"wavepoints": wavepoints//daqFreqFactor,"switchTrigger":True}}
+   
+   # Input DMM, B- and H-Coil for both direction
+   NIDMM = {"Hallx": {"slotName": "PXI1Slot18","range": 2.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1.5 Hallz
+            "Hallz": {"slotName": "PXI1Slot17","range": 2.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1.5 Hallx
+            "Hy_upper": {"slotName": "PXI1Slot16","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1 Bx
+            "By_upper": {"slotName": "PXI1Slot15","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints} #1 Hx
+            }
+   
+   # NIDMM = {"Hx": {"slotName": "PXI1Slot18","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1.5 Hallz
+   #          "Hy": {"slotName": "PXI1Slot17","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1.5 Hallx
+   #          "By": {"slotName": "PXI1Slot16","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints}, #1 Bx
+   #          "Bx": {"slotName": "PXI1Slot15","range": 0.5,"sampleFreq": sampleFrequency, "wavepoints":wavepoints} #1 Hx
+   #          }
+   
+   ###################### No further adaption by user necessary ###################### 
+   #%% Define Class
+   infoDict = {"description": (description,"-"), 
+               **info_dict_signal, 
+               "niOutput":NIOutput, 
+               "niInput":NIInput,
+               "niDMM":NIDMM,
+               "lenUpSignalDMM": (len(upSignal_x), "-"),
+               "lenMainSignalDMM": (len(mainSignal_x), "-"),
+               "lenDownSignalDMM": (len(downSignal_x), "-"),
+               "lenUpSignalDAQ": (len(upSignal_x/daqFreqFactor), "-"),
+               "lenMainSignalDAQ": (len(mainSignal_x/daqFreqFactor), "-"),
+               "lenDownSignalDAQ": (len(downSignal_x/daqFreqFactor), "-"),
+               "tDMM": (mainSteps, "s"),
+               "tDAQ": (np.arange(0,numPeriods/frequency,daqFreqFactor/sampleFrequency),"s")}
+   
+   ppTool = PXIPreProcessing(peakIBoundaryU,
+                                           peakIBoundaryL,
+                                           frequency,
+                                           numPeriods,
+                                           sampleFrequency,
+                                           numIntervalls,
+                                           mainSignal,
+                                           upSignal,
+                                           downSignal)
+          
+   
+   ss.writeInfo(infoDict)
+   pxiHandler = PXIControl()
+   
+   #%% To Measurement
+   allMeasurments = []
+   allSignals = []
+   
+   for i in range(numIntervalls):
+   
+       #connect to pxi devices
+       pxiHandler.connectHardware(dmmDict=NIDMM, analogOutDict=NIOutput, anlaogInDict=NIInput,switchSlotName="PXI1Slot13")
+       allSignals = []
+       outputSignal = ppTool.getOutputSignal(i)
+       ######################################################
+       # Use when one signals x-direction
+       # allSignals = np.asarray(outputSignal[0])
+       # ss.writeOutputSignal(i,"outx",outputSignal[0])
+       ######################################################
+   
+       ######################################################
+       # Use when one signals y-direction
+       allSignals = np.asarray(outputSignal[0])
+       ss.writeOutputSignal(i,"outy",outputSignal[0])
+       ######################################################
+   
+       ######################################################
+       # Use when two signals
+       # allSignals.append(outputSignal[0])
+       # allSignals.append(outputSignal[1])
+       # allSignals = np.asarray(allSignals)
+       # ss.writeOutputSignal(i,"outx",outputSignal[0])
+       # ss.writeOutputSignal(i,"outy",outputSignal[1])
+       ######################################################
+   
+       #pxiHandler.startAnalogOutputTask(allSignals)
+       pxiHandler.triggerDevices(allSignals)
+       dmm_results = pxiHandler.getMeasResults()
+       #daq_results = pxiHandler.analogInResults
+       pxiHandler.closeAnalogOutputTask()
+       #pxiHandler.closeAnalogInputTask()
+   
+   
+       ss.writeData(i,NIDMM.keys(),dmm_results)
+       #ss.writeData(i,NIInput.keys(),daq_results)
+   
+   
+   
+   
+   
+   
+   
