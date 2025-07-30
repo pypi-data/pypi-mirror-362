@@ -1,0 +1,163 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "eidosui"
+version = "0.8.0"
+description = "A modern, Tailwind CSS-based UI library for air development"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Isaac Flath"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+]
+keywords = ["ui", "web", "tailwind", "css", "components", "fastapi", "air"]
+requires-python = ">=3.10"
+
+dependencies = [
+    "air>=0.12",
+    "fastapi[standard]",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+markdown = [
+    "markdown>=3.4",
+]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "mypy",
+    "ruff",
+]
+
+[project.urls]
+Homepage = "https://github.com/isaac-flath/EidosUI"
+Repository = "https://github.com/isaac-flath/EidosUI"
+Issues = "https://github.com/isaac-flath/EidosUI/issues"
+Documentation = "https://github.com/isaac-flath/EidosUI#readme"
+
+[tool.hatch.build.targets.wheel]
+packages = ["eidos"]
+include = [
+    "eidos/css/**/*.css",
+    "eidos/plugins/markdown/css/*.css",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/eidos",
+    "/README.md",
+    "/pyproject.toml",
+]
+
+# UV-specific configuration
+[tool.uv]
+dev-dependencies = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "isort",
+    "mypy",
+    "ruff",
+    "twine",
+    "build",
+]
+
+# Ruff configuration
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "F403",  # star imports
+    "F405",  # star imports
+    "E402",  # module level import not at top
+    "E701",  # multiple statements on one line
+    "E743",  # ambiguous function name
+]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["eidos"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+# mypy configuration
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "air.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "markdown.*"
+ignore_missing_imports = true
+
+# pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v --strict-markers"
+
+# coverage configuration
+[tool.coverage.run]
+source = ["eidos"]
+omit = ["*/tests/*", "*/test_*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
