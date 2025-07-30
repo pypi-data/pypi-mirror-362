@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fluidic Graph Editor</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- <style>
+    html, body { margin:0; padding:0; height:100%; display:flex; flex-direction:column; font-family:sans-serif; }
+    #toolbar { background:#eee; padding:5px; display:flex; gap:5px; border-bottom:1px solid #ccc; }
+    #container { flex:1; display:flex; }
+    #sidebar { width:100px; background:#f5f5f5; padding:10px; border-right:1px solid #ccc; display:flex; flex-direction:column; gap:10px; }
+    #sidebar img { width:50px; height:50px; cursor:grab; }
+    #cy { flex:1; position:relative; /* make sure it shows a background so you can see drop area */ background:#fafafa; }
+    /* modal */
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; }
+    .modal .content { background:#fff; padding:20px; border-radius:5px; width:300px; }
+    .modal h3 { margin-top:0; }
+    .modal label { display:block; margin-top:10px; font-size:14px; }
+    .modal input, .modal select { width:100%; box-sizing:border-box; padding:4px; margin-top:2px; }
+    .modal .close { position:absolute; top:10px; right:15px; cursor:pointer; font-size:18px; }
+  </style> -->
+</head>
+<body>
+
+    <div id="toolbar">
+        <button id="copyBtn">Copy (Ctrl+C)</button>
+        <button id="pasteBtn">Paste (Ctrl+V)</button>
+        <button id="deleteBtn">Delete (Del)</button>
+        <button id="saveBtn">Save (Ctrl+S)</button>
+        <button id="undoBtn">Go Back (Ctrl+Z)</button>
+        <button id="exportBtn">Export</button>
+        <button id="exitBtn" title="Exit Designer">Exit</button>
+      </div>
+    
+      <div id="container">
+        <div id="sidebar">
+          <img src="icons/pump.svg"    class="draggable" data-type="pump"    draggable="true" alt="Pump">
+          <img src="icons/valve.svg"   class="draggable" data-type="valve"   draggable="true" alt="Valve">
+          <img src="icons/relay.svg"   class="draggable" data-type="relay"   draggable="true" alt="Relay">
+          <img src="icons/hotplate.svg"class="draggable" data-type="hotplate"draggable="true" alt="Hotplate">
+          <img src="icons/vessel.svg"  class="draggable" data-type="vessel"  draggable="true" alt="Vessel">
+        </div>
+        <div id="cy"></div>
+      </div>
+
+  <!-- Node properties modal -->
+  <div id="nodeModal" class="modal">
+    <div class="content">
+      <span class="close">&times;</span>
+      <h3>Edit Node</h3>
+      <form id="nodeForm"></form>
+      <button id="saveNodeBtn" style="margin-top:10px;">Save</button>
+    </div>
+  </div>
+
+  <!-- Edge properties modal -->
+  <div id="edgeModal" class="modal">
+    <div class="content">
+      <span class="close">&times;</span>
+      <h3>New Edge</h3>
+      <form id="edgeForm">
+        <label>Type
+          <select id="edgeType">
+            <option value="volumetric">volumetric</option>
+            <option value="gas">gas</option>
+            <option value="thermal">thermal</option>
+          </select>
+        </label>
+        <div id="portField" style="display:none;">
+          <label>Source Port
+            <input type="number" id="edgePort" min="0" value="0">
+          </label>
+        </div>
+      </form>
+      <button id="saveEdgeBtn" style="margin-top:10px;">Create Edge</button>
+    </div>
+  </div>
+
+  <!-- libraries -->
+  <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+  <script src="https://unpkg.com/cytoscape-edgehandles/cytoscape-edgehandles.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
