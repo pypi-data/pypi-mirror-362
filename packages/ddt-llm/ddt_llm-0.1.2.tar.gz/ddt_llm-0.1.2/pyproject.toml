@@ -1,0 +1,47 @@
+[project]
+name = "ddt-llm"
+version = "0.1.2"
+description = "A CLI tool that crawls a directory and counts the tokens per filetype"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "jinja2>=3.1.6",
+    "openai>=1.63.2",
+    "pillow>=11.1.0",
+    "tiktoken>=0.9.0",
+]
+license = "MIT"
+
+[project.scripts]
+ddt = "ddt.__main__:main"
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "bandit>=1.8.5",
+    "basedpyright>=1.29.4",
+    "hatchling>=1.27.0",
+    "pytest>=8.4.0",
+    "pytest-cov>=6.2.1",
+    "pytest-xdist>=3.7.0",
+    "ruff>=0.11.13",
+    "ty>=0.0.1a8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ddt"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/ddt/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
