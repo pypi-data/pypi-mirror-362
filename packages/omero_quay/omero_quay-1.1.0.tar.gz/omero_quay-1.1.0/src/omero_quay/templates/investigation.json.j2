@@ -1,0 +1,22 @@
+    {% extends "collection.json.j2" %}
+    {% block id %}
+      "@id": "./",
+      "license": {"@id": "https://creativecommons.org/licenses/by/4.0/"},
+      "datePublished": "{{ manifest.creation_date[:10] }}",
+    {% endblock %}
+    {% block hasMember %}
+      {% for person in manifest.members  %}{"@id": "{{ person.first_name }} {{ person.last_name }}"}{% if not loop.last %},{% endif %}{% endfor %}
+    {% endblock %}
+    {% block hasPart %}
+      {% for study in manifest.studies %}{% if study.id in collection.children %}{"@id": "./{{ study.name }}"}{% if not loop.last %},{% endif %}{% endif %}{% endfor %}
+      {% for assay in manifest.assays if assay.id in collection.children %}{"@id": "./{{ collection.name }}/{{ assay.name }}"}{% if not loop.last %},{% endif %}{% endfor %}
+      {% if collection.images is defined %}
+        {% for image in manifest.images if image.id in collection.images %}{% for study in manifest.studies if study.id in collection.parents %}{"@id": "./{{ study.name }}/{{ collection.name }}/{{ image.name }}"}{% endfor %}{% if not loop.last %},{% endif %}{% endfor %}
+      {% endif %}
+    {% endblock %}
+    {% block keywords %}
+      {% for annotation in manifest.quay_annotations if annotation.ann_type == 'tag_annotation' and annotation.id in collection.quay_annotations %}{"item": "{{ annotation.value }}"}{% if not loop.last %},{% endif %}{% endfor %}
+    {% endblock %}
+    {% block subjectOf %}
+      {% for annotation in collection.quay_annotations if annotation.ann_type != 'tag_annotation' %}{"@id": "{{ annotation }}"}{% if not loop.last %},{% endif %}{% endfor %}
+    {% endblock %}

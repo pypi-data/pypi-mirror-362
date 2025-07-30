@@ -1,0 +1,61 @@
+<!-- # Define color code for job status dict -->
+<!-- state_color = { -->
+<!--     "started": "step", -->
+<!--     "checked": "complete", -->
+<!--     "changed": "active", -->
+<!--     "expired": "active", -->
+<!--     "errored": "error", -->
+<!-- } -->
+
+{% block content %}
+  <div class="col themed-grid-col">
+    Manager: {{ manifest.manager }}<br>
+    {% for inv in manifest.investigations %}
+    Owner: {{ inv.owner }}
+    {% endfor %}
+  </div>
+  <div class="col themed-grid-col" title={{ manifest.timestamps.0 }}>
+    Date: {{ manifest.timestamps.0 }}<br>
+    ID: {{ manifest.id }}<br>
+    Name: {% for inv in manifest.investigations %} {{ inv.name }} {% endfor %}
+  </div>
+  {% for job in jobs %}
+  <div class="col themed-grid-col">
+  {% for state in manifest.states %}
+  {% if state.scheme == job %}
+    {% if state.status == "started" %}
+    <span
+      class="badge bg-primary-subtle border border-primary-subtle text-primary-emphasis">
+      <img src="{% static "assets/play-button.png" %}" alt="check mark" width="20px" height="20px">
+      {{ state.scheme }}: {{ state.status }}
+    {% endif %}
+    {% if state.status == "checked" %}
+    <span
+      class="badge bg-success-subtle border border-success-subtle text-success-emphasis">
+      <img src="{% static "assets/check-mark.png" %}" alt="check mark" width="20px" height="20px">
+      {{ state.scheme }}: {{ state.status }}
+    {% endif %}
+    {% if state.status == "changed"  %}
+    <span
+      class="badge bg-primary-subtle border border-primary-subtle text-primary-emphasis">
+    <img src="{% static "assets/changed-arrows.png" %}" alt="check mark" width="20px" height="20px">
+      {{ state.scheme }}: {{ state.status }}
+    {% endif %}
+    {% if state.status == "expired"  %}
+    <span
+      class="badge bg-warning-subtle border border-warning-subtle text-warning-emphasis">
+      <img src="{% static "assets/changed-arrows.png" %}" alt="check mark" width="20px" height="20px">
+      {{ state.scheme }}: {{ state.status }}
+    {% endif %}
+    {% if state.status == "errored" %}
+    <span
+      class="badge bg-error-subtle border border-error-subtle text-error-emphasis">
+      <img src="{% static "assets/cross-mark.png" %}" alt="check mark" width="20px" height="20px">
+      {{ state.scheme }}: {{ state.status }}
+    {% endif %}
+    </span>
+  {% endif %}
+  {% endfor %}
+  </div>
+  {% endfor %}
+{% endblock %}
