@@ -1,0 +1,182 @@
+[build-system]
+requires = [
+    "pdm-backend",
+]
+build-backend = "pdm.backend"
+
+[project]
+name = "iblqt"
+description = "A collection of extensions to the Qt framework."
+dependencies = [
+    "qtpy>=2.4.1",
+    "pandas>2.0",
+    "numpy",
+    "pyqtgraph>=0.13.7",
+    "ONE-api>=3.0.0",
+    "iblutil>=1.20.0",
+]
+keywords = [
+    "pyqt",
+    "qt",
+    "pyside",
+    "qtpy",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+authors = [
+    { name = "Florian Rau", email = "bimac@users.noreply.github.com" },
+]
+dynamic = []
+version = "0.7.1"
+
+[project.license]
+text = "MIT"
+
+[project.optional-dependencies]
+pyqt5 = [
+    "PyQt5",
+    "PyQtWebEngine",
+]
+pyqt6 = [
+    "PyQt6",
+    "PyQt6-WebEngine",
+]
+pyside6 = [
+    "PySide6",
+]
+
+[project.urls]
+Homepage = "https://github.com/int-brain-lab/iblqt/"
+Documentation = "https://int-brain-lab.github.io/iblqt/"
+Repository = "https://github.com/int-brain-lab/iblqt.git"
+Issues = "https://github.com/int-brain-lab/iblqt/issues"
+Changelog = "https://github.com/int-brain-lab/iblqt/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    { include-group = "doc" },
+    { include-group = "lint" },
+    { include-group = "test" },
+    { include-group = "typing" },
+]
+doc = [
+    "sphinx>=7.0.0",
+    "myst-parser>=4.0.0",
+    "sphinx-autodoc-typehints>=2.3.0",
+    "sphinx-qt-documentation>=0.4.1",
+    "sphinx-rtd-theme>=2.0.0",
+    "sphinx-design>=0.6.1",
+    "sphinx-copybutton>=0.5.2",
+]
+lint = [
+    "ruff>=0.9.2",
+]
+test = [
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest-qt>=4.4.0",
+    "pytest-xvfb>=3.1.1",
+    "tox>=4.23.2",
+    "tox-uv>=1.26.1",
+]
+typing = [
+    "mypy>=1.14.1",
+    "pandas-stubs>=2.2.3.241126",
+    "types-requests>=2.32.0.20241016",
+    "PyQt5-stubs>=5.15.6.0",
+]
+ci = [
+    "coveralls>=4.0.1",
+    "pytest-github-actions-annotate-failures>=0.3.0",
+]
+
+[tool.uv]
+required-environments = [
+    "sys_platform == 'win32'",
+    "sys_platform == 'linux'",
+    "sys_platform == 'darwin'",
+]
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+excludes = [
+    "docs/source/api",
+]
+source-includes = [
+    "tests/*.py",
+    "resources/",
+    "docs/source/",
+]
+
+[tool.pdm.version]
+source = "file"
+path = "iblqt/__init__.py"
+
+[tool.ruff]
+include = [
+    "pyproject.toml",
+    "iblqt/**/*.py",
+    "tests/**/*.py",
+]
+exclude = [
+    "iblqt/resources.py",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint]
+extend-select = [
+    "D",
+    "I",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "D",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "ibl*",
+    "one*",
+]
+
+[tool.mypy]
+packages = [
+    "iblqt",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "iblutil.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=iblqt"
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+source_pkgs = [
+    "iblqt",
+]
+relative_files = true
+
+[tool.coverage.paths]
+source = [
+    "iblqt/",
+    ".tox/py*/lib/py*/site-packages/iblqt/",
+    ".tox/py*/Lib/site-packages/iblqt/",
+]
+
+[tool.tox]
+legacy_tox_ini = "[tox]\nenv_list = clean,typing,py{310,313}-{pyqt5,pyqt6,pyside6},report\n\n[testenv]\ndependency_groups = test\nrunner = uv-venv-lock-runner\n\n[testenv:py{310,313}-{pyqt5,pyqt6,pyside6}]\ndepends = clean\ncommands =\n  pytest\n  {env:POST_COMMAND:python --version}\ndependency_groups =\n  test\n  {env:EXTRA_DEPS:}\nextras=\n  pyqt5: pyqt5\n  pyqt6: pyqt6\n  pyside6: pyside6\nsetenv =\n  py310: PYTHON=py310\n  py313: PYTHON=py313\n  pyqt5: PYTEST_QT_API=pyqt5\n  pyqt6: PYTEST_QT_API=pyqt6\n  pyside6: PYTEST_QT_API=pyside6\n  COVERALLS_FLAG_NAME={env:PLATFORM}_{env:PYTHON}_{env:PYTEST_QT_API}\n  COVERAGE_FILE=.coverage.{env:PYTHON}.{env:PYTEST_QT_API}.xml\n  QTWEBENGINE_CHROMIUM_FLAGS=\"--disable-gpu\"\n  QT_QPA_PLATFORM=offscreen\n  QT_QUICK_BACKEND=software\n  QT_OPENGL=software\n  TOX=true\npassenv=\n  DISPLAY\n  XAUTHORITY\n  COLUMNS\n  GITHUB_*\n  EXTRA_DEPS\n\n[testenv:clean]\nskip_install = true\ncommands =\n  coverage erase\n\n[testenv:typing]\nskip_install = true\ndependency_groups = typing\nextras = pyqt5\ncommands = mypy --always-true=PYQT5 --always-false=PYQT6 --always-false=PYSIDE6\n\n[testenv:report]\ndepends = py{310,313}-{pyqt5,pyqt6,pyside6}\nskip_install = true\ncommands =\n  coverage combine\n"
