@@ -1,0 +1,96 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  CI_IMAGE: registry.gitlab.inria.fr/ncedilni/pyezzi:ci
+  MANYLINUX_IMAGE: registry.gitlab.inria.fr/ncedilni/pyezzi:manylinux
+  MANYLINUX_TARGET: manylinux_2_38_x86_64
+
+default:
+  tags:
+    - ci.inria.fr
+    - small
+
+tests:
+  stage: test
+  image: $CI_IMAGE
+  script:
+    - uv sync --frozen --all-groups
+    - coverage run -m pytest test
+    - coverage report
+    - coverage xml
+    - mypy
+    - pdoc pyezzi --math -o public
+  artifacts:
+    paths:
+      - public
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+build-sdist:
+  stage: build
+  image: $CI_IMAGE
+  artifacts:
+    paths:
+      - dist/
+  script: |
+    uv build --sdist
+
+build-wheels:
+  stage: build
+  image: $MANYLINUX_IMAGE
+  needs:
+    - build-sdist  # if we don't wait for build-sdist first, dist will not
+  artifacts:
+    paths:
+      - dist/
+  parallel:
+    matrix:
+      - PYTHON_VERSION:
+          - "10"
+          - "11"
+          - "12"
+          - "13"
+  script: |
+    python3.$PYTHON_VERSION -m build --wheel
+
+# wheels are $MANYLINUX_TARGET-compliant but there is no dedicated
+# container for that, so we need to call auditwheel afterward.
+wheel-repair:
+  stage: build
+  needs:
+    - build-wheels
+  image: $MANYLINUX_IMAGE
+  artifacts:
+    paths:
+      - dist/
+  script: |
+    auditwheel repair dist/*.whl --plat $MANYLINUX_TARGET --wheel-dir dist/
+    rm dist/*-linux_x86_64.whl
+    ls -l dist/
+
+publish-pypi:
+  only:
+    - tags
+  stage: deploy
+  image: $CI_IMAGE
+  needs:
+    - wheel-repair
+    - tests
+  script: |
+    ls dist/*
+    uv publish --token $PYPI_TOKEN
+
+create-pages:
+  stage: deploy
+  pages: true
+  script: ls public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_TAG
