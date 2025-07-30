@@ -1,0 +1,298 @@
+# DevMe Service Detection Patterns
+# This file defines how DevMe detects and monitors external services
+
+version: "0.2.0"
+description: "Service detection patterns for DevMe"
+
+services:
+  # AI/ML Services
+  openai:
+    name: "OpenAI API"
+    icon: "🤖"
+    category: "ai"
+    env_vars:
+      - "OPENAI_API_KEY"
+      - "OPENAI_ORG_ID"
+      - "OPENAI_BASE_URL"
+    packages:
+      python: ["openai"]
+      javascript: ["openai"]
+    health_check:
+      url: "https://api.openai.com/v1/models"
+      method: "GET"
+      headers:
+        Authorization: "Bearer {OPENAI_API_KEY}"
+      timeout: 10
+    required_for: ["ai_features", "chat_completion"]
+
+  anthropic:
+    name: "Anthropic Claude API"
+    icon: "🧠"
+    category: "ai"
+    env_vars:
+      - "ANTHROPIC_API_KEY"
+      - "CLAUDE_API_KEY"
+    packages:
+      python: ["anthropic"]
+      javascript: ["@anthropic-ai/sdk"]
+    health_check:
+      url: "https://api.anthropic.com/v1/messages"
+      method: "POST"
+      headers:
+        "x-api-key": "{ANTHROPIC_API_KEY}"
+      timeout: 10
+
+  # Database Services
+  supabase:
+    name: "Supabase"
+    icon: "🗄️"
+    category: "database"
+    env_vars:
+      - "SUPABASE_URL"
+      - "SUPABASE_KEY"
+      - "SUPABASE_SERVICE_KEY"
+      - "SUPABASE_ANON_KEY"
+    packages:
+      python: ["supabase"]
+      javascript: ["@supabase/supabase-js"]
+    files:
+      - "supabase/config.toml"
+    health_check:
+      url: "{SUPABASE_URL}/rest/v1/"
+      method: "GET"
+      headers:
+        apikey: "{SUPABASE_KEY}"
+      timeout: 5
+    required_for: ["database", "auth", "storage"]
+
+  postgresql:
+    name: "PostgreSQL"
+    icon: "🐘"
+    category: "database"
+    env_vars:
+      - "DATABASE_URL"
+      - "POSTGRES_URL"
+      - "PG_CONNECTION_STRING"
+      - "POSTGRESQL_URL"
+    packages:
+      python: ["psycopg2", "psycopg2-binary", "asyncpg"]
+      javascript: ["pg"]
+    required_for: ["database"]
+
+  mongodb:
+    name: "MongoDB"
+    icon: "🍃"
+    category: "database"
+    env_vars:
+      - "MONGO_URL"
+      - "MONGODB_URI"
+      - "MONGO_CONNECTION_STRING"
+    packages:
+      python: ["pymongo", "motor"]
+      javascript: ["mongodb"]
+    required_for: ["database"]
+
+  # Vector Databases
+  chroma:
+    name: "Chroma Vector Database"
+    icon: "🎨"
+    category: "vector_db"
+    env_vars:
+      - "CHROMA_API_KEY"
+      - "CHROMA_URL"
+      - "CHROMA_HOST"
+    packages:
+      python: ["chromadb"]
+    health_check:
+      url: "{CHROMA_URL}/api/v1/heartbeat"
+      method: "GET"
+      timeout: 5
+
+  pinecone:
+    name: "Pinecone"
+    icon: "🌲"
+    category: "vector_db"
+    env_vars:
+      - "PINECONE_API_KEY"
+      - "PINECONE_ENVIRONMENT"
+    packages:
+      python: ["pinecone-client"]
+    health_check:
+      url: "https://controller.{PINECONE_ENVIRONMENT}.pinecone.io/actions/whoami"
+      method: "GET"
+      headers:
+        Api-Key: "{PINECONE_API_KEY}"
+
+  # Deployment Platforms
+  railway:
+    name: "Railway"
+    icon: "🚂"
+    category: "deployment"
+    env_vars:
+      - "RAILWAY_TOKEN"
+      - "RAILWAY_PROJECT_ID"
+    files:
+      - "railway.toml"
+      - "railway.json"
+    health_check:
+      url: "https://backboard.railway.app/graphql/v2"
+      method: "POST"
+      headers:
+        Authorization: "Bearer {RAILWAY_TOKEN}"
+
+  vercel:
+    name: "Vercel"
+    icon: "▲"
+    category: "deployment"
+    env_vars:
+      - "VERCEL_TOKEN"
+      - "VERCEL_PROJECT_ID"
+    files:
+      - "vercel.json"
+      - ".vercel/project.json"
+    packages:
+      javascript: ["@vercel/node"]
+
+  netlify:
+    name: "Netlify"
+    icon: "🌐"
+    category: "deployment"
+    env_vars:
+      - "NETLIFY_AUTH_TOKEN"
+      - "NETLIFY_SITE_ID"
+    files:
+      - "netlify.toml"
+      - "_redirects"
+
+  # Cloud Providers
+  aws:
+    name: "Amazon Web Services"
+    icon: "☁️"
+    category: "cloud"
+    env_vars:
+      - "AWS_ACCESS_KEY_ID"
+      - "AWS_SECRET_ACCESS_KEY"
+      - "AWS_REGION"
+      - "AWS_PROFILE"
+    packages:
+      python: ["boto3", "aws-cdk-lib"]
+      javascript: ["aws-sdk", "@aws-sdk/client-s3"]
+    files:
+      - "aws-exports.js"
+      - ".aws/config"
+
+  gcp:
+    name: "Google Cloud Platform"
+    icon: "☁️"
+    category: "cloud"
+    env_vars:
+      - "GOOGLE_CLOUD_PROJECT"
+      - "GOOGLE_APPLICATION_CREDENTIALS"
+      - "GCP_PROJECT_ID"
+    packages:
+      python: ["google-cloud-storage", "google-auth"]
+      javascript: ["@google-cloud/storage"]
+
+  # Authentication
+  auth0:
+    name: "Auth0"
+    icon: "🔐"
+    category: "auth"
+    env_vars:
+      - "AUTH0_DOMAIN"
+      - "AUTH0_CLIENT_ID"
+      - "AUTH0_CLIENT_SECRET"
+    packages:
+      python: ["auth0-python"]
+      javascript: ["@auth0/auth0-react"]
+
+  clerk:
+    name: "Clerk"
+    icon: "🔑"
+    category: "auth"
+    env_vars:
+      - "CLERK_PUBLISHABLE_KEY"
+      - "CLERK_SECRET_KEY"
+    packages:
+      javascript: ["@clerk/nextjs", "@clerk/clerk-react"]
+
+  # Monitoring & Analytics
+  sentry:
+    name: "Sentry"
+    icon: "🔍"
+    category: "monitoring"
+    env_vars:
+      - "SENTRY_DSN"
+      - "SENTRY_AUTH_TOKEN"
+    packages:
+      python: ["sentry-sdk"]
+      javascript: ["@sentry/node", "@sentry/react"]
+
+  datadog:
+    name: "Datadog"
+    icon: "📊"
+    category: "monitoring"
+    env_vars:
+      - "DD_API_KEY"
+      - "DD_APP_KEY"
+      - "DATADOG_API_KEY"
+    packages:
+      python: ["datadog"]
+      javascript: ["dd-trace"]
+
+  # Email Services
+  sendgrid:
+    name: "SendGrid"
+    icon: "📧"
+    category: "email"
+    env_vars:
+      - "SENDGRID_API_KEY"
+    packages:
+      python: ["sendgrid"]
+      javascript: ["@sendgrid/mail"]
+
+  resend:
+    name: "Resend"
+    icon: "📨"
+    category: "email"
+    env_vars:
+      - "RESEND_API_KEY"
+    packages:
+      python: ["resend"]
+      javascript: ["resend"]
+
+  # Payment Processing
+  stripe:
+    name: "Stripe"
+    icon: "💳"
+    category: "payment"
+    env_vars:
+      - "STRIPE_SECRET_KEY"
+      - "STRIPE_PUBLISHABLE_KEY"
+      - "STRIPE_WEBHOOK_SECRET"
+    packages:
+      python: ["stripe"]
+      javascript: ["stripe"]
+
+# Detection patterns for environment variables
+env_patterns:
+  api_key: ["*_API_KEY", "*_KEY", "*_SECRET"]
+  database: ["*_DATABASE_URL", "*_DB_*", "*_MONGO*", "*_POSTGRES*"]
+  url: ["*_URL", "*_ENDPOINT", "*_HOST"]
+  token: ["*_TOKEN", "*_AUTH*"]
+
+# File patterns that indicate specific services
+file_patterns:
+  docker: ["Dockerfile", "docker-compose.yml", ".dockerignore"]
+  kubernetes: ["*.yaml", "*.yml"]
+  terraform: ["*.tf", "terraform.tfvars"]
+  github_actions: [".github/workflows/*.yml", ".github/workflows/*.yaml"]
+  
+# Package patterns for different languages
+package_files:
+  python: ["requirements.txt", "pyproject.toml", "setup.py", "Pipfile"]
+  javascript: ["package.json", "package-lock.json", "yarn.lock"]
+  go: ["go.mod", "go.sum"]
+  rust: ["Cargo.toml", "Cargo.lock"]
+  php: ["composer.json", "composer.lock"]
+  java: ["pom.xml", "build.gradle"]
