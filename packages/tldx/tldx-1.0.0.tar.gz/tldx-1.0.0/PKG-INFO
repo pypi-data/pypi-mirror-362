@@ -1,0 +1,90 @@
+Metadata-Version: 2.2
+Name: tldx
+Version: 1.0.0
+Summary: TLD Expansion Tool for Bug Bounty Reconnaissance
+Home-page: https://github.com/LocaMartin/tldx
+Author: Loca Martin
+Author-email: locaboyff@gmail.com
+Keywords: bugbounty recon tld security
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Security
+Classifier: Intended Audience :: Information Technology
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.25.1
+Requires-Dist: argparse>=1.4.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# TLDX - TLD Expansion Tool for Bug Bounty
+
+Expand keywords across all TLDs to discover hidden assets during reconnaissance.
+
+## Features
+- Generate domain permutations (keyword + TLD)
+- Supports single keywords or keyword files
+- Uses official IANA TLD list
+- Custom TLD lists support
+- Output to console or file
+
+## Installation
+```bash
+pip install tldx
+```
+### Usage
+```yaml
+# Single keyword
+tldx -k google
+
+# Keyword file
+tldx -kf keywords.txt
+
+# Save output
+tldx -k admin -o targets.txt
+
+# Custom TLD list
+tldx -k test -t custom_tlds.txt
+
+# Verbose mode
+tldx -k dev -v
+```
+### Example
+
+```yaml
+# Generate government domains
+tldx -k gov | head -5
+gov.aaa
+gov.aarp
+gov.abb
+gov.abbott
+gov.abbvie
+
+# Pipe to DNS resolver
+tldx -k api | dnsx -silent
+
+# Full recon workflow
+tldx -kf keywords.txt | httpx -silent | nuclei -t vulnerabilities/
+```
+
+```yaml
+tldx/
+├── setup.py
+├── requirements.txt
+├── README.md
+├── tldx/
+│   ├── __init__.py
+│   ├── cli.py
+│   └── core.py
+└── tests/
+    └── test_tldx.py
+```
