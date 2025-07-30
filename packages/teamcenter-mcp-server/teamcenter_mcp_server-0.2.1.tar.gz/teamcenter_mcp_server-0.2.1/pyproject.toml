@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "teamcenter-mcp-server"
+version = "0.2.1"
+description = "MCP server for Teamcenter Knowledge Base with Azure AD and cookie authentication"
+readme = "README_MCP.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Siemens Digital Industries Software"}]
+keywords = ["mcp", "teamcenter", "siemens", "ai", "llm"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn>=0.24.0",
+    "fastmcp>=0.1.0",
+    "httpx>=0.24.0",
+    "requests>=2.28.0",
+    "msal>=1.20.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/siemens/teamcenter-mcp-server"
+"Bug Reports" = "https://github.com/siemens/teamcenter-mcp-server/issues"
+"Documentation" = "https://github.com/siemens/teamcenter-mcp-server#readme"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+teamcenter-mcp-server = "auth_mcp_stdio_v2:main"
+teamcenter-auth-helper = "auth_helper:main"
+
+[tool.setuptools]
+py-modules = ["auth_mcp_stdio_v2", "auth_mcp_stdio", "auth_helper"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
