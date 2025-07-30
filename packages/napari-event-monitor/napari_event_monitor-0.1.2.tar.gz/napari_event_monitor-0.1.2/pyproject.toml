@@ -1,0 +1,33 @@
+[build-system]
+requires= ["setuptools>=42.0.0", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "napari-event-monitor"
+dynamic = ["version"]
+authors = [{ name= "Ian Coccimiglio", email="icoccimi@gmail.com"}]
+description = "Dynamic event monitoring and diagnostics in napari"
+readme = "README.md"
+requires-python = ">3.10"
+classifiers = ["Programming Language :: Python :: 3",
+    		"Operating System :: OS Independent",
+		"Framework :: napari"]
+license="MIT"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml"]
+
+[tool.setuptools_scm]
+
+[project.entry-points."napari.manifest"]
+napari-event-monitor = "napari_event_monitor:napari.yaml"
+
+[project.urls]
+Homepage="https://github.com/ian-coccimiglio/napari-event-monitor"
+Issues="https://github.com/ian-coccimiglio/napari-event-monitor/issues/"
