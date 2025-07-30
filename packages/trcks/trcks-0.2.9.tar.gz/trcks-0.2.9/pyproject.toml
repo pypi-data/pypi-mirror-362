@@ -1,0 +1,143 @@
+[build-system]
+build-backend = "pdm.backend"
+requires = [
+    "pdm-backend >= 2.4, <3",
+]
+
+[dependency-groups]
+dev = [
+    "mypy == 1.16.1",
+    "pre-commit == 4.2.0",
+    "pydoctor == 25.4.0",
+    "pyright[nodejs] == 1.1.403",
+    "pytest == 8.4.1",
+    "pytest-asyncio == 1.0.0",
+    "pytest-cov == 6.2.1",
+    "pytest-doctestplus == 1.4.0",
+]
+
+[project]
+authors = [
+    { name = "Christoph Gietl" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "typing-extensions >= 4.12 ; python_full_version < '3.13'",
+]
+description = "Typesafe railway-oriented programming (ROP)"
+dynamic = []
+keywords = [
+    "composition",
+    "control flow",
+    "error handling",
+    "fp",
+    "functional programming",
+    "monad",
+    "object-oriented programming",
+    "oop",
+    "pipeline",
+    "railway-oriented programming",
+    "result type",
+    "rop",
+    "static typing",
+    "type safety",
+]
+license = "MIT"
+license-files = [
+    "LICEN[CS]E*",
+]
+maintainers = [
+    { name = "Christoph Gietl" },
+]
+name = "trcks"
+readme = "README.md"
+requires-python = ">=3.9"
+version = "0.2.9"
+
+[project.urls]
+Documentation = "https://christophgietl.github.io/trcks/"
+Issues = "https://github.com/christophgietl/trcks/issues"
+Repository = "https://github.com/christophgietl/trcks.git"
+
+[tool.mypy]
+disallow_any_decorated = true
+disallow_any_explicit = true
+disallow_any_unimported = true
+disallow_redefinition = true
+disallow_untyped_globals = true
+files = "."
+strict = true
+strict_bytes = true
+warn_incomplete_stub = true
+warn_unreachable = true
+
+[tool.pdm.version]
+source = "scm"
+
+[tool.pydoctor]
+add-package = [
+    "src/trcks",
+]
+html-base-url = "https://christophgietl.github.io/trcks"
+html-viewsource-base = "https://github.com/christophgietl/trcks/blob/main"
+intersphinx = [
+    "https://docs.python.org/3/objects.inv",
+    "https://typing-extensions.readthedocs.io/en/latest/objects.inv",
+]
+project-name = "trcks"
+project-url = "https://github.com/christophgietl/trcks"
+warnings-as-errors = true
+
+[tool.pyright]
+deprecateTypingAliases = true
+pythonVersion = "3.9"
+reportCallInDefaultInitializer = true
+reportImplicitOverride = true
+reportImplicitStringConcatenation = true
+reportImportCycles = true
+reportMissingSuperCall = true
+reportPropertyTypeMismatch = true
+reportShadowedImports = true
+reportUninitializedInstanceVariable = true
+reportUnnecessaryTypeIgnoreComment = true
+reportUnusedCallResult = true
+typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+addopts = "--cov=trcks --cov-fail-under=100 --cov-report=term-missing --doctest-glob='*.md'"
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
+doctest_plus = "enabled"
+
+[tool.ruff.lint]
+ignore = [
+    "COM812",
+    "D205",
+]
+select = [
+    "ALL",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "D",
+    "INP001",
+    "S101",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
