@@ -1,0 +1,52 @@
+[project]
+name = "rag_evaluation"
+version = "0.2.2"
+description = "A robust Python package for evaluating Retrieval-Augmented Generation (RAG) systems."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "Ola Akindele", email = "akindele.ok@gmail.com" }
+]
+keywords = ["rag", "nlp", "evaluation"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3.10",
+  "Intended Audience :: Developers",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+dependencies = [
+  "numpy>=1.25",
+  "pandas>=2.0",
+  "python-dotenv>=0.21",
+  "openai>=1.58.1,<2",
+  "google-genai>=1.15,<2",
+  "httpx>=0.28.1,<1",
+  "transformers>=4.30.0",
+  "torch>=2.0.0",
+  "accelerate>=0.20.0",
+  "sentencepiece>=0.1.97",
+  "protobuf>=3.20.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/OlaAkindele/rag_evaluation"
+
+
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["rag_evaluation", "rag_evaluation.*"]
+exclude = ["gpt_evaluation", "gpt_evaluation.*"]
+
+
+[build-system]
+requires = [
+  "setuptools>=61.0",
+  "wheel"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+build-backend = "setuptools.build_meta"
