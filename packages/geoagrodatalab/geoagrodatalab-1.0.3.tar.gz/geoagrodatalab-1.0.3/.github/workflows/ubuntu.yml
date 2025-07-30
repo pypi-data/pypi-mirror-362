@@ -1,0 +1,58 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+name: Linux build
+
+jobs:
+  py-check:
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: ubuntu-latest, py: "3.8" }
+          - { os: ubuntu-latest, py: "3.9" }
+          - { os: ubuntu-latest, py: "3.10" }
+          - { os: ubuntu-latest, py: "3.11" }
+    name: ${{ matrix.config.os }} (${{ matrix.config.py }})
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.config.py }}
+
+      - name: Install GDAL
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir Cython
+          if [ "${{ matrix.config.py }}" = "3.8" ]; then
+            # En 3.8 instalamos GDAL<3.11 para usar wheel y evitar compilación fallida
+            pip install --find-links=https://girder.github.io/large_image_wheels --no-cache "GDAL<3.11"
+          else
+            # En 3.9+ instalamos la última versión (3.11.x) desde wheels
+            pip install --find-links=https://girder.github.io/large_image_wheels --no-cache GDAL
+          fi
+
+      - name: Test GDAL installation
+        run: |
+          python -c "from osgeo import gdal"
+          gdalinfo --version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install --user -r requirements.txt
+          pip install --user .
+
+      - name: PKG-TEST
+        run: |
+          python -m unittest discover tests/
+
