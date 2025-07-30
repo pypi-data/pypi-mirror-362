@@ -1,0 +1,79 @@
+Metadata-Version: 2.4
+Name: aresxq
+Version: 1.0.1
+Summary: ARES-X/Q: Quantum-safe encryption with ARX cipher, Kyber-style KEM, and AEAD
+Home-page: https://github.com/fb6si15/aresxq
+Author: Joaquin Martinez
+Author-email: your@email.com
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Security :: Cryptography
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pycryptodome
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+
+# 🔐 ARES-X/Q: Quantum-Safe Encryption Library
+
+**ARES-X/Q** (*Advanced Resilient Encryption Standard – eXtended*) is a modern, quantum-resistant encryption system co-created by **Joaquin Martinez** and **ChatGPT**. It combines post-quantum key exchange (Kyber-style), 512-bit symmetric encryption, and built-in authenticated encryption (AEAD) in a modular, developer-friendly library.
+
+## ✨ Features
+- 🛡️ Quantum-safe (simulated Kyber1024)
+- 🔒 ARX-based symmetric cipher (ChaCha placeholder)
+- ✅ Built-in AEAD with PolyMAC-256
+- 📦 Modular: swap out cipher, MAC, or KDF
+- 🧪 Easy testing, extensible, Python-first
+
+## 🚀 Install
+
+```bash
+git clone https://github.com/fb6si15/aresxq.git
+cd aresxq
+pip install -r requirements.txt
+```
+
+## 🔧 Example
+
+```python
+from aresxq import encrypt, decrypt
+
+plaintext = b"Secret message"
+aad = b"header-info"
+
+enc_data = encrypt(plaintext, aad)
+decrypted = decrypt(enc_data, aad)
+
+assert decrypted == plaintext
+```
+
+## 📁 Project Structure
+
+```
+aresxq/
+├── pqc/        # Post-quantum key exchange (Kyber simulated)
+├── kdf/        # HKDF-SHA3-512
+├── cipher/     # ARX cipher (ChaCha20 for now)
+├── aead/       # XAEAD (Authenticated Encryption)
+├── demo/       # Example interface
+├── tests/      # Unit tests
+```
+
+## 📜 License
+
+MIT © 2025 Joaquin Martinez + ChatGPT
