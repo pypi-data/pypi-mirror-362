@@ -1,0 +1,4 @@
+import os
+
+SERVICE_NAME = os.getenv("SERVICE_NAME", "UNKNOWN")
+SERVICE_VERSION = os.getenv("SERVICE_VERSION", "UNKNOWN")
