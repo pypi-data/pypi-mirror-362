@@ -1,0 +1,112 @@
+Metadata-Version: 2.1
+Name: amiyabot
+Version: 2.0.8
+Summary: Python 异步渐进式机器人框架
+Home-page: https://www.amiyabot.com
+Author: vivien8261
+Author-email: 826197021@qq.com
+License: MIT Licence
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: aiohttp~=3.12.13
+Requires-Dist: amiyahttp~=0.0.7
+Requires-Dist: amiyalog~=0.0.3
+Requires-Dist: amiyautils~=0.0.2
+Requires-Dist: apscheduler~=3.11.0
+Requires-Dist: dhash~=1.4
+Requires-Dist: graiax-silkcoder~=0.3.6
+Requires-Dist: jieba~=0.42.1
+Requires-Dist: peewee~=3.18.1
+Requires-Dist: pillow~=11.2.1
+Requires-Dist: playwright~=1.53.0
+Requires-Dist: pymysql~=1.1.1
+Requires-Dist: audioop-lts~=0.2.1; python_version >= "3.13"
+
+# Amiya-Bot
+
+![PyPI](https://img.shields.io/pypi/v/amiyabot)
+
+简洁高效的 Python 异步渐进式 QQ 机器人框架！
+
+现已支持：
+
+- [QQ频道机器人](https://www.amiyabot.com/develop/adapters/qqChannel)
+- [QQ群机器人](https://www.amiyabot.com/develop/adapters/qqGroup)
+- [QQ全域机器人](https://www.amiyabot.com/develop/adapters/qqGlobal)
+- [KOOK机器人](https://www.amiyabot.com/develop/adapters/kook)
+- [Mirai-Api-Http](https://www.amiyabot.com/develop/adapters/mah)
+- [Go-CQHttp](https://www.amiyabot.com/develop/adapters/gocq)
+- [ComWeChatBot Client](https://www.amiyabot.com/develop/adapters/comwechat)
+- [OneBot 11](https://www.amiyabot.com/develop/adapters/onebot11)
+- [OneBot 12](https://www.amiyabot.com/develop/adapters/onebot12)
+
+官方文档：[www.amiyabot.com](https://www.amiyabot.com/)
+
+## Install
+
+    pip install amiyabot
+
+## Get started
+
+```python
+import asyncio
+
+from amiyabot import AmiyaBot, Message, Chain
+
+bot = AmiyaBot(appid='******', token='******')
+
+
+@bot.on_message(keywords='hello')
+async def _(data: Message):
+    return Chain(data).text(f'hello, {data.nickname}')
+
+
+asyncio.run(bot.start())
+```
+
+### 多账户
+
+```python
+import asyncio
+
+from amiyabot import MultipleAccounts, AmiyaBot, Message, Chain
+
+bots = MultipleAccounts(
+    AmiyaBot(appid='******', token='******'),
+    AmiyaBot(appid='******', token='******'),
+    ...
+)
+
+
+@bots.on_message(keywords='hello')
+async def _(data: Message):
+    return Chain(data).text(f'hello, {data.nickname}')
+
+
+asyncio.run(bots.start())
+```
+
+### 使用适配器
+
+```python
+import asyncio
+
+from amiyabot import AmiyaBot, Message, Chain
+from amiyabot.adapters.onebot.v11 import onebot11
+
+bot = AmiyaBot(
+    appid='******',
+    token='******',
+    adapter=onebot11(host='127.0.0.1', http_port=8080, ws_port=8060)
+)
+
+
+@bot.on_message(keywords='hello')
+async def _(data: Message):
+    return Chain(data).text(f'hello, {data.nickname}')
+
+
+asyncio.run(bot.start())
+```
+
