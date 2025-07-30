@@ -1,0 +1,67 @@
+name: Tests
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  tests:
+    env:
+      ENV_NAME: tests
+      PYTHON: ${{ matrix.python-version }}
+      OS: ${{ matrix.os }}
+    name: Testing
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.11", "3.12"]
+    defaults:
+     run:
+       # Adding -l {0} ensures conda can be found properly in each step
+       shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          # auto-update-conda: true
+          channels: conda-forge,defaults
+          python-version: ${{ matrix.python-version }}
+          channel-priority: true
+
+      - name: Install Non-Python Dependencies
+        run: |
+          conda install fftw gsl
+
+      - name: Install the Package
+        run: pip install ".[dev]" --pre
+
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+          poetry --version
+
+      - name: Install ska-ost-array
+        run: |
+          git clone https://gitlab.com/ska-telescope/ost/ska-ost-array-config.git
+          cd ska-ost-array-config
+          poetry install
+          cd ..
+
+      - name: Run Tests
+        run: |
+          coverage run -m pytest
+
+      - name: Upload coverage report
+        if: matrix.os == 'ubuntu-latest' && success()
+        uses: codecov/codecov-action@v5.4.3
+        with:
+          files: "./coverage.xml"
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
