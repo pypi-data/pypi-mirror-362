@@ -1,0 +1,16 @@
+# docker/Dockerfile.gpu
+FROM nvidia/cuda:12.1.0-base-ubuntu22.04
+
+# Set up the base environment
+# (This is a simplified example, a real implementation would be more complex)
+RUN apt-get update && apt-get install -y python3.11 python3-pip
+
+# Copy the application code
+COPY . /app
+WORKDIR /app
+
+# Install dependencies
+RUN pip install -e ".[gpu]"
+
+# Run the application
+CMD ["python", "-m", "openrxn_perovskite_optimizer"]

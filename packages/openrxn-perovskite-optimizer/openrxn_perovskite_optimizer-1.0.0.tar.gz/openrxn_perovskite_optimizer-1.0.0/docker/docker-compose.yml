@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    volumes:
+      - ..:/app
+      - ~/.cache/uv:/root/.cache/uv
+    ports:
+      - "8000:8000"
+      - "8501:8501"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/openrxn
+      - REDIS_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - db
+      - redis
+    command: tail -f /dev/null
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=openrxn
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    volumes:
+      - ..:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/openrxn
+      - REDIS_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - db
+      - redis
+    command: >
+      bash -c "
+        source .venv/bin/activate &&
+        celery -A openrxn_perovskite_optimizer.tasks worker --loglevel=info
+      "
+
+volumes:
+  postgres_data:
+  redis_data:

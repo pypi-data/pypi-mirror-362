@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openrxn-app
+  namespace: openrxn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openrxn-app
+  template:
+    metadata:
+      labels:
+        app: openrxn-app
+    spec:
+      containers:
+      - name: openrxn-app
+        image: openrxn/perovskite-optimizer:latest
+        ports:
+        - containerPort: 8000
