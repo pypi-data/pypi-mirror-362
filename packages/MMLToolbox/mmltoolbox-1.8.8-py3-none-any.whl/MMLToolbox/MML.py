@@ -1,0 +1,2 @@
+class MML():
+  pass
