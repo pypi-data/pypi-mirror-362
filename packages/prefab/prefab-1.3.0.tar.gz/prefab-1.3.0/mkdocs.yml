@@ -1,0 +1,114 @@
+site_name: "PreFab Docs"
+
+site_url: https://docs.prefabphotonics.com/
+repo_url: https://github.com/PreFab-Photonics/PreFab
+repo_name: PreFab-Photonics/PreFab
+
+nav:
+  - Home: index.md
+  - Setup: setup.md
+  - Fab-aware design: fab_aware_design.md
+  - Model library: models.md
+  - Changelog: CHANGELOG.md
+  - Blog: blog/index.md
+  - Examples:
+      - Making a prediction: examples/1_prediction.ipynb
+      - Making a correction: examples/2_correction.ipynb
+      - Working with sidewall angles: examples/3_sidewall_angle.ipynb
+      - SEM generation: examples/4_SEM_generation.ipynb
+      - Simulating a predicted device: examples/5_prediction_simulation.ipynb
+      - Fabrication-aware inverse design: examples/6_fabrication-aware_inverse_design.ipynb
+      - Simulating sidewall angle: examples/7_sidewall_simulation.ipynb
+  - Reference:
+      - Compare: reference/compare.md
+      - Device: reference/device.md
+      - Geometry: reference/geometry.md
+      - Models: reference/models.md
+      - Predict: reference/predict.md
+      - Read: reference/read.md
+      - Shapes: reference/shapes.md
+
+theme:
+  name: "material"
+  custom_dir: docs/overrides
+  palette:
+    scheme: prefab
+  font:
+    text: Geist
+    code: Geist Mono
+  language: en
+  logo: assets/prefab_logo_box.svg
+  favicon: assets/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - announce.dismiss
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.sections
+    - navigation.footer
+    - content.code.copy
+
+extra:
+  homepage: https://prefabphotonics.com
+  # consent:
+  #   title: Cookie consent
+  #   description: >-
+  #     We use cookies to recognize your repeated visits and preferences, as well
+  #     as to measure the effectiveness of our documentation and whether users
+  #     find what they're searching for. With your consent, you're helping us to
+  #     make our documentation better.
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/PreFab-Photonics/PreFab
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/102847109/
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/prefab/
+
+copyright: Copyright &copy; 2025 PreFab Photonics
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - footnotes
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - md_in_html
+  - codehilite
+
+plugins:
+  - search
+  - blog:
+      authors: true
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            docstring_style: numpy
+            show_docstring_examples: true
+  - mkdocs-jupyter:
+      include_source: true
+      theme: dark
+
+extra_css:
+  - stylesheets/extra.css

@@ -1,0 +1,36 @@
+name: Deploy PreFab Docs
+on:
+  push:
+    branches:
+      - master
+      - main
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - id: get_cache_id
+        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          key: mkdocs-material-${{ steps.get_cache_id.outputs.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - run: pip install mkdocs
+      - run: pip install mkdocs-material
+      - run: pip install mkdocstrings[python]
+      - run: pip install mkdocs-jupyter
+      - run: pip install mistune==3.0
+      - name: Create CNAME file
+        run: echo "docs.prefabphotonics.com" > docs/CNAME
+      - run: mkdocs gh-deploy --force
