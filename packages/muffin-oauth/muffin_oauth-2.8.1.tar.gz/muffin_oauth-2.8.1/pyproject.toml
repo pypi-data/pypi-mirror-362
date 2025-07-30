@@ -1,0 +1,97 @@
+[tool.poetry]
+name = "muffin-oauth"
+version = "2.8.1"
+description = "Support OAuth authentication for Muffin Framework."
+readme = "README.md"
+license = "MIT"
+authors = ["Kirill Klenov <horneds@gmail.com>"]
+keywords = ["asgi", "asyncio", "authorization", "muffin", "oauth", "trio"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Internet :: WWW/HTTP",
+  "Framework :: AsyncIO",
+  "Framework :: Trio",
+]
+homepage = "https://github.com/klen/muffin-oauth"
+repository = "https://github.com/klen/muffin-oauth"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+muffin = "*"
+aioauth-client = "*"
+uvicorn = { version = "*", optional = true }
+
+[tool.poetry.group.tests.dependencies]
+ruff = "*"
+pytest = "*"
+pytest-mypy = "*"
+pytest-aio = { version = "*", extras = ["curio", "trio"] }
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "*"
+
+[tool.poetry.extras]
+uvicorn = ["uvicorn"]
+
+[tool.pytest.ini_options]
+addopts = "-xsv tests.py"
+log_cli = true
+
+[tool.mypy]
+packages = ["muffin_oauth"]
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py310,py311,py312,py313,pypy310
+
+[testenv]
+deps = -e .[tests]
+commands =
+	pytest --mypy tests.py
+
+[testenv:pypy310]
+deps = -e .[tests]
+commands =
+	pytest tests.py
+"""
+
+[tool.ruff]
+fix = true
+line-length = 100
+target-version = "py310"
+exclude = [".venv", "docs", "examples"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "A003",
+  "ANN",
+  "D",
+  "DJ",
+  "EM",
+  "N804",
+  "PLR0912",
+  "PLR2004",
+  "RET",
+  "RSE",
+  "S101",
+  "SLF",
+  "TRY003",
+  "UP",
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
