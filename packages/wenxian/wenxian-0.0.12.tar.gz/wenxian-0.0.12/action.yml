@@ -1,0 +1,26 @@
+name: "run-wenxian"
+description: "Generate BibTeX files from given identifiers (DOI, PMID, or arXiv ID)"
+inputs:
+  id:
+    description: "DOI, PMID, or arXiv ID. Use space to separate multiple identifiers."
+    required: true
+outputs:
+  bibtex:
+    description: "Generated BibTeX entry"
+    value: ${{ steps.run-wenxian.outputs.bibtex }}
+runs:
+  using: composite
+  steps:
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v6
+    - name: Run wenxian
+      id: run-wenxian
+      run: |
+        {
+          echo 'bibtex<<EOF'
+          uvx --from ${{ github.action_path }} wenxian from $INPUT_IDENTIFIER
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+      shell: bash
+      env:
+        INPUT_IDENTIFIER: ${{ inputs.id }}
