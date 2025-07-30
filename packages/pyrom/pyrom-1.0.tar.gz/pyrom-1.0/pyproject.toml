@@ -1,0 +1,97 @@
+# SPDX-FileCopyrightText: © 2025 Corn
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "pyrom"
+dynamic = ["version", "description"]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["rich>=13.9.4"]
+authors = [{ name = "1corn2" }]
+maintainers = [{ name = "1corn2" }]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSES/GPL-3.0-or-later.txt"]
+classifiers = [
+	"Development Status :: 5 - Production/Stable",
+	"Environment :: Console",
+	"Intended Audience :: End Users/Desktop",
+	"Natural Language :: English",
+	"Operating System :: POSIX",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
+	"Topic :: Utilities",
+	"Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/1corn2/PyRom"
+GitHub = "https://github.com/1corn2/PyRom"
+# TODO: keywords
+
+[project.scripts]
+pyrom = "pyrom.__main__:main"
+pyrom-resolve = "pyrom.__main__:resolve"
+pyrom-morph = "pyrom.__main__:morph"
+
+[project.optional-dependencies]
+blake3 = ["blake3>=1.0.5"]
+xxhash = ["xxhash>=3.5.0"]
+lxml = ["lxml>=6.0.0"]
+
+[dependency-groups]
+dev = [
+	"coverage>=7.9.2",
+	"pyfakefs>=5.9.1",
+	"pytest>=8.4.1",
+	"xmlschema>=3.4.3",
+	"nox>=2025.5.1",    # for type-checking noxfile.py
+]
+
+[tool.flit.external-data]
+directory = "data"
+
+[tool.ruff]
+line-length = 100
+[tool.ruff.format]
+indent-style = "tab"
+[tool.ruff.lint]
+select = [
+	"E",
+	"F",
+	"W",
+	"I",
+	"N",
+	"UP",
+	"YTT",
+	"B",
+	"A",
+	"SIM",
+	"PL",
+	"PT",
+	"PERF",
+	"RUF",
+	"FURB",
+	"TRY",
+	"TC",
+	"T10",
+	"C4",
+	"ICN",
+	"PIE",
+	"PT",
+	"RET",
+]
+ignore = ["W191", "PLR0912", "PLR0913", "PLR0915", "TRY003", "PLR2004", "N812"]
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+markers = ["shortcut: For testing shortcuts in code with coverage"]
+
+[tool.coverage.run]
+omit = ["./pyrom/__main__.py", "./pyrom/stats.py"]
+parallel = true
+branch = true
